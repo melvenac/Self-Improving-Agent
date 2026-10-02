@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 262 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 264 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -41,25 +41,28 @@ _None._
 - D-081/084/088 T-194 r6-r8 inversion; D-089 option 3 then 2; D-090 public + ruleset
 - D-086/087 Aaron's merges, r7 to Forge, step 4 on the laptop
 
-## developer [sia-builder] _(written session 152)_
+## developer [sia-builder] _(written session 156)_
 
 ### Pick up here
 
-Builder seat (Claude Code, desktop) is being moved to the QA PC. Every branch below is pushed to origin and read back with ls-remote. T-201 (P0, /start names the seat's assignment; builds on T-200) is NEXT, NOT STARTED, brief pending from Atlas. T-199 moved to Forge (loop/t199-missing-handoff). DONE and pushed, none merged (except PR 222 which Atlas merges on CLEAN), none CI-run (D-061): T-194 r2b on loop/t194-planner-hook 0f69e041 (product 699789e1; mutants loop/t194-r2-mut-m1..m5, old loop/t194-planner-hook-mut-ph1..8); T-200 on loop/t200-record-from-master 5b9eab0a (product 92f9cc0f; mutants loop/t200-mut-m1..m6); T-164 on loop/t164-record-session-number 567657af (mutant loop/t164-record-session-number-mut-sc4 956755d6); TG-2 fixture fix on fix/tg2-fixture-record a4d540cf, PR 222 (mutant loop/tg2-mut-drop-scan b4bc641b); T-196+T-197 merge on loop/t196-t197-merge dde3cf5d, PR 220. Handoffs in docs/loops/t194-developer-handoff.md and docs/loops/t200-developer-handoff.md. This write is the SECOND attempt (session 152, on rev 183); the first, docs/forge-session-t200-handoff 611d1721 on rev 178, is kept only as its record.
+Builder seat (Claude Code, sia-builder checkout on the QA PC), rolled by Aaron. Nothing is uncommitted or unpushed. Delivered and pushed this stretch: T-216 (9a0973f0, merged), T-214 (caebe8b6, QA 239), slice four step 2 on loop/15-slice-4-step2 (r1 2d4cd863, r2 779be4d6, r3 36a0fc28, r4 8a6cfb2d, r5 1311c2a7; QA 244 accepted r4, r5 scoped the S4-5b guard after PR #254's merge-ref CI failed it), and T-217/T-218 (1a38e3f2, merged as #256). No assignment is open: the next work is an Atlas dispatch. SIA master now has ruleset 24343321, so a branch reaches master only through a PR with the CI test passing. Handoffs: docs/loops/t216-developer-handoff.md, t214-developer-handoff.md, loop-15-slice-4-step2-developer-handoff.md (r1 to r5), t217-t218-developer-handoff.md.
 
 ### Watch out
 
-- T-200 and T-199 OVERLAP IN server.ts handleStart, in different hunks. T-199 (Forge) adds sessionUuid: proven.id to the renderState call and a function after renderHandoffs in state-render.ts. T-200 leaves that call's argument list alone (it rebinds sj upstream of it). git merge-tree of loop/t200-record-from-master against origin/loop/t199-missing-handoff, loop/t164-record-session-number and origin/master was clean; whoever merges second rebases. T-164 (567657af) also touches server.ts and the session-log path.
-- T-194 r2 needs a token to work at all on a keyring-only machine: this desktop's gh stores its token in the keyring, so the hook cannot read it and every docs merge stays grant-required until GH_TOKEN (fine-grained, Pull requests: Read, scoped to melvenac/Self-Improving-Agent only) is in the planner seat's env block. That is Aaron's hand, at hook registration.
-- THE FULL SUITE EXITS 1 ON THE OVERLOADED DESKTOP WITH ZERO FAILED TESTS OR ONLY 5000ms TIMEOUTS. Every full run showed 3 unhandled [vitest-worker] Timeout calling onTaskUpdate errors, and a moving set of 3-14 tests timing out at the 5000ms default (state-import-r6, t048-r3, repo-root V6, role-files, runSync); all pass alone. The last run, on fix/tg2-fixture-record, had 0 failed tests and exit 1. Read the exit code AND the failure list, and re-run a failing file alone before calling it a regression.
-- Bash ref:path is mangled by MSYS: git show origin/master:path fails in the Bash tool. Use PowerShell, or MSYS_NO_PATHCONV=1 with quotes. A node -e script written through a heredoc silently turned backslash-n into a real newline and backslash-d into d in three files; use the Edit tool for anything with a backslash.
-- A diff check written as git diff c8165f5 origin/master cannot equal a merge's diff (it contains the reversal of the candidate). Compare each side against the merge-base. Atlas recorded that error as its own.
-- THE SESSION-NUMBER COLLISION HAPPENED TWICE ON THIS HANDOFF: the local counter said Session #13 while the record's last was 150 (T-164), then the first attempt took 151 which Forge also took, so this one is 152. Take the number from the record on the branch you are writing to, immediately before the write, and re-read it after a fetch.
+- REPORT TO `atlas-sia`: the SIA planner restarts under the fleet-unique name `atlas-sia` (plain name, no [ref]); Relay becomes `relay-a2a`; `clark` stays the fallback. Earlier dispatches name the old Atlas session addresses, which no longer apply.
+- I did not see PR #254's CI result after r5, so whether both its push and pull_request runs went green is unconfirmed from this seat.
+- NEVER run the full vitest suite on the QA PC. Free RAM there is 1.2 to 1.9 GB shared with Chisel, and Claude Code killed a queued full-suite background run for memory. Atlas rules: single files, one at a time, mutants sequentially; QA runs the full suite on Plumb. Heavy runs need Aaron's approval in the seat's own window, or a one-line 'MANUAL MODE -> sia-builder: <action> (<why>)' to clark.
+- The Bash tool mangles git ref:path (MSYS) and node cannot read /tmp from it: use PowerShell, MSYS_NO_PATHCONV=1, or the scratchpad directory. A heredoc containing a nested EOF aborts the whole command silently: use the Write tool for files.
+- A diff-based guard that scans from a fixed base reads master's LATER docs and fails on the merge ref (PR #254, S4-5b). Give each guard only the paths its row names, from one table, and test it on a scratch merge into current origin/master. An untracked file is invisible to git diff, so a guard can look green while a planted line is uncommitted.
+- Redaction is two layers (JevTransport's error text and each record writer), and a mutant on one is hidden by the other: test each layer directly. A hostile fake that echoes the Authorization header, a scan that is shown to find a planted canary, and a global fetch replaced by a function that throws are all required.
+- Red-first for a group that adds source: copy src to the scratchpad, commit the tests, git checkout HEAD -- open-brain/src and git clean -fdq open-brain/src, run red, copy src back, run green. Capture a mutant with Edit, then git diff > file, then git checkout open-brain/src; every mutant must pass tsc --noEmit (unreachable code and optional types make some fail it).
+- The record's last session was 155 when I took 156; the greeting's local number is different (T-164). Re-read the record's last n after a fetch, immediately before any write.
+- S4-4b independence is disclosed four/four: for #182, #187, #195 and #209 I had read some of the diff's code before writing their D_t (listed in the step-2 handoff); #165, #227, #220 and #218 were written without. Atlas accepted it with disclosure and the close-out reports them separately.
 
 ### Open questions
 
-- Atlas to rule: docs/idea-b-probe a77e73d9, docs/loop-13-developer-testimony e68abdce and loop/7-injection e865f488 are older sessions' work, local-only in the desktop's shared .git. Atlas said not to push or retire them; they stay named here until it decides.
-- Sequencing: the developer handoff at session 152 lands with PR 221 (fast-forwarded to this branch, docs/builder-handoff-qa-move); docs/forge-session-t200-handoff 611d1721 (rev 178) is superseded and is not to be merged.
+- Step 4 (the QA live calls, at most 17) and the close-out belong to the QA seat; the generator is `harness closeout-tables [--check <report>]` and the attempt count is `harness count-attempts`.
+- Whether QA 247 (T-217/T-218) and PR #254 are accepted and merged: not known from this seat.
 
 ## developer [sia-forge] _(written session 151)_
 
@@ -108,8 +111,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_7 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_8 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 155 — 2026-10-01 — planner [sia-planner] — `6ed7ada0-65ef-43fe-83a5-1fd42c871777` (11 writing session(s) in the record)
+Session 156 — 2026-10-01 — developer [sia-builder] — `734793c2-bd4c-48e0-98e9-f9ca5f478ab9` (12 writing session(s) in the record)

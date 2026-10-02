@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 262,
+  "revision": 264,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4070,6 +4070,30 @@
       "session_uuid": "6ed7ada0-65ef-43fe-83a5-1fd42c871777",
       "checkout": "sia-planner",
       "first_rev": 228
+    },
+    {
+      "seat": "developer",
+      "pick_up": "Builder seat (Claude Code, sia-builder checkout on the QA PC), rolled by Aaron. Nothing is uncommitted or unpushed. Delivered and pushed this stretch: T-216 (9a0973f0, merged), T-214 (caebe8b6, QA 239), slice four step 2 on loop/15-slice-4-step2 (r1 2d4cd863, r2 779be4d6, r3 36a0fc28, r4 8a6cfb2d, r5 1311c2a7; QA 244 accepted r4, r5 scoped the S4-5b guard after PR #254's merge-ref CI failed it), and T-217/T-218 (1a38e3f2, merged as #256). No assignment is open: the next work is an Atlas dispatch. SIA master now has ruleset 24343321, so a branch reaches master only through a PR with the CI test passing. Handoffs: docs/loops/t216-developer-handoff.md, t214-developer-handoff.md, loop-15-slice-4-step2-developer-handoff.md (r1 to r5), t217-t218-developer-handoff.md.",
+      "watch_out": [
+        "REPORT TO `atlas-sia`: the SIA planner restarts under the fleet-unique name `atlas-sia` (plain name, no [ref]); Relay becomes `relay-a2a`; `clark` stays the fallback. Earlier dispatches name the old Atlas session addresses, which no longer apply.",
+        "I did not see PR #254's CI result after r5, so whether both its push and pull_request runs went green is unconfirmed from this seat.",
+        "NEVER run the full vitest suite on the QA PC. Free RAM there is 1.2 to 1.9 GB shared with Chisel, and Claude Code killed a queued full-suite background run for memory. Atlas rules: single files, one at a time, mutants sequentially; QA runs the full suite on Plumb. Heavy runs need Aaron's approval in the seat's own window, or a one-line 'MANUAL MODE -> sia-builder: <action> (<why>)' to clark.",
+        "The Bash tool mangles git ref:path (MSYS) and node cannot read /tmp from it: use PowerShell, MSYS_NO_PATHCONV=1, or the scratchpad directory. A heredoc containing a nested EOF aborts the whole command silently: use the Write tool for files.",
+        "A diff-based guard that scans from a fixed base reads master's LATER docs and fails on the merge ref (PR #254, S4-5b). Give each guard only the paths its row names, from one table, and test it on a scratch merge into current origin/master. An untracked file is invisible to git diff, so a guard can look green while a planted line is uncommitted.",
+        "Redaction is two layers (JevTransport's error text and each record writer), and a mutant on one is hidden by the other: test each layer directly. A hostile fake that echoes the Authorization header, a scan that is shown to find a planted canary, and a global fetch replaced by a function that throws are all required.",
+        "Red-first for a group that adds source: copy src to the scratchpad, commit the tests, git checkout HEAD -- open-brain/src and git clean -fdq open-brain/src, run red, copy src back, run green. Capture a mutant with Edit, then git diff > file, then git checkout open-brain/src; every mutant must pass tsc --noEmit (unreachable code and optional types make some fail it).",
+        "The record's last session was 155 when I took 156; the greeting's local number is different (T-164). Re-read the record's last n after a fetch, immediately before any write.",
+        "S4-4b independence is disclosed four/four: for #182, #187, #195 and #209 I had read some of the diff's code before writing their D_t (listed in the step-2 handoff); #165, #227, #220 and #218 were written without. Atlas accepted it with disclosure and the close-out reports them separately."
+      ],
+      "open_questions": [
+        "Step 4 (the QA live calls, at most 17) and the close-out belong to the QA seat; the generator is `harness closeout-tables [--check <report>]` and the attempt count is `harness count-attempts`.",
+        "Whether QA 247 (T-217/T-218) and PR #254 are accepted and merged: not known from this seat."
+      ],
+      "session": 156,
+      "loop_state": null,
+      "session_uuid": "734793c2-bd4c-48e0-98e9-f9ca5f478ab9",
+      "checkout": "sia-builder",
+      "first_rev": 263
     }
   ],
   "sessions": [
@@ -4160,6 +4184,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 228
+    },
+    {
+      "n": 156,
+      "date": "2026-10-01",
+      "uuid": "734793c2-bd4c-48e0-98e9-f9ca5f478ab9",
+      "seat": "developer",
+      "checkout": "sia-builder",
+      "first_rev": 263
     }
   ]
 }
