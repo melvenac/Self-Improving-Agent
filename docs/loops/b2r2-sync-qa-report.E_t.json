@@ -1,0 +1,49 @@
+{
+  "loop": "qa-260-b2r2-sync",
+  "candidate_git": {
+    "sha": "40db0b5bb8772226b75add3aaad5d24591300b77",
+    "branch": "qa/b2r2-sync-merge (local scratch merge of #295, #298, #306, #309 onto origin/master a30fa359)",
+    "frozen_at": "2026-10-02T17:04:37Z"
+  },
+  "candidates": [
+    { "task": "T-008", "sha": "7312a292c342e91c64c2de4263a6eb85cf8b3cc1", "branch": "origin/loop/t008-mcp-paths", "pr": 295, "verdict": "REJECT" },
+    { "task": "T-008b", "sha": "7afd7f1bbb31ff1ba54c924b386384be45f261a0", "branch": "origin/loop/t008b-mcp-sources", "pr": 298, "verdict": "REJECT" },
+    { "task": "T-048", "sha": "3f30e8258cdc1537a85b0b9eb3f5d3c81664a184", "branch": "origin/loop/t048-sync-counts", "pr": 306, "verdict": "ACCEPT" },
+    { "task": "T-048", "sha": "f1c2a338e20c3b5b041ad53d55df533ec72bcbed", "branch": "origin/loop/t048-hook-configs-nested", "pr": 309, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit (open-brain, on scratch merge 40db0b5b)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 20000,
+      "detail": "CI test job success on 37006673986 (7312a292), 37007008347 (7afd7f1b), 37007461710 (3f30e825), 37009727374 (f1c2a338)"
+    },
+    "unit": {
+      "command": "npx vitest run, one touched file per invocation, on the merge: checks 102/102, hook-registration 7/7, mcp-command-paths 27/27, mirror-parity 13/13, t048-counts-parity 7/7, t048-counts 20/20",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 15000,
+      "detail": "LIGHT job: no local full suite; full suite green in CI on each head"
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q260-1", "status": "met", "order": "shown", "evidence": "#295 ${...}+good warn, non-string+good warn; #298 G warn 'settings unreadable, plugins not examined', J warn manifest not checked; #306 vault unreadable+clean warn, hook-configs unparseable issue no throw (also on #309 and the merge)." },
+    { "id": "Q260-2", "status": "not_met", "order": "shown", "evidence": "url+good pass named (#295/#298); bare echo, type prompt, type agent + good pass named (#309); typed-hook-malformed mutant 1 red. NOT MET: #298 absent settings.json + good gives 'pass: 1 MCP server command(s) resolve to a file.' with no skip named; #295/#298 non-object or null mcpServers entry + good gives silent pass (rule: a non-object entry is not checked, WARN)." },
+    { "id": "Q260-3", "status": "met", "order": "red-first", "evidence": "#295 cc285738 4 failed | 11 passed, head 15/15. #298 7b09c5b7 6 failed | 21 passed, head 27/27. #306 d8dc12db 2 failed | 8 passed, head 10/10. #309 eb721dec 5 failed | 15 passed, head 20/20." },
+    { "id": "Q260-4", "status": "met", "order": "shown", "evidence": "QA mutants: #295 nocmd->skipped 2 red; #298 absent settings not-checked 10 red; #306 issue->warn 1 red; #309 bare head->notChecked 2 red. Dev: notchecked-passes 3, settings-silent 1, vault-unreadable-passes 1, any-type-skips 2, typed-hook-malformed 1. All killed, all reverted." },
+    { "id": "Q260-5", "status": "met", "order": "shown", "evidence": "gh pr checks: test pass on all four (runs 37006673986, 37007008347, 37007461710, 37009727374), headSha equals pinned heads; test-windows skipping." },
+    { "id": "Q260-6", "status": "met", "order": "shown", "evidence": "hook-configs skip 0 of 0 entries; mcp-command-paths skip no mcpServers entry with a command. Real config has 0 hook events, 0 MCP servers, 0 enabled plugins: nothing exercised." },
+    { "id": "Q260-7", "status": "met", "order": "shown", "evidence": "Merge #295 916338ed, #298 f85ae64f, #306 cab03f0f clean; #309 40db0b5b one conflict hunk on the node:fs import line (node:path auto-resolved identically), resolved by union; 6 touched test files 176 passed; tsc --noEmit exit 0." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "Containers of the wrong type are dropped silently with a pass: hooks event value not an array (pre-existing), project mcpServers a string, checkout .mcp.json an array. Not enumerated by the dispatch; same class as the #295 finding.",
+    "#298 treats absent ~/.claude.json as not checked (WARN) but absent settings.json as a quiet pass.",
+    "#309 prints a not-checked hook entry whole (JSON.stringify) into the /sync message; env or prompt values would be echoed.",
+    "Row 6: this machine's real config has no hooks, MCP servers or plugins; real-install plugin chain still unverified.",
+    "Developer handoff test counts stale (#295 says 23, file has 15; #309 says 17, file has 20)."
+  ],
+  "notes": "QA 260, dispatch tree 64a70651ae8da217dac3280cced3d8eb617cad3e, origin/master a30fa359. No live Jev call. B2 round 2 is not under the overnight pre-approval: any merge waits for Aaron. Batch verdict REJECT (#295, #298 rejected; #306, #309 accepted). #295 flips to ACCEPT if the planner scopes 'a non-object entry' to hook entries only; #298 needs that and a waiver on naming the absent settings.json skip."
+}
