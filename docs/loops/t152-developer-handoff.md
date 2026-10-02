@@ -70,7 +70,7 @@ How each group was fixed. All are behaviour-neutral; where a value had to be cho
 **Findings, none fixed here:**
 
 1. `gate.test.ts` sent `legend`, which is the key the RESPONSE returns; the request field is `criteria`. src never read `legend`, so it did nothing, and I removed it. The test may have meant `criteria`, which would change the payload; that is for whoever owns the test.
-2. `policies.test.ts` now passes `hasPriorFailures: false` everywhere, so nothing in that file exercises the `true` side of that gate rule. A coverage gap, not a type error.
+2. CORRECTED in round 3: I wrote that nothing in `policies.test.ts` exercised `hasPriorFailures: true` after my edit. That was wrong: the F5 block already did ("still thresholds it when there ARE prior failures", line ~367, with `ctx({ hasPriorFailures: true })`). The four call sites I changed use `false`, the value their missing field already meant. At the planner's ruling I added one more true-side row anyway ("with prior failures AND a plan that addresses them, the gate proceeds ..."), so the file now has two.
 3. `fires.test.ts` and `ranking.test.ts` still carry present-tense comments about the cut lifecycle (the area of #294).
 
 ## Round 1 findings (not fixed, per the brief)

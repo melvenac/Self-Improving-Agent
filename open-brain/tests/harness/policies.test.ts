@@ -369,6 +369,15 @@ describe("gate policies", { timeout: 60_000 }, () => {
       expect(d.reasons.join(" ")).toContain("addresses_top_failures");
     });
 
+    it("with prior failures AND a plan that addresses them, the gate proceeds and the rule is applicable (hasPriorFailures: true)", () => {
+      // T-152 round 2: the other call sites in this file pass hasPriorFailures: false (the value their
+      // missing field already meant). This row keeps the true side with an otherwise-passing answer.
+      const answers = { ...PLAN_ANSWERS, addresses_top_failures: { type: "noul", noul: 0.9 } };
+      const d = decidePlanGate(answers, loadPolicies().plan, ctx({ hasPriorFailures: true }));
+      expect(d.verdict).toBe("proceed");
+      expect(d.notApplicable ?? []).not.toContain("addresses_top_failures");
+    });
+
     it("records the applicability in the decision, so a reader is not left to infer it", () => {
       const answers = { ...PLAN_ANSWERS, addresses_top_failures: { type: "noul", noul: 0.32 } };
       const d = decidePlanGate(answers, loadPolicies().plan, ctx());
