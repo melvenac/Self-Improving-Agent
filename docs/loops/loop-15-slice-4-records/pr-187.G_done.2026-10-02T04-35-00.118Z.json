@@ -1,0 +1,229 @@
+{
+  "gate": "developer-done",
+  "loop": "15-slice-3-b2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T04:35:00.118Z",
+  "answered_at": "2026-10-02T04:35:00.514Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "15-slice-3-b2",
+        "objective": "Change E_t's schema as ruled in R10 (a) to (d), so that a verdict is not widened or narrowed by the schema instead of by the evidence: human-seat loop ids, an attribution field on acceptance rows, a distinct pending status, and out-of-scope ids declared beside the unrunnable ones.",
+        "tasks": [
+          "(a) widen the loop id pattern to admit human-seat ids; the exact form is the developer's",
+          "(b) add no new status value; record attribution as an order field on the acceptance row, order: shown | attributed, required on met rows and failing closed",
+          "(c) make pending its own status, so a verdict row with any pending item is undefined and never would-not-merge",
+          "(d) declare out-of-scope ids in the same parseable block as R3's unrunnable ids, at the criteria SHA, before any candidate, excluded from the verdict, with the two lists kept separate",
+          "keep BE-1.3 in this part: the runtime refuses an E_t whose loop is not the run's",
+          "supply the validator the QA seat runs, not a writer: the QA seat writes E_t"
+        ],
+        "out_of_scope": [
+          "a writer for E_t (BE-7: the QA seat writes it)",
+          "the shadow merge gate, which keys on what this makes recordable",
+          "B part 1, the G-042 repair, which is already merged"
+        ],
+        "preserve": [
+          "candidate A's accepted behaviour, including the configwatch R95 and R96 rows, and R77 stopping before git",
+          "B part 1's G-042 repair",
+          "every existing E_t consumer, each named with how it reads the new fields",
+          "backward compatibility (BE-5): an existing E_t still validates"
+        ],
+        "acceptance": [
+          {
+            "id": "R10a",
+            "observable": "A human-seat loop id validates as an E_t loop, and the runtime refuses an E_t whose loop is not the run's loop (BE-1.3)",
+            "type": "blackbox"
+          },
+          {
+            "id": "R10b",
+            "observable": "A met acceptance row without order is refused, and no new status value exists",
+            "type": "blackbox"
+          },
+          {
+            "id": "R10c",
+            "observable": "A verdict computed from a row with a pending item is undefined and never would-not-merge",
+            "type": "blackbox"
+          },
+          {
+            "id": "R10d",
+            "observable": "Out-of-scope ids parse from the same block as the unrunnable ids, stay a separate list, and are excluded from the verdict; merging the two lists is caught by a mutant",
+            "type": "blackbox"
+          },
+          {
+            "id": "R10-compat",
+            "observable": "An E_t written before this change still validates",
+            "type": "blackbox"
+          },
+          {
+            "id": "R10-scope",
+            "observable": "The diff touches only the schema change's scope, checked first",
+            "type": "whitebox"
+          }
+        ],
+        "repair_targets": [
+          "E_t's schema cannot say what the QA seat observed in four places, so a verdict can be widened or narrowed by the schema instead of by the evidence (R10 a to d)"
+        ],
+        "new_capability": "E_t can record human-seat loop ids, attribution, a pending status and declared out-of-scope ids",
+        "reconstructed_by": "sia-builder",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-b2-brief.md",
+          "blob": "41df27ad27622b632f9aa096c78d545dbcaa335e"
+        }
+      },
+      "candidate": "c1eda2f6fb6e75020d2f7f517d72b33b29026452",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-b2-developer-handoff.md",
+        "open-brain/src/harness/cli.ts",
+        "open-brain/src/harness/declared.ts",
+        "open-brain/src/harness/index.ts",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/src/harness/schema.ts",
+        "open-brain/src/harness/schemas/evidence.schema.json",
+        "open-brain/tests/harness/b2-et.test.ts",
+        "open-brain/tests/harness/schema.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [
+        "E_t's schema cannot say what the QA seat observed in four places, so a verdict can be widened or narrowed by the schema instead of by the evidence (R10 a to d)"
+      ],
+      "scored_diff": {
+        "pr": 187,
+        "base_sha": "677c1dd54c0030b335bb3e49203e51d96d8fe3b4",
+        "scored_sha": "c1eda2f6fb6e75020d2f7f517d72b33b29026452",
+        "merge_commit": "c9a7acc1d7ae8788169ab3ad7c308d53b2ea9f06"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.49
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.32
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.49
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.44
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 1.44,
+      "confidence": 0.15,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.05,
+        "1": 0.46,
+        "2": 0.49
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1839,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.49 is below the required 0.7",
+      "touches_out_of_scope 0.32 is above the permitted 0.3",
+      "local_tests_support_claim 0.49 is below the required 0.6",
+      "the deterministic checks failed (read from process exit codes, not from the gate)"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T04:35:00.510Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "bd37b93f-c21d-48bb-9fbb-fb1f4213e513",
+  "subject": {
+    "gate": "developer-done",
+    "key": "c1eda2f6fb6e75020d2f7f517d72b33b29026452",
+    "blob": "f8cc861a6d81b484227e6718c6e9a64b641876d6"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T04:35:00.118Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 187,
+  "merge_commit": "c9a7acc1d7ae8788169ab3ad7c308d53b2ea9f06",
+  "scored_sha": "c1eda2f6fb6e75020d2f7f517d72b33b29026452",
+  "base_sha": "677c1dd54c0030b335bb3e49203e51d96d8fe3b4",
+  "dt": {
+    "path": "docs/loops/loop-15-slice-4-records/pr-187.D_t.json",
+    "blob": "f8cc861a6d81b484227e6718c6e9a64b641876d6"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-b2-developer-handoff.md",
+    "open-brain/src/harness/cli.ts",
+    "open-brain/src/harness/declared.ts",
+    "open-brain/src/harness/index.ts",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/src/harness/schema.ts",
+    "open-brain/src/harness/schemas/evidence.schema.json",
+    "open-brain/tests/harness/b2-et.test.ts",
+    "open-brain/tests/harness/schema.test.ts"
+  ]
+}

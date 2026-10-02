@@ -1,0 +1,293 @@
+{
+  "gate": "developer-done",
+  "loop": "15-slice-3-a",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T04:34:50.770Z",
+  "answered_at": "2026-10-02T04:34:51.281Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "15-slice-3-a",
+        "objective": "Repair G-045 mechanically before any real role is pointed at the runtime, then run a real model-backed role through the harness end to end, so the runtime survives the repository states a real role produces and, when it fails, says so.",
+        "tasks": [
+          "Observe the G-045 crash red first: run the update-ref -d probe against the built candidate and see no LoopResult, no FAILED.md and an unresolvable HEAD",
+          "Repair the restore so it reads nothing from the repository until the snapshot is restored: after HEAD's name is put back, HEAD resolves or the ref is restored from the snapshot before any read, and the deferred delta is restored ahead of anything that reads HEAD, not only inside rollBack",
+          "Point a real, model-backed role at the runtime and run it end to end (the roles are stubs today)",
+          "State what the repair leaves open: the channel denominator (index, hooks, config, submodules, reflog) is unprobed, and a green G-045 row is one named case closed, not 'the runtime is safe'"
+        ],
+        "out_of_scope": [
+          "the ranking gap (G-026)",
+          "T-159, the trigger's cheap not-asked path, and the census price",
+          "registering the recall trigger for production",
+          "the transcript-loss mechanism (T-161)",
+          "G-042 on a second machine and the build-freshness fix shape",
+          "T-165, evaluating an alternate harness as the developer seat",
+          "QA scoring through Jev and F11, the later items in the brief's order"
+        ],
+        "preserve": [
+          "the refusals slices one and two built: a stage write outside the allowlist, a moved SHA, a dirty tree, an exhausted retry cap, and a check that prints success while exiting 1",
+          "a failure is an artifact: every refusal leaves a LoopResult and a FAILED.md",
+          "D-019: the runtime stops at a candidate commit and local tags and never merges or pushes"
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "observable": "The update-ref -d refs/heads/main probe, first seen producing the crash against the unfixed product, then run against the built candidate, leaves a LoopResult, a FAILED.md and a resolvable HEAD",
+            "type": "blackbox"
+          },
+          {
+            "id": "A2",
+            "observable": "A real, model-backed role runs through the harness end to end, and a failure of that run is recorded as a LoopResult and FAILED.md rather than a crash",
+            "type": "blackbox"
+          },
+          {
+            "id": "A3",
+            "observable": "The handoff names the unprobed channels (index, hooks, config, submodules, reflog) and does not describe G-045 as the runtime being safe against repository states",
+            "type": "whitebox"
+          }
+        ],
+        "repair_targets": [
+          "G-045: update-ref -d on the checked-out branch crashes runLoop before rollBack, with no LoopResult, no FAILED.md, an unresolvable HEAD, main gone and the tree staged"
+        ],
+        "new_capability": "the harness runs a real role end to end and survives the repository states a real role produces",
+        "reconstructed_by": "sia-builder",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-brief.md",
+          "blob": "e4855ddd9b5a5b8264ac7463176ce03256847da0"
+        }
+      },
+      "candidate": "0d44374e7b1bcaa768c92ac21cd5566e743edf4b",
+      "diffstat": [
+        ".github/workflows/ci.yml",
+        "docs/loops/loop-15-slice-3-a10-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a11-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a12-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a13-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a2-grok-handoff.md",
+        "docs/loops/loop-15-slice-3-a3-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a4-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a5-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a6-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a7-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a8-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a9-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-candidate-a-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-qa-criteria-a.md",
+        "open-brain/src/harness/artifacts.ts",
+        "open-brain/src/harness/checks.ts",
+        "open-brain/src/harness/configwatch.ts",
+        "open-brain/src/harness/git.ts",
+        "open-brain/src/harness/process.ts",
+        "open-brain/src/harness/refwatch.ts",
+        "open-brain/src/harness/roles.ts",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/src/harness/schema.ts",
+        "open-brain/tests/harness/candidate-a-fixture.ts",
+        "open-brain/tests/harness/config-channel.test.ts",
+        "open-brain/tests/harness/configwatch-a12.test.ts",
+        "open-brain/tests/harness/configwatch-a13.test.ts",
+        "open-brain/tests/harness/configwatch-a7-seam.test.ts",
+        "open-brain/tests/harness/configwatch-links.test.ts",
+        "open-brain/tests/harness/configwatch-r77-contain.test.ts",
+        "open-brain/tests/harness/configwatch-r77-hardlink.test.ts",
+        "open-brain/tests/harness/configwatch-r78-read-facts.test.ts",
+        "open-brain/tests/harness/configwatch-r79-sides.test.ts",
+        "open-brain/tests/harness/configwatch-r80-report.test.ts",
+        "open-brain/tests/harness/configwatch-r80-texts.test.ts",
+        "open-brain/tests/harness/configwatch-r83.test.ts",
+        "open-brain/tests/harness/configwatch-r84.test.ts",
+        "open-brain/tests/harness/configwatch-r85.test.ts",
+        "open-brain/tests/harness/configwatch-r86.test.ts",
+        "open-brain/tests/harness/configwatch-r87.test.ts",
+        "open-brain/tests/harness/configwatch-r88.test.ts",
+        "open-brain/tests/harness/process-role.test.ts",
+        "open-brain/tests/harness/qa104-a9-probe2.test.ts",
+        "open-brain/tests/harness/qa104-a9-probe3.test.ts",
+        "open-brain/tests/harness/refwatch-stage.test.ts",
+        "open-brain/tests/harness/runtime.test.ts",
+        "open-brain/tests/harness/spawn-sites.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [
+        "G-045: update-ref -d on the checked-out branch crashes runLoop before rollBack, with no LoopResult, no FAILED.md, an unresolvable HEAD, main gone and the tree staged"
+      ],
+      "scored_diff": {
+        "pr": 182,
+        "base_sha": "ebda33d5a31629ebc7bdf2028cc94af7f83a8c29",
+        "scored_sha": "0d44374e7b1bcaa768c92ac21cd5566e743edf4b",
+        "merge_commit": "677c1dd54c0030b335bb3e49203e51d96d8fe3b4"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.54
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.49
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 1.24,
+      "confidence": 0.49,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.05,
+        "1": 0.66,
+        "2": 0.29
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2592,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.47 is below the required 0.7",
+      "touches_out_of_scope 0.54 is above the permitted 0.3",
+      "local_tests_support_claim 0.49 is below the required 0.6",
+      "the deterministic checks failed (read from process exit codes, not from the gate)"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T04:34:51.269Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "eff17401-5ef6-4d6d-8b1b-d71d1a0fb1b6",
+  "subject": {
+    "gate": "developer-done",
+    "key": "0d44374e7b1bcaa768c92ac21cd5566e743edf4b",
+    "blob": "9c90d2c591cc191f4b394c5b79c9070774eac021"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T04:34:50.770Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 182,
+  "merge_commit": "677c1dd54c0030b335bb3e49203e51d96d8fe3b4",
+  "scored_sha": "0d44374e7b1bcaa768c92ac21cd5566e743edf4b",
+  "base_sha": "ebda33d5a31629ebc7bdf2028cc94af7f83a8c29",
+  "dt": {
+    "path": "docs/loops/loop-15-slice-4-records/pr-182.D_t.json",
+    "blob": "9c90d2c591cc191f4b394c5b79c9070774eac021"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".github/workflows/ci.yml",
+    "docs/loops/loop-15-slice-3-a10-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a11-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a12-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a13-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a2-grok-handoff.md",
+    "docs/loops/loop-15-slice-3-a3-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a4-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a5-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a6-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a7-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a8-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a9-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-candidate-a-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-qa-criteria-a.md",
+    "open-brain/src/harness/artifacts.ts",
+    "open-brain/src/harness/checks.ts",
+    "open-brain/src/harness/configwatch.ts",
+    "open-brain/src/harness/git.ts",
+    "open-brain/src/harness/process.ts",
+    "open-brain/src/harness/refwatch.ts",
+    "open-brain/src/harness/roles.ts",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/src/harness/schema.ts",
+    "open-brain/tests/harness/candidate-a-fixture.ts",
+    "open-brain/tests/harness/config-channel.test.ts",
+    "open-brain/tests/harness/configwatch-a12.test.ts",
+    "open-brain/tests/harness/configwatch-a13.test.ts",
+    "open-brain/tests/harness/configwatch-a7-seam.test.ts",
+    "open-brain/tests/harness/configwatch-links.test.ts",
+    "open-brain/tests/harness/configwatch-r77-contain.test.ts",
+    "open-brain/tests/harness/configwatch-r77-hardlink.test.ts",
+    "open-brain/tests/harness/configwatch-r78-read-facts.test.ts",
+    "open-brain/tests/harness/configwatch-r79-sides.test.ts",
+    "open-brain/tests/harness/configwatch-r80-report.test.ts",
+    "open-brain/tests/harness/configwatch-r80-texts.test.ts",
+    "open-brain/tests/harness/configwatch-r83.test.ts",
+    "open-brain/tests/harness/configwatch-r84.test.ts",
+    "open-brain/tests/harness/configwatch-r85.test.ts",
+    "open-brain/tests/harness/configwatch-r86.test.ts",
+    "open-brain/tests/harness/configwatch-r87.test.ts",
+    "open-brain/tests/harness/configwatch-r88.test.ts",
+    "open-brain/tests/harness/process-role.test.ts",
+    "open-brain/tests/harness/qa104-a9-probe2.test.ts",
+    "open-brain/tests/harness/qa104-a9-probe3.test.ts",
+    "open-brain/tests/harness/refwatch-stage.test.ts",
+    "open-brain/tests/harness/runtime.test.ts",
+    "open-brain/tests/harness/spawn-sites.test.ts"
+  ]
+}

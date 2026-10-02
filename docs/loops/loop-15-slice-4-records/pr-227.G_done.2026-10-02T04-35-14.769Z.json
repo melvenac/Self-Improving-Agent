@@ -1,0 +1,224 @@
+{
+  "gate": "developer-done",
+  "loop": "15-t198",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T04:35:14.769Z",
+  "answered_at": "2026-10-02T04:35:15.160Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "15-t198",
+        "objective": "At /start (ob_start), print one line per partner seat saying whether that seat is listening, so a planner learns a seat is not polling instead of finding out from an unread-by line an hour later.",
+        "tasks": [
+          "read the hub's presence endpoint and filter the roster by seat name on the client, because the endpoint ignores an agents filter",
+          "print one line per partner seat: <seat>: polling | not polling, N unread since <time>",
+          "take the seat names and rooms from T-196's tracked data file once it exists, and until then from a named interim source, saying in the output which source was read",
+          "never fail silently: a timeout, a non-2xx response or an unparseable body prints presence: UNKNOWN (<cause>), with a bounded timeout so /start never hangs",
+          "say which process makes the call, because a check served through the MCP server cannot report that server's own staleness (G-033)"
+        ],
+        "out_of_scope": [
+          "replacing the interim source of seat names, which is T-196's step",
+          "any test that calls the live hub: tests use a fixture HTTP server only",
+          "any merge or CI run"
+        ],
+        "preserve": [
+          "every existing ob_start section and the tests that cover them, unchanged",
+          "the greeting-size limit is reported, not silently exceeded: the one new block is measured against it (T-183)"
+        ],
+        "acceptance": [
+          {
+            "id": "PR-1",
+            "observable": "A seat with pollingNow true in its room prints as polling",
+            "type": "blackbox"
+          },
+          {
+            "id": "PR-2",
+            "observable": "A seat that is not polling and has unread turns prints the count and the age",
+            "type": "blackbox"
+          },
+          {
+            "id": "PR-3",
+            "observable": "With the hub unreachable, non-2xx or malformed, one visible UNKNOWN line with its cause is printed, never nothing",
+            "type": "blackbox"
+          },
+          {
+            "id": "PR-4",
+            "observable": "A partner seat absent from the presence roster prints as absent, not skipped",
+            "type": "blackbox"
+          },
+          {
+            "id": "PR-5",
+            "observable": "A mutant that swallows the fetch error goes red on PR-3, on its own branch and clean under tsc --noEmit",
+            "type": "blackbox"
+          },
+          {
+            "id": "PR-6",
+            "observable": "Every existing ob_start section and its tests are unchanged, and the new block's size against the greeting limit is reported as a number",
+            "type": "whitebox"
+          }
+        ],
+        "repair_targets": [
+          "tracked text does not make a planner check its seats: builder and Forge sat on dispatches for about an hour and the planner learned it only from a listener's unread-by line"
+        ],
+        "new_capability": "ob_start shows whether each partner seat is listening, and says visibly when the hub cannot be reached",
+        "reconstructed_by": "sia-builder",
+        "reconstructed_from": {
+          "path": "docs/loops/t198-presence-dispatch.md",
+          "blob": "089a508f06f35e747ef4f034f51dfaa6c13b387c"
+        }
+      },
+      "candidate": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+      "diffstat": [
+        ".agents/SYSTEM/hub-partner-seats.json",
+        ".gitignore",
+        "docs/loops/t198-developer-handoff.md",
+        "open-brain/src/pipelines/session-start/hub-presence.ts",
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/src/server.ts",
+        "open-brain/tests/pipelines/session-start/hub-presence.test.ts",
+        "open-brain/tests/pipelines/sync/greeting-size.test.ts"
+      ],
+      "checks": {
+        "source": "E_t:C:/qa-scratch/qa248-et/pr-227.E_t.json@63afb2c88a04334ea07da664f0401679842d60f0",
+        "build": {
+          "exit_code": 0
+        },
+        "unit": {
+          "exit_code": 1
+        }
+      },
+      "prior_failures": [
+        "tracked text does not make a planner check its seats: builder and Forge sat on dispatches for about an hour and the planner learned it only from a listener's unread-by line"
+      ],
+      "scored_diff": {
+        "pr": 227,
+        "base_sha": "a74982101fcfc94bbb5b055dc56c1bf764c0d192",
+        "scored_sha": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+        "merge_commit": "c1296f2b1f1871e8bc032b92143a472174c05a2a"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.5
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 1.4,
+      "confidence": 0.32,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.03,
+        "1": 0.54,
+        "2": 0.43
+      }
+    },
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.37
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.43
+    }
+  },
+  "usage": {
+    "input_tokens": 1781,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.37 is below the required 0.7",
+      "touches_out_of_scope 0.43 is above the permitted 0.3",
+      "local_tests_support_claim 0.5 is below the required 0.6",
+      "the deterministic checks failed (read from process exit codes, not from the gate)"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T04:35:15.149Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "4ceb76f0-5d2c-4750-b5d5-77223c46a9d4",
+  "subject": {
+    "gate": "developer-done",
+    "key": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+    "blob": "31e7af8c57975a3353bb06bd2c827d3bd4d64ef4"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T04:35:14.769Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 227,
+  "merge_commit": "c1296f2b1f1871e8bc032b92143a472174c05a2a",
+  "scored_sha": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+  "base_sha": "a74982101fcfc94bbb5b055dc56c1bf764c0d192",
+  "dt": {
+    "path": "docs/loops/loop-15-slice-4-records/pr-227.D_t.json",
+    "blob": "31e7af8c57975a3353bb06bd2c827d3bd4d64ef4"
+  },
+  "checks_source": "E_t:C:/qa-scratch/qa248-et/pr-227.E_t.json@63afb2c88a04334ea07da664f0401679842d60f0",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/SYSTEM/hub-partner-seats.json",
+    ".gitignore",
+    "docs/loops/t198-developer-handoff.md",
+    "open-brain/src/pipelines/session-start/hub-presence.ts",
+    "open-brain/src/pipelines/sync/checks.ts",
+    "open-brain/src/server.ts",
+    "open-brain/tests/pipelines/session-start/hub-presence.test.ts",
+    "open-brain/tests/pipelines/sync/greeting-size.test.ts"
+  ]
+}

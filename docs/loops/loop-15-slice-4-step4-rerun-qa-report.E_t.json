@@ -1,0 +1,48 @@
+{
+  "loop": "15-slice-4",
+  "candidate_git": {
+    "sha": "460c9a492fe15b88c8cebf845bd99cc322eb519b",
+    "branch": "origin/master",
+    "frozen_at": "2026-10-02T04:27:43Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci, npm run build (open-brain/), then tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 0,
+      "detail": "npm ci exit 0 (185 packages); npm run build exit 0 (build stamped 460c9a4); tsc --noEmit exit 0. Duration not measured."
+    },
+    "unit": {
+      "command": "vitest run tests/harness/t220-closeout-labels.test.ts tests/harness/s4-g6-closeout.test.ts (open-brain/)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 0,
+      "detail": "The touched harness tests only (LIGHT job class): 2 files, 16 tests passed. No full suite was run, so this is not a full-suite result."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "S4-2", "status": "met", "evidence": "One answered live G_plan, docs/loops/loop-15-slice-4-brief.G_plan.2026-10-02T04-34-15.660Z.json: sent true, five PLAN_GATE_QUESTIONS ids, usage 4620/129, model_resolved jev-1.13.0 (comparator true); not ignored; policy_hash = sha256 of plan-gate.json at ec7138bb; verdict reject quoted, not re-asked. Clause 1 is read with D-092 ruling 3: QA 245's unanswered auth record also sits beside the brief.", "order": "shown" },
+    { "id": "S4-3a", "status": "met", "evidence": "Live half: 14 answered records (1 G_plan, 8 G_done, 5 G_qa), all HTTP 200 with model_resolved jev-1.13.0, which passes jevModelAtLeast; no two models differ.", "order": "shown" },
+    { "id": "S4-3b", "status": "met", "evidence": "Live half: docs/loops/qa-248/key-scan.mjs read the key from the environment; known positive 1 hit, temp file deleted; 0 matches over the gate records, E_t copies, ledger and dry-run records, every captured stdout/stderr file, the close-out and this report, and this session's transcript, named by absolute path C:/Users/Aaron/.claude/projects/C--Users-Aaron-Worktrees-sia-qa/a35fcfeb-44f5-4cf7-82b7-2674c0869310.jsonl (session a35fcfeb-44f5-4cf7-82b7-2674c0869310, K1). Final output: docs/loops/qa-248/key-scan.out.", "order": "shown" },
+    { "id": "S4-4", "status": "met", "evidence": "8 live G_done, one per Terms-table row, all answered (all reject). Each names pr, merge_commit, scored_sha, base_sha (recomputed equal), dt path and blob (equal); checks_source none for #182/#165/#187 with checks_passed false, E_t:<path>@<blob> for the five; runtime_action 'shadow: recorded only; no outcome was changed'.", "order": "shown" },
+    { "id": "S4-4a", "status": "met", "evidence": "Clauses 3 and 6 at the live run: harness validate gate-record exit 0 on all 13 G_done/G_qa; all 13 carry source seat and plan_provenance reconstructed-after. Not run on G_plan (D-092 ruling 4).", "order": "shown" },
+    { "id": "S4-5a", "status": "met", "evidence": "harness closeout-tables exit 0; --check docs/loops/loop-15-slice-4-closeout.md exit 0; labels PROVISIONAL (N=8 seat-built, 0 runtime) and PROVISIONAL (N=5 seat-built, 0 runtime) computed; every threshold has N, per-diff values, min, max and both sides; 'E_t source: the criteria Terms table (8 rows).' present. 4.4 SHA column naming: F8.", "order": "shown" },
+    { "id": "S4-5b", "status": "met", "evidence": "0 whole-word hits in the close-out, the ledger and all 13 G_done/G_qa and 5 E_t copies. The new G_plan has 4 lines, all inside request (quoted brief and D_t), 0 outside; covered by D-092 ruling 6 (F3).", "order": "shown" },
+    { "id": "S4-5c", "status": "met", "evidence": "git diff --exit-code ec7138bb 460c9a49 over plan-gate.json, developer-done.json, merge.json exit 0; merge.json require_plan_gate and require_done_gate false; every G_done policy_hash = sha256 developer-done.json at ec7138bb; every G_qa policy_hash = sha256 qa-score.json.", "order": "shown" },
+    { "id": "S4-6b", "status": "met", "evidence": "5 G_qa, one request each: results[] with pass/fail/untested and decided_by, severity on every fail; 5 untested decided by code, each on a not_evaluated E_t row; missing empty. No call for #182, #165, #187; the generated table says 'not scored: no E_t' for exactly those three. Verdicts: #209, #218 proceed; #195, #220, #227 reject.", "order": "shown" },
+    { "id": "S4-6c", "status": "met", "evidence": "Each G_qa sits beside pr-<N>.E_t.json in docs/loops/loop-15-slice-4-records/; copy blob = e_t_ref.blob = blob at the qa/* commit, 5 of 5; the qa/* branches were not written.", "order": "shown" },
+    { "id": "S4-7", "status": "met", "evidence": "harness count-attempts: attempts 15 (<= 17, <= 20), answered 14, incomplete 0, 0 transport retries; ledger 30 lines, every begin before its end and its record's answered_at. Exit 1 on one VIOLATION, the 4.2 record linked by the harness to QA 245's auth record (retries: 1 is that record), decided by D-092 ruling 3 (F5).", "order": "shown" },
+    { "id": "S4-8", "status": "partial", "evidence": "Clause 2 guard: 3b192871 is an ancestor of 460c9a49 (exit 0) and LOOP_LIMITS is byte-identical ec7138bb..460c9a49 (1896 chars). Clause 4 unmet: no CI run id read (no network call allowed).", "order": "shown" }
+  ],
+  "regressions": [],
+  "gaps": [
+    "count-attempts exits 1 on the 4.2 record: plan-gate set retry_of to QA 245's auth record, and the counter refuses a retry of auth; ruling 3 decides it, the tool does not express it (F5).",
+    "The done gate's reason text says checks failed 'read from process exit codes' when checks_source is none (F6).",
+    "G_done checks_source holds a local scratch path to the E_t copy (F7).",
+    "The 4.4 table's scored SHA column holds the qa/* commit, not the QA'd candidate SHA (F8).",
+    "S4-8 clause 4: no CI run id, head_sha or created_at quoted."
+  ],
+  "notes": "QA-248: step 4 re-run. 13 live calls of 13 budgeted, 13 answered by jev-1.13.0, 0 retries; count-attempts total 15, including QA 245's auth attempt. 4.2 reject; 4.3 8 reject; 4.4 2 proceed, 3 reject. Report: docs/loops/loop-15-slice-4-step4-rerun-qa-report.md."
+}

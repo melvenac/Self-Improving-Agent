@@ -1,0 +1,234 @@
+{
+  "gate": "developer-done",
+  "loop": "15-slice-3-c",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T04:35:05.382Z",
+  "answered_at": "2026-10-02T04:35:05.803Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "15-slice-3-c",
+        "objective": "Before a loop candidate merges to master, have the runtime record what it WOULD have done, and after Aaron's decision record in one ledger line whether the two disagreed. Nothing is automated and the runtime still never merges.",
+        "tasks": [
+          "Record a verdict before the merge: would-merge, would-not-merge or undefined",
+          "After Aaron's decision, append one ledger line recording whether the verdict and the decision disagreed",
+          "Build every row of the criteria CC-0 to CC-22 except CC-21, which is cut, plus CC-29 and CC-30, with the amendments in section 8 overriding section 1 where they differ",
+          "Run every red row against the unfixed base and every green row on the candidate, locally",
+          "Build the gate so a shadow developer can be pointed at it (T-165 is gated on this)"
+        ],
+        "out_of_scope": [
+          "the declared rows of the criteria section 2",
+          "CC-21, which was cut",
+          "automating any merge: the runtime still never merges",
+          "turning on any gate as a requirement"
+        ],
+        "preserve": [
+          "candidates A and B as merged",
+          "section 8's preserve list, each item held or broken in the handoff",
+          "no test touches this repository, the real knowledge database or a live state.json: every git-touching test builds a throwaway repo (G-044)"
+        ],
+        "acceptance": [
+          {
+            "id": "SM-1",
+            "observable": "Before a candidate merges, the runtime records exactly one of would-merge, would-not-merge or undefined for it",
+            "type": "blackbox"
+          },
+          {
+            "id": "SM-2",
+            "observable": "After Aaron's decision, one ledger line records whether the recorded verdict and the decision agreed",
+            "type": "blackbox"
+          },
+          {
+            "id": "SM-3",
+            "observable": "A mutant that counts undefined as agreement goes red",
+            "type": "blackbox"
+          },
+          {
+            "id": "SM-4",
+            "observable": "A mutant in which a pending row gives would-not-merge, or in which the two declared lists are merged into one, goes red",
+            "type": "blackbox"
+          },
+          {
+            "id": "SM-5",
+            "observable": "A mutant in which prepare overwrites an existing verdict, or decide --merged accepts a sha that is not on origin/master, goes red",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "a shadow merge gate: the runtime records what it would have done at each merge and counts disagreements with Aaron",
+        "reconstructed_by": "sia-builder",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-c-brief.md",
+          "blob": "b4967b97ad6a35433d5a1f167e975fe2541691e4"
+        }
+      },
+      "candidate": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-c-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-c-r2-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-c-r3-developer-handoff.md",
+        "docs/loops/shadow-merge/PROCEDURE.md",
+        "open-brain/src/harness/cli.ts",
+        "open-brain/src/harness/policies.ts",
+        "open-brain/src/harness/policies/merge.json",
+        "open-brain/src/harness/schemas/policy-merge.schema.json",
+        "open-brain/src/harness/shadow-merge.ts",
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/tests/harness/fixtures/shadow-merge/all-attributed.json",
+        "open-brain/tests/harness/fixtures/shadow-merge/skipped-required-live-gate.json",
+        "open-brain/tests/harness/fixtures/shadow-merge/undefined.json",
+        "open-brain/tests/harness/fixtures/shadow-merge/would-merge.json",
+        "open-brain/tests/harness/fixtures/shadow-merge/would-not-merge.json",
+        "open-brain/tests/harness/policies.test.ts",
+        "open-brain/tests/harness/shadow-merge.test.ts"
+      ],
+      "checks": {
+        "source": "E_t:C:/qa-scratch/qa248-et/pr-195.E_t.json@d20c65ed29e73a69a3d1efea512fb0dee1cb8db9",
+        "build": {
+          "exit_code": 0
+        },
+        "unit": {
+          "exit_code": 1
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 195,
+        "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+        "scored_sha": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+        "merge_commit": "ddd435260bd07221f83d5ad2d426410171d6f0f3"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.59
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.63
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 1.08,
+      "confidence": 0.41,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.15,
+        "1": 0.61,
+        "2": 0.24
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1866,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.59 is below the required 0.7",
+      "touches_out_of_scope 0.47 is above the permitted 0.3",
+      "the deterministic checks failed (read from process exit codes, not from the gate)"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T04:35:05.792Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "1616d7f1-b40c-496b-bc75-4191907776e4",
+  "subject": {
+    "gate": "developer-done",
+    "key": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+    "blob": "84e9ffdbc0e77285af8c478b14faa570887d3096"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T04:35:05.382Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 195,
+  "merge_commit": "ddd435260bd07221f83d5ad2d426410171d6f0f3",
+  "scored_sha": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+  "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+  "dt": {
+    "path": "docs/loops/loop-15-slice-4-records/pr-195.D_t.json",
+    "blob": "84e9ffdbc0e77285af8c478b14faa570887d3096"
+  },
+  "checks_source": "E_t:C:/qa-scratch/qa248-et/pr-195.E_t.json@d20c65ed29e73a69a3d1efea512fb0dee1cb8db9",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-c-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-c-r2-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-c-r3-developer-handoff.md",
+    "docs/loops/shadow-merge/PROCEDURE.md",
+    "open-brain/src/harness/cli.ts",
+    "open-brain/src/harness/policies.ts",
+    "open-brain/src/harness/policies/merge.json",
+    "open-brain/src/harness/schemas/policy-merge.schema.json",
+    "open-brain/src/harness/shadow-merge.ts",
+    "open-brain/src/pipelines/sync/index.ts",
+    "open-brain/tests/harness/fixtures/shadow-merge/all-attributed.json",
+    "open-brain/tests/harness/fixtures/shadow-merge/skipped-required-live-gate.json",
+    "open-brain/tests/harness/fixtures/shadow-merge/undefined.json",
+    "open-brain/tests/harness/fixtures/shadow-merge/would-merge.json",
+    "open-brain/tests/harness/fixtures/shadow-merge/would-not-merge.json",
+    "open-brain/tests/harness/policies.test.ts",
+    "open-brain/tests/harness/shadow-merge.test.ts"
+  ]
+}

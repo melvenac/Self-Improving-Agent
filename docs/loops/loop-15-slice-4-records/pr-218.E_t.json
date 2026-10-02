@@ -1,0 +1,60 @@
+{
+  "loop": "t158",
+  "candidate_git": {
+    "sha": "e23e622813a540e18bed0849779040cf181ff9b7",
+    "branch": "origin/loop/t158-gap-tombstone",
+    "frozen_at": "2026-09-30T05:32:09Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "CI run 36673852699, test job, Typecheck",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 6000,
+      "detail": "Candidate test job Typecheck step succeeded."
+    },
+    "unit": {
+      "command": "CI run 36673852699, test job, Test",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 187000,
+      "detail": "Full suite: 1 failed, 1829 passed, 6 skipped. The sole T-171 r3b failure was identical at base run 36673856307; no candidate regression."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "TG-1",
+      "status": "met",
+      "evidence": "Focused tests and independent scratch-state probe retained G-001 as a closed tombstone with closed_session and closed_rev; greeting and SUMMARY omitted it; second close refused.",
+      "order": "shown"
+    },
+    {
+      "id": "TG-2",
+      "status": "met",
+      "evidence": "Dry-run against the candidate copy assigned G-049, named cited skips G-046/G-047/G-048, refused each same explicit id, and left state.json byte-identical. A corrupt scratch index made git grep exit 128 and add_gap refused with that exit.",
+      "order": "shown"
+    },
+    {
+      "id": "TG-3",
+      "status": "met",
+      "evidence": "Candidate fixture test passed both directions: cited G-040 skipped and uncited G-041 assigned. Candidate scan found G-046/G-047/G-048.",
+      "order": "shown"
+    },
+    {
+      "id": "TG-4",
+      "status": "met",
+      "evidence": "All four developer mutants were reapplied to e23e622, typechecked, and killed by their intended rows; QA render-closed mutant also typechecked and was killed by two TG-1 assertions.",
+      "order": "shown"
+    },
+    {
+      "id": "TG-5",
+      "status": "met",
+      "evidence": "Schema remains v3 with optional gap lifecycle fields and legacy absent status interpreted open. Writer/render focused tests passed; full CI had only the base-identical moving-origin/master r3b failure.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [],
+  "notes": "QA-227 ACCEPT. Candidate and base CI both failed only T-171 r3b because both code SHAs predate the master fix; candidate added five passing tests and no new failure."
+}
