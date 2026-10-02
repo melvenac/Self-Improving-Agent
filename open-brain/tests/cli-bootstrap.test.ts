@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { spawnAsync } from "./spawn-async.js";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { createRequire } from "node:module";
@@ -169,6 +169,16 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     // with the right value look identical afterwards.
     expect(r.stdout).toMatch(/Session slot NOT written/);
     expect(existsSync(slotPath)).toBe(false);
+  });
+
+  it("T-048 DC-7: the slot records workspace_unusable_roots beside workspace_root_count, 0 included", async () => {
+    const readSlot = (): string => readFileSync(slotPath, "utf-8");
+    await runRaw(JSON.stringify({ cwd, session_id: "roots-ok-1", workspace_roots: [cwd] }));
+    expect(readSlot()).toMatch(/"workspace_root_count":\s*1/);
+    expect(readSlot()).toMatch(/"workspace_unusable_roots":\s*0/);
+    rmSync(slotPath, { force: true });
+    await runRaw(JSON.stringify({ cwd, session_id: "roots-bad-2", workspace_roots: [cwd, 7, null] }));
+    expect(readSlot()).toMatch(/"workspace_unusable_roots":\s*2/);
   });
 
   it("a payload WITH a session id still writes the slot — the guard is not a ban", async () => {

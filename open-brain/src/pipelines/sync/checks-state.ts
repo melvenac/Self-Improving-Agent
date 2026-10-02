@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec
   const hits: string[] = [];
   let scanned = 0;
   let markers = 0;
+  // T-048: tracked files that were NOT scanned, by reason, so "0 markers" cannot be read as "every tracked file was clean".
+  let deleted = 0;
+  let unreadable = 0;
+  let binary = 0;
   for (const rel of files) {
     const p = join(projectRoot, rel);
-    if (!existsSync(p)) continue; // tracked but deleted in the working tree
+    if (!existsSync(p)) { deleted++; continue; } // tracked but deleted in the working tree
     let buf: Buffer;
-    try { buf = readFileSync(p); } catch { continue; }
-    if (buf.subarray(0, 8192).includes(0)) continue; // binary
+    try { buf = readFileSync(p); } catch { unreadable++; continue; }
+    if (buf.subarray(0, 8192).includes(0)) { binary++; continue; } // binary
     scanned++;
     const lines = buf.toString("utf-8").split(/\r?\n/);
     const found: number[] = [];
@@ -236,8 +240,10 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec
       hits.push(`${rel}:${found.slice(0, 5).join(",")}${found.length > 5 ? ",…" : ""}`);
     }
   }
+  const notScanned = deleted + unreadable + binary;
+  const skippedNote = `${notScanned} tracked file${notScanned === 1 ? "" : "s"} not scanned (${deleted} deleted, ${unreadable} unreadable, ${binary} binary)`;
   if (markers === 0) {
-    return { name, report: true, severity: "pass", message: `0 conflict markers in ${scanned} tracked text files` };
+    return { name, report: true, severity: "pass", message: `0 conflict markers in ${scanned} tracked text files; ${skippedNote}` };
   }
-  return { name, report: true, severity: "issue", message: `${markers} conflict marker line(s) in ${hits.length} of ${scanned} tracked text files: ${hits.join("; ")}` };
+  return { name, report: true, severity: "issue", message: `${markers} conflict marker line(s) in ${hits.length} of ${scanned} tracked text files: ${hits.join("; ")}; ${skippedNote}` };
 }

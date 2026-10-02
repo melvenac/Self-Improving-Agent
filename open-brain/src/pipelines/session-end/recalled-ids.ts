@@ -48,6 +48,9 @@ import { getSessionRecalledIds } from "../../db-v2.js";
  */
 export interface RecalledIdsSource {
   ids: number[];
+  /** T-048: set only for origin "file": entries the file listed, and how many had no numeric id and were not rated. */
+  entriesInFile?: number;
+  droppedEntries?: number;
   origin: "explicit" | "recall-log" | "file" | "none";
   /** Set when a file existed but was not trusted. */
   rejected?: { path: string; fileSessionId: string | null; reason: string };
@@ -106,6 +109,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
     }
 
     const fileSessionId = parsed.session_id ?? null;
+    const entriesInFile = (parsed.entries ?? []).length;
     const ids = (parsed.entries ?? [])
       .map((e) => e.id)
       .filter((id): id is number => typeof id === "number");
@@ -114,7 +118,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
     // file cannot be shown to describe this session. Refusing is the safe
     // default now that a rating carries weight.
     if (!sessionId) {
-      if (fileSessionId === null) return { ids, origin: "file" };
+      if (fileSessionId === null) return { ids, origin: "file", entriesInFile, droppedEntries: entriesInFile - ids.length };
       return {
         ids: [],
         origin: "none",
@@ -122,7 +126,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
       };
     }
 
-    if (fileSessionId === sessionId) return { ids, origin: "file" };
+    if (fileSessionId === sessionId) return { ids, origin: "file", entriesInFile, droppedEntries: entriesInFile - ids.length };
 
     return {
       ids: [],
@@ -161,6 +165,10 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
  */
 export function formatRecalledResolution(resolved: RecalledIdsSource, indent = "  "): string[] {
   const lines = [`${indent}Recalled ids: ${resolved.ids.length} from ${resolved.origin}`];
+  // T-048 round 2: printed at zero too. `droppedEntries` is set only for origin "file"; 0 means every entry had an id.
+  if (resolved.droppedEntries !== undefined) {
+    lines.push(`${indent}Dropped ${resolved.droppedEntries} of ${resolved.entriesInFile} entries in the file: no numeric id, so they were not rated`);
+  }
   if (resolved.rejected) {
     lines.push(`${indent}Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`);
   }

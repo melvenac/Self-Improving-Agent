@@ -234,6 +234,7 @@ try {
     // than re-argued.
     dir_source: workspace.dir_source,
     workspace_root_count: workspace.root_count,
+    workspace_unusable_roots: workspace.unusable_roots,
     ...resolveAgentIdentity(payload),
   });
 } catch { /* provenance is best-effort — never fail session start */ }

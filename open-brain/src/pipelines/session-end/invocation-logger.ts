@@ -26,7 +26,12 @@ export interface InvocationEntry {
 
 export interface InvocationLogResult {
   logged: number;
+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */
   skippedSessions: number;
+  /** T-048: session dbs that could not be opened or read. */
+  unreadableSessions: number;
+  /** T-048: events read whose append to the log failed. */
+  appendFailures: number;
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -97,16 +102,16 @@ const SESSIONS_DB_DIR = join(homedir(), ".claude", "context-mode", "sessions");
  * Extract skill/mcp/command invocations from session .db files and append to JSONL log.
  * Skips sessions already logged (deduplication by session_id).
  */
-export function logInvocations(): InvocationLogResult {
-  if (!existsSync(SESSIONS_DB_DIR)) {
-    return { logged: 0, skippedSessions: 0 };
+export function logInvocations(sessionsDbDir: string = SESSIONS_DB_DIR, logPath: string = INVOCATION_LOG_PATH): InvocationLogResult {
+  if (!existsSync(sessionsDbDir)) {
+    return { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0 };
   }
 
   // Read already-logged session IDs
   const loggedSessions = new Set<string>();
-  if (existsSync(INVOCATION_LOG_PATH)) {
+  if (existsSync(logPath)) {
     try {
-      const lines = readFileSync(INVOCATION_LOG_PATH, "utf8").split("\n").filter(Boolean);
+      const lines = readFileSync(logPath, "utf8").split("\n").filter(Boolean);
       for (const line of lines) {
         try {
           const entry = JSON.parse(line) as { session?: string };
@@ -116,14 +121,17 @@ export function logInvocations(): InvocationLogResult {
     } catch { /* file read error — proceed without dedup */ }
   }
 
-  const dbFiles = readdirSync(SESSIONS_DB_DIR).filter((f) => f.endsWith(".db"));
+  const dbFiles = readdirSync(sessionsDbDir).filter((f) => f.endsWith(".db"));
   let totalLogged = 0;
   let skippedSessions = 0;
+  let unreadableSessions = 0;
+  let appendFailures = 0;
 
   for (const file of dbFiles) {
-    const filePath = join(SESSIONS_DB_DIR, file);
+    const filePath = join(sessionsDbDir, file);
+    let sessionDb: Database.Database | null = null;
     try {
-      const sessionDb = new Database(filePath, { readonly: true });
+      sessionDb = new Database(filePath, { readonly: true });
 
       const hasEvents = sessionDb
         .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='session_events'")
@@ -183,12 +191,16 @@ export function logInvocations(): InvocationLogResult {
         };
 
         try {
-          appendFileSync(INVOCATION_LOG_PATH, JSON.stringify(entry) + "\n");
+          appendFileSync(logPath, JSON.stringify(entry) + "\n");
           totalLogged++;
-        } catch { /* append error — skip */ }
+        } catch { appendFailures++; }
       }
-    } catch { /* session db read error — skip */ }
+    } catch {
+      unreadableSessions++;
+      // A db that opened but could not be read must not stay open: on Windows it locks the file.
+      try { sessionDb?.close(); } catch { /* already closed */ }
+    }
   }
 
-  return { logged: totalLogged, skippedSessions };
+  return { logged: totalLogged, skippedSessions, unreadableSessions, appendFailures };
 }

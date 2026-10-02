@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {
  */
 export function findExistingSessionLog(
   projectRoot: string,
-  sessionId: string | null
+  sessionId: string | null,
+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */
+  onUnreadable?: (name: string) => void
 ): { sessionNumber: number; logPath: string } | null {
   if (!sessionId) return null;
   const sessionsDir = join(projectRoot, ".agents", "SESSIONS");
@@ -56,7 +58,7 @@ export function findExistingSessionLog(
     if (!m) continue;
     const logPath = join(sessionsDir, f);
     let content: string;
-    try { content = readFileSync(logPath, "utf-8"); } catch { continue; }
+    try { content = readFileSync(logPath, "utf-8"); } catch { onUnreadable?.(f); continue; }
     const idMatch = content.match(SESSION_ID_LINE);
     if (!idMatch || idMatch[1] !== sessionId) continue;
     const sessionNumber = parseInt(m[1], 10);

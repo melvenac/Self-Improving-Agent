@@ -30,6 +30,7 @@ import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
+import { formatScanCounts } from "./pipelines/session-start/scan-counts.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from "./db-v2.js";
@@ -286,6 +287,8 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
         lines.push(`  [${w.category}] ${w.message}`);
       }
     }
+    // T-048 round 2: what the two scans could not read, at zero too.
+    lines.push(...formatScanCounts(result.session, result.health));
 
     // Seat identity and the role knowledge that goes with it (C1 / G-032).
     //
@@ -596,7 +599,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     return {
       content: [{
         type: "text",
-        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged\n${shadowLine}\n\n${shadowReport}`,
+        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged (${result.invocations.skippedSessions} already logged, ${result.invocations.unreadableSessions} unreadable, ${result.invocations.appendFailures} append failed)\n${shadowLine}\n\n${shadowReport}`,
       }],
     };
   } catch (err) {

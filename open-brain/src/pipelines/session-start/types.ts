@@ -94,10 +94,14 @@ export interface SessionInfo {
   skippedReason: string | null;
   /** Where sessionNumber came from when the log was created (T-164). Omitted when reused or skipped. */
   sessionNumberSource?: SessionNumberSource;
+  /** T-048: Session_N.md files that could not be read during the existing-log search. Undefined when no search ran (no session id). */
+  unreadableLogs?: number;
 }
 
 export interface HealthCheckResult {
   warnings: Array<{ category: string; message: string }>;
+  /** T-048: transcript directories that could not be listed. Null when ~/.claude/projects was not scanned (absent). */
+  transcriptDirsUnreadable?: number | null;
 }
 
 export interface SessionStartResult {
