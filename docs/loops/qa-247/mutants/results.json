@@ -1,0 +1,67 @@
+[
+  {
+    "id": "clean",
+    "diffLines": 1,
+    "tsc": 0,
+    "exit": 0,
+    "counts": "passed=16 failed=0 skipped=0",
+    "killed": false,
+    "failed": []
+  },
+  {
+    "id": "qa236-M6",
+    "diffLines": 14,
+    "tsc": 0,
+    "exit": 1,
+    "counts": "passed=15 failed=1 skipped=0",
+    "killed": true,
+    "failed": [
+      "t216-loop-id.test.ts :: L3b T-217: PlanSchema's and EvidenceSchema's loop regex IS LOOP_ID_PATTERN, by identity :: AssertionError: expected /^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/ to be /^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/ // Object.is equality"
+    ]
+  },
+  {
+    "id": "qa236-M7",
+    "diffLines": 14,
+    "tsc": 0,
+    "exit": 1,
+    "counts": "passed=14 failed=2 skipped=0",
+    "killed": true,
+    "failed": [
+      "t216-loop-id.test.ts :: L2b T-217: plan refuses upper case, which a case-insensitive copy of the pattern would accept :: AssertionError: \"T001\": expected true to be false // Object.is equality",
+      "t216-loop-id.test.ts :: L3b T-217: PlanSchema's and EvidenceSchema's loop regex IS LOOP_ID_PATTERN, by identity :: AssertionError: expected /^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/i to be /^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/ // Object.is equality"
+    ]
+  },
+  {
+    "id": "qa239-q5",
+    "diffLines": 14,
+    "tsc": 0,
+    "exit": 1,
+    "counts": "passed=15 failed=1 skipped=0",
+    "killed": true,
+    "failed": [
+      "t214-declared-blank.test.ts :: J3 T-218: leading whitespace on a header or an item is refused, under both fence kinds :: AssertionError: qa-declared [\" [unrunnable]\",\"A-1: x\"]: expected false to be true // Object.is equality"
+    ]
+  },
+  {
+    "id": "qa247-A-new-RegExp-source",
+    "diffLines": 14,
+    "tsc": 0,
+    "exit": 1,
+    "counts": "passed=15 failed=1 skipped=0",
+    "killed": true,
+    "failed": [
+      "t216-loop-id.test.ts :: L3b T-217: PlanSchema's and EvidenceSchema's loop regex IS LOOP_ID_PATTERN, by identity :: AssertionError: expected /^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/ to be /^(?:t\\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/ // Object.is equality"
+    ]
+  },
+  {
+    "id": "qa247-B-strip-leading-tab-only",
+    "diffLines": 14,
+    "tsc": 0,
+    "exit": 1,
+    "counts": "passed=15 failed=1 skipped=0",
+    "killed": true,
+    "failed": [
+      "t214-declared-blank.test.ts :: J3 T-218: leading whitespace on a header or an item is refused, under both fence kinds :: AssertionError: qa-declared [\"\\t[unrunnable]\",\"A-1: x\"]: expected false to be true // Object.is equality"
+    ]
+  }
+]

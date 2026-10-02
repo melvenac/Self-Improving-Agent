@@ -1,0 +1,58 @@
+{
+  "loop": "t217-t218",
+  "candidate_git": {
+    "sha": "1a38e3f2bc2ce0b850d2bf68949823c5812c2576",
+    "branch": "origin/loop/t217-t218-guards",
+    "frozen_at": "2026-10-01T00:00:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc -p open-brain (CI Typecheck, run 36948923624)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 152000,
+      "detail": "test job 110657297570 step Typecheck succeeded on qa/t217-t218-ci-candidate headSha 1a38e3f2bc2ce0b850d2bf68949823c5812c2576; local tsc --noEmit 0 on clean and all mutants"
+    },
+    "unit": {
+      "command": "npx vitest run --reporter=json in open-brain (local, Plumb) + CI Test, run 36948923624",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 464490,
+      "detail": "local: 2089 passed, 0 failed, 5 skipped, success:true, but vitest exited 1 with no captured message (unattributed); CI test job success"
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    {
+      "id": "R247-1",
+      "status": "met",
+      "order": "shown",
+      "evidence": "git diff c34866d3 1a38e3f2: 6 files (handoff, 3 mutant diffs, t214-declared-blank.test.ts, t216-loop-id.test.ts); 0 under open-brain/src. Kept mutants byte-identical to QA 236/239 originals."
+    },
+    {
+      "id": "R247-2",
+      "status": "met",
+      "order": "shown",
+      "evidence": "M6 red on L3b; M7 red on L2b and L3b. QA 247 mutant new RegExp(LOOP_ID_PATTERN.source) red on L3b identity check only."
+    },
+    {
+      "id": "R247-3",
+      "status": "met",
+      "order": "shown",
+      "evidence": "q5 red on J3 (leading-space header row). QA 247 mutant strip-leading-tab-only red on J3 at [\"\\t[unrunnable]\",\"A-1: x\"]."
+    },
+    {
+      "id": "R247-4",
+      "status": "met",
+      "order": "shown",
+      "evidence": "Full suite once at candidate: 559 suites, 2089 passed, 0 failed, 5 skipped; JSON success true; vitest exit 1 unattributed (no message captured)."
+    },
+    {
+      "id": "R247-5",
+      "status": "met",
+      "order": "shown",
+      "evidence": "CI run 36948923624, headSha 1a38e3f2bc2ce0b850d2bf68949823c5812c2576, conclusion success; test job 110657297570 success; test-windows skipped."
+    }
+  ],
+  "verdict": "ACCEPT"
+}
