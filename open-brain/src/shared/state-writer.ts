@@ -28,6 +28,7 @@ import {
   EvidenceSchema,
   SeatName,
   LoopStateSchema,
+  OpenQuestionSchema,
   parseState,
   serializeState,
   compareFirstRev,
@@ -80,7 +81,7 @@ export const OpSchema = z.discriminatedUnion("op", [
   // an argument: it comes from ApplyStateOptions.session_uuid, so a batch cannot
   // write under another session's uuid (T-163). The op is strict, so a batch
   // that tries is refused rather than having the key ignored.
-  z.strictObject({ op: z.literal("set_handoff"), seat: SeatName, pick_up: z.string(), watch_out: z.array(z.string()), open_questions: z.array(z.string()), loop_state: LoopStateSchema.nullable().optional() }),
+  z.strictObject({ op: z.literal("set_handoff"), seat: SeatName, pick_up: z.string(), watch_out: z.array(z.string()), open_questions: z.array(OpenQuestionSchema), loop_state: LoopStateSchema.nullable().optional() }),
 ]);
 export type StateOp = z.infer<typeof OpSchema>;
 

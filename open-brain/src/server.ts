@@ -30,6 +30,7 @@ import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
+import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
 import { formatScanCounts } from "./pipelines/session-start/scan-counts.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -353,6 +354,20 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       lines.push(...renderState(sj.data, result.state.version, {
         seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
         projectRoot,
+      }));
+      // T-233 B: the whole briefing, rendered here, so /start prints it instead of assembling it.
+      lines.push("", ...renderBriefing({
+        state: sj.data,
+        version: result.state.version,
+        seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+        sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
+        sessionNote: result.session.skippedReason,
+        date: new Date().toISOString().slice(0, 10),
+        drift: result.drift,
+        usage: describeUsage(projectRoot),
+        latestBrief,
+        workingTree: describeWorkingTree(projectRoot),
+        skills: describeSkills(projectRoot),
       }));
     } else {
       // F3: an unknown schema_version REFUSES, with no prose fallback.

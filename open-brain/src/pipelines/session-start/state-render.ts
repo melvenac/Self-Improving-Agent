@@ -1,5 +1,5 @@
-import type { State, Task, Handoff, Seat } from "../../shared/state-schema.js";
-import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat } from "../../shared/state-schema.js";
+import type { State, Task, Handoff, Seat, OpenQuestion } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat, questionText, questionResolvedBy } from "../../shared/state-schema.js";
 import { findHandoffCommit } from "./handoff-provenance.js";
 
 /**
@@ -143,7 +143,7 @@ export const GAPS_SHOWN = 10;
 /** D-100: a task title longer than this is cut to this many characters and ends with an ellipsis. Ids and statuses are never clipped. */
 export const TITLE_CLIP = 100;
 /** Priorities rendered as a count line, not a list of titles. */
-const COUNT_ONLY_PRIORITIES: ReadonlySet<string> = new Set(["P2", "P3"]);
+export const COUNT_ONLY_PRIORITIES: ReadonlySet<string> = new Set(["P2", "P3"]);
 export const VERIFIED_CLIP = 100;
 /** Verified is its count plus the newest this many (planner ruling (a), T-183). */
 export const VERIFIED_SHOWN = 10;
@@ -230,6 +230,17 @@ function instanceLabel(h: Handoff): string {
   return ` [${h.checkout ?? "legacy"}]`;
 }
 
+/** The unresolved question texts, and how many were resolved (T-233 B). */
+export function splitQuestions(questions: readonly OpenQuestion[]): { open: string[]; resolved: number } {
+  const open: string[] = [];
+  let resolved = 0;
+  for (const q of questions) {
+    if (questionResolvedBy(q) !== null) resolved++;
+    else open.push(questionText(q));
+  }
+  return { open, resolved };
+}
+
 function renderOneHandoff(h: Handoff): string[] {
   const lines: string[] = [];
   lines.push(`  pick up: ${h.pick_up}`);
@@ -237,9 +248,12 @@ function renderOneHandoff(h: Handoff): string[] {
     lines.push(`  watch out:`);
     for (const w of h.watch_out) lines.push(`    - ${w}`);
   }
-  if (h.open_questions.length > 0) {
+  // T-233 B: a resolved question is omitted and COUNTED, so "none" and "N answered" stay different facts.
+  const { open, resolved } = splitQuestions(h.open_questions);
+  if (open.length > 0 || resolved > 0) {
     lines.push(`  open questions:`);
-    for (const q of h.open_questions) lines.push(`    - ${q}`);
+    for (const q of open) lines.push(`    - ${q}`);
+    if (resolved > 0) lines.push(`    (${resolved} resolved, not shown)`);
   }
   if (h.loop_state) {
     const ls = h.loop_state;
