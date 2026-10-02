@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 281 by open-brain v0.45.0 — do not edit; change state via ob_state -->
-> **Status:** v0.45.0 — Loop 15 slice FOUR is CLOSED (PROVISIONAL): step 4 re-run QA 248 ACCEPTED (D-093), 13/13 live Jev calls answered, records merged with the ruling. NEXT: (1) the ONE release for slices three and four (D-073), which is Aaron's under D-019: consolidate the three Unreleased CHANGELOG sections first and propose the version; (2) T-164 port + T-211 standing cron, dispatched to sia-builder at bea385b2 (Aaron's priority); (3) T-221 ruling (cancelled push 'test' blocks loop/qa PRs); (4) T-194 r7 courtesy-layer ruling, then the sparse planner checkout; (5) T-222 (count-attempts and F6-F8).
+<!-- generated from .agents/state.json rev 282 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+> **Status:** v0.45.0 — Clear the session-157 code-PR backlog through BATCH QA from the 11:50Z 2026-10-02 reset (Aaron's three-part plan): groupings B1-B4 in docs/loops/planner-session-157-handoff.md, one AskUserQuestion per accepted batch naming every PR, merge each pinned. First: read QA 254 (T-208/T-212 REJECT, origin/qa/t208-t212-report 6a908ebf), rule it, dispatch round 2. Backlog gate: devs open no new code PRs while 6 or more await QA. Then: the D-073 release (Aaron's, D-019), T-225 calibration-2 prerequisites.
 
 ## What's working
 
