@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 271 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 272 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -47,24 +47,24 @@ _None._
 
 ### Pick up here
 
-Builder seat (Claude Code, sia-builder checkout on the QA PC), rolled by Aaron. Nothing is uncommitted or unpushed. Delivered and pushed this stretch: T-216 (9a0973f0, merged), T-214 (caebe8b6, QA 239), slice four step 2 on loop/15-slice-4-step2 (r1 2d4cd863, r2 779be4d6, r3 36a0fc28, r4 8a6cfb2d, r5 1311c2a7; QA 244 accepted r4, r5 scoped the S4-5b guard after PR #254's merge-ref CI failed it), and T-217/T-218 (1a38e3f2, merged as #256). No assignment is open: the next work is an Atlas dispatch. SIA master now has ruleset 24343321, so a branch reaches master only through a PR with the CI test passing. Handoffs: docs/loops/t216-developer-handoff.md, t214-developer-handoff.md, loop-15-slice-4-step2-developer-handoff.md (r1 to r5), t217-t218-developer-handoff.md.
+Builder seat (Claude Code, sia-builder checkout on the QA PC), rolled at Aaron's word. Nothing is uncommitted or unpushed. Since the last handoff: T-219 (PR #262, merged), T-220 (PR #266, merged), T-164 port (PR #270, loop/t164-port fbf94ae6, last seen BLOCKED pending its push-run re-run) and T-211 (PR #272, loop/t211-standing-cron 9f6fcea4, stacked on T-164, last seen CLEAN) are delivered and frozen for QA; I merged none of them. Earlier: slice four step 2 (loop/15-slice-4-step2, final 1311c2a7), T-217/T-218 (#256), T-216, T-214. No assignment is open: the next work is a dispatch from atlas-sia (plain name, no [ref]; Relay is relay-a2a; clark is the fallback). Handoffs: docs/loops/t164-port-developer-handoff.md, t211-developer-handoff.md, t219-developer-handoff.md, t220-developer-handoff.md, loop-15-slice-4-step2-developer-handoff.md (r1 to r5), t217-t218-developer-handoff.md. SIA master has ruleset 24343321: PR plus the CI test required.
 
 ### Watch out
 
-- REPORT TO `atlas-sia`: the SIA planner restarts under the fleet-unique name `atlas-sia` (plain name, no [ref]); Relay becomes `relay-a2a`; `clark` stays the fallback. Earlier dispatches name the old Atlas session addresses, which no longer apply.
-- I did not see PR #254's CI result after r5, so whether both its push and pull_request runs went green is unconfirmed from this seat.
-- NEVER run the full vitest suite on the QA PC. Free RAM there is 1.2 to 1.9 GB shared with Chisel, and Claude Code killed a queued full-suite background run for memory. Atlas rules: single files, one at a time, mutants sequentially; QA runs the full suite on Plumb. Heavy runs need Aaron's approval in the seat's own window, or a one-line 'MANUAL MODE -> sia-builder: <action> (<why>)' to clark.
-- The Bash tool mangles git ref:path (MSYS) and node cannot read /tmp from it: use PowerShell, MSYS_NO_PATHCONV=1, or the scratchpad directory. A heredoc containing a nested EOF aborts the whole command silently: use the Write tool for files.
-- A diff-based guard that scans from a fixed base reads master's LATER docs and fails on the merge ref (PR #254, S4-5b). Give each guard only the paths its row names, from one table, and test it on a scratch merge into current origin/master. An untracked file is invisible to git diff, so a guard can look green while a planted line is uncommitted.
-- Redaction is two layers (JevTransport's error text and each record writer), and a mutant on one is hidden by the other: test each layer directly. A hostile fake that echoes the Authorization header, a scan that is shown to find a planted canary, and a global fetch replaced by a function that throws are all required.
-- Red-first for a group that adds source: copy src to the scratchpad, commit the tests, git checkout HEAD -- open-brain/src and git clean -fdq open-brain/src, run red, copy src back, run green. Capture a mutant with Edit, then git diff > file, then git checkout open-brain/src; every mutant must pass tsc --noEmit (unreachable code and optional types make some fail it).
-- The record's last session was 155 when I took 156; the greeting's local number is different (T-164). Re-read the record's last n after a fetch, immediately before any write.
-- S4-4b independence is disclosed four/four: for #182, #187, #195 and #209 I had read some of the diff's code before writing their D_t (listed in the step-2 handoff); #165, #227, #220 and #218 were written without. Atlas accepted it with disclosure and the close-out reports them separately.
+- T-221: a push run and its PR run share a concurrency group, so the push run's `test` is cancelled and the PR reads BLOCKED until the planner re-runs it. Report it; never push empty commits.
+- The record already holds TWO uuids under session 156 (mine, and the planner's 83f0e630), so the number I took collided. Re-read the record's last n after a fetch immediately before any write; T-164's port (PR #270) is the fix, once merged.
+- NEVER run the full vitest suite on the QA PC (free RAM 1.2 to 1.9 GB, shared with Chisel; Claude Code killed a queued full run). Single files, one at a time; mutants sequentially; QA runs the full suite on Plumb. Heavy runs need Aaron's approval or a 'MANUAL MODE -> sia-builder: <action> (<why>)' line to clark.
+- The Bash tool mangles git ref:path (MSYS) and node cannot read /tmp from it: use PowerShell, MSYS_NO_PATHCONV=1, or the scratchpad. A heredoc with a nested EOF aborts the whole command: use the Write tool for files.
+- A diff-based guard scanning from a fixed base reads master's LATER docs and fails on the merge ref (PR #254). Give each guard only its row's paths from one table (SCOPES), and test on a scratch merge into current origin/master. git diff never sees an untracked file.
+- Redaction has two layers (JevTransport's error text and each record writer); a mutant on one is hidden by the other, so test each layer directly with a hostile echoing fake, a planted-canary scan, and a global fetch that throws.
+- Red-first for a group that adds source: copy src to the scratchpad, commit the tests, git checkout HEAD -- open-brain/src and git clean -fdq open-brain/src, run red, copy src back, run green. Capture a mutant with Edit, git diff > file, git checkout open-brain/src; every mutant must pass tsc --noEmit.
+- Adding lines to .claude/commands/start.md needs the same lines in project-template/.claude/commands/start.md and either in the Cursor copy or listed under claude_only in docs/loops/cursor-start-differences.json (the cursor-start-parity check waives only exact lines).
+- S4-4b independence stays disclosed four/four (#182, #187, #195, #209 read some code first; #165, #227, #220, #218 did not).
 
 ### Open questions
 
-- Step 4 (the QA live calls, at most 17) and the close-out belong to the QA seat; the generator is `harness closeout-tables [--check <report>]` and the attempt count is `harness count-attempts`.
-- Whether QA 247 (T-217/T-218) and PR #254 are accepted and merged: not known from this seat.
+- Whether PR #270 (T-164) and #272 (T-211) pass QA and merge, and when the planner writes its own AGENT.local.md standing-cron keys after T-211 merges: not known from this seat.
+- Step 4 of slice four (the QA live calls) and the close-out belong to the QA seat; regenerate tables with `harness closeout-tables` (T-220 is merged).
 
 ## developer [sia-forge] _(written session 151)_
 
