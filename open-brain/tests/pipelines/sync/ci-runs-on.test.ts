@@ -201,7 +201,8 @@ function testJobRuns(ctx: Ctx, paths: string[] | "unreadable"): boolean {
     const listed = paths === "unreadable" ? [] : paths;
     return truthy(evalRunsOn(jobIf, { ...ctx, commits: [{ modified: listed }] }));
   }
-  const seat = ctx.event === "push" && ctx.ref !== "refs/heads/master";
+  // The changed job runs on a pull request (D-091) and on a non-master push (T-178).
+  const seat = ctx.event === "pull_request" || (ctx.event === "push" && ctx.ref !== "refs/heads/master");
   return truthy(evalRunsOn(jobIf, {
     ...ctx,
     changedResult: seat ? "success" : "skipped",
@@ -247,14 +248,63 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ hosted: expect.anything(), windows: expect.anything() });
   });
 
-  it("a pull request ignores only docs/** and README.md (D-055)", () => {
+  it("a pull request has no paths filter, so a docs-only PR starts the workflow and reports test (D-091, T-219)", () => {
     const doc = parse(readFileSync(workflowPath, "utf-8")) as {
       on: {
         pull_request?: { "paths-ignore"?: string[]; paths?: unknown } | null;
       };
     };
-    expect(doc.on.pull_request?.["paths-ignore"]).toEqual(["docs/**", "README.md"]);
-    expect(doc.on.pull_request == null || !("paths" in doc.on.pull_request)).toBe(true);
+    // D-055 filtered docs-only PRs out here. A workflow that never starts never reports `test`,
+    // which master's ruleset requires, so the PR was blocked forever.
+    expect("pull_request" in doc.on, "the pull_request trigger is gone").toBe(true);
+    expect(doc.on.pull_request == null || !("paths-ignore" in doc.on.pull_request || "paths" in doc.on.pull_request)).toBe(true);
+  });
+
+  it("T-219 a docs-only PR skips test at the job level, a code PR runs it, and there is no stub job named test", () => {
+    const docsOnly = ["docs/loops/x.md", "README.md"];
+    const pr = { event: "pull_request", ref: "refs/pull/1/merge", hosted: null } as const;
+    expect(testJobRuns(pr, docsOnly), "a docs-only PR ran test").toBe(false);
+    expect(testJobRuns(pr, ["open-brain/src/cli.ts"]), "a code PR skipped test").toBe(true);
+    expect(testJobRuns(pr, [".github/workflows/ci.yml", "docs/a.md"]), "a PR changing ci.yml plus docs skipped test").toBe(true);
+    expect(testJobRuns(pr, "unreadable"), "an unreadable change list skipped test").toBe(true);
+    // Not allowed (D-091): a second workflow or stub job that reports `test` and always passes.
+    const doc = parse(readFileSync(workflowPath, "utf-8")) as { jobs: Record<string, { name?: string; steps?: unknown[] }> };
+    const named = Object.entries(doc.jobs).filter(([id, job]) => id === "test" || job.name === "test");
+    expect(named.map(([id]) => id)).toEqual(["test"]);
+    expect((doc.jobs.test.steps ?? []).length, "the test job lost its steps").toBeGreaterThan(5);
+    expect(JSON.stringify(doc.jobs.test)).toContain("npm ci");
+  });
+
+  it("T-219 a PR is diffed from the merge-base, so master's later code does not keep a docs-only PR from skipping", () => {
+    const root = mkdtempSync(join(tmpdir(), "ci-pr-"));
+    try {
+      git(root, ["init", "--initial-branch=main"]);
+      git(root, ["config", "user.email", "forge@example.com"]);
+      git(root, ["config", "user.name", "forge"]);
+      git(root, ["commit", "--allow-empty", "-m", "base"]);
+      const branchPoint = git(root, ["rev-parse", "HEAD"]).trim();
+      git(root, ["checkout", "-q", "-b", "pr"]);
+      mkdirSync(join(root, "docs"), { recursive: true });
+      writeFileSync(join(root, "docs/a.md"), "x\n");
+      git(root, ["add", "-A"]);
+      git(root, ["commit", "-m", "docs only"]);
+      const head = git(root, ["rev-parse", "HEAD"]).trim();
+      git(root, ["checkout", "-q", "main"]);
+      mkdirSync(join(root, "open-brain"), { recursive: true });
+      writeFileSync(join(root, "open-brain/code.ts"), "x\n");
+      git(root, ["add", "-A"]);
+      git(root, ["commit", "-m", "master moved on with code"]);
+      const base = git(root, ["rev-parse", "HEAD"]).trim();
+      const run = (from: string): string =>
+        execFileSync("node", [skipScript, from, head], { cwd: root, encoding: "utf8" }).trim();
+      const mergeBase = git(root, ["merge-base", base, head]).trim();
+      expect(mergeBase).toBe(branchPoint);
+      expect(run(mergeBase), "from the merge-base").toBe("skip=true");
+      expect(run(base), "from base.sha: master's own code change leaks in (the safe, but wrong, direction)").toBe("skip=false");
+      expect(run(""), "an empty merge-base").toBe("skip=false");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 
   it("push branches are master, loop/**, and qa/** (T-178)", () => {
@@ -335,7 +385,7 @@ describe("ci.yml runs-on (T-192)", () => {
       }>;
     };
     const changed = doc.jobs.changed;
-    expect(changed.if).toBe("github.event_name == 'push' && github.ref != 'refs/heads/master'");
+    expect(changed.if).toBe("github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/master')");
     expect(changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
     expect(changed.outputs?.skip).toBe("${{ steps.diff.outputs.skip }}");
     const checkout = changed.steps?.find((step) => step.uses === "actions/checkout@v4");
@@ -344,6 +394,9 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(diff?.run).toContain("open-brain/scripts/ci-seat-skip.mjs");
     expect(diff?.run).toContain("github.event.before");
     expect(diff?.run).toContain("github.sha");
+    expect(diff?.run).toContain("github.event.pull_request.base.sha");
+    expect(diff?.run).toContain("github.event.pull_request.head.sha");
+    expect(diff?.run).toContain("git merge-base");
     expect(diff?.run).not.toContain("github.event.commits");
     expect(doc.jobs.test.needs).toBe("changed");
     const jobIf = doc.jobs.test.if ?? "";
