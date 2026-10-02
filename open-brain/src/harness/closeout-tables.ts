@@ -64,6 +64,26 @@ const sha256 = (path: string): string => createHash("sha256").update(readFileSyn
 export interface CloseoutInput {
   recordsDir: string;
   policiesDir?: string;
+  /** The criteria file whose Terms table says which diffs have an E_t. Default: beside the records directory. */
+  criteriaPath?: string;
+}
+
+/**
+ * Which diffs have an E_t, from the criteria's Terms table: `| diff | #PR | merge | head | E_t |`.
+ * A last cell that starts with `none` means no E_t on any qa branch. Null when the file or the table
+ * is missing, so a caller never reads "no rows" as "no E_t".
+ */
+export function readTermsTable(path: string): Map<number, boolean> | null {
+  if (!existsSync(path)) return null;
+  const facts = new Map<number, boolean>();
+  for (const line of readFileSync(path, "utf-8").split(/\r?\n/)) {
+    if (!line.startsWith("|")) continue;
+    const cells = line.split("|").slice(1, -1).map((c) => c.trim());
+    const pr = cells.length >= 5 ? cells[1]!.match(/^#(\d+)$/) : null;
+    if (pr === null) continue;
+    facts.set(Number(pr[1]), !/^none\b/i.test(cells[cells.length - 1]!));
+  }
+  return facts.size === 0 ? null : facts;
 }
 
 export interface CloseoutResult {
@@ -108,7 +128,7 @@ function thresholdTable(
   flags: readonly string[],
 ): string[] {
   const out: string[] = [`### ${title} — ${provisionalLabel(records.map((l) => l.rec))}`, ""];
-  out.push(`N = ${records.length}. ${records.length === 0 ? "No scored records." : modelLine(records)}.`, "");
+  out.push(`N = ${records.length}. ${records.length === 0 ? "No scored records." : `${modelLine(records)}.`}`, "");
   out.push("| PR | scored SHA | model_resolved |", "| --- | --- | --- |");
   for (const l of records) out.push(`| ${prOf(l.rec, l.path)} | ${shaOf(l)} | ${String(l.rec.model_resolved)} |`);
   out.push("", "| threshold | value | rejects | N | per-diff values | min | max | reject side | other side |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |");
@@ -202,12 +222,25 @@ export function buildCloseoutTables(input: CloseoutInput): CloseoutResult {
         .sort((a, b) => a - b)
     : [];
   const scored = new Set(qa.map((l) => prOf(l.rec, l.path)));
+  // Whether a diff HAS an E_t comes from the criteria's Terms table, which does not depend on a G_qa
+  // having run (T-220, D-092 F2). Only a G_qa run writes the `pr-<n>.E_t.json` copy, so the copy's
+  // presence alone mislabelled every diff that has an E_t but had not been called.
+  const criteriaPath = resolve(input.criteriaPath ?? join(recordsDir, "..", "loop-15-slice-4-criteria.md"));
+  const facts = readTermsTable(criteriaPath);
   const hasCopy = (pr: number): boolean => existsSync(join(recordsDir, `pr-${pr}.E_t.json`));
+  const qaLabel = (pr: number): string => {
+    if (scored.has(pr)) return "scored";
+    if (facts === null) return hasCopy(pr) ? "not scored" : "not scored: no E_t";
+    const has = facts.get(pr);
+    if (has === undefined) return "not scored: E_t unknown";
+    return has ? "not called" : "not scored: no E_t";
+  };
   lines.push("### Diffs and what was scored", "", "| PR | 4.3 G_done | 4.4 G_qa |", "| --- | --- | --- |");
   const doneSet = new Set(done.map((l) => prOf(l.rec, l.path)));
   for (const pr of diffs) {
-    lines.push(`| ${pr} | ${doneSet.has(pr) ? "scored" : "not scored"} | ${scored.has(pr) ? "scored" : hasCopy(pr) ? "not scored" : "not scored: no E_t"} |`);
+    lines.push(`| ${pr} | ${doneSet.has(pr) ? "scored" : "not scored"} | ${qaLabel(pr)} |`);
   }
+  lines.push("", facts === null ? "E_t source: none (the criteria Terms table was not readable; the records directory alone was used)." : `E_t source: the criteria Terms table (${facts.size} rows).`);
   lines.push("");
 
   return { markdown: `${lines.join("\n")}\n`, refused, doneN: done.length, qaN: qa.length };
