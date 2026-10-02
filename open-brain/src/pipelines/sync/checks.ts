@@ -896,6 +896,8 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, 
   if (!settings.ok && !settings.cause.endsWith("does not exist")) {
     notChecked.push(`${settings.cause}: settings unreadable, plugins not examined`);
   }
+  // Absent settings enable nothing: a pass, but the skip is NAMED like a url server (QA 260).
+  const settingsAbsent = !settings.ok && settings.cause.endsWith("does not exist");
   if (enabled.length > 0) {
     const installed = readJsonFile(join(home, ".claude", "plugins", "installed_plugins.json"));
     for (const key of enabled) {
@@ -968,6 +970,7 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, 
   }
 
   const skippedNote = skipped.length > 0 ? ` Skipped ${skipped.length}: ${skipped.join("; ")}.` : "";
+  const absentNote = settingsAbsent ? " Skipped: settings.json absent: no plugins enabled, none examined." : "";
   const notCheckedNote = notChecked.length > 0 ? ` not checked: ${notChecked.join("; ")}.` : "";
   if (missing.size > 0) {
     const list = [...missing].map(([k, s]) => `${k} not found (${s.length === 1 ? s[0] : `${s.length} scopes, first ${s[0]}`})`).join("; ");
@@ -979,9 +982,9 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, 
   }
   // Any input that was not examined caps the result at warn, even when the message names it (B2 ruling).
   if (notChecked.length > 0) {
-    return { name, severity: "warn", message: `${checked} MCP server command(s) resolve to a file, but${notCheckedNote} This is not a full pass.${skippedNote}` };
+    return { name, severity: "warn", message: `${checked} MCP server command(s) resolve to a file, but${notCheckedNote} This is not a full pass.${skippedNote}${absentNote}` };
   }
-  return { name, severity: "pass", message: `${checked} MCP server command(s) resolve to a file.${skippedNote}` };
+  return { name, severity: "pass", message: `${checked} MCP server command(s) resolve to a file.${skippedNote}${absentNote}` };
 }
 
 /**

@@ -134,7 +134,7 @@ describe("checkMcpCommandPaths (T-008)", () => {
       config({ mcpServers: { broken: bad, good: { command: onPath("goodserver") } } });
       const r = checkMcpCommandPaths(home, env());
       expect(r.severity, r.message).toBe("warn");
-      expect(r.message).toContain("Not checked 1: broken (global): entry is not an object");
+      expect(r.message).toContain("not checked: broken (global): entry is not an object");
     }
   });
 
@@ -281,9 +281,27 @@ describe("checkMcpCommandPaths: .mcp.json and plugins (T-008b)", () => {
     expect(r.message).toContain("settings unreadable, plugins not examined");
   });
 
-  it("an ABSENT ~/.claude/settings.json enables nothing and stays a pass", () => {
+  it("an ABSENT ~/.claude/settings.json enables nothing and stays a pass, with the skip NAMED", () => {
     writeFileSync(join(home, ".claude.json"), JSON.stringify({ mcpServers: { good: { command: onPath("goodserver") } } }));
-    expect(run().severity).toBe("pass");
+    const r = run();
+    expect(r.severity, r.message).toBe("pass");
+    expect(r.message).toContain("settings.json absent: no plugins enabled, none examined");
+  });
+
+  it("a PRESENT settings.json does not carry the absent-skip note", () => {
+    writeFileSync(join(home, ".claude.json"), JSON.stringify({ mcpServers: { good: { command: onPath("goodserver") } } }));
+    mkdirSync(join(home, ".claude"), { recursive: true });
+    writeFileSync(join(home, ".claude", "settings.json"), JSON.stringify({ enabledPlugins: {} }));
+    const r = run();
+    expect(r.severity, r.message).toBe("pass");
+    expect(r.message).not.toContain("settings.json absent");
+  });
+
+  it("B2 r3 (QA 260): a non-object mcpServers entry is WARN here too, with the #298 wording", () => {
+    writeFileSync(join(home, ".claude.json"), JSON.stringify({ mcpServers: { broken: null, good: { command: onPath("goodserver") } } }));
+    const r = run();
+    expect(r.severity, r.message).toBe("warn");
+    expect(r.message).toContain("not checked: broken (global): entry is not an object");
   });
 
   it("J: an enabled plugin with a GARBLED plugin.json beside a good root .mcp.json is WARN, the manifest recorded as not checked", () => {
