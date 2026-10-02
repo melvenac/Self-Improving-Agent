@@ -1,0 +1,13 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 87e817eb..80e124fb 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -54,7 +54,7 @@ on:
+ # two merges close together must both get a result. A dispatch has its own group per run.
+ concurrency:
+   group: "${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || (github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-push-{0}', github.sha)) }}"
+-  cancel-in-progress: "${{ github.event_name == 'pull_request' }}"
++  cancel-in-progress: true
+ 
+ jobs:
+   # T-178/T-227: the list of changed files comes from git diff, not from a payload. It runs on a pull request
