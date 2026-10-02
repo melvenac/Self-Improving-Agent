@@ -37,6 +37,7 @@ import { checkWorktreeLayout } from "./worktree-layout.js";
 import { checkHubSeats } from "./hub-seats.js";
 import { checkCursorStartParity } from "./start-parity.js";
 import { checkProbeMarkers } from "./probe-markers.js";
+import { checkVaultPollution } from "./vault-pollution.js";
 import { checkCursorHookCompat } from "./cursor-hook-compat.js";
 import { checkShadowMergeLedger } from "../../harness/shadow-merge.js";
 
@@ -110,6 +111,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkCursorStartParity(options.projectRoot));
   // Record 198: a file under open-brain/tests that says "not for merge" is an issue.
   checks.push(checkProbeMarkers(options.projectRoot));
+  // T-042: ob-server-* test artifacts in the real vault (a preventer existed; this is the detector).
+  checks.push(checkVaultPollution(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   // Loop 10 R1: the runtime label travels with the check, because the same code
   // passing in one process and failing in the other IS the signal.
