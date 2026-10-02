@@ -15,7 +15,7 @@ import { join } from "path";
 import { homedir } from "os";
 import { openV2Database } from "./db-v2.js";
 import { formatSessionEndLines, sessionEndV2 } from "./pipelines/session-end/index-v2.js";
-import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
 import { resolveSessionId } from "./shared/active-session.js";
@@ -117,7 +117,7 @@ try {
     // recall_log for this session wins; the file is consulted only when it
     // names this same session. See resolveRecalledIds — the copy on disk had
     // been two sessions stale and was being rated as if it were current.
-    const resolved = resolveRecalledIds({
+    const { resolved, foreign } = resolveRecalledIdsObserved({
       db,
       sessionId: sessionId || null,
       filePaths: [
@@ -130,7 +130,7 @@ try {
     // Loop 5 R3: this hook runs unattended, so it was the worst place for a
     // silent no-rating. It previously spoke only when a file was refused; a
     // session with no id and no file said nothing at all and rated nothing.
-    for (const line of formatRecalledResolution(resolved, "")) console.log(`[session-end] ${line}`);
+    for (const line of [...formatRecalledResolution(resolved, ""), ...formatForeignWriter(foreign, "")]) console.log(`[session-end] ${line}`);
     const result = sessionEndV2({
       db,
       vaultDir: V2_VAULT,

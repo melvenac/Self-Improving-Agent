@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import Database from "better-sqlite3";
 import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from "../../../src/db-v2.js";
-import { resolveRecalledIds, formatRecalledResolution } from "../../../src/pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from "../../../src/pipelines/session-end/recalled-ids.js";
 
 const THIS_SESSION = "efcaeb75-f5d5-421f-a1e5-645f155c59e4";
 const OTHER_SESSION = "2fb67133-f85a-4c1d-9e30-000000000000";
@@ -196,5 +196,71 @@ describe("R3: a session that rates nothing says why", () => {
     const r = resolve(db, null, {});
     expect(formatRecalledResolution(r, "")[0]).toBe("Recalled ids: 0 from none");
     expect(formatRecalledResolution(r, "  ")[0]).toBe("  Recalled ids: 0 from none");
+  });
+});
+
+/**
+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the
+ * file is never read, so "no foreign writer" and "a foreign writer never looked at" printed the same nothing.
+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.
+ */
+describe("detectForeignWriter — T-050", () => {
+  const OURS = THIS_SESSION;
+  const run = (sessionId: string | null, files: Record<string, string>) =>
+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });
+
+  it("FW-1: a file written by another session is reported, with the path and the session it names", () => {
+    const r = run(OURS, { "/p/.recalled-entries.json": fileFor(OTHER_SESSION, [1, 2]) });
+    expect(r.checked).toBe(true);
+    expect(r.findings).toEqual([{ path: "/p/.recalled-entries.json", kind: "foreign", fileSessionId: OTHER_SESSION }]);
+    expect(formatForeignWriter(r)).toEqual([
+      `  Foreign writer: FOUND /p/.recalled-entries.json names session ${OTHER_SESSION}, not ${OURS} (reported, not refused; it played no part in which entries were rated)`,
+    ]);
+  });
+
+  it("FW-2: our own file is not a finding, and says it was read", () => {
+    const r = run(OURS, { "/p/.recalled-entries.json": fileFor(OURS, [1]) });
+    expect(r.findings).toEqual([]);
+    expect(formatForeignWriter(r)).toEqual(["  Foreign writer: none (1 file read, all name this session)"]);
+  });
+
+  it("FW-3: no file anywhere says 'none present', which is not 'not checked'", () => {
+    const r = detectForeignWriter({ sessionId: OURS, filePaths: ["/a/.recalled-entries.json", "/b/.recalled-entries.json"], readFile: () => null });
+    expect(formatForeignWriter(r)).toEqual(["  Foreign writer: none present (no .recalled-entries.json in 2 location(s))"]);
+    const unchecked = detectForeignWriter({ sessionId: null, filePaths: ["/a/.recalled-entries.json"], readFile: () => null });
+    expect(unchecked.checked).toBe(false);
+    expect(formatForeignWriter(unchecked)).toEqual(["  Foreign writer: not checked (no session id, so no file can be called foreign)"]);
+    expect(formatForeignWriter(r)).not.toEqual(formatForeignWriter(unchecked));
+  });
+
+  it("FW-4: an unparseable file and a file naming no session are reported by kind, not ignored", () => {
+    const r = run(OURS, { "/a/.recalled-entries.json": "{not json", "/b/.recalled-entries.json": fileFor(null, [5]) });
+    expect(r.findings.map((f) => [f.path, f.kind])).toEqual([
+      ["/a/.recalled-entries.json", "unparseable"],
+      ["/b/.recalled-entries.json", "unattributed"],
+    ]);
+  });
+
+  it("FW-5: the detector's read cannot feed the resolver — ids, origin and rejection are identical with and without it", () => {
+    const db = makeDb();
+    recordRecallEvent(db, OURS, "q", [351, 365]);
+    const files = { "/p/.recalled-entries.json": fileFor(OTHER_SESSION, [999, 998]) };
+    const input = { db, sessionId: OURS, filePaths: Object.keys(files), readFile: (p: string) => files[p] ?? null };
+    const alone = resolveRecalledIds(input);
+    const observed = resolveRecalledIdsObserved(input);
+    expect(observed.resolved).toEqual(alone);
+    expect(observed.resolved.ids).toEqual([351, 365]);
+    expect(observed.resolved.origin).toBe("recall-log");
+    expect(observed.foreign.findings).toHaveLength(1);
+    // and with nothing in recall_log the foreign file is still refused by the resolver, not adopted
+    const empty = resolveRecalledIdsObserved({ ...input, db: makeDb() });
+    expect(empty.resolved.ids).toEqual([]);
+    expect(empty.resolved.origin).toBe("none");
+    expect(empty.foreign.findings).toHaveLength(1);
+  });
+
+  it("FW-6: the report carries no ids at all, so it cannot be mistaken for evidence of what was recalled", () => {
+    const r = run(OURS, { "/p/.recalled-entries.json": fileFor(OTHER_SESSION, [1, 2]) });
+    expect(JSON.stringify(r)).not.toMatch(/"ids"|"entries"/);
   });
 });

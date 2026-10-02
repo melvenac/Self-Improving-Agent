@@ -34,7 +34,7 @@ import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
-import { resolveRecalledIds, formatRecalledResolution } from "./pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
@@ -546,7 +546,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     // No named id means the proven one. end.md calls ob_end that way, and a
     // rating ob_recalled lists is in recall_log under that id (D3).
     const endedId = endSession.id;
-    const resolved = resolveRecalledIds({
+    const { resolved, foreign } = resolveRecalledIdsObserved({
       db: v2db,
       sessionId: endedId,
       explicitIds: args.recalled_entry_ids,
@@ -584,7 +584,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     // Same lines the session-end hook prints, including the reason a none-origin
     // resolved nothing. The count alone made "no session id" and "no recall_log
     // rows" look identical.
-    const originLine = formatRecalledResolution(resolved).join("\n");
+    // T-050: who wrote .recalled-entries.json, observed beside the resolution and never fed into it.
+    const originLine = [...formatRecalledResolution(resolved), ...formatForeignWriter(foreign)].join("\n");
 
     const shadowLine = result.shadow.evaluated
       ? `  Shadow recall: ${result.shadow.strategies} strategies over ${result.shadow.queries} queries (best: ${result.shadow.leader})`
@@ -1349,7 +1350,7 @@ server.tool(
     //    saw. resolveRecalledIds compares the file's `session_id` and refuses a
     //    mismatch; reading the file raw does not.
     const session = writeSessionId();
-    const resolved = resolveRecalledIds({
+    const { resolved, foreign } = resolveRecalledIdsObserved({
       db: v2db,
       sessionId: session.id,
       explicitIds: [],
@@ -1362,7 +1363,7 @@ server.tool(
       const why = resolved.rejected
         ? `\nIgnored ${resolved.rejected.path}: ${resolved.rejected.reason}`
         : session.id !== null ? "" : `\nNo session id: ${session.reason}`;
-      return { content: [{ type: "text" as const, text: `No knowledge entries recalled this session.${why}` }] };
+      return { content: [{ type: "text" as const, text: `No knowledge entries recalled this session.${why}\n${formatForeignWriter(foreign).join("\n")}` }] };
     }
 
     // Which of these the HOOK put in front of the agent, as opposed to the
@@ -1383,6 +1384,7 @@ server.tool(
       if (entry) lines.push(`  [${entry.id}] ${entry.key || "(no key)"} — ${entry.maturity}${how}`);
       else lines.push(`  [${id}] (deleted)${how}`);
     }
+    lines.push("", ...formatForeignWriter(foreign));
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
   }
