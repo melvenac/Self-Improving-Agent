@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {
 
 type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };
 
-function readStatusKeys(path: string): StatusKeys | null {
+/**
+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside
+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was
+ * instead of "missing".
+ */
+const PLACEHOLDER = /<[^<>s]+>/;
+
+type Keys = StatusKeys;
+type Placeholders = Partial<Record<keyof StatusKeys, string>>;
+
+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {
   if (!existsSync(path)) return null;
   const match = readFileSync(path, "utf8").match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
   const out: StatusKeys = {};
+  const placeholders: Placeholders = {};
   for (const line of match[1]!.split(/\r?\n/)) {
     const m = line.match(/^(status_cron|status_to|status_rule)\s*:\s*(.*)$/);
     if (!m) continue;
@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {
     if (value.length >= 2 && ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'")))) {
       value = value.slice(1, -1).trim();
     }
-    if (value === "" || value.startsWith("<")) continue;
+    if (value === "") continue;
+    const ph = PLACEHOLDER.exec(value);
+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }
     out[m[1] as keyof StatusKeys] = value;
   }
-  return Object.keys(out).length === 0 ? null : out;
+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };
 }
 
 /**
@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {
  */
 export function readStandingCron(cwd: string): string {
   for (const file of ["AGENT.local.md", "AGENT.md"]) {
-    const keys = readStatusKeys(join(cwd, ".agents", file));
-    if (keys === null) continue;
+    const read = readStatusKeys(join(cwd, ".agents", file));
+    if (read === null) continue;
+    const { keys, placeholders } = read;
     const where = `.agents/${file}`;
     for (const key of ["status_cron", "status_to", "status_rule"] as const) {
-      if (keys[key] === undefined) return `Standing cron: INVALID in ${where}: ${key} is missing`;
+      if (keys[key] === undefined) {
+        const ph = placeholders[key];
+        return `Standing cron: INVALID in ${where}: ${key} is ${ph ? `an unfilled placeholder (${ph})` : "missing"}`;
+      }
     }
     const problem = cronProblem(keys.status_cron!);
     if (problem !== null) return `Standing cron: INVALID in ${where}: ${problem}`;

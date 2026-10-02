@@ -117,6 +117,36 @@ describe("T-211 standing cron in seat data", { timeout: 120_000 }, () => {
     );
   });
 
+  const templateExample = (): string[] => {
+    const template = readFileSync(join(import.meta.dirname, "../../../../project-template/.agents/AGENT.md"), "utf-8");
+    const block = template.match(/```\n(status_cron:[\s\S]*?)```/);
+    expect(block, "the template documents the three keys in a fenced block").not.toBeNull();
+    return block![1]!.split("\n").filter((l) => l.trim() !== "");
+  };
+
+  it("SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'", () => {
+    const example = templateExample();
+    expect(example).toHaveLength(3);
+    seatFile(root, "AGENT.local.md", [...IDENTITY, ...example]);
+    expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)");
+  });
+
+  it("SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled", () => {
+    const example = templateExample().map((l) => l.replace("<agent-name>", "clark"));
+    seatFile(root, "AGENT.local.md", [...IDENTITY, ...example]);
+    expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)");
+  });
+
+  it("SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing", () => {
+    seatFile(root, "AGENT.local.md", [...IDENTITY, 'status_cron: "*/20 * * * *"', "status_rule: .agents/roles/planner.md"]);
+    expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_to is missing");
+    seatFile(root, "AGENT.local.md", [...IDENTITY, 'status_cron: "*/20 * * * *"', "status_to:", "status_rule: .agents/roles/planner.md"]);
+    expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_to is missing");
+    // A file whose only cron keys are placeholders carries none of them: unchanged from before.
+    seatFile(root, "AGENT.local.md", [...IDENTITY, "status_to: <agent-name>"]);
+    expect(readStandingCron(root)).toBe("Standing cron: none in seat data.");
+  });
+
   it("SR-6 ob_start prints the line in the seat block, and every other greeting line is unchanged by it", async () => {
     const make = (extra: string[]): string => {
       const dir = mkdtempSync(join(tmpdir(), "t211-greet-"));
