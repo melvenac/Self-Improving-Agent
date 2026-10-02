@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 265 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 267 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -70,6 +70,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-212** SessionStart missing-handoff check attributes commits by Claude-Session trailer, not git identity
 - [ ] **T-213** Repoint the forge seat in hub-partner-seats.json to hub_name forge, room k571c0nz, and un-pin the tests from the live file
 - [ ] **T-215** Finish the maturity-lifecycle cut in code: 10 LIVE referrers R-011 now records as owed, including two tests that prove nothing
+- [ ] **T-220** closeout-tables: label 'no E_t' only when no E_t exists, 'not called' separately; G_plan writes repo-relative paths (QA 245 F2, F4)
 
 ## P2
 
