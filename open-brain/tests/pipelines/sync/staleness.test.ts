@@ -71,15 +71,16 @@ describe("checkGitNexusIndex", () => {
     expect(r.message).toContain("ahead=0");
   });
 
-  it("issues when the index is ahead of HEAD on the same line (T-176 red row)", async () => {
+  it("warns, naming the count, when the index is AHEAD of HEAD on the same line (T-176; QA's c9947c5 case)", async () => {
     writeFileSync(join(dir, "ahead.txt"), "ahead\n");
     await execAsync("git add -A && git commit -q -m ahead", { cwd: dir });
     const indexed = (await execAsync("git rev-parse HEAD", { cwd: dir })).trim();
     await execAsync(`git reset -q --hard ${head}`, { cwd: dir });
     writeMeta({ lastCommit: indexed, branch: "main" });
     const r = checkGitNexusIndex(dir);
-    expect(r.severity).toBe("issue");
-    expect(r.message).toContain("ahead of HEAD");
+    expect(r.severity).toBe("warn");
+    expect(r.message).toContain("index is 1 commit(s) AHEAD of HEAD");
+    expect(r.message).toContain("behind=0 ahead=1");
     expect(r.severity).not.toBe("pass");
   });
 
@@ -95,6 +96,8 @@ describe("checkGitNexusIndex", () => {
     const r = checkGitNexusIndex(dir);
     expect(r.severity).toBe("issue");
     expect(r.message).toContain("diverged");
+    expect(r.message).toContain("1 commit(s) behind and 1 ahead");
+    expect(r.message).toContain(`merge-base ${head.slice(0, 7)}`);
     expect(r.message).toContain(`indexed ${side.slice(0, 7)}`);
     expect(r.message).toContain(`HEAD ${currentHead.slice(0, 7)}`);
   });
@@ -120,10 +123,12 @@ describe("checkGitNexusIndex", () => {
     expect(r.message).toContain("1 commit(s) behind");
   });
 
-  it("treats an indexed commit absent from the repo as UNDEFINED, not zero", () => {
+  it("an indexed commit absent from the repo is 'not checked: <sha> unknown', UNDEFINED not zero, and never a pass", () => {
     writeMeta({ lastCommit: "0".repeat(40), branch: "main" });
     const r = checkGitNexusIndex(dir);
-    expect(r.severity).toBe("issue");
+    expect(r.severity).toBe("warn");
+    expect(r.severity).not.toBe("pass");
+    expect(r.message).toContain("not checked: indexed commit 0000000 unknown");
     expect(r.message).toContain("UNDEFINED, not zero");
   });
 
