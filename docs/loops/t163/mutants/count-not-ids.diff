@@ -1,0 +1,14 @@
+diff --git a/open-brain/src/pipelines/sync/record-erasure.ts b/open-brain/src/pipelines/sync/record-erasure.ts
+index 98bd991b..a54cbda9 100644
+--- a/open-brain/src/pipelines/sync/record-erasure.ts
++++ b/open-brain/src/pipelines/sync/record-erasure.ts
+@@ -161,7 +161,8 @@ export function erasuresInStep(before: Raw | null, after: Raw | null): { removed
+   const a = recordsOf(after);
+   const out: { removed: RecordRef; added: RecordRef[] }[] = [];
+   for (const r of b) {
+-    if (presentIn(a, r) || explainedByRetention(r, after)) continue;
++    // mutant: compares the COUNT of records of this kind, not the ids
++    if (a.filter((x) => x.kind === r.kind).length >= b.filter((x) => x.kind === r.kind).length || explainedByRetention(r, after)) continue;
+     out.push({ removed: r, added: a.filter((x) => x.kind === r.kind && !presentIn(b, x)) });
+   }
+   return out;
