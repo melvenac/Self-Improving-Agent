@@ -364,7 +364,8 @@ describe("renderState — T183-3 the real record's handoffs are verbatim", () =>
   it("leaves the objective unchanged and every active task title whole, or cut at 100 with an ellipsis (D-100)", () => {
     const text = renderState(real, "x").join("\n");
     if (real.objective) expect(text).toContain(`Objective: ${real.objective.text} (since session ${real.objective.since_session})`);
-    const active = real.tasks.filter((t) => t.status !== "done");
+    // P2 and P3 render as count lines (D-100 follow-up), so only P0 and P1 titles are asserted.
+    const active = real.tasks.filter((t) => t.status !== "done" && (t.priority === "P0" || t.priority === "P1"));
     expect(active.length).toBeGreaterThan(0);
     for (const t of active) expect(text).toContain(`${t.id} ${t.title.length > 100 ? `${t.title.slice(0, 100).trimEnd()}…` : t.title}`);
   });
@@ -476,5 +477,48 @@ describe("renderState — T-183 gaps cap and task-title clip (D-100)", () => {
     const out = renderState(s, "x");
     expect(out).toContain(`    [open] T-778 ${hundred}`);
     expect(out).toContain("    [in_progress] T-779 short (supersedes T-099)");
+  });
+});
+
+/**
+ * T-183 (D-100 follow-up): P0 and P1 titles render; P2 and P3 render as ONE count line each. NEXT only ever needs the
+ * top items, and INBOX.md keeps the full list. The counts come from tasks[], never from the rendered lines.
+ */
+describe("renderState — T-183 P2/P3 as count lines", () => {
+  const task = (id: string, priority: string, status = "open") => ({
+    id, title: `title of ${id}`, priority, status, opened_session: 1, closed_session: null, supersedes: null, note: null,
+  });
+  const withTasks = (tasks: object[]): State => ({ ...state, tasks }) as unknown as State;
+  const fixture = withTasks([
+    task("T-001", "P0"), task("T-002", "P0"), task("T-003", "P1", "in_progress"),
+    task("T-004", "P2"), task("T-005", "P2", "blocked"), task("T-006", "P2"), task("T-007", "P3"),
+    task("T-008", "P2", "done"), task("T-009", "P3", "done"),
+  ]);
+  const out = renderState(fixture, "x");
+
+  it("P3-1: P0 and P1 titles render in full; P2 and P3 titles do not", () => {
+    for (const id of ["T-001", "T-002", "T-003"]) expect(out.join("\n")).toContain(`${id} title of ${id}`);
+    for (const id of ["T-004", "T-005", "T-006", "T-007"]) expect(out.join("\n")).not.toContain(id);
+    expect(out).toContain("  P0:");
+    expect(out).toContain("  P1:");
+  });
+
+  it("P3-2: one count line per lower priority, counted from tasks[] (done ones excluded, blocked included)", () => {
+    expect(out).toContain("  [P2] 3 active: INBOX.md");
+    expect(out).toContain("  [P3] 1 active: INBOX.md");
+    expect(out.filter((l) => /^ {2}\[P[23]\] /.test(l))).toHaveLength(2);
+    expect(out.join("\n")).toContain("Tasks (7 active; done: 2):");
+  });
+
+  it("P3-3: a record with no P2 tasks has no P2 line (and none for P3 when P3 is empty)", () => {
+    const text = renderState(withTasks([task("T-001", "P0"), task("T-007", "P3")]), "x").join("\n");
+    expect(text).not.toContain("[P2]");
+    expect(text).toContain("[P3] 1 active: INBOX.md");
+    expect(renderState(withTasks([task("T-001", "P1")]), "x").join("\n")).not.toMatch(/\[P[23]\]/);
+  });
+
+  it("P3-4: the full list is still in the record, not dropped: the count is the number of P2 tasks, not a number of lines", () => {
+    const big = withTasks(Array.from({ length: 25 }, (_, i) => task(`T-${100 + i}`, "P2")));
+    expect(renderState(big, "x")).toContain("  [P2] 25 active: INBOX.md");
   });
 });

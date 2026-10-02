@@ -43,6 +43,12 @@ export function renderState(state: State, version?: string, options: RenderState
   for (const priority of TaskPriority.options) {
     const group = active.filter((t) => t.priority === priority);
     if (group.length === 0) continue;
+    // D-100 follow-up: P0 and P1 titles are what NEXT is chosen from. P2 and P3 are one count line each, counted from
+    // tasks[]; INBOX.md keeps the full list.
+    if (COUNT_ONLY_PRIORITIES.has(priority)) {
+      lines.push(`  [${priority}] ${group.length} active: INBOX.md`);
+      continue;
+    }
     lines.push(`  ${priority}:`);
     for (const t of group) lines.push(`    ${formatTask(t)}`);
   }
@@ -136,6 +142,8 @@ export const GAP_CLIP = 140;
 export const GAPS_SHOWN = 10;
 /** D-100: a task title longer than this is cut to this many characters and ends with an ellipsis. Ids and statuses are never clipped. */
 export const TITLE_CLIP = 100;
+/** Priorities rendered as a count line, not a list of titles. */
+const COUNT_ONLY_PRIORITIES: ReadonlySet<string> = new Set(["P2", "P3"]);
 export const VERIFIED_CLIP = 100;
 /** Verified is its count plus the newest this many (planner ruling (a), T-183). */
 export const VERIFIED_SHOWN = 10;
