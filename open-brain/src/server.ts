@@ -25,7 +25,7 @@ import { sessionStart, type StateFileSize } from "./pipelines/session-start/inde
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
 import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
-import { readAgentIdentity, readStandingCron } from "./pipelines/session-start/agent-identity.js";
+import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
@@ -308,8 +308,6 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
         ? `Seat: ${roles.seat.name} (${roles.seat.role})${roles.seat.partner ? ` — partner: ${roles.seat.partner}` : ""}`
         : `Seat: UNRESOLVED`
     );
-    // T-211: the standing status cron, from the seat data, printed on every start.
-    lines.push(readStandingCron(projectRoot));
     lines.push(...roles.lines);
     if (roles.problems.length > 0) {
       lines.push(`

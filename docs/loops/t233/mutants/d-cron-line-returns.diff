@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts
+index 32b6e883..f8ee3f0b 100644
+--- a/open-brain/src/server.ts
++++ b/open-brain/src/server.ts
+@@ -308,6 +308,7 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
+         ? `Seat: ${roles.seat.name} (${roles.seat.role})${roles.seat.partner ? ` — partner: ${roles.seat.partner}` : ""}`
+         : `Seat: UNRESOLVED`
+     );
++    lines.push("Standing cron: none in seat data.");
+     lines.push(...roles.lines);
+     if (roles.problems.length > 0) {
+       lines.push(`
