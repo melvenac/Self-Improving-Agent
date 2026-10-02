@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 287,
+  "revision": 288,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1346,6 +1346,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "QA 258 #299 follow-up (docs/loops/b4-misc-qa-report.md, #299 row 8). The wrapper predates T-050 and does not affect which entries are rated.",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-230",
+      "title": "Pin that ob_start PRINTS the T-048 zero lines: a server.test.ts row asserting 'Session logs unreadable: 0' and 'Transcript directories unreadable: 0' in handleStart output (QA 261's surviving mutant Q1)",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "QA 261 (docs/loops/t048r2-qa-report.md row 4): deleting lines.push(...formatScanCounts(...)) from handleStart in server.ts leaves every committed test green; QA's own demo row kills it. Lands after #302 merges.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
@@ -3946,6 +3960,12 @@
       "title": "QA 258 (B4): #289 #290 #294 #299 ACCEPT, #302 REJECT (row 9: zero dropped counts not printed at DC-3..DC-6; DC-7 unusable_roots never read). Ruling: the REJECT stands, because T-048's invariant is that absent and zero never collapse FOR THE READER. QA 259 (B5): #292 #293 #320 ACCEPT. Neither batch is under D-103; the accepted PRs are listed for Aaron's morning question in docs/loops/morning-merge-list-2026-10-02.md.",
       "date": "2026-10-02",
       "note": "Reports: 64cee8ab (docs/loops/b4-misc-qa-report.md), a161b4ad (docs/loops/b5-misc-qa-report.md). #294 went DIRTY against master after the B3 merges; sia-forge rebases it and the planner reviews the range-diff before listing it (a non-trivial resolution means a narrow re-QA). #302 round 2 is with sia-builder."
+    },
+    {
+      "id": "D-106",
+      "title": "QA 260 (B2 r2): #306 #309 ACCEPT, #295 #298 REJECT. Ruling: the rejects stand. A non-object or null entry is malformed input in EVERY source (mcpServers too, not only hooks), so not-checked gives WARN; the skip for an absent settings.json must be NAMED in a passing result. QA 261: #302 r2 ACCEPT, needing a rebase (one server.ts import adjacency with master; keep both imports). sia-forge does round 3 and the #302 rebase. Accepted PRs are added to docs/loops/morning-merge-list-2026-10-02.md.",
+      "date": "2026-10-02",
+      "note": "Reports: 0f53d867 (docs/loops/b2r2-sync-qa-report.md), f395ee84 (docs/loops/t048r2-qa-report.md). QA 261's mutant Q1 (removing formatScanCounts from handleStart) survived every committed test; behaviour verified correct by QA's own row; opened as T-230. None of these is under D-103."
     }
   ],
   "handoffs": [
