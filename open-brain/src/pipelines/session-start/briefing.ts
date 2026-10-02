@@ -208,9 +208,37 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
   } catch (err) {
     return notChecked(`${path} is not readable JSON: ${why(err)}`);
   }
-  const level = data && typeof data === "object" && !Array.isArray(data) ? (data as { usageLevel?: unknown }).usageLevel : undefined;
-  if (typeof level !== "string") return notChecked(`${path} has no usageLevel string`);
-  const consequence = USAGE_CONSEQUENCES[level.trim().toUpperCase()];
-  if (consequence === undefined) return notChecked(`${path} usageLevel ${JSON.stringify(level)} is not one of ${Object.keys(USAGE_CONSEQUENCES).join(", ")}`);
-  return `Usage: ${level.trim().toUpperCase()} → ${consequence}`;
+  const raw = data && typeof data === "object" && !Array.isArray(data) ? (data as { usageLevel?: unknown }).usageLevel : undefined;
+  // The real file's usageLevel is an OBJECT ({level, fiveHourPct, sevenDayPct, fiveHourResetsAt, ...}); the bare string form
+  // stays accepted. T-233 B ruling.
+  const obj = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, unknown>) : null;
+  const levelText = typeof raw === "string" ? raw : obj !== null && typeof obj.level === "string" ? obj.level : null;
+  if (levelText === null) return notChecked(`${path} has no usageLevel string or usageLevel.level string`);
+  // `level` is free text today ("GREEN (5h 4%); weekly 97%: ...") and one word soon: the 5-hour level is the LEADING WORD.
+  const five = /^[A-Za-z]+/.exec(levelText.trim())?.[0].toUpperCase() ?? "";
+  const consequence = USAGE_CONSEQUENCES[five];
+  if (consequence === undefined) return notChecked(`${path} usageLevel ${JSON.stringify(levelText)} does not start with one of ${Object.keys(USAGE_CONSEQUENCES).join(", ")}`);
+
+  const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
+  const fivePct = obj ? num(obj.fiveHourPct) : null;
+  let resets: string | null = null;
+  if (obj && typeof obj.fiveHourResetsAt === "string") {
+    const t = new Date(obj.fiveHourResetsAt);
+    if (!Number.isNaN(t.getTime())) resets = `${String(t.getUTCHours()).padStart(2, "0")}:${String(t.getUTCMinutes()).padStart(2, "0")}Z`;
+  }
+  const bits = [fivePct !== null ? `5h ${fivePct}%` : null, resets !== null ? `resets ${resets}` : null].filter((b): b is string => b !== null);
+  const head = `${five}${bits.length > 0 ? ` (${bits.join(", ")})` : ""}`;
+
+  // WEEKLY comes ONLY from the numeric sevenDayPct. Percentages are never parsed out of the free-text `level`; an absent
+  // number is `weekly not checked`. `weeklyOverride` (string, optional) names the loop Aaron lifted the hold for.
+  const weekly: number | null = obj ? num(obj.sevenDayPct) : null;
+  const override = obj && typeof obj.weeklyOverride === "string" && obj.weeklyOverride.trim() !== "" ? obj.weeklyOverride.trim() : null;
+  let weeklyConsequence: string | null = null;
+  if (weekly !== null && weekly >= 98) weeklyConsequence = "wind down: every seat pushes WIP and a handoff and parks";
+  else if (weekly !== null && weekly >= 95) {
+    weeklyConsequence = override !== null ? `no new QA, tasks or dispatches except ${override} (Aaron's lift)` : "no new QA, tasks or dispatches";
+  }
+  // Below 95 adds nothing: no weekly segment. Not checked is named, never dropped.
+  const weeklyPart = weekly === null ? " + weekly not checked" : weeklyConsequence !== null ? ` + WEEKLY ${weekly}%` : "";
+  return `Usage: ${head}${weeklyPart} → ${[consequence, weeklyConsequence].filter((c): c is string => c !== null).join("; ")}`;
 }

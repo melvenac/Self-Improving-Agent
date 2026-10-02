@@ -198,10 +198,10 @@ describe("T-233 B item 4: the Usage line", () => {
   };
 
   it.each([
-    ["GREEN", "Usage: GREEN → dispatches open"],
-    ["amber", "Usage: AMBER → small LIGHT tasks only, QA cap 2"],
-    ["RED", "Usage: RED → devs finish the current step then park; planners rule and merge only"],
-    ["STOP", "Usage: STOP → everyone parks until the 5-hour reset"],
+    ["GREEN", "Usage: GREEN + weekly not checked → dispatches open"],
+    ["amber", "Usage: AMBER + weekly not checked → small LIGHT tasks only, QA cap 2"],
+    ["RED", "Usage: RED + weekly not checked → devs finish the current step then park; planners rule and merge only"],
+    ["STOP", "Usage: STOP + weekly not checked → everyone parks until the 5-hour reset"],
   ])("a valid file with usageLevel %s prints its consequence", (level, line) => {
     const root = tmp("t233b-usage-");
     seatFile(root, [`usage_file: ${slots(root, JSON.stringify({ usageLevel: level, other: 1 }))}`]);
@@ -213,7 +213,7 @@ describe("T-233 B item 4: the Usage line", () => {
     const green = slots(root, JSON.stringify({ usageLevel: "GREEN" }));
     mkdirSync(join(root, "b"));
     const red = slots(join(root, "b"), JSON.stringify({ usageLevel: "RED" }));
-    expect(describeUsage(root, { SIA_USAGE_FILE: green })).toBe("Usage: GREEN → dispatches open");
+    expect(describeUsage(root, { SIA_USAGE_FILE: green })).toBe("Usage: GREEN + weekly not checked → dispatches open");
     seatFile(root, [`usage_file: ${red}`]);
     expect(describeUsage(root, { SIA_USAGE_FILE: green })).toMatch(/^Usage: RED/);
   });
@@ -240,7 +240,7 @@ describe("T-233 B item 4: the Usage line", () => {
     for (const [body, frag] of [
       ["{}", "has no usageLevel string"],
       ['{"usageLevel": 3}', "has no usageLevel string"],
-      ['{"usageLevel": "PURPLE"}', 'usageLevel "PURPLE" is not one of'],
+      ['{"usageLevel": "PURPLE"}', 'usageLevel "PURPLE" does not start with one of'],
       ["[1]", "has no usageLevel string"],
     ] as const) {
       seatFile(root, [`usage_file: ${slots(root, body)}`]);
@@ -248,6 +248,82 @@ describe("T-233 B item 4: the Usage line", () => {
       expect(line.startsWith("Usage: not checked ("), line).toBe(true);
       expect(line).toContain(frag);
     }
+  });
+
+  // The REAL file's shape (atlas-sia, from the desktop's slots.json): usageLevel is an object. Values here are synthetic.
+  const realShape = (over: Record<string, unknown> = {}): string =>
+    JSON.stringify({
+      usageLevel: {
+        level: "RED + WEEKLY95",
+        fiveHourPct: 87,
+        sevenDayPct: 95,
+        fiveHourResetsAt: "2026-10-03T03:15:00.000Z",
+        set: "2026-10-02T21:09:00.000Z",
+        note: "synthetic note",
+        rules: "~/Worktrees/usage-winddown-rules.md",
+        ...over,
+      },
+    });
+  const usageFor = (body: string): string => {
+    const root = tmp("t233b-usage-obj-");
+    seatFile(root, [`usage_file: ${slots(root, body)}`]);
+    return describeUsage(root, {});
+  };
+
+  it("the real object shape: the 5-hour token, the numbers, the weekly cap, in the ruled format", () => {
+    expect(usageFor(realShape())).toBe(
+      "Usage: RED (5h 87%, resets 03:15Z) + WEEKLY 95% → devs finish the current step then park; planners rule and merge only; no new QA, tasks or dispatches",
+    );
+  });
+
+  it("a one-word level, and free text with a LEADING WORD, both give the 5-hour level", () => {
+    expect(usageFor(realShape({ level: "GREEN", fiveHourPct: 4, sevenDayPct: 40, fiveHourResetsAt: "2026-10-03T05:00:00Z" }))).toBe("Usage: GREEN (5h 4%, resets 05:00Z) → dispatches open");
+    expect(usageFor(realShape({ level: "amber (5h 60%); weekly 97%: hold except T-233", fiveHourPct: 60, sevenDayPct: 20 }))).toBe(
+      "Usage: AMBER (5h 60%, resets 03:15Z) → small LIGHT tasks only, QA cap 2",
+    );
+  });
+
+  it("percentages are NEVER read out of the level text: the prose says 97, the number is absent, so weekly is not checked", () => {
+    const { usageLevel } = JSON.parse(realShape({ level: "GREEN (5h 4%); weekly 97%: hold" })) as { usageLevel: Record<string, unknown> };
+    delete usageLevel.sevenDayPct;
+    const line = usageFor(JSON.stringify({ usageLevel }));
+    expect(line).toContain("+ weekly not checked");
+    expect(line).not.toContain("97");
+    expect(line).not.toContain("no new QA");
+  });
+
+  it("an object without sevenDayPct says weekly not checked, and keeps the 5-hour part", () => {
+    const { usageLevel } = JSON.parse(realShape()) as { usageLevel: Record<string, unknown> };
+    delete usageLevel.sevenDayPct;
+    expect(usageFor(JSON.stringify({ usageLevel }))).toBe("Usage: RED (5h 87%, resets 03:15Z) + weekly not checked → devs finish the current step then park; planners rule and merge only");
+  });
+
+  it("the weekly consequence follows sevenDayPct: below 95 adds nothing, 95 and 96 hold, 98 winds down", () => {
+    expect(usageFor(realShape({ sevenDayPct: 94.9 }))).not.toContain("WEEKLY");
+    expect(usageFor(realShape({ sevenDayPct: 95 }))).toContain("+ WEEKLY 95% →");
+    expect(usageFor(realShape({ sevenDayPct: 96 }))).toContain("no new QA, tasks or dispatches");
+    const wind = usageFor(realShape({ sevenDayPct: 98 }));
+    expect(wind).toContain("wind down: every seat pushes WIP and a handoff and parks");
+    expect(wind).not.toContain("no new QA");
+  });
+
+  it("weeklyOverride names the lifted loop at >= 95 only; absent or null changes nothing", () => {
+    expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: "T-233" }))).toContain("no new QA, tasks or dispatches except T-233 (Aaron's lift)");
+    expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: null }))).toMatch(/no new QA, tasks or dispatches$/);
+    expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: "  " }))).toMatch(/no new QA, tasks or dispatches$/);
+    expect(usageFor(realShape({ sevenDayPct: 90, weeklyOverride: "T-233" }))).not.toContain("T-233");
+  });
+
+  it("an unknown or missing leading word is not checked; a number in the wrong place is not a level", () => {
+    for (const level of ["PURPLE (5h 1%)", "", "   ", "87% RED", 5]) {
+      const line = usageFor(realShape({ level }));
+      expect(line.startsWith("Usage: not checked ("), `${JSON.stringify(level)} -> ${line}`).toBe(true);
+    }
+    expect(usageFor(JSON.stringify({ usageLevel: { fiveHourPct: 5 } }))).toContain("has no usageLevel string or usageLevel.level string");
+  });
+
+  it("a bad timestamp drops only the reset time", () => {
+    expect(usageFor(realShape({ fiveHourResetsAt: "soon", sevenDayPct: 10 }))).toBe("Usage: RED (5h 87%) → devs finish the current step then park; planners rule and merge only");
   });
 
   it("a relative path and an unfilled placeholder are not checked", () => {
