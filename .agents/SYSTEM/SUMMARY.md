@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 279 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 280 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — Loop 15 slice FOUR is CLOSED (PROVISIONAL): step 4 re-run QA 248 ACCEPTED (D-093), 13/13 live Jev calls answered, records merged with the ruling. NEXT: (1) the ONE release for slices three and four (D-073), which is Aaron's under D-019: consolidate the three Unreleased CHANGELOG sections first and propose the version; (2) T-164 port + T-211 standing cron, dispatched to sia-builder at bea385b2 (Aaron's priority); (3) T-221 ruling (cancelled push 'test' blocks loop/qa PRs); (4) T-194 r7 courtesy-layer ruling, then the sparse planner checkout; (5) T-222 (count-attempts and F6-F8).
 
 ## What's working
@@ -154,6 +154,7 @@ CAUGHT BY THE QA SEAT at its /start, reading this gap against the T-161 rewrite 
 THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about instruments that cannot tell 'nothing there' from 'I did not look' asserted a cause that nobody had looked for a counterexample to. The counterexample was one `ls` away in the same directory. THE ORIGINAL CLASS IS UNCHANGED AND STILL UNSWEPT.
 - Gap G-045: DELETING THE CHECKED-OUT BRANCH DURING A STAGE CRASHES THE RUNTIME WITH NO RECORD (D4, slice two). `git update-ref -d refs/heads/main` while main is checked out (legal; `git branch -D` would refuse): the watch records the deferred ref as deleted, restoreHead sees HEAD's NAME unchanged and does nothing, then `git rev-parse HEAD` fails on the dangling name inside enforceAllowlist and GitFailed escapes runLoop before rollBack, where the deferred-ref restore lives. No LoopResult, no FAILED.md, HEAD unresolvable, main gone, tree staged. D1's sibling: the D1 repair keys on HEAD's name changing; here the name is constant and its referent was removed. Lower likelihood than D1 and the fix is D2's shape moved earlier.
 - Gap G-049: Three seat checkouts share one hub identity: sia-builder, sia-infra and sia-forge all carry AGENT.local.md identity 'Forge / developer', so anything keyed on identity resolves all three to the same seat. Found by Forge (T-198 r2 handoff, derived from the key directory and each checkout's AGENT.local.md, planner session 150). T-198's presence block resolves builder and infra to the grok reader row and to forge.key, never to cursor-builder.key or cursor-infra.key, which exist but are never looked up. sia-qa and sia-research have no reader row and print no block. (Id chosen explicitly: G-046..G-048 are cited in 21/21/10 tracked files on origin/master abae5f9, and the serving MCP build predates T-158's citation guard.)
+- Gap G-050: The retirements check allows a referrer per FILE, so a new live mention of a cut thing inside a file that is still an allowed referrer passes silently. Had dashboard.mjs kept the word 'progenitor', it would have stayed allowed and the re-added success_rate mutant would have passed. A per-file allowance cannot tell an obituary line from a live read added beside it.
 
 ## What's next
 

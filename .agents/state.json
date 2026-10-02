@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 279,
+  "revision": 280,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3043,6 +3043,13 @@
       "evidence": "Forge's T-198 r2 report over native A2A, 2026-09-30; docs/loops/t198-r2-developer-handoff.md at a40fc77 (local until pushed): the derived key-file mapping table.",
       "recommended_update": "Resolve a seat by the CHECKOUT (the worktree-seats.json layout, keyed by worktree path), not by the identity name in AGENT.local.md; give each seat checkout its own hub name in the tracked seat file. Reconcile with T-196 (seat file), T-198 (presence key), T-202 (seat-online report) and T-164 (per-seat records). The planner decides where it lands; do not alias around it inside T-198.",
       "opened_session": 150
+    },
+    {
+      "id": "G-050",
+      "what": "The retirements check allows a referrer per FILE, so a new live mention of a cut thing inside a file that is still an allowed referrer passes silently. Had dashboard.mjs kept the word 'progenitor', it would have stayed allowed and the re-added success_rate mutant would have passed. A per-file allowance cannot tell an obituary line from a live read added beside it.",
+      "evidence": "sia-forge, T-215 handoff docs/loops/t215-developer-handoff.md on loop/t215-maturity-cut c1fc5ecc (PR #294); mutant docs/loops/t215/mutants/dashboard-success-rate.diff is caught only because dashboard.mjs left the allowlist entirely.",
+      "recommended_update": "Scope an allowed referrer to line ranges or to a quoted line hash, so a new matching line in an allowed file is a finding. Not ruled yet; candidate for a later loop.",
+      "opened_session": 157
     }
   ],
   "decisions": [
