@@ -1,0 +1,46 @@
+{
+  "loop": "qa-259-b5-misc",
+  "candidate_git": {
+    "sha": "49009b15a4c81a0df1425c47ecf1fb23fae7aafe",
+    "branch": "qa/b5-misc-merge (local scratch merge of #293, #292, #320 onto origin/master d11301ee)",
+    "frozen_at": "2026-10-02T12:54:21Z"
+  },
+  "candidates": [
+    { "task": "T-224", "sha": "c77dce55677a71a4ede59bbab933adf3270f2c22", "branch": "origin/loop/t224-placeholder-reason", "pr": 292, "verdict": "ACCEPT" },
+    { "task": "T-223", "sha": "58e0ce15eb5871c50eb01794c007a9a842fc5acb", "branch": "origin/loop/t223-pin-pr-group", "pr": 293, "verdict": "ACCEPT" },
+    { "task": "T-228", "sha": "c9b5e7571d0b02c822372d78ed102281e7415c8e", "branch": "origin/loop/t228-hub-rc3", "pr": 320, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit (open-brain, on scratch merge 49009b15)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 20000,
+      "detail": "CI test job success on 37003721961 and 37003717431 (c77dce55), 37003859495 (58e0ce15), 37006678567 (c9b5e757)"
+    },
+    "unit": {
+      "command": "npx vitest run, one touched file per invocation, on the merge: standing-cron 12/12, ci-runs-on 22/22, hub-talk-exit-codes 6/6, start-parity 11/11, command-parity 9/9, mirror-parity 13/13, hub-seats 5/5",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 30000,
+      "detail": "LIGHT job: no local full suite; full suite green in CI on each head"
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q259-1", "status": "met", "order": "shown", "evidence": "#292: agent-identity.ts, standing-cron.test.ts, template AGENT.md. #293: ci-runs-on.test.ts only. #320: 2 hub-room.mdc, template cursor start.md, cursor-start-differences.json, new test, handoff." },
+    { "id": "Q259-2", "status": "met", "order": "red-first", "evidence": "#292 master 3 failed | 9 passed, head 12/12. #293 master 22/22 by construction, pre-#310 ci.yml 9 failed | 13 passed, head 22/22. #320 master 5 failed | 1 passed, head 6/6." },
+    { "id": "Q259-3", "status": "met", "order": "shown", "evidence": "All 7 mutants killed: #292 dev /<[^<>s]+>/ and QA /<[^<>]+>/; #293 M1, M2 (T-227 row green) and QA dispatch-by-sha; #320 dev appended word (start-parity red) and QA 60s->30s in template mdc." },
+    { "id": "Q259-4", "status": "met", "order": "shown", "evidence": "test pass: #292 runs 37003721961 (PR) and 37003717431 (push); #293 run 37003859495; #320 run 37006678567; headSha match pinned heads." },
+    { "id": "Q259-5", "status": "met", "order": "shown", "evidence": "cat -A: 121:const PLACEHOLDER = /<[^<>\\s]+>/;$ ; SR-8d names <status>, <seat>, <sia-status-recipient>, prose a < b > c not a placeholder; SR-8c absent key says missing; SR-8 reads template at test time and gives status_to is an unfilled placeholder (<agent-name>)." },
+    { "id": "Q259-6", "status": "met", "order": "shown", "evidence": "Row asserts ci-pr-7, ci-push-9f8e7d, ci-dispatch-11 exactly; same digits -> Set size 3; M1 and M2 each red on T-223 row with T-227 row green; ci.yml restored." },
+    { "id": "Q259-7", "status": "met", "order": "shown", "evidence": "3 live copies carry rc 0-3 incl. stderr line, retry-after wait, 5s doubling to 60s, stop after 5 rc3 over 2 min; mdc sha256 e40c86a2... both; parity files 11/9/13/5 pass; json: cursor_only 1 entry replaced by 2 hub-room lines, other keys unchanged. Relay's table not readable locally." },
+    { "id": "Q259-8", "status": "met", "order": "shown", "evidence": "Merge #293, #292, #320 onto d11301ee: no conflicts, 49009b15; 7 touched test files green one per invocation; tsc --noEmit exit 0." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "#320: relay's Loop 13 table (A2A-Hub 8e59f58) not available on this machine; codes checked against the dispatch text.",
+    "#320: cursor-start-differences.json replaces one hub-room entry with two (reworded line + new codes line); needed by complete-line waiving."
+  ],
+  "notes": "QA 259, dispatch tree 1579c786018a98dafe130ae2bdaa67c3af00919d, origin/master d11301ee (docs-only drift). No live Jev call. B5 not covered by the overnight pre-approval: merge waits for Aaron. Batch verdict ACCEPT."
+}
