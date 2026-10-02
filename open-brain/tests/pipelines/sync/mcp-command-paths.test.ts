@@ -105,11 +105,42 @@ describe("checkMcpCommandPaths (T-008)", () => {
     expect(r.message).toContain("project C:/work/proj");
   });
 
-  it("a command using ${...} expansion is skipped with that reason, not guessed at", () => {
+  // B2 ruling (QA 256 row 5): ANY input that was not checked caps the result at WARN, never pass,
+  // even when the message names the skip.
+  it("a command using ${...} expansion beside a good one is WARN 'not checked', not pass", () => {
     config({ mcpServers: { x: { command: "${TOOLS}/server" }, good: { command: onPath("goodserver") } } });
     const r = checkMcpCommandPaths(home, env());
+    expect(r.severity, r.message).toBe("warn");
+    expect(r.message).toContain("Not checked 1: x (global): command uses ${...} expansion");
+    expect(r.message).toContain("not a full pass");
+  });
+
+  it("QA's mixed fixture: a non-string command beside a good one is WARN, not pass", () => {
+    config({ mcpServers: { y: { command: ["node", "x.js"] }, good: { command: onPath("goodserver") } } });
+    const r = checkMcpCommandPaths(home, env());
+    expect(r.severity, r.message).toBe("warn");
+    expect(r.message).toContain("Not checked 1: y (global): no command and no url");
+  });
+
+  it("no command and no url beside a good one is WARN, not pass", () => {
+    config({ mcpServers: { z: {}, good: { command: onPath("goodserver") } } });
+    const r = checkMcpCommandPaths(home, env());
+    expect(r.severity, r.message).toBe("warn");
+    expect(r.message).toContain("z (global): no command and no url");
+  });
+
+  it("a url server beside a good command is still a pass: it has no command to stat, by design", () => {
+    config({ mcpServers: { remote: { url: "https://example.invalid/mcp" }, good: { command: onPath("goodserver") } } });
+    const r = checkMcpCommandPaths(home, env());
     expect(r.severity, r.message).toBe("pass");
-    expect(r.message).toContain("x (global): command uses ${...} expansion");
+    expect(r.message).toContain("remote (global): url server");
+  });
+
+  it("a missing command still outranks the warn: ISSUE, with the not-checked servers named", () => {
+    config({ mcpServers: { x: { command: "${TOOLS}/server" }, ghost: { command: "no-such-server-anywhere" } } });
+    const r = checkMcpCommandPaths(home, env());
+    expect(r.severity, r.message).toBe("issue");
+    expect(r.message).toContain("Not checked 1");
   });
 
   it("resolveMcpCommand: an empty PATH finds nothing, and a directory is not a command", () => {

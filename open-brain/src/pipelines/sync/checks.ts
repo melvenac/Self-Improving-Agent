@@ -857,18 +857,19 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}):
   }
 
   const missing = new Map<string, string[]>(); // "server: command" -> scopes
-  const skipped: string[] = [];
+  const skipped: string[] = []; // url servers: nothing to stat, by design
+  const notChecked: string[] = []; // a command we could not examine: caps the result at warn (B2 ruling)
   let checked = 0;
   for (const { scope, servers } of scopes) {
     for (const [server, def] of Object.entries(servers)) {
       if (!def || typeof def !== "object") continue;
       if (typeof def.command !== "string" || def.command === "") {
         if (typeof def.url === "string") skipped.push(`${server} (${scope}): url server, no command to stat`);
-        else skipped.push(`${server} (${scope}): no command and no url`);
+        else notChecked.push(`${server} (${scope}): no command and no url`);
         continue;
       }
       if (def.command.includes("${")) {
-        skipped.push(`${server} (${scope}): command uses \${...} expansion, not resolved here`);
+        notChecked.push(`${server} (${scope}): command uses \${...} expansion, not resolved here`);
         continue;
       }
       checked++;
@@ -879,13 +880,19 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}):
     }
   }
 
-  const skippedNote = skipped.length > 0 ? ` Skipped ${skipped.length}: ${skipped.join("; ")}.` : "";
+  const skippedNote =
+    (skipped.length > 0 ? ` Skipped ${skipped.length}: ${skipped.join("; ")}.` : "") +
+    (notChecked.length > 0 ? ` Not checked ${notChecked.length}: ${notChecked.join("; ")}.` : "");
   if (missing.size > 0) {
     const list = [...missing].map(([k, s]) => `${k} not found (${s.length === 1 ? s[0] : `${s.length} scopes, first ${s[0]}`})`).join("; ");
     return { name, severity: "issue", message: `MCP command path missing — ${list}. The server cannot start, so its tools are silently absent.${skippedNote}` };
   }
   if (checked === 0) {
     return { name, severity: "skip", message: `not checked: no mcpServers entry with a command in ${configPath}.${skippedNote} This is not a pass.` };
+  }
+  if (notChecked.length > 0) {
+    // Any input that was not examined caps the result at warn, even when the message names it.
+    return { name, severity: "warn", message: `${checked} MCP server command(s) resolve to a file, but ${notChecked.length} not checked.${skippedNote} This is not a full pass.` };
   }
   return { name, severity: "pass", message: `${checked} MCP server command(s) resolve to a file.${skippedNote}` };
 }
