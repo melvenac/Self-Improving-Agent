@@ -27,7 +27,7 @@ A quoted value (`"*/20 * * * *"`) is read without its quotes; a value starting w
 | SR-2 | `AGENT.md`'s keys print when the local file lacks them; a local file that has the keys overrides | same | pass |
 | SR-3 | neither file: `none in seat data` (also with no agent files) | same | pass |
 | SR-4, SR-4b | `"4 * *"` and `"61 * * * *"` print INVALID with the reason (and hour, day, month, weekday ranges, `*/0`, a non-number); a missing `status_to`, `status_rule` or `status_cron` is INVALID | same | pass |
-| SR-5 | mutants below | | red |
+| SR-5 | mutants below: 5a (line dropped) goes red on **SR-6** only (SR-1, SR-2 call `readStandingCron` directly); 5b on SR-1, SR-2, SR-4, SR-4b (QA 249 F5, corrected in round 2) | | red |
 | SR-6 | `handleStart` with and without the keys: the line sits right after `Seat:`, and every other greeting line is identical (the `Total returned words` line is excluded by name because it counts the added line's words) | same | pass |
 
 ## Mutants (SR-5), `docs/loops/t211/mutants/`
