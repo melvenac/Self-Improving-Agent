@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index cf641adc..e15c203c 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -682,7 +682,6 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}):
+     for (const [server, def] of Object.entries(servers)) {
+       // A non-object (or null) entry is malformed input, not an empty one: not checked, and it names its key (QA 260).
+       if (!def || typeof def !== "object") {
+-        notChecked.push(`${server} (${scope}): entry is not an object`);
+         continue;
+       }
+       if (typeof def.command !== "string" || def.command === "") {
