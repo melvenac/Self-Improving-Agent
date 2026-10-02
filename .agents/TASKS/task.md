@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 280 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 281 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
@@ -9,7 +9,7 @@ Loop 15 slice FOUR is CLOSED (PROVISIONAL): step 4 re-run QA 248 ACCEPTED (D-093
 ## Top tasks
 
 - [ ] **T-008** [P0] Add a `/sync` validator that stats every MCP command path in `~/.claude.json`
-- [ ] **T-014** [P0] Make point-of-use rating reachable
 - [ ] **T-022** [P0] Replace-on-write for `state` facts
-- [ ] **T-023** [P0] Improve state-side classifier precision
 - [ ] **T-024** [P0] Rewrite the two genuine `obsolete-reference` hits
+- [ ] **T-025** [P0] Reconcile the experience `type` field across three sources
+- [ ] **T-031** [P0] Add agent attribution to sessions
