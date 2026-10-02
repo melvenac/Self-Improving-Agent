@@ -1,0 +1,96 @@
+{
+  "loop": "t196",
+  "candidate_git": {
+    "sha": "3059ca9cc5b0cb668216561b7b77c8b0119abad3",
+    "branch": "origin/loop/t197-cursor-start-parity",
+    "frozen_at": "2026-09-28T23:36:09-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm run build; npx vitest run tests/pipelines/sync/hub-seats.test.ts tests/pipelines/sync/start-parity.test.ts --reporter=verbose",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 16106,
+      "detail": "Exact candidate built and the focused acceptance suite passed 9/9."
+    },
+    "unit": {
+      "command": "CI run 36674710808, test job: npm test -- --reporter=verbose",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 164000,
+      "detail": "Exact-candidate tcm test job failed only tests/shared/state-schema.test.ts:248; the exact base failed the identical assertion."
+    }
+  },
+  "requirements": [
+    {
+      "id": "full-suite-candidate",
+      "status": "unmet",
+      "evidence": "tcm run 36674710808 at the exact candidate ended failure; test job failure with 1 failed, 1833 passed, 6 skipped.",
+      "severity": "major"
+    },
+    {
+      "id": "full-suite-base",
+      "status": "unmet",
+      "evidence": "tcm run 36674715816 at the exact base ended failure; test job failure with the same state-schema.test.ts:248 assertion, 1 failed, 1824 passed, 6 skipped.",
+      "severity": "info"
+    },
+    {
+      "id": "no-new-full-suite-failure",
+      "status": "met",
+      "evidence": "Candidate and base failed only tests/shared/state-schema.test.ts:248; candidate added nine passing tests and no new failure.",
+      "severity": "info"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "HB-1",
+      "status": "not_evaluated",
+      "evidence": "Live planner-session row; dispatch required not_evaluated and prohibited imitation."
+    },
+    {
+      "id": "HB-2",
+      "status": "not_evaluated",
+      "evidence": "Live fresh-Cursor-chat row across each seat; dispatch required not_evaluated and prohibited imitation."
+    },
+    {
+      "id": "HB-3",
+      "status": "not_evaluated",
+      "evidence": "Live sia-forge Cursor /start row with unread atlas turn; dispatch required not_evaluated and prohibited imitation."
+    },
+    {
+      "id": "HB-4",
+      "status": "met",
+      "evidence": "Exact-candidate hub-seats tests passed unknown-seat, missing-room and valid-file cases; focused suite passed 9/9.",
+      "order": "shown"
+    },
+    {
+      "id": "CS-1",
+      "status": "met",
+      "evidence": "Direct template diff contained only three nonblank Cursor-only lines, each equal to one complete tracked table entry; the green-tree parity test passed.",
+      "order": "shown"
+    },
+    {
+      "id": "CS-2",
+      "status": "met",
+      "evidence": "Three candidate scratch copies each returned issue: a longer line containing CallDynamicTool, a duplicated waived line, and deletion of a table-listed line. Developer mutant ad1bfa7 and QA reuse mutant 25f38a0 both typechecked and were killed.",
+      "order": "shown"
+    },
+    {
+      "id": "CS-3",
+      "status": "met",
+      "evidence": "Static search and full procedure read found no Proposed, hand-edit, fix-mismatches or session-template instruction; all references to state.json and rendered views are read-only.",
+      "order": "shown"
+    },
+    {
+      "id": "CS-4",
+      "status": "not_evaluated",
+      "evidence": "Live developer-seat Cursor /start row; dispatch required not_evaluated and prohibited imitation."
+    }
+  ],
+  "regressions": [],
+  "gaps": [
+    "The live HB-1, HB-2, HB-3 and CS-4 observations remain unevaluated by dispatch rule.",
+    "The tracked talk command requires replacing <A2A-Hub> with a local checkout; no scripts/hub-talk.mjs exists under this QA user's home, so it is not runnable on this host without installing or locating that checkout."
+  ],
+  "notes": "QA 228, scoring record 219 r2. T-198 readHubPartnerSeats at 231f501 parsed the candidate file and returned all three atlas partners while ignoring talk_tokens and other extra keys. Planner role commit e21e71a matches T-196 scope item 2. The CI state-schema r3b failure is inherited from base despite the fix existing on master at 3592f11."
+}

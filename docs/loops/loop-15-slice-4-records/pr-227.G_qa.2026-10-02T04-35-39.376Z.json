@@ -1,0 +1,1016 @@
+{
+  "gate": "qa-score",
+  "loop": "t198",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T04:35:39.376Z",
+  "answered_at": "2026-10-02T04:35:39.747Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "e_t": {
+        "loop": "t198",
+        "candidate_git": {
+          "sha": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+          "branch": "origin/loop/t198-presence",
+          "frozen_at": "2026-09-30T01:14:25-05:00"
+        },
+        "runtime_checks": {
+          "build": {
+            "command": "CI run 36681338277, test job, Typecheck: npx tsc --noEmit",
+            "exit_code": 0,
+            "passed": true,
+            "duration_ms": 5000,
+            "detail": "Exact-candidate tcm Typecheck step succeeded."
+          },
+          "unit": {
+            "command": "CI run 36681338277, test job, Test: npm test -- --reporter=verbose",
+            "exit_code": 1,
+            "passed": false,
+            "duration_ms": 114000,
+            "detail": "Exact-candidate tcm test step failed only the inherited moving-origin/master T-171 state-schema assertion: 1 failed, 1853 passed, 6 skipped. All T-198 tests passed."
+          }
+        },
+        "requirements": [
+          {
+            "id": "full-suite-candidate",
+            "status": "unmet",
+            "evidence": "Exact-candidate tcm run 36681338277 and its test job concluded failure solely on the inherited moving-origin/master T-171 assertion.",
+            "severity": "info"
+          },
+          {
+            "id": "full-suite-r1",
+            "status": "unmet",
+            "evidence": "R1 tcm run 36681343536 failed 6 tests: the inherited T-171 assertion and five hub-presence fixture-server tests.",
+            "severity": "info"
+          },
+          {
+            "id": "full-suite-base",
+            "status": "unmet",
+            "evidence": "Exact-base tcm run 36681349895 failed only the inherited moving-origin/master T-171 assertion.",
+            "severity": "info"
+          },
+          {
+            "id": "no-new-full-suite-failure",
+            "status": "met",
+            "evidence": "Candidate and base have the same sole failure; all five additional r1 hub-presence failures pass on the candidate.",
+            "severity": "info"
+          },
+          {
+            "id": "no-live-hub-in-tests",
+            "status": "met",
+            "evidence": "Focused tests inject fetchFn and arm tripwires on global fetch and net.Socket.connect; candidate tcm run passes all T-198 tests under egress isolation.",
+            "severity": "info"
+          }
+        ],
+        "acceptance": [
+          {
+            "id": "PR-1",
+            "status": "met",
+            "evidence": "pollingNow true prints 'grok: listener polling'; the seat-seen mutant dies.",
+            "order": "shown"
+          },
+          {
+            "id": "PR-2",
+            "status": "met",
+            "evidence": "Non-polling fixture prints 'cursor-infra: listener not polling, 3 unread since 5m'.",
+            "order": "shown"
+          },
+          {
+            "id": "PR-3",
+            "status": "met",
+            "evidence": "Unreachable, non-2xx, malformed JSON, timeout, QA 225 rooms-object, negative-unread and null-room cases each produce exactly one visible UNKNOWN line; timeout is bounded.",
+            "order": "shown"
+          },
+          {
+            "id": "PR-4",
+            "status": "met",
+            "evidence": "A partner absent from the roster prints as absent and is not skipped.",
+            "order": "shown"
+          },
+          {
+            "id": "PR-5",
+            "status": "met",
+            "evidence": "The r1 swallow behavior was semantically reapplied to the exact candidate, typechecked, and failed 12 error-contract tests.",
+            "order": "shown"
+          },
+          {
+            "id": "PR-6",
+            "status": "met",
+            "evidence": "Focused presence, greeting-size and server suites pass 67/67; the deterministic presence upper bound is included in greeting-size.",
+            "order": "shown"
+          },
+          {
+            "id": "R1",
+            "status": "met",
+            "evidence": "Header and every non-absent partner line explicitly say listener activity and deny proof that the seat read a turn; mutant c60d13a dies on 2 tests.",
+            "order": "shown"
+          },
+          {
+            "id": "R2",
+            "status": "met",
+            "evidence": "Every agent and supplied room is structurally validated; seven committed malformed cases and three independent QA cases return one UNKNOWN line; mutant cc114bf dies on 7 tests.",
+            "order": "shown"
+          },
+          {
+            "id": "R3",
+            "status": "met",
+            "evidence": "Greeting output reports presence block 313 as a worst-case upper bound, not fetched; the identical-root count is 46139 with and 45825 without; mutant 1419350 dies.",
+            "order": "shown"
+          },
+          {
+            "id": "R4",
+            "status": "met",
+            "evidence": "Candidate tcm run 36681338277 passes all five fixture-server tests that fail in r1 run 36681343536; candidate test job failure is only inherited T-171.",
+            "order": "shown"
+          },
+          {
+            "id": "R5",
+            "status": "met",
+            "evidence": "Own identity key is sent without output leakage; missing, unreadable and short keys do not call fetch; dev-key and fallback mutants die on 2 and 4 tests.",
+            "order": "shown"
+          }
+        ],
+        "regressions": [],
+        "gaps": [],
+        "notes": "QA 230, scoring record 217 r2. The permitted live GET was skipped because this QA account has no cursor-qa2-gpt key. Candidate carries T-196 seat blob 344bd46. G-049 shared checkout identity is reported but is not a T-198 defect. QA mutant 00b29fe is killed by the independent negative-unread probe."
+      },
+      "e_t_ref": {
+        "branch": "qa/t198-r2-report",
+        "commit": "1cc2fe3807542b65fbe3769415a23e28a14b6a3b",
+        "path": "docs/loops/t198-r2-qa-report.E_t.json",
+        "blob": "63afb2c88a04334ea07da664f0401679842d60f0"
+      },
+      "note": "Rows without evidence are not asked; they are recorded untested by code."
+    },
+    "questions": {
+      "res:requirements:full-suite-candidate": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for requirements item \"full-suite-candidate\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:requirements:full-suite-candidate": {
+        "type": "score",
+        "instructions": "If requirements item \"full-suite-candidate\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:requirements:full-suite-r1": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for requirements item \"full-suite-r1\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:requirements:full-suite-r1": {
+        "type": "score",
+        "instructions": "If requirements item \"full-suite-r1\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:requirements:full-suite-base": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for requirements item \"full-suite-base\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:requirements:full-suite-base": {
+        "type": "score",
+        "instructions": "If requirements item \"full-suite-base\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:requirements:no-new-full-suite-failure": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for requirements item \"no-new-full-suite-failure\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:requirements:no-new-full-suite-failure": {
+        "type": "score",
+        "instructions": "If requirements item \"no-new-full-suite-failure\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:requirements:no-live-hub-in-tests": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for requirements item \"no-live-hub-in-tests\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:requirements:no-live-hub-in-tests": {
+        "type": "score",
+        "instructions": "If requirements item \"no-live-hub-in-tests\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:PR-1": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"PR-1\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:PR-1": {
+        "type": "score",
+        "instructions": "If acceptance item \"PR-1\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:PR-2": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"PR-2\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:PR-2": {
+        "type": "score",
+        "instructions": "If acceptance item \"PR-2\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:PR-3": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"PR-3\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:PR-3": {
+        "type": "score",
+        "instructions": "If acceptance item \"PR-3\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:PR-4": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"PR-4\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:PR-4": {
+        "type": "score",
+        "instructions": "If acceptance item \"PR-4\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:PR-5": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"PR-5\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:PR-5": {
+        "type": "score",
+        "instructions": "If acceptance item \"PR-5\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:PR-6": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"PR-6\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:PR-6": {
+        "type": "score",
+        "instructions": "If acceptance item \"PR-6\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:R1": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"R1\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:R1": {
+        "type": "score",
+        "instructions": "If acceptance item \"R1\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:R2": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"R2\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:R2": {
+        "type": "score",
+        "instructions": "If acceptance item \"R2\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:R3": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"R3\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:R3": {
+        "type": "score",
+        "instructions": "If acceptance item \"R3\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:R4": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"R4\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:R4": {
+        "type": "score",
+        "instructions": "If acceptance item \"R4\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:R5": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"R5\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:R5": {
+        "type": "score",
+        "instructions": "If acceptance item \"R5\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "regression_of_validated": {
+        "type": "noul",
+        "instructions": "Does the report's evidence show that a behaviour listed as validated has regressed?"
+      },
+      "artifact_complete_enough_to_stop": {
+        "type": "noul",
+        "instructions": "Is the artifact complete enough, on this report's evidence, that the next planner could stop here?"
+      }
+    }
+  },
+  "answer": {
+    "res:requirements:full-suite-candidate": {
+      "type": "choice",
+      "choice": "fail",
+      "confidence": 1,
+      "probabilities": {
+        "fail": 1,
+        "untested": 0,
+        "pass": 0
+      }
+    },
+    "sev:requirements:full-suite-candidate": {
+      "type": "score",
+      "score": 0.74,
+      "confidence": 0.46,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.31,
+        "1": 0.64,
+        "2": 0.05
+      }
+    },
+    "res:requirements:full-suite-r1": {
+      "type": "choice",
+      "choice": "fail",
+      "confidence": 0.97,
+      "probabilities": {
+        "fail": 0.99,
+        "untested": 0.01,
+        "pass": 0
+      }
+    },
+    "sev:requirements:full-suite-r1": {
+      "type": "score",
+      "score": 0.78,
+      "confidence": 0.47,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.28,
+        "1": 0.65,
+        "2": 0.07
+      }
+    },
+    "res:requirements:full-suite-base": {
+      "type": "choice",
+      "choice": "fail",
+      "confidence": 0.95,
+      "probabilities": {
+        "fail": 0.97,
+        "untested": 0.03,
+        "pass": 0
+      }
+    },
+    "sev:requirements:full-suite-base": {
+      "type": "score",
+      "score": 0.62,
+      "confidence": 0.34,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.41,
+        "1": 0.56,
+        "2": 0.03
+      }
+    },
+    "res:requirements:no-new-full-suite-failure": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0,
+        "pass": 1
+      }
+    },
+    "sev:requirements:no-new-full-suite-failure": {
+      "type": "score",
+      "score": 1.44,
+      "confidence": 0.15,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.11,
+        "1": 0.34,
+        "2": 0.55
+      }
+    },
+    "res:requirements:no-live-hub-in-tests": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0,
+        "pass": 1
+      }
+    },
+    "sev:requirements:no-live-hub-in-tests": {
+      "type": "score",
+      "score": 1.55,
+      "confidence": 0.32,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.11,
+        "1": 0.24,
+        "2": 0.65
+      }
+    },
+    "res:acceptance:PR-1": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.96,
+      "probabilities": {
+        "fail": 0,
+        "pass": 0.98,
+        "untested": 0.02
+      }
+    },
+    "sev:acceptance:PR-1": {
+      "type": "score",
+      "score": 1.94,
+      "confidence": 0.91,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.03,
+        "2": 0.96
+      }
+    },
+    "res:acceptance:PR-2": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.97,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.02,
+        "pass": 0.98
+      }
+    },
+    "sev:acceptance:PR-2": {
+      "type": "score",
+      "score": 1.86,
+      "confidence": 0.79,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.03,
+        "1": 0.07,
+        "2": 0.9
+      }
+    },
+    "res:acceptance:PR-3": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.96,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.03,
+        "pass": 0.97
+      }
+    },
+    "sev:acceptance:PR-3": {
+      "type": "score",
+      "score": 1.97,
+      "confidence": 0.95,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.02,
+        "2": 0.97
+      }
+    },
+    "res:acceptance:PR-4": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.92,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.05,
+        "pass": 0.95
+      }
+    },
+    "sev:acceptance:PR-4": {
+      "type": "score",
+      "score": 1.94,
+      "confidence": 0.91,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.05,
+        "2": 0.94
+      }
+    },
+    "res:acceptance:PR-5": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.35,
+      "probabilities": {
+        "fail": 0.39,
+        "untested": 0.04,
+        "pass": 0.57
+      }
+    },
+    "sev:acceptance:PR-5": {
+      "type": "score",
+      "score": 1.87,
+      "confidence": 0.81,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.02,
+        "1": 0.09,
+        "2": 0.89
+      }
+    },
+    "res:acceptance:PR-6": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.01,
+        "pass": 0.99
+      }
+    },
+    "sev:acceptance:PR-6": {
+      "type": "score",
+      "score": 1.91,
+      "confidence": 0.86,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.02,
+        "1": 0.06,
+        "2": 0.92
+      }
+    },
+    "res:acceptance:R1": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.96,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.02,
+        "pass": 0.98
+      }
+    },
+    "sev:acceptance:R1": {
+      "type": "score",
+      "score": 1.93,
+      "confidence": 0.89,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.02,
+        "1": 0.04,
+        "2": 0.94
+      }
+    },
+    "res:acceptance:R2": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.01,
+        "pass": 0.99
+      }
+    },
+    "sev:acceptance:R2": {
+      "type": "score",
+      "score": 1.96,
+      "confidence": 0.95,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.02,
+        "2": 0.97
+      }
+    },
+    "res:acceptance:R3": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.01,
+        "pass": 0.99
+      }
+    },
+    "sev:acceptance:R3": {
+      "type": "score",
+      "score": 1.96,
+      "confidence": 0.94,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.02,
+        "2": 0.97
+      }
+    },
+    "res:acceptance:R4": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0.01,
+        "untested": 0,
+        "pass": 0.99
+      }
+    },
+    "sev:acceptance:R4": {
+      "type": "score",
+      "score": 1.79,
+      "confidence": 0.68,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.05,
+        "1": 0.12,
+        "2": 0.83
+      }
+    },
+    "res:acceptance:R5": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.98,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.02,
+        "pass": 0.98
+      }
+    },
+    "sev:acceptance:R5": {
+      "type": "score",
+      "score": 1.97,
+      "confidence": 0.95,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.02,
+        "2": 0.97
+      }
+    },
+    "regression_of_validated": {
+      "type": "noul",
+      "noul": 0.1
+    },
+    "artifact_complete_enough_to_stop": {
+      "type": "noul",
+      "noul": 0.43
+    }
+  },
+  "usage": {
+    "input_tokens": 5352,
+    "output_tokens": 1085
+  },
+  "decision": {
+    "gate": "qa-score",
+    "verdict": "reject",
+    "reasons": [
+      "artifact_complete_enough_to_stop 0.43 is below the required 0.5",
+      "3 requirement(s) failed: full-suite-candidate, full-suite-r1, full-suite-base"
+    ],
+    "applied": {
+      "regression_of_validated_max": 0.5,
+      "artifact_complete_enough_to_stop_min": 0.5,
+      "fail_severity_reject_at_or_above": 2,
+      "any_fail_is_reject": true,
+      "untested_is_reject": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T04:35:39.736Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "2019d35e-0f7a-4dc9-986d-d00b79533f21",
+  "subject": {
+    "gate": "qa-score",
+    "key": "1cc2fe3807542b65fbe3769415a23e28a14b6a3b:docs/loops/t198-r2-qa-report.E_t.json",
+    "blob": "63afb2c88a04334ea07da664f0401679842d60f0"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T04:35:39.376Z",
+  "policy_hash": "56d11a9489574eee49142fb1b14179f9eb272d30217051fe275857f4b6fcee26",
+  "e_t_ref": {
+    "branch": "qa/t198-r2-report",
+    "commit": "1cc2fe3807542b65fbe3769415a23e28a14b6a3b",
+    "path": "docs/loops/t198-r2-qa-report.E_t.json",
+    "blob": "63afb2c88a04334ea07da664f0401679842d60f0"
+  },
+  "results": [
+    {
+      "id": "full-suite-candidate",
+      "from": "requirements",
+      "result": "fail",
+      "decided_by": "jev",
+      "severity": 0.74
+    },
+    {
+      "id": "full-suite-r1",
+      "from": "requirements",
+      "result": "fail",
+      "decided_by": "jev",
+      "severity": 0.78
+    },
+    {
+      "id": "full-suite-base",
+      "from": "requirements",
+      "result": "fail",
+      "decided_by": "jev",
+      "severity": 0.62
+    },
+    {
+      "id": "no-new-full-suite-failure",
+      "from": "requirements",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "no-live-hub-in-tests",
+      "from": "requirements",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "PR-1",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "PR-2",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "PR-3",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "PR-4",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "PR-5",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "PR-6",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "R1",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "R2",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "R3",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "R4",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "R5",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    }
+  ],
+  "missing": [],
+  "regression_of_validated": 0.1,
+  "artifact_complete_enough_to_stop": 0.43
+}

@@ -1,0 +1,396 @@
+{
+  "gate": "qa-score",
+  "loop": "t158",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T04:35:47.747Z",
+  "answered_at": "2026-10-02T04:35:48.127Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "e_t": {
+        "loop": "t158",
+        "candidate_git": {
+          "sha": "e23e622813a540e18bed0849779040cf181ff9b7",
+          "branch": "origin/loop/t158-gap-tombstone",
+          "frozen_at": "2026-09-30T05:32:09Z"
+        },
+        "runtime_checks": {
+          "build": {
+            "command": "CI run 36673852699, test job, Typecheck",
+            "exit_code": 0,
+            "passed": true,
+            "duration_ms": 6000,
+            "detail": "Candidate test job Typecheck step succeeded."
+          },
+          "unit": {
+            "command": "CI run 36673852699, test job, Test",
+            "exit_code": 1,
+            "passed": false,
+            "duration_ms": 187000,
+            "detail": "Full suite: 1 failed, 1829 passed, 6 skipped. The sole T-171 r3b failure was identical at base run 36673856307; no candidate regression."
+          }
+        },
+        "requirements": [],
+        "acceptance": [
+          {
+            "id": "TG-1",
+            "status": "met",
+            "evidence": "Focused tests and independent scratch-state probe retained G-001 as a closed tombstone with closed_session and closed_rev; greeting and SUMMARY omitted it; second close refused.",
+            "order": "shown"
+          },
+          {
+            "id": "TG-2",
+            "status": "met",
+            "evidence": "Dry-run against the candidate copy assigned G-049, named cited skips G-046/G-047/G-048, refused each same explicit id, and left state.json byte-identical. A corrupt scratch index made git grep exit 128 and add_gap refused with that exit.",
+            "order": "shown"
+          },
+          {
+            "id": "TG-3",
+            "status": "met",
+            "evidence": "Candidate fixture test passed both directions: cited G-040 skipped and uncited G-041 assigned. Candidate scan found G-046/G-047/G-048.",
+            "order": "shown"
+          },
+          {
+            "id": "TG-4",
+            "status": "met",
+            "evidence": "All four developer mutants were reapplied to e23e622, typechecked, and killed by their intended rows; QA render-closed mutant also typechecked and was killed by two TG-1 assertions.",
+            "order": "shown"
+          },
+          {
+            "id": "TG-5",
+            "status": "met",
+            "evidence": "Schema remains v3 with optional gap lifecycle fields and legacy absent status interpreted open. Writer/render focused tests passed; full CI had only the base-identical moving-origin/master r3b failure.",
+            "order": "shown"
+          }
+        ],
+        "regressions": [],
+        "gaps": [],
+        "notes": "QA-227 ACCEPT. Candidate and base CI both failed only T-171 r3b because both code SHAs predate the master fix; candidate added five passing tests and no new failure."
+      },
+      "e_t_ref": {
+        "branch": "qa/t158-r2-report",
+        "commit": "ad20f4d33919be802fd8f5ba556fc3301c4642b7",
+        "path": "docs/loops/t158-r2-qa-report.E_t.json",
+        "blob": "5facd074851e916d98922443d74d47c1fa0a248d"
+      },
+      "note": "Rows without evidence are not asked; they are recorded untested by code."
+    },
+    "questions": {
+      "res:acceptance:TG-1": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"TG-1\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:TG-1": {
+        "type": "score",
+        "instructions": "If acceptance item \"TG-1\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:TG-2": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"TG-2\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:TG-2": {
+        "type": "score",
+        "instructions": "If acceptance item \"TG-2\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:TG-3": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"TG-3\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:TG-3": {
+        "type": "score",
+        "instructions": "If acceptance item \"TG-3\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:TG-4": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"TG-4\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:TG-4": {
+        "type": "score",
+        "instructions": "If acceptance item \"TG-4\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "res:acceptance:TG-5": {
+        "type": "choice",
+        "instructions": "Judging only the evidence the QA report gives for acceptance item \"TG-5\", did the candidate meet it? Answer untested when the evidence does not let you tell.",
+        "criteria": {
+          "pass": "The evidence shows the item is met.",
+          "fail": "The evidence shows the item is not met.",
+          "untested": "The evidence is too thin to tell either way."
+        }
+      },
+      "sev:acceptance:TG-5": {
+        "type": "score",
+        "instructions": "If acceptance item \"TG-5\" failed, how severe would the failure be? The order of the levels is the scale.",
+        "criteria": [
+          "Cosmetic or wording: no behaviour is affected.",
+          "Contained: behaviour is affected but a validated behaviour is not.",
+          "Breaking: a validated behaviour or the candidate's own claim is broken."
+        ]
+      },
+      "regression_of_validated": {
+        "type": "noul",
+        "instructions": "Does the report's evidence show that a behaviour listed as validated has regressed?"
+      },
+      "artifact_complete_enough_to_stop": {
+        "type": "noul",
+        "instructions": "Is the artifact complete enough, on this report's evidence, that the next planner could stop here?"
+      }
+    }
+  },
+  "answer": {
+    "res:acceptance:TG-1": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0,
+        "pass": 1
+      }
+    },
+    "sev:acceptance:TG-1": {
+      "type": "score",
+      "score": 1.98,
+      "confidence": 0.97,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0,
+        "1": 0.02,
+        "2": 0.98
+      }
+    },
+    "res:acceptance:TG-2": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0,
+        "pass": 1
+      }
+    },
+    "sev:acceptance:TG-2": {
+      "type": "score",
+      "score": 1.94,
+      "confidence": 0.91,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.05,
+        "2": 0.94
+      }
+    },
+    "res:acceptance:TG-3": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.99,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0,
+        "pass": 1
+      }
+    },
+    "sev:acceptance:TG-3": {
+      "type": "score",
+      "score": 1.89,
+      "confidence": 0.83,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.1,
+        "2": 0.89
+      }
+    },
+    "res:acceptance:TG-4": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.98,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.02,
+        "pass": 0.98
+      }
+    },
+    "sev:acceptance:TG-4": {
+      "type": "score",
+      "score": 1.91,
+      "confidence": 0.87,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.07,
+        "2": 0.92
+      }
+    },
+    "res:acceptance:TG-5": {
+      "type": "choice",
+      "choice": "pass",
+      "confidence": 0.96,
+      "probabilities": {
+        "fail": 0,
+        "untested": 0.02,
+        "pass": 0.98
+      }
+    },
+    "sev:acceptance:TG-5": {
+      "type": "score",
+      "score": 1.91,
+      "confidence": 0.86,
+      "legend": {
+        "0": "Cosmetic or wording: no behaviour is affected.",
+        "1": "Contained: behaviour is affected but a validated behaviour is not.",
+        "2": "Breaking: a validated behaviour or the candidate's own claim is broken."
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.07,
+        "2": 0.92
+      }
+    },
+    "regression_of_validated": {
+      "type": "noul",
+      "noul": 0.07
+    },
+    "artifact_complete_enough_to_stop": {
+      "type": "noul",
+      "noul": 0.58
+    }
+  },
+  "usage": {
+    "input_tokens": 2291,
+    "output_tokens": 372
+  },
+  "decision": {
+    "gate": "qa-score",
+    "verdict": "proceed",
+    "reasons": [],
+    "applied": {
+      "regression_of_validated_max": 0.5,
+      "artifact_complete_enough_to_stop_min": 0.5,
+      "fail_severity_reject_at_or_above": 2,
+      "any_fail_is_reject": true,
+      "untested_is_reject": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T04:35:48.117Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "be3df3e4-98a3-4bf0-86bc-014c7fcbeda8",
+  "subject": {
+    "gate": "qa-score",
+    "key": "ad20f4d33919be802fd8f5ba556fc3301c4642b7:docs/loops/t158-r2-qa-report.E_t.json",
+    "blob": "5facd074851e916d98922443d74d47c1fa0a248d"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T04:35:47.747Z",
+  "policy_hash": "56d11a9489574eee49142fb1b14179f9eb272d30217051fe275857f4b6fcee26",
+  "e_t_ref": {
+    "branch": "qa/t158-r2-report",
+    "commit": "ad20f4d33919be802fd8f5ba556fc3301c4642b7",
+    "path": "docs/loops/t158-r2-qa-report.E_t.json",
+    "blob": "5facd074851e916d98922443d74d47c1fa0a248d"
+  },
+  "results": [
+    {
+      "id": "TG-1",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "TG-2",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "TG-3",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "TG-4",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    },
+    {
+      "id": "TG-5",
+      "from": "acceptance",
+      "result": "pass",
+      "decided_by": "jev",
+      "severity": null
+    }
+  ],
+  "missing": [],
+  "regression_of_validated": 0.07,
+  "artifact_complete_enough_to_stop": 0.58
+}

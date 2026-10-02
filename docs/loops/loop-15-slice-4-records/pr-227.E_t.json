@@ -1,0 +1,127 @@
+{
+  "loop": "t198",
+  "candidate_git": {
+    "sha": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+    "branch": "origin/loop/t198-presence",
+    "frozen_at": "2026-09-30T01:14:25-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "CI run 36681338277, test job, Typecheck: npx tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 5000,
+      "detail": "Exact-candidate tcm Typecheck step succeeded."
+    },
+    "unit": {
+      "command": "CI run 36681338277, test job, Test: npm test -- --reporter=verbose",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 114000,
+      "detail": "Exact-candidate tcm test step failed only the inherited moving-origin/master T-171 state-schema assertion: 1 failed, 1853 passed, 6 skipped. All T-198 tests passed."
+    }
+  },
+  "requirements": [
+    {
+      "id": "full-suite-candidate",
+      "status": "unmet",
+      "evidence": "Exact-candidate tcm run 36681338277 and its test job concluded failure solely on the inherited moving-origin/master T-171 assertion.",
+      "severity": "info"
+    },
+    {
+      "id": "full-suite-r1",
+      "status": "unmet",
+      "evidence": "R1 tcm run 36681343536 failed 6 tests: the inherited T-171 assertion and five hub-presence fixture-server tests.",
+      "severity": "info"
+    },
+    {
+      "id": "full-suite-base",
+      "status": "unmet",
+      "evidence": "Exact-base tcm run 36681349895 failed only the inherited moving-origin/master T-171 assertion.",
+      "severity": "info"
+    },
+    {
+      "id": "no-new-full-suite-failure",
+      "status": "met",
+      "evidence": "Candidate and base have the same sole failure; all five additional r1 hub-presence failures pass on the candidate.",
+      "severity": "info"
+    },
+    {
+      "id": "no-live-hub-in-tests",
+      "status": "met",
+      "evidence": "Focused tests inject fetchFn and arm tripwires on global fetch and net.Socket.connect; candidate tcm run passes all T-198 tests under egress isolation.",
+      "severity": "info"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "PR-1",
+      "status": "met",
+      "evidence": "pollingNow true prints 'grok: listener polling'; the seat-seen mutant dies.",
+      "order": "shown"
+    },
+    {
+      "id": "PR-2",
+      "status": "met",
+      "evidence": "Non-polling fixture prints 'cursor-infra: listener not polling, 3 unread since 5m'.",
+      "order": "shown"
+    },
+    {
+      "id": "PR-3",
+      "status": "met",
+      "evidence": "Unreachable, non-2xx, malformed JSON, timeout, QA 225 rooms-object, negative-unread and null-room cases each produce exactly one visible UNKNOWN line; timeout is bounded.",
+      "order": "shown"
+    },
+    {
+      "id": "PR-4",
+      "status": "met",
+      "evidence": "A partner absent from the roster prints as absent and is not skipped.",
+      "order": "shown"
+    },
+    {
+      "id": "PR-5",
+      "status": "met",
+      "evidence": "The r1 swallow behavior was semantically reapplied to the exact candidate, typechecked, and failed 12 error-contract tests.",
+      "order": "shown"
+    },
+    {
+      "id": "PR-6",
+      "status": "met",
+      "evidence": "Focused presence, greeting-size and server suites pass 67/67; the deterministic presence upper bound is included in greeting-size.",
+      "order": "shown"
+    },
+    {
+      "id": "R1",
+      "status": "met",
+      "evidence": "Header and every non-absent partner line explicitly say listener activity and deny proof that the seat read a turn; mutant c60d13a dies on 2 tests.",
+      "order": "shown"
+    },
+    {
+      "id": "R2",
+      "status": "met",
+      "evidence": "Every agent and supplied room is structurally validated; seven committed malformed cases and three independent QA cases return one UNKNOWN line; mutant cc114bf dies on 7 tests.",
+      "order": "shown"
+    },
+    {
+      "id": "R3",
+      "status": "met",
+      "evidence": "Greeting output reports presence block 313 as a worst-case upper bound, not fetched; the identical-root count is 46139 with and 45825 without; mutant 1419350 dies.",
+      "order": "shown"
+    },
+    {
+      "id": "R4",
+      "status": "met",
+      "evidence": "Candidate tcm run 36681338277 passes all five fixture-server tests that fail in r1 run 36681343536; candidate test job failure is only inherited T-171.",
+      "order": "shown"
+    },
+    {
+      "id": "R5",
+      "status": "met",
+      "evidence": "Own identity key is sent without output leakage; missing, unreadable and short keys do not call fetch; dev-key and fallback mutants die on 2 and 4 tests.",
+      "order": "shown"
+    }
+  ],
+  "regressions": [],
+  "gaps": [],
+  "notes": "QA 230, scoring record 217 r2. The permitted live GET was skipped because this QA account has no cursor-qa2-gpt key. Candidate carries T-196 seat blob 344bd46. G-049 shared checkout identity is reported but is not a T-198 defect. QA mutant 00b29fe is killed by the independent negative-unread probe."
+}

@@ -1,0 +1,90 @@
+{
+  "loop": "15-slice-3-c",
+  "candidate_git": {
+    "sha": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+    "branch": "origin/loop/15-slice-3-candidate-c",
+    "frozen_at": "2026-09-30T00:52:07-05:00"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "local, C:/qa-scratch/qa232-cand/open-brain: npm run build; node node_modules/typescript/bin/tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "Build exit 0, stamped c339427; tsc --noEmit exit 0. tcm run 36690140665 (headSha c339427) also built; its failure is in the test step only."
+    },
+    "unit": {
+      "command": "tcm ci.yml run 36690140665 (qa/c-r4-ci-candidate, headSha c33942725c73b1aa91ceb46458e6ea7d11c70dcd): npm test",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 163880,
+      "detail": "Run conclusion failure; test job failure: 1 failed | 1853 passed | 6 skipped (1860), 132 files. The one failure is tests/shared/state-schema.test.ts T-171 r3b, which reads the moving origin/master; base run 36690144823 (5f7c9a0) fails the same test with the same assertion (expected true to be false). tcm run 36691109295 at 9823d774 (c339427 plus one test-only commit to state-schema.test.ts, outside C) is success: 132 files, 1854 passed, 6 skipped."
+    }
+  },
+  "requirements": [
+    {
+      "id": "planner-1-CC-1.2-policy-read",
+      "status": "met",
+      "evidence": "computeShadowMergeVerdict calls missingRequiredInput(ev, input.policy.required_inputs); prepare passes loadMergePolicy() when no policy is given. schema.ts unchanged (CC-0.1). Mutants cc12a (loader row by name) and cc12b (verdict row) both die locally.",
+      "severity": "info"
+    },
+    {
+      "id": "planner-2-CC-13.2-plants",
+      "status": "met",
+      "evidence": "Scratch repos via the candidate build: matched -> pass, 1 walked 0 pending; unmatched-merged -> issue 'decide is owed'; unmatched-pending (real side-branch commit) -> pass, '1 pending decide (15-side/e435bea...)'; no ledger + merged artifact -> issue; the same side-branch artifact after merging -> issue. Every message carries the LIMIT sentence.",
+      "severity": "info"
+    },
+    {
+      "id": "planner-3-red-first",
+      "status": "met",
+      "evidence": "At d1e9739 (5f7c9a0 product plus the new tests and fixtures), shadow-merge.test.ts: 8 failed | 61 passed. Failures are exactly the 2 CC-1.2 rows and the 6 CC-13.2 rows. CC-2.2, CC-5.6, CC-13.1 and CC-17 rows pass at base; their reds are mutants, which is what the handoff says.",
+      "severity": "info"
+    },
+    {
+      "id": "planner-4-fd6c310-dies",
+      "status": "met",
+      "evidence": "fd6c310's diff re-applied to c339427: tsc 0, vitest 1 failed | 68 passed; the failing row is 'record 217 r4 > CC-13.1 a present, non-empty, INCORRECT line_hash is the only problem reported'.",
+      "severity": "info"
+    },
+    {
+      "id": "qa-mutant-loopkey-survives",
+      "status": "partial",
+      "evidence": "QA mutant 72de853 (ledger match keyed on candidate_sha only, ignoring loop) survives shadow-merge.test.ts and policies.test.ts (69 passed), and no other test file names checkShadowMergeLedger. The product is right (the probe shows loop B's artifact reported as owed while loop A holds the ledger line); the assertion is missing.",
+      "severity": "minor"
+    }
+  ],
+  "acceptance": [
+    { "id": "CC-0", "status": "met", "evidence": "r4 diff 5f7c9a0..c339427 is 10 files: policies.ts, merge.json, policy-merge.schema.json, shadow-merge.ts, shadow-merge.test.ts and five fixtures. schema.ts, declared.ts, runtime.ts, cli.ts and pipelines/ unchanged. No skip, todo, skipIf or runIf added; no test deleted. tcm tests passed 1853 at the candidate against 1838 at base.", "order": "shown" },
+    { "id": "CC-1", "status": "met", "evidence": "CC-1.2 is now met: merge.json carries required_inputs [runtime_checks, E_t.acceptance]; the strict zod schema requires both and the derived policy-merge.schema.json lists the field as required; the verdict reads the list. True red at base (2 rows). cc12a and cc12b die. CC-1.1 and CC-1.3 unchanged from QA 213.", "order": "shown" },
+    { "id": "CC-2", "status": "met", "evidence": "fixtures/shadow-merge/would-merge.json, would-not-merge.json, undefined.json exist, and each test names its file and asserts the outcome and a reason. cc22 and cc17 kill the named fixture rows.", "order": "shown" },
+    { "id": "CC-3", "status": "met", "evidence": "Unchanged from QA 213; the row passes on the candidate (69/69 focused, tcm 1853 passed).", "order": "shown" },
+    { "id": "CC-4", "status": "met", "evidence": "Unchanged from QA 213; all five cause rows pass on the candidate.", "order": "shown" },
+    { "id": "CC-5", "status": "met", "evidence": "CC-5.6 is now met: skipped-required-live-gate.json (require_done_gate true, gateMode skip, no record) returns undefined and says skip; the paired live case says 'required and missing'. cc56 kills that row only.", "order": "shown" },
+    { "id": "CC-6", "status": "met", "evidence": "Unchanged; CC-6 rows pass on the candidate.", "order": "shown" },
+    { "id": "CC-7", "status": "met", "evidence": "Unchanged; CC-7 row passes on the candidate.", "order": "shown" },
+    { "id": "CC-8", "status": "met", "evidence": "Unchanged; CC-8 rows pass on the candidate.", "order": "shown" },
+    { "id": "CC-9", "status": "met", "evidence": "Unchanged; CC-9 row passes. The probe's decide --merged lines carry every field.", "order": "shown" },
+    { "id": "CC-10", "status": "met", "evidence": "Unchanged; CC-10 rows pass on the candidate.", "order": "shown" },
+    { "id": "CC-11", "status": "met", "evidence": "Unchanged; summary rows pass on the candidate.", "order": "shown" },
+    { "id": "CC-12", "status": "met", "evidence": "Unchanged; CC-12 row passes on the candidate.", "order": "shown" },
+    { "id": "CC-13", "status": "met", "evidence": "CC-13.1: an isolated incorrect line_hash row exists and kills fd6c310 and cc131. CC-13.2 (rev 167 rule): the check walks docs/loops/shadow-merge and artifacts/iterations; an unmatched artifact whose candidate is an ancestor of HEAD is an issue; otherwise it is pending decide (pass), printed with its count and SHAs; the absent-ledger early return is gone; the LIMIT is stated. All four planted cases behave as ruled. True red at base (6 rows). cc132 and QA mutants noledger and iterroot die. QA mutant loopkey survives (coverage, minor).", "order": "shown" },
+    { "id": "CC-14", "status": "met", "evidence": "Unchanged; the CC-5.1 pending row passes, and cc22 kills it.", "order": "shown" },
+    { "id": "CC-15", "status": "met", "evidence": "Unchanged; CC-15 row passes on the candidate.", "order": "shown" },
+    { "id": "CC-16", "status": "met", "evidence": "Unchanged; CC-16 rows pass on the candidate.", "order": "shown" },
+    { "id": "CC-17", "status": "met", "evidence": "all-attributed.json: three in-scope rows, all attributed, green checks, returns would-merge with three '(attributed)' reasons; dropping one row does not change the outcome. cc17 kills it.", "order": "shown" },
+    { "id": "CC-18", "status": "met", "evidence": "Unchanged; CC-18 rows pass. The new required-input check forces undefined for an empty acceptance[], which matches CC-18's 'at least one row'.", "order": "shown" },
+    { "id": "CC-19", "status": "met", "evidence": "Unchanged; runtime.ts and cli.ts are untouched by r4.", "order": "shown" },
+    { "id": "CC-20", "status": "met", "evidence": "Unchanged; harness help lists shadow-verdict prepare, decide and summary; usage rows pass.", "order": "shown" },
+    { "id": "CC-21", "status": "not_evaluated", "evidence": "Cut by the planner's ruling in section 8 (P2); declared out of scope." },
+    { "id": "CC-22", "status": "met", "evidence": "Local build and tsc exit 0 at c339427. tcm candidate run 36690140665: 1 failed | 1853 passed | 6 skipped. The one failure is state-schema T-171 r3b, which reads the moving origin/master and fails the same way at base (run 36690144823). No failure is new. Run 36691109295 (c339427 plus a test-only fix to that test) is green: 132 files, 1854 passed, 6 skipped. Scored met because that failure is at base too; the strict reading is in Open for the planner.", "order": "shown" },
+    { "id": "CC-29", "status": "met", "evidence": "Unchanged; the human-seat layout is docs/loops/shadow-merge/, which the probe used.", "order": "shown" },
+    { "id": "CC-30", "status": "met", "evidence": "Unchanged; CC-30 row passes on the candidate.", "order": "shown" }
+  ],
+  "regressions": [],
+  "gaps": [
+    "QA mutant qa/c-r4-mut-loopkey (72de853) survives: no test gives two loops the same candidate SHA with a ledger line for only one of them.",
+    "When the ledger is absent but artifacts exist, the pass message says 'ledger parses (0 lines)' and does not say the ledger is absent.",
+    "listVerdictArtifacts does not check that a directory name is a 40-hex SHA. A hand-planted docs/loops/shadow-merge/<loop>/HEAD/shadow_merge.json is reported as owed with the reason 'HEAD is already an ancestor of HEAD'. It is still an issue, so it is not a silent pass."
+  ],
+  "notes": "QA 232 verdict: ACCEPT. All six r4 rows (CC-1.2, CC-2.2, CC-5.6, CC-13.1, CC-13.2, CC-17) are met, and every row QA 213 scored met is still met. The candidate full suite on tcm fails one moving-ref test that fails the same way at base. Model: Claude Opus 5.5 in Claude Code (claude-opus-5-5), headless on the laptop DESKTOP-0GV3HAD."
+}
