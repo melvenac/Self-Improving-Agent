@@ -1,0 +1,14 @@
+diff --git a/open-brain/src/pipelines/session-start/state-render.ts b/open-brain/src/pipelines/session-start/state-render.ts
+index 400fb7a8..faeed19f 100644
+--- a/open-brain/src/pipelines/session-start/state-render.ts
++++ b/open-brain/src/pipelines/session-start/state-render.ts
+@@ -235,8 +235,8 @@ export function splitQuestions(questions: readonly OpenQuestion[]): { open: stri
+   const open: string[] = [];
+   let resolved = 0;
+   for (const q of questions) {
++    open.push(questionText(q));
+     if (questionResolvedBy(q) !== null) resolved++;
+-    else open.push(questionText(q));
+   }
+   return { open, resolved };
+ }
