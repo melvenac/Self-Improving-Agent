@@ -233,6 +233,10 @@ export function renderSummaryRegion(state: State, o: ViewOptions): string {
  * twice yields the same text.
  */
 export function applySummaryRegion(existing: string, region: string): string {
+  // T-186: a leading BOM is not part of the first line. readFileSync(..., "utf-8") keeps it, and with it
+  // the title line reads "﻿# Title", which `startsWith("# ")` misses: the region used to land ABOVE
+  // the title and the BOM ended up mid-file. Strip it for detection, put it back first on the way out.
+  if (existing.startsWith("﻿")) return "﻿" + applySummaryRegion(existing.slice(1), region);
   const begin = existing.indexOf(SUMMARY_BEGIN);
   const end = existing.indexOf(SUMMARY_END);
   if (begin !== -1 && end !== -1 && end > begin) {

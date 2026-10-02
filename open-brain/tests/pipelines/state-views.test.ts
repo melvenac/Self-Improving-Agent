@@ -145,6 +145,35 @@ describe("state views (Loop 3 C3)", () => {
     expect(() => applySummaryRegion("# T\n" + SUMMARY_BEGIN + "\nno end\n", "x")).toThrow(/unpaired state marker/);
   });
 
+  // T-186: a SUMMARY.md with a leading BOM is the same file as one without, with the BOM kept first.
+  it("applySummaryRegion with a leading BOM and no markers inserts after the title, and the BOM stays first (T-186)", () => {
+    const region = renderSummaryRegion(state, opts);
+    const withBom = "﻿" + fixtureSummary;
+    const out = applySummaryRegion(withBom, region);
+    expect(out.startsWith("﻿# Project Summary\n\n" + SUMMARY_BEGIN)).toBe(true);
+    expect(out.indexOf("﻿")).toBe(0);
+    expect(out.lastIndexOf("﻿")).toBe(0); // exactly one, and not mid-file
+    // identical to the no-BOM result, apart from the BOM itself
+    expect(out.slice(1)).toBe(applySummaryRegion(fixtureSummary, region));
+    // idempotent
+    expect(applySummaryRegion(out, region)).toBe(out);
+  });
+
+  it("applySummaryRegion with a leading BOM and markers replaces the region and keeps the BOM (T-186)", () => {
+    const prose = "﻿# Title\n\nIntro.\n\n" + SUMMARY_BEGIN + "\nOLD\n" + SUMMARY_END + "\n\n## Hand-written\n";
+    const out = applySummaryRegion(prose, renderSummaryRegion(state, opts));
+    expect(out.startsWith("﻿# Title\n\nIntro.\n\n" + SUMMARY_BEGIN)).toBe(true);
+    expect(out).not.toContain("OLD");
+    expect(out.endsWith("\n\n## Hand-written\n")).toBe(true);
+  });
+
+  it("applySummaryRegion without a BOM is unchanged by the BOM handling (T-186)", () => {
+    const region = renderSummaryRegion(state, opts);
+    const out = applySummaryRegion(fixtureSummary, region);
+    expect(out.includes("﻿")).toBe(false);
+    expect(out.startsWith("# Project Summary\n\n" + SUMMARY_BEGIN)).toBe(true);
+  });
+
   it("applySummaryRegion keeps CRLF files CRLF", () => {
     const crlf = "# Title\r\n\r\nProse\r\n";
     const out = applySummaryRegion(crlf, SUMMARY_BEGIN + "\nline\n" + SUMMARY_END);
