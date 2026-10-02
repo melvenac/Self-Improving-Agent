@@ -367,3 +367,36 @@ describe("renderState — T183-3 the real record's handoffs are verbatim", () =>
     for (const t of active) expect(text).toContain(`${t.id} ${t.title}`);
   });
 });
+
+/**
+ * T-209: the gaps list is newest-first. At 40 open gaps the old order (append order,
+ * so oldest first) showed a starting session G-001..G-007 and hid G-049 and G-042..G-045,
+ * the ones that bite. Open session descending, then id descending.
+ */
+describe("renderState — T-209 gaps newest-first", () => {
+  const gap = (id: string, opened_session: number) => ({ id, what: `gap ${id}`, evidence: "", recommended_update: "", opened_session });
+  // Append order is NOT session order (G-005 was opened before G-002), and G-002/G-003 tie on session.
+  const fixture: State = {
+    ...state,
+    gaps: [gap("G-001", 54), gap("G-005", 54), gap("G-002", 60), gap("G-003", 60), gap("G-049", 150), gap("G-1000", 60)],
+  } as unknown as State;
+  const rendered = () => renderState(fixture, "x").filter((l) => /^ {2}G-\d+ — /.test(l)).map((l) => /^ {2}(G-\d+)/.exec(l)![1]);
+
+  it("T209-1: the newest gap renders first; ties break by id, highest first", () => {
+    // 150; then the 60s by id descending (numeric: G-1000 > G-003 > G-002); then the 54s.
+    expect(rendered()).toEqual(["G-049", "G-1000", "G-003", "G-002", "G-005", "G-001"]);
+  });
+
+  it("T209-2: the render does not mutate the record's gap order", () => {
+    const before = fixture.gaps.map((g) => g.id);
+    renderState(fixture, "x");
+    expect(fixture.gaps.map((g) => g.id)).toEqual(before);
+  });
+
+  it("T209-3: the count line and the closed-gap filter are unchanged", () => {
+    const withClosed = { ...fixture, gaps: [...fixture.gaps, { ...gap("G-999", 200), status: "closed" as const, closed_session: 201, closed_rev: 3 }] } as unknown as State;
+    const text = renderState(withClosed, "x").join("\n");
+    expect(text).toContain("Gaps (6):");
+    expect(text).not.toContain("G-999");
+  });
+});

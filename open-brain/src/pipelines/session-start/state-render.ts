@@ -64,7 +64,9 @@ export function renderState(state: State, version?: string, options: RenderState
   }
   if (state.verified.length === 0) lines.push(`  (none)`);
 
-  const openGaps = state.gaps.filter(isOpenGap);
+  // T-209: newest first. Append order is oldest first, which put G-001..G-007 in front of a
+  // reader and hid the newest at 40 open gaps. Sorted on a copy; the record's order is untouched.
+  const openGaps = state.gaps.filter(isOpenGap).sort(newestGapFirst);
   lines.push(`\nGaps (${openGaps.length}):`);
   for (const g of openGaps) {
     lines.push(`  ${g.id} — ${clip(g.what, GAP_CLIP, `gaps[${g.id}]`)} (opened session ${g.opened_session})`);
@@ -104,6 +106,15 @@ export function renderState(state: State, version?: string, options: RenderState
 function formatTask(t: Task): string {
   const sup = t.supersedes ? ` (supersedes ${t.supersedes})` : "";
   return `[${t.status}] ${t.id} ${t.title}${sup}`;
+}
+
+/** Open session descending, then id descending. Ids compare by their number (G-1000 after G-999), then as text. */
+export function newestGapFirst(a: { id: string; opened_session: number }, b: { id: string; opened_session: number }): number {
+  if (a.opened_session !== b.opened_session) return b.opened_session - a.opened_session;
+  const na = Number(/(d+)s*$/.exec(a.id)?.[1]);
+  const nb = Number(/(d+)s*$/.exec(b.id)?.[1]);
+  if (Number.isFinite(na) && Number.isFinite(nb) && na !== nb) return nb - na;
+  return b.id.localeCompare(a.id);
 }
 
 /**

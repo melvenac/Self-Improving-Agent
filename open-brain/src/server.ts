@@ -29,6 +29,7 @@ import { readAgentIdentity, readStandingCron } from "./pipelines/session-start/a
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
+import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from "./db-v2.js";
@@ -258,6 +259,11 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     } else {
       lines.push(`\nDrift: none`);
     }
+
+    // T-210: the newest brief by git commit date, so the briefing does not guess it from file names.
+    // Omitted when there is no brief; says so when git could not answer.
+    const latestBrief = describeLatestBrief(projectRoot);
+    if (latestBrief) lines.push(latestBrief);
 
     if (result.session.logPath) {
       const localNote =
