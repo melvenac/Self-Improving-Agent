@@ -1,0 +1,55 @@
+{
+  "loop": "qa-256-b2-sync",
+  "candidate_git": {
+    "sha": "19c3585e9224c0ddf71c5438dab3f901db64e9ac",
+    "branch": "qa/b2-sync-merge (local scratch: origin/master 50700414 + #295 #298 #300 #303 #306 #309, --no-ff)",
+    "frozen_at": "2026-10-02T12:19:58Z"
+  },
+  "candidates": [
+    { "task": "T-008", "sha": "cc28573882497898e3ab0346777066ecf1e62287", "branch": "origin/loop/t008-mcp-paths", "pr": 295, "verdict": "REJECT" },
+    { "task": "T-008b", "sha": "7b09c5b7ce3aa661f4e2acfc6d4235e09239cebf", "branch": "origin/loop/t008b-mcp-sources", "pr": 298, "verdict": "REJECT" },
+    { "task": "T-051", "sha": "5ae7f9f28bed80d58cbdb34056e87d620faecaed", "branch": "origin/loop/t051-skills-contract", "pr": 300, "verdict": "ACCEPT" },
+    { "task": "T-176", "sha": "112a41396f78e2312c85ce71221aaeed15fa2979", "branch": "origin/loop/t176-index-divergence", "pr": 303, "verdict": "ACCEPT" },
+    { "task": "T-048", "sha": "d8dc12db5da04aabb66ec9e30433aee0ed637aab", "branch": "origin/loop/t048-sync-counts", "pr": 306, "verdict": "REJECT" },
+    { "task": "T-048", "sha": "eb721dec39b13e6a17a8ca7f16cb574c56b62d02", "branch": "origin/loop/t048-hook-configs-nested", "pr": 309, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit && npm run build (merged tree 19c3585e)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "tsc --noEmit exit 0; build stamped 19c3585. CI test=success on push and PR runs of all six heads (36980683831/36980699553, 36981113693/36981125352, 36981365144/36981372828, 36982112075/36982118850, 36983763926/36983770989, 36984838805/36984843268)."
+    },
+    "unit": {
+      "command": "npx vitest run <one touched sync test file> per invocation, on each head, each base (red) and the merged tree",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "LIGHT: no local full suite. Merged: mcp-command-paths 19, skills-contract 9, staleness 19, t048-counts 13, t048-counts-parity 7, checks 102, hook-registration 7, mirror-parity 13 = 189 passed, 0 failed."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q256-1", "status": "met", "order": "shown", "evidence": "All six confined to sync/checks.ts, sync/index.ts, their sync tests, own handoff and mutant docs; heads equal pins and gh headRefOid; stacks cc285738<7b09c5b7, d8dc12db<eb721dec." },
+    { "id": "Q256-2", "status": "met", "order": "red-first", "evidence": "Red on base: 295 11/11 failed; 298 7 failed 12 passed; 300 9/9; 303 3 failed 16 passed; 306 6+7+2+1+1=17 failed; 309 9 failed 4 passed. Green on heads: 11, 19, 9, 19, 6/7/102/7/13, 13." },
+    { "id": "Q256-3", "status": "met", "order": "shown", "evidence": "Own mutants all killed (295 no-PATHEXT 2 red; 298 warn-cap removed 1 red; 300 Skill-cell 1 red; 303 swap 3 red; 306 vault zero-scan 1 red; 309 -c detection 1 red). Dev mutants reproduce: absolute-only 4, claude-json-only 7, skip-no-frontmatter 1, one-direction 2, hook-configs-zero-is-pass 2, top-level-only 9 (8 + later sh -c row)." },
+    { "id": "Q256-4", "status": "met", "order": "shown", "evidence": "gh pr checks: test pass on push+PR runs for all six; run headSha == pinned head; test-windows skipped." },
+    { "id": "Q256-5", "status": "not_met", "order": "shown", "evidence": "295: good + ${...} (or non-string) command -> pass naming the skip. 298: unparseable ~/.claude/settings.json -> silent pass (plugins unread); garbled plugin.json + good root .mcp.json -> pass. 306: vault-path-refs with an unreadable file beside a clean one -> pass ('1 unreadable'). 303 and 309 met (unknown sha warn 'not checked'; unparseable hook command warn)." },
+    { "id": "Q256-6", "status": "partial", "order": "shown", "evidence": "Fixture chain enabledPlugins -> installed_plugins.json -> .claude-plugin/plugin.json | .mcp.json confirmed in code/test; ${CLAUDE_PLUGIN_ROOT} resolved by literal substitution in command only. Real install NOT read (Clark's rule: only ~/.claude.json and settings.json); settings.json enabledPlugins 14 keys, 2 true (context-mode, typesafe)." },
+    { "id": "Q256-7", "status": "met", "order": "shown", "evidence": "Real settings.json, #309: '5 hook command file(s) checked; skipped 1 (1 not a command that launches a file); 0 not checked; of 6 entries' (pass). Fixture sh -c -> warn not checked, no missing-file; node \"C:\\path with spaces\\x.js\" stat'ed as one path (issue naming it)." },
+    { "id": "Q256-8", "status": "met", "order": "shown", "evidence": "Fixture repos: at HEAD pass behind=0 ahead=0; behind 2 warn; ahead 3 warn 'AHEAD of HEAD'; diverged issue '3 commit(s) behind and 2 ahead, merge-base 3844781'." },
+    { "id": "Q256-9", "status": "met", "order": "shown", "evidence": "Merges 295..306 clean; #309 one hunk in checks.ts import header (markers on node:fs line, node:path identical both sides), resolved as union (295's superset fs line); remerge-diff shows only that hunk. Merged 189/189 on 8 files, tsc 0, build ok, sync --check (fixture homes) new-check lines quoted." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "295: non-url skipped commands (${...}, non-string) do not cap a pass at warn (row 5).",
+    "298: unparseable ~/.claude/settings.json makes enabledPlugins [] with no not-checked entry -> silent pass; garbled plugin.json is dropped when a root .mcp.json exists (row 5).",
+    "306: vault-path-refs counts unreadable files but still passes (row 5).",
+    "Pre-existing on master: checkHookConfigs JSON.parse unguarded; an unparseable settings.json throws and aborts sync --check with no report.",
+    "306: command-tool-names/command-names absent-dir naming uses unnormalised home; forward-slash USERPROFILE gives 'de/commands, or/commands'.",
+    "298 warn cap pinned by one row only.",
+    "Row 6 real-install layout unverified by QA (Clark's rule); desktop has 2 enabled plugins, handoff saw 1."
+  ],
+  "notes": "QA 256, dispatch tree 507004147df01ec665ff5970257ee400534720ef. No live Jev call. Batch verdict REJECT (295, 298, 306). 295 and 306 rejections rest on a literal reading of row 5 against a pass that names its skip; 298 is a silent pass. Secret scan of both committed files for sk-, ghp_, github_pat_, AIza, xox, 'Bearer ', apikey, api_key, token[:=]value and 20+ char base64/hex runs from config files: hits were only git SHAs, CI run ids, path fragments, identifiers and this pattern list itself; no real value found, nothing removed. No config values were copied (only key names, counts, plugin key names and fixture paths)."
+}
