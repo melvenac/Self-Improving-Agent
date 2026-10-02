@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = "
   }
   return lines;
 }
+
+/**
+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.
+ *
+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and
+ * uncountable: "no foreign writer" and "a foreign writer never looked at" printed the same nothing. Removing a
+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no
+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.
+ */
+export interface ForeignWriterFinding {
+  path: string;
+  kind: "foreign" | "unattributed" | "unparseable";
+  fileSessionId: string | null;
+}
+
+export interface ForeignWriterReport {
+  /** The session the files were compared against (null when it was not known). */
+  sessionId: string | null;
+  /** False when the question could not be asked (no session id to compare against). */
+  checked: boolean;
+  notChecked?: string;
+  /** Candidate locations examined. */
+  looked: number;
+  /** Of those, files that existed and were read. */
+  present: number;
+  findings: ForeignWriterFinding[];
+}
+
+export function detectForeignWriter(input: {
+  sessionId: string | null;
+  filePaths: string[];
+  readFile: (path: string) => string | null;
+}): ForeignWriterReport {
+  const { sessionId, filePaths, readFile } = input;
+  if (!sessionId) {
+    return { sessionId, checked: false, notChecked: "no session id, so no file can be called foreign", looked: filePaths.length, present: 0, findings: [] };
+  }
+  const findings: ForeignWriterFinding[] = [];
+  let present = 0;
+  for (const path of filePaths) {
+    const raw = readFile(path);
+    if (raw === null) continue;
+    present += 1;
+    let parsed: { session_id?: unknown };
+    try {
+      parsed = JSON.parse(raw) as { session_id?: unknown };
+    } catch {
+      findings.push({ path, kind: "unparseable", fileSessionId: null });
+      continue;
+    }
+    const named = typeof parsed.session_id === "string" ? parsed.session_id : null;
+    if (named === null) findings.push({ path, kind: "unattributed", fileSessionId: null });
+    else if (named !== sessionId) findings.push({ path, kind: "foreign", fileSessionId: named });
+  }
+  return { sessionId, checked: true, looked: filePaths.length, present, findings };
+}
+
+/** One line per finding, or one line saying what was (or was not) looked at. Never empty: absent and zero differ. */
+export function formatForeignWriter(report: ForeignWriterReport, indent = "  "): string[] {
+  if (!report.checked) return [`${indent}Foreign writer: not checked (${report.notChecked})`];
+  if (report.findings.length === 0) {
+    return report.present === 0
+      ? [`${indent}Foreign writer: none present (no .recalled-entries.json in ${report.looked} location(s))`]
+      : [`${indent}Foreign writer: none (${report.present} file${report.present === 1 ? "" : "s"} read, all name this session)`];
+  }
+  return report.findings.map((f) => {
+    const what =
+      f.kind === "foreign" ? `names session ${f.fileSessionId}, not ${report.sessionId}` : f.kind === "unattributed" ? "names no session" : "is not parseable JSON";
+    return `${indent}Foreign writer: FOUND ${f.path} ${what} (reported, not refused; it played no part in which entries were rated)`;
+  });
+}
+
+/**
+ * The resolution and the observation together. `resolved` is exactly `resolveRecalledIds(input)`: the observation is
+ * computed beside it and nothing flows from `foreign` into `resolved`.
+ */
+export function resolveRecalledIdsObserved(input: ResolveRecalledIdsInput): { resolved: RecalledIdsSource; foreign: ForeignWriterReport } {
+  const resolved = resolveRecalledIds(input);
+  const foreign = detectForeignWriter({ sessionId: input.sessionId, filePaths: input.filePaths, readFile: input.readFile });
+  return { resolved, foreign };
+}
