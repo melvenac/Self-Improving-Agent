@@ -118,7 +118,7 @@ type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: stri
  * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was
  * instead of "missing".
  */
-const PLACEHOLDER = /<[^<>s]+>/;
+const PLACEHOLDER = /<[^<>\s]+>/;
 
 type Keys = StatusKeys;
 type Placeholders = Partial<Record<keyof StatusKeys, string>>;

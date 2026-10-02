@@ -137,6 +137,16 @@ describe("T-211 standing cron in seat data", { timeout: 120_000 }, () => {
     expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)");
   });
 
+  it("SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)", () => {
+    for (const ph of ["<status>", "<agent-name>", "<seat>", "<sia-status-recipient>"]) {
+      seatFile(root, "AGENT.local.md", [...IDENTITY, 'status_cron: "*/20 * * * *"', `status_to: ${ph}`, "status_rule: .agents/roles/planner.md"]);
+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);
+    }
+    // a value with a space inside angle brackets is prose, not a placeholder
+    seatFile(root, "AGENT.local.md", [...IDENTITY, 'status_cron: "*/20 * * * *"', "status_to: a < b > c", "status_rule: .agents/roles/planner.md"]);
+    expect(readStandingCron(root)).toContain("→ status to a < b > c");
+  });
+
   it("SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing", () => {
     seatFile(root, "AGENT.local.md", [...IDENTITY, 'status_cron: "*/20 * * * *"', "status_rule: .agents/roles/planner.md"]);
     expect(readStandingCron(root)).toBe("Standing cron: INVALID in .agents/AGENT.local.md: status_to is missing");
