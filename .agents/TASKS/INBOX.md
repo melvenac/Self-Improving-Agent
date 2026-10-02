@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 283 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 284 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -72,6 +72,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
 - [ ] **T-210** ob_start names the newest docs/loops brief by git commit date
 - [ ] **T-225** Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text
+- [ ] **T-228** Cursor /start: handle hub-talk exit 3 (A2A Loop 13): on exit 3 wait retry-after seconds and run again; after 5 consecutive rc 3 over 2 minutes with no retry-after, stop and report
 
 ## P3
 

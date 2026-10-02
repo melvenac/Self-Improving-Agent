@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 283,
+  "revision": 284,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1312,6 +1312,20 @@
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
       "closed_rev": 283
+    },
+    {
+      "id": "T-228",
+      "title": "Cursor /start: handle hub-talk exit 3 (A2A Loop 13): on exit 3 wait retry-after seconds and run again; after 5 consecutive rc 3 over 2 minutes with no retry-after, stop and report",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "From relay-a2a's Loop 13 design ruling (A2A docs/loops/loop-13-design-ruling.md, master 8e59f58): rc 0 turn printed or one-shot done; rc 1 refused/called wrong, do not retry; rc 2 window elapsed with a healthy last poll, wait again; rc 3 NEW unavailable or throttled, last stderr '[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>'. SIA edit: project-template/.cursor/commands/start.md:107 and its mirrors. Planner ACKed the table (A2A T-008 note, master 2f15ff4). SEQUENCED AFTER batch B1 merges (#297 and #312 edit the same start.md files); sia-builder. Send relay-a2a the merge SHA.",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -3082,6 +3096,13 @@
       "evidence": "sia-forge, T-215 handoff docs/loops/t215-developer-handoff.md on loop/t215-maturity-cut c1fc5ecc (PR #294); mutant docs/loops/t215/mutants/dashboard-success-rate.diff is caught only because dashboard.mjs left the allowlist entirely.",
       "recommended_update": "Scope an allowed referrer to line ranges or to a quoted line hash, so a new matching line in an allowed file is a finding. Not ruled yet; candidate for a later loop.",
       "opened_session": 157
+    },
+    {
+      "id": "G-051",
+      "what": "A QA dispatch that lets a seat read REAL config files (~/.claude.json, settings.json, .mcp.json, env) said 'read-only' but did not forbid copying VALUES into a report committed to a PUBLIC repo.",
+      "evidence": "docs/loops/qa-256-b2-sync-dispatch.md at 50700414 (rows 6-7 read the desktop's real config); clark added a header to the launched prompt: report only counts, key names, server names and command paths, never values, and scan for key/token patterns before commit.",
+      "recommended_update": "Every QA dispatch that touches real config carries that rule in its Rules section (done for QA 258, docs/loops/qa-258-b4-dispatch.md). A structural fix would be a pre-commit key scan in each push-qa helper, which refuses to push a commit matching key or token patterns.",
+      "opened_session": 157
     }
   ],
   "decisions": [
@@ -3876,6 +3897,12 @@
       "title": "QA 254: T-208 REJECT (e442b955, #289), T-212 ACCEPT (626f7d13, #290). T-208 takes 'last fetch' from FETCH_HEAD's mtime, so a FAILED fetch that rewrites FETCH_HEAD makes the FAILED line and later ob_start and /sync read 'level ... compared against the last fetch (<fresh time>)' while origin is ahead; its cause is the last stderr line, 'and the repository exists.' for every SSH failure. Round 2 to sia-forge; T-212 rebases off T-208 to merge alone.",
       "date": "2026-10-02",
       "note": "Report origin/qa/t208-t212-report 6a908ebf (docs/loops/t208-t212-qa-report.md). Planner confirmed in e442b955: tree-currency.ts lines 345-379 date the last fetch by FETCH_HEAD's mtime, and line 133 takes the last non-empty stderr line as the cause. Batch QA from the 11:50Z reset: B1 QA 255, B2 QA 256, B3 QA 257 (docs/loops/qa-25{5,6,7}-*-dispatch.md); #294 is out of B3 (CI red, S4-9.2 'cli-flags.test.ts lost a test'), #293 out (needs re-pin against #310's ci.yml), #292 out (needs the \\s fix)."
+    },
+    {
+      "id": "D-103",
+      "title": "Overnight merge pre-approval (Aaron, AskUserQuestion in clark's window, ~12:10Z, while asleep 5-6 h): the planner merges every PR its batch QA (QA 255, 256, 257) ACCEPTs, per PR, pinned with --match-head-commit to the exact QA'd head, after CI is green; a REJECT on a sibling does not hold an accepted PR back unless it is stacked on or depends on the rejected one. REJECTED, PARTIAL, held or moved heads wait for Aaron. B4 (QA 258) and later batches are NOT covered.",
+      "date": "2026-10-02",
+      "note": "Relayed by clark first-hand (two messages ~12:10Z, the second correcting scope to per-PR ACCEPT). Same route as #310's merge (clark-window AskUserQuestion). Also standing from Aaron the same hour: no rolls overnight (seats run to 25% context, then push WIP plus a merged or in-record handoff and park); weekly runs to the cap; WEEKLY WIND-DOWN at >=95% (no new QA, tasks or dispatches) and >=98% (every seat pushes WIP and a merged or in-record handoff and parks; the planner merges or closes what is ready under the pre-approval). One D-063 line to clark per merge."
     }
   ],
   "handoffs": [
