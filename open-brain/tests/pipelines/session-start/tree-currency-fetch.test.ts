@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
 import { spawnAsync } from "../../spawn-async.js";
-import { describeTreeCurrency, fetchOrigin } from "../../../src/pipelines/session-start/tree-currency.js";
+import { describeTreeCurrency, fetchOrigin, informativeLine } from "../../../src/pipelines/session-start/tree-currency.js";
 
 /**
  * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges
@@ -135,6 +135,76 @@ describe("T-208 the SessionStart hook fetches before it judges currency", { time
     const lines = describeTreeCurrency(clone, { fetch: f }).lines;
     expect(lines[0]).toMatch(/^fetch FAILED: timed out after 1500 ms; currency is against a fetch from /);
     expect(lines.join("\n")).not.toContain("level with");
+  });
+
+  // r2 (QA 254 rows 3b, 5): a FAILED fetch must never make currency look fresher.
+  it.each(["startup", "resume"] as const)("r2 row 3b/5 (%s): a failed fetch names the pre-failure SUCCESS time, and ob_start/sync never read level afterwards", async (source) => {
+    const { clone, seed } = makeClone(root);
+    expect(fetchOrigin(clone).ok).toBe(true);
+    const good = describeTreeCurrency(clone).lastFetchAt;
+    expect(good).not.toBeNull();
+    advanceOrigin(seed, 2); // origin is now ahead; the clone does not know
+    git(clone, "remote", "set-url", "origin", join(root, "does-not-exist.git"));
+    await new Promise((r) => setTimeout(r, 1200)); // a later mtime would be distinguishable
+    const out = await hook(clone, source);
+    const failed = out.split("\n").find((l) => l.startsWith("fetch FAILED:"));
+    expect(failed, out).toBeDefined();
+    expect(failed!.endsWith(`from ${good}`), `${failed} vs ${good}`).toBe(true);
+    expect(out).not.toContain("level with");
+    // The callers that do not fetch (ob_start server.ts, /sync checks.ts) call exactly this.
+    const after = describeTreeCurrency(clone);
+    expect(after.lastFetchAt).toBe(good);
+    expect(after.lines[0]).toMatch(/^fetch FAILED: /);
+    expect(after.lines.join("\n")).not.toContain("level with");
+  });
+
+  it("r2: a later successful fetch clears the failure for callers that do not fetch", () => {
+    const { clone, origin } = makeClone(root);
+    git(clone, "remote", "set-url", "origin", join(root, "does-not-exist.git"));
+    expect(fetchOrigin(clone).ok).toBe(false);
+    expect(describeTreeCurrency(clone).lines[0]).toMatch(/^fetch FAILED: /);
+    git(clone, "remote", "set-url", "origin", origin);
+    expect(fetchOrigin(clone).ok).toBe(true);
+    const lines = describeTreeCurrency(clone).lines.join("\n");
+    expect(lines).toContain("level with origin/master");
+    expect(lines).not.toContain("FAILED");
+  });
+
+  it("r2: after a failed fetch the record-behind and ahead lines do not say level or Not stale", () => {
+    const { clone, origin } = makeClone(root);
+    const f = { ok: false, at: new Date().toISOString(), cause: "x" };
+    writeState(clone, 0); // record behind origin's rev 1, commits level
+    const behind = describeTreeCurrency(clone, { fetch: f }).lines.join("\n");
+    expect(behind).toContain("THE RECORD HERE IS BEHIND");
+    expect(behind).not.toContain("level");
+    git(clone, "checkout", "-q", "--", ".");
+    writeFileSync(join(clone, "x.txt"), "x");
+    git(clone, "add", "-A");
+    git(clone, "commit", "-q", "-m", "local");
+    const ahead = describeTreeCurrency(clone, { fetch: f }).lines.join("\n");
+    expect(ahead).toContain("ahead");
+    expect(ahead).not.toContain("Not stale");
+    expect(ahead).not.toContain("level");
+    void origin;
+  });
+
+  it("r2: the cause is the fatal: line, not git's last stderr line (SSH-style and missing-path)", () => {
+    const ssh = [
+      "ssh: Could not resolve hostname github-sia: Name or service not known",
+      "fatal: Could not read from remote repository.",
+      "",
+      "Please make sure you have the correct access rights",
+      "and the repository exists.",
+    ].join("\n");
+    expect(informativeLine(ssh)).toBe("fatal: Could not read from remote repository.");
+    expect(informativeLine("just one line")).toBe("just one line");
+    expect(informativeLine("")).toBeNull();
+    const { clone } = makeClone(root);
+    git(clone, "remote", "set-url", "origin", join(root, "does-not-exist.git"));
+    const f = fetchOrigin(clone);
+    expect(f.ok).toBe(false);
+    expect(f.cause).toMatch(/^fatal: /);
+    expect(f.cause).not.toContain("and the repository exists.");
   });
 
   it("a successful fetch leaves the lines exactly as before (no FAILED line)", () => {
