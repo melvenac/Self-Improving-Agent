@@ -2,7 +2,7 @@
 
 *A protocol, a tool server and a small runtime that let AI coding agents start warm, keep one record of project state, and work as seats whose boundaries are enforced.*
 
-**Latest: v0.44.2** · [Changelog](CHANGELOG.md) · [What it is for](.agents/SYSTEM/PRD.md)
+**Latest: v0.45.0** · [Changelog](CHANGELOG.md) · [What it is for](.agents/SYSTEM/PRD.md)
 
 ---
 

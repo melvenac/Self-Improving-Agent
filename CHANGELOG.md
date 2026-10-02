@@ -1,12 +1,103 @@
 # Changelog
 
-## [0.45.0] - Unreleased — `/bootstrap` produces a working SIA project
+## [0.45.0] - 2026-10-02 — Loop 15 slices three and four, `/bootstrap`, the per-session record, and CI on tcm
+
+One release for everything since v0.44.2 (D-073, Aaron’s ruling on 2026-10-02). It folds in the three sections that were
+drafted as Unreleased: `/bootstrap`, T-003 and the importer fixes (formerly `[0.44.3]`, never tagged).
+
+Close-outs: `docs/loops/loop-15-slice-3-closeout.md` and `docs/loops/loop-15-slice-4-closeout.md`. Slices three and
+four ship together in one release (D-073).
+
+### Added: Loop 15 slice three — a real role through the harness runtime
+
+- **Candidate A: the harness runtime runs a real model-backed role end to end (#182).** Thirteen candidates, twelve
+  rejected; A13 was accepted by QA 162 and QA 174. The runtime lets the operating system resolve links and compares
+  only which file it reaches (D-041). An unrestored note enters `unrestored` and stops before git (R95), and a change
+  the runtime cannot observe is `kind: "unobservable"` (R96).
+- **Candidate B, part 1: the full suite no longer exits 1 under load while every test passes (G-042, #165).** Seven
+  test files moved from blocking `spawnSync`/`execSync` to awaited spawns (`tests/spawn-async.ts`). Nothing under
+  `open-brain/src/` changed, and there is no worker cap.
+- **Candidate B, part 2: `E_t` records a human-seat loop, order and pending (#187).** `EvidenceSchema` accepts a
+  seat loop id such as `15-slice-3`, requires `order` on `met`, and adds `pending`. `harness validate evidence <file>`
+  validates a file. The runtime refuses with `evidence-loop-mismatch` before writing `E_t.json` for another loop.
+- **Candidate C: the shadow merge gate (T-155, #195).** `harness shadow-verdict prepare | decide | summary` and an
+  append-only ledger under `docs/loops/shadow-merge/`. The runtime still does not merge or push. `decide --merged`
+  refuses a SHA not reachable from `origin/master`. Its first live episode returned `undefined`, because of a blank
+  line in a declared block (fixed by T-214 below).
+
+### Added: Loop 15 slice four — Jev shadow scoring on real diffs (PROVISIONAL)
+
+- **Gate records, key tests, two shadow runners and a close-out table generator (step 2, #254).** Every Jev gate
+  call is written as a record with provenance. The 4.3 developer done-gate and the 4.4 QA-score gate run in shadow
+  only: they record a verdict and change no outcome. The QA-score policy is data (`harness/policies/qa-score.json`).
+  `harness closeout-tables` generates the close-out tables from the records, and `--check` re-checks a file.
+- **A `D_t` beside every brief, and a plan gate (T-195, #209).** `harness validate plan` checks a plan, the plan gate
+  (4.2) exits 1 on a reject, and `harness dispatch <brief.md> --say "..."` refuses to send a brief that fails its
+  dispatch check.
+- **Live results (QA 248, ruled ACCEPT under D-093).** 13 calls, all answered by `jev-1.13.0`, no retries. 4.2:
+  `reject` on `scope_size`. 4.3: 8 of 8 `reject`. 4.4: `proceed` for #209 and #218, `reject` for #195, #220 and
+  #227. **These are shadow observations, PROVISIONAL (N=8 and N=5, seat-built diffs, 0 runtime loops). No calibration
+  is claimed.** Eight of eight done-gate rejects is a finding about the thresholds or the inputs, not about the diffs.
+- **A live call needs a key.** Each adopting project needs its own `TYPESAFE_API_KEY`; SIA ships none (D-070).
+
+### Changed
+
+- **Breaking for record readers: the record is per session (schema v3; T-179, T-163, #170).** `last_session` is
+  replaced by `sessions[]`, which every state write upserts by session uuid. `handoffs[]` is keyed by the writing
+  session's uuid, so a close-out can only add its own entry. Retention never compares session numbers. The merge
+  migrates the live record v2 to v3, keeping every uuid.
+- **`/end` stores the session's lessons and writes no project state (T-179, #170).** The record is written as the
+  work happens, through `ob_state`. All three copies of `end.md` changed.
+- **Breaking for scripts: an unrecognised flag refuses in every `open-brain` subcommand (T-185, #161).** `sync`,
+  `start`, `relocate`, `topics`, `detach`, `state show` and `state migrate` exit 2 on an undeclared `-` token, before
+  any I/O. Before this, `sync -check` ran the fixing sync and `detach -dry-run` did a real detach.
+- **The `ob_start` greeting is 43–46% shorter for every seat, with every handoff item byte-identical (T-183, #160).**
+- **`PRD.md` and `README.md` are rewritten against what ships (T-169, #238).** `retirements.json` adds R-011 (the
+  maturity lifecycle).
+
+### Added: `/sync` checks and session-start lines
+
+- **`worktree-layout`:** every worktree is the main checkout or `<project>-<seat>`, read from
+  `.agents/SYSTEM/worktree-seats.json` (T-193, #186).
+- **`cursor-hook-compat`:** a plugin PreToolUse hook is an issue when Cursor CLI is installed; a bad `installPath`
+  is an issue, not a pass (T-046, #192, #197).
+- **`hub-seats` and `start-parity`:** the hub seat file is checked, and Cursor's `/start` template must equal Claude's
+  plus the documented lines (T-196, T-197, #220). `/start` shows each partner seat's hub listener (T-198, #227).
+- **`probe-markers`:** flags a not-for-merge probe left under `open-brain/tests` (#198).
+
+### Fixed
+
+- **`/sync` checks and session end tell missing from unreadable (T-048, #175, #185, #176, #191, #193).** A check that
+  could not read its input no longer reports pass, and names every finding before it returns. Session end, `ob_end`
+  and `ob_recall` print `NOT WRITTEN` or `NOT LOGGED` with the reason instead of counting a failed write.
+- **`gitnexus-index` reports an index ahead of or diverged from HEAD, not only behind (T-176, #196).**
+- **`close_gap` keeps a tombstone, and `add_gap` skips an id cited in the tracked tree (T-158, #218).**
+- **Harness: a blank line inside a declared block is not content (T-214, #250); plan and evidence schemas share one
+  loop-id rule (T-216, #245), guarded by identity (T-217, #256); closeout-tables labels `E_t` from the criteria Terms
+  table and writes repo-relative `G_plan` paths (T-220, #266).**
+- **`state import` leftovers:** UTF-32 and NUL-bearing UTF-16 inputs are filed `unreadable` with the reason; an
+  unreadable `DECISIONS.md` lists the ADRs imported and not imported; an unreadable latest session log or ADR list is
+  named, not read as "none found" (#172, #184).
+- **Tests that asserted live record values now use fixtures (#210, #222).** A symlink `EPERM` skips with a note (#198).
+
+### CI and the repository
+
+- **CI runs on the tcm self-hosted runners (D-043, D-044, T-192; #152, #189).** PRs, dispatches and master pushes run
+  on `[self-hosted, linux, tcm]`; only a dispatch with `hosted: true` selects `ubuntu-latest`. An egress self-check
+  runs first on self-hosted runners. `/sync` ci-status names a never-started job.
+- **A push to `master`, `loop/**` or `qa/**` runs the suite (T-178, #199, #200).** A seat push skips `test` only when
+  the diff is `docs/` or `README.md` alone.
+- **An opt-in Windows job, `test-windows`, on the isolated laptop runner (#159).** Dispatch only, with `windows: true`.
+- **Master has ruleset 24343321: PR required, CI `test` required, no force push or deletion (D-090).**
+- **A docs-only PR reports `test` as Skipped instead of no check (D-091, T-219, #262).** Without it the required check
+  never reported and the PR stayed blocked.
+
+### `/bootstrap` produces a working SIA project
 
 Brief: `docs/loops/bootstrap-fix-brief.md` (planner, record session 109). Acceptance list: frogger's pilot report
-`docs/loops/t181-frogger-pilot-report.md` (F1–F15), as rows BF-1..BF-8. Stacked on the T-179 merge candidate. There is
-no version bump in these commits, because the release is Aaron's (D-019).
+`docs/loops/t181-frogger-pilot-report.md` (F1–F15), as rows BF-1..BF-8. Stacked on the T-179 merge candidate.
 
-### Added
+#### Added
 
 - **`open-brain bootstrap check | move-residue | scaffold`**, the deterministic half of `/bootstrap`.
   - `check` is read-only. It reports git (none, repository root, or nested), `CLAUDE.md` (absent, present, or with
@@ -21,7 +112,7 @@ no version bump in these commits, because the release is Aaron's (D-019).
     is always its own commit (F7).
 - **`project-template/gitattributes`** (`/.agents/** text eol=lf`), merged by scaffold (BF-7, F10).
 
-### Changed
+#### Changed
 
 - **`/bootstrap` (`project-template/.claude/commands/bootstrap.md`) is rewritten.** It carries no file content, and
   every file comes from the template through `scaffold`. It adds the import step: `--draft` is shown to the owner,
@@ -43,12 +134,12 @@ no version bump in these commits, because the release is Aaron's (D-019).
   this too. A test now reads `bootstrap.md` top to bottom and asserts that every act comes after the one it depends
   on. It is shown red on both earlier orders.
 
-### Removed
+#### Removed
 
 - **`project-template/.agents/state.json`**, the `{{PROJECT}}` seed. `state import` is the only thing that writes a
   record, and it refuses when one exists; nothing ever substituted the placeholder (BF-2, F2).
 
-### Fixed
+#### Fixed
 
 - **`state import` read none of the template INBOX's tasks.** `## 🔴 P0 — Critical` did not match `^## (P[0-3])`,
   so a project scaffolded or copied from the template imported 0 tasks. A symbol run may now precede the priority
@@ -59,13 +150,12 @@ no version bump in these commits, because the release is Aaron's (D-019).
   and the schema's session numbers are non-negative. It is now floored at 0, and the report no longer prints a
   negative retention edge (BF-8, F9).
 
-## Unreleased (T-003) — a server knows its own session
+### A server knows its own session (T-003)
 
 Brief: `docs/loops/t003-session-identity-brief.md` (planner, record session 109). Measurements and rulings:
-`docs/loops/t003-step0.md`. Stacked on T-179 round 2. There is no version bump in these commits: the
-release is Aaron's (D-019).
+`docs/loops/t003-step0.md`. Stacked on T-179 round 2.
 
-### Fixed
+#### Fixed
 
 - **A server wrote under another session's id (T-003; QA 125's A7, A8, A9).** The id came from
   `ob_set_session`'s unchecked argument, or from the per-project slot in `active-session.json` (which
@@ -86,14 +176,14 @@ release is Aaron's (D-019).
 - **R179-2's different-checkout refusal is superseded:** no id but the server's own can register now, in
   any checkout, so its pinned LIMIT (same-checkout impersonation) is closed.
 
-### Changed
+#### Changed
 
 - **Cursor no longer attributes writes** (ruling Q2): Cursor writes no proof, so a Cursor server refuses
   attributed writes. A measured Cursor proof is a follow-up task. `end.md` (all three copies) says so.
 - `ob_stats` reports the session proof (id and parent pid, or the reason there is none) in place of the
   self-registration count.
 
-### Limits
+#### Limits
 
 - Stale adoption needs SessionStart AND SessionEnd to fail across one `/clear`; either alone is caught.
 - The ordering "SessionStart completes before the new session's first tool call" was measured headless,
@@ -101,12 +191,12 @@ release is Aaron's (D-019).
 - The server must be claude's **direct** child (setup registers `command: node`, which is). A wrapper
   between them makes every attributed write refuse.
 
-## [0.44.3] - Unreleased — the importer carries none of SIA's history into another project
+### The importer carries none of SIA’s history into another project
 
 Brief: `docs/loops/importer-fixes-brief.md` (planner, record session 100). These fixes gate every
-further adoption (T-181). There is no version bump in these commits: the release is Aaron's (D-019).
+further adoption (T-181).
 
-### Fixed
+#### Fixed
 
 - **`state import` seeded SIA's own history into every project it imported (T-175).**
   `seedVerified()` and `seedGaps()` wrote V-001..V-005 and G-001..G-006, which are claims about this
@@ -116,7 +206,7 @@ further adoption (T-181). There is no version bump in these commits: the release
   from `verified_seeded`/`gaps_seeded` to `verified_imported`/`gaps_imported`. SIA's own record is
   unaffected: it was imported once, and `--commit` refuses a second run (V-009).
 
-### Added
+#### Added
 
 - **`state import` names an input that predates the project's latest session, and `--commit`
   refuses on it (T-180).** The importer used to present an old handoff or INBOX as current state
@@ -138,7 +228,7 @@ further adoption (T-181). There is no version bump in these commits: the release
     inputs at A2A-Hub `e0bc3f8`. It is on `.agents/retirements.json`'s `historical` list, like the
     other three fixture directories, because its text names SIA's retired mailbox.
 
-### Fixed in round 2 (`docs/loops/importer-fixes-round-2-brief.md`, after QA 102)
+#### Fixed in round 2 (`docs/loops/importer-fixes-round-2-brief.md`, after QA 102)
 
 - **A byte-order mark no longer hides a stale input (QA's D2).** A leading UTF-8 BOM kept the
   `# ` title line from being found, so a stale input read as *could not tell* under a false reason
@@ -168,7 +258,7 @@ further adoption (T-181). There is no version bump in these commits: the release
   in any of these cases. `--commit` now prints the `Root:` it committed. Other subcommands share
   the old shape. They are listed in the round-2 handoff and are not changed here.
 
-### Changed: a task note is never replaced silently (T-171, with QA 125's D4)
+#### Changed: a task note is never replaced silently (T-171, with QA 125's D4)
 
 Brief: `docs/loops/t171-note-replace-brief.md`. Stacked on T-179 round 2 (schema v3, not yet on
 master). **Breaking for `ob_state` callers:** `note` on `update_task` and `close_task` is refused.
