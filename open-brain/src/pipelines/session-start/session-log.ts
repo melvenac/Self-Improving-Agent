@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { nextSessionNumber } from "../../shared/state-schema.js";
 import type { StateJsonResult } from "./types.js";
 
 const SESSION_FILE = /^Session_(\d+)\.md$/;
@@ -15,9 +16,7 @@ export function nextGreetingSessionNumber(
   stateJson: StateJsonResult,
 ): { sessionNumber: number; source: SessionNumberSource } {
   if (stateJson.present && stateJson.valid && stateJson.data) {
-    const nums = stateJson.data.sessions.map((s) => s.n);
-    const sessionNumber = nums.length === 0 ? 1 : Math.max(...nums) + 1;
-    return { sessionNumber, source: "record" };
+    return { sessionNumber: nextSessionNumber(stateJson.data.sessions), source: "record" };
   }
   return { sessionNumber: findNextSessionNumber(projectRoot), source: "local" };
 }

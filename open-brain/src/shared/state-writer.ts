@@ -31,7 +31,7 @@ import {
   parseState,
   serializeState,
   compareFirstRev,
-  nextFreeSessionNumber,
+  nextSessionNumber,
   type Seat,
   type State,
   type Task,
@@ -264,7 +264,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   if (uuid !== null && !mine) {
     const taken = next.sessions.find((s) => s.n === options.session && s.uuid !== uuid);
     if (taken) {
-      const free = nextFreeSessionNumber(next.sessions);
+      const free = nextSessionNumber(next.sessions);
       return refuse(
         before,
         `session number ${options.session} is already recorded for uuid ${taken.uuid}; next free number is ${free}`,

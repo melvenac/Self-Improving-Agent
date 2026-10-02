@@ -360,12 +360,13 @@ export function lastSession(state: Pick<State, "sessions">): SessionRecord | nul
   return best;
 }
 
-/** Lowest n not already used in sessions[] (T-164 SC-2 refusal text). */
-export function nextFreeSessionNumber(sessions: readonly Pick<SessionRecord, "n">[]): number {
-  const used = new Set(sessions.map((s) => s.n));
-  let n = 1;
-  while (used.has(n)) n++;
-  return n;
+/**
+ * The number a new session takes: max(n)+1 over sessions[], 1 for an empty record.
+ * One function for the greeting AND the SC-2 refusal text, so the two cannot
+ * disagree (QA 249 F1).
+ */
+export function nextSessionNumber(sessions: readonly Pick<SessionRecord, "n">[]): number {
+  return sessions.length === 0 ? 1 : Math.max(...sessions.map((s) => s.n)) + 1;
 }
 
 /**

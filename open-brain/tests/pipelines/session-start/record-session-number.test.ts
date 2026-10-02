@@ -96,6 +96,29 @@ describe("T-164 SC-2 — provisional number until first write", () => {
     expect(second.error).toContain("uuid-a");
     expect(second.error).toContain("next free number is 2");
   });
+
+  // QA 249 F1 (D-095): on the live-shaped sparse record the refusal must name the
+  // same number the greeting does, max(n)+1, never the lowest unused n.
+  it("on a sparse record (76, 147..155) the refusal names max(n)+1, the number the greeting names", () => {
+    const ns = [76, 147, 148, 149, 150, 151, 152, 153, 154, 155];
+    const sessions = ns.map((n, i) => ({
+      n, date: "2026-10-01", uuid: `cccccccc-0000-4000-8000-${String(n).padStart(12, "0")}`, seat: "planner", checkout: "sia-planner", first_rev: i + 1,
+    }));
+    const state = { schema_version: 3, revision: 300, project: { name: "fixture" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions };
+    writeFileSync(join(root, STATE), `${JSON.stringify(state, null, 2)}\n`, "utf-8");
+
+    const greeting = nextGreetingSessionNumber(root, readProjectState(root).stateJson).sessionNumber;
+    expect(greeting).toBe(156);
+    const refused = applyStateOps(root, {
+      expected_revision: 300,
+      session: 155,
+      session_uuid: "uuid-late",
+      checkout: "sia-planner",
+      ops: [{ op: "set_objective", text: "collision" }],
+    });
+    expect(refused.ok).toBe(false);
+    expect(refused.error).toContain(`next free number is ${greeting}`);
+  });
 });
 
 describe("T-164 SC-3 — local fallback without state.json", () => {
