@@ -1,0 +1,18 @@
+## The 10 most valuable OPEN items for a LIGHT dev job
+
+Chosen from the batch audits' candidate lists. Selection rule: real code, a few files, an acceptance test that runs on touched files only, no ruling pending, and **not in `sync/checks.ts`, `sync/index.ts`, `tree-currency.ts`, `cli-bootstrap.ts` or `handoff-guard.ts`** (sia-forge's files). Ordered by value per effort.
+
+| # | task | class | the job | one-line acceptance test |
+|---|---|---|---|---|
+| 1 | T-148 (P1) | OPEN | The legend in `state-views/index.ts:95`, `.claude/commands/start.md:74` and the project-template mirror says to read the task note before ruling on or **retiring** a task. | The state-views legend test and both start.md copies contain the sentence; start-parity stays green. |
+| 2 | T-186 (P2) | OPEN | `applySummaryRegion` tolerates a leading U+FEFF (the same blind spot the importer had). Run `impact` first: it is rated HIGH. | A state-views test with a BOM-led SUMMARY.md and no markers puts the region after the title line and keeps the BOM first; CRLF and idempotence rows stay green. |
+| 3 | T-188 (P3) | OPEN | In `sync/checks-state.ts` `checkCiStatus`, `gh`'s "please run: gh auth login" hint on a non-GitHub origin is a skip reason about the remote, not "gh is not authenticated". | A new checks-state row feeds that runner error with a non-GitHub origin and expects the remote-named skip; the existing rows pass. |
+| 4 | T-065 (P1) | PARTLY | Delete `knowledgeDb` from `shared/paths.ts` and its assertion at `tests/shared/paths.test.ts:54` (the v1 database is ported). | `git grep -n knowledgeDb open-brain/src open-brain/tests` is empty (fixtures-import excluded) and `paths.test.ts` passes. |
+| 5 | T-184 (P2) | OPEN | `state import --draft` records a sha256 per input in `state.draft.json`; `--commit` refuses or says so when one differs. | A state-import test changes an input between `--draft` and `--commit` and sees the refusal or the changed-input note. |
+| 6 | T-182 (P1) | OPEN | Declare `MIN_CLAUDE_VERSION` in `harness/roles.ts`; the CA-9 check prints the installed and required versions. | A CA-9 unit test with a stubbed `claude --version` shows both versions in the message. |
+| 7 | T-042 (P0) | OPEN | A `/sync` check counts `ob-server-*` files in the vault (vault pollution has a preventer and no detector). Put it in a new check file, not `checks.ts`. | A test seeds a temp vault with `ob-server-x.md` and expects a warning; a clean vault passes. |
+| 8 | T-156 (P2) | PARTLY | Every remaining source-text scan in the tests gets a planted positive and a near-miss in the same test (G-040). | Each scan's test asserts one planted positive and one near-miss; touched test files only. |
+| 9 | T-168 (P1) | OPEN | The marker half of "run the full suite alone": a suite-running lock file under `~/.claude/`, written at start and removed at end, stale by age. | A test shows a stale marker is ignored and a live one is recorded in the suite output. |
+| 10 | T-225 (P2) | PARTLY | Item 4: a calibration-2 copy of `score.mjs` whose `drivers()` matches "no deterministic checks were supplied". | A fixture reasons list with that text yields the checks driver, and one with the old text still does for calibration-1 replay. |
+
+**Considered and left out:** T-167's remaining half (change `prd-version` from warn to issue) is a one-line change in `sync/checks.ts` lines 91 and 104, which sia-forge is editing; T-172 part 1 is in `tree-currency.ts` (forge); T-207 and T-199/T-200/T-201/T-203 are built on unmerged branches and need a merge decision, not new work; T-213's fixture half waits on confirming the hub rooms are still the routing; T-154's second half needs a hook-contract ruling; T-187, T-191, T-194, T-202, T-204 and T-206 are not light.
