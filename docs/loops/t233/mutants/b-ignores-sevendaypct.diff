@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+index cfe19bb7..4689bebc 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -231,7 +231,7 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
+ 
+   // WEEKLY comes ONLY from the numeric sevenDayPct. Percentages are never parsed out of the free-text `level`; an absent
+   // number is `weekly not checked`. `weeklyOverride` (string, optional) names the loop Aaron lifted the hold for.
+-  const weekly: number | null = obj ? num(obj.sevenDayPct) : null;
++  const weekly: number | null = null;
+   const override = obj && typeof obj.weeklyOverride === "string" && obj.weeklyOverride.trim() !== "" ? obj.weeklyOverride.trim() : null;
+   let weeklyConsequence: string | null = null;
+   if (weekly !== null && weekly >= 98) weeklyConsequence = "wind down: every seat pushes WIP and a handoff and parks";

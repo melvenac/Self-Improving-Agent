@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+index 7a584cb0..0e23e3a9 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -43,7 +43,6 @@ export function renderBriefing(i: BriefingInput): string[] {
+   const s = i.state;
+   const out: string[] = [BRIEFING_START];
+ 
+-  out.push(i.serving);
+   out.push(i.usage);
+   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
+   out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}`);

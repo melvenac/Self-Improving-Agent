@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/serving-build.ts b/open-brain/src/pipelines/session-start/serving-build.ts
+index 18b1aa49..95dffa90 100644
+--- a/open-brain/src/pipelines/session-start/serving-build.ts
++++ b/open-brain/src/pipelines/session-start/serving-build.ts
+@@ -61,7 +61,7 @@ export function describeServingBuild(buildDir: string = runningBuildDir()): stri
+ 
+   let behind: number;
+   try {
+-    behind = Number.parseInt(gitIn(tree, ["rev-list", "--count", `${commit}..${SERVING_UPSTREAM}`]), 10);
++    behind = Number.parseInt(gitIn(tree, ["rev-list", "--count", `${head}..${SERVING_UPSTREAM}`]), 10);
+   } catch (err) {
+     return notChecked(`${short} built ${builtAt}: its distance from ${SERVING_UPSTREAM} is unknown (${why(err)})`);
+   }

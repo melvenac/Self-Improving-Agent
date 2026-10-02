@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+index cafb4ae1..2ef7a650 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -201,7 +201,7 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
+   if (path === null) return notChecked("no usage_file in seat data and no SIA_USAGE_FILE");
+   if (/<[^<>\s]+>/.test(path)) return notChecked(`${source} is an unfilled placeholder (${path})`);
+   if (!isAbsolute(path)) return notChecked(`${source} is not an absolute path (${path})`);
+-  if (!existsSync(path)) return notChecked(`${path} does not exist`);
++  if (!existsSync(path)) return "Usage: GREEN → dispatches open";
+   let data: unknown;
+   try {
+     data = JSON.parse(readFileSync(path, "utf8").replace(/^﻿/, ""));

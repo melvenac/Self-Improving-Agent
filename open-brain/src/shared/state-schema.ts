@@ -216,11 +216,22 @@ export const LoopStateSchema = z.strictObject({
  * rows are the planner's to answer, and a developer or QA seat that happens to
  * know the frozen SHA may still record it.
  */
+/**
+ * An open question on a handoff (T-233 B, item 6). A bare string is an UNRESOLVED question, exactly as before; an object
+ * carries the same text plus an optional `resolved_by` (who or what answered it: a decision id, a PR, a session). The greeting
+ * omits a resolved question and counts it, so a question answered two sessions ago stops being re-asked at every start.
+ * A union rather than a new field so every existing record stays valid and nothing needs migrating.
+ */
+export const OpenQuestionSchema = z.union([z.string(), z.strictObject({ text: z.string().min(1), resolved_by: z.string().min(1).optional() })]);
+export type OpenQuestion = z.infer<typeof OpenQuestionSchema>;
+export const questionText = (q: OpenQuestion): string => (typeof q === "string" ? q : q.text);
+export const questionResolvedBy = (q: OpenQuestion): string | null => (typeof q === "string" ? null : q.resolved_by ?? null);
+
 export const HandoffSchema = z.strictObject({
   seat: SeatName,
   pick_up: z.string(),
   watch_out: z.array(z.string()),
-  open_questions: z.array(z.string()),
+  open_questions: z.array(OpenQuestionSchema),
   session: sessionNumber,
   loop_state: LoopStateSchema.nullable(),
   session_uuid: z.string().min(1).nullable(),

@@ -412,7 +412,7 @@ function revisionOf(text: string): number | null {
  * the common dir. Every seat checkout in this repo is a linked worktree, so a
  * hardcoded `.git/FETCH_HEAD` would return null in exactly the trees this runs in.
  */
-function readLastFetchAt(projectRoot: string): string | null {
+export function readLastFetchAt(projectRoot: string): string | null {
   // TWO candidates, and the answer is the NEWER of them. Measured, because two
   // guesses in a row were wrong here:
   //
