@@ -1,0 +1,24 @@
+diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts
+index 5f7c9e30..1f7c4e89 100644
+--- a/open-brain/src/shared/handoff-guard.ts
++++ b/open-brain/src/shared/handoff-guard.ts
+@@ -146,15 +146,15 @@ export function checkSessionHandoff(projectDir: string, since: string | null, se
+   const withWork = new Set<string>();
+   const handoffs = new Set<string>();
+   for (const b of branches) {
+-    const rows = git(projectDir, ["log", `--since=${since}`, "--format=%H%x1f%(trailers:key=Claude-Session,valueonly,separator=%x20)%x1e", b, ...exclude]);
++    const rows = git(projectDir, ["log", `--since=${since}`, "--format=%H%x1f%(trailers:key=Claude-Session,valueonly,separator=%x20)%x1f%an%x1e", b, ...exclude]);
+     for (const row of rows.split("\x1e")) {
+-      const [sha, trailer = ""] = row.trim().split("\x1f");
++      const [sha, trailer = "", author = ""] = row.trim().split("\x1f");
+       if (!sha) continue;
+-      if (trailer.trim() === "") {
++      if (trailer.trim() === "" && author !== git(projectDir, ["config", "user.name"]).trim()) {
+         unattributed.add(sha);
+         continue;
+       }
+-      if (!ids.some((id) => trailer.includes(id))) continue;
++      if (trailer.trim() !== "" && !ids.some((id) => trailer.includes(id))) continue;
+       mine.add(sha);
+       withWork.add(b);
+       const names = git(projectDir, ["show", "--format=", "--name-only", "--diff-filter=AM", sha, "--", "docs/loops"]);

@@ -15,13 +15,14 @@
  *
  * ## How "this session's" commits are found — and what that misses
  *
- * By TIME: the session's start is the first timestamp in its own transcript
- * (the hook payload's `transcript_path`), and a commit is this session's when
- * its committer date is at or after that start and it is on a local `loop/*`
- * branch and not on origin/master. Commits carry no session uuid today, so a
- * trailer could not be relied on. What this misses, stated rather than hidden:
- * - another session committing to a `loop/*` branch of the same checkout in the
- *   same window is counted as this one's;
+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own
+ * transcript (the hook payload's `transcript_path`), and a commit is this session's
+ * when its committer date is at or after that start, it is on a local `loop/*`
+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this
+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned
+ * to the checkout's seat by git identity (seats share one identity). What this misses,
+ * stated rather than hidden:
+ * - a commit made without the trailer by this session is not counted as its work;
  * - a commit whose committer date predates the window (amended or rebased from
  *   older work) is not counted;
  * - a handoff committed under a name that does not end `-handoff.md`, or outside
@@ -52,6 +53,8 @@ export interface HandoffCheck {
   commits: number;
   /** docs/loops/*-handoff.md paths this session's commits added or modified. */
   handoffs: string[];
+  /** Commits in the window on loop/* with NO Claude-Session trailer: reported, never counted for any seat (T-212). */
+  unattributed: number;
   reason?: string;
 }
 
@@ -90,10 +93,36 @@ function git(cwd: string, args: string[]): string {
   return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 });
 }
 
+/**
+ * The ids a commit's `Claude-Session:` trailer can carry for this session (T-212).
+ * The trailer is `https://claude.ai/code/session_<X>`; the transcript records the
+ * same session as a `bridge-session` line whose `bridgeSessionId` is `cse_<X>`.
+ * Reads the head of the file only, like sessionStartFromTranscript.
+ */
+export function sessionIdsFromTranscript(path: unknown): string[] {
+  if (typeof path !== "string" || !path || !existsSync(path)) return [];
+  const ids = new Set<string>();
+  try {
+    const fd = openSync(path, "r");
+    try {
+      const buf = Buffer.alloc(256 * 1024);
+      const n = readSync(fd, buf, 0, buf.length, 0);
+      for (const m of buf.subarray(0, n).toString("utf8").matchAll(/"bridgeSessionId"\s*:\s*"cse_([A-Za-z0-9]+)"/g)) ids.add(m[1]!);
+    } finally {
+      closeSync(fd);
+    }
+  } catch {
+    return [];
+  }
+  return [...ids];
+}
+
 /** Did this session commit loop work, and did it commit a handoff with it? */
-export function checkSessionHandoff(projectDir: string, since: string | null): HandoffCheck {
-  const base: HandoffCheck = { status: "unknown", since, branches: [], commits: 0, handoffs: [] };
+export function checkSessionHandoff(projectDir: string, since: string | null, sessionIds: readonly string[] = []): HandoffCheck {
+  const base: HandoffCheck = { status: "unknown", since, branches: [], commits: 0, handoffs: [], unattributed: 0 };
   if (since === null) return { ...base, reason: "this session's start could not be read from its transcript, so its commits cannot be told from anyone else's" };
+  const ids = sessionIds.filter(Boolean);
+  if (ids.length === 0) return { ...base, reason: "this session's Claude-Session id could not be read from its transcript, so its commits cannot be told from another seat's (a commit is attributed by its trailer, never by git identity)" };
   let branches: string[];
   try {
     branches = git(projectDir, ["for-each-ref", "--format=%(refname:short)", "refs/heads/loop/"]).split(/\r?\n/).filter(Boolean);
@@ -107,19 +136,33 @@ export function checkSessionHandoff(projectDir: string, since: string | null): H
   } catch {
     /* no origin/master: count everything on the branch in the window */
   }
-  const commits = new Set<string>();
-  const withWork: string[] = [];
+  // T-212: a commit is this session's only by its Claude-Session trailer. No
+  // trailer = UNATTRIBUTED, counted apart and never assigned to this seat by git
+  // identity (two seats share one identity: the check once blamed a session for
+  // 28 commits that were another seat's). A trailer naming another session is
+  // that session's.
+  const mine = new Set<string>();
+  const unattributed = new Set<string>();
+  const withWork = new Set<string>();
   const handoffs = new Set<string>();
   for (const b of branches) {
-    const shas = git(projectDir, ["rev-list", `--since=${since}`, b, ...exclude]).split(/\r?\n/).filter(Boolean);
-    if (shas.length === 0) continue;
-    withWork.push(b);
-    for (const s of shas) commits.add(s);
-    const names = git(projectDir, ["log", `--since=${since}`, "--format=", "--name-only", "--diff-filter=AM", b, ...exclude, "--", "docs/loops"]);
-    for (const n of names.split(/\r?\n/)) if (HANDOFF_RE.test(n.trim())) handoffs.add(n.trim());
+    const rows = git(projectDir, ["log", `--since=${since}`, "--format=%H%x1f%(trailers:key=Claude-Session,valueonly,separator=%x20)%x1e", b, ...exclude]);
+    for (const row of rows.split("\x1e")) {
+      const [sha, trailer = ""] = row.trim().split("\x1f");
+      if (!sha) continue;
+      if (trailer.trim() === "") {
+        unattributed.add(sha);
+        continue;
+      }
+      if (!ids.some((id) => trailer.includes(id))) continue;
+      mine.add(sha);
+      withWork.add(b);
+      const names = git(projectDir, ["show", "--format=", "--name-only", "--diff-filter=AM", sha, "--", "docs/loops"]);
+      for (const n of names.split(/\r?\n/)) if (HANDOFF_RE.test(n.trim())) handoffs.add(n.trim());
+    }
   }
-  const status = commits.size === 0 ? "no-work" : handoffs.size > 0 ? "ok" : "missing";
-  return { ...base, status, branches: withWork, commits: commits.size, handoffs: [...handoffs].sort() };
+  const status = mine.size === 0 ? "no-work" : handoffs.size > 0 ? "ok" : "missing";
+  return { ...base, status, branches: [...withWork], commits: mine.size, handoffs: [...handoffs].sort(), unattributed: unattributed.size };
 }
 
 /** The warning, in words a human reading a hook's output can act on. */

@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import {
   checkSessionHandoff,
   sessionStartFromTranscript,
+  sessionIdsFromTranscript,
   recordMissingHandoff,
   takeMissingHandoffNotices,
   describeMissing,
@@ -23,16 +24,27 @@ const hookEntry = join(import.meta.dirname, "../../src/cli-session-end.ts");
 function git(cwd: string, ...args: string[]): string {
   return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 }
-/** Commit with an explicit committer date, so the session window is exact. */
-function commitAt(dir: string, when: string, file: string, msg: string): string {
+/**
+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is
+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;
+ * pass null for a commit with no trailer.
+ */
+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = "T"): string {
   mkdirSync(join(dir, file, ".."), { recursive: true });
   writeFileSync(join(dir, file), `${msg}\n`);
   git(dir, "add", "-A");
-  execFileSync("git", ["-c", "user.email=t@example.com", "-c", "user.name=T", "commit", "-q", "-m", msg], {
+  execFileSync("git", ["-c", "user.email=t@example.com", "-c", "user.name=" + author, "commit", "-q", "-m", msg, ...(trailer === null ? [] : ["-m", trailer])], {
     cwd: dir, stdio: "ignore", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },
   });
   return git(dir, "rev-parse", "HEAD");
 }
+
+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.
+const ME = "01MeMeMeMeMeMeMeMeMeMeMe";
+const OTHER = "01OtherOtherOtherOtherOth";
+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;
+const OTHER_TRAILER = `Claude-Session: https://claude.ai/code/session_${OTHER}`;
+const IDS = [ME];
 
 const BEFORE = "2026-09-25T10:00:00Z";
 const START = "2026-09-25T12:00:00.000Z";
@@ -53,7 +65,7 @@ describe("handoff guard (T179-2)", () => {
     git(dir, "checkout", "-q", "-b", "loop/t183-r2");
     commitAt(dir, DURING, "src/a.ts", "round 2 work");
     commitAt(dir, DURING, "src/b.ts", "a mutant's fix");
-    const c = checkSessionHandoff(dir, START);
+    const c = checkSessionHandoff(dir, START, IDS);
     expect(c.status).toBe("missing");
     expect(c.branches).toEqual(["loop/t183-r2"]);
     expect(c.commits).toBe(2);
@@ -67,7 +79,7 @@ describe("handoff guard (T179-2)", () => {
     commitAt(dir, DURING, "src/mut.ts", "mutant");
     git(dir, "checkout", "-q", "-b", "loop/t179-end", "loop/t179-redcheck");
     commitAt(dir, DURING, "docs/loops/t179-developer-handoff.md", "handoff");
-    const c = checkSessionHandoff(dir, START);
+    const c = checkSessionHandoff(dir, START, IDS);
     expect(c.status).toBe("ok");
     expect(c.handoffs).toEqual(["docs/loops/t179-developer-handoff.md"]);
     expect(c.branches.sort()).toEqual(["loop/t179-end", "loop/t179-mut-key", "loop/t179-redcheck"]);
@@ -76,14 +88,14 @@ describe("handoff guard (T179-2)", () => {
   it("a commit BEFORE the session started is not this session's", () => {
     git(dir, "checkout", "-q", "-b", "loop/old");
     commitAt(dir, BEFORE, "src/a.ts", "yesterday's work");
-    expect(checkSessionHandoff(dir, START).status).toBe("no-work");
+    expect(checkSessionHandoff(dir, START, IDS).status).toBe("no-work");
   });
 
   it("a handoff committed BEFORE the session does not cover this session's work", () => {
     git(dir, "checkout", "-q", "-b", "loop/x");
     commitAt(dir, BEFORE, "docs/loops/x-developer-handoff.md", "an earlier session's handoff");
     commitAt(dir, DURING, "src/a.ts", "this session's work");
-    expect(checkSessionHandoff(dir, START).status).toBe("missing");
+    expect(checkSessionHandoff(dir, START, IDS).status).toBe("missing");
   });
 
   it("work already on origin/master is not counted, and a non-loop branch is not checked", () => {
@@ -92,13 +104,13 @@ describe("handoff guard (T179-2)", () => {
     git(dir, "checkout", "-q", "-b", "loop/merged");
     const sha = commitAt(dir, DURING, "src/a.ts", "merged already");
     git(dir, "update-ref", "refs/remotes/origin/master", sha);
-    expect(checkSessionHandoff(dir, START).status).toBe("no-work");
+    expect(checkSessionHandoff(dir, START, IDS).status).toBe("no-work");
   });
 
   it("a handoff under another name is NOT recognised (a stated limit, pinned so it cannot change silently)", () => {
     git(dir, "checkout", "-q", "-b", "loop/x");
     commitAt(dir, DURING, "docs/loops/x-notes.md", "notes, not a handoff");
-    expect(checkSessionHandoff(dir, START).status).toBe("missing");
+    expect(checkSessionHandoff(dir, START, IDS).status).toBe("missing");
   });
 
   it("UNKNOWN, saying why, when the session's start is not known — never a pass", () => {
@@ -115,10 +127,69 @@ describe("handoff guard (T179-2)", () => {
     expect(sessionStartFromTranscript(undefined)).toBeNull();
   });
 
+  describe("T-212: attribution by the Claude-Session trailer, never by git identity", () => {
+    it("row 1: two seats share one git identity and the commits carry no trailer: UNATTRIBUTED, not blamed on this seat", () => {
+      // This checkout's own git identity is the one the other seat's commits carry.
+      git(dir, "config", "user.name", "Aaron Melven");
+      git(dir, "checkout", "-q", "-b", "loop/rivet-work");
+      commitAt(dir, DURING, "src/a.ts", "another seat's work", null, "Aaron Melven");
+      commitAt(dir, DURING, "src/b.ts", "more of it", null, "Aaron Melven");
+      const c = checkSessionHandoff(dir, START, IDS);
+      expect(c.status).toBe("no-work");
+      expect(c.commits).toBe(0);
+      expect(c.unattributed).toBe(2);
+      expect(c.branches).toEqual([]);
+    });
+
+    it("row 2: a trailer naming another seat's session is not counted against this seat", () => {
+      git(dir, "checkout", "-q", "-b", "loop/other");
+      commitAt(dir, DURING, "src/a.ts", "the other seat's work", OTHER_TRAILER);
+      const c = checkSessionHandoff(dir, START, IDS);
+      expect(c.status).toBe("no-work");
+      expect(c.commits).toBe(0);
+      expect(c.unattributed).toBe(0);
+    });
+
+    it("row 3: a trailer for this seat's session is still counted, mixed in with the others", () => {
+      git(dir, "checkout", "-q", "-b", "loop/mixed");
+      commitAt(dir, DURING, "src/a.ts", "the other seat's work", OTHER_TRAILER);
+      commitAt(dir, DURING, "src/b.ts", "no trailer", null);
+      commitAt(dir, DURING, "src/c.ts", "mine");
+      const c = checkSessionHandoff(dir, START, IDS);
+      expect(c.status).toBe("missing");
+      expect(c.commits).toBe(1);
+      expect(c.unattributed).toBe(1);
+      expect(c.branches).toEqual(["loop/mixed"]);
+    });
+
+    it("a handoff committed by ANOTHER seat's session does not cover this session's work", () => {
+      git(dir, "checkout", "-q", "-b", "loop/x");
+      commitAt(dir, DURING, "src/a.ts", "mine");
+      commitAt(dir, DURING, "docs/loops/x-developer-handoff.md", "the other seat's handoff", OTHER_TRAILER);
+      expect(checkSessionHandoff(dir, START, IDS).status).toBe("missing");
+    });
+
+    it("UNKNOWN, saying why, when the transcript carries no session id: never a pass and never identity", () => {
+      git(dir, "checkout", "-q", "-b", "loop/x");
+      commitAt(dir, DURING, "src/a.ts", "work");
+      const c = checkSessionHandoff(dir, START, []);
+      expect(c.status).toBe("unknown");
+      expect(c.reason).toMatch(/never by git identity/);
+    });
+
+    it("reads this session's id from the transcript's bridge-session line", () => {
+      const t = join(dir, "t.jsonl");
+      writeFileSync(t, ['{"type":"summary"}', `{"type":"bridge-session","bridgeSessionId":"cse_${ME}"}`].join("\n"));
+      expect(sessionIdsFromTranscript(t)).toEqual([ME]);
+      expect(sessionIdsFromTranscript(join(dir, "absent.jsonl"))).toEqual([]);
+      expect(sessionIdsFromTranscript(undefined)).toEqual([]);
+    });
+  });
+
   it("the warning is recorded for the next greeting and shown ONCE", () => {
     git(dir, "checkout", "-q", "-b", "loop/x");
     commitAt(dir, DURING, "src/a.ts", "work");
-    const c = checkSessionHandoff(dir, START);
+    const c = checkSessionHandoff(dir, START, IDS);
     recordMissingHandoff(dir, "u-1", c);
     expect(existsSync(join(dir, MARKER_REL))).toBe(true);
     const first = takeMissingHandoffNotices(dir);
@@ -155,7 +226,7 @@ describe("the SessionEnd hook runs the guard and NEVER blocks (T179-2)", () => {
     git(dir, "checkout", "-q", "-b", "loop/x");
     commitAt(dir, DURING, "src/a.ts", "work, no handoff");
     const transcript = join(dir, "t.jsonl");
-    writeFileSync(transcript, `{"timestamp":"${START}"}\n`);
+    writeFileSync(transcript, `{"timestamp":"${START}"}\n{"type":"bridge-session","bridgeSessionId":"cse_${ME}"}\n`);
 
     const r = hook({ session_id: "11111111-2222-4333-8444-555555555555", transcript_path: transcript, hook_event_name: "SessionEnd", reason: "clear" });
     expect(r.status, r.stdout + r.stderr).toBe(0);

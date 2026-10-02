@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from "./shared/repo-root.js";
 import { resolveSessionId } from "./shared/active-session.js";
 import { byPidDir, removeProcessSession } from "./shared/process-session.js";
 import { resolvePaths } from "./shared/paths.js";
-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from "./shared/handoff-guard.js";
+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
@@ -77,7 +77,7 @@ try {
   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
   if (existsSync(join(dir, ".agents"))) {
     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));
+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));
     if (check.status === "missing") {
       const msg = describeMissing(check, id);
       console.log(`[session-end] ${msg}`);
@@ -86,7 +86,7 @@ try {
     } else if (check.status === "unknown") {
       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);
     } else {
-      console.log(`[session-end] handoff check: ${check.status === "ok" ? `handoff committed (${check.handoffs.join(", ")})` : "no loop/* commits this session"}`);
+      console.log(`[session-end] handoff check: ${check.status === "ok" ? `handoff committed (${check.handoffs.join(", ")})` : "no loop/* commits attributed to this session"}${check.unattributed > 0 ? `; ${check.unattributed} loop/* commit(s) in the window carry no Claude-Session trailer: UNATTRIBUTED, not counted for any seat` : ""}`);
     }
   }
 } catch (err) {
