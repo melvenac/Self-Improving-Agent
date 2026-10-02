@@ -18,3 +18,15 @@ close-outs go in `docs/loops/`; decisions go in `.agents/state.json` `decisions[
 before the exchange ends.
 
 If there's no counterpart agent, leave `partner` blank.
+
+## Optional: a standing status cron
+
+A seat that must report on a cadence can keep that cadence in its seat data instead of in handoff text, which is lost at the first roll that does not copy it. Add three optional keys to the frontmatter of `.agents/AGENT.local.md` (this seat's own checkout, untracked) or, for every seat of the repo, of this tracked file:
+
+```
+status_cron: "*/20 * * * *"        # a 5-field cron, local time
+status_to: <agent-name>            # who the status goes to
+status_rule: .agents/roles/<role>.md   # a repo-relative path to the rule text
+```
+
+`ob_start` prints one `Standing cron:` line right after the `Seat:` line: the cron, the recipient and the rule, or `none in seat data`, or `INVALID in <file>: <why>` for a malformed cron or a missing key. `/start` then creates the cron with `CronCreate`. A file that carries any of the three keys is the whole answer; `AGENT.local.md` is read before this file.
