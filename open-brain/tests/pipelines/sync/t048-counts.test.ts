@@ -142,13 +142,32 @@ describe("T-048 sync counts", () => {
 
     it("B2: a MALFORMED entry (no command string, or not an object) beside a good one is WARN not checked, never pass", () => {
       const good = { command: `node ${fwd(join(scripts, "boot.js"))}` };
-      const noCommand = checkHookConfigs(settings({ hooks: { A: [good, { type: "x" }] } }));
+      const noCommand = checkHookConfigs(settings({ hooks: { A: [good, { type: "command" }] } }));
       expect(noCommand.severity, noCommand.message).toBe("warn");
       expect(noCommand.message).toContain("entry has no command string");
       expect(noCommand.message).toContain("1 hook command file(s) checked");
       const notObject = checkHookConfigs(settings({ hooks: { A: [good, "a string, not an object"] } }));
       expect(notObject.severity, notObject.message).toBe("warn");
       expect(notObject.message).toContain("entry is not an object");
+    });
+
+    it("B2: a typed non-command hook (prompt, agent) is a NAMED SKIP inside a passing result", () => {
+      const good = { command: `node ${fwd(join(scripts, "boot.js"))}` };
+      const r = checkHookConfigs(settings({ hooks: { A: [good, { type: "prompt", prompt: "be careful" }, { type: "agent", agent: "x" }] } }));
+      expect(r.severity, r.message).toBe("pass");
+      expect(r.message).toContain("1 prompt hook, no command");
+      expect(r.message).toContain("1 agent hook, no command");
+      expect(r.message).toContain("1 hook command file(s) checked; skipped 2");
+      expect(r.message).toContain("0 not checked");
+    });
+
+    it("B2: a command-type entry with no command is WARN, with or without an explicit type", () => {
+      const good = { command: `node ${fwd(join(scripts, "boot.js"))}` };
+      for (const bad of [{ type: "command" }, {}]) {
+        const r = checkHookConfigs(settings({ hooks: { A: [good, bad] } }));
+        expect(r.severity, r.message).toBe("warn");
+        expect(r.message).toContain("entry has no command string");
+      }
     });
 
     it("nothing readable at all is 'not checked', not a pass", () => {

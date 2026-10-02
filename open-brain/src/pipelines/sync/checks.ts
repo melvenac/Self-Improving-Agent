@@ -264,7 +264,7 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
   let checked = 0;
   // A malformed entry (not an object, or no command string) was not examined: not checked, capped at warn
   // (B2 ruling). A bare head with no path (echo, a builtin, a PATH name) is a named SKIP: nothing to stat.
-  const skipped = { otherCommand: 0 };
+  const skipped = { otherCommand: 0, typedNoCommand: [] as string[] };
   for (const hook of hooks) {
     if (!hook || typeof hook !== "object") {
       notChecked.push(`${JSON.stringify(hook) ?? String(hook)} (entry is not an object)`);
@@ -272,6 +272,12 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
     }
     const h = hook as Record<string, unknown>;
     if (typeof h.command !== "string") {
+      // An explicit non-command type (prompt, agent, ...) is a legitimate hook with no file to launch: a named skip.
+      // Only a command-type entry (type "command", or no type in the legacy shape) lacking a command is malformed.
+      if (typeof h.type === "string" && h.type !== "command") {
+        skipped.typedNoCommand.push(h.type);
+        continue;
+      }
       notChecked.push(`${JSON.stringify(hook)} (entry has no command string)`);
       continue;
     }
@@ -287,8 +293,9 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
     checked++;
     if (!existsSync(target.path)) missing.push(target.path);
   }
-  const skippedCount = skipped.otherCommand;
+  const skippedCount = skipped.otherCommand + skipped.typedNoCommand.length;
   const why = [
+    ...[...new Set(skipped.typedNoCommand)].map((t) => `${skipped.typedNoCommand.filter((x) => x === t).length} ${t} hook, no command`),
     skipped.otherCommand ? `${skipped.otherCommand} not a command that launches a file` : "",
   ].filter(Boolean).join(", ");
   const counts =
