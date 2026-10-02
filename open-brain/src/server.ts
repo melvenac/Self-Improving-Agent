@@ -29,6 +29,7 @@ import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
 import { renderState } from "./pipelines/session-start/state-render.js";
+import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
 import { formatScanCounts } from "./pipelines/session-start/scan-counts.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -241,6 +242,8 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     // The line names `origin/master` and disclaims drift in its own words, so a
     // reader seeing it above `Drift: none` cannot take either as the other's
     // confirmation. See pipelines/session-start/tree-currency.ts.
+    // T-233 A: the SERVING build comes before even that, because it is the code producing this greeting.
+    lines.push(describeServingBuild());
     lines.push(...describeTreeCurrency(projectRoot).lines);
     lines.push("");
 
