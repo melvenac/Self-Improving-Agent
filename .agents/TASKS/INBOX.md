@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 297 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 298 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -58,6 +58,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-184** state import: an input changed between --draft and --commit commits the DRAFT's content with no note (QA 102 PROBE-7): record each input's hash in the draft and have --commit refuse or say so when one differs
 - [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
 - [ ] **T-225** Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text
+- [ ] **T-234** T-233 follow-ups from QA 263 (F1-F7): adopt QA's probes into the suite and close the surviving-mutant gaps; 'ahead of origin/master' must not read as 'level'
 
 ## P3
 

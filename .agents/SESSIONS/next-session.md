@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 297 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 298 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-Planner session 158, ~22:05Z 2026-10-02. NOW: T-233 (deterministic /start greeting, P0, first loop; brief docs/loops/start-greeting-deterministic-brief.md; D-112 lifts the weekly hold for this loop only) is ready to dispatch at clark's GREEN (the 5-hour STOP resets 21:50Z). D-113: Aaron had clark update the DESKTOP serving tree to master (ba1edf70, read back by the planner), and DROPPED the hourly status cron. The planner's cron is deleted; message clark on events only. The QA PC's serving tree is still 429 behind (9c603615): it must be updated before a dev seat's greeting there is trusted. That is Aaron's act (or clark's on his word); the planner reads by SSH only. Seats: sia-builder is on Aaron's roll list (31%), then re-brief it by message with T-233. sia-forge is back online and parked (its tree is 14 behind). After a /mcp reconnect or fresh session on the desktop, check the SERVED greeting and rescope T-233 (see its note). No PRs open; #339 (rev 294) and #340 (rev 295) are merged.
+Planner session 158, ~23:0xZ 2026-10-02. T-233 CODE IS MERGED (D-114: #343-#346 on Aaron's word after QA 263 ACCEPT; master 8df2abcf; master push CI was in progress at writing, so check it). T-233 stays OPEN until DEPLOYED and SERVED: (1) update the desktop and QA PC serving trees to master and read back HEAD + build SHA (Aaron's act, or clark's on his word; the planner reads by SSH only); (2) set usage_file: per seat; (3) a fresh-session /start on each machine shows the serving line first and a real Usage line. Then retire the /START AUDIT GAPS watch-out. T-234 (P2) carries QA 263's F1-F7 test gaps. D-110's queue (T-191 is now largely done by T-233; re-read before dispatching) stays HELD under the weekly hold (97% at 22:2xZ; Aaron's lift covered T-233 only). Seats: sia-forge parked after T-233 (its handoff docs/loops/t233-developer-handoff.md is merged); sia-builder free. Hourly status to clark is dropped (D-113), but a status prompt still fired at 22:22Z from an unknown source; that question is open with Aaron.
 
 ### Watch out
 
@@ -34,11 +34,13 @@ _None._
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Update the QA PC's serving tree (C:/Users/AARONM~1/Projects/Self-Improving-Agent, 9c603615, 429 behind) to master before T-233's dev seat starts there?
+- Deploy T-233: update the desktop and QA PC serving trees to master 8df2abcf, and set usage_file: per seat?
+- A status prompt fired at 22:22Z after D-113 dropped the cadence; where is it from, and should it be removed or should D-113 be amended?
 
 **Rulings made mid-loop:** 
-- D-112 T-233 first loop, weekly hold lifted for it
-- D-113 status cron dropped; desktop serving tree updated
+- D-112 T-233 first loop
+- D-113 status cron dropped
+- D-114 T-233 batch merged
 
 ## developer [sia-builder] _(written session 156)_
 
