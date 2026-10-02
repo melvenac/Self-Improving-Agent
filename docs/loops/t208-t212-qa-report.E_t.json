@@ -1,0 +1,58 @@
+{
+  "loop": "qa-254-t208-t212",
+  "candidate_git": {
+    "sha": "e442b955f2b713c7bdddb1edb5bb86253dfe0203",
+    "branch": "origin/loop/t208-fetch-first",
+    "frozen_at": "2026-10-02T08:50:28Z"
+  },
+  "candidates": [
+    { "task": "T-208", "sha": "e442b955f2b713c7bdddb1edb5bb86253dfe0203", "branch": "origin/loop/t208-fetch-first", "pr": 289, "verdict": "REJECT" },
+    { "task": "T-212", "sha": "626f7d1347d3080ae2dd15022391f4f402a6d495", "branch": "origin/loop/t212-trailer-attribution", "pr": 290, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "tsc --noEmit at e442b955 and 626f7d13",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "Both heads exit 0; each QA mutant also tsc-clean."
+    },
+    "unit": {
+      "command": "vitest run tests/pipelines/session-start tests/pipelines/session-end tests/shared/handoff-guard.test.ts tests/cli-bootstrap.test.ts",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 130000,
+      "detail": "LIGHT job, no full suite. T-208 19 files 223 passed, T-212 19 files 229 passed, exit 0. Adding bootstrap-fix*/qa135 gives all pass plus a vitest-worker onTaskUpdate timeout (exit 1) that reproduces at base 79d1f5d9. CI push+PR success, test=success on e442b955 (36979508568, 36979522661) and 1e61ccb2 (36979509712, 36979526571); 626f7d13 has no run of its own."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q254-1", "status": "met", "order": "shown", "evidence": "diff 79d1f5d9...e442b955: cli-bootstrap.ts, tree-currency.ts, tree-currency-fetch.test.ts, t208 skip-fetch mutant diff." },
+    { "id": "Q254-2", "status": "met", "order": "red-first", "evidence": "tree-currency-fetch.test.ts on base source 7 failed (7); candidate 7 passed (7)." },
+    { "id": "Q254-3a", "status": "met", "order": "shown", "evidence": "origin +2 unfetched: 'THIS TREE IS STALE: 2 commits behind origin/master', no 'level', startup and resume." },
+    { "id": "Q254-3b", "status": "unmet", "order": "shown", "evidence": "FAILED line printed, but the time is the failed attempt's (old fetch 08:28:05.049Z, printed 08:28:10.816Z; FETCH_HEAD truncated to 0 bytes). Afterwards describeTreeCurrency(root) (ob_start/sync) prints 'level with origin/master ... compared against the last fetch (08:28:56.835Z)' against an origin 1 ahead; base prints the true old time. Cause is the last stderr line 'and the repository exists.' (also for SSH, this repo's origin). record-behind passes 'commits are level with' through after FAILED." },
+    { "id": "Q254-3c", "status": "met", "order": "shown", "evidence": "uploadpack sleeping 300 s: full hook wall 16677 ms startup, 16667 ms resume, 'fetch FAILED: timed out after 15000 ms'." },
+    { "id": "Q254-3d", "status": "met", "order": "shown", "evidence": "origin/loop/gone present before the hook and gone after; origin/loop/stays kept; startup and resume." },
+    { "id": "Q254-3e", "status": "met", "order": "shown", "evidence": "3a-3d identical with source resume; SessionStart registered with matcher ''." },
+    { "id": "Q254-4", "status": "met", "order": "shown", "evidence": "skip-fetch killed by candidate rows 1x2, 5x2, 2 and QA 3a-3d x2; no-timeout killed by candidate row 3 and QA 3c x2 (hook hung to 120 s cap); level-after-fail killed by candidate rows 2, 3 and QA 3b, 3c x2." },
+    { "id": "Q254-5", "status": "partial", "order": "shown", "evidence": "ob_start path prints 'compared against the last fetch (<ISO>)'; git grep fetch on all start.md copies: no match. After a failed hook fetch, that time is the failed attempt's (Q254-3b)." },
+    { "id": "Q254-6", "status": "met", "order": "shown", "evidence": "diff e442b955...626f7d13: handoff-guard.ts, cli-session-end.ts, handoff-guard.test.ts. Caller hunk is 3 lines (import, call, message), not 1." },
+    { "id": "Q254-7", "status": "met", "order": "red-first", "evidence": "handoff-guard.test.ts on e442b955 source 6 failed | 11 passed; candidate 17 passed." },
+    { "id": "Q254-8", "status": "met", "order": "shown", "evidence": "a no-work/unattributed 2, no blame (real hook); b not counted; c counted and HANDOFF MISSING (real hook), ok with handoff; d unknown and hook NOT RUN; e cse_X to session_X matched via sessionIdsFromTranscript; f key case/whitespace counted, value case ignored, non-final paragraph UNATTRIBUTED." },
+    { "id": "Q254-9", "status": "met", "order": "shown", "evidence": "identity-fallback mutant killed by candidate row 1 (and row 3 incidentally) and QA 8a, 10-missing." },
+    { "id": "Q254-10", "status": "met", "order": "shown", "evidence": "trailered seat commits on loop/x and loop/x-redcheck, no handoff: missing, commits 3, real hook HANDOFF MISSING stdout+stderr; with handoff: handoff committed." },
+    { "id": "Q254-11", "status": "met", "order": "shown", "evidence": "tsc 0 both heads; neighbours 19 files exit 0 both heads; the onTaskUpdate worker timeout with bootstrap-fix* reproduces at base." },
+    { "id": "Q254-12", "status": "met", "order": "shown", "evidence": "e442b955: push 36979508568 and PR 36979522661 success, test success; 1e61ccb2: push 36979509712 and PR 36979526571 success, test success; 626f7d13: no run (docs-only delta to 1e61ccb2); test-windows skipped on all." }
+  ],
+  "regressions": [
+    "T-208: after a failed SessionStart fetch, FETCH_HEAD is truncated, so the FAILED line's 'fetch from <time>' and ob_start's/sync's 'level with origin/master ... compared against the last fetch (<time>)' carry the failed attempt's time; base reported the true old fetch time."
+  ],
+  "gaps": [
+    "T-208: fetch FAILED cause is the last stderr line ('and the repository exists.') for path and SSH failures.",
+    "T-208: record-behind ('commits are level with') and ahead ('Not stale') lines pass through unchanged after a failed fetch.",
+    "T-208: note's added acceptance 'prints tree currency and drift in one line' is not addressed (not a dispatch row).",
+    "T-212: cli-session-end.ts hunk is 3 lines, not the stated 1; id match is substring (prefix ids would collide); cse_/session_ equivalence not verified on a real transcript by QA.",
+    "T-212 is stacked on the rejected T-208 commit."
+  ],
+  "notes": "QA 254, dispatch tree 5ec37cdf4d5566237bb3ecfc552d77cc0b486e69. No live Jev call; no real-origin fetch in any fixture. Pair verdict REJECT (T-208)."
+}
