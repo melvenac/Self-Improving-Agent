@@ -23,39 +23,157 @@ describe("T-048 sync counts", () => {
   };
 
   describe("hook-configs", () => {
-    it("the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'", () => {
-      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: "command", command: "node /x/cli-bootstrap.js" }] }], SessionEnd: [{ hooks: [{ command: "node /x/end.js" }] }] } });
-      const r = checkHookConfigs(p);
-      expect(r.severity).toBe("skip");
-      expect(r.message).toContain("not checked");
-      expect(r.message).toContain("0 hook command file(s) checked; skipped 2 (2 with no command string) of 2 entries");
-      expect(r.message).toContain("not a pass");
+    // Real files on disk, so "exists" is a stat and not a string compare. One path has a space in it.
+    let scripts: string;
+    let spaced: string;
+    beforeEach(() => {
+      scripts = join(dir, "scripts");
+      spaced = join(dir, "dir with space");
+      mkdirSync(scripts, { recursive: true });
+      mkdirSync(spaced, { recursive: true });
+      writeFileSync(join(scripts, "boot.js"), "");
+      writeFileSync(join(scripts, "end.js"), "");
+      writeFileSync(join(spaced, "x.js"), "");
+      writeFileSync(join(scripts, "runner.exe"), "");
     });
+    const fwd = (p: string) => p.replace(/\\/g, "/");
+    const group = (...commands: string[]) => ({ matcher: "Bash", hooks: commands.map((command) => ({ type: "command", command })) });
 
-    it("a pass states how many it checked and how many it skipped, by reason", () => {
-      const real = join(dir, "present.mjs");
-      writeFileSync(real, "");
+    it("walks event -> matcher group -> hooks[] -> command, and stats each one (the real settings.json shape)", () => {
       const p = settings({
         hooks: {
-          A: [{ command: `node ${real}` }, "a string, not an object", { type: "x" }, { command: "echo hi" }, { command: "node " }],
+          SessionStart: [group(`node "${fwd(join(scripts, "boot.js"))}"`)],
+          SessionEnd: [group(`node ${fwd(join(scripts, "end.js"))}`)],
         },
       });
       const r = checkHookConfigs(p);
       expect(r.severity, r.message).toBe("pass");
-      expect(r.message).toContain("1 hook command file(s) checked; skipped 4");
-      expect(r.message).toContain("1 not an object");
-      expect(r.message).toContain("1 with no command string");
-      expect(r.message).toContain("1 not a node/npx tsx command");
-      expect(r.message).toContain("1 with no file path after node/npx tsx");
-      expect(r.message).toContain("of 5 entries");
+      expect(r.message).toContain("2 hook command file(s) checked; skipped 0");
+      expect(r.message).toContain("of 2 entries");
     });
 
-    it("a missing file is still an issue, and the counts ride along", () => {
-      const p = settings({ hooks: { A: [{ command: "node /nonexistent/a.mjs" }, { command: "echo hi" }] } });
+    it("a missing script behind a matcher group is a FAIL naming the path", () => {
+      const gone = fwd(join(scripts, "gone.js"));
+      const p = settings({ hooks: { SessionStart: [group(`node "${gone}"`, `node "${fwd(join(scripts, "boot.js"))}"`)] } });
       const r = checkHookConfigs(p);
       expect(r.severity).toBe("issue");
-      expect(r.message).toContain("/nonexistent/a.mjs");
-      expect(r.message).toContain("1 hook command file(s) checked; skipped 1");
+      expect(r.message).toContain(gone);
+      expect(r.message).toContain("2 hook command file(s) checked");
+    });
+
+    it("a quoted path with spaces is one argument, found when present and named when absent", () => {
+      const ok = checkHookConfigs(settings({ hooks: { A: [group(`node "${fwd(join(spaced, "x.js"))}"`)] } }));
+      expect(ok.severity, ok.message).toBe("pass");
+      const missingPath = fwd(join(spaced, "nope.js"));
+      const bad = checkHookConfigs(settings({ hooks: { A: [group(`node "${missingPath}"`)] } }));
+      expect(bad.severity).toBe("issue");
+      expect(bad.message).toContain(missingPath);
+    });
+
+    it("a quoted node binary as the head: the SCRIPT after it is stat'ed; any other path head is itself the file", () => {
+      const nodeBin = join(scripts, "node.exe");
+      writeFileSync(nodeBin, "");
+      const viaNode = checkHookConfigs(settings({ hooks: { A: [group(`"${fwd(nodeBin)}" "${fwd(join(scripts, "missing-after-node.js"))}"`)] } }));
+      expect(viaNode.severity).toBe("issue");
+      expect(viaNode.message).toContain("missing-after-node.js");
+      expect(checkHookConfigs(settings({ hooks: { A: [group(`"${fwd(join(scripts, "runner.exe"))}" --arg`)] } })).severity).toBe("pass");
+      const gone = fwd(join(scripts, "gone.exe"));
+      const headMissing = checkHookConfigs(settings({ hooks: { A: [group(`"${gone}" --arg`)] } }));
+      expect(headMissing.severity).toBe("issue");
+      expect(headMissing.message).toContain(gone);
+    });
+
+    it("environment prefixes and node flags are skipped before the script", () => {
+      const r = checkHookConfigs(settings({ hooks: { A: [group(`NODE_ENV=production FOO="a b" node --no-warnings "${fwd(join(scripts, "boot.js"))}"`)] } }));
+      expect(r.severity, r.message).toBe("pass");
+      expect(r.message).toContain("1 hook command file(s) checked");
+    });
+
+    it("npx tsx <script> stats the script; npx of a package is not a file and is 'not checked'", () => {
+      expect(checkHookConfigs(settings({ hooks: { A: [group(`npx tsx "${fwd(join(scripts, "boot.js"))}"`)] } })).severity).toBe("pass");
+      const r = checkHookConfigs(settings({ hooks: { A: [group("npx some-package --flag")] } }));
+      expect(r.severity).toBe("warn");
+      expect(r.message).toContain("npx some-package --flag (npx runs a package, not a file)");
+    });
+
+    it("an unparseable command is 'not checked: <command>', never a pass", () => {
+      const cases: Array<[string, string]> = [
+        [`node "${fwd(join(scripts, "boot.js"))}`, "unterminated quote"],
+        ["node", "no script argument after node"],
+        ["node ./relative.js", "relative path"],
+        ["node $HOME/x.js", "variable"],
+        ["FOO=1", "no command after environment prefixes"],
+      ];
+      for (const [cmd, reason] of cases) {
+        const r = checkHookConfigs(settings({ hooks: { A: [group(cmd), group(`node "${fwd(join(scripts, "boot.js"))}"`)] } }));
+        expect(r.severity, `${cmd}: ${r.message}`).toBe("warn");
+        expect(r.severity).not.toBe("pass");
+        expect(r.message).toContain(`not checked: 1 hook command(s) could not be parsed`);
+        expect(r.message).toContain(cmd);
+        expect(r.message).toContain(reason);
+        expect(r.message).toContain("1 hook command file(s) checked");
+      }
+    });
+
+    it("sh -c / bash -c is 'not checked: inline shell (-c)', a warn, never a missing-script FAIL", () => {
+      for (const cmd of [`sh -c "echo hello && true"`, `bash -c 'node /does/not/exist.js'`, `/bin/bash -lc "run it"`, `bash -c "x"`]) {
+        const r = checkHookConfigs(settings({ hooks: { A: [group(cmd), group(`node "${fwd(join(scripts, "boot.js"))}"`)] } }));
+        expect(r.severity, `${cmd}: ${r.message}`).toBe("warn");
+        expect(r.message).toContain("inline shell (-c)");
+        expect(r.message).toContain(cmd);
+        expect(r.message).not.toContain("Hook commands reference missing files");
+        expect(r.message).toContain("1 hook command file(s) checked");
+      }
+      // a shell running a real script file (no -c) is still stat'ed
+      expect(checkHookConfigs(settings({ hooks: { A: [group(`bash "${fwd(join(scripts, "boot.js"))}"`)] } })).severity).toBe("pass");
+    });
+
+    it("a bare echo is a named SKIP inside a passing result, and the legacy flat shape is still read", () => {
+      const p = settings({
+        hooks: {
+          A: [{ command: `node ${fwd(join(scripts, "boot.js"))}` }, { command: "echo hi" }, group("echo nested")],
+        },
+      });
+      const r = checkHookConfigs(p);
+      expect(r.severity, r.message).toBe("pass");
+      expect(r.message).toContain("1 hook command file(s) checked; skipped 2 (2 not a command that launches a file); 0 not checked");
+      expect(r.message).toContain("of 3 entries");
+    });
+
+    it("B2: a MALFORMED entry (no command string, or not an object) beside a good one is WARN not checked, never pass", () => {
+      const good = { command: `node ${fwd(join(scripts, "boot.js"))}` };
+      const noCommand = checkHookConfigs(settings({ hooks: { A: [good, { type: "command" }] } }));
+      expect(noCommand.severity, noCommand.message).toBe("warn");
+      expect(noCommand.message).toContain("entry has no command string");
+      expect(noCommand.message).toContain("1 hook command file(s) checked");
+      const notObject = checkHookConfigs(settings({ hooks: { A: [good, "a string, not an object"] } }));
+      expect(notObject.severity, notObject.message).toBe("warn");
+      expect(notObject.message).toContain("entry is not an object");
+    });
+
+    it("B2: a typed non-command hook (prompt, agent) is a NAMED SKIP inside a passing result", () => {
+      const good = { command: `node ${fwd(join(scripts, "boot.js"))}` };
+      const r = checkHookConfigs(settings({ hooks: { A: [good, { type: "prompt", prompt: "be careful" }, { type: "agent", agent: "x" }] } }));
+      expect(r.severity, r.message).toBe("pass");
+      expect(r.message).toContain("1 prompt hook, no command");
+      expect(r.message).toContain("1 agent hook, no command");
+      expect(r.message).toContain("1 hook command file(s) checked; skipped 2");
+      expect(r.message).toContain("0 not checked");
+    });
+
+    it("B2: a command-type entry with no command is WARN, with or without an explicit type", () => {
+      const good = { command: `node ${fwd(join(scripts, "boot.js"))}` };
+      for (const bad of [{ type: "command" }, {}]) {
+        const r = checkHookConfigs(settings({ hooks: { A: [good, bad] } }));
+        expect(r.severity, r.message).toBe("warn");
+        expect(r.message).toContain("entry has no command string");
+      }
+    });
+
+    it("nothing readable at all is 'not checked', not a pass", () => {
+      const r = checkHookConfigs(settings({ hooks: { A: [group("echo only")] } }));
+      expect(r.severity).toBe("skip");
+      expect(r.message).toContain("not checked: no hook command file was read");
     });
   });
 

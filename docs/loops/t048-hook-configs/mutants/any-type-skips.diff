@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index ce0e9e13..4a78a00d 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -274,7 +274,7 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
+     if (typeof h.command !== "string") {
+       // An explicit non-command type (prompt, agent, ...) is a legitimate hook with no file to launch: a named skip.
+       // Only a command-type entry (type "command", or no type in the legacy shape) lacking a command is malformed.
+-      if (typeof h.type === "string" && h.type !== "command") {
++      if (typeof h.type === "string") {
+         skipped.typedNoCommand.push(h.type);
+         continue;
+       }
