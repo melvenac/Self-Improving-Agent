@@ -479,6 +479,8 @@ export function decidePlanGate(
 export interface DoneGateContext {
   /** From process exit codes. Never asked of the gate (§3, §4). */
   checksPassed: boolean;
+  /** Where the exit codes came from; `none` means none were supplied (T-222 F6). Absent: from process exit codes. */
+  checksSource?: string;
 }
 
 /** Apply the developer done-gate policy. No number in this function; see {@link decidePlanGate}. */
@@ -541,7 +543,11 @@ export function decideDoneGate(
 
   // The exit codes, not the gate. §3: never ask Jev whether tests passed.
   if (policy.hand_to_qa_requires_green_checks && !ctx.checksPassed) {
-    reasons.push(`the deterministic checks failed (read from process exit codes, not from the gate)`);
+    reasons.push(
+      ctx.checksSource === "none"
+        ? `no deterministic checks were supplied`
+        : `the deterministic checks failed (read from process exit codes, not from the gate)`,
+    );
   }
 
   if (missing.length > 0) {

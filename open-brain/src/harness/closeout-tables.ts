@@ -126,10 +126,11 @@ function thresholdTable(
   policy: Record<string, unknown>,
   shaOf: (l: Loaded) => string,
   flags: readonly string[],
+  shaHeader = "scored SHA",
 ): string[] {
   const out: string[] = [`### ${title} — ${provisionalLabel(records.map((l) => l.rec))}`, ""];
   out.push(`N = ${records.length}. ${records.length === 0 ? "No scored records." : `${modelLine(records)}.`}`, "");
-  out.push("| PR | scored SHA | model_resolved |", "| --- | --- | --- |");
+  out.push(`| PR | ${shaHeader} | model_resolved |`, "| --- | --- | --- |");
   for (const l of records) out.push(`| ${prOf(l.rec, l.path)} | ${shaOf(l)} | ${String(l.rec.model_resolved)} |`);
   out.push("", "| threshold | value | rejects | N | per-diff values | min | max | reject side | other side |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |");
   for (const spec of specs) {
@@ -208,6 +209,7 @@ export function buildCloseoutTables(input: CloseoutInput): CloseoutResult {
       qaRaw,
       (l) => (l.rec as ShadowQaRecord).e_t_ref.commit,
       ["any_fail_is_reject", "untested_is_reject"],
+      "E_t commit",
     ),
   );
   const staleQa = qa.filter((l) => l.rec.policy_hash !== qaHash).map((l) => `PR ${prOf(l.rec, l.path)}`);

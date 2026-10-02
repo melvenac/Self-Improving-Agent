@@ -461,7 +461,7 @@ async function cmdShadowDone(argv: readonly string[]): Promise<number> {
     throw new UsageError("name the test exit codes' source: exactly one of --checks-e-t <E_t.json> or --checks none");
   }
   if (checksNone !== undefined && checksNone !== "none") throw new UsageError('--checks takes only "none"');
-  const checks = typeof checksE === "string" ? checksFromEvidence(resolve(checksE)) : NO_CHECKS;
+  const checks = typeof checksE === "string" ? checksFromEvidence(resolve(checksE), repo) : NO_CHECKS;
   const ledgerFlag = flags.get("ledger");
   const ledger =
     mode === "live" ? (typeof ledgerFlag === "string" ? resolve(ledgerFlag) : join(repo, SLICE_RECORDS_DIR, SLICE_LEDGER_FILE)) : undefined;

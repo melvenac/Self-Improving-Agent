@@ -470,6 +470,19 @@ export function countAttempts(options: { ledger?: string; recordsDir?: string; m
   }
 
   const byPath = new Map(live.map((a) => [a.record_path, a]));
+  /**
+   * D-092 ruling 3 / D-093: an attempt after a non-retryable outcome that got NO answer is a fresh
+   * attempt, not a retry. "No answer" is read from the parent's own record (`answer` is null), and
+   * a record that cannot be read proves nothing, so it is not assumed unanswered.
+   */
+  const unansweredParent = (prior: AttemptView): boolean => {
+    try {
+      const rec = JSON.parse(readFileSync(resolve(root, prior.record_path), "utf-8")) as Record<string, unknown>;
+      return rec.answer === null;
+    } catch {
+      return false;
+    }
+  };
   let retries = 0;
   for (const group of bySubject.values()) {
     const label = `${group[0]!.subject.gate} ${group[0]!.subject.key}`;
@@ -482,12 +495,14 @@ export function countAttempts(options: { ledger?: string; recordsDir?: string; m
         if (a.retry_of !== null) violations.push(`${a.record_path}: the first record for ${label} names retry_of ${a.retry_of}`);
         return;
       }
-      retries += 1;
       const prior = a.retry_of === null ? undefined : byPath.get(a.retry_of);
       if (prior === undefined || !sameSubject(prior.subject, a.subject)) {
+        retries += 1;
         violations.push(`${a.record_path}: retry_of ${String(a.retry_of)} does not name an earlier record for ${label}`);
         return;
       }
+      if (prior.outcome_class !== null && !RETRYABLE_OUTCOMES.includes(prior.outcome_class) && unansweredParent(prior)) return;
+      retries += 1;
       if (prior.outcome_class === null || !RETRYABLE_OUTCOMES.includes(prior.outcome_class)) {
         violations.push(
           `${a.record_path}: retries ${prior.record_path}, whose outcome is ${String(prior.outcome_class)}; ` +

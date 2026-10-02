@@ -35,7 +35,7 @@ policy_hash: every G_done carries the sha256 of developer-done.json as it is now
 
 N = 5. all records report jev-1.13.0; every one is at or above jev-1.13.0.
 
-| PR | scored SHA | model_resolved |
+| PR | E_t commit | model_resolved |
 | --- | --- | --- |
 | 195 | b43e719b510eeb6fb36ba5cb479d1d0247ff373a | jev-1.13.0 |
 | 209 | 08c4e495b770302adb57c61d95439c2a54712030 | jev-1.13.0 |
