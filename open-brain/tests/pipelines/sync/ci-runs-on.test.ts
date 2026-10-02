@@ -394,6 +394,27 @@ describe("ci.yml runs-on (T-192)", () => {
     expect([d1, d2]).not.toContain(m1);
   });
 
+  it("T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group", () => {
+    const group = String(workflow().concurrency?.group ?? "");
+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));
+    const pr = (n: string, sha = "aaa") => grp({ event: "pull_request", ref: `refs/pull/${n}/merge`, headRef: "loop/x", prNumber: n, sha });
+    const push = (sha: string) => grp({ event: "push", ref: "refs/heads/master", sha });
+    const dispatch = (runId: string) => grp({ event: "workflow_dispatch", ref: "refs/heads/loop/x", runId });
+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant
+    // survived the T-221 row for the same reason).
+    expect(pr("7")).toBe("ci-pr-7");
+    expect(push("9f8e7d")).toBe("ci-push-9f8e7d");
+    expect(dispatch("11")).toBe("ci-dispatch-11");
+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).
+    expect(pr("7", "aaa")).toBe(pr("7", "bbb"));
+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.
+    const same = [pr("7"), push("7"), dispatch("7")];
+    expect(new Set(same).size).toBe(3);
+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.
+    expect(pr("1")).not.toBe(pr("11"));
+    expect(pr("7", "abc123")).not.toBe(push("abc123"));
+  });
+
   it("T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled", () => {
     const cancel = String(workflow().concurrency?.["cancel-in-progress"] ?? "");
     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));
