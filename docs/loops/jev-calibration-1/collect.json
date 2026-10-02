@@ -2472,9 +2472,39 @@
         "path": "docs/loops/t164-t211-qa-report.md"
       },
       "ruling_ref": null
+    },
+    {
+      "base_how": "master-at-candidate-date",
+      "base_options": [
+        {
+          "how": "master-at-candidate-date",
+          "paths": 3,
+          "sha": "8961ba1fede1a69ce53c143fcacd9efacd95d34f"
+        }
+      ],
+      "base_sha": "8961ba1fede1a69ce53c143fcacd9efacd95d34f",
+      "candidate_sha": "9ab021fdd2df605aacdff2de4db4b963f131d32d",
+      "case_id": "t221-t222",
+      "case_no": 75,
+      "dispatch_blob": "995fe42166d7fcb2e8b933e748ae0920ef9aae8b",
+      "dispatch_commit": "b144d2358182f7adfbb2f805a05e95f7bc07720e",
+      "dispatch_commit_date": "2026-10-02T00:39:57-05:00",
+      "dispatch_how": "name",
+      "dispatch_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+      "merge_commit": "9ab021fdd2df605aacdff2de4db4b963f131d32d",
+      "merged": false,
+      "other_candidates_named": [],
+      "qa_no": 250,
+      "qa_report_ref": {
+        "commit": "799e55dcd5e5280df68f83e6183189a56edbb0db",
+        "commit_date": "2026-10-02T00:52:57-05:00",
+        "first_commit": "75d7ec48ae7505c61d2b9f69912d8a564253e985",
+        "path": "docs/loops/t221-t222-qa-report.md"
+      },
+      "ruling_ref": null
     }
   ],
-  "origin_master": "5b7e034fe505d2995272c4d045968e0a5b65c5c5",
+  "origin_master": "f7ac983d4face4a88f5af9742cc91a54c01e3f4f",
   "refs": [
     "origin/master",
     "origin/qa/b-criteria-load",
@@ -2833,7 +2863,8 @@
     "origin/qa/t216-report",
     "origin/qa/t217-t218-ci-candidate",
     "origin/qa/t217-t218-report",
-    "origin/qa/t221-t222-ci-candidate"
+    "origin/qa/t221-t222-ci-candidate",
+    "origin/qa/t221-t222-report"
   ],
   "unusable": [
     {

@@ -1,0 +1,1678 @@
+{
+  "ambiguous_verdict": [
+    {
+      "case_id": "importer-fixes",
+      "trigger": "It is not a clean pass. There are two new defects in the code this candidate adds, and neither blocks an IF row:"
+    },
+    {
+      "case_id": "importer-fixes-r2",
+      "trigger": "Do not merge aba35de as it stands."
+    },
+    {
+      "case_id": "importer-fixes-r3",
+      "trigger": "It does not close D5's class. D8 (new to QA, present since round 2, medium"
+    },
+    {
+      "case_id": "importer-leftovers-r5",
+      "trigger": "There are three low defects."
+    },
+    {
+      "case_id": "t003",
+      "trigger": "PASS on what T-003 set out to fix, with five defects: fix D1 and D3 in this round."
+    },
+    {
+      "case_id": "t048-r1",
+      "trigger": "PASS, with three defects and a test gap."
+    },
+    {
+      "case_id": "t183",
+      "trigger": "so the verdict is ACCEPT WITH ONE DEFECT TO FIX OR RULE (D1, low-medium)"
+    },
+    {
+      "case_id": "t185",
+      "trigger": "ACCEPT T-185 at 9473b0d, with two defects to fix in a short test-and-code round (D1, D2) and two test gaps (D3, D4)."
+    }
+  ],
+  "b1": {
+    "dispatch_paths_that_look_like_report_or_ruling": [],
+    "imports_lib_only_from_here": [
+      "../../../open-brain/src/harness/schema.ts",
+      "./lib.mjs"
+    ],
+    "mentions_of_labels_or_reports_in_code": 0,
+    "reads_in_code": [
+      "git([\"show\")",
+      "readJson(\"dispatches.json\")"
+    ]
+  },
+  "built_from": {
+    "origin_master": "f7ac983d4face4a88f5af9742cc91a54c01e3f4f",
+    "refs_count": 359,
+    "refs_sha256": "03a1df50c7c45fa3feb58deabbb93892b3eb80312349cb8cf780fe1e1f9a8a03"
+  },
+  "cases": [
+    {
+      "case_id": "loop-15-slice-3",
+      "case_no": 1,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "28aedb3b48867b4a7b2c352f214a122a962b7033",
+      "dispatch_commit_date": "2026-09-22T18:01:56-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-2.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-22T19:07:51-05:00",
+      "qa_report_last_commit_date": "2026-09-22T19:07:51-05:00",
+      "source_kind": "dev-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-a4",
+      "case_no": 2,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "7c6862e614b7954b270a9f28b83fd03d8b955010",
+      "dispatch_commit_date": "2026-09-23T16:27:43-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a4.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-23T18:39:17-05:00",
+      "qa_report_last_commit_date": "2026-09-23T18:39:17-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-a5",
+      "case_no": 3,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "80dca0203f8e140e7d886bffec5ba983f67c4267",
+      "dispatch_commit_date": "2026-09-23T21:57:31-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a5.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-24T00:23:48-05:00",
+      "qa_report_last_commit_date": "2026-09-24T00:23:48-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-a6",
+      "case_no": 4,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "3452484317f43e2a66ae16c749a2f7aed98be9d3",
+      "dispatch_commit_date": "2026-09-24T01:20:37-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a6.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-24T03:27:33-05:00",
+      "qa_report_last_commit_date": "2026-09-24T03:27:33-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-a7",
+      "case_no": 5,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "3e44a66b0f372bd946f694a7480b8a587dbe5b72",
+      "dispatch_commit_date": "2026-09-24T16:22:56-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a7.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-24T18:54:56-05:00",
+      "qa_report_last_commit_date": "2026-09-24T18:54:56-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-a8",
+      "case_no": 6,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "60334bf2683a81c3dd5ef9dc97e085e861bb2992",
+      "dispatch_commit_date": "2026-09-24T20:59:24-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a8.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-24T23:10:36-05:00",
+      "qa_report_last_commit_date": "2026-09-24T23:10:36-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "importer-fixes",
+      "case_no": 7,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "3258372fa931bb0d816608ded77af4bee4bc7055",
+      "dispatch_commit_date": "2026-09-24T23:23:28-05:00",
+      "dispatch_path": "docs/loops/importer-fixes-dispatch-qa.md",
+      "excluded": "ambiguous-verdict",
+      "label": null,
+      "qa_report_first_commit_date": "2026-09-24T23:59:48-05:00",
+      "qa_report_last_commit_date": "2026-09-24T23:59:48-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "excluded: ambiguous-verdict",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-a9",
+      "case_no": 8,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "fcfbaeb9b1f0478bd847a7f7a77d466863b77f9e",
+      "dispatch_commit_date": "2026-09-25T00:06:57-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a9.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-25T04:18:02-05:00",
+      "qa_report_last_commit_date": "2026-09-25T04:18:02-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "importer-fixes-r2",
+      "case_no": 9,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "56adfa0413b3679018304f7ca2344b643d4fa080",
+      "dispatch_commit_date": "2026-09-25T02:05:13-05:00",
+      "dispatch_path": "docs/loops/importer-fixes-r2-dispatch-qa.md",
+      "excluded": "ambiguous-verdict",
+      "label": null,
+      "qa_report_first_commit_date": "2026-09-25T05:52:22-05:00",
+      "qa_report_last_commit_date": "2026-09-25T05:52:22-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "excluded: ambiguous-verdict",
+      "verdict_words": [
+        "accept"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "s3-a10",
+      "case_no": 10,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "f4b17237a88cf662c714619708fdfe71fabb9012",
+      "dispatch_commit_date": "2026-09-25T17:58:57-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a10.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-25T19:36:51-05:00",
+      "qa_report_last_commit_date": "2026-09-25T19:36:51-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "importer-fixes-r3",
+      "case_no": 11,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "4c9a0da2c1418702217fb2056cf1b37b4107fb29",
+      "dispatch_commit_date": "2026-09-25T18:18:44-05:00",
+      "dispatch_path": "docs/loops/importer-fixes-r3-dispatch-qa.md",
+      "excluded": "ambiguous-verdict",
+      "label": null,
+      "qa_report_first_commit_date": "2026-09-25T20:21:06-05:00",
+      "qa_report_last_commit_date": "2026-09-25T20:21:06-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "excluded: ambiguous-verdict",
+      "verdict_words": [
+        "accept"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t183",
+      "case_no": 12,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "4c9a0da2c1418702217fb2056cf1b37b4107fb29",
+      "dispatch_commit_date": "2026-09-25T18:18:44-05:00",
+      "dispatch_path": "docs/loops/t183-dispatch-qa.md",
+      "excluded": "ambiguous-verdict",
+      "label": null,
+      "qa_report_first_commit_date": "2026-09-25T20:54:22-05:00",
+      "qa_report_last_commit_date": "2026-09-25T20:54:22-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "excluded: ambiguous-verdict",
+      "verdict_words": [
+        "accept",
+        "accepted"
+      ],
+      "verdict_words_in_dt": 4
+    },
+    {
+      "case_id": "t185",
+      "case_no": 13,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "9208dde0762dab5045b4f59e3a385298275cc572",
+      "dispatch_commit_date": "2026-09-25T21:10:14-05:00",
+      "dispatch_path": "docs/loops/t185-dispatch-qa.md",
+      "excluded": "ambiguous-verdict",
+      "label": null,
+      "qa_report_first_commit_date": "2026-09-25T22:07:45-05:00",
+      "qa_report_last_commit_date": "2026-09-25T22:07:45-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "excluded: ambiguous-verdict",
+      "verdict_words": [
+        "accept",
+        "accepted",
+        "accepts"
+      ],
+      "verdict_words_in_dt": 10
+    },
+    {
+      "case_id": "importer-fixes-r4",
+      "case_no": 14,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "7729943afe0fa1f526771a5408a58c5229372c0c",
+      "dispatch_commit_date": "2026-09-25T22:20:23-05:00",
+      "dispatch_path": "docs/loops/importer-fixes-r4-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-25T23:00:36-05:00",
+      "qa_report_last_commit_date": "2026-09-25T23:00:36-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accept",
+        "accepted"
+      ],
+      "verdict_words_in_dt": 4
+    },
+    {
+      "case_id": "t179",
+      "case_no": 15,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "e1b5011a3ba9f559f1fb99b32499e62d2bc4144e",
+      "dispatch_commit_date": "2026-09-26T01:53:58-05:00",
+      "dispatch_path": "docs/loops/t179-dispatch-qa.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-26T02:36:53-05:00",
+      "qa_report_last_commit_date": "2026-09-26T02:36:53-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "s3-b-step1",
+      "case_no": 16,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "3afddeee00c9482fefe75594c0ef434721953e30",
+      "dispatch_commit_date": "2026-09-26T02:42:44-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-b-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-26T03:44:42-05:00",
+      "qa_report_last_commit_date": "2026-09-26T03:44:42-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "bootstrap-fix",
+      "case_no": 17,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "904765c6c37dee3603c16094985f4de91768c701",
+      "dispatch_commit_date": "2026-09-26T04:28:12-05:00",
+      "dispatch_path": "docs/loops/bootstrap-fix-dispatch-qa.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-26T18:54:04-05:00",
+      "qa_report_last_commit_date": "2026-09-26T18:54:04-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-a11",
+      "case_no": 18,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "2799bd31fd3507cfa255e5ca667232b34e98f35c",
+      "dispatch_commit_date": "2026-09-26T03:42:07-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a11.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-26T19:29:10-05:00",
+      "qa_report_last_commit_date": "2026-09-26T19:29:10-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accept",
+        "accepted"
+      ],
+      "verdict_words_in_dt": 4
+    },
+    {
+      "case_id": "importer-leftovers",
+      "case_no": 19,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "d78c41624133664187d20aaeab8c8fd57b5c780b",
+      "dispatch_commit_date": "2026-09-26T18:43:44-05:00",
+      "dispatch_path": "docs/loops/importer-leftovers-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-26T19:52:55-05:00",
+      "qa_report_last_commit_date": "2026-09-26T19:52:55-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t179-r2",
+      "case_no": 20,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "fb300cac3c10667f4b116dc321bc6250f802279f",
+      "dispatch_commit_date": "2026-09-26T04:16:40-05:00",
+      "dispatch_path": "docs/loops/t179-r2-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-26T20:23:11-05:00",
+      "qa_report_last_commit_date": "2026-09-26T20:23:11-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted"
+      ],
+      "verdict_words_in_dt": 4
+    },
+    {
+      "case_id": "t003",
+      "case_no": 21,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "906c46b47506a9b2e19c00e285464d3eea013c0b",
+      "dispatch_commit_date": "2026-09-26T19:12:12-05:00",
+      "dispatch_path": "docs/loops/t003-dispatch-qa.md",
+      "excluded": "ambiguous-verdict",
+      "label": null,
+      "qa_report_first_commit_date": "2026-09-26T20:31:20-05:00",
+      "qa_report_last_commit_date": "2026-09-26T20:31:20-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "excluded: ambiguous-verdict",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t171",
+      "case_no": 22,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "8ec85b23c51c4cdf654cc242a73497cf6595970d",
+      "dispatch_commit_date": "2026-09-26T19:32:23-05:00",
+      "dispatch_path": "docs/loops/t171-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-26T20:46:58-05:00",
+      "qa_report_last_commit_date": "2026-09-26T20:46:58-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "bootstrap-fix-r3",
+      "case_no": 23,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "3fe0d10c924cb87347fdd46c9611587ab3e1140d",
+      "dispatch_commit_date": "2026-09-26T19:58:19-05:00",
+      "dispatch_path": "docs/loops/bootstrap-fix-r3-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-26T21:04:48-05:00",
+      "qa_report_last_commit_date": "2026-09-26T21:04:48-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted",
+        "accepts"
+      ],
+      "verdict_words_in_dt": 12
+    },
+    {
+      "case_id": "t048-r1",
+      "case_no": 24,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "2c765f45d1dcb6551b0a73aae8b01193059d3c9d",
+      "dispatch_commit_date": "2026-09-26T20:42:21-05:00",
+      "dispatch_path": "docs/loops/t048-r1-dispatch-qa.md",
+      "excluded": "ambiguous-verdict",
+      "label": null,
+      "qa_report_first_commit_date": "2026-09-26T23:07:51-05:00",
+      "qa_report_last_commit_date": "2026-09-26T23:07:51-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "excluded: ambiguous-verdict",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-a12",
+      "case_no": 25,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "f6c3036e5b7c0ea64fe5b3a577fc0789844a99dd",
+      "dispatch_commit_date": "2026-09-26T20:37:13-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a12.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-26T23:12:02-05:00",
+      "qa_report_last_commit_date": "2026-09-26T23:12:02-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accept"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t048-r2",
+      "case_no": 26,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "261a9f506574caf16644420cceb99504ddbe0bc7",
+      "dispatch_commit_date": "2026-09-26T23:11:51-05:00",
+      "dispatch_path": "docs/loops/t048-r2-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-26T23:41:07-05:00",
+      "qa_report_last_commit_date": "2026-09-26T23:41:07-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "importer-leftovers-r5",
+      "case_no": 27,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "88377ff3a72f0bdc66fe9882ee2bdf4a5cf7b98e",
+      "dispatch_commit_date": "2026-09-26T22:29:47-05:00",
+      "dispatch_path": "docs/loops/importer-leftovers-r5-dispatch-qa.md",
+      "excluded": "ambiguous-verdict",
+      "label": null,
+      "qa_report_first_commit_date": "2026-09-26T23:45:16-05:00",
+      "qa_report_last_commit_date": "2026-09-26T23:45:16-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "excluded: ambiguous-verdict",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t171-r2",
+      "case_no": 28,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "261a9f506574caf16644420cceb99504ddbe0bc7",
+      "dispatch_commit_date": "2026-09-26T23:11:51-05:00",
+      "dispatch_path": "docs/loops/t171-r2-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T00:05:11-05:00",
+      "qa_report_last_commit_date": "2026-09-27T00:05:11-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t003-r2",
+      "case_no": 29,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "88377ff3a72f0bdc66fe9882ee2bdf4a5cf7b98e",
+      "dispatch_commit_date": "2026-09-26T22:29:47-05:00",
+      "dispatch_path": "docs/loops/t003-r2-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T00:42:07-05:00",
+      "qa_report_last_commit_date": "2026-09-27T00:42:07-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "cal-a12-composer",
+      "case_no": 30,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "f6c3036e5b7c0ea64fe5b3a577fc0789844a99dd",
+      "dispatch_commit_date": "2026-09-26T20:37:13-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a12.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-27T00:53:03-05:00",
+      "qa_report_last_commit_date": "2026-09-27T00:53:03-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accept"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "s3-a13",
+      "case_no": 31,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "e31ba92327fed0a76a219fcc7319db0bf9b3b999",
+      "dispatch_commit_date": "2026-09-26T23:36:55-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-dispatch-qa-a13.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T03:43:24-05:00",
+      "qa_report_last_commit_date": "2026-09-27T03:43:24-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t171-r3",
+      "case_no": 32,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "449da7403a96bcdc7405096895960913c6027c0a",
+      "dispatch_commit_date": "2026-09-27T02:11:26-05:00",
+      "dispatch_path": "docs/loops/t171-r3-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T04:00:26-05:00",
+      "qa_report_last_commit_date": "2026-09-27T04:00:26-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "importer-leftovers-r6",
+      "case_no": 33,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "c62a108a6510cae413474e4cd843c42a01d6b0a7",
+      "dispatch_commit_date": "2026-09-27T01:16:11-05:00",
+      "dispatch_path": "docs/loops/importer-leftovers-r6-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T04:01:28-05:00",
+      "qa_report_last_commit_date": "2026-09-27T04:01:28-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t048-r1b",
+      "case_no": 34,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "c62a108a6510cae413474e4cd843c42a01d6b0a7",
+      "dispatch_commit_date": "2026-09-27T01:16:11-05:00",
+      "dispatch_path": "docs/loops/t048-r1b-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T04:07:59-05:00",
+      "qa_report_last_commit_date": "2026-09-27T04:07:59-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-b2",
+      "case_no": 35,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "80f3383ef15f205b73f5aadc5d1e0f5f3153e66d",
+      "dispatch_commit_date": "2026-09-27T07:06:53-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-b2-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T16:17:37-05:00",
+      "qa_report_last_commit_date": "2026-09-27T16:17:37-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t048-r3",
+      "case_no": 36,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "4604240973e5f923521a351f178bd699f23367fd",
+      "dispatch_commit_date": "2026-09-27T03:52:55-05:00",
+      "dispatch_path": "docs/loops/t048-r3-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T16:26:42-05:00",
+      "qa_report_last_commit_date": "2026-09-27T16:26:42-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t192",
+      "case_no": 37,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "a22813a0c9f8f051c2cb266898aa4f6715de6b5a",
+      "dispatch_commit_date": "2026-09-27T04:10:17-05:00",
+      "dispatch_path": "docs/loops/t192-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T16:32:48-05:00",
+      "qa_report_last_commit_date": "2026-09-27T16:32:48-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "bootstrap-fix-r4",
+      "case_no": 38,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "9edf53a7b4c76fb8c4670c4c7d903bfbdc70a558",
+      "dispatch_commit_date": "2026-09-26T23:30:56-05:00",
+      "dispatch_path": "docs/loops/bootstrap-fix-r4-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T16:54:40-05:00",
+      "qa_report_last_commit_date": "2026-09-27T16:54:40-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t048-r2b",
+      "case_no": 39,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "a6fa0bb13e08550d26d22a29e8e2c19c4d301c1d",
+      "dispatch_commit_date": "2026-09-27T02:16:00-05:00",
+      "dispatch_path": "docs/loops/t048-r2b-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T17:09:54-05:00",
+      "qa_report_last_commit_date": "2026-09-27T17:09:54-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "qa-driver-cursor-r2",
+      "case_no": 40,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "3bc048965eb435ba0ce75528613dc73c7f3cf5da",
+      "dispatch_commit_date": "2026-09-27T22:11:04-05:00",
+      "dispatch_path": "docs/loops/qa-driver-cursor-r2-dispatch-qa.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-27T22:37:31-05:00",
+      "qa_report_last_commit_date": "2026-09-27T22:37:31-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t192-d1",
+      "case_no": 41,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "3bc048965eb435ba0ce75528613dc73c7f3cf5da",
+      "dispatch_commit_date": "2026-09-27T22:11:04-05:00",
+      "dispatch_path": "docs/loops/t192-d1-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T22:54:46-05:00",
+      "qa_report_last_commit_date": "2026-09-27T22:54:46-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t046-detector",
+      "case_no": 42,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "3bc048965eb435ba0ce75528613dc73c7f3cf5da",
+      "dispatch_commit_date": "2026-09-27T22:11:04-05:00",
+      "dispatch_path": "docs/loops/t046-detector-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-27T23:00:32-05:00",
+      "qa_report_last_commit_date": "2026-09-27T23:00:32-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "qa-driver-cursor-r3",
+      "case_no": 43,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "bd047e13860d39ca5262db93f02295beea955952",
+      "dispatch_commit_date": "2026-09-28T00:32:26-05:00",
+      "dispatch_path": "docs/loops/qa-driver-cursor-r3-dispatch-qa.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-28T01:29:27-05:00",
+      "qa_report_last_commit_date": "2026-09-28T01:29:27-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t176-index-direction",
+      "case_no": 44,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "a82b43269f3ff79c8913c0d977ed6319854e26db",
+      "dispatch_commit_date": "2026-09-28T01:25:57-05:00",
+      "dispatch_path": "docs/loops/t176-index-direction-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-28T01:41:43-05:00",
+      "qa_report_last_commit_date": "2026-09-28T01:41:43-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t046-d1",
+      "case_no": 45,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "a82b43269f3ff79c8913c0d977ed6319854e26db",
+      "dispatch_commit_date": "2026-09-28T01:25:57-05:00",
+      "dispatch_path": "docs/loops/t046-d1-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-28T02:09:37-05:00",
+      "qa_report_last_commit_date": "2026-09-28T02:09:37-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-c",
+      "case_no": 46,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "bd047e13860d39ca5262db93f02295beea955952",
+      "dispatch_commit_date": "2026-09-28T00:32:26-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-c-dispatch-qa.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-28T02:11:27-05:00",
+      "qa_report_last_commit_date": "2026-09-28T02:11:27-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-c-r2",
+      "case_no": 47,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "1affe9d819ebd59be6ea21630eb3edd2784562cf",
+      "dispatch_commit_date": "2026-09-28T02:24:58-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-c-r2-dispatch-qa.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-28T15:55:55-05:00",
+      "qa_report_last_commit_date": "2026-09-28T15:55:55-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t178-ci-on-push",
+      "case_no": 48,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "b7f963acb67f90a7e1f59aaa9450a954e05f6db7",
+      "dispatch_commit_date": "2026-09-28T02:14:55-05:00",
+      "dispatch_path": "docs/loops/t178-ci-on-push-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-28T16:10:58-05:00",
+      "qa_report_last_commit_date": "2026-09-28T16:10:58-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-c-r3",
+      "case_no": 49,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "a4205c9cf2a559de0c3933f409ce30259e5262ca",
+      "dispatch_commit_date": "2026-09-28T19:32:02-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-3-c-r3-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-28T19:56:11-05:00",
+      "qa_report_last_commit_date": "2026-09-28T19:56:11-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "qa-driver-cursor-r5",
+      "case_no": 50,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "32d669d20c8e520037136d88b50bde70d3a612c0",
+      "dispatch_commit_date": "2026-09-28T19:20:15-05:00",
+      "dispatch_path": "docs/loops/qa-driver-cursor-r5-dispatch-qa.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-28T20:08:38-05:00",
+      "qa_report_last_commit_date": "2026-09-28T20:08:38-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t195",
+      "case_no": 51,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "6992663db776dd424bd36174f5eef641721549db",
+      "dispatch_commit_date": "2026-09-28T19:11:39-05:00",
+      "dispatch_path": "docs/loops/t195-dispatch-qa.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-28T20:15:56-05:00",
+      "qa_report_last_commit_date": "2026-09-28T20:15:56-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t195-r2",
+      "case_no": 52,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "ef1ce7d6f1eff34b8e3e10c6f3e0b900c98d755e",
+      "dispatch_commit_date": "2026-09-28T21:35:13-05:00",
+      "dispatch_path": "docs/loops/qa-222-t195-r2-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-28T22:16:17-05:00",
+      "qa_report_last_commit_date": "2026-09-28T22:16:17-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "rejected"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t158",
+      "case_no": 53,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "ef1ce7d6f1eff34b8e3e10c6f3e0b900c98d755e",
+      "dispatch_commit_date": "2026-09-28T21:35:13-05:00",
+      "dispatch_path": "docs/loops/qa-223-t158-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-28T22:31:13-05:00",
+      "qa_report_last_commit_date": "2026-09-28T22:31:13-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t196-t197",
+      "case_no": 54,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "ef1ce7d6f1eff34b8e3e10c6f3e0b900c98d755e",
+      "dispatch_commit_date": "2026-09-28T21:35:13-05:00",
+      "dispatch_path": "docs/loops/qa-224-t196-t197-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-28T22:43:58-05:00",
+      "qa_report_last_commit_date": "2026-09-28T22:43:58-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t198",
+      "case_no": 55,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "ef1ce7d6f1eff34b8e3e10c6f3e0b900c98d755e",
+      "dispatch_commit_date": "2026-09-28T21:35:13-05:00",
+      "dispatch_path": "docs/loops/qa-225-t198-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-28T22:55:27-05:00",
+      "qa_report_last_commit_date": "2026-09-28T22:55:27-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "qa-probes-on-master",
+      "case_no": 56,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "bd047e13860d39ca5262db93f02295beea955952",
+      "dispatch_commit_date": "2026-09-28T00:32:26-05:00",
+      "dispatch_path": "docs/loops/qa-probes-on-master-dispatch-qa.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-30T00:16:35-05:00",
+      "qa_report_last_commit_date": "2026-09-30T00:16:35-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t158-r2",
+      "case_no": 57,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "a9c0a0e4c636b92858f0517a4efc0268d2a226db",
+      "dispatch_commit_date": "2026-09-28T23:46:38-05:00",
+      "dispatch_path": "docs/loops/qa-227-t158-r2-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-30T00:42:09-05:00",
+      "qa_report_last_commit_date": "2026-09-30T00:42:09-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "rejected"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t196-t197-r2",
+      "case_no": 58,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "a9c0a0e4c636b92858f0517a4efc0268d2a226db",
+      "dispatch_commit_date": "2026-09-28T23:46:38-05:00",
+      "dispatch_path": "docs/loops/qa-228-t196-t197-r2-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-30T01:02:38-05:00",
+      "qa_report_last_commit_date": "2026-09-30T01:02:38-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "rejected"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t198-r2",
+      "case_no": 59,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "01eae1f6a0af1c46d7a7593aafb2a7fd3255e838",
+      "dispatch_commit_date": "2026-09-30T01:30:29-05:00",
+      "dispatch_path": "docs/loops/qa-230-t198-r2-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-30T02:42:12-05:00",
+      "qa_report_last_commit_date": "2026-09-30T02:42:12-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "s3-c-r4",
+      "case_no": 60,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "db6b2196af5fc4c6469ede37125fd65b5daec8bc",
+      "dispatch_commit_date": "2026-09-30T03:00:15-05:00",
+      "dispatch_path": "docs/loops/qa-232-c-r4-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-09-30T04:02:40-05:00",
+      "qa_report_last_commit_date": "2026-09-30T04:02:40-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t194-r2",
+      "case_no": 61,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "db6b2196af5fc4c6469ede37125fd65b5daec8bc",
+      "dispatch_commit_date": "2026-09-30T03:00:15-05:00",
+      "dispatch_path": "docs/loops/qa-233-t194-r2-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-30T07:10:46-05:00",
+      "qa_report_last_commit_date": "2026-09-30T07:10:46-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t194-r3",
+      "case_no": 62,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "070e14e04c8ec361f8731f2b11b51504c0271e44",
+      "dispatch_commit_date": "2026-09-30T08:00:50-05:00",
+      "dispatch_path": "docs/loops/qa-234-t194-r3-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-30T08:47:33-05:00",
+      "qa_report_last_commit_date": "2026-09-30T08:47:33-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "reject"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t194-r4",
+      "case_no": 63,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "7f0f1599c65e9099ccab569d3e0214dbe33e6bcf",
+      "dispatch_commit_date": "2026-09-30T09:19:27-05:00",
+      "dispatch_path": "docs/loops/qa-235-t194-r4-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-09-30T10:05:46-05:00",
+      "qa_report_last_commit_date": "2026-09-30T10:05:46-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "reject"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t216",
+      "case_no": 64,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "54be21b51c8194ca52e0ced41718fae6fbebb449",
+      "dispatch_commit_date": "2026-10-01T01:32:47-05:00",
+      "dispatch_path": "docs/loops/qa-236-t216-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-10-01T02:01:26-05:00",
+      "qa_report_last_commit_date": "2026-10-01T02:01:26-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accept"
+      ],
+      "verdict_words_in_dt": 4
+    },
+    {
+      "case_id": "t214",
+      "case_no": 65,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "5a8b5fbb14b67d1d0e8421b5c8f64e75256d61e8",
+      "dispatch_commit_date": "2026-10-01T04:10:58-05:00",
+      "dispatch_path": "docs/loops/qa-239-t214-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-10-01T04:14:13-05:00",
+      "qa_report_last_commit_date": "2026-10-01T04:14:13-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t194-r5",
+      "case_no": 66,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "efd9cf15ab2c351524c25c8209758b9182f51e7d",
+      "dispatch_commit_date": "2026-10-01T03:33:25-05:00",
+      "dispatch_path": "docs/loops/qa-237-t194-r5-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-10-01T06:58:12-05:00",
+      "qa_report_last_commit_date": "2026-10-01T06:58:12-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "loop-15-slice-4-step2",
+      "case_no": 67,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "c3ba18e4e969610728b7988738342d39bbd5a4f8",
+      "dispatch_commit_date": "2026-10-01T04:16:15-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-4-step2-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-10-01T07:38:46-05:00",
+      "qa_report_last_commit_date": "2026-10-01T07:38:46-05:00",
+      "source_kind": "dev-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "loop-15-slice-4-step2-r2",
+      "case_no": 68,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "7767cd6913bc3749f070e5836209ad21429eaeca",
+      "dispatch_commit_date": "2026-10-01T07:51:57-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-4-step2-r2-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-10-01T09:11:33-05:00",
+      "qa_report_last_commit_date": "2026-10-01T09:11:33-05:00",
+      "source_kind": "dev-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "rejects"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t194-r6",
+      "case_no": 69,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "e4a3327f2d887ae226b1619e68b9872d828ca559",
+      "dispatch_commit_date": "2026-10-01T08:12:01-05:00",
+      "dispatch_path": "docs/loops/qa-241-t194-r6-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-10-01T09:36:14-05:00",
+      "qa_report_last_commit_date": "2026-10-01T09:36:14-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepted"
+      ],
+      "verdict_words_in_dt": 4
+    },
+    {
+      "case_id": "loop-15-slice-4-step2-r3",
+      "case_no": 70,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "a676bf6841328ad1d4f7b75cd114e1f53fa3191f",
+      "dispatch_commit_date": "2026-10-01T09:13:00-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-4-step2-r3-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-10-01T12:05:16-05:00",
+      "qa_report_last_commit_date": "2026-10-01T12:05:16-05:00",
+      "source_kind": "dev-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "reject"
+      ],
+      "verdict_words_in_dt": 4
+    },
+    {
+      "case_id": "loop-15-slice-4-step2-r4",
+      "case_no": 71,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "09022b661b269c24cb1518555ab3813676a827f6",
+      "dispatch_commit_date": "2026-10-01T12:07:14-05:00",
+      "dispatch_path": "docs/loops/loop-15-slice-4-step2-r4-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-10-01T12:27:33-05:00",
+      "qa_report_last_commit_date": "2026-10-01T12:27:33-05:00",
+      "source_kind": "dev-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t194-r7",
+      "case_no": 72,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "ea44065ba189885dfa4554b4f105c694e296032d",
+      "dispatch_commit_date": "2026-10-01T17:47:31-05:00",
+      "dispatch_path": "docs/loops/qa-246-t194-r7-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-10-01T19:28:52-05:00",
+      "qa_report_last_commit_date": "2026-10-01T19:28:52-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "reject"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t217-t218",
+      "case_no": 73,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "bd9b78f601737864bb6c37c530b7bda41a64a6ab",
+      "dispatch_commit_date": "2026-10-01T19:49:38-05:00",
+      "dispatch_path": "docs/loops/qa-247-t217-t218-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-10-01T20:05:31-05:00",
+      "qa_report_last_commit_date": "2026-10-01T20:05:31-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    },
+    {
+      "case_id": "t164-t211",
+      "case_no": 74,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "b97be3f06e92b38c444963913c478eedd4dc2f90",
+      "dispatch_commit_date": "2026-10-02T00:00:54-05:00",
+      "dispatch_path": "docs/loops/qa-249-t164-t211-dispatch.md",
+      "excluded": null,
+      "label": "REJECT",
+      "qa_report_first_commit_date": "2026-10-02T00:34:37-05:00",
+      "qa_report_last_commit_date": "2026-10-02T00:34:37-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "leak-wording",
+      "verdict_words": [
+        "accepts"
+      ],
+      "verdict_words_in_dt": 2
+    },
+    {
+      "case_id": "t221-t222",
+      "case_no": 75,
+      "dispatch_after_first_report": false,
+      "dispatch_commit": "b144d2358182f7adfbb2f805a05e95f7bc07720e",
+      "dispatch_commit_date": "2026-10-02T00:39:57-05:00",
+      "dispatch_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+      "excluded": null,
+      "label": "ACCEPT",
+      "qa_report_first_commit_date": "2026-10-02T00:52:57-05:00",
+      "qa_report_last_commit_date": "2026-10-02T00:52:57-05:00",
+      "source_kind": "qa-dispatch",
+      "status": "headline-pool",
+      "verdict_words": [],
+      "verdict_words_in_dt": 0
+    }
+  ],
+  "counts": {
+    "d_t_built": 75,
+    "d_t_dropped": 0,
+    "d_t_with_verdict_wording_all_cases": 27,
+    "excluded_by_reason": {
+      "ambiguous-verdict": 8
+    },
+    "headline": {
+      "ACCEPT": 18,
+      "REJECT": 18,
+      "meets_50": false,
+      "n": 36,
+      "pool_before_balance": {
+        "accept": 26,
+        "reject": 18
+      }
+    },
+    "labelled_not_excluded": {
+      "ACCEPT": 36,
+      "REJECT": 31,
+      "total": 67
+    },
+    "leak_wording_group": {
+      "ACCEPT": 10,
+      "REJECT": 13,
+      "n": 23
+    },
+    "pool_cases": 75,
+    "reports_found": 95,
+    "scored_total": 59,
+    "source_kind": {
+      "dev-dispatch": 5,
+      "qa-dispatch": 70
+    },
+    "unusable_reports_by_reason": {
+      "duplicate-candidate": 2,
+      "no-candidate-commit-named": 2,
+      "no-dispatch": 16
+    }
+  },
+  "dropped": [
+    {
+      "candidate": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/cal2-a12-gpt-qa-report.md"
+    },
+    {
+      "candidate": "c7fbdd9345fca02b5c78b846ea0cd2d809aa51e2",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-14-qa-report-2.md"
+    },
+    {
+      "candidate": "c7fbdd9345fca02b5c78b846ea0cd2d809aa51e2",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-14-qa-report-3.md"
+    },
+    {
+      "candidate": "7e1c0418b3aa5bde71d09e195398cb645fa860d0",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-14-qa-report.md"
+    },
+    {
+      "candidate": "4414bcc6f2d46fa62296d0ed65cb16a9b3c31752",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-15-qa-report-2.md"
+    },
+    {
+      "candidate": "1086e5528f87491f2e3a5533c4494c38a400531a",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-15-qa-report.md"
+    },
+    {
+      "candidate": "830af701b0c57b24d719c1751648ba23bcf0be80",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-15-slice-2-qa-report-2.md"
+    },
+    {
+      "candidate": "b4194a97070d7cb371894ed62c7876cf33e9a6ac",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-15-slice-2-qa-report.md"
+    },
+    {
+      "candidate": "3b19287111b07ee61100adc9d5a6bbb0e1b5cf10",
+      "must_include": "candidate A round A",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-15-slice-3-qa-report-a.md"
+    },
+    {
+      "candidate": "4b434101e6e93f0b967ca20effa6a0c8ab96735c",
+      "reason": "dropped: duplicate-candidate",
+      "what": "docs/loops/loop-15-slice-3-qa-report-a13-spot.md"
+    },
+    {
+      "candidate": "2add792e1cf46c6e52493c7d23e0084502f2f387",
+      "must_include": "candidate A round A2",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-15-slice-3-qa-report-a2.md"
+    },
+    {
+      "candidate": "50101992e0bd6c79c8f18f0b62f78a459aebee2b",
+      "must_include": "candidate A round A3",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-15-slice-3-qa-report-a3.md"
+    },
+    {
+      "candidate": null,
+      "reason": "dropped: no-candidate-commit-named",
+      "what": "docs/loops/loop-15-slice-4-step4-qa-report.md"
+    },
+    {
+      "candidate": null,
+      "reason": "dropped: no-candidate-commit-named",
+      "what": "docs/loops/loop-15-slice-4-step4-rerun-qa-report.md"
+    },
+    {
+      "candidate": "f7930d00361bbda0a71452bcdc0c727a4133002b",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-16-qa-report-2.md"
+    },
+    {
+      "candidate": "5351270c65de1624952bbbdf35151568f4c76788",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-16-qa-report-3.md"
+    },
+    {
+      "candidate": "5351270c65de1624952bbbdf35151568f4c76788",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-16-qa-report-4.md"
+    },
+    {
+      "candidate": "45ee2abc68ad6b13bc4abcb25a3fa11a51c483e4",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/loop-16-qa-report.md"
+    },
+    {
+      "candidate": "462403d6eb2e4268352de230274d50c222d0b283",
+      "reason": "dropped: duplicate-candidate",
+      "what": "docs/loops/qa-driver-cursor-r4-qa-report.md"
+    },
+    {
+      "candidate": "d3d8e8f4acdc8b6427eb317f475a6031fd5dc110",
+      "reason": "dropped: no-dispatch",
+      "what": "docs/loops/qa-driver-cursor-r6-qa-report.md"
+    },
+    {
+      "candidate": null,
+      "reason": "dropped: no-qa-report",
+      "what": "t194-r1"
+    },
+    {
+      "candidate": null,
+      "reason": "dropped: no-qa-report",
+      "what": "t194-r8"
+    }
+  ],
+  "freeze": "Jev calibration 1, Phase 1. Frozen by one commit, before any Jev call. No record exists under records/.",
+  "hashes": {
+    "data": {
+      "collect.json": "3b7d69e143abafc41e4b9e5a83ed82a5294d27d46f4e9c58a29ceb4474ef5b17",
+      "dispatches.json": "0dd3109dfae32b6160485abc136f04049180837c94bd8c1e2ad7a7a91fe31475",
+      "inputs.json": "a4c5ba0bb3e23aa079d0e7858591b62ffaa6a88e3c5b022471fd4f1c408ff284",
+      "labels.json": "d43e627f1ef7b5632ce70e16dc5e13dd5cfc5a97dfdc0a9cd0301c11facad7c2",
+      "runlist.json": "33111c935f87410985229315b5d898142d2db6930c29de4730bf91234b485657",
+      "sample.json": "3fc44dadd186d767fb6fd2d86869101aabe1b1c657447f9bc3cbb735371f05c9"
+    },
+    "inputs": {
+      "inputs/001-loop-15-slice-3.D_t.json": "6f6e27d5640ca6584e4ba91e21fcee501a055eef22a0d69094433e32f07cfda7",
+      "inputs/002-s3-a4.D_t.json": "7b2cdfc4b735698d1a17829b6c3465095637f310df9ff8c3ed78530d8d6f6988",
+      "inputs/003-s3-a5.D_t.json": "9e9c1d29fa33f7861d0a90bab124a3be8fe35a038c241a12dbd6c296019ef00e",
+      "inputs/004-s3-a6.D_t.json": "f4d5de0e2a303ec88e11086ed1c2237b94f78068729ba2f0b9144baf2d2a358a",
+      "inputs/005-s3-a7.D_t.json": "ab64cb113e921e360a8f63fb009adca265e96667cf96fd7ad63b3abf5f3cb4ac",
+      "inputs/006-s3-a8.D_t.json": "85dbf73195eb186d752ff8537a34b84e4ccb6d387ecd6c6970c732732c2ec08b",
+      "inputs/007-importer-fixes.D_t.json": "d64d62abb12c139f6bb3f27709c24bd545c588c2ef8a21f1287d7c9808f213b6",
+      "inputs/008-s3-a9.D_t.json": "cd0f414f4f3d611798fc836ce1f99ff01d7a859b1449aaaff2e8b67f2ba14ee3",
+      "inputs/009-importer-fixes-r2.D_t.json": "ea398b3f29159749e58c917e7638fd4475069ee7f9d591384c1d094f68a1b880",
+      "inputs/010-s3-a10.D_t.json": "2a2d9ce289afd29a2ff9aadc9620d69aa3e6a29c589f68bdd8256dd13dee9622",
+      "inputs/011-importer-fixes-r3.D_t.json": "04e561a3dd5608b14ee316a4e9eae613d48d9e4d287987651bc9445c137eca7f",
+      "inputs/012-t183.D_t.json": "00552b4b2bfbe9c524b8252aefdfc46a24372e609fe2eeeef99b43ef9fb9a25a",
+      "inputs/013-t185.D_t.json": "65f52b27f7def35589ddf7d6c16016caa2d42af31171fb1f56acd9d02cd800e6",
+      "inputs/014-importer-fixes-r4.D_t.json": "87d7317f9759641238d9c3efe9206e8b82209f3e7a43ac84f20b829f0dc69d94",
+      "inputs/015-t179.D_t.json": "d77c7429a1fd07228f5935dfd52e8d3e75ade00b3e5748162d2b69624c927bcb",
+      "inputs/016-s3-b-step1.D_t.json": "30d09debf028ec5ab29cf0526169bbd99c541230216c48d9470c10ad1ecc3cea",
+      "inputs/017-bootstrap-fix.D_t.json": "d29dfd508e5ac6e5320a8785bd5698f7e8d050a876723e89170ecf2a74abe7c9",
+      "inputs/018-s3-a11.D_t.json": "4d08118afb91b138b57fb136b20d2e6a596b2f4e9d25a435dda2e3b1226ca794",
+      "inputs/019-importer-leftovers.D_t.json": "3f7d1dee2dd4fa2d7791363affcef32552ecbf5ab62ad187157ad5027edb7e49",
+      "inputs/020-t179-r2.D_t.json": "f0b51efb9db8914343b3bcc754f1fb25b4773b594fcc78f4a104cf87fb9d001c",
+      "inputs/021-t003.D_t.json": "0691e9d6190bb18dbe91ff47fabd1571403b29f7f40f8a28d205da0e0af60b1d",
+      "inputs/022-t171.D_t.json": "38ff77262c83a958c59d44ced8379b10afb7e9f54aff5e28ebfb6d2d0ca7d43a",
+      "inputs/023-bootstrap-fix-r3.D_t.json": "0f78ac387b695ec905c83a56c49fda3afb1e781b7e1c7dc874aee6c6c32c08ad",
+      "inputs/024-t048-r1.D_t.json": "83a603da6eb91e3a5e4b3f1096653948a4783f936639c0479f63a92a3eed1af9",
+      "inputs/025-s3-a12.D_t.json": "de832029eea7ca7f8d10563006df90910e4debdba30eb2520b2343743c455192",
+      "inputs/026-t048-r2.D_t.json": "0fca0f4bd94b9bf873099ec81e9f06491743c5b0483a844b0de5c0d7bf2ae568",
+      "inputs/027-importer-leftovers-r5.D_t.json": "b664a7c33f14fb6b497f8cc2be1c06634f1e26ac6c4a75a52bcef00404d863e4",
+      "inputs/028-t171-r2.D_t.json": "0ff46d3e02a88b9656e326076bd953dfd09db6e0aed4f17058649edfee1cd608",
+      "inputs/029-t003-r2.D_t.json": "19ba4911b9b7cb9dff0cca2b2295a64a4343df210a082cdec6c514b44c6a1757",
+      "inputs/030-cal-a12-composer.D_t.json": "72bd678a954d865817df5e91e5382159d437202fadb84ee5511d250c9f8ebc14",
+      "inputs/031-s3-a13.D_t.json": "ee5c9e16f0b0d950a2020d341103b5b93a2d4cf61eaf9621d609ec19189297d3",
+      "inputs/032-t171-r3.D_t.json": "f62ab36049adf12c5bf403fc4dfcf2ad4850e05dec02c689df7403739c017d34",
+      "inputs/033-importer-leftovers-r6.D_t.json": "049dc2efcc9a667e56e4a73806c901b793017cf3c8e1303fc71a42dee9acff24",
+      "inputs/034-t048-r1b.D_t.json": "87e5ba5e484e6eaf7c58bab18d36c22e3f4710b0cc27e2d8fb272aaed7184e43",
+      "inputs/035-s3-b2.D_t.json": "dac3698ef51810069655c33988f9aa8b0a4881e739abc856959e32cdb1d32baa",
+      "inputs/036-t048-r3.D_t.json": "6d55a3d7f7436023502d1bd5626c8f6f53a00c0d6cefa8070b9da444ed86bd8a",
+      "inputs/037-t192.D_t.json": "ddb58293d2fa218a5a4922355ed7322ff8a88db647f015eff3d1a40fd5c1e635",
+      "inputs/038-bootstrap-fix-r4.D_t.json": "6a1efd71abe19050899011c95ae129c681de664ff9438561e603692f84b71e33",
+      "inputs/039-t048-r2b.D_t.json": "fa69d3c89eeeca148426058c1c6301b560a6bed38bb93165a0d883cb004ef6f4",
+      "inputs/040-qa-driver-cursor-r2.D_t.json": "af0d68efd2e3bb99a79509c8f8c6ac0594ace6640b8a5b0b6af90c47a5224705",
+      "inputs/041-t192-d1.D_t.json": "cc17996eaba876a23c212ed256cba408bf6074445e8f18996798f76f1aaf8250",
+      "inputs/042-t046-detector.D_t.json": "5119550700b3b30dff94e9478d7dc33b069417239f925140c93f2a72b5c66ebc",
+      "inputs/043-qa-driver-cursor-r3.D_t.json": "02ca23bb364c48665976e1728713ea18e2d1c8c3f7ac979540996deb2944efc3",
+      "inputs/044-t176-index-direction.D_t.json": "b7bb40f5bbc4315da28ef7bc0cbd30d9076f4bf43465465b915a0ea6a5352d1f",
+      "inputs/045-t046-d1.D_t.json": "54707f51c3c79ede427ed3b862de7dcb39a70388b43894d471beb4f2c4fe7efa",
+      "inputs/046-s3-c.D_t.json": "f96eeac365dd497b7f797d7a587811b8a4496250d22a5044670c611039fa1e37",
+      "inputs/047-s3-c-r2.D_t.json": "9d7316baa6b23b4ffddc9fd0a09ed65d6590fc4eec5c8c8d1dcfb124b62448e8",
+      "inputs/048-t178-ci-on-push.D_t.json": "570c2806671d183efa9fb002b37ea93dd8e851cf16fbfcb4cf2d8c2a94ce3cb6",
+      "inputs/049-s3-c-r3.D_t.json": "1ddf2b372b74bb83226975aeb0a96d26c1224dc141d7627cdeaae6467482f453",
+      "inputs/050-qa-driver-cursor-r5.D_t.json": "80212a9b2a5bc94067e366f430a7d9c25fd4ddda08854b45ed0a4a90267ca68d",
+      "inputs/051-t195.D_t.json": "67cd34a80e573a3cd8fbeb060dba5edc2f3611660740a8ea896c705d3ebf9645",
+      "inputs/052-t195-r2.D_t.json": "c08d39712bd3b15f57d567c635dbbc6b4c535074a42dda208730d11ac7ff6110",
+      "inputs/053-t158.D_t.json": "8e775afe0fba2ebe00be52322afda5633aa78f12702ae50e064aa63e91c1ce7e",
+      "inputs/054-t196-t197.D_t.json": "56784b41d5d2646fc181363531d7a55a3fddfba0bc0b8c256c240a7e1593e715",
+      "inputs/055-t198.D_t.json": "30a0ddb8a6b0876e2e2cf9f9fdf4457bc7e9e0d5b2daefb6d203b04e120bd0c4",
+      "inputs/056-qa-probes-on-master.D_t.json": "8ca9328d2198cd8f8fcd16c0205fdc5b01f9d0f7d6b322b51e4f136d35ab45f9",
+      "inputs/057-t158-r2.D_t.json": "564aaabd48f38869277ffbb1c8fa8dba9672457ed514600f00c5fc95d6e4432a",
+      "inputs/058-t196-t197-r2.D_t.json": "7c231f3305510b59070cf642c4cf1c42c43ca4efe01514fc7a262dae98901f20",
+      "inputs/059-t198-r2.D_t.json": "f5f059881fa2bccfc9589209c1ddff9100b266ce18133de22ffcd894a25a00bc",
+      "inputs/060-s3-c-r4.D_t.json": "474176496c84ff7b58d2570f1a60d64ae76715313a3b176ed35b3a481773a11b",
+      "inputs/061-t194-r2.D_t.json": "79263c319f72758db9a1707e0201cc1de99568b1d4659882a0fc1efa16582269",
+      "inputs/062-t194-r3.D_t.json": "5bda45dd10f3c9225926fb66fc1e2d37cf5b1c0a3e997a91941126b41fd6d12d",
+      "inputs/063-t194-r4.D_t.json": "25fb6d61e01dd0461e9368c5220d8c4e09699f223e38777f0afa6e19d27b54f2",
+      "inputs/064-t216.D_t.json": "31a8cbc5765303fa9b82038e9997ab5d2c0c2537192c2e45f340f0fb01f279c8",
+      "inputs/065-t214.D_t.json": "0e462e307444679b5109a7b1acdedc514136430b342fab9692885b5b1bda6cc7",
+      "inputs/066-t194-r5.D_t.json": "994f1f62b47acb921ee773043b2b5730d3c203dd76f8af97d876e8bbc7af5f8c",
+      "inputs/067-loop-15-slice-4-step2.D_t.json": "0621e03c7d3cb01fef6d1ea3978b02bc00712edca5ab367691aafaab4f41da57",
+      "inputs/068-loop-15-slice-4-step2-r2.D_t.json": "6efb2073c5dbabb2b5f0884590a5d59b51aadb27b553004ee0d169dff97fb538",
+      "inputs/069-t194-r6.D_t.json": "34f538ef89228fde032e4d70faec06d31f57723b88a0d4d82a6eb600e30f3844",
+      "inputs/070-loop-15-slice-4-step2-r3.D_t.json": "5c9d271b9b932a00356d0e9173ae492ce00afa65697a33ddc458f728facb3ecc",
+      "inputs/071-loop-15-slice-4-step2-r4.D_t.json": "0003936471926bceb363e60208e59c18e71692e8b343fff818f580a3b631e647",
+      "inputs/072-t194-r7.D_t.json": "0a9536d80f1d45f54fd9ae4fce4616d4579ad30527e70a83a6c0ad564aada3d0",
+      "inputs/073-t217-t218.D_t.json": "6df5220d12cd830901f6a9f098674379fae09d51681276d51b956998aa8d44b3",
+      "inputs/074-t164-t211.D_t.json": "376818caa99800cc034b4eb4f9373e734e12de89295c998896234ba0d65e1262",
+      "inputs/075-t221-t222.D_t.json": "47569fff5b30da7c9c890e9712402bf99bd09eebb2ff1c011aa51ef30aa5cf8e"
+    },
+    "scripts": {
+      "collect.mjs": "432e21d66db7e5d298f361cab5ed4e8a836dd74faac098bafcf08e2ae0cb9629",
+      "inputs.mjs": "e0c0f9c0ea9b665e82368cfb4102c4edf3fd6756fb6ca5f8c2bcff0e6830ef34",
+      "labels.mjs": "d7e11962811195c8f7936b89acf848e359c4665f3a3b3aaf9f37eaa000d2669e",
+      "lib.mjs": "4753f4f005051eede8ca538dc27422fc8267b4a9b280be7093eca1952e185a97",
+      "manifest.mjs": "79cbe463c472e01ba217e46aaf6e6b5740cbb7cb0cf515bd585bfc96719f1ac4",
+      "sample.mjs": "a18001b1f03dfb152e5ff3059a1604f202a983e80f645e33afa7ce281cfa9915",
+      "score.mjs": "cb637c7e241afad18d1d0e8fd6ab847f775453e79a91f1063a0e1778956b5746"
+    }
+  },
+  "must_include": {
+    "T-194 r1..r8": [
+      {
+        "case_id": "t194-r1",
+        "placed": "not-in-pool"
+      },
+      {
+        "case_id": "t194-r2",
+        "placed": "headline"
+      },
+      {
+        "case_id": "t194-r3",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t194-r4",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t194-r5",
+        "placed": "headline"
+      },
+      {
+        "case_id": "t194-r6",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t194-r7",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t194-r8",
+        "placed": "not-in-pool"
+      }
+    ],
+    "candidate A rejected rounds": [
+      {
+        "case_id": "s3-a4",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a5",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a6",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a7",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a8",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "s3-a9",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a10",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a11",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "s3-a12",
+        "placed": "leak_group"
+      }
+    ],
+    "slice-four (all ACCEPTED)": [
+      {
+        "case_id": "s3-b-step1",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a13",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-b2",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "s3-c-r4",
+        "placed": "headline"
+      },
+      {
+        "case_id": "t195-r2",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t158-r2",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t196-t197-r2",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t198-r2",
+        "placed": "headline"
+      }
+    ]
+  },
+  "note_on_headline_n": "The headline set is 36, below the brief's 50: rulings-1 item 5 excludes leak-wording D_t from the headline and says to report the real N. The rule is not relaxed and no text was edited.",
+  "ref_tips_note": "refs_sha256 is the sha256 of the sorted 'ref sha' lines of every origin/qa/* ref and origin/master used.",
+  "seed": 20261002
+}

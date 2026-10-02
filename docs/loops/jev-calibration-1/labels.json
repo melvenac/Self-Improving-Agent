@@ -1,5 +1,6 @@
 [
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "9ed674c8dac8aa96502c2960b693b75ea6e3afac",
     "case_id": "loop-15-slice-3",
     "case_no": 1,
@@ -8,10 +9,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-22T19:07:51-05:00",
+    "qa_report_first_commit_date": "2026-09-22T19:07:51-05:00",
     "report_verdict_text": "9ed674c  is ACCEPTED on its §2 scope ( G-045 ).   A1 and A2 pass, with evidence independent of the developer's.   Four items are open, and none of them is a can",
     "source": "QA report 76c728a1"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
     "case_id": "s3-a4",
     "case_no": 2,
@@ -20,10 +23,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-23T18:39:17-05:00",
+    "qa_report_first_commit_date": "2026-09-23T18:39:17-05:00",
     "report_verdict_text": "REJECTED. A3-1, A3-2 and A3-3 are closed; CA-15 clause 3 still fails, on a final-component link at base (A4-1), measured on CI's Linux",
     "source": "QA report 58890bce"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "4c1287f4e4b3420909428ba8ce007e03b0daafc5",
     "case_id": "s3-a5",
     "case_no": 3,
@@ -32,10 +37,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-24T00:23:48-05:00",
+    "qa_report_first_commit_date": "2026-09-24T00:23:48-05:00",
     "report_verdict_text": "REJECTED. A4-1 is closed; A5-1 is a regression in which machine config is silently not watched",
     "source": "QA report 6df52d8a"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "dc35b24869e77d2b62729d12598fb50e5adcd24b",
     "case_id": "s3-a6",
     "case_no": 4,
@@ -44,10 +51,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-24T03:27:33-05:00",
+    "qa_report_first_commit_date": "2026-09-24T03:27:33-05:00",
     "report_verdict_text": "REJECTED. A5-1 and A4-1 are closed; R61 is not built, and R62's sibling keeps A5-4's false stage failure",
     "source": "QA report ea825b70"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5",
     "case_id": "s3-a7",
     "case_no": 5,
@@ -56,10 +65,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-24T18:54:56-05:00",
+    "qa_report_first_commit_date": "2026-09-24T18:54:56-05:00",
     "report_verdict_text": "REJECTED. A6-1 and A6-2 are closed and D-042's trade holds. But the machine side has no R64 facts, so a later-stage in-place write to an unread machine path is ",
     "source": "QA report bd4c28b3"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "9e2dd5dd8762f95431cffc80cab65f7c02885724",
     "case_id": "s3-a8",
     "case_no": 6,
@@ -68,22 +79,26 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-24T23:10:36-05:00",
+    "qa_report_first_commit_date": "2026-09-24T23:10:36-05:00",
     "report_verdict_text": "REJECTED. R69, R70 and R71's \"before\" texts hold, and A7-1's ordinary trigger is closed. But R68's facts reach only the text of a change: an in-place write to a",
     "source": "QA report d46909a4"
   },
   {
+    "ambiguous_trigger": "It is not a clean pass. There are two new defects in the code this candidate adds, and neither blocks an IF row:",
     "candidate_sha": "f6b6d44b03837d2d5e23dd90c01b93d90b80a1f1",
     "case_id": "importer-fixes",
     "case_no": 7,
     "dispatch_commit_date": "2026-09-24T23:23:28-05:00",
-    "excluded": "unclassified-verdict",
+    "excluded": "ambiguous-verdict",
     "expected_decision": null,
     "label": null,
     "qa_report_commit_date": "2026-09-24T23:59:48-05:00",
+    "qa_report_first_commit_date": "2026-09-24T23:59:48-05:00",
     "report_verdict_text": "All eight rows pass, IF-1 to IF-8, and all three rulings hold.   I re-ran every row myself against the built CLI, not only through the developer's tests. IF-2 r",
     "source": null
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "6bd97f2a573394ce84f986531975f3d509d484c5",
     "case_id": "s3-a9",
     "case_no": 8,
@@ -92,22 +107,26 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-25T04:18:02-05:00",
+    "qa_report_first_commit_date": "2026-09-25T04:18:02-05:00",
     "report_verdict_text": "REJECTED. A9 closes A8-1, A8-2 and A8-3 as QA 99 measured them, and R72's decision-by-comparison holds. But a role that makes a watched tree unreadable still en",
     "source": "QA report e80acd43"
   },
   {
+    "ambiguous_trigger": "Do not merge aba35de as it stands.",
     "candidate_sha": "aba35dee16d8312654d48da5e55812cf9cd5e9c4",
     "case_id": "importer-fixes-r2",
     "case_no": 9,
     "dispatch_commit_date": "2026-09-25T02:05:13-05:00",
-    "excluded": "unclassified-verdict",
+    "excluded": "ambiguous-verdict",
     "expected_decision": null,
     "label": null,
     "qa_report_commit_date": "2026-09-25T05:52:22-05:00",
+    "qa_report_first_commit_date": "2026-09-25T05:52:22-05:00",
     "report_verdict_text": "Do not merge  aba35de  as it stands.   Read as they are written, all fifteen rows pass: IF-1 to IF-15. IF-9, IF-11 and IF-13 carry qualifications, given below. ",
     "source": null
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "4b7a5aebd9a17b0ce8e6ee99545f4f8f5784c90f",
     "case_id": "s3-a10",
     "case_no": 10,
@@ -116,58 +135,68 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-25T19:36:51-05:00",
+    "qa_report_first_commit_date": "2026-09-25T19:36:51-05:00",
     "report_verdict_text": "REJECTED. A10 builds R77's containment, the stop before git, R78, R80's words and R82's ENOENT precision, and every earlier fix holds. But identify's contained ",
     "source": "QA report d352af37"
   },
   {
+    "ambiguous_trigger": "It does not close D5's class. D8 (new to QA, present since round 2, medium",
     "candidate_sha": "063662bb12ca1badead8022dd8d3a0992fa94788",
     "case_id": "importer-fixes-r3",
     "case_no": 11,
     "dispatch_commit_date": "2026-09-25T18:18:44-05:00",
-    "excluded": "unclassified-verdict",
+    "excluded": "ambiguous-verdict",
     "expected_decision": null,
     "label": null,
     "qa_report_commit_date": "2026-09-25T20:21:06-05:00",
+    "qa_report_first_commit_date": "2026-09-25T20:21:06-05:00",
     "report_verdict_text": "All five round-3 rows pass: IF-16 to IF-20. IF-1 to IF-15 still hold. Tested by class on this PC's NTFS, round 3 closes QA 106's three defects:   -   D6 is clos",
     "source": null
   },
   {
+    "ambiguous_trigger": "so the verdict is ACCEPT WITH ONE DEFECT TO FIX OR RULE (D1, low-medium)",
     "candidate_sha": "0f0e7ada2b37e7886147b7a816245bc864e0b544",
     "case_id": "t183",
     "case_no": 12,
     "dispatch_commit_date": "2026-09-25T18:18:44-05:00",
-    "excluded": "accept-with-defects",
+    "excluded": "ambiguous-verdict",
     "expected_decision": null,
     "label": null,
     "qa_report_commit_date": "2026-09-25T20:54:22-05:00",
+    "qa_report_first_commit_date": "2026-09-25T20:54:22-05:00",
     "report_verdict_text": "The candidate does what the brief asks, and I found no behavioural defect. It fails §2.3's test requirement in two places, so the verdict is ACCEPT WITH ONE DEF",
     "source": null
   },
   {
+    "ambiguous_trigger": "ACCEPT T-185 at 9473b0d, with two defects to fix in a short test-and-code round (D1, D2) and two test gaps (D3, D4).",
     "candidate_sha": "9473b0d4c816f18f92021cc45262d6259d331a27",
     "case_id": "t185",
     "case_no": 13,
     "dispatch_commit_date": "2026-09-25T21:10:14-05:00",
-    "excluded": "accept-with-defects",
+    "excluded": "ambiguous-verdict",
     "expected_decision": null,
     "label": null,
     "qa_report_commit_date": "2026-09-25T22:07:45-05:00",
+    "qa_report_first_commit_date": "2026-09-25T22:07:45-05:00",
     "report_verdict_text": "ACCEPT T-185 at  9473b0d , with two defects to fix in a short test-and-code round (D1, D2) and two test gaps (D3, D4).   None of them is a regression. On every ",
     "source": null
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "78a7d131a2b4ab6bb78be132f9d18be31663538a",
     "case_id": "importer-fixes-r4",
     "case_no": 14,
     "dispatch_commit_date": "2026-09-25T22:20:23-05:00",
-    "excluded": "unclassified-verdict",
-    "expected_decision": null,
-    "label": null,
+    "excluded": null,
+    "expected_decision": "proceed",
+    "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-25T23:00:36-05:00",
+    "qa_report_first_commit_date": "2026-09-25T23:00:36-05:00",
     "report_verdict_text": "All five round-4 rows pass: IF-21 to IF-25. IF-1 to IF-20 still hold. R4-1 closes D8 by class, R4-2 closes D9, and R4-3 closes D10's first half:   -   D8 is clo",
-    "source": null
+    "source": "rulings-qa122 (importer-fixes-r4-rulings-qa122.md): \"Accepted: round 4 is sound, and the importer (rounds 1-4) goes to merge\""
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
     "case_id": "t179",
     "case_no": 15,
@@ -176,34 +205,40 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-26T02:36:53-05:00",
+    "qa_report_first_commit_date": "2026-09-26T02:36:53-05:00",
     "report_verdict_text": "REJECT as it stands: one blocking defect (D1). Everything else the dispatch named was verified and holds, with three more defects (D2 is the serious one) and a ",
     "source": "QA report 7df2ed0d"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "e815e3d9ed4e43943d9147301afaae24d273b1b2",
     "case_id": "s3-b-step1",
     "case_no": 16,
     "dispatch_commit_date": "2026-09-26T02:42:44-05:00",
-    "excluded": "unclassified-verdict",
-    "expected_decision": null,
-    "label": null,
+    "excluded": null,
+    "expected_decision": "proceed",
+    "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-26T03:44:42-05:00",
+    "qa_report_first_commit_date": "2026-09-26T03:44:42-05:00",
     "report_verdict_text": "The G-042 repair (B Step 1,  e815e3d ) PASSES B-0 to B-9.   Every criterion is met on evidence I re-read from the job logs and artifacts myself. I did not take ",
-    "source": null
+    "source": "rulings-qa129 (loop-15-slice-3-b-step1-rulings-qa129.md): \"ACCEPTED: the G-042 repair (e815e3d) passes B-0 to B-9.\""
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
     "case_id": "bootstrap-fix",
     "case_no": 17,
     "dispatch_commit_date": "2026-09-26T04:28:12-05:00",
-    "excluded": "unclassified-verdict",
-    "expected_decision": null,
-    "label": null,
+    "excluded": null,
+    "expected_decision": "reject",
+    "label": "REJECT",
     "qa_report_commit_date": "2026-09-26T18:54:04-05:00",
+    "qa_report_first_commit_date": "2026-09-26T18:54:04-05:00",
     "report_verdict_text": "PASS for BF-1 to BF-8 as the brief words them, and FAIL on \"a stranger can install this\" outside a Node project.   Every BF row does what it says, and every in-",
-    "source": null
+    "source": "rulings-qa135 (bootstrap-fix-rulings-qa135.md): \"the candidate does NOT merge until round 3\" (BF-1 to BF-8 PASS, but install (ii) FAIL blocks)"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da",
     "case_id": "s3-a11",
     "case_no": 18,
@@ -212,22 +247,26 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-26T19:29:10-05:00",
+    "qa_report_first_commit_date": "2026-09-26T19:29:10-05:00",
     "report_verdict_text": "REJECTED, on R85 alone. Every behavioural ruling holds: R83, R84, R86, R87 and R88 pass, and so does R85b as ruled. Every positive QA 108 measured on A10 now pa",
     "source": "QA report cc4b1853"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "d500730953db3f69ef528f431474477149757383",
     "case_id": "importer-leftovers",
     "case_no": 19,
     "dispatch_commit_date": "2026-09-26T18:43:44-05:00",
-    "excluded": "unclassified-verdict",
-    "expected_decision": null,
-    "label": null,
+    "excluded": null,
+    "expected_decision": "proceed",
+    "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-26T19:52:55-05:00",
+    "qa_report_first_commit_date": "2026-09-26T19:52:55-05:00",
     "report_verdict_text": "The leftovers do what R4-4, R4-5, O7 and O14 rule, on the merged tree. PASS, with three defects. None is a way past the STALE block, none is a regression of the",
-    "source": null
+    "source": "rulings-qa138 (importer-leftovers-rulings-qa138.md): \"Verdict accepted: PASS. d500730 merges\""
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "16465675d0d146e00ef29fe8e31ed92216fc3695",
     "case_id": "t179-r2",
     "case_no": 20,
@@ -236,22 +275,26 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-26T20:23:11-05:00",
+    "qa_report_first_commit_date": "2026-09-26T20:23:11-05:00",
     "report_verdict_text": "ACCEPT  1646567 . D1 is closed by construction, and nothing the dispatch named is broken. One medium defect (R2-D1) should be fixed before or with T-003, and th",
     "source": "QA report 69c772ed"
   },
   {
+    "ambiguous_trigger": "PASS on what T-003 set out to fix, with five defects: fix D1 and D3 in this round.",
     "candidate_sha": "706c029ea749c6e3ec24895fb6fef619554a5c73",
     "case_id": "t003",
     "case_no": 21,
     "dispatch_commit_date": "2026-09-26T19:12:12-05:00",
-    "excluded": "unclassified-verdict",
+    "excluded": "ambiguous-verdict",
     "expected_decision": null,
     "label": null,
     "qa_report_commit_date": "2026-09-26T20:31:20-05:00",
+    "qa_report_first_commit_date": "2026-09-26T20:31:20-05:00",
     "report_verdict_text": "PASS on what T-003 set out to fix, with five defects: fix D1 and D3 in this round.    -   QA 125's A7, A8 and A9 are closed in one checkout.   Each is red on  d",
     "source": null
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "b3711763a4b9f5624803e8992234c51e793872ef",
     "case_id": "t171",
     "case_no": 22,
@@ -260,10 +303,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-26T20:46:58-05:00",
+    "qa_report_first_commit_date": "2026-09-26T20:46:58-05:00",
     "report_verdict_text": "ACCEPT  b371176 . Nothing the dispatch named is broken: no op replaces a note without a  NOTE CHANGE  line, the bare  note  is refused by name on both ops,  app",
     "source": "QA report d5a783a0"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "7f4ca741e6ba4836590ca9f83d7ae9a2b28bfabf",
     "case_id": "bootstrap-fix-r3",
     "case_no": 23,
@@ -272,22 +317,26 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-26T21:04:48-05:00",
+    "qa_report_first_commit_date": "2026-09-26T21:04:48-05:00",
     "report_verdict_text": "ACCEPT  7f4ca74 .   R-BF-9 to R-BF-13 hold against their rows and their wording. R-BF-14 holds:   the real built session-end hook, run in install (iii), writes ",
     "source": "QA 145 report 67af2b25"
   },
   {
+    "ambiguous_trigger": "PASS, with three defects and a test gap.",
     "candidate_sha": "7913c5f20378c90b9c156ae7828bc507a26f2a99",
     "case_id": "t048-r1",
     "case_no": 24,
     "dispatch_commit_date": "2026-09-26T20:42:21-05:00",
-    "excluded": "unclassified-verdict",
+    "excluded": "ambiguous-verdict",
     "expected_decision": null,
     "label": null,
     "qa_report_commit_date": "2026-09-26T23:07:51-05:00",
+    "qa_report_first_commit_date": "2026-09-26T23:07:51-05:00",
     "report_verdict_text": "PASS, with three defects and a test gap. None of the defects is a false pass.    On real unreadable paths on this machine, all five checks name the path as an I",
     "source": null
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "a69f07d1716d7854f7e5a4d3bbe6cdb443fb5017",
     "case_id": "s3-a12",
     "case_no": 25,
@@ -296,10 +345,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-26T23:12:02-05:00",
+    "qa_report_first_commit_date": "2026-09-26T23:12:02-05:00",
     "report_verdict_text": "REJECTED. R90's new branch claims a restore that did not happen, and it removes R77's stop before git for that path. QA 130's own Q130-R83-SUBDIR-NOSEARCH-PLANT",
     "source": "QA report 7133e279"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "5b9a40322d0b05de00ce201e60977f9bc5b68bea",
     "case_id": "t048-r2",
     "case_no": 26,
@@ -308,22 +359,26 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-26T23:41:07-05:00",
+    "qa_report_first_commit_date": "2026-09-26T23:41:07-05:00",
     "report_verdict_text": "ACCEPT  5b9a403 .   Every distinction the brief names is a distinct value, and all but one reach a printed line. That exception is SILENT 6 (  T048-D1, Medium  ",
     "source": "QA report 338bb113"
   },
   {
+    "ambiguous_trigger": "There are three low defects.",
     "candidate_sha": "e2f202be6ec0c412e7564d8807ef87e7793bc1cb",
     "case_id": "importer-leftovers-r5",
     "case_no": 27,
     "dispatch_commit_date": "2026-09-26T22:29:47-05:00",
-    "excluded": "unclassified-verdict",
+    "excluded": "ambiguous-verdict",
     "expected_decision": null,
     "label": null,
     "qa_report_commit_date": "2026-09-26T23:45:16-05:00",
+    "qa_report_first_commit_date": "2026-09-26T23:45:16-05:00",
     "report_verdict_text": "PASS on R5-1, R5-3, R5-4, O-e and every preserve. R5-2 is PASS for the judged inputs and DECISIONS.md, and falls short on the session log (D1). There are three ",
     "source": null
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
     "case_id": "t171-r2",
     "case_no": 28,
@@ -332,22 +387,26 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T00:05:11-05:00",
+    "qa_report_first_commit_date": "2026-09-27T00:05:11-05:00",
     "report_verdict_text": "ACCEPT  a78a883 .   The two items the ruling made merge-blocking hold: -   T171-D1   holds on QA 144's C2h shape and on seven variants. -   T171-D3   holds: QA ",
     "source": "QA report f30b076d"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417",
     "case_id": "t003-r2",
     "case_no": 29,
     "dispatch_commit_date": "2026-09-26T22:29:47-05:00",
-    "excluded": "unclassified-verdict",
-    "expected_decision": null,
-    "label": null,
+    "excluded": null,
+    "expected_decision": "proceed",
+    "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T00:42:07-05:00",
+    "qa_report_first_commit_date": "2026-09-27T00:42:07-05:00",
     "report_verdict_text": "PASS. Every required fix and every ride-along holds, with no regression. There is one low test gap (QA154-1). The departure from the ruling (the registration ch",
-    "source": null
+    "source": "QA 154 report eb861f4e: \"PASS. Every required fix and every ride-along holds, with no regression. There is one low test gap (QA154-1).\""
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "7200e1cd2e5d4bcb67e3bae9bfcd112e1ede1f55",
     "case_id": "cal-a12-composer",
     "case_no": 30,
@@ -356,10 +415,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-27T00:53:03-05:00",
+    "qa_report_first_commit_date": "2026-09-27T00:53:03-05:00",
     "report_verdict_text": "REJECT — one QA 130 regression (R77.4) on an otherwise clean A12",
     "source": "QA report c9ae65af"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "4b434101e6e93f0b967ca20effa6a0c8ab96735c",
     "case_id": "s3-a13",
     "case_no": 31,
@@ -368,10 +429,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T03:43:24-05:00",
+    "qa_report_first_commit_date": "2026-09-27T03:43:24-05:00",
     "report_verdict_text": "ACCEPTED. A12-1 is healed. R95 pushes the true unrestored note and R77 stops before git; R96 stores  kind: \"unobservable\" ; R97's four developer rows pass on tc",
     "source": "QA 138 report e45f5a18"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "2dcc68a52f8fe1e2423ca5a3530d72ed293cecf8",
     "case_id": "t171-r3",
     "case_no": 32,
@@ -380,34 +443,40 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T04:00:26-05:00",
+    "qa_report_first_commit_date": "2026-09-27T04:00:26-05:00",
     "report_verdict_text": "ACCEPT  2dcc68a .   T171-D2 is fixed on SIA's real note shape. r3b holds on today's  origin/master  merged in. Nothing QA 158 accepted regressed in the note pat",
     "source": "QA 158 report fc8d8cd4"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "c2ee52dba61a132eabc778ff51d15da6aeddc714",
     "case_id": "importer-leftovers-r6",
     "case_no": 33,
     "dispatch_commit_date": "2026-09-27T01:16:11-05:00",
-    "excluded": "unclassified-verdict",
-    "expected_decision": null,
-    "label": null,
+    "excluded": null,
+    "expected_decision": "proceed",
+    "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T04:01:28-05:00",
+    "qa_report_first_commit_date": "2026-09-27T04:01:28-05:00",
     "report_verdict_text": "PASS on QA 153 D1, the DECISIONS.md line, and every preserve. No defects. None should hold the merge.    -   QA 153 D1: PASS.   The latest session log of the od",
-    "source": null
+    "source": "QA 153 report b9a4ed61: \"PASS on QA 153 D1, the DECISIONS.md line, and every preserve. No defects.\""
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "d5b78cb1c107fd08fcb8e52989b38f707ecc7dda",
     "case_id": "t048-r1b",
     "case_no": 34,
     "dispatch_commit_date": "2026-09-27T01:16:11-05:00",
-    "excluded": "unclassified-verdict",
-    "expected_decision": null,
-    "label": null,
+    "excluded": null,
+    "expected_decision": "proceed",
+    "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T04:07:59-05:00",
+    "qa_report_first_commit_date": "2026-09-27T04:07:59-05:00",
     "report_verdict_text": "PASS  d5b78cb .   Round 1b fixes all three QA 151 output defects (D1–D3) without regressing QA 151's unreadable-path behaviour or the repository's own  sync --c",
-    "source": null
+    "source": "QA report daec2b8c: \"PASS d5b78cb. Round 1b fixes all three QA 151 output defects (D1\""
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0",
     "case_id": "s3-b2",
     "case_no": 35,
@@ -416,10 +485,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T16:17:37-05:00",
+    "qa_report_first_commit_date": "2026-09-27T16:17:37-05:00",
     "report_verdict_text": "ACCEPTED.   The product diff is inside B part 2's scope (BE-0). Every BE-1 to BE-8 row passes on the candidate locally and on tcm. Developer red/green and five ",
     "source": "QA report 75c2c953"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "b048df8a99639ec0480bcb935e1023226fa149ae",
     "case_id": "t048-r3",
     "case_no": 36,
@@ -428,10 +499,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T16:26:42-05:00",
+    "qa_report_first_commit_date": "2026-09-27T16:26:42-05:00",
     "report_verdict_text": "ACCEPT  b048df8 .   All three round-3 distinctions reach a printed line on the routes the brief names. A failed recall log write with a live session names the e",
     "source": "QA report 6092a992"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "a38ff92a2113392187b228258dee9a981bb7fa6b",
     "case_id": "t192",
     "case_no": 37,
@@ -440,10 +513,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T16:32:48-05:00",
+    "qa_report_first_commit_date": "2026-09-27T16:32:48-05:00",
     "report_verdict_text": "ACCEPT  a38ff92 .   Master's  jobs.test.runs-on  sends every run, including a master push, to tcm; only  inputs.hosted == true  selects  ubuntu-latest .  evalRu",
     "source": "QA report 1bef8eac"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "d74c0e54a936a7a31fab251c43ac68f56ec33764",
     "case_id": "bootstrap-fix-r4",
     "case_no": 38,
@@ -452,10 +527,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T16:54:40-05:00",
+    "qa_report_first_commit_date": "2026-09-27T16:54:40-05:00",
     "report_verdict_text": "ACCEPT  d74c0e5 .   R-BF-17 through R-BF-21 hold on the candidate and on the rows named in the dispatch. The reconciliation merge changes  cli.ts  only to the u",
     "source": "QA 161 report ac04e7dc"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "822f398248d3e98a13610ab48b7ed547d3c4f482",
     "case_id": "t048-r2b",
     "case_no": 39,
@@ -464,10 +541,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T17:09:54-05:00",
+    "qa_report_first_commit_date": "2026-09-27T17:09:54-05:00",
     "report_verdict_text": "ACCEPT  822f398 .   Every QA 157 defect this round scoped (D1 cli half, D2-D5, D3 test gaps) is fixed on the product commit.  server.ts  is unchanged from the a",
     "source": "QA 178 report 5b9c2257"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "462403d6eb2e4268352de230274d50c222d0b283",
     "case_id": "qa-driver-cursor-r2",
     "case_no": 40,
@@ -476,10 +555,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-27T22:37:31-05:00",
+    "qa_report_first_commit_date": "2026-09-27T22:37:31-05:00",
     "report_verdict_text": "REJECT",
     "source": "QA report dc9eee02"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "ecd378d676e9d1b702c58a5359e4c4d2c4aec020",
     "case_id": "t192-d1",
     "case_no": 41,
@@ -488,10 +569,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T22:54:46-05:00",
+    "qa_report_first_commit_date": "2026-09-27T22:54:46-05:00",
     "report_verdict_text": "ACCEPT  ecd378d .   After a successful  gh run view , a missing  test  job names  failure (steps not read: job test absent in run view)  and a non-array  steps ",
     "source": "QA report 60c5d822"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "3af41f52e3881f6289d4f88ab03600a39e7c33c0",
     "case_id": "t046-detector",
     "case_no": 42,
@@ -500,10 +583,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-27T23:00:32-05:00",
+    "qa_report_first_commit_date": "2026-09-27T23:00:32-05:00",
     "report_verdict_text": "ACCEPT.   The  cursor-hook-compat  check detects a non-empty  PreToolUse  in an installed plugin's  hooks/hooks.json  when Cursor CLI is present, names the plug",
     "source": "QA report c3e5ce90"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "d67c5e7044df129d61deba68c489f9f89cdb87fc",
     "case_id": "qa-driver-cursor-r3",
     "case_no": 43,
@@ -512,10 +597,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-28T01:29:27-05:00",
+    "qa_report_first_commit_date": "2026-09-28T01:29:27-05:00",
     "report_verdict_text": "REJECT",
     "source": "QA 195 report 68ac9db3"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "6adc07ef34e9021765adacb7816bc0f213806a3c",
     "case_id": "t176-index-direction",
     "case_no": 44,
@@ -524,10 +611,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-28T01:41:43-05:00",
+    "qa_report_first_commit_date": "2026-09-28T01:41:43-05:00",
     "report_verdict_text": "ACCEPT.   The check now measures both commit directions. At HEAD is PASS; behind is WARN; ahead-only, diverged, and an indexed commit absent from the repository",
     "source": "QA 208 report 9b564098"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "0081dab8703d93cd2d66d0a41635dd2e5f988e48",
     "case_id": "t046-d1",
     "case_no": 45,
@@ -536,10 +625,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-28T02:09:37-05:00",
+    "qa_report_first_commit_date": "2026-09-28T02:09:37-05:00",
     "report_verdict_text": "ACCEPT.   The candidate reports ISSUE for each unreadable  installPath  shape, names the plugin and says  hooks/hooks.json  could not be read. Zero installs and",
     "source": "QA 197 report f41d310e"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "2035e893497cf37f4224835dd95a7d3838e45cca",
     "case_id": "s3-c",
     "case_no": 46,
@@ -548,10 +639,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-28T02:11:27-05:00",
+    "qa_report_first_commit_date": "2026-09-28T02:11:27-05:00",
     "report_verdict_text": "REJECT.   Product  2035e893497cf37f4224835dd95a7d3838e45cca  implements the central three-way verdict and prepare/decide flow, but it does not satisfy the froze",
     "source": "QA report b16d5b53"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "8054f9fd35394eb77a639206611bf3320983527d",
     "case_id": "s3-c-r2",
     "case_no": 47,
@@ -560,10 +653,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-28T15:55:55-05:00",
+    "qa_report_first_commit_date": "2026-09-28T15:55:55-05:00",
     "report_verdict_text": "REJECT.   Product  8054f9fd35394eb77a639206611bf3320983527d  closes all five findings from QA 204 and is green on tcm, but it still violates the frozen CC-6 art",
     "source": "QA 204 report 2ffece81"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
     "case_id": "t178-ci-on-push",
     "case_no": 48,
@@ -572,10 +667,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-28T16:10:58-05:00",
+    "qa_report_first_commit_date": "2026-09-28T16:10:58-05:00",
     "report_verdict_text": "ACCEPT.   Pushes to  loop/    and  qa/    trigger CI on tcm. Docs-only seat pushes skip the  test  job only when  git diff before..sha  proves every path is und",
     "source": "QA 211 report 2f222fce"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
     "case_id": "s3-c-r3",
     "case_no": 49,
@@ -584,10 +681,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-28T19:56:11-05:00",
+    "qa_report_first_commit_date": "2026-09-28T19:56:11-05:00",
     "report_verdict_text": "ACCEPT.   Product  20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410  closes QA 212's sole blocking defect: every candidate, criteria, merged, and replacement SHA is ref",
     "source": "QA 212 report 5aa776ff"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7",
     "case_id": "qa-driver-cursor-r5",
     "case_no": 50,
@@ -596,10 +695,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-28T20:08:38-05:00",
+    "qa_report_first_commit_date": "2026-09-28T20:08:38-05:00",
     "report_verdict_text": "REJECT",
     "source": "QA report b980de9b"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
     "case_id": "t195",
     "case_no": 51,
@@ -608,10 +709,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-28T20:15:56-05:00",
+    "qa_report_first_commit_date": "2026-09-28T20:15:56-05:00",
     "report_verdict_text": "REJECT / return to Forge.   The candidate implements most of the requested surface, but it is not merge-ready:  1. exact-candidate tcm CI is newly red while the",
     "source": "QA report 73728dd8"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "647cc74ebb66eae6cd36acc9c09d0804b2972387",
     "case_id": "t195-r2",
     "case_no": 52,
@@ -620,10 +723,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-28T22:16:17-05:00",
+    "qa_report_first_commit_date": "2026-09-28T22:16:17-05:00",
     "report_verdict_text": "ACCEPT.   Candidate  647cc74ebb66eae6cd36acc9c09d0804b2972387  closes all four QA-216 findings and meets DT-1 through DT-8 plus DT-9a through DT-9d. Exact-candi",
     "source": "QA 216 report 08c4e495"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720",
     "case_id": "t158",
     "case_no": 53,
@@ -632,10 +737,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-28T22:31:13-05:00",
+    "qa_report_first_commit_date": "2026-09-28T22:31:13-05:00",
     "report_verdict_text": "REJECT.   Candidate  c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720  correctly keeps closed gaps as tombstones and protects the automatic next-id path, but  add_gap  ",
     "source": "QA 223 report 18c97b4a"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "929673b1babe26db5a22d683c0e642245117c722",
     "case_id": "t196-t197",
     "case_no": 54,
@@ -644,10 +751,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-28T22:43:58-05:00",
+    "qa_report_first_commit_date": "2026-09-28T22:43:58-05:00",
     "report_verdict_text": "REJECT.   Candidate  929673b1babe26db5a22d683c0e642245117c722  meets HB-4, CS-1, and CS-3, but CS-2 is unmet: the parity checker treats each difference-table en",
     "source": "QA 224 report cadc6d44"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "231f501f99b217fd65ab496139cb0d11feba8eb1",
     "case_id": "t198",
     "case_no": 55,
@@ -656,10 +765,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-28T22:55:27-05:00",
+    "qa_report_first_commit_date": "2026-09-28T22:55:27-05:00",
     "report_verdict_text": "REJECT.   Candidate  231f501f99b217fd65ab496139cb0d11feba8eb1  adds the presence block, but its central label overclaims what the hub observes:  polling  is lis",
     "source": "QA 225 report a8a5612f"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "dabc7fe2d448a3c6172897e0bf7e42d09163e80d",
     "case_id": "qa-probes-on-master",
     "case_no": 56,
@@ -668,10 +779,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-30T00:16:35-05:00",
+    "qa_report_first_commit_date": "2026-09-30T00:16:35-05:00",
     "report_verdict_text": "ACCEPT.   The candidate removes the not-for-merge QA probes, keeps the four real QA rows with guard headers, routes every harness  symlinkSync  through  symlink",
     "source": "QA report ed0ccbe9"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "e23e622813a540e18bed0849779040cf181ff9b7",
     "case_id": "t158-r2",
     "case_no": 57,
@@ -680,10 +793,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-30T00:42:09-05:00",
+    "qa_report_first_commit_date": "2026-09-30T00:42:09-05:00",
     "report_verdict_text": "ACCEPT.   Candidate  e23e622813a540e18bed0849779040cf181ff9b7  closes both majors from QA 223: explicit  add_gap  ids receive the citation protection, and a cit",
     "source": "QA 223 report ad20f4d3"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "3059ca9cc5b0cb668216561b7b77c8b0119abad3",
     "case_id": "t196-t197-r2",
     "case_no": 58,
@@ -692,10 +807,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-30T01:02:38-05:00",
+    "qa_report_first_commit_date": "2026-09-30T01:02:38-05:00",
     "report_verdict_text": "ACCEPT.   Candidate  3059ca9cc5b0cb668216561b7b77c8b0119abad3  closes QA 224's CS-2 finding: the table now waives one exact complete line at most once, and reje",
     "source": "QA 224 report 58a91efa"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
     "case_id": "t198-r2",
     "case_no": 59,
@@ -704,10 +821,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-30T02:42:12-05:00",
+    "qa_report_first_commit_date": "2026-09-30T02:42:12-05:00",
     "report_verdict_text": "ACCEPT.   Candidate  f172e280aa1532c7a246a9017e1dd79c65e7028a  repairs all five r2 requirements without regressing the six original PR rows. The mandatory tcm  ",
     "source": "QA 230 report 1cc2fe38"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
     "case_id": "s3-c-r4",
     "case_no": 60,
@@ -716,10 +835,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-09-30T04:02:40-05:00",
+    "qa_report_first_commit_date": "2026-09-30T04:02:40-05:00",
     "report_verdict_text": "ACCEPT.   The candidate is code  c33942725c73b1aa91ceb46458e6ea7d11c70dcd  (branch tip  0dc20ff  adds only the handoff docs). It closes the five rows the planne",
     "source": "QA 232 report b43e719b"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "699789e1a21763d1e7e4e15a6a501cbbf4756f83",
     "case_id": "t194-r2",
     "case_no": 61,
@@ -728,10 +849,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-30T07:10:46-05:00",
+    "qa_report_first_commit_date": "2026-09-30T07:10:46-05:00",
     "report_verdict_text": "REJECT.",
     "source": "QA 233 report d6b13423"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97",
     "case_id": "t194-r3",
     "case_no": 62,
@@ -740,10 +863,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-30T08:47:33-05:00",
+    "qa_report_first_commit_date": "2026-09-30T08:47:33-05:00",
     "report_verdict_text": "REJECT.",
     "source": "QA 234 report 9df1cfaf"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "d37e09dc4bd38cec0306e542773c3ab881602d6e",
     "case_id": "t194-r4",
     "case_no": 63,
@@ -752,10 +877,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-09-30T10:05:46-05:00",
+    "qa_report_first_commit_date": "2026-09-30T10:05:46-05:00",
     "report_verdict_text": "REJECT.",
     "source": "QA 235 report e6e1d085"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "9a0973f0d330b3b85a4ce5e23f8a0ef583de2070",
     "case_id": "t216",
     "case_no": 64,
@@ -764,10 +891,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-10-01T02:01:26-05:00",
+    "qa_report_first_commit_date": "2026-10-01T02:01:26-05:00",
     "report_verdict_text": "ACCEPT.   I reproduced every row's red and green myself, not from the handoff. The product does what T-216 asks. Plan and evidence share one exported constant a",
     "source": "QA 236 report a1960173"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "caebe8b6ecaa32db8defaf979e19df435a5b60f3",
     "case_id": "t214",
     "case_no": 65,
@@ -776,10 +905,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-10-01T04:14:13-05:00",
+    "qa_report_first_commit_date": "2026-10-01T04:14:13-05:00",
     "report_verdict_text": "ACCEPT.   P-blank holds on 6,196 independently generated variants with 0 disagreements, against an oracle that also states \"nothing else loosens\". Every T214-2 ",
     "source": "QA 239 report d4993796"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
     "case_id": "t194-r5",
     "case_no": 66,
@@ -788,10 +919,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-10-01T06:58:12-05:00",
+    "qa_report_first_commit_date": "2026-10-01T06:58:12-05:00",
     "report_verdict_text": "REJECT.",
     "source": "QA 237 report 1a658b39"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
     "case_id": "loop-15-slice-4-step2",
     "case_no": 67,
@@ -800,10 +933,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-10-01T07:38:46-05:00",
+    "qa_report_first_commit_date": "2026-10-01T07:38:46-05:00",
     "report_verdict_text": "REJECT",
     "source": "QA 240 report aca2f399"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
     "case_id": "loop-15-slice-4-step2-r2",
     "case_no": 68,
@@ -812,10 +947,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-10-01T09:11:33-05:00",
+    "qa_report_first_commit_date": "2026-10-01T09:11:33-05:00",
     "report_verdict_text": "REJECT",
     "source": "QA 242 report bd18167f"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "9cf8c7eb427f732022c23baefa8092571d94daca",
     "case_id": "t194-r6",
     "case_no": 69,
@@ -824,10 +961,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-10-01T09:36:14-05:00",
+    "qa_report_first_commit_date": "2026-10-01T09:36:14-05:00",
     "report_verdict_text": "REJECT.",
     "source": "QA 241 report 8d69bed5"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d",
     "case_id": "loop-15-slice-4-step2-r3",
     "case_no": 70,
@@ -836,10 +975,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-10-01T12:05:16-05:00",
+    "qa_report_first_commit_date": "2026-10-01T12:05:16-05:00",
     "report_verdict_text": "REJECT",
     "source": "QA 243 report 81881bb5"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "8a6cfb2db4f33787c09721c97a095ad8430fcf82",
     "case_id": "loop-15-slice-4-step2-r4",
     "case_no": 71,
@@ -848,10 +989,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-10-01T12:27:33-05:00",
+    "qa_report_first_commit_date": "2026-10-01T12:27:33-05:00",
     "report_verdict_text": "ACCEPT",
     "source": "QA 244 report 8b4fecdd"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "71ea310188e14d530988c6b3cb17cb70e75997cc",
     "case_id": "t194-r7",
     "case_no": 72,
@@ -860,10 +1003,12 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-10-01T19:28:52-05:00",
+    "qa_report_first_commit_date": "2026-10-01T19:28:52-05:00",
     "report_verdict_text": "REJECT.",
     "source": "QA 246 report 513a3f38"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "1a38e3f2bc2ce0b850d2bf68949823c5812c2576",
     "case_id": "t217-t218",
     "case_no": 73,
@@ -872,10 +1017,12 @@
     "expected_decision": "proceed",
     "label": "ACCEPT",
     "qa_report_commit_date": "2026-10-01T20:05:31-05:00",
+    "qa_report_first_commit_date": "2026-10-01T20:05:31-05:00",
     "report_verdict_text": "ACCEPT.",
     "source": "QA 247 report f138bc6e"
   },
   {
+    "ambiguous_trigger": null,
     "candidate_sha": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e",
     "case_id": "t164-t211",
     "case_no": 74,
@@ -884,7 +1031,22 @@
     "expected_decision": "reject",
     "label": "REJECT",
     "qa_report_commit_date": "2026-10-02T00:34:37-05:00",
+    "qa_report_first_commit_date": "2026-10-02T00:34:37-05:00",
     "report_verdict_text": "REJECT",
     "source": "QA 249 report 0c891c82"
+  },
+  {
+    "ambiguous_trigger": null,
+    "candidate_sha": "9ab021fdd2df605aacdff2de4db4b963f131d32d",
+    "case_id": "t221-t222",
+    "case_no": 75,
+    "dispatch_commit_date": "2026-10-02T00:39:57-05:00",
+    "excluded": null,
+    "expected_decision": "proceed",
+    "label": "ACCEPT",
+    "qa_report_commit_date": "2026-10-02T00:52:57-05:00",
+    "qa_report_first_commit_date": "2026-10-02T00:52:57-05:00",
+    "report_verdict_text": null,
+    "source": "QA 250 report 799e55dc: \"Pair: ACCEPT.\""
   }
 ]
