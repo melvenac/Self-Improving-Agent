@@ -98,6 +98,10 @@ brief and boundary reports in `docs/loops/`, by the largest loop number. Decisio
 **A2A has no memory.** Anything a later session must be able to read goes in a tracked file before
 the exchange ends — session 61’s close-out travelled by A2A alone and exists in no file anywhere.
 
+### 5b. Standing cron
+
+`ob_start` prints one `Standing cron:` line in the seat block, read from `.agents/AGENT.local.md` (then `.agents/AGENT.md`). When it reads `Standing cron: <cron> → status to <agent> (rule: <path>). Create it with CronCreate before the briefing ends.`, create that cron now with `CronCreate`: the cron expression as printed, and a prompt that reads the rule file and sends the status to that agent. Do it once, before the briefing. `Standing cron: none in seat data.` needs nothing. `Standing cron: INVALID in <file>: <why>` creates nothing and goes in FLAGS.
+
 ### 6. Present the briefing
 
 Print this and stop. No commentary, no summary of the summary.
@@ -146,6 +150,8 @@ there is work to start has told the reader nothing.
 
 Include in FLAGS: a missing `CLAUDE.md` in the project root (**do not create one — ask first**), a
 missing `SESSION_UUID`, any drift reported as `not fixed`, and any MCP server that failed to connect.
+
+Also include in FLAGS, verbatim, any `Standing cron: INVALID` line.
 
 ---
 
