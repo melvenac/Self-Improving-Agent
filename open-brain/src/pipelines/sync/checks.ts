@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, posix as pathPosix, win32 as pathWin32 } from "node:path";
 import { homedir } from "node:os";
 import { execSync, execFileSync } from "node:child_process";
 import type { CheckResult, SyncRuntime } from "./types.js";
@@ -150,28 +150,114 @@ export function checkReadmeRefs(projectRoot: string): CheckResult {
   return { name: "readme-refs", severity: "pass", message: `All ${refs.length} script references in README exist` };
 }
 
+/**
+ * Split a hook command into words the way a shell would for its first tokens (T-048): single and
+ * double quotes group (and are removed), whitespace separates, and a backslash is LITERAL, because
+ * these are Windows paths (`node "C:\Users\a b\x.js"`); only `\"` inside double quotes is an escape.
+ * Returns null for an unterminated quote: that command is not parseable, and is never guessed at.
+ */
+export function splitHookCommand(cmd: string): string[] | null {
+  const words: string[] = [];
+  let cur = "";
+  let inWord = false;
+  let quote: '"' | "'" | null = null;
+  for (let i = 0; i < cmd.length; i++) {
+    const c = cmd[i]!;
+    if (quote) {
+      if (c === quote) quote = null;
+      else if (quote === '"' && c === "\\" && cmd[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else cur += c;
+      continue;
+    }
+    if (c === '"' || c === "'") {
+      quote = c;
+      inWord = true;
+      continue;
+    }
+    if (/\s/.test(c)) {
+      if (inWord) words.push(cur);
+      cur = "";
+      inWord = false;
+      continue;
+    }
+    cur += c;
+    inWord = true;
+  }
+  if (quote) return null;
+  if (inWord) words.push(cur);
+  return words;
+}
+
+/**
+ * The file a hook command launches, or why that cannot be said.
+ *   - leading `NAME=value` words are environment prefixes and are skipped;
+ *   - head `node`, `npx` (through `tsx`) or `bash`/`sh`: the SCRIPT argument is the file;
+ *   - any other head that is a path (has a separator): the head itself is the file;
+ *   - any other bare head (`echo`, `python`): not a file this check can stat, `other`;
+ *   - a missing script argument, an unterminated quote, an environment variable or a relative path in the
+ *     file: `unparseable`, reported as "not checked: <command>", never a pass.
+ */
+export type HookTarget = { kind: "file"; path: string } | { kind: "other" } | { kind: "unparseable"; reason: string };
+
+export function hookCommandTarget(cmd: string): HookTarget {
+  const words = splitHookCommand(cmd);
+  if (words === null) return { kind: "unparseable", reason: "unterminated quote" };
+  let i = 0;
+  while (i < words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(words[i]!)) i++;
+  if (i >= words.length) return { kind: "unparseable", reason: "no command after environment prefixes" };
+  const head = words[i]!;
+  const base = head.replace(/\\/g, "/").split("/").pop()!.toLowerCase().replace(/\.(exe|cmd|bat)$/, "");
+  const rest = words.slice(i + 1);
+  let script: string | undefined;
+  if (base === "node" || base === "bash" || base === "sh") {
+    script = rest.find((w) => !w.startsWith("-"));
+  } else if (base === "npx") {
+    const args = rest.filter((w) => !w.startsWith("-"));
+    if (args[0] === "tsx") script = args[1];
+    else return { kind: "unparseable", reason: "npx runs a package, not a file" };
+  } else if (head.includes("/") || head.includes("\\")) {
+    script = head;
+  } else {
+    return { kind: "other" };
+  }
+  if (script === undefined || script === "") return { kind: "unparseable", reason: `no script argument after ${base}` };
+  if (/[$%`]/.test(script) || script.startsWith("~")) return { kind: "unparseable", reason: "the path uses a variable or ~, not expanded here" };
+  if (!pathWin32.isAbsolute(script) && !pathPosix.isAbsolute(script)) return { kind: "unparseable", reason: "relative path, the run directory is unknown" };
+  return { kind: "file", path: script };
+}
+
 export function checkHookConfigs(settingsPath: string): CheckResult {
   if (!existsSync(settingsPath)) {
     return { name: "hook-configs", severity: "warn", message: "settings.json not found" };
   }
   let settings: { hooks?: unknown };
   try {
-    settings = JSON.parse(readFileSync(settingsPath, "utf-8").replace(/^﻿/, ""));
+    settings = JSON.parse(readFileSync(settingsPath, "utf-8").replace(/^\uFEFF/, ""));
   } catch {
     // Matches hook-registration; an unparseable file used to throw and take /sync down (QA 256).
     return { name: "hook-configs", severity: "issue", message: "settings.json is not valid JSON" };
   }
+  // event -> matcher group -> hooks[] -> command (T-048). A flat entry that itself carries a `command`
+  // (the shape older fixtures use) is a hook as well.
   const hooks: unknown[] = [];
   if (settings.hooks && typeof settings.hooks === "object") {
-    for (const hookList of Object.values(settings.hooks)) {
-      if (Array.isArray(hookList)) hooks.push(...hookList);
+    for (const eventList of Object.values(settings.hooks)) {
+      if (!Array.isArray(eventList)) continue;
+      for (const entry of eventList) {
+        const inner = entry && typeof entry === "object" ? (entry as { hooks?: unknown }).hooks : undefined;
+        if (Array.isArray(inner)) hooks.push(...inner);
+        else hooks.push(entry);
+      }
     }
   }
   const missing: string[] = [];
+  const notChecked: string[] = [];
   // T-048: every entry that is not stat'ed is counted by WHY, and the verdict says how many were
   // read. A zero here used to print "All hook command files exist".
   let checked = 0;
-  const skipped = { notAnObject: 0, noCommand: 0, notNodeOrTsx: 0, noFilePath: 0 };
+  const skipped = { notAnObject: 0, noCommand: 0, otherCommand: 0 };
   for (const hook of hooks) {
     if (!hook || typeof hook !== "object") {
       skipped.notAnObject++;
@@ -182,33 +268,33 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
       skipped.noCommand++;
       continue;
     }
-    const cmd: string = h.command;
-    if (!cmd.includes("node ") && !cmd.includes("npx tsx ")) {
-      skipped.notNodeOrTsx++;
+    const target = hookCommandTarget(h.command);
+    if (target.kind === "other") {
+      skipped.otherCommand++;
       continue;
     }
-    // Extract file path: word after "node" or "npx tsx"
-    const fileMatch = cmd.match(/(?:node|npx tsx)\s+([^\s]+)/);
-    if (!fileMatch) {
-      skipped.noFilePath++;
+    if (target.kind === "unparseable") {
+      notChecked.push(`${h.command} (${target.reason})`);
       continue;
     }
-    const filePath = fileMatch[1];
     checked++;
-    if (!existsSync(filePath)) {
-      missing.push(filePath);
-    }
+    if (!existsSync(target.path)) missing.push(target.path);
   }
-  const skippedCount = skipped.notAnObject + skipped.noCommand + skipped.notNodeOrTsx + skipped.noFilePath;
+  const skippedCount = skipped.notAnObject + skipped.noCommand + skipped.otherCommand;
   const why = [
     skipped.notAnObject ? `${skipped.notAnObject} not an object` : "",
     skipped.noCommand ? `${skipped.noCommand} with no command string` : "",
-    skipped.notNodeOrTsx ? `${skipped.notNodeOrTsx} not a node/npx tsx command` : "",
-    skipped.noFilePath ? `${skipped.noFilePath} with no file path after node/npx tsx` : "",
+    skipped.otherCommand ? `${skipped.otherCommand} not a command that launches a file` : "",
   ].filter(Boolean).join(", ");
-  const counts = `${checked} hook command file(s) checked; skipped ${skippedCount}${why ? ` (${why})` : ""} of ${hooks.length} entr${hooks.length === 1 ? "y" : "ies"}`;
+  const counts =
+    `${checked} hook command file(s) checked; skipped ${skippedCount}${why ? ` (${why})` : ""}; ` +
+    `${notChecked.length} not checked${notChecked.length ? ` [${notChecked.join("; ")}]` : ""}; ` +
+    `of ${hooks.length} entr${hooks.length === 1 ? "y" : "ies"}`;
   if (missing.length > 0) {
     return { name: "hook-configs", severity: "issue", message: `Hook commands reference missing files: ${missing.join(", ")}. ${counts}` };
+  }
+  if (notChecked.length > 0) {
+    return { name: "hook-configs", severity: "warn", message: `not checked: ${notChecked.length} hook command(s) could not be parsed to a file, so this is not a full pass. ${counts}` };
   }
   if (checked === 0) {
     return { name: "hook-configs", severity: "skip", message: `not checked: no hook command file was read. ${counts}. This is not a pass.` };
@@ -446,7 +532,7 @@ export function checkSkillsContract(projectRoot: string): CheckResult {
     indexNote = "INDEX.md does not exist";
   } else {
     try {
-      for (const line of readFileSync(indexPath, "utf-8").replace(/^﻿/, "").split(/\r?\n/)) {
+      for (const line of readFileSync(indexPath, "utf-8").replace(/^\uFEFF/, "").split(/\r?\n/)) {
         if (!line.trim().startsWith("|")) continue;
         const cells = line.split("|").map((c) => c.trim());
         const filled = cells.filter(Boolean);
@@ -470,7 +556,7 @@ export function checkSkillsContract(projectRoot: string): CheckResult {
     if (!existsSync(skillMd)) {
       fm = "none (no SKILL.md)";
     } else {
-      const text = readFileSync(skillMd, "utf-8").replace(/^﻿/, "");
+      const text = readFileSync(skillMd, "utf-8").replace(/^\uFEFF/, "");
       const block = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
       if (!block) fm = "none (no frontmatter)";
       else {
