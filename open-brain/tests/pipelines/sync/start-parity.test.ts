@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { checkCursorStartParity } from "../../../src/pipelines/sync/start-parity.js";
@@ -62,5 +62,36 @@ describe("checkCursorStartParity", () => {
     const result = checkCursorStartParity(root);
     expect(result.severity).toBe("issue");
     expect(result.message).toContain("not in the difference table");
+  });
+});
+
+/**
+ * T-226: /start used to say the newest brief was "the largest loop number", which no longer fits task-named briefs.
+ * ob_start now prints `Latest brief: <path> (<date>)` (T-210); the three copies take it from there and omit it when absent.
+ */
+describe("T-226 the briefing takes the brief from ob_start's Latest brief line", () => {
+  const copies = [".claude/commands/start.md", "project-template/.claude/commands/start.md", "project-template/.cursor/commands/start.md"];
+  const text = (rel: string): string => readFileSync(join(repo, rel), "utf-8").replace(/\r\n/g, "\n");
+
+  for (const rel of copies) {
+    it(`${rel}: no longer picks a brief by loop number or file name`, () => {
+      const t = text(rel);
+      expect(t).not.toContain("largest loop number");
+      expect(t).not.toContain("loop-N-*.md");
+    });
+
+    it(`${rel}: the briefing line is ob_start's own, verbatim, and is omitted when ob_start printed none`, () => {
+      const t = text(rel);
+      expect(t).toContain('Latest brief: {the "Latest brief:" line ob_start printed, verbatim}');
+      expect(t).toContain("The `Latest brief:` line is omitted when `ob_start` printed none.");
+      expect(t).toContain("`ob_start` names for you on its `Latest brief: <path> (<date>)` line");
+    });
+  }
+
+  it("the Claude and Cursor template copies carry the same sentences about the brief (the parity table is not stretched to cover it)", () => {
+    const grab = (rel: string): string[] =>
+      text(rel).split("\n").filter((l) => /Latest brief|brief, which|\*brief\*|no brief to read|boundary report/.test(l));
+    expect(grab("project-template/.claude/commands/start.md").length).toBeGreaterThanOrEqual(5);
+    expect(grab("project-template/.cursor/commands/start.md")).toEqual(grab("project-template/.claude/commands/start.md"));
   });
 });

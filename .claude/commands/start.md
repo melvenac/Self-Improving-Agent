@@ -92,8 +92,10 @@ Skip any that do not exist:
 between seats is A2A (direct cross-session messages), which arrives on its own and needs no read.
 
 **What a session start DOES need to read is the durable half, and it is in the repo:** the newest
-brief and boundary reports in `docs/loops/`, by the largest loop number. Decisions live in
-`.agents/state.json` `decisions[]` and already reached you through `ob_start`.
+brief, which `ob_start` names for you on its `Latest brief: <path> (<date>)` line (the newest
+`*brief*.md` in `docs/loops/` by git commit date; do not pick one by loop number or by file name).
+If that line is absent there is no brief to read. Read any boundary report the brief or the handoff
+names. Decisions live in `.agents/state.json` `decisions[]` and already reached you through `ob_start`.
 
 **A2A has no memory.** Anything a later session must be able to read goes in a tracked file before
 the exchange ends — session 61’s close-out travelled by A2A alone and exists in no file anywhere.
@@ -131,13 +133,13 @@ BROKEN ({n} gaps open; newest {m})
 - {any task with status blocked}
 
 Working tree: {clean | N uncommitted: path, path, ...}
-Latest brief: {newest docs/loops/loop-N-*.md} ({date})
+Latest brief: {the "Latest brief:" line ob_start printed, verbatim}
 Skills: {relevant entries from .agents/skills/INDEX.md, or "none"}
 
 FLAGS: {anything to verify, or "none"}
 ```
 
-**Omit an empty section rather than printing a placeholder.**
+**Omit an empty section rather than printing a placeholder.** The `Latest brief:` line is omitted when `ob_start` printed none.
 
 **WATCH OUT is the highest-value part of this briefing.** It is short, already curated, and it is
 where the previous session wrote down what will bite this one. Print every item verbatim. Never
