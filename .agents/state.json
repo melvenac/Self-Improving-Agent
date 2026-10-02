@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 263,
+  "revision": 264,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4075,6 +4075,7 @@
       "seat": "developer",
       "pick_up": "Builder seat (Claude Code, sia-builder checkout on the QA PC), rolled by Aaron. Nothing is uncommitted or unpushed. Delivered and pushed this stretch: T-216 (9a0973f0, merged), T-214 (caebe8b6, QA 239), slice four step 2 on loop/15-slice-4-step2 (r1 2d4cd863, r2 779be4d6, r3 36a0fc28, r4 8a6cfb2d, r5 1311c2a7; QA 244 accepted r4, r5 scoped the S4-5b guard after PR #254's merge-ref CI failed it), and T-217/T-218 (1a38e3f2, merged as #256). No assignment is open: the next work is an Atlas dispatch. SIA master now has ruleset 24343321, so a branch reaches master only through a PR with the CI test passing. Handoffs: docs/loops/t216-developer-handoff.md, t214-developer-handoff.md, loop-15-slice-4-step2-developer-handoff.md (r1 to r5), t217-t218-developer-handoff.md.",
       "watch_out": [
+        "REPORT TO `atlas-sia`: the SIA planner restarts under the fleet-unique name `atlas-sia` (plain name, no [ref]); Relay becomes `relay-a2a`; `clark` stays the fallback. Earlier dispatches name the old Atlas session addresses, which no longer apply.",
         "I did not see PR #254's CI result after r5, so whether both its push and pull_request runs went green is unconfirmed from this seat.",
         "NEVER run the full vitest suite on the QA PC. Free RAM there is 1.2 to 1.9 GB shared with Chisel, and Claude Code killed a queued full-suite background run for memory. Atlas rules: single files, one at a time, mutants sequentially; QA runs the full suite on Plumb. Heavy runs need Aaron's approval in the seat's own window, or a one-line 'MANUAL MODE -> sia-builder: <action> (<why>)' to clark.",
         "The Bash tool mangles git ref:path (MSYS) and node cannot read /tmp from it: use PowerShell, MSYS_NO_PATHCONV=1, or the scratchpad directory. A heredoc containing a nested EOF aborts the whole command silently: use the Write tool for files.",

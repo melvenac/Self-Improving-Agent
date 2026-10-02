@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 263 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 264 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -49,6 +49,7 @@ Builder seat (Claude Code, sia-builder checkout on the QA PC), rolled by Aaron. 
 
 ### Watch out
 
+- REPORT TO `atlas-sia`: the SIA planner restarts under the fleet-unique name `atlas-sia` (plain name, no [ref]); Relay becomes `relay-a2a`; `clark` stays the fallback. Earlier dispatches name the old Atlas session addresses, which no longer apply.
 - I did not see PR #254's CI result after r5, so whether both its push and pull_request runs went green is unconfirmed from this seat.
 - NEVER run the full vitest suite on the QA PC. Free RAM there is 1.2 to 1.9 GB shared with Chisel, and Claude Code killed a queued full-suite background run for memory. Atlas rules: single files, one at a time, mutants sequentially; QA runs the full suite on Plumb. Heavy runs need Aaron's approval in the seat's own window, or a one-line 'MANUAL MODE -> sia-builder: <action> (<why>)' to clark.
 - The Bash tool mangles git ref:path (MSYS) and node cannot read /tmp from it: use PowerShell, MSYS_NO_PATHCONV=1, or the scratchpad directory. A heredoc containing a nested EOF aborts the whole command silently: use the Write tool for files.
