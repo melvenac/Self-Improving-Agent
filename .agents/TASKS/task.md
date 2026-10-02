@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 290 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 291 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
@@ -8,8 +8,8 @@ FIRST: check master push CI on 19b79b39 (after 10 merges). THEN finish #295 (T-0
 
 ## Top tasks
 
-- [ ] **T-008** [P0] Add a `/sync` validator that stats every MCP command path in `~/.claude.json`
 - [ ] **T-022** [P0] Replace-on-write for `state` facts
 - [ ] **T-024** [P0] Rewrite the two genuine `obsolete-reference` hits
 - [ ] **T-025** [P0] Reconcile the experience `type` field across three sources
 - [ ] **T-031** [P0] Add agent attribution to sessions
+- [ ] **T-044** [P0] The slot needs an OWNER, not just a timestamp
