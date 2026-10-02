@@ -11,7 +11,7 @@
 
 import { createHash } from "node:crypto";
 import { existsSync, openSync, readFileSync, readdirSync, closeSync, writeSync } from "node:fs";
-import { basename, dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import type { GateRecord } from "./artifacts.js";
 import { renderGateRecord } from "./artifacts.js";
 import {
@@ -123,6 +123,18 @@ export interface BriefPlanGateSources {
   changed_area_hints: string;
 }
 
+/**
+ * A path as a record should carry it: relative to the repository, forward slashes (T-220, D-092 F4).
+ * An absolute path in a tracked record names a local checkout (for example a QA scratch tree) and
+ * means nothing on another machine. A path outside the repository is reduced to its file name
+ * rather than written as `../..` or as an absolute path.
+ */
+export function repoRelative(repoRoot: string, abs: string): string {
+  const rel = relative(resolve(repoRoot), resolve(abs));
+  if (rel === "" || rel.startsWith("..") || isAbsolute(rel)) return basename(abs);
+  return toPosix(rel);
+}
+
 /** Build HOH-JEV §4 plan-gate state and name where each field came from. */
 export function buildBriefPlanGateContext(
   plan: Plan,
@@ -135,7 +147,7 @@ export function buildBriefPlanGateContext(
       : plan.objective;
   const specSource =
     briefPath !== null && existsSync(briefPath)
-      ? `brief markdown (${briefPath}, first 4000 chars)`
+      ? `brief markdown (${repoRelative(repoRoot, briefPath)}, first 4000 chars)`
       : "D_t.objective (brief file absent)";
 
   const priorFailures = [...plan.repair_targets];
@@ -330,8 +342,8 @@ export async function runBriefPlanGate(options: RunBriefPlanGateOptions): Promis
     decision: null,
     runtime_action: "",
     note: "",
-    brief: briefAbs,
-    dt: dtPath,
+    brief: repoRelative(repoRoot, briefAbs),
+    dt: repoRelative(repoRoot, dtPath),
     policy_hash: policyHash,
     sources,
   };
