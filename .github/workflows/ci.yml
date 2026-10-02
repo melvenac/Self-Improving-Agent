@@ -2,25 +2,24 @@ name: CI
 
 on:
   push:
-    # T-178: a push to master, loop/**, or qa/** runs CI. D-055 leaves push
-    # unfiltered: one paths filter would also drop a docs-only push to master,
-    # and merging a docs PR is that push. A docs-only seat push is decided by
-    # the changed job, from git diff, not from the push payload. workflow_dispatch
-    # is not filtered.
+    # T-227: a push triggers CI only on master. Every other branch runs on its pull request, so a branch
+    # push and its PR no longer produce two runs of one SHA (T-221's cancelled-check problem, #277). A push to
+    # master always runs the suite, docs-only or not (D-055 left it unfiltered). A branch with no PR runs CI
+    # by workflow_dispatch.
     branches:
       - master
-      - "loop/**"
-      - "qa/**"
   pull_request:
-    # D-091 (T-219): no paths filter. D-055 filtered a docs-only PR out here, and a
-    # workflow that never starts never reports `test`, which master's ruleset (D-090)
-    # requires, so every docs-only PR was blocked forever. A docs-only PR now starts
-    # the workflow and the changed job decides: skip=true skips `test` at the job level,
-    # and a skipped job reports Skipped. push and workflow_dispatch are not filtered.
+    # D-091 (T-219): no paths filter. A workflow that never starts never reports `test`, which master's ruleset
+    # (D-090) requires, so every docs-only PR was blocked forever. A docs-only PR starts the workflow and the
+    # changed job decides: skip=true skips `test` at the job level, and a skipped job reports Skipped.
+    # T-227: only opened and synchronize. A reopened or ready_for_review event would start a SECOND run of the
+    # same head SHA, and that run would cancel the first inside the PR's concurrency group, leaving a cancelled
+    # `test` on the head commit (the #277 lesson). One run per commit means only a superseded commit is cancelled.
+    types: [opened, synchronize]
   workflow_dispatch:
     inputs:
-      hosted:
-        description: Run on GitHub-hosted ubuntu-latest instead of tcm (the fallback when tcm is down)
+      tcm:
+        description: "Run on the self-hosted tcm runner instead of GitHub-hosted ubuntu-latest (T-227: hosted is the default, tcm is the opt-in)"
         type: boolean
         default: false
       windows:
@@ -49,25 +48,21 @@ on:
         type: string
         default: "0"
 
-# T-178: a newer run cancels the older one in its group. T-221 (D-094 a): the group
-# holds the EVENT, so a branch's push run and its pull request run never cancel each
-# other (a cancelled check on the head SHA reads as failing to ruleset 24343321);
-# a newer push still cancels the older push, a newer PR commit the older PR run.
-# A dispatch uses its own group. A push to master
-# does not cancel: two merges close together must both get a result. The second
-# master push waits in the ci-master group; it is not cancelled.
+# T-227: concurrency is per pull request. A newer commit on a PR cancels the run of the commit it superseded and
+# nothing else: the head commit's run is never cancelled, because it is the newest in its group and the PR trigger
+# fires once per commit (see `types` above). A master push gets a group of its own per SHA and is never cancelled:
+# two merges close together must both get a result. A dispatch has its own group per run.
 concurrency:
-  group: "${{ github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-{0}-{1}', github.event_name, github.head_ref || github.ref_name) }}"
-  cancel-in-progress: "${{ github.event_name != 'workflow_dispatch' && github.ref != 'refs/heads/master' }}"
+  group: "${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || (github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-push-{0}', github.sha)) }}"
+  cancel-in-progress: "${{ github.event_name == 'pull_request' }}"
 
 jobs:
-  # T-178: the push payload's commits[] lists are truncated, so they cannot prove
-  # every file is docs. git diff before..sha is the list. Any error, an empty
-  # list, or a first push (before is all zeros) prints skip=false, and the test
-  # job runs. skip=true only when every path is under docs/ or is README.md.
+  # T-178/T-227: the list of changed files comes from git diff, not from a payload. It runs on a pull request
+  # only (a push is master, which always runs the suite). Any error or an empty list prints skip=false, and the
+  # test job runs. skip=true only when every path is under docs/ or is README.md.
   changed:
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/master')
-    runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
+    if: github.event_name == 'pull_request'
+    runs-on: ${{ inputs.tcm && fromJSON('["self-hosted", "linux", "tcm"]') || 'ubuntu-latest' }}
     outputs:
       skip: ${{ steps.diff.outputs.skip }}
     steps:
@@ -87,16 +82,15 @@ jobs:
           fi
 
   test:
-    # Every run, including a push to master, runs on the self-hosted runner on tcm,
-    # whose minutes are free (D-043, T-192). inputs.hosted is the fallback when tcm
-    # is down: only a dispatch with hosted=true selects ubuntu-latest.
+    # T-227: GitHub-hosted ubuntu-latest by default (this repository is public, so its minutes are free).
+    # The self-hosted tcm runner (D-043, T-192) is an opt-in: only a workflow_dispatch with tcm=true selects it.
     # The job name stays `test`, so the check D-032's merge gate reads keeps its name.
     # GitHub skips a job that needs a skipped job unless its if calls a status
     # function. !cancelled() is that call, so a pull request and a master push
     # still run test. A failed changed job is not success, so the suite runs.
     needs: changed
     if: "${{ !cancelled() && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
-    runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
+    runs-on: ${{ inputs.tcm && fromJSON('["self-hosted", "linux", "tcm"]') || 'ubuntu-latest' }}
 
     steps:
       # The tcm runner user is firewalled to the public internet only. If any of these connects,
@@ -117,6 +111,10 @@ jobs:
           exit "$fail"
 
       - uses: actions/checkout@v4
+        with:
+          # Full history: tests resolve revisions (git rev-parse of an older sha). The default depth of 1 failed 8 tests on
+          # a hosted runner, where tcm's persistent workspace had the history (T-227 addendum, run 36984810269).
+          fetch-depth: 0
 
       # Node 22 LTS — v24 breaks the Smart Connections Obsidian plugin, so the
       # project pins 22 everywhere to keep local and CI on the same runtime.
@@ -164,6 +162,10 @@ jobs:
           exit $fail
 
       - uses: actions/checkout@v4
+        with:
+          # Full history: tests resolve revisions (git rev-parse of an older sha). The default depth of 1 failed 8 tests on
+          # a hosted runner, where tcm's persistent workspace had the history (T-227 addendum, run 36984810269).
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:

@@ -1,5 +1,5 @@
 /**
- * T-192: a master push runs on tcm. `evalRunsOn` is the small evaluator for the
+ * T-227: tests run on GitHub-hosted ubuntu-latest by default and tcm is a dispatch opt-in (was T-192: a master push runs on tcm). `evalRunsOn` is the small evaluator for the
  * one `runs-on` expression. `&&` binds tighter than `||`, and each returns the
  * value rather than a boolean, as GitHub's expression language does. T-221: it also reads github.head_ref, ref_name and run_id, and format() (third commit).
  */
@@ -16,7 +16,10 @@ const TCM = ["self-hosted", "linux", "tcm"];
 type Ctx = {
   event: string;
   ref: string;
-  hosted: boolean | null;
+  /** T-227: inputs.tcm of a workflow_dispatch (null for every other event). */
+  tcm?: boolean | null;
+  /** Legacy: the old inputs.hosted fallback, gone in T-227. */
+  hosted?: boolean | null;
   commits?: unknown;
   changedResult?: string;
   changedSkip?: string;
@@ -24,6 +27,9 @@ type Ctx = {
   headRef?: string;
   refName?: string;
   runId?: string;
+  /** T-227: github.event.pull_request.number and github.sha, for the concurrency group. */
+  prNumber?: string;
+  sha?: string;
 };
 
 function truthy(v: unknown): boolean {
@@ -131,7 +137,10 @@ export function evalRunsOn(runsOn: string, ctx: Ctx): unknown {
     if (m[0] === "github.event.commits") return ctx.commits ?? null;
     if (m[0] === "needs.changed.result") return ctx.changedResult ?? "";
     if (m[0] === "needs.changed.outputs.skip") return ctx.changedSkip ?? "";
-    if (m[0] === "inputs.hosted") return ctx.hosted;
+    if (m[0] === "inputs.hosted") return ctx.hosted ?? null;
+    if (m[0] === "inputs.tcm") return ctx.tcm ?? null;
+    if (m[0] === "github.event.pull_request.number") return ctx.prNumber ?? "";
+    if (m[0] === "github.sha") return ctx.sha ?? "0000000";
     throw new Error(`evalRunsOn: unknown name ${m[0]}`);
   }
   return parseOr();
@@ -140,7 +149,7 @@ export function evalRunsOn(runsOn: string, ctx: Ctx): unknown {
 type Workflow = {
   on: {
     push?: { branches?: string[]; "paths-ignore"?: string[]; paths?: unknown };
-    pull_request?: { "paths-ignore"?: string[] };
+    pull_request?: { "paths-ignore"?: string[]; types?: string[] } | null;
     workflow_dispatch?: Record<string, unknown> | null;
   };
   concurrency?: { group?: unknown; "cancel-in-progress"?: unknown };
@@ -210,7 +219,7 @@ function testJobRuns(ctx: Ctx, paths: string[] | "unreadable"): boolean {
     return truthy(evalRunsOn(jobIf, { ...ctx, commits: [{ modified: listed }] }));
   }
   // The changed job runs on a pull request (D-091) and on a non-master push (T-178).
-  const seat = ctx.event === "pull_request" || (ctx.event === "push" && ctx.ref !== "refs/heads/master");
+  const seat = ctx.event === "pull_request";
   return truthy(evalRunsOn(jobIf, {
     ...ctx,
     changedResult: seat ? "success" : "skipped",
@@ -229,20 +238,40 @@ function runsOn(): string {
 describe("ci.yml runs-on (T-192)", () => {
   const expr = runsOn();
 
-  it("a master push runs on tcm", () => {
-    expect(evalRunsOn(expr, { event: "push", ref: "refs/heads/master", hosted: null })).toEqual(TCM);
+  it("T-227: a master push, a pull request and a default dispatch all run on GitHub-hosted ubuntu-latest", () => {
+    expect(evalRunsOn(expr, { event: "push", ref: "refs/heads/master", tcm: null })).toBe("ubuntu-latest");
+    expect(evalRunsOn(expr, { event: "pull_request", ref: "refs/pull/7/merge", headRef: "loop/x", tcm: null })).toBe("ubuntu-latest");
+    expect(evalRunsOn(expr, { event: "workflow_dispatch", ref: "refs/heads/loop/x", tcm: false })).toBe("ubuntu-latest");
   });
 
-  it("a dispatch runs on tcm", () => {
-    expect(evalRunsOn(expr, { event: "workflow_dispatch", ref: "refs/heads/loop/x", hosted: false })).toEqual(TCM);
+  it("T-227: a dispatch with tcm=true is the only way onto the self-hosted tcm runner", () => {
+    expect(evalRunsOn(expr, { event: "workflow_dispatch", ref: "refs/heads/master", tcm: true })).toEqual(TCM);
+    for (const event of ["push", "pull_request"]) {
+      expect(evalRunsOn(expr, { event, ref: "refs/heads/master", tcm: null }), event).toBe("ubuntu-latest");
+    }
   });
 
-  it("a dispatch with hosted=true runs on ubuntu-latest", () => {
-    expect(evalRunsOn(expr, { event: "workflow_dispatch", ref: "refs/heads/master", hosted: true })).toBe("ubuntu-latest");
+  it("T-227 addendum: every checkout in the workflow fetches full history (fetch-depth 0), because the suite reads it", () => {
+    // actions/checkout defaults to depth 1. On a hosted runner 8 tests failed with 'fatal: bad revision' (run 36984810269);
+    // tcm's persistent workspace had hidden it.
+    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
+      jobs: Record<string, { steps?: Array<{ uses?: string; with?: { "fetch-depth"?: number } }> }>;
+    };
+    const seen: string[] = [];
+    for (const [id, job] of Object.entries(doc.jobs)) {
+      for (const step of job.steps ?? []) {
+        if (!step.uses?.startsWith("actions/checkout@")) continue;
+        seen.push(id);
+        expect(step.with?.["fetch-depth"], `${id}: checkout without fetch-depth 0`).toBe(0);
+      }
+    }
+    // the three jobs that check out: changed (diffs against a base), test, test-windows
+    expect(seen.sort()).toEqual(["changed", "test", "test-windows"]);
   });
 
-  it("a push to a non-master branch runs on tcm", () => {
-    expect(evalRunsOn(expr, { event: "push", ref: "refs/heads/loop/x", hosted: null })).toEqual(TCM);
+  it("T-227: the changed job runs on the same runner expression as the test job", () => {
+    const doc = workflow() as Workflow & { jobs: Record<string, { "runs-on"?: string }> };
+    expect(doc.jobs.changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
   });
 
   it("keeps the egress self-check on the test job and leaves test-windows opt-in", () => {
@@ -252,8 +281,12 @@ describe("ci.yml runs-on (T-192)", () => {
     };
     const egress = doc.jobs.test.steps?.find((s) => s.name === "Egress isolation self-check (tcm)");
     expect(egress?.if).toBe("runner.environment == 'self-hosted'");
+    // T-227: hosted is the default now, so the old opt-out input is gone and tcm is an opt-in defaulting to false.
+    const inputs = doc.on?.workflow_dispatch?.inputs as Record<string, { default?: unknown }>;
+    expect(inputs.hosted).toBeUndefined();
+    expect(inputs.tcm.default).toBe(false);
     expect(doc.jobs["test-windows"].if).toBe("github.event_name == 'workflow_dispatch' && inputs.windows");
-    expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ hosted: expect.anything(), windows: expect.anything() });
+    expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ tcm: expect.anything(), windows: expect.anything() });
   });
 
   it("a pull request has no paths filter, so a docs-only PR starts the workflow and reports test (D-091, T-219)", () => {
@@ -270,7 +303,7 @@ describe("ci.yml runs-on (T-192)", () => {
 
   it("T-219 a docs-only PR skips test at the job level, a code PR runs it, and there is no stub job named test", () => {
     const docsOnly = ["docs/loops/x.md", "README.md"];
-    const pr = { event: "pull_request", ref: "refs/pull/1/merge", hosted: null } as const;
+    const pr = { event: "pull_request", ref: "refs/pull/1/merge", tcm: null } as const;
     expect(testJobRuns(pr, docsOnly), "a docs-only PR ran test").toBe(false);
     expect(testJobRuns(pr, ["open-brain/src/cli.ts"]), "a code PR skipped test").toBe(true);
     expect(testJobRuns(pr, [".github/workflows/ci.yml", "docs/a.md"]), "a PR changing ci.yml plus docs skipped test").toBe(true);
@@ -315,11 +348,19 @@ describe("ci.yml runs-on (T-192)", () => {
     }
   });
 
-  it("push branches are master, loop/**, and qa/** (T-178)", () => {
-    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
-      on: { push?: { branches?: string[] } };
-    };
-    expect(doc.on.push?.branches).toEqual(["master", "loop/**", "qa/**"]);
+  it("T-227: push triggers only for master, so a push to a loop/ or qa/ branch triggers nothing", () => {
+    const doc = parse(readFileSync(workflowPath, "utf-8")) as { on: { push?: { branches?: string[] } } };
+    expect(doc.on.push?.branches).toEqual(["master"]);
+    const triggers = (branch: string) => (doc.on.push?.branches ?? []).some((b) => b === branch);
+    expect(triggers("master")).toBe(true);
+    for (const branch of ["loop/t227-ci-hosted", "qa/t221-ci-candidate", "docs/x", "feature/y"]) {
+      expect(triggers(branch), branch + " must not trigger on push").toBe(false);
+    }
+  });
+
+  it("T-227: the pull_request trigger fires once per commit (opened, synchronize), so a head commit never gets a duplicate run", () => {
+    const doc = workflow();
+    expect(doc.on.pull_request?.types).toEqual(["opened", "synchronize"]);
   });
 
   it("a push has no paths filter, so master is not filtered, and a dispatch has none either (T-178)", () => {
@@ -330,74 +371,66 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(dispatch == null || !("paths" in dispatch || "paths-ignore" in dispatch)).toBe(true);
   });
 
-  it("a push and the pull request for that branch share one concurrency group, and a dispatch does not join it (T-178)", () => {
-    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
-      concurrency?: { group?: unknown; "cancel-in-progress"?: unknown };
-    };
-    expect(doc.concurrency, "concurrency is absent").toBeTruthy();
-    const group = String(doc.concurrency?.group ?? "");
-    expect(group).toContain("github.head_ref || github.ref_name");
-    expect(group).toContain("github.event_name == 'workflow_dispatch'");
-    const cancel = String(doc.concurrency?.["cancel-in-progress"] ?? "");
-    expect(truthy(evalRunsOn(cancel, { event: "workflow_dispatch", ref: "refs/heads/loop/x", hosted: null }))).toBe(false);
-    expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/loop/x", hosted: null }))).toBe(true);
-    expect(truthy(evalRunsOn(cancel, { event: "pull_request", ref: "refs/pull/1/merge", hosted: null }))).toBe(true);
-  });
-
-  it("a branch's push run and its pull request run are in different concurrency groups, and each event still cancels its own older run (T-221, D-094)", () => {
+  it("T-227: concurrency is per PR; a master push and a dispatch never share a group with a PR run or each other", () => {
     const doc = workflow();
     const group = String(doc.concurrency?.group ?? "");
-    const cancel = String(doc.concurrency?.["cancel-in-progress"] ?? "");
-    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) =>
-      String(evalRunsOn(group, { hosted: null, ...ctx }));
-    for (const branch of ["loop/t221-x", "qa/t221-ci-candidate"]) {
-      const push = grp({ event: "push", ref: `refs/heads/${branch}` });
-      const pr = grp({ event: "pull_request", ref: "refs/pull/7/merge", headRef: branch });
-      expect(push, `${branch}: the push group`).not.toBe(pr);
-      // a newer push shares the older push's group (so it cancels it), and a newer PR commit shares the older PR run's
-      expect(grp({ event: "push", ref: `refs/heads/${branch}` })).toBe(push);
-      expect(grp({ event: "pull_request", ref: "refs/pull/7/merge", headRef: branch })).toBe(pr);
-      // another branch never joins it
-      expect(grp({ event: "push", ref: "refs/heads/loop/other" })).not.toBe(push);
-    }
-    // a dispatch keeps its own group per run, and joins neither
-    const d1 = grp({ event: "workflow_dispatch", ref: "refs/heads/loop/t221-x", runId: "11" });
-    const d2 = grp({ event: "workflow_dispatch", ref: "refs/heads/loop/t221-x", runId: "12" });
+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));
+    // two commits of one PR share the group (so the newer cancels the superseded one); another PR does not
+    const pr7a = grp({ event: "pull_request", ref: "refs/pull/7/merge", headRef: "loop/x", prNumber: "7", sha: "aaa" });
+    const pr7b = grp({ event: "pull_request", ref: "refs/pull/7/merge", headRef: "loop/x", prNumber: "7", sha: "bbb" });
+    const pr8 = grp({ event: "pull_request", ref: "refs/pull/8/merge", headRef: "loop/x", prNumber: "8", sha: "aaa" });
+    expect(pr7a).toBe(pr7b);
+    expect(pr8).not.toBe(pr7a);
+    // a master push has a group of its own PER SHA: two close merges are never in one group, so neither waits to be replaced
+    const m1 = grp({ event: "push", ref: "refs/heads/master", sha: "111" });
+    const m2 = grp({ event: "push", ref: "refs/heads/master", sha: "222" });
+    expect(m1).not.toBe(m2);
+    expect([m1, m2]).not.toContain(pr7a);
+    // a dispatch keeps its own group per run
+    const d1 = grp({ event: "workflow_dispatch", ref: "refs/heads/loop/x", runId: "11" });
+    const d2 = grp({ event: "workflow_dispatch", ref: "refs/heads/loop/x", runId: "12" });
     expect(d1).not.toBe(d2);
-    expect(d1).not.toBe(grp({ event: "push", ref: "refs/heads/loop/t221-x" }));
-    // each event's older run is still cancelled by a newer one (T-178's purpose), master's is not
-    expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/loop/t221-x", hosted: null }))).toBe(true);
-    expect(truthy(evalRunsOn(cancel, { event: "pull_request", ref: "refs/pull/7/merge", hosted: null }))).toBe(true);
-    expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/master", hosted: null }))).toBe(false);
+    expect([d1, d2]).not.toContain(pr7a);
+    expect([d1, d2]).not.toContain(m1);
+  });
+
+  it("T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled", () => {
+    const cancel = String(workflow().concurrency?.["cancel-in-progress"] ?? "");
+    const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));
+    expect(c("pull_request", "refs/pull/7/merge")).toBe(true);
+    expect(c("push", "refs/heads/master")).toBe(false);
+    expect(c("workflow_dispatch", "refs/heads/master")).toBe(false);
+    expect(c("workflow_dispatch", "refs/heads/loop/x")).toBe(false);
   });
 
   it("a master push whose only path is under docs still runs the test job (T-178)", () => {
     expect(
-      testJobRuns({ event: "push", ref: "refs/heads/master", hosted: null }, ["docs/loops/x.md"]),
+      testJobRuns({ event: "push", ref: "refs/heads/master", tcm: null }, ["docs/loops/x.md"]),
       "a docs-only master push did not run the test job",
     ).toBe(true);
   });
 
-  it("a seat push of docs and README does not run the test job, and a seat push of open-brain does (T-178)", () => {
-    expect(testJobRuns({ event: "push", ref: "refs/heads/loop/x", hosted: null }, ["docs/a.md", "README.md"])).toBe(false);
-    expect(testJobRuns({ event: "push", ref: "refs/heads/qa/y", hosted: null }, ["open-brain/src/cli.ts"])).toBe(true);
+  it("T-227: a docs-only PR does not run the test job (reported Skipped), and a PR of open-brain does", () => {
+    const pr = { event: "pull_request", ref: "refs/pull/9/merge", headRef: "loop/x", tcm: null } as const;
+    expect(testJobRuns(pr, ["docs/a.md", "README.md"])).toBe(false);
+    expect(testJobRuns(pr, ["open-brain/src/cli.ts"])).toBe(true);
   });
 
-  it("a seat push of a code path outside the prefix list plus a docs file still runs (T-178)", () => {
+  it("a PR of a code path outside the prefix list plus a docs file still runs (T-178)", () => {
     expect(
-      testJobRuns({ event: "push", ref: "refs/heads/loop/x", hosted: null }, ["LICENSE", "docs/a.md"]),
-      "a code file outside the prefix list was skipped because a docs file was in the same push",
+      testJobRuns({ event: "pull_request", ref: "refs/pull/9/merge", headRef: "loop/x", tcm: null }, ["LICENSE", "docs/a.md"]),
+      "a code file outside the prefix list was skipped because a docs file was in the same change",
     ).toBe(true);
   });
 
   it("an unreadable change list still runs the test job (T-178)", () => {
-    expect(testJobRuns({ event: "push", ref: "refs/heads/qa/y", hosted: null }, "unreadable")).toBe(true);
+    expect(testJobRuns({ event: "pull_request", ref: "refs/pull/9/merge", headRef: "qa/y", tcm: null }, "unreadable")).toBe(true);
   });
 
   it("a failed change-list job still runs the test job (T-178)", () => {
     const jobIf = workflow().jobs.test.if ?? "";
     expect(truthy(evalRunsOn(jobIf, {
-      event: "push", ref: "refs/heads/loop/x", hosted: null, changedResult: "failure", changedSkip: "true",
+      event: "pull_request", ref: "refs/pull/9/merge", tcm: null, changedResult: "failure", changedSkip: "true",
     }))).toBe(true);
   });
 
@@ -420,7 +453,7 @@ describe("ci.yml runs-on (T-192)", () => {
       }>;
     };
     const changed = doc.jobs.changed;
-    expect(changed.if).toBe("github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/master')");
+    expect(changed.if).toBe("github.event_name == 'pull_request'");
     expect(changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
     expect(changed.outputs?.skip).toBe("${{ steps.diff.outputs.skip }}");
     const checkout = changed.steps?.find((step) => step.uses === "actions/checkout@v4");
@@ -436,15 +469,15 @@ describe("ci.yml runs-on (T-192)", () => {
     expect(doc.jobs.test.needs).toBe("changed");
     const jobIf = doc.jobs.test.if ?? "";
     expect(truthy(evalRunsOn(jobIf, {
-      event: "push", ref: "refs/heads/loop/x", hosted: null, changedResult: "success", changedSkip: "true",
+      event: "pull_request", ref: "refs/pull/9/merge", tcm: null, changedResult: "success", changedSkip: "true",
     }))).toBe(false);
     expect(truthy(evalRunsOn(jobIf, {
-      event: "push", ref: "refs/heads/loop/x", hosted: null, changedResult: "success", changedSkip: "false",
+      event: "pull_request", ref: "refs/pull/9/merge", tcm: null, changedResult: "success", changedSkip: "false",
     }))).toBe(true);
   });
 
   it("cancel-in-progress evaluates to false for a push to refs/heads/master (T-178)", () => {
     const cancel = String(workflow().concurrency?.["cancel-in-progress"] ?? "");
-    expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/master", hosted: null }))).toBe(false);
+    expect(truthy(evalRunsOn(cancel, { event: "push", ref: "refs/heads/master", tcm: null }))).toBe(false);
   });
 });

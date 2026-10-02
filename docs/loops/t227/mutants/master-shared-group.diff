@@ -1,0 +1,13 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 87e817eb..db2a6af2 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -53,7 +53,7 @@ on:
+ # fires once per commit (see `types` above). A master push gets a group of its own per SHA and is never cancelled:
+ # two merges close together must both get a result. A dispatch has its own group per run.
+ concurrency:
+-  group: "${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || (github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-push-{0}', github.sha)) }}"
++  group: "${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || (github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-push-{0}', github.ref_name)) }}"
+   cancel-in-progress: "${{ github.event_name == 'pull_request' }}"
+ 
+ jobs:
