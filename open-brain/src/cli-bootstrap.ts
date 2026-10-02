@@ -16,6 +16,7 @@ import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
 import { describeDerivedArtifacts } from "./pipelines/session-start/derived-artifacts.js";
 import { describeTreeCurrency, fetchOrigin } from "./pipelines/session-start/tree-currency.js";
+import { describeDriftLine } from "./pipelines/session-start/drift-line.js";
 import {
   resolveSessionId,
   writeActiveSession,
@@ -159,6 +160,8 @@ if (hasAgents) {
   // is registered without a matcher, so startup and resume take this one path.
   // The outcome rides into the currency lines, which say so when it failed.
   for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);
+  // T-208 r3: drift beside currency, on startup and resume (same check ob_start reports).
+  lines.push(describeDriftLine(cwd));
 }
 
 // Session UUID — emit so /start can pick it up and call ob_set_session.
