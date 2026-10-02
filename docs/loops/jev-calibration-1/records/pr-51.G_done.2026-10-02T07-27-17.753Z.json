@@ -1,0 +1,229 @@
+{
+  "gate": "developer-done",
+  "loop": "51-t195",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:17.753Z",
+  "answered_at": "2026-10-02T07:27:18.176Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "51-t195",
+        "objective": "Record 215 (T-195: a D_t beside every brief, judged by the plan gate): QA dispatch (record 216)",
+        "tasks": [
+          "Full suite on tcm at 603be51 and at the base 8467cb1. Say whether any failure is new. Master CI runs tests again from c933a44 (#200), so a green run now means tests ran; quote the test job's conclusion, not only the run's.",
+          "Fails closed (DT-6): each of these must refuse, exit nonzero and name its cause. Never a pass.",
+          "a missing TYPESAFE_API_KEY;",
+          "a transport error;",
+          "a non-2xx response;",
+          "a malformed envelope.",
+          "Blocks dispatch (DT-7): name the mechanism Forge chose (harness dispatch-check). Say whether anything in the planner's actual dispatch path calls it. If nothing does, score DT-7 partial and say what would have to call it. A check that nothing runs is a tool, not a gate.",
+          "DT-9 compares content, not ancestry: try DT-9b yourself with a real brief in a scratch clone, not only through the test.",
+          "Preserved (DT-8): validate evidence, the runtime's plan gate, the done-gate and both policy files are unchanged. Diff them against 8467cb1.",
+          "Your own mutants, at least two, on qa/t195-mut-."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Full suite on tcm at 603be51 and at the base 8467cb1. Say whether any failure is new. Master CI runs tests again from c933a44 (#200), so a green run now means tests ran; quote the test job's conclusion, not only the run's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Fails closed (DT-6): each of these must refuse, exit nonzero and name its cause. Never a pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "a missing TYPESAFE_API_KEY;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "a transport error;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "a non-2xx response;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "a malformed envelope.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Blocks dispatch (DT-7): name the mechanism Forge chose (harness dispatch-check). Say whether anything in the planner's actual dispatch path calls it. If nothing does, score DT-7 partial and say what would have to call it. A check that nothing runs is a tool, not a gate.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "DT-9 compares content, not ancestry: try DT-9b yourself with a real brief in a scratch clone, not only through the test.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Preserved (DT-8): validate evidence, the runtime's plan gate, the done-gate and both policy files are unchanged. Diff them against 8467cb1.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Your own mutants, at least two, on qa/t195-mut-.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Record 215 (T-195: a D_t beside every brief, judged by the plan gate): QA dispatch (record 216)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t195-dispatch-qa.md",
+          "blob": "3eff7387be7bf33afde12e04bca84765493e9a60"
+        }
+      },
+      "candidate": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
+      "diffstat": [
+        "docs/loops/t195-developer-handoff.md",
+        "open-brain/src/harness/brief-plan-gate.ts",
+        "open-brain/src/harness/cli.ts",
+        "open-brain/tests/harness/t195-plan-gate.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 51,
+        "base_sha": "8467cb10837d2da4b13237c22a8be4e8bc5d6a1a",
+        "scored_sha": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
+        "merge_commit": "603be51e4c0a639ef08a0d04fc02fce6669aba02"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.36
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.21
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.44
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 1.33,
+      "confidence": 0,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.18,
+        "1": 0.31,
+        "2": 0.51
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1892,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.36 is below the required 0.7",
+      "local_tests_support_claim 0.44 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:18.165Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "81198620-30a2-40b0-9fc7-a27ce8e5adc3",
+  "subject": {
+    "gate": "developer-done",
+    "key": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
+    "blob": "2785c5d11a64f3dd2530bc83c0890de73162b5ec"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:17.753Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 51,
+  "merge_commit": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
+  "scored_sha": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
+  "base_sha": "8467cb10837d2da4b13237c22a8be4e8bc5d6a1a",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/051-t195.D_t.json",
+    "blob": "2785c5d11a64f3dd2530bc83c0890de73162b5ec"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t195-developer-handoff.md",
+    "open-brain/src/harness/brief-plan-gate.ts",
+    "open-brain/src/harness/cli.ts",
+    "open-brain/tests/harness/t195-plan-gate.test.ts"
+  ]
+}

@@ -1,0 +1,231 @@
+{
+  "gate": "developer-done",
+  "loop": "28-t171-r2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:02.900Z",
+  "answered_at": "2026-10-02T07:27:03.283Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "28-t171-r2",
+        "objective": "T-171 round 2 (note authorship): dispatch to a FRESH, HEADLESS QA seat (record session 158)",
+        "tasks": [
+          "T171-D1: a replace that removes nothing keeps the previous authors in note_by and adds the writer.",
+          "An unrecorded (null) note stays null.",
+          "The same session's next replace can no longer remove another session's text without replace_other_sessions. Use QA 144's C2h shape.",
+          "T171-D3: QA 144's three mutants, re-applied to a78a883 and run on tcm, must each be killed now:",
+          "dry-run-hides-replace;",
+          "removes-by-length;",
+          "superset-foreign-unflagged.",
+          "T171-D2: the REPLACED line quotes the first old line the new text does not contain. Try a prefix-keeping edit, a middle deletion, and an edit that keeps every line but changes one word.",
+          "Regressions: QA 144's checks 1–4 on the new tip, and the T-169 shape.",
+          "Your own mutants, at least one per defect."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "T171-D1: a replace that removes nothing keeps the previous authors in note_by and adds the writer.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "An unrecorded (null) note stays null.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "The same session's next replace can no longer remove another session's text without replace_other_sessions. Use QA 144's C2h shape.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "T171-D3: QA 144's three mutants, re-applied to a78a883 and run on tcm, must each be killed now:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "dry-run-hides-replace;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "removes-by-length;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "superset-foreign-unflagged.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "T171-D2: the REPLACED line quotes the first old line the new text does not contain. Try a prefix-keeping edit, a middle deletion, and an edit that keeps every line but changes one word.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Regressions: QA 144's checks 1–4 on the new tip, and the T-169 shape.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Your own mutants, at least one per defect.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "T-171 round 2 (note authorship): dispatch to a FRESH, HEADLESS QA seat (record session 158)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t171-r2-dispatch-qa.md",
+          "blob": "0e57896f631a44fe0c3ad152186cd455fd0b1540"
+        }
+      },
+      "candidate": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
+      "diffstat": [
+        "docs/loops/dev-scripts-t171/evidence/ci-runs.tsv",
+        "docs/loops/t171-developer-handoff.md",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/server.test.ts",
+        "open-brain/tests/shared/state-writer-notes.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 28,
+        "base_sha": "b3711763a4b9f5624803e8992234c51e793872ef",
+        "scored_sha": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
+        "merge_commit": "a78a883a08fe7b898addbe32f623de4aa71d98a3"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.37
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.5
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.23,
+      "confidence": 0.66,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.79,
+        "1": 0.18,
+        "2": 0.03
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1809,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.37 is below the required 0.7",
+      "local_tests_support_claim 0.5 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:03.272Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "e6e1b345-4617-47ae-85af-cf29e9e0de11",
+  "subject": {
+    "gate": "developer-done",
+    "key": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
+    "blob": "f158011b6c32be9dbf8fbcdf8076cf97cd941024"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:02.900Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 28,
+  "merge_commit": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
+  "scored_sha": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
+  "base_sha": "b3711763a4b9f5624803e8992234c51e793872ef",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/028-t171-r2.D_t.json",
+    "blob": "f158011b6c32be9dbf8fbcdf8076cf97cd941024"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/dev-scripts-t171/evidence/ci-runs.tsv",
+    "docs/loops/t171-developer-handoff.md",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/server.test.ts",
+    "open-brain/tests/shared/state-writer-notes.test.ts"
+  ]
+}

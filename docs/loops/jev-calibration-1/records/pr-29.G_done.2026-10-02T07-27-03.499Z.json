@@ -1,0 +1,267 @@
+{
+  "gate": "developer-done",
+  "loop": "29-t003-r2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:03.499Z",
+  "answered_at": "2026-10-02T07:27:04.008Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "29-t003-r2",
+        "objective": "T-003 round 2 (a server knows its own session): dispatch to a FRESH, HEADLESS QA seat (record session 154)",
+        "tasks": [
+          "D1: ob_start with no proof prints Session ID: none — <reason>, never discovers, and never reuses another session's log. Use QA 142's P7/P7b shared-checkout shape.",
+          "D3: ob_end as end.md calls it (no session_id) uses the proven id. A rating that ob_recalled lists reaches feedback_log. Use QA 142's S4 shape.",
+          "R2-D1 in the WRITER: QA 134's P2, P3 and P4 are each refused by applyStateOps.",
+          "One departure from the ruling: the ruling said the registration-time check \"stays as the early refusal\". The developer reports it \"was already gone on T-003 and was not restored\", so the writer is the only door.",
+          "Verify both halves: that it was gone at 706c029, and that the writer alone refuses every shape the old registration check refused. Report whether anything was lost, and the planner rules on it.",
+          "end.md, all three copies, says exactly what the code guarantees: a null checkout is not refused, and a write with no session records nothing. Compare the copies byte for byte.",
+          "The ride-alongs:",
+          "D2: a JSON null proof is a named refusal, and ob_recall no longer reports \"FTS search error\";",
+          "D4: ob_feedback with no proof prints NOT LOGGED;",
+          "D5: --ide cursor with an inherited CLAUDE_PID and no cursor_version writes no Claude proof;",
+          "R2-D5: the legacy-session removal is flagged.",
+          "Regressions: QA 142's A7, A8 and A9 checks and every attack in its check 2, re-run byte-exact from docs/loops/qa-scripts-t003/ on origin/qa/t003-report. QA 134's D1 checks on the merged tree.",
+          "Your own mutants, at least one per required fix (D1, D3, R2-D1)."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "D1: ob_start with no proof prints Session ID: none — <reason>, never discovers, and never reuses another session's log. Use QA 142's P7/P7b shared-checkout shape.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "D3: ob_end as end.md calls it (no session_id) uses the proven id. A rating that ob_recalled lists reaches feedback_log. Use QA 142's S4 shape.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "R2-D1 in the WRITER: QA 134's P2, P3 and P4 are each refused by applyStateOps.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "One departure from the ruling: the ruling said the registration-time check \"stays as the early refusal\". The developer reports it \"was already gone on T-003 and was not restored\", so the writer is the only door.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Verify both halves: that it was gone at 706c029, and that the writer alone refuses every shape the old registration check refused. Report whether anything was lost, and the planner rules on it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "end.md, all three copies, says exactly what the code guarantees: a null checkout is not refused, and a write with no session records nothing. Compare the copies byte for byte.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The ride-alongs:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "D2: a JSON null proof is a named refusal, and ob_recall no longer reports \"FTS search error\";",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "D4: ob_feedback with no proof prints NOT LOGGED;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "D5: --ide cursor with an inherited CLAUDE_PID and no cursor_version writes no Claude proof;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "R2-D5: the legacy-session removal is flagged.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Regressions: QA 142's A7, A8 and A9 checks and every attack in its check 2, re-run byte-exact from docs/loops/qa-scripts-t003/ on origin/qa/t003-report. QA 134's D1 checks on the merged tree.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Your own mutants, at least one per required fix (D1, D3, R2-D1).",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "T-003 round 2 (a server knows its own session): dispatch to a FRESH, HEADLESS QA seat (record session 154)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t003-r2-dispatch-qa.md",
+          "blob": "00b1755f455f7e1f1262bae4b75b909423ff1f11"
+        }
+      },
+      "candidate": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417",
+      "diffstat": [
+        ".claude/commands/end.md",
+        "docs/loops/t003-developer-handoff.md",
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/pipelines/session-start/index.ts",
+        "open-brain/src/pipelines/session-start/types.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/process-session.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/pipelines/session-start/index.test.ts",
+        "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+        "open-brain/tests/qa142-t003.test.ts",
+        "open-brain/tests/t003-r2.test.ts",
+        "project-template/.claude/commands/end.md",
+        "project-template/.cursor/commands/end.md"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 29,
+        "base_sha": "706c029ea749c6e3ec24895fb6fef619554a5c73",
+        "scored_sha": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417",
+        "merge_commit": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.48
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.52
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.11,
+      "confidence": 0.83,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.9,
+        "1": 0.08,
+        "2": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2437,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.48 is below the required 0.7",
+      "local_tests_support_claim 0.52 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:04.004Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "ba373d7a-80b6-4b64-9c59-6448eb418921",
+  "subject": {
+    "gate": "developer-done",
+    "key": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417",
+    "blob": "7ea7de6cf171ba428502a93724044c281adcedc0"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:03.499Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 29,
+  "merge_commit": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417",
+  "scored_sha": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417",
+  "base_sha": "706c029ea749c6e3ec24895fb6fef619554a5c73",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/029-t003-r2.D_t.json",
+    "blob": "7ea7de6cf171ba428502a93724044c281adcedc0"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".claude/commands/end.md",
+    "docs/loops/t003-developer-handoff.md",
+    "open-brain/src/cli-bootstrap.ts",
+    "open-brain/src/pipelines/session-start/index.ts",
+    "open-brain/src/pipelines/session-start/types.ts",
+    "open-brain/src/server.ts",
+    "open-brain/src/shared/process-session.ts",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/pipelines/session-start/index.test.ts",
+    "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+    "open-brain/tests/qa142-t003.test.ts",
+    "open-brain/tests/t003-r2.test.ts",
+    "project-template/.claude/commands/end.md",
+    "project-template/.cursor/commands/end.md"
+  ]
+}

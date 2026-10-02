@@ -1,0 +1,221 @@
+{
+  "gate": "developer-done",
+  "loop": "18-s3-a11",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:58.138Z",
+  "answered_at": "2026-10-02T07:26:58.567Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "18-s3-a11",
+        "objective": "Loop 15 slice three, candidate A11: dispatch to a FRESH, HEADLESS QA seat (record session 130)",
+        "tasks": [
+          "docs/loops/loop-15-slice-3-rulings-19.md: R83 to R88, plus R85b, ruled in hub turn 155. That text is in this file: \"when observe has no lstat facts, the text says so and prints no zeros; where observe HAS an lstat, it prints those real facts\".",
+          "Rulings-18 readings 1, 5 and 6, and R82, which must still hold.",
+          "Your predecessor QA 108's report (origin/qa/loop-15-slice-3-a10-report d352af3), and its probe files (docs/loops/qa-scripts-a10/, and qa108-a10-probe.test.ts on qa/loop-15-slice-3-a10-probe and -probe2). Re-run them byte-exact.",
+          "Each positive that A10 failed must pass now.",
+          "§14 item 2's list is adopted as the obsolete set (rulings-19): re-read each of those in its new form, and say, for each, whether the new form holds.",
+          "The consumer list (R83) and the R85 search in the handoff: check them, don't accept them. Search configwatch.ts yourself for any site that turns an identity or read result into null, or builds a side from a bare word or zeroed facts. Grok's answers on the kind: dir null (:479/:715/:736) and on :227 were accepted by the planner. Check both.",
+          "The mutants: the developer's (loop/15-slice-3-a11-mut-, each run id in the handoff), plus QA 108's own q108-r72-callsite, which R87 must kill. Then at least one of your own per ruling."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "docs/loops/loop-15-slice-3-rulings-19.md: R83 to R88, plus R85b, ruled in hub turn 155. That text is in this file: \"when observe has no lstat facts, the text says so and prints no zeros; where observe HAS an lstat, it prints those real facts\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Rulings-18 readings 1, 5 and 6, and R82, which must still hold.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Your predecessor QA 108's report (origin/qa/loop-15-slice-3-a10-report d352af3), and its probe files (docs/loops/qa-scripts-a10/, and qa108-a10-probe.test.ts on qa/loop-15-slice-3-a10-probe and -probe2). Re-run them byte-exact.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Each positive that A10 failed must pass now.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "§14 item 2's list is adopted as the obsolete set (rulings-19): re-read each of those in its new form, and say, for each, whether the new form holds.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "The consumer list (R83) and the R85 search in the handoff: check them, don't accept them. Search configwatch.ts yourself for any site that turns an identity or read result into null, or builds a side from a bare word or zeroed facts. Grok's answers on the kind: dir null (:479/:715/:736) and on :227 were accepted by the planner. Check both.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The mutants: the developer's (loop/15-slice-3-a11-mut-, each run id in the handoff), plus QA 108's own q108-r72-callsite, which R87 must kill. Then at least one of your own per ruling.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice three, candidate A11: dispatch to a FRESH, HEADLESS QA seat (record session 130)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-dispatch-qa-a11.md",
+          "blob": "7dd87b9264d8818c235cb2bff20b187f78a342fd"
+        }
+      },
+      "candidate": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-a11-developer-handoff.md",
+        "open-brain/src/harness/configwatch.ts",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/tests/harness/configwatch-r83.test.ts",
+        "open-brain/tests/harness/configwatch-r84.test.ts",
+        "open-brain/tests/harness/configwatch-r85.test.ts",
+        "open-brain/tests/harness/configwatch-r86.test.ts",
+        "open-brain/tests/harness/configwatch-r87.test.ts",
+        "open-brain/tests/harness/configwatch-r88.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 18,
+        "base_sha": "4b7a5aebd9a17b0ce8e6ee99545f4f8f5784c90f",
+        "scored_sha": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da",
+        "merge_commit": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.45
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.51
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.24,
+      "confidence": 0.65,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.79,
+        "1": 0.18,
+        "2": 0.03
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2194,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.45 is below the required 0.7",
+      "local_tests_support_claim 0.51 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:58.563Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "30231816-c3dc-4189-9de0-f88f4d207d00",
+  "subject": {
+    "gate": "developer-done",
+    "key": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da",
+    "blob": "643fc6241516b233b3fefa90ab7e77d9bb56f513"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:58.138Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 18,
+  "merge_commit": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da",
+  "scored_sha": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da",
+  "base_sha": "4b7a5aebd9a17b0ce8e6ee99545f4f8f5784c90f",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/018-s3-a11.D_t.json",
+    "blob": "643fc6241516b233b3fefa90ab7e77d9bb56f513"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-a11-developer-handoff.md",
+    "open-brain/src/harness/configwatch.ts",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/tests/harness/configwatch-r83.test.ts",
+    "open-brain/tests/harness/configwatch-r84.test.ts",
+    "open-brain/tests/harness/configwatch-r85.test.ts",
+    "open-brain/tests/harness/configwatch-r86.test.ts",
+    "open-brain/tests/harness/configwatch-r87.test.ts",
+    "open-brain/tests/harness/configwatch-r88.test.ts"
+  ]
+}

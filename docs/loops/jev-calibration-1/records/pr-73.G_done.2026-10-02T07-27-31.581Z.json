@@ -1,0 +1,227 @@
+{
+  "gate": "developer-done",
+  "loop": "73-t217-t218",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:31.581Z",
+  "answered_at": "2026-10-02T07:27:31.986Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "73-t217-t218",
+        "objective": "QA 247: T-217 + T-218 (two test guards; a narrow check)",
+        "tasks": [
+          "Confined: git diff c34866d3 1a38e3f2 touches only t216-loop-id.test.ts, t214-declared-blank.test.ts, the handoff and docs/loops/t217-t218/mutants/. Nothing under open-brain/src changes.",
+          "T-217:",
+          "QA 236's M6 and M7 go red on the candidate's tests.",
+          "Write one mutant of your own: PlanSchema.loop uses a regex equal in source and flags but built as a new RegExp(LOOP_ID_PATTERN.source). Report whether L3b's identity check catches it; it should.",
+          "T-218:",
+          "QA 239's q5 goes red.",
+          "Your own mutant: strip only a leading TAB, not spaces. Report whether J3 catches it.",
+          "Full suite once at the candidate. Expect 0 failed tests; an unattributed vitest RPC error is environmental (D-083).",
+          "CI: gh now works on Plumb. Push qa/t217-t218-ci-candidate and quote the run id, headSha, conclusion and test job. Use 1 run."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined: git diff c34866d3 1a38e3f2 touches only t216-loop-id.test.ts, t214-declared-blank.test.ts, the handoff and docs/loops/t217-t218/mutants/. Nothing under open-brain/src changes.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "T-217:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "QA 236's M6 and M7 go red on the candidate's tests.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Write one mutant of your own: PlanSchema.loop uses a regex equal in source and flags but built as a new RegExp(LOOP_ID_PATTERN.source). Report whether L3b's identity check catches it; it should.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "T-218:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "QA 239's q5 goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Your own mutant: strip only a leading TAB, not spaces. Report whether J3 catches it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Full suite once at the candidate. Expect 0 failed tests; an unattributed vitest RPC error is environmental (D-083).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "CI: gh now works on Plumb. Push qa/t217-t218-ci-candidate and quote the run id, headSha, conclusion and test job. Use 1 run.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 247: T-217 + T-218 (two test guards; a narrow check)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-247-t217-t218-dispatch.md",
+          "blob": "e0324cd6e66ed938a5332e21bf34c5fc7fe14f89"
+        }
+      },
+      "candidate": "1a38e3f2bc2ce0b850d2bf68949823c5812c2576",
+      "diffstat": [
+        "docs/loops/t217-t218-developer-handoff.md",
+        "docs/loops/t217-t218/mutants/qa236-M6-identical-literal-copy-regen.diff",
+        "docs/loops/t217-t218/mutants/qa236-M7-widen-i-flag-regen.diff",
+        "docs/loops/t217-t218/mutants/qa239-q5-leading-space-tab-stripped.diff",
+        "open-brain/tests/harness/t214-declared-blank.test.ts",
+        "open-brain/tests/harness/t216-loop-id.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 73,
+        "base_sha": "c34866d37e3fb54e2a2c78aa0507417911f684da",
+        "scored_sha": "1a38e3f2bc2ce0b850d2bf68949823c5812c2576",
+        "merge_commit": "1dc71dbed014cff1063373ef5affbb68f3494119"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.67
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.21
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.52
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.01,
+      "confidence": 0.98,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.99,
+        "1": 0.01,
+        "2": 0
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1919,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.67 is below the required 0.7",
+      "local_tests_support_claim 0.52 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:31.973Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "02d1aaaa-68b4-40d5-a962-cd66f1b996f9",
+  "subject": {
+    "gate": "developer-done",
+    "key": "1a38e3f2bc2ce0b850d2bf68949823c5812c2576",
+    "blob": "e99ceab0a611c4a4149fdb0251542a4d2bccf5a7"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:31.581Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 73,
+  "merge_commit": "1dc71dbed014cff1063373ef5affbb68f3494119",
+  "scored_sha": "1a38e3f2bc2ce0b850d2bf68949823c5812c2576",
+  "base_sha": "c34866d37e3fb54e2a2c78aa0507417911f684da",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/073-t217-t218.D_t.json",
+    "blob": "e99ceab0a611c4a4149fdb0251542a4d2bccf5a7"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t217-t218-developer-handoff.md",
+    "docs/loops/t217-t218/mutants/qa236-M6-identical-literal-copy-regen.diff",
+    "docs/loops/t217-t218/mutants/qa236-M7-widen-i-flag-regen.diff",
+    "docs/loops/t217-t218/mutants/qa239-q5-leading-space-tab-stripped.diff",
+    "open-brain/tests/harness/t214-declared-blank.test.ts",
+    "open-brain/tests/harness/t216-loop-id.test.ts"
+  ]
+}

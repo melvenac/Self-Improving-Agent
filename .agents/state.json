@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 278,
+  "revision": 279,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1248,6 +1248,34 @@
       "closed_session": null,
       "supersedes": null,
       "note": "QA 251 N1 (docs/loops/t164-t211-r2-qa-report.md on d4dea22a): readStatusKeys (agent-identity.ts:128 at 3b0b8188) skips any value starting with '<', so copying the template's example verbatim prints INVALID ... status_to is missing although the key is present. Non-blocking; ruled in D-099.",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-225",
+      "title": "Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "From QA 252 (docs/loops/jev-calibration-1.md, Recommendation and Findings 1-2) and D-100. Calibration 1 measured that the done-gate as built cannot proceed on anything (diff_matches_plan_min 0.7 is above 0 of 36 ACCEPT answers) and that fitted cuts do not transfer (0.682 headline, 0.388 leak group). Next calibration needs: (1) G_qa requests that do not carry the E_t met/unmet status; (2) cases with real checks so (a) differs from (b); (3) a held-out set before any threshold is proposed for use; (4) score.mjs drivers() matching 'no deterministic checks were supplied' (T-222 F6 text). No policy or threshold change until then.",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-226",
+      "title": "/start text still says 'largest loop number' for the brief; point it at ob_start's new Latest brief line (T-210) in .claude/commands/start.md, the project template and the Cursor mirror",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Flagged by sia-builder in the T-209/T-210 handoff (loop/t209-t210-render 5ceb6eef). Lands after T-210 merges.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
@@ -3791,6 +3819,12 @@
       "title": "QA 251 ACCEPT: T-164 r2 (#270 892f7644) and T-211 r2 (#272 3b0b8188); F4 ruled on the 'as documented' reading; N1 opened as T-224",
       "date": "2026-10-02",
       "note": "Report origin/qa/t164-t211-r2-report d4dea22a (docs/loops/t164-t211-r2-qa-report.md). Planner re-derived at session 157: git grep nextFreeSessionNumber 892f7644 -- open-brain = 0 lines; state-schema.ts:368-370 nextSessionNumber = max(n)+1 (1 when empty); state-writer.ts:267 refusal calls it; gh run view 36976283947/36976289271 (892f7644) and 36976284517/36976288445 (3b0b8188) all success; range-diff bea385b2..9f6fcea4 vs f7ac983d..3b0b8188 = 6 round-1 patches '=' plus 3 new. F4: QA 249's F4 was the inline '# comment' breaking a FILLED example; angle-bracket values are this template's placeholder convention and the reader deliberately treats them as unset, so the 'as documented' reading is the right one. Both PRs touch code: merge needs Aaron's word naming each PR; #272 is stacked on #270, so #270 first."
+    },
+    {
+      "id": "D-100",
+      "title": "Jev calibration 1 COMPLETE (QA 252, report d495032c): done-gate rejects all 44 headline cases under (a) AND (b); Brier 0.2708 vs 0.25 for p=0.5; no driving answer reaches 0.9. Recommendation ACCEPTED: keep G_done in shadow, change NO threshold, human QA stays in front of every candidate. G_qa uncalibratable as built. T-183 cuts ruled.",
+      "date": "2026-10-02",
+      "note": "Planner re-derived from origin/qa/jev-cal-1-report d495032c at session 157: 67 records, all mode live, sent true, outcome_class answered, every decision verdict reject; ledger attempts.jsonl = 134 lines = 67 begin + 67 end; MANIFEST/score.mjs/runlist byte-identical to freeze a26e44d0; key-scan pass 4 exit 0 with known positive 1/1. Report finding 1 (score.mjs drivers() under-counts the checks rule) has a derived cause: T-222's F6 (#277, merged after the freeze, inside DISPATCH ada4701a) changed the reason text to 'no deterministic checks were supplied', and score.mjs was frozen matching the old 'the deterministic checks' string. Verdicts and calibration unaffected; fix rides calibration 2 (T-225). Finding 2 (fitted cuts collapse to 0.388 on the leak group) is why no threshold changes. T-183 ruling on sia-builder's measurement (51,520 chars; role files 45.6%, shared.md 34.3%, tasks 23.4%, gaps 13.8%): ACCEPT newest-10 gaps plus a count line and task titles clipped at 100 chars; REFUSE shared.md as a pointer for now (it is the rule set every seat must actually read; a smaller shared.md is an edit to the rules, not a render cut)."
     }
   ],
   "handoffs": [

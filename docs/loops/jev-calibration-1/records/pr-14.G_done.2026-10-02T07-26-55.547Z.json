@@ -1,0 +1,279 @@
+{
+  "gate": "developer-done",
+  "loop": "14-importer-fixes-r4",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:55.547Z",
+  "answered_at": "2026-10-02T07:26:55.953Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "14-importer-fixes-r4",
+        "objective": "Importer fixes round 4: dispatch to a FRESH, HEADLESS QA seat (record session 122)",
+        "tasks": [
+          "docs/loops/importer-fixes-round-4-brief.md §1 and §3, rows IF-21 to IF-25 (on origin/docs/session-100-qa99-dispatch), plus IF-1 to IF-20 from the round 1–3 briefs.",
+          "Your predecessors' scripts, byte-exact: QA 106's (probes-r2.mjs, probe-existing-snapshot.mjs, mutants-r2.mjs) and QA 111's (probes-r3.mjs, mutants-r3-qa.mjs, on origin/qa/importer-fixes-r3-report). The developer reports probes-r2 at 24/1 and probes-r3 at 17/4, and says every FAIL is a row checking \"all STALE and bare --commit refuses\", which R3-2 or R4-1 changed. Re-derive that for each FAIL row, and name the ruling that changed each. A FAIL no ruling covers is a defect.",
+          "R4-1, check, not accept:",
+          "QA 111's four append shapes (PS 5.1 >> onto UTF-8, onto UTF-8 with a BOM and onto 1252, and a stray NUL), plus UTF-16LE and UTF-16BE with no BOM. Write them with Windows PowerShell 5.1 itself here, not only as bytes. A bare --commit exits 1 and leaves the tree identical (sha256, size, mtime, the read-only bit), and --accept-stale completes.",
+          "IF-22's list says unreadable is the only blocking could-not-tell reason, and that no_session_log, no_declared_session and ahead_of_latest do not block. Check it against index.ts (the table at about :457), and check that IF-10's +13/+1 still commit.",
+          "Look for another shape: an input that is readable but judged unreadable, or unreadable but judged readable. Candidates include a UTF-8 BOM followed by UTF-16, a file that is all NULs, a zero-byte file, and a file that another process holds open for writing.",
+          "R4-2 and R4-3: QA 111's N5, Q1, Q17 and Q20 must be red. The developer reports N5 at 1/45.",
+          "The developer's own claim to check: QA 106's mutants-r2.mjs runs a fixed list of five test files. That is why R4-2's test was duplicated into state-import-r2.test.ts. Confirm that the duplicate is the same test.",
+          "Merge check: 9473b0d (T-185, accepted with a round 2) and 78a7d13 in a scratch clone (git merge --no-commit --no-ff, then abort): no conflict in cli.ts, and tsc clean on the merged tree. Report it.",
+          "O7 was not done (which snapshot to name is an open question). Record your view on it under \"Open\"."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "docs/loops/importer-fixes-round-4-brief.md §1 and §3, rows IF-21 to IF-25 (on origin/docs/session-100-qa99-dispatch), plus IF-1 to IF-20 from the round 1–3 briefs.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Your predecessors' scripts, byte-exact: QA 106's (probes-r2.mjs, probe-existing-snapshot.mjs, mutants-r2.mjs) and QA 111's (probes-r3.mjs, mutants-r3-qa.mjs, on origin/qa/importer-fixes-r3-report). The developer reports probes-r2 at 24/1 and probes-r3 at 17/4, and says every FAIL is a row checking \"all STALE and bare --commit refuses\", which R3-2 or R4-1 changed. Re-derive that for each FAIL row, and name the ruling that changed each. A FAIL no ruling covers is a defect.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "R4-1, check, not accept:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "QA 111's four append shapes (PS 5.1 >> onto UTF-8, onto UTF-8 with a BOM and onto 1252, and a stray NUL), plus UTF-16LE and UTF-16BE with no BOM. Write them with Windows PowerShell 5.1 itself here, not only as bytes. A bare --commit exits 1 and leaves the tree identical (sha256, size, mtime, the read-only bit), and --accept-stale completes.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "IF-22's list says unreadable is the only blocking could-not-tell reason, and that no_session_log, no_declared_session and ahead_of_latest do not block. Check it against index.ts (the table at about :457), and check that IF-10's +13/+1 still commit.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Look for another shape: an input that is readable but judged unreadable, or unreadable but judged readable. Candidates include a UTF-8 BOM followed by UTF-16, a file that is all NULs, a zero-byte file, and a file that another process holds open for writing.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "R4-2 and R4-3: QA 111's N5, Q1, Q17 and Q20 must be red. The developer reports N5 at 1/45.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The developer's own claim to check: QA 106's mutants-r2.mjs runs a fixed list of five test files. That is why R4-2's test was duplicated into state-import-r2.test.ts. Confirm that the duplicate is the same test.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Merge check: 9473b0d (T-185, accepted with a round 2) and 78a7d13 in a scratch clone (git merge --no-commit --no-ff, then abort): no conflict in cli.ts, and tsc clean on the merged tree. Report it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "O7 was not done (which snapshot to name is an open question). Record your view on it under \"Open\".",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Importer fixes round 4: dispatch to a FRESH, HEADLESS QA seat (record session 122)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/importer-fixes-r4-dispatch-qa.md",
+          "blob": "879cde3c65df8c66cc4f9dece1ddb8949a1476aa"
+        }
+      },
+      "candidate": "78a7d131a2b4ab6bb78be132f9d18be31663538a",
+      "diffstat": [
+        "docs/loops/dev-scripts-importer-r3/evidence/importer-files-baseline-063662b.out",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/N13.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R31-path.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R31-record.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R31-rollback.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-evidence.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-fallback.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-nul.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-summary.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-table.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-commit.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-draft.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-rolledback.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-success.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-write.diff",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutants-r3-063662b.out",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutants-r3-dfa1a2a-R32-nul-rerun.out",
+        "docs/loops/dev-scripts-importer-r3/evidence/mutants-r3-dfa1a2a.out",
+        "docs/loops/dev-scripts-importer-r3/evidence/probe-existing-snapshot-063662b.out",
+        "docs/loops/dev-scripts-importer-r3/evidence/probes-r2-063662b.out",
+        "docs/loops/dev-scripts-importer-r3/evidence/procs-before-full-suite-precheck.txt",
+        "docs/loops/dev-scripts-importer-r3/evidence/quiet-samples.txt",
+        "docs/loops/dev-scripts-importer-r3/mutants-r3.cjs",
+        "docs/loops/dev-scripts-importer-r3/quiet-wait.ps1",
+        "docs/loops/importer-fixes-r3-developer-handoff.md",
+        "open-brain/src/cli.ts",
+        "open-brain/src/pipelines/state-import/index.ts",
+        "open-brain/tests/pipelines/state-import-r2.test.ts",
+        "open-brain/tests/pipelines/state-import-r4.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 14,
+        "base_sha": "063662bb12ca1badead8022dd8d3a0992fa94788",
+        "scored_sha": "78a7d131a2b4ab6bb78be132f9d18be31663538a",
+        "merge_commit": "78a7d131a2b4ab6bb78be132f9d18be31663538a"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.27
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.43
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.17,
+      "confidence": 0.75,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.86,
+        "1": 0.1,
+        "2": 0.04
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 3506,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.26 is below the required 0.7",
+      "local_tests_support_claim 0.43 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:55.941Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "32162cf3-221e-4678-bbef-9668d2baaeda",
+  "subject": {
+    "gate": "developer-done",
+    "key": "78a7d131a2b4ab6bb78be132f9d18be31663538a",
+    "blob": "005697c8dc50ddf1e482b36083ed5f99bb8186f1"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:55.547Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 14,
+  "merge_commit": "78a7d131a2b4ab6bb78be132f9d18be31663538a",
+  "scored_sha": "78a7d131a2b4ab6bb78be132f9d18be31663538a",
+  "base_sha": "063662bb12ca1badead8022dd8d3a0992fa94788",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/014-importer-fixes-r4.D_t.json",
+    "blob": "005697c8dc50ddf1e482b36083ed5f99bb8186f1"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/dev-scripts-importer-r3/evidence/importer-files-baseline-063662b.out",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/N13.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R31-path.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R31-record.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R31-rollback.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-evidence.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-fallback.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-nul.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-summary.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R32-table.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-commit.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-draft.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-rolledback.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-success.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutant-diffs-063662b/R33-write.diff",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutants-r3-063662b.out",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutants-r3-dfa1a2a-R32-nul-rerun.out",
+    "docs/loops/dev-scripts-importer-r3/evidence/mutants-r3-dfa1a2a.out",
+    "docs/loops/dev-scripts-importer-r3/evidence/probe-existing-snapshot-063662b.out",
+    "docs/loops/dev-scripts-importer-r3/evidence/probes-r2-063662b.out",
+    "docs/loops/dev-scripts-importer-r3/evidence/procs-before-full-suite-precheck.txt",
+    "docs/loops/dev-scripts-importer-r3/evidence/quiet-samples.txt",
+    "docs/loops/dev-scripts-importer-r3/mutants-r3.cjs",
+    "docs/loops/dev-scripts-importer-r3/quiet-wait.ps1",
+    "docs/loops/importer-fixes-r3-developer-handoff.md",
+    "open-brain/src/cli.ts",
+    "open-brain/src/pipelines/state-import/index.ts",
+    "open-brain/tests/pipelines/state-import-r2.test.ts",
+    "open-brain/tests/pipelines/state-import-r4.test.ts"
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "gate": "developer-done",
+  "loop": "1-loop-15-slice-3",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:50.199Z",
+  "answered_at": "2026-10-02T07:26:50.741Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "1-loop-15-slice-3",
+        "objective": "Loop 15 slice three: dispatch 2, the loop resumes",
+        "tasks": [
+          "Candidate 9ed674c (on origin/loop/15-slice-3-forge-candidate, tip 5759008, which adds only the developer handoff). Criteria 17c9056 on origin/loop/15-slice-3, which you wrote before the candidate existed. Fast-forward loop/15-slice-3 to 5759008 in your own tree.",
+          "Read-only, frozen SHA; report \"tree moved\" and \"tree dirty\" separately; verdicts from exit codes only; the baseline at eb14d09 is not assumed green (criteria §7, V-076).",
+          "Full-suite run (T-168): call ListAgents immediately before the run and record every peer's state beside the result. Limits: registration lag means an empty listing is not evidence of idleness, and non-Claude load is invisible. Tell Forge and the planner before you start the run, and again when it ends.",
+          "Report into a tracked docs/loops/loop-15-slice-3-qa-report.md on your branch, then message the planner. Aaron merges; a relay is not his approval."
+        ],
+        "out_of_scope": [
+          "Atlas (planner) | 78",
+          "Probe (QA) | 79",
+          "Forge (developer) | 80"
+        ],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Candidate 9ed674c (on origin/loop/15-slice-3-forge-candidate, tip 5759008, which adds only the developer handoff). Criteria 17c9056 on origin/loop/15-slice-3, which you wrote before the candidate existed. Fast-forward loop/15-slice-3 to 5759008 in your own tree.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Read-only, frozen SHA; report \"tree moved\" and \"tree dirty\" separately; verdicts from exit codes only; the baseline at eb14d09 is not assumed green (criteria §7, V-076).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Full-suite run (T-168): call ListAgents immediately before the run and record every peer's state beside the result. Limits: registration lag means an empty listing is not evidence of idleness, and non-Claude load is invisible. Tell Forge and the planner before you start the run, and again when it ends.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Report into a tracked docs/loops/loop-15-slice-3-qa-report.md on your branch, then message the planner. Aaron merges; a relay is not his approval.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice three: dispatch 2, the loop resumes",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-dispatch-2.md",
+          "blob": "8739a47f7d6a9c809207c2cd9b6a10ba0d75531d"
+        }
+      },
+      "candidate": "9ed674c8dac8aa96502c2960b693b75ea6e3afac",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-qa-criteria.md",
+        "open-brain/src/harness/refwatch.ts",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/tests/harness/refwatch-stage.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 1,
+        "base_sha": "eb14d09c3a0d6a8ea769694091208300b96f5e1e",
+        "scored_sha": "9ed674c8dac8aa96502c2960b693b75ea6e3afac",
+        "merge_commit": "9ed674c8dac8aa96502c2960b693b75ea6e3afac"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.4
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.42
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.48
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.03,
+      "confidence": 0.95,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.97,
+        "1": 0.02,
+        "2": 0.01
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1680,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.4 is below the required 0.7",
+      "touches_out_of_scope 0.42 is above the permitted 0.3",
+      "local_tests_support_claim 0.48 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:50.737Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "1fc1ec70-d73c-4769-a5b2-b1e4cf4925bc",
+  "subject": {
+    "gate": "developer-done",
+    "key": "9ed674c8dac8aa96502c2960b693b75ea6e3afac",
+    "blob": "b5b3f51e6fd3ef0ff4e8a930861186761ac16883"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:50.199Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 1,
+  "merge_commit": "9ed674c8dac8aa96502c2960b693b75ea6e3afac",
+  "scored_sha": "9ed674c8dac8aa96502c2960b693b75ea6e3afac",
+  "base_sha": "eb14d09c3a0d6a8ea769694091208300b96f5e1e",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/001-loop-15-slice-3.D_t.json",
+    "blob": "b5b3f51e6fd3ef0ff4e8a930861186761ac16883"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-qa-criteria.md",
+    "open-brain/src/harness/refwatch.ts",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/tests/harness/refwatch-stage.test.ts"
+  ]
+}

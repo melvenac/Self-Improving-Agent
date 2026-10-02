@@ -1,0 +1,2739 @@
+{
+  "all_scored": {
+    "a_gate_as_built": {
+      "accept_class_rate": 0,
+      "accept_proceed": 0,
+      "accept_reject": 36,
+      "accuracy": 0.4627,
+      "balanced_accuracy": 0.5,
+      "false_accept_rate": 0,
+      "false_reject_rate": 1,
+      "n": 67,
+      "other": 0,
+      "reject_class_rate": 1,
+      "reject_proceed": 0,
+      "reject_reject": 31
+    },
+    "b_jev_alone_COUNTERFACTUAL": {
+      "accept_class_rate": 0,
+      "accept_proceed": 0,
+      "accept_reject": 36,
+      "accuracy": 0.4627,
+      "balanced_accuracy": 0.5,
+      "false_accept_rate": 0,
+      "false_reject_rate": 1,
+      "n": 67,
+      "other": 0,
+      "reject_class_rate": 1,
+      "reject_proceed": 0,
+      "reject_reject": 31
+    },
+    "calibration_all_questions": {
+      "bands": [
+        {
+          "band": "<0.7",
+          "correct": 59,
+          "fraction_correct": 0.4155,
+          "n": 142
+        },
+        {
+          "band": "0.7-0.9",
+          "correct": 44,
+          "fraction_correct": 0.5176,
+          "n": 85
+        },
+        {
+          "band": ">=0.9",
+          "correct": 53,
+          "fraction_correct": 0.4907,
+          "n": 108
+        }
+      ],
+      "brier": 0.3407,
+      "confident_misses": [
+        {
+          "case_id": "bootstrap-fix",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "bootstrap-fix",
+          "label": "REJECT",
+          "p": 0.925,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2",
+          "label": "REJECT",
+          "p": 0.945,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "qa-driver-cursor-r2",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "qa-driver-cursor-r3",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "qa-driver-cursor-r3",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "qa-driver-cursor-r5",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a10",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a10",
+          "label": "REJECT",
+          "p": 0.9,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a4",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a4",
+          "label": "REJECT",
+          "p": 0.935,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a5",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a5",
+          "label": "REJECT",
+          "p": 0.905,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a6",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a6",
+          "label": "REJECT",
+          "p": 0.905,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a7",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a9",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a9",
+          "label": "REJECT",
+          "p": 0.905,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-c",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-c",
+          "label": "REJECT",
+          "p": 0.945,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-c-r2",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-c-r2",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r2",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r2",
+          "label": "REJECT",
+          "p": 0.97,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r5",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r5",
+          "label": "REJECT",
+          "p": 0.955,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t195",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t196-t197",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t196-t197",
+          "label": "REJECT",
+          "p": 0.975,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t198",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t198",
+          "label": "REJECT",
+          "p": 0.965,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "cal-a12-composer",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "cal-a12-composer",
+          "label": "REJECT",
+          "p": 0.9299999999999999,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2-r2",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2-r2",
+          "label": "REJECT",
+          "p": 0.975,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2-r3",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2-r3",
+          "label": "REJECT",
+          "p": 0.975,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a11",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a12",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a12",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a8",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a8",
+          "label": "REJECT",
+          "p": 0.935,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t158",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t158",
+          "label": "REJECT",
+          "p": 0.915,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t164-t211",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t164-t211",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t179",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r3",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r4",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r4",
+          "label": "REJECT",
+          "p": 0.935,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r6",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r6",
+          "label": "REJECT",
+          "p": 0.915,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r7",
+          "label": "REJECT",
+          "p": 0.9299999999999999,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r7",
+          "label": "REJECT",
+          "p": 0.935,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        }
+      ],
+      "n": 335
+    },
+    "calibration_driving_questions": {
+      "bands": [
+        {
+          "band": "<0.7",
+          "correct": 27,
+          "fraction_correct": 0.4426,
+          "n": 61
+        },
+        {
+          "band": "0.7-0.9",
+          "correct": 39,
+          "fraction_correct": 0.5342,
+          "n": 73
+        },
+        {
+          "band": ">=0.9",
+          "correct": 0,
+          "fraction_correct": null,
+          "n": 0
+        }
+      ],
+      "brier": 0.2841,
+      "confident_misses": [],
+      "n": 134
+    },
+    "drivers_a": {
+      "diff_matches_plan": 66,
+      "local_tests_support_claim": 65,
+      "risk_of_regression": 1,
+      "stuck_repeating_prior_failure": 2,
+      "the deterministic checks": 1,
+      "touches_out_of_scope": 3
+    },
+    "drivers_b": {
+      "diff_matches_plan": 66,
+      "local_tests_support_claim": 65,
+      "stuck_repeating_prior_failure": 2,
+      "touches_out_of_scope": 3
+    },
+    "n": 67
+  },
+  "by_source_kind": {
+    "dev-dispatch": {
+      "a_gate_as_built": {
+        "accept_class_rate": 0,
+        "accept_proceed": 0,
+        "accept_reject": 2,
+        "accuracy": 0.6,
+        "balanced_accuracy": 0.5,
+        "false_accept_rate": 0,
+        "false_reject_rate": 1,
+        "n": 5,
+        "other": 0,
+        "reject_class_rate": 1,
+        "reject_proceed": 0,
+        "reject_reject": 3
+      },
+      "b_jev_alone_COUNTERFACTUAL": {
+        "accept_class_rate": 0,
+        "accept_proceed": 0,
+        "accept_reject": 2,
+        "accuracy": 0.6,
+        "balanced_accuracy": 0.5,
+        "false_accept_rate": 0,
+        "false_reject_rate": 1,
+        "n": 5,
+        "other": 0,
+        "reject_class_rate": 1,
+        "reject_proceed": 0,
+        "reject_reject": 3
+      },
+      "calibration_all_questions": {
+        "bands": [
+          {
+            "band": "<0.7",
+            "correct": 4,
+            "fraction_correct": 0.3636,
+            "n": 11
+          },
+          {
+            "band": "0.7-0.9",
+            "correct": 1,
+            "fraction_correct": 0.25,
+            "n": 4
+          },
+          {
+            "band": ">=0.9",
+            "correct": 4,
+            "fraction_correct": 0.4,
+            "n": 10
+          }
+        ],
+        "brier": 0.4049,
+        "confident_misses": [
+          {
+            "case_id": "loop-15-slice-4-step2",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "loop-15-slice-4-step2",
+            "label": "REJECT",
+            "p": 0.945,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "loop-15-slice-4-step2-r2",
+            "label": "REJECT",
+            "p": 0.94,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "loop-15-slice-4-step2-r2",
+            "label": "REJECT",
+            "p": 0.975,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "loop-15-slice-4-step2-r3",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "loop-15-slice-4-step2-r3",
+            "label": "REJECT",
+            "p": 0.975,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          }
+        ],
+        "n": 25
+      },
+      "calibration_driving_questions": {
+        "bands": [
+          {
+            "band": "<0.7",
+            "correct": 2,
+            "fraction_correct": 0.3333,
+            "n": 6
+          },
+          {
+            "band": "0.7-0.9",
+            "correct": 1,
+            "fraction_correct": 0.25,
+            "n": 4
+          },
+          {
+            "band": ">=0.9",
+            "correct": 0,
+            "fraction_correct": null,
+            "n": 0
+          }
+        ],
+        "brier": 0.3359,
+        "confident_misses": [],
+        "n": 10
+      },
+      "drivers_a": {
+        "diff_matches_plan": 5,
+        "local_tests_support_claim": 5,
+        "touches_out_of_scope": 1
+      },
+      "drivers_b": {
+        "diff_matches_plan": 5,
+        "local_tests_support_claim": 5,
+        "touches_out_of_scope": 1
+      },
+      "n": 5
+    },
+    "qa-dispatch": {
+      "a_gate_as_built": {
+        "accept_class_rate": 0,
+        "accept_proceed": 0,
+        "accept_reject": 34,
+        "accuracy": 0.4516,
+        "balanced_accuracy": 0.5,
+        "false_accept_rate": 0,
+        "false_reject_rate": 1,
+        "n": 62,
+        "other": 0,
+        "reject_class_rate": 1,
+        "reject_proceed": 0,
+        "reject_reject": 28
+      },
+      "b_jev_alone_COUNTERFACTUAL": {
+        "accept_class_rate": 0,
+        "accept_proceed": 0,
+        "accept_reject": 34,
+        "accuracy": 0.4516,
+        "balanced_accuracy": 0.5,
+        "false_accept_rate": 0,
+        "false_reject_rate": 1,
+        "n": 62,
+        "other": 0,
+        "reject_class_rate": 1,
+        "reject_proceed": 0,
+        "reject_reject": 28
+      },
+      "calibration_all_questions": {
+        "bands": [
+          {
+            "band": "<0.7",
+            "correct": 55,
+            "fraction_correct": 0.4198,
+            "n": 131
+          },
+          {
+            "band": "0.7-0.9",
+            "correct": 43,
+            "fraction_correct": 0.5309,
+            "n": 81
+          },
+          {
+            "band": ">=0.9",
+            "correct": 49,
+            "fraction_correct": 0.5,
+            "n": 98
+          }
+        ],
+        "brier": 0.3355,
+        "confident_misses": [
+          {
+            "case_id": "bootstrap-fix",
+            "label": "REJECT",
+            "p": 0.94,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "bootstrap-fix",
+            "label": "REJECT",
+            "p": 0.925,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "qa-driver-cursor-r2",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "qa-driver-cursor-r3",
+            "label": "REJECT",
+            "p": 0.94,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "qa-driver-cursor-r3",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "qa-driver-cursor-r5",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a10",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a10",
+            "label": "REJECT",
+            "p": 0.9,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a4",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a4",
+            "label": "REJECT",
+            "p": 0.935,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a5",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a5",
+            "label": "REJECT",
+            "p": 0.905,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a6",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a6",
+            "label": "REJECT",
+            "p": 0.905,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a7",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a9",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a9",
+            "label": "REJECT",
+            "p": 0.905,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-c",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-c",
+            "label": "REJECT",
+            "p": 0.945,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-c-r2",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-c-r2",
+            "label": "REJECT",
+            "p": 0.94,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r2",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r2",
+            "label": "REJECT",
+            "p": 0.97,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r5",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r5",
+            "label": "REJECT",
+            "p": 0.955,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t195",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t196-t197",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t196-t197",
+            "label": "REJECT",
+            "p": 0.975,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t198",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t198",
+            "label": "REJECT",
+            "p": 0.965,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "cal-a12-composer",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "cal-a12-composer",
+            "label": "REJECT",
+            "p": 0.9299999999999999,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a11",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a12",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a12",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a8",
+            "label": "REJECT",
+            "p": 0.96,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "s3-a8",
+            "label": "REJECT",
+            "p": 0.935,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t158",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t158",
+            "label": "REJECT",
+            "p": 0.915,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t164-t211",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t164-t211",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t179",
+            "label": "REJECT",
+            "p": 0.95,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r3",
+            "label": "REJECT",
+            "p": 0.94,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r4",
+            "label": "REJECT",
+            "p": 0.94,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r4",
+            "label": "REJECT",
+            "p": 0.935,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r6",
+            "label": "REJECT",
+            "p": 0.94,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r6",
+            "label": "REJECT",
+            "p": 0.915,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r7",
+            "label": "REJECT",
+            "p": 0.9299999999999999,
+            "question": "stuck_repeating_prior_failure",
+            "stance": "ACCEPT"
+          },
+          {
+            "case_id": "t194-r7",
+            "label": "REJECT",
+            "p": 0.935,
+            "question": "risk_of_regression",
+            "stance": "ACCEPT"
+          }
+        ],
+        "n": 310
+      },
+      "calibration_driving_questions": {
+        "bands": [
+          {
+            "band": "<0.7",
+            "correct": 25,
+            "fraction_correct": 0.4545,
+            "n": 55
+          },
+          {
+            "band": "0.7-0.9",
+            "correct": 38,
+            "fraction_correct": 0.5507,
+            "n": 69
+          },
+          {
+            "band": ">=0.9",
+            "correct": 0,
+            "fraction_correct": null,
+            "n": 0
+          }
+        ],
+        "brier": 0.2799,
+        "confident_misses": [],
+        "n": 124
+      },
+      "drivers_a": {
+        "diff_matches_plan": 61,
+        "local_tests_support_claim": 60,
+        "risk_of_regression": 1,
+        "stuck_repeating_prior_failure": 2,
+        "the deterministic checks": 1,
+        "touches_out_of_scope": 2
+      },
+      "drivers_b": {
+        "diff_matches_plan": 61,
+        "local_tests_support_claim": 60,
+        "stuck_repeating_prior_failure": 2,
+        "touches_out_of_scope": 2
+      },
+      "n": 62
+    }
+  },
+  "headline": {
+    "a_gate_as_built": {
+      "accept_class_rate": 0,
+      "accept_proceed": 0,
+      "accept_reject": 26,
+      "accuracy": 0.4091,
+      "balanced_accuracy": 0.5,
+      "false_accept_rate": 0,
+      "false_reject_rate": 1,
+      "n": 44,
+      "other": 0,
+      "reject_class_rate": 1,
+      "reject_proceed": 0,
+      "reject_reject": 18
+    },
+    "b_jev_alone_COUNTERFACTUAL": {
+      "accept_class_rate": 0,
+      "accept_proceed": 0,
+      "accept_reject": 26,
+      "accuracy": 0.4091,
+      "balanced_accuracy": 0.5,
+      "false_accept_rate": 0,
+      "false_reject_rate": 1,
+      "n": 44,
+      "other": 0,
+      "reject_class_rate": 1,
+      "reject_proceed": 0,
+      "reject_reject": 18
+    },
+    "calibration_all_questions": {
+      "bands": [
+        {
+          "band": "<0.7",
+          "correct": 42,
+          "fraction_correct": 0.4468,
+          "n": 94
+        },
+        {
+          "band": "0.7-0.9",
+          "correct": 33,
+          "fraction_correct": 0.5893,
+          "n": 56
+        },
+        {
+          "band": ">=0.9",
+          "correct": 38,
+          "fraction_correct": 0.5429,
+          "n": 70
+        }
+      ],
+      "brier": 0.3143,
+      "confident_misses": [
+        {
+          "case_id": "bootstrap-fix",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "bootstrap-fix",
+          "label": "REJECT",
+          "p": 0.925,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2",
+          "label": "REJECT",
+          "p": 0.945,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "qa-driver-cursor-r2",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "qa-driver-cursor-r3",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "qa-driver-cursor-r3",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "qa-driver-cursor-r5",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a10",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a10",
+          "label": "REJECT",
+          "p": 0.9,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a4",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a4",
+          "label": "REJECT",
+          "p": 0.935,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a5",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a5",
+          "label": "REJECT",
+          "p": 0.905,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a6",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a6",
+          "label": "REJECT",
+          "p": 0.905,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a7",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a9",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a9",
+          "label": "REJECT",
+          "p": 0.905,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-c",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-c",
+          "label": "REJECT",
+          "p": 0.945,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-c-r2",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-c-r2",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r2",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r2",
+          "label": "REJECT",
+          "p": 0.97,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r5",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r5",
+          "label": "REJECT",
+          "p": 0.955,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t195",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t196-t197",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t196-t197",
+          "label": "REJECT",
+          "p": 0.975,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t198",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t198",
+          "label": "REJECT",
+          "p": 0.965,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        }
+      ],
+      "n": 220
+    },
+    "calibration_driving_questions": {
+      "bands": [
+        {
+          "band": "<0.7",
+          "correct": 17,
+          "fraction_correct": 0.4359,
+          "n": 39
+        },
+        {
+          "band": "0.7-0.9",
+          "correct": 29,
+          "fraction_correct": 0.5918,
+          "n": 49
+        },
+        {
+          "band": ">=0.9",
+          "correct": 0,
+          "fraction_correct": null,
+          "n": 0
+        }
+      ],
+      "brier": 0.2708,
+      "confident_misses": [],
+      "n": 88
+    },
+    "drivers_a": {
+      "diff_matches_plan": 43,
+      "local_tests_support_claim": 42,
+      "risk_of_regression": 1,
+      "the deterministic checks": 1,
+      "touches_out_of_scope": 3
+    },
+    "drivers_b": {
+      "diff_matches_plan": 43,
+      "local_tests_support_claim": 42,
+      "touches_out_of_scope": 3
+    },
+    "n": 44
+  },
+  "leak_group": {
+    "a_gate_as_built": {
+      "accept_class_rate": 0,
+      "accept_proceed": 0,
+      "accept_reject": 10,
+      "accuracy": 0.5652,
+      "balanced_accuracy": 0.5,
+      "false_accept_rate": 0,
+      "false_reject_rate": 1,
+      "n": 23,
+      "other": 0,
+      "reject_class_rate": 1,
+      "reject_proceed": 0,
+      "reject_reject": 13
+    },
+    "b_jev_alone_COUNTERFACTUAL": {
+      "accept_class_rate": 0,
+      "accept_proceed": 0,
+      "accept_reject": 10,
+      "accuracy": 0.5652,
+      "balanced_accuracy": 0.5,
+      "false_accept_rate": 0,
+      "false_reject_rate": 1,
+      "n": 23,
+      "other": 0,
+      "reject_class_rate": 1,
+      "reject_proceed": 0,
+      "reject_reject": 13
+    },
+    "calibration_all_questions": {
+      "bands": [
+        {
+          "band": "<0.7",
+          "correct": 17,
+          "fraction_correct": 0.3542,
+          "n": 48
+        },
+        {
+          "band": "0.7-0.9",
+          "correct": 11,
+          "fraction_correct": 0.3793,
+          "n": 29
+        },
+        {
+          "band": ">=0.9",
+          "correct": 15,
+          "fraction_correct": 0.3947,
+          "n": 38
+        }
+      ],
+      "brier": 0.3913,
+      "confident_misses": [
+        {
+          "case_id": "cal-a12-composer",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "cal-a12-composer",
+          "label": "REJECT",
+          "p": 0.9299999999999999,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2-r2",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2-r2",
+          "label": "REJECT",
+          "p": 0.975,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2-r3",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "loop-15-slice-4-step2-r3",
+          "label": "REJECT",
+          "p": 0.975,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a11",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a12",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a12",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a8",
+          "label": "REJECT",
+          "p": 0.96,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "s3-a8",
+          "label": "REJECT",
+          "p": 0.935,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t158",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t158",
+          "label": "REJECT",
+          "p": 0.915,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t164-t211",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t164-t211",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t179",
+          "label": "REJECT",
+          "p": 0.95,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r3",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r4",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r4",
+          "label": "REJECT",
+          "p": 0.935,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r6",
+          "label": "REJECT",
+          "p": 0.94,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r6",
+          "label": "REJECT",
+          "p": 0.915,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r7",
+          "label": "REJECT",
+          "p": 0.9299999999999999,
+          "question": "stuck_repeating_prior_failure",
+          "stance": "ACCEPT"
+        },
+        {
+          "case_id": "t194-r7",
+          "label": "REJECT",
+          "p": 0.935,
+          "question": "risk_of_regression",
+          "stance": "ACCEPT"
+        }
+      ],
+      "n": 115
+    },
+    "calibration_driving_questions": {
+      "bands": [
+        {
+          "band": "<0.7",
+          "correct": 10,
+          "fraction_correct": 0.4545,
+          "n": 22
+        },
+        {
+          "band": "0.7-0.9",
+          "correct": 10,
+          "fraction_correct": 0.4167,
+          "n": 24
+        },
+        {
+          "band": ">=0.9",
+          "correct": 0,
+          "fraction_correct": null,
+          "n": 0
+        }
+      ],
+      "brier": 0.3096,
+      "confident_misses": [],
+      "n": 46
+    },
+    "drivers_a": {
+      "diff_matches_plan": 23,
+      "local_tests_support_claim": 23,
+      "stuck_repeating_prior_failure": 2
+    },
+    "drivers_b": {
+      "diff_matches_plan": 23,
+      "local_tests_support_claim": 23,
+      "stuck_repeating_prior_failure": 2
+    },
+    "n": 23
+  },
+  "note": "(a) is the gate as built. (b) is a COUNTERFACTUAL: the same policy recomputed from the recorded answers with checksPassed true. Neither changes a policy file.",
+  "per_case": [
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "bootstrap-fix",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "bootstrap-fix-r4",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "importer-leftovers",
+      "drivers_a": [
+        "diff_matches_plan",
+        "touches_out_of_scope",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "touches_out_of_scope",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "importer-leftovers-r6",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "loop-15-slice-3",
+      "drivers_a": [
+        "diff_matches_plan",
+        "touches_out_of_scope",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "touches_out_of_scope",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "loop-15-slice-4-step2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "loop-15-slice-4-step2-r4",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "qa-driver-cursor-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "qa-driver-cursor-r3",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "qa-driver-cursor-r5",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "qa-probes-on-master",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a10",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a13",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a4",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a5",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a6",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a7",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a9",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-b-step1",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-c",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-c-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-c-r3",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-c-r4",
+      "drivers_a": [
+        "diff_matches_plan"
+      ],
+      "drivers_b": [
+        "diff_matches_plan"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t003-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t046-d1",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t046-detector",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t048-r1b",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t048-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "touches_out_of_scope",
+        "local_tests_support_claim",
+        "risk_of_regression",
+        "the deterministic checks"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "touches_out_of_scope",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t048-r3",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t171",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t171-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t176-index-direction",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t178-ci-on-push",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t192",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t192-d1",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t194-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t194-r5",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t195",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t196-t197",
+      "drivers_a": [
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t198",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t198-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t214",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t217-t218",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t221-t222",
+      "drivers_a": [
+        "diff_matches_plan"
+      ],
+      "drivers_b": [
+        "diff_matches_plan"
+      ],
+      "group": "headline",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "bootstrap-fix-r3",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "cal-a12-composer",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "importer-fixes-r4",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "loop-15-slice-4-step2-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "loop-15-slice-4-step2-r3",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a11",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a12",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-a8",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "s3-b2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t048-r2b",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t158",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t158-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t164-t211",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t171-r3",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t179",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t179-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t194-r3",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t194-r4",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t194-r6",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t194-r7",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "REJECT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t195-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim",
+        "stuck_repeating_prior_failure"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim",
+        "stuck_repeating_prior_failure"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t196-t197-r2",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim",
+        "stuck_repeating_prior_failure"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim",
+        "stuck_repeating_prior_failure"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    },
+    {
+      "a_built": "reject",
+      "b_counterfactual": "reject",
+      "case_id": "t216",
+      "drivers_a": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "drivers_b": [
+        "diff_matches_plan",
+        "local_tests_support_claim"
+      ],
+      "group": "leak_group",
+      "label": "ACCEPT"
+    }
+  ],
+  "slice_four_must_include": {
+    "a_gate_as_built": {
+      "accept_class_rate": 0,
+      "accept_proceed": 0,
+      "accept_reject": 8,
+      "accuracy": 0,
+      "balanced_accuracy": null,
+      "false_accept_rate": null,
+      "false_reject_rate": 1,
+      "n": 8,
+      "other": 0,
+      "reject_class_rate": null,
+      "reject_proceed": 0,
+      "reject_reject": 0
+    },
+    "b_jev_alone_COUNTERFACTUAL": {
+      "accept_class_rate": 0,
+      "accept_proceed": 0,
+      "accept_reject": 8,
+      "accuracy": 0,
+      "balanced_accuracy": null,
+      "false_accept_rate": null,
+      "false_reject_rate": 1,
+      "n": 8,
+      "other": 0,
+      "reject_class_rate": null,
+      "reject_proceed": 0,
+      "reject_reject": 0
+    },
+    "calibration_all_questions": {
+      "bands": [
+        {
+          "band": "<0.7",
+          "correct": 3,
+          "fraction_correct": 0.1875,
+          "n": 16
+        },
+        {
+          "band": "0.7-0.9",
+          "correct": 9,
+          "fraction_correct": 0.8182,
+          "n": 11
+        },
+        {
+          "band": ">=0.9",
+          "correct": 13,
+          "fraction_correct": 1,
+          "n": 13
+        }
+      ],
+      "brier": 0.161,
+      "confident_misses": [],
+      "n": 40
+    },
+    "calibration_driving_questions": {
+      "bands": [
+        {
+          "band": "<0.7",
+          "correct": 1,
+          "fraction_correct": 0.1429,
+          "n": 7
+        },
+        {
+          "band": "0.7-0.9",
+          "correct": 8,
+          "fraction_correct": 0.8889,
+          "n": 9
+        },
+        {
+          "band": ">=0.9",
+          "correct": 0,
+          "fraction_correct": null,
+          "n": 0
+        }
+      ],
+      "brier": 0.2053,
+      "confident_misses": [],
+      "n": 16
+    },
+    "drivers_a": {
+      "diff_matches_plan": 8,
+      "local_tests_support_claim": 7,
+      "stuck_repeating_prior_failure": 2
+    },
+    "drivers_b": {
+      "diff_matches_plan": 8,
+      "local_tests_support_claim": 7,
+      "stuck_repeating_prior_failure": 2
+    },
+    "n": 8
+  },
+  "spend": {
+    "input_tokens": 185764,
+    "output_tokens": 6767
+  },
+  "unscored": []
+}
