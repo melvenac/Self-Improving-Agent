@@ -11,7 +11,7 @@
 | **Project** | Self-Improving Agent (SIA) |
 | **Description** | A protocol, a tool server and a small runtime that let AI coding agents start warm, keep one written record of project state, and work as separate seats (planner, developer, QA) whose boundaries are enforced rather than requested. |
 | **Repo** | https://github.com/melvenac/Self-Improving-Agent (private since Loop 11) |
-| **Version** | v0.44.2 |
+| **Version** | v0.45.0 |
 | **License** | MIT |
 
 ## Problem Statement
