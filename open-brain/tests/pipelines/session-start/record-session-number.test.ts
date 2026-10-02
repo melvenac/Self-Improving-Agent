@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { sessionStart } from "../../../src/pipelines/session-start/index.js";
-import { nextGreetingSessionNumber } from "../../../src/pipelines/session-start/session-log.js";
+import { findNextSessionNumber, nextGreetingSessionNumber } from "../../../src/pipelines/session-start/session-log.js";
 import { applyStateOps } from "../../../src/shared/state-writer.js";
 import { readProjectState } from "../../../src/pipelines/session-start/state-reader.js";
 
@@ -148,5 +148,38 @@ describe("T-164 SC-5 — second ob_start reuses the log", () => {
     expect(second.session.reused).toBe(true);
     expect(second.session.sessionNumber).toBe(first.session.sessionNumber);
     expect(second.session.logPath).toBe(first.session.logPath);
+  });
+});
+
+describe("T-164 live case — a checkout whose local logs say 17 greets the record's 156 (D-091 port)", () => {
+  let root: string;
+
+  beforeEach(() => {
+    root = mkdtempSync(join(tmpdir(), "t164-live-"));
+    mkdirSync(join(root, ".agents", "SESSIONS"), { recursive: true });
+    // Sixteen local logs: the local counter alone would greet 17.
+    for (let i = 1; i <= 16; i++) {
+      writeFileSync(join(root, ".agents", "SESSIONS", `Session_${i}.md`), `# Session ${i}\n`);
+    }
+    const sessions = [153, 154, 155].map((n) => ({
+      n,
+      date: "2026-10-01",
+      uuid: `aaaaaaaa-bbbb-cccc-dddd-${String(n).padStart(12, "0")}`,
+      seat: "planner",
+      checkout: "sia-planner",
+      first_rev: n,
+    }));
+    const state = { schema_version: 3, revision: 200, project: { name: "fixture" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions };
+    writeFileSync(join(root, ".agents", "state.json"), `${JSON.stringify(state, null, 2)}\n`, "utf-8");
+  });
+
+  afterEach(() => rmSync(root, { recursive: true, force: true }));
+
+  it("the local count is 17, the record's last session is 155, and the greeting is 156", () => {
+    expect(findNextSessionNumber(root), "the precondition: the local counter says 17").toBe(17);
+    const r = sessionStart({ projectRoot: root, homePath: root, sessionId: "22222222-2222-2222-2222-222222222222" });
+    expect(r.session.sessionNumber).toBe(156);
+    expect(r.session.sessionNumberSource).toBe("record");
+    expect(r.session.logPath).toContain("Session_156.md");
   });
 });
