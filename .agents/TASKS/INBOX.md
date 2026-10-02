@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 285 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 286 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -70,6 +70,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-188** sync's ci-status check reads gh's 'gh auth login' hint in a clone whose origin is not GitHub as 'gh is not authenticated'
 - [ ] **T-223** Pin the event in the PR concurrency group in ci-runs-on.test.ts so QA 250's M-push-only mutant dies
 - [ ] **T-224** Standing-cron reader says 'status_to is missing' for an unfilled <placeholder>; say 'unfilled placeholder' or tell the template reader to replace <...> values
+- [ ] **T-229** The callers' readFile wrapper for .recalled-entries.json turns ANY error (EISDIR, EACCES, EBUSY) into 'no file', so the foreign-writer detector reports 'none present' for a path it could not read; report non-ENOENT errors as 'not checked (<code>)'
 
 ## Done (last 3 sessions)
 

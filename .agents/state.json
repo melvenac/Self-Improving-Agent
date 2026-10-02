@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 285,
+  "revision": 286,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1332,6 +1332,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "From relay-a2a's Loop 13 design ruling (A2A docs/loops/loop-13-design-ruling.md, master 8e59f58): rc 0 turn printed or one-shot done; rc 1 refused/called wrong, do not retry; rc 2 window elapsed with a healthy last poll, wait again; rc 3 NEW unavailable or throttled, last stderr '[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>'. SIA edit: project-template/.cursor/commands/start.md:107 and its mirrors. Planner ACKed the table (A2A T-008 note, master 2f15ff4). SEQUENCED AFTER batch B1 merges (#297 and #312 edit the same start.md files); sia-builder. Send relay-a2a the merge SHA.",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-229",
+      "title": "The callers' readFile wrapper for .recalled-entries.json turns ANY error (EISDIR, EACCES, EBUSY) into 'no file', so the foreign-writer detector reports 'none present' for a path it could not read; report non-ENOENT errors as 'not checked (<code>)'",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "QA 258 #299 follow-up (docs/loops/b4-misc-qa-report.md, #299 row 8). The wrapper predates T-050 and does not affect which entries are rated.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
@@ -3926,6 +3940,12 @@
       "title": "Batch QA results under D-103: QA 255 (B1) ACCEPT, merged #287 #291 #297 #312; QA 256 (B2) merged #300 #303, REJECTED #295 #298 #306 (row 5: a pass despite an unchecked input), #309 accepted but held (stacked on #306); QA 257 (B3) ACCEPT, merged #308 #301 #313 #314 #305. Ruling: any input not checked caps a /sync result at WARN even when the message names the skip; a hook entry with no command string is not-checked; a bare builtin head is a legitimate named skip.",
       "date": "2026-10-02",
       "note": "Reports: qa/b1-start-report 0736e432 (docs/loops/b1-start-qa-report.md), qa/b2-sync-report 336cf208 (docs/loops/b2-sync-qa-report.md), b3 report 6533ba75 (docs/loops/b3-misc-qa-report.md). Each merge: head == QA'd SHA, CI test green, --match-head-commit; master push CI green after every merge through 8961635d. Planner verified load-bearing rows: B1 regex bytes /(\\d+)\\s*$/ and server.test 30/30; B3 #308 row 7 byte-identical no-BOM output and BOM at offset 0. B2 round 2 by sia-forge (#295 7312a292, #298 7afd7f1b, #306 3f30e825, #309 de8cbbe9+) goes to re-QA as QA 260; not under D-103."
+    },
+    {
+      "id": "D-105",
+      "title": "QA 258 (B4): #289 #290 #294 #299 ACCEPT, #302 REJECT (row 9: zero dropped counts not printed at DC-3..DC-6; DC-7 unusable_roots never read). Ruling: the REJECT stands, because T-048's invariant is that absent and zero never collapse FOR THE READER. QA 259 (B5): #292 #293 #320 ACCEPT. Neither batch is under D-103; the accepted PRs are listed for Aaron's morning question in docs/loops/morning-merge-list-2026-10-02.md.",
+      "date": "2026-10-02",
+      "note": "Reports: 64cee8ab (docs/loops/b4-misc-qa-report.md), a161b4ad (docs/loops/b5-misc-qa-report.md). #294 went DIRTY against master after the B3 merges; sia-forge rebases it and the planner reviews the range-diff before listing it (a non-trivial resolution means a narrow re-QA). #302 round 2 is with sia-builder."
     }
   ],
   "handoffs": [
