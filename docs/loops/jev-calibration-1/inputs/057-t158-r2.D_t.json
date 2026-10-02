@@ -1,0 +1,95 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Code at e23e622813a540e18bed0849779040cf181ff9b7 on origin/loop/t158-gap-tombstone. The tip 6a04048 adds only the handoff. The base is 474b652.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Built by Composer (cursor-infra). This is r2. QA 223 REJECTED c9ba1db (qa/t158-report 18c97b4). Read that report first. Every row it scored met must still be met.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The developer's r2 mutants:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "loop/t158-r2-mutant-explicit 652e749 drops the explicit-id check;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "loop/t158-r2-mutant-scan-open 258852f reads every non-zero git grep exit as \"no citations\".",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "The r1 mutants -mutant-splice f8c3643 and -mutant-scan 41fe1db still apply. Re-apply all four to e23e622.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "The brief is docs/loops/t158-t164-dispatch.md §\"Record 220\", with rows TG-1 to TG-5.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Explicit ids.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "An explicit add_gap id goes through the same refusal as a generated one: it is refused if it exists in the record or is cited in the tracked tree.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Try G-046, G-047 and G-048 explicitly, against a copy of this repo's .agents/state.json, never the live file.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "The citation scan fails closed.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Only git grep exit 1 means \"no citations\". Any other exit, or a spawn failure, refuses add_gap and names the exit.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Force a real failure: a corrupt index, a missing git, or an unreadable path, whichever you can do safely in a scratch copy. Show the refusal.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "57-t158-r2",
+  "new_capability": "QA 227: record 220 r2 (T-158: close_gap tombstones; add_gap never reuses a gap id)",
+  "objective": "QA 227: record 220 r2 (T-158: close_gap tombstones; add_gap never reuses a gap id)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "7316902792bc7bbfc8880e0f52030236f278b871",
+    "path": "docs/loops/qa-227-t158-r2-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Code at e23e622813a540e18bed0849779040cf181ff9b7 on origin/loop/t158-gap-tombstone. The tip 6a04048 adds only the handoff. The base is 474b652.",
+    "Built by Composer (cursor-infra). This is r2. QA 223 REJECTED c9ba1db (qa/t158-report 18c97b4). Read that report first. Every row it scored met must still be met.",
+    "The developer's r2 mutants:",
+    "loop/t158-r2-mutant-explicit 652e749 drops the explicit-id check;",
+    "loop/t158-r2-mutant-scan-open 258852f reads every non-zero git grep exit as \"no citations\".",
+    "The r1 mutants -mutant-splice f8c3643 and -mutant-scan 41fe1db still apply. Re-apply all four to e23e622.",
+    "The brief is docs/loops/t158-t164-dispatch.md §\"Record 220\", with rows TG-1 to TG-5.",
+    "Explicit ids.",
+    "An explicit add_gap id goes through the same refusal as a generated one: it is refused if it exists in the record or is cited in the tracked tree.",
+    "Try G-046, G-047 and G-048 explicitly, against a copy of this repo's .agents/state.json, never the live file.",
+    "The citation scan fails closed.",
+    "Only git grep exit 1 means \"no citations\". Any other exit, or a spawn failure, refuses add_gap and names the exit.",
+    "Force a real failure: a corrupt index, a missing git, or an unreadable path, whichever you can do safely in a scratch copy. Show the refusal."
+  ]
+}

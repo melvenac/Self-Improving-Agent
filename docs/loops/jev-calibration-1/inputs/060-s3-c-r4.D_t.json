@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "You are QA 232. The report's last line is exactly QA-232: REPORT COMPLETE.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Push only through node docs/loops/qa-232/push-qa.mjs. The prefix is unchanged, c-r4, and so are the report path and branch.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Run your own mutants locally. Push them to qa/c-r4-mut- as the record, but do not wait on or count CI for them: T-207 will stop CI on mutant refs. CI is for the candidate and the base only.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "If a model refusal or usage limit stops you, write it into the report's \"Open for the planner\" section and finish the report. Do not retry in a loop.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "60-s3-c-r4",
+  "new_capability": "QA 232: candidate C r4 (T-155), re-dispatched on Composer",
+  "objective": "QA 232: candidate C r4 (T-155), re-dispatched on Composer",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "8ac928b143c7366ed3cd583ea5d9acdc9fddecbd",
+    "path": "docs/loops/qa-232-c-r4-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "You are QA 232. The report's last line is exactly QA-232: REPORT COMPLETE.",
+    "Push only through node docs/loops/qa-232/push-qa.mjs. The prefix is unchanged, c-r4, and so are the report path and branch.",
+    "Run your own mutants locally. Push them to qa/c-r4-mut- as the record, but do not wait on or count CI for them: T-207 will stop CI on mutant refs. CI is for the candidate and the base only.",
+    "If a model refusal or usage limit stops you, write it into the report's \"Open for the planner\" section and finish the report. Do not retry in a loop."
+  ]
+}

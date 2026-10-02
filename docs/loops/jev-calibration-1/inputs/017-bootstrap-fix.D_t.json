@@ -1,0 +1,83 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/bootstrap-fix-brief.md, rows BF-1 to BF-8, and its acceptance (a)–(e).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The acceptance list: docs/loops/t181-frogger-pilot-report.md, F1–F15. Every finding the brief put in scope must be closed.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "A fresh install, by you, following the merged bootstrap.md literally, as a stranger would. Do it in two scratch projects:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "(i) frogger's real shape: an existing CLAUDE.md, a leftover .agents/reflection-queue.json, no git, core.autocrlf=true;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "(ii) a clean empty folder.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "open-brain bootstrap check | move-residue | scaffold: residue is moved aside and named, never deleted. An existing CLAUDE.md is offered an append, never overwritten. What counts as \"not bootstrapped\"? Try an .agents/ holding only a state.json, and one holding only TASKS/.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "BF-2: no template state.json reaches a new project, and the importer is the only producer. BF-1: a draft with 0 parsed tasks WARNS.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "BF-5: a fresh install is role: none, and /start says NOT A SEAT with no false \"refused\" claim.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "BF-7: line endings. With autocrlf=true, state.json survives a checkout round trip, and the next ob_state write works.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Forge 133's note: bootstrap check after step 4 says \"IMPORT path, not a fresh install\". Is the wording misleading to a stranger?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Mutants of your own, at least: the residue rule deletes instead of moving; the 0-task warning is removed; the template state.json is copied again.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "17-bootstrap-fix",
+  "new_capability": "The /bootstrap fix (stacked on T-179 round 2): dispatch to a FRESH, HEADLESS QA seat (record session 135)",
+  "objective": "The /bootstrap fix (stacked on T-179 round 2): dispatch to a FRESH, HEADLESS QA seat (record session 135)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "dd93ba6684bc4219ea825a05de3b79fdc8aaa003",
+    "path": "docs/loops/bootstrap-fix-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/bootstrap-fix-brief.md, rows BF-1 to BF-8, and its acceptance (a)–(e).",
+    "The acceptance list: docs/loops/t181-frogger-pilot-report.md, F1–F15. Every finding the brief put in scope must be closed.",
+    "A fresh install, by you, following the merged bootstrap.md literally, as a stranger would. Do it in two scratch projects:",
+    "(i) frogger's real shape: an existing CLAUDE.md, a leftover .agents/reflection-queue.json, no git, core.autocrlf=true;",
+    "(ii) a clean empty folder.",
+    "open-brain bootstrap check | move-residue | scaffold: residue is moved aside and named, never deleted. An existing CLAUDE.md is offered an append, never overwritten. What counts as \"not bootstrapped\"? Try an .agents/ holding only a state.json, and one holding only TASKS/.",
+    "BF-2: no template state.json reaches a new project, and the importer is the only producer. BF-1: a draft with 0 parsed tasks WARNS.",
+    "BF-5: a fresh install is role: none, and /start says NOT A SEAT with no false \"refused\" claim.",
+    "BF-7: line endings. With autocrlf=true, state.json survives a checkout round trip, and the next ob_state write works.",
+    "Forge 133's note: bootstrap check after step 4 says \"IMPORT path, not a fresh install\". Is the wording misleading to a stranger?",
+    "Mutants of your own, at least: the residue rule deletes instead of moving; the 0-task warning is removed; the template state.json is copied again."
+  ]
+}

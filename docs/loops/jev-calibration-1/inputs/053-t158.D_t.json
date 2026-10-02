@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Code at c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720 on origin/loop/t158-gap-tombstone. The tip eeec97d adds only the handoff. The base is 474b652.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Built by Composer (cursor-infra).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The brief: docs/loops/t158-t164-dispatch.md §\"Record 220\", with rows TG-1 to TG-5.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The developer's mutants: -mutant-splice f8c3643, and -mutant-scan 41fe1db.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "TG-2 on the real repo. Dry-run add_gap against a copy of this repo's .agents/state.json, never the live file. It must not be assigned G-046, G-047 or G-048, which the tracked tree cites. The planner verified that G-048 is cited in 2 files. It must name each id it skipped.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "TG-3 (G-040). The citation scan must be validated both ways. Find one gap id cited ONLY in a form the scan might miss (for example G-046 inside a code span, or at a line start), and say whether it is caught.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "TG-5 compatibility. A record at rev 156 with no gap status fields must still parse, render and pass state-schema. Also check that the greeting and the rendered views state closed gaps as closed or omitted, and never list them as open.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "R28 context. Once this is accepted and merged, the planner lifts the ban on add_gap. Name any path by which a reused id could still happen.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "53-t158",
+  "new_capability": "QA 223: record 220 (T-158, close_gap tombstones; add_gap never reuses a gap id)",
+  "objective": "QA 223: record 220 (T-158, close_gap tombstones; add_gap never reuses a gap id)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "5c648476073190b375d2ec41d7fbc829ef1f5eca",
+    "path": "docs/loops/qa-223-t158-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Code at c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720 on origin/loop/t158-gap-tombstone. The tip eeec97d adds only the handoff. The base is 474b652.",
+    "Built by Composer (cursor-infra).",
+    "The brief: docs/loops/t158-t164-dispatch.md §\"Record 220\", with rows TG-1 to TG-5.",
+    "The developer's mutants: -mutant-splice f8c3643, and -mutant-scan 41fe1db.",
+    "TG-2 on the real repo. Dry-run add_gap against a copy of this repo's .agents/state.json, never the live file. It must not be assigned G-046, G-047 or G-048, which the tracked tree cites. The planner verified that G-048 is cited in 2 files. It must name each id it skipped.",
+    "TG-3 (G-040). The citation scan must be validated both ways. Find one gap id cited ONLY in a form the scan might miss (for example G-046 inside a code span, or at a line start), and say whether it is caught.",
+    "TG-5 compatibility. A record at rev 156 with no gap status fields must still parse, render and pass state-schema. Also check that the greeting and the rendered views state closed gaps as closed or omitted, and never list them as open.",
+    "R28 context. Once this is accepted and merged, the planner lifts the ban on add_gap. Name any path by which a reused id could still happen."
+  ]
+}

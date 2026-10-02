@@ -1,0 +1,53 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Push routes. Against the real cli.json through real cursor-agent, each form a seat plausibly uses for push-qa.mjs passes: plain, cd … &&, and through PowerShell. Every git push form stays denied, and so does any other push the pattern could let through. Look for a push form the narrowed git push deny misses (for example git -C . push, git.exe push, or & git push), and say whether it matters.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Denial source. Confirm the harness reads denial from cursor-agent's stream-json and does not re-implement the match. Run one push row yourself.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Attribution. A ref that another seat moved mid-run is ref_moved_elsewhere. A seat push outside qa/<prefix>- is still ref_violations. Run the ORDINARY harness (no -MutantRef) against e385f0d and against bf33fe4. Each must FAIL with a nonzero exit. Quote the lines.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The stated limit. A mid-run git fetch by the seat could mis-attribute. Say whether any path lets a real seat violation be reported as ref_moved_elsewhere. That is the dangerous direction.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Preserve. Completion, resume-at-most-3, refusal and denial handling, and the drive.meta keys other tools read are unchanged. qa-driver-copy.mjs still produces a working driver from the template.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Your own mutants, at least two, on qa/qa-driver-r2-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "40-qa-driver-cursor-r2",
+  "new_capability": "Record 192 (Cursor QA driver r2: push-route refusal, ref-audit attribution): QA dispatch (record 195)",
+  "objective": "Record 192 (Cursor QA driver r2: push-route refusal, ref-audit attribution): QA dispatch (record 195)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "5dccd4fe27f4a57402c9c712ff7b411b45c82d05",
+    "path": "docs/loops/qa-driver-cursor-r2-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Push routes. Against the real cli.json through real cursor-agent, each form a seat plausibly uses for push-qa.mjs passes: plain, cd … &&, and through PowerShell. Every git push form stays denied, and so does any other push the pattern could let through. Look for a push form the narrowed git push deny misses (for example git -C . push, git.exe push, or & git push), and say whether it matters.",
+    "Denial source. Confirm the harness reads denial from cursor-agent's stream-json and does not re-implement the match. Run one push row yourself.",
+    "Attribution. A ref that another seat moved mid-run is ref_moved_elsewhere. A seat push outside qa/<prefix>- is still ref_violations. Run the ORDINARY harness (no -MutantRef) against e385f0d and against bf33fe4. Each must FAIL with a nonzero exit. Quote the lines.",
+    "The stated limit. A mid-run git fetch by the seat could mis-attribute. Say whether any path lets a real seat violation be reported as ref_moved_elsewhere. That is the dangerous direction.",
+    "Preserve. Completion, resume-at-most-3, refusal and denial handling, and the drive.meta keys other tools read are unchanged. qa-driver-copy.mjs still produces a working driver from the template.",
+    "Your own mutants, at least two, on qa/qa-driver-r2-mut-."
+  ]
+}

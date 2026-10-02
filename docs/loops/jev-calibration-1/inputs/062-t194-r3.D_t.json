@@ -1,0 +1,83 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/t194-r3-dispatch.md: the planner's r3 scope, rows 1 to 6. This is what you score.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "docs/loops/t194-r2-qa-report.md and docs/loops/qa-233/evidence/ on origin/qa/t194-r2-report: QA 233's defects D1 and D2, and probes P1 to P15. Re-run P3, P4 and P6 to P15 against the candidate.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "docs/loops/t194-r3-developer-handoff.md at the candidate: its row-to-test map and red-then-green claims. Verify them; do not trust them.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "docs/loops/qa-231-t194-r2-dispatch.md and docs/loops/qa-222-225-common.md: the PH-1..PH-8 and r2-1..r2-4 rows still hold. r3 must not regress any row QA 233 scored met.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "r3-1, D1: absolute paths, in both slash forms, are denied for PH-1, PH-2 and PH-6. A path outside the repo, or one that cannot be made relative, is denied with a named cause. Test through the real CLI with fixture input, and use a cwd that is not the repo root as well as one that is.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "r3-2, D2: a compound command after a docs-only gh pr merge is not allowed without a grant: P3, P4, and variants with ||, ;, |, a newline, $(…) and backticks. A single docs-only merge is still allowed with no grant (r2-1 must not regress).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "r3-3: the grant matches a single invocation only. A grant for gh pr merge 5 does not cover gh pr merge 5 && git push --force origin master.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "r3-4, --repo: --repo, --repo= and -R are denied with a named cause, and nothing is fetched. Assert that no fetch happens.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "r3-5, D-066: .agents/assignments.json is allowed in a docs-only merge (QA 233's P6).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "r3-6, mutants: r1's ph1 to ph3 are replaced by forms that typecheck and are red. The D1 and D2 mutants are red. Add at least one mutant of your own per row r3-1 to r3-4.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Regression: every PH and r2 row QA 233 scored met is still met.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "62-t194-r3",
+  "new_capability": "QA 234: T-194 r3 (the planner seat hook), after QA 233's REJECT",
+  "objective": "QA 234: T-194 r3 (the planner seat hook), after QA 233's REJECT",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "7cdbd8529c53df9b789947d8e9b4e151115ac692",
+    "path": "docs/loops/qa-234-t194-r3-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/t194-r3-dispatch.md: the planner's r3 scope, rows 1 to 6. This is what you score.",
+    "docs/loops/t194-r2-qa-report.md and docs/loops/qa-233/evidence/ on origin/qa/t194-r2-report: QA 233's defects D1 and D2, and probes P1 to P15. Re-run P3, P4 and P6 to P15 against the candidate.",
+    "docs/loops/t194-r3-developer-handoff.md at the candidate: its row-to-test map and red-then-green claims. Verify them; do not trust them.",
+    "docs/loops/qa-231-t194-r2-dispatch.md and docs/loops/qa-222-225-common.md: the PH-1..PH-8 and r2-1..r2-4 rows still hold. r3 must not regress any row QA 233 scored met.",
+    "r3-1, D1: absolute paths, in both slash forms, are denied for PH-1, PH-2 and PH-6. A path outside the repo, or one that cannot be made relative, is denied with a named cause. Test through the real CLI with fixture input, and use a cwd that is not the repo root as well as one that is.",
+    "r3-2, D2: a compound command after a docs-only gh pr merge is not allowed without a grant: P3, P4, and variants with ||, ;, |, a newline, $(…) and backticks. A single docs-only merge is still allowed with no grant (r2-1 must not regress).",
+    "r3-3: the grant matches a single invocation only. A grant for gh pr merge 5 does not cover gh pr merge 5 && git push --force origin master.",
+    "r3-4, --repo: --repo, --repo= and -R are denied with a named cause, and nothing is fetched. Assert that no fetch happens.",
+    "r3-5, D-066: .agents/assignments.json is allowed in a docs-only merge (QA 233's P6).",
+    "r3-6, mutants: r1's ph1 to ph3 are replaced by forms that typecheck and are red. The D1 and D2 mutants are red. Add at least one mutant of your own per row r3-1 to r3-4.",
+    "Regression: every PH and r2 row QA 233 scored met is still met."
+  ]
+}

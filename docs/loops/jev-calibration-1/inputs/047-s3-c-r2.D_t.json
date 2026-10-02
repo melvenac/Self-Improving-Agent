@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Full suite on tcm at 8054f9f and at the base d1e8674: say whether any failure is new.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Each C-204 finding (1-5) is closed, each shown with the row that would fail if it returned.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Coverage: name every row that still has no asserting test. QA 204 listed CC-0, CC-10, CC-13 and CC-19.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Your own mutants, at least two, on qa/c-r2-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "47-s3-c-r2",
+  "new_capability": "Candidate C (T-155, the shadow merge gate): QA dispatch (record 212), candidate C r2",
+  "objective": "Candidate C (T-155, the shadow merge gate): QA dispatch (record 212), candidate C r2",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "2d02441a8381acc24014a93bd35795cf1c481ff8",
+    "path": "docs/loops/loop-15-slice-3-c-r2-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Full suite on tcm at 8054f9f and at the base d1e8674: say whether any failure is new.",
+    "Each C-204 finding (1-5) is closed, each shown with the row that would fail if it returned.",
+    "Coverage: name every row that still has no asserting test. QA 204 listed CC-0, CC-10, CC-13 and CC-19.",
+    "Your own mutants, at least two, on qa/c-r2-mut-."
+  ]
+}

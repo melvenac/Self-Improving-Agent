@@ -1,0 +1,47 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Removed or kept: each QA-named test under open-brain/tests/ is gone, or has a header saying what it guards. Nothing under open-brain/tests/ says \"not for merge\".",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "EPERM: every symlink-creating test goes through the skip helper. An EPERM is a skip whose reason names EPERM and says it is not a pass. Any other error still throws. Look for a symlink call that bypasses the helper.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The detector: probe-markers fails on a file containing the phrase and on a missing tests directory. Check whether it matches its OWN test file or fixture text (G-040: a scan that matches the sentence forbidding a thing). Validate it against a known positive and a known negative.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Preserve: the three kept QA tests still pass, and no other test was deleted.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Your own mutants, at least two, on qa/qa-probes-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "56-qa-probes-on-master",
+  "new_capability": "Record 198 (QA probe tests on master; symlink EPERM skips; the \"not for merge\" detector): QA dispatch (record 203)",
+  "objective": "Record 198 (QA probe tests on master; symlink EPERM skips; the \"not for merge\" detector): QA dispatch (record 203)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "afe18dd16b74c9c8ccbe656d47c8ad42ab708555",
+    "path": "docs/loops/qa-probes-on-master-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Removed or kept: each QA-named test under open-brain/tests/ is gone, or has a header saying what it guards. Nothing under open-brain/tests/ says \"not for merge\".",
+    "EPERM: every symlink-creating test goes through the skip helper. An EPERM is a skip whose reason names EPERM and says it is not a pass. Any other error still throws. Look for a symlink call that bypasses the helper.",
+    "The detector: probe-markers fails on a file containing the phrase and on a missing tests directory. Check whether it matches its OWN test file or fixture text (G-040: a scan that matches the sentence forbidding a thing). Validate it against a known positive and a known negative.",
+    "Preserve: the three kept QA tests still pass, and no other test was deleted.",
+    "Your own mutants, at least two, on qa/qa-probes-mut-."
+  ]
+}

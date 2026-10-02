@@ -1,0 +1,95 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "D1: ob_start with no proof prints Session ID: none — <reason>, never discovers, and never reuses another session's log. Use QA 142's P7/P7b shared-checkout shape.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "D3: ob_end as end.md calls it (no session_id) uses the proven id. A rating that ob_recalled lists reaches feedback_log. Use QA 142's S4 shape.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "R2-D1 in the WRITER: QA 134's P2, P3 and P4 are each refused by applyStateOps.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "One departure from the ruling: the ruling said the registration-time check \"stays as the early refusal\". The developer reports it \"was already gone on T-003 and was not restored\", so the writer is the only door.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Verify both halves: that it was gone at 706c029, and that the writer alone refuses every shape the old registration check refused. Report whether anything was lost, and the planner rules on it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "end.md, all three copies, says exactly what the code guarantees: a null checkout is not refused, and a write with no session records nothing. Compare the copies byte for byte.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "The ride-alongs:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "D2: a JSON null proof is a named refusal, and ob_recall no longer reports \"FTS search error\";",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "D4: ob_feedback with no proof prints NOT LOGGED;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "D5: --ide cursor with an inherited CLAUDE_PID and no cursor_version writes no Claude proof;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "R2-D5: the legacy-session removal is flagged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Regressions: QA 142's A7, A8 and A9 checks and every attack in its check 2, re-run byte-exact from docs/loops/qa-scripts-t003/ on origin/qa/t003-report. QA 134's D1 checks on the merged tree.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Your own mutants, at least one per required fix (D1, D3, R2-D1).",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "29-t003-r2",
+  "new_capability": "T-003 round 2 (a server knows its own session): dispatch to a FRESH, HEADLESS QA seat (record session 154)",
+  "objective": "T-003 round 2 (a server knows its own session): dispatch to a FRESH, HEADLESS QA seat (record session 154)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "00b1755f455f7e1f1262bae4b75b909423ff1f11",
+    "path": "docs/loops/t003-r2-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "D1: ob_start with no proof prints Session ID: none — <reason>, never discovers, and never reuses another session's log. Use QA 142's P7/P7b shared-checkout shape.",
+    "D3: ob_end as end.md calls it (no session_id) uses the proven id. A rating that ob_recalled lists reaches feedback_log. Use QA 142's S4 shape.",
+    "R2-D1 in the WRITER: QA 134's P2, P3 and P4 are each refused by applyStateOps.",
+    "One departure from the ruling: the ruling said the registration-time check \"stays as the early refusal\". The developer reports it \"was already gone on T-003 and was not restored\", so the writer is the only door.",
+    "Verify both halves: that it was gone at 706c029, and that the writer alone refuses every shape the old registration check refused. Report whether anything was lost, and the planner rules on it.",
+    "end.md, all three copies, says exactly what the code guarantees: a null checkout is not refused, and a write with no session records nothing. Compare the copies byte for byte.",
+    "The ride-alongs:",
+    "D2: a JSON null proof is a named refusal, and ob_recall no longer reports \"FTS search error\";",
+    "D4: ob_feedback with no proof prints NOT LOGGED;",
+    "D5: --ide cursor with an inherited CLAUDE_PID and no cursor_version writes no Claude proof;",
+    "R2-D5: the legacy-session removal is flagged.",
+    "Regressions: QA 142's A7, A8 and A9 checks and every attack in its check 2, re-run byte-exact from docs/loops/qa-scripts-t003/ on origin/qa/t003-report. QA 134's D1 checks on the merged tree.",
+    "Your own mutants, at least one per required fix (D1, D3, R2-D1)."
+  ]
+}

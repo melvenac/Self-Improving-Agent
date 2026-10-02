@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/importer-fixes-round-3-brief.md §3, rows IF-16 to IF-20, plus IF-1 to IF-15 (round 1's and round 2's briefs), which must still hold. All three briefs are on master.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Your predecessor's report: QA 106's, on origin/qa/importer-fixes-r2-report (9d50e1f). Re-run its probes-r2.mjs and probe-existing-snapshot.mjs byte-exact (blobs bf970cc, e015912) against the candidate and against aba35de.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "IF-20, utf16le-nobom, ruled by the planner before you score it: the round-3 brief (R3-2) keeps \"could not tell\" for UTF-16 with no BOM. QA 106's probe expects STALE for that shape, so its one FAIL there is the rule changing by ruling, not a defect. Score it as such, and say whether any OTHER shape is filed \"could not tell\" that should be judged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The full suite was NOT run on the developer's machine, by the planner's ruling (that machine is never quiet during the day). Your run is the only Windows full-suite evidence. tcm CI 36198263294 is the Linux one.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Check, not accept, the developer's claims:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "D7 depends on readdir order (NTFS vs Linux). Reproduce it on this PC's NTFS at aba35de, with QA 106's real PowerShell-handle induction, and show the candidate loses nothing at every step.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "R3-1: the --force-snapshot aside and the first-created directory never overlap.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "R3-3: the refusal names the way out (restore, then remove the marker, naming its path).",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "11-importer-fixes-r3",
+  "new_capability": "Importer fixes round 3: dispatch to a FRESH, HEADLESS QA seat (record session 111)",
+  "objective": "Importer fixes round 3: dispatch to a FRESH, HEADLESS QA seat (record session 111)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "ae656c85ccf1af57bc4c0d393d38df82236a0e5b",
+    "path": "docs/loops/importer-fixes-r3-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/importer-fixes-round-3-brief.md §3, rows IF-16 to IF-20, plus IF-1 to IF-15 (round 1's and round 2's briefs), which must still hold. All three briefs are on master.",
+    "Your predecessor's report: QA 106's, on origin/qa/importer-fixes-r2-report (9d50e1f). Re-run its probes-r2.mjs and probe-existing-snapshot.mjs byte-exact (blobs bf970cc, e015912) against the candidate and against aba35de.",
+    "IF-20, utf16le-nobom, ruled by the planner before you score it: the round-3 brief (R3-2) keeps \"could not tell\" for UTF-16 with no BOM. QA 106's probe expects STALE for that shape, so its one FAIL there is the rule changing by ruling, not a defect. Score it as such, and say whether any OTHER shape is filed \"could not tell\" that should be judged.",
+    "The full suite was NOT run on the developer's machine, by the planner's ruling (that machine is never quiet during the day). Your run is the only Windows full-suite evidence. tcm CI 36198263294 is the Linux one.",
+    "Check, not accept, the developer's claims:",
+    "D7 depends on readdir order (NTFS vs Linux). Reproduce it on this PC's NTFS at aba35de, with QA 106's real PowerShell-handle induction, and show the candidate loses nothing at every step.",
+    "R3-1: the --force-snapshot aside and the first-created directory never overlap.",
+    "R3-3: the refusal names the way out (restore, then remove the marker, naming its path)."
+  ]
+}

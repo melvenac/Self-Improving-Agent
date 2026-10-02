@@ -1,0 +1,167 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "The criteria FINAL at 6672e83, read with rulings-9, rulings-10 and rulings-11 on master:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "R43 and R44 are superseded for reads by R49;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "R44's attribution is replaced by R54;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "R51 to R53 answer QA report A3 §11;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "R53 says a clause binds on shapes beyond the listed probes.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Your predecessor's handoff: QA report A3 §14 (docs/loops/loop-15-slice-3-qa-report-a3.md).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "The tools: docs/loops/qa-scripts-a3/ (probe15.mts, probe2.mts, the mutants, and a README with the rebase notes and the known positives).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Every row is re-run.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Every CA-15 probe runs against A4, A3 5010199, A2 2add792 and 3b19287, in git archive copies and never in the main tree.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "A3 is the known positive for A3-1, A3-2 and A3-3.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "A2 is the known positive for A2-1 to A2-5.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "R49 is read by the CODE PATH as well as the record (QA report A3 §14.2): a traceless read passes the probes.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "The R44 test's QA-stage assertion now expects no finding under R54, with reread asserted undefined.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "Its no-read evidence in the QA stage therefore rests on code reading and a mutant. Score it that way.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "One mutant per protection.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "R49's repository side (repositoryResolutionDiff) and machine side (resolutionMismatch) are each revertible alone.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "So is R54's attribution (attributionChange).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "R52's five POSIX tests are read from CI's per-test lines: the verbose reporter, ANSI codes stripped, the ✓/↓ lines. Not from the counts.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T19",
+      "observable": "Take plain sync's exit code in a scratch clone.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T20",
+      "observable": "FULL SUITE: ask the live planner first. A quiet machine is required (G-042):",
+      "type": "blackbox"
+    },
+    {
+      "id": "T21",
+      "observable": "A2A-Hub's local stack was STOPPED on Aaron's word, and must stay stopped through your run;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T22",
+      "observable": "the A2A-Hub seats hold (their record, rev 25);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T23",
+      "observable": "the planner stays idle.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T24",
+      "observable": "both exited 1, on the onTaskUpdate heartbeat only, in ~/Worktrees/sia-forge, with 0 tests failed at 2db806a;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T25",
+      "observable": "every idle run in ~/Worktrees/sia-qa tonight was clean.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "2-s3-a4",
+  "new_capability": "Loop 15 slice three: dispatch of candidate A4 to a FRESH QA seat (record session 89)",
+  "objective": "Loop 15 slice three: dispatch of candidate A4 to a FRESH QA seat (record session 89)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "64be67a4dd9b3756d21c57711237b1e6f73ec3f2",
+    "path": "docs/loops/loop-15-slice-3-dispatch-qa-a4.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "The criteria FINAL at 6672e83, read with rulings-9, rulings-10 and rulings-11 on master:",
+    "R43 and R44 are superseded for reads by R49;",
+    "R44's attribution is replaced by R54;",
+    "R51 to R53 answer QA report A3 §11;",
+    "R53 says a clause binds on shapes beyond the listed probes.",
+    "Your predecessor's handoff: QA report A3 §14 (docs/loops/loop-15-slice-3-qa-report-a3.md).",
+    "The tools: docs/loops/qa-scripts-a3/ (probe15.mts, probe2.mts, the mutants, and a README with the rebase notes and the known positives).",
+    "Every row is re-run.",
+    "Every CA-15 probe runs against A4, A3 5010199, A2 2add792 and 3b19287, in git archive copies and never in the main tree.",
+    "A3 is the known positive for A3-1, A3-2 and A3-3.",
+    "A2 is the known positive for A2-1 to A2-5.",
+    "R49 is read by the CODE PATH as well as the record (QA report A3 §14.2): a traceless read passes the probes.",
+    "The R44 test's QA-stage assertion now expects no finding under R54, with reread asserted undefined.",
+    "Its no-read evidence in the QA stage therefore rests on code reading and a mutant. Score it that way.",
+    "One mutant per protection.",
+    "R49's repository side (repositoryResolutionDiff) and machine side (resolutionMismatch) are each revertible alone.",
+    "So is R54's attribution (attributionChange).",
+    "R52's five POSIX tests are read from CI's per-test lines: the verbose reporter, ANSI codes stripped, the ✓/↓ lines. Not from the counts.",
+    "Take plain sync's exit code in a scratch clone.",
+    "FULL SUITE: ask the live planner first. A quiet machine is required (G-042):",
+    "A2A-Hub's local stack was STOPPED on Aaron's word, and must stay stopped through your run;",
+    "the A2A-Hub seats hold (their record, rev 25);",
+    "the planner stays idle.",
+    "both exited 1, on the onTaskUpdate heartbeat only, in ~/Worktrees/sia-forge, with 0 tests failed at 2db806a;",
+    "every idle run in ~/Worktrees/sia-qa tonight was clean."
+  ]
+}

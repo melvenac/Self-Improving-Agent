@@ -1,0 +1,125 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Each of the five checks, on a real unreadable path, not only on the mocks.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The developer's 14 rows use a vi.mock of node:fs with a synthetic EACCES. Make at least one real unreadable file and one real unreadable directory on this machine, then run sync --check in a scratch clone. Candidate mechanisms: an ACL deny with icacls, a file held with share None, or a directory where a file is expected.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Run it with and without SeBackupPrivilege. An elevated process may read straight through a deny, which is exactly the \"cannot see it\" class this round exists for. Say which runs could see the path.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Nothing new reads as a pass:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "an unreadable path is an ISSUE naming it, in all five checks;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "each pass states what it walked and what it excluded;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "the fallback walk says FALLBACK, and PARTIAL when a path was unreadable.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "git ls-files failing;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "git ls-files listing nothing (the developer's addition (d));",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "an unreadable file that is ALSO historical, or ALSO an allowed referrer;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "several unreadable paths alongside real findings. Does the output's cut-off at six hide the real finding?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "The widened retirements scan (.sh, .ps1, .yml, .yaml, .toml, .mts, .cts). The developer reports it finds nothing new on this tree. Plant a retired name in a tracked .sh in a scratch clone: the base misses it and the candidate finds it. Check the count by extension in the output.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Preserve: sync --check on this repository's own clean tree gives the same verdicts at 1646567 and at 7913c5f. retirements is an issue on both, naming ENTITIES.md. The tree is unchanged after --check.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "The developer's audit additions:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "(a) SILENT 3's \"binary\" catch never fires;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "(b) SILENT 2 used to CRASH on an unreadable file;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "(c) the allowed_referrers read still has no try, and is left open.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "Your own mutants, at least one per check, plus a re-run of P1.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "24-t048-r1",
+  "new_capability": "T-048 round 1 (/sync's checks must prove they looked): dispatch to a FRESH, HEADLESS QA seat (record session 151)",
+  "objective": "T-048 round 1 (/sync's checks must prove they looked): dispatch to a FRESH, HEADLESS QA seat (record session 151)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "5c20cc45877cf3e19b935a597f495ed1cabf6c55",
+    "path": "docs/loops/t048-r1-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Each of the five checks, on a real unreadable path, not only on the mocks.",
+    "The developer's 14 rows use a vi.mock of node:fs with a synthetic EACCES. Make at least one real unreadable file and one real unreadable directory on this machine, then run sync --check in a scratch clone. Candidate mechanisms: an ACL deny with icacls, a file held with share None, or a directory where a file is expected.",
+    "Run it with and without SeBackupPrivilege. An elevated process may read straight through a deny, which is exactly the \"cannot see it\" class this round exists for. Say which runs could see the path.",
+    "Nothing new reads as a pass:",
+    "an unreadable path is an ISSUE naming it, in all five checks;",
+    "each pass states what it walked and what it excluded;",
+    "the fallback walk says FALLBACK, and PARTIAL when a path was unreadable.",
+    "git ls-files failing;",
+    "git ls-files listing nothing (the developer's addition (d));",
+    "an unreadable file that is ALSO historical, or ALSO an allowed referrer;",
+    "several unreadable paths alongside real findings. Does the output's cut-off at six hide the real finding?",
+    "The widened retirements scan (.sh, .ps1, .yml, .yaml, .toml, .mts, .cts). The developer reports it finds nothing new on this tree. Plant a retired name in a tracked .sh in a scratch clone: the base misses it and the candidate finds it. Check the count by extension in the output.",
+    "Preserve: sync --check on this repository's own clean tree gives the same verdicts at 1646567 and at 7913c5f. retirements is an issue on both, naming ENTITIES.md. The tree is unchanged after --check.",
+    "The developer's audit additions:",
+    "(a) SILENT 3's \"binary\" catch never fires;",
+    "(b) SILENT 2 used to CRASH on an unreadable file;",
+    "(c) the allowed_referrers read still has no try, and is left open.",
+    "Your own mutants, at least one per check, plus a re-run of P1."
+  ]
+}

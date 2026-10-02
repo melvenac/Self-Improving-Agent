@@ -1,0 +1,53 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "R1, listener is not presence. No printed line or header can be read as \"the seat has seen my turn\". The wording is \"listener polling\" / \"listener not polling\". QA 225's seat-seen mutant must die.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "R2, structural validation. Every malformed body prints exactly one presence: UNKNOWN (malformed body: <path>) line and never throws. Include QA 225's probe body {\"agents\":[{\"name\":\"grok\",\"rooms\":{}}]}, and add at least two malformed shapes of your own.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "R3, greeting-size. The check includes a deterministic worst-case bound for the block, labelled as an upper bound in its own output. It never calls the live hub. Quote the greeting-size line with and without the block.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "R4, no network egress, on tcm. Your candidate CI run passes all five fixture-server tests that failed on tcm in QA 225. Quote the run id and the test job conclusion. This is the row the developer could not run (D-061).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "R5, the reader's own key (turn 236). The header carries the key read from ~/.a2a-hub/keys/<hub-id>/<name>.key, never dev-key. A missing, unreadable or short key prints presence: UNKNOWN (...), and fetch is never called. The key text never appears in any output. Both dev-key mutants must die.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "The key-file mapping in the handoff (G-049). Check the developer's derived table: which checkout resolves to which key file. Report it; don't score it as a defect of T-198. The planner has recorded the shared-identity problem as G-049.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "59-t198-r2",
+  "new_capability": "QA 230: record 217 r2 (T-198, /start shows whether each seat's hub listener is polling)",
+  "objective": "QA 230: record 217 r2 (T-198, /start shows whether each seat's hub listener is polling)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "a848eb6d11c4e76638d70ba286ff917350a8e108",
+    "path": "docs/loops/qa-230-t198-r2-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "R1, listener is not presence. No printed line or header can be read as \"the seat has seen my turn\". The wording is \"listener polling\" / \"listener not polling\". QA 225's seat-seen mutant must die.",
+    "R2, structural validation. Every malformed body prints exactly one presence: UNKNOWN (malformed body: <path>) line and never throws. Include QA 225's probe body {\"agents\":[{\"name\":\"grok\",\"rooms\":{}}]}, and add at least two malformed shapes of your own.",
+    "R3, greeting-size. The check includes a deterministic worst-case bound for the block, labelled as an upper bound in its own output. It never calls the live hub. Quote the greeting-size line with and without the block.",
+    "R4, no network egress, on tcm. Your candidate CI run passes all five fixture-server tests that failed on tcm in QA 225. Quote the run id and the test job conclusion. This is the row the developer could not run (D-061).",
+    "R5, the reader's own key (turn 236). The header carries the key read from ~/.a2a-hub/keys/<hub-id>/<name>.key, never dev-key. A missing, unreadable or short key prints presence: UNKNOWN (...), and fetch is never called. The key text never appears in any output. Both dev-key mutants must die.",
+    "The key-file mapping in the handoff (G-049). Check the developer's derived table: which checkout resolves to which key file. Report it; don't score it as a defect of T-198. The planner has recorded the shared-identity problem as G-049."
+  ]
+}

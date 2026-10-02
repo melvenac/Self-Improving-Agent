@@ -1,0 +1,119 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/loop-15-slice-4-dispatch.md, \"Step 1\": the property P-blank and its clauses. This is what you score. The rule is D-075.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "docs/loops/t214-developer-handoff.md at the candidate: its clause-to-test map, generator counts and mutants. Verify it; do not take it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "T214-1, P-blank, scored with YOUR OWN generator. Do not import the builder's.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "From valid qa-declared and qa-unrunnable blocks, insert whitespace-only lines (\"\", spaces, tabs, a lone \\r, and mixes of them) at every position: before the first header, between sections, between items, at the end, and directly after the opening fence. Each variant must parse equal to the original, with ids in the same order.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Use at least 200 variants, CRLF files included. Report every disagreement.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "T214-2, nothing else loosens. Each of these is still refused:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "a non-blank junk line;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "an item before any header in qa-declared;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "an id in both lists, or twice in one list;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "two blocks;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "a header or item with leading whitespace.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Also judge characters outside [ \\t\\r], such as NBSP, \\f, \\v and a zero-width space. The builder keeps NBSP as junk. Say whether refusing them matches D-075's \"whitespace-only\" or is a gap, and give your reason.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "T214-3, present-but-empty vs absent. A block with only blank lines is present and empty. No block is absent.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "T214-4, the real file. parseDeclared on docs/loops/loop-15-slice-3-c-criteria.md, as committed, is refused at the base with the blank-line message, which the builder did not capture. Capture it. At the candidate it parses to CC-23, 24 and 25 unrunnable and CC-26, 27, 28 and 21 out-of-scope. Confirm the file, C's shadow artifact and the ledger are byte-identical at base and candidate.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "Mutants: re-run the builder's 5, and add at least 2 of your own. One must target the BLANK_RE character class.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "Regression: every existing declared, shadow-merge and tests/harness test passes unchanged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "Downstream, report only: does shadow-verdict prepare change any outcome for a criteria file that has blank lines? It must not rewrite any existing artifact. Do not re-run C's episode.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "65-t214",
+  "new_capability": "QA 239: T-214, a blank line inside a declared block is not content (slice four, step 1)",
+  "objective": "QA 239: T-214, a blank line inside a declared block is not content (slice four, step 1)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "8c75e0a1e9154a5fa0074943ae3ec3ff677eaba4",
+    "path": "docs/loops/qa-239-t214-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/loop-15-slice-4-dispatch.md, \"Step 1\": the property P-blank and its clauses. This is what you score. The rule is D-075.",
+    "docs/loops/t214-developer-handoff.md at the candidate: its clause-to-test map, generator counts and mutants. Verify it; do not take it.",
+    "T214-1, P-blank, scored with YOUR OWN generator. Do not import the builder's.",
+    "From valid qa-declared and qa-unrunnable blocks, insert whitespace-only lines (\"\", spaces, tabs, a lone \\r, and mixes of them) at every position: before the first header, between sections, between items, at the end, and directly after the opening fence. Each variant must parse equal to the original, with ids in the same order.",
+    "Use at least 200 variants, CRLF files included. Report every disagreement.",
+    "T214-2, nothing else loosens. Each of these is still refused:",
+    "a non-blank junk line;",
+    "an item before any header in qa-declared;",
+    "an id in both lists, or twice in one list;",
+    "two blocks;",
+    "a header or item with leading whitespace.",
+    "Also judge characters outside [ \\t\\r], such as NBSP, \\f, \\v and a zero-width space. The builder keeps NBSP as junk. Say whether refusing them matches D-075's \"whitespace-only\" or is a gap, and give your reason.",
+    "T214-3, present-but-empty vs absent. A block with only blank lines is present and empty. No block is absent.",
+    "T214-4, the real file. parseDeclared on docs/loops/loop-15-slice-3-c-criteria.md, as committed, is refused at the base with the blank-line message, which the builder did not capture. Capture it. At the candidate it parses to CC-23, 24 and 25 unrunnable and CC-26, 27, 28 and 21 out-of-scope. Confirm the file, C's shadow artifact and the ledger are byte-identical at base and candidate.",
+    "Mutants: re-run the builder's 5, and add at least 2 of your own. One must target the BLANK_RE character class.",
+    "Regression: every existing declared, shadow-merge and tests/harness test passes unchanged.",
+    "Downstream, report only: does shadow-verdict prepare change any outcome for a criteria file that has blank lines? It must not rewrite any existing artifact. Do not re-run C's episode."
+  ]
+}

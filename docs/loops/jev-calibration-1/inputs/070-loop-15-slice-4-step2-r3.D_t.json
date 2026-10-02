@@ -1,0 +1,107 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Timeouts, by class, not by test. P4 in s4-g1-records.test.ts timed out at 5 s in 2 of 2 full runs on Plumb. It takes 4.5 s alone. Give every slice-four test file that spawns tsx or the CLI a timeout at the describe level, as policies.test.ts does (describe(…, { timeout: 120_000 }, …)): s4-g1 (P4, C6), and the spawning K2 tests in s4-g2, s4-g3 and s4-g5.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Add a guard: a test that reads each s4-.test.ts and fails if a file calls spawnSync/execFileSync but has no explicit timeout in its describe or it. Show it fires on a planted spawn with no timeout.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The behavioural S4-6d.3 test (now required). Write a reject G_done record where the 4.3 runner writes it, and a reject G_qa where the 4.4 runner writes it. Then run harness shadow-verdict prepare on a fixture, and assert the verdict, reasons and artifact bytes equal the run without those records.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "QA 242's r03 (prepareShadowVerdict defaults doneGate to the slice's G_done file) must go red.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Also make the static check refuse a spread (...) inside the prepareShadowVerdict({…}) call, so r02 goes red.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "The disclosure: add runtime.ts to #187's line in the handoff. The four/four split is unchanged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "The skip guard's residuals from QA 242 §3: the suite alias, and nested parentheses inside a modifier's arguments.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Open 1, the unattributed vitest RPC timeout on Plumb ([vitest-worker]: Timeout calling \"onTaskUpdate\"). It is environmental: it happens at the base with all 1940 tests passing, it is attributed to no test, and it comes with load.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "S4-9.3 stays as D-082 reads it: the candidate adds no failed test over the base on the same machine, and the PR's CI on tcm is green.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "An unattributed worker error that also occurs at the base is not a failed test.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Open 2, P4 strictly: yes, it counts. It reproduced 2 of 2, and its time alone is within 10% of the limit. Item 1 fixes the class.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Open 4: the behavioural test is required (item 2). It is S4-6d's actual property.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Same branch, from 779be4d6, never forced. Red first, then green, per item. Single files only on the QA PC, with no full suite; QA reruns the suite on Plumb.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "For heavy-run approval, send clark MANUAL MODE → sia-builder: <action> (<why>).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "Append an r3 section to the handoff. Report the SHA to atlas [f21cf4].",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "70-loop-15-slice-4-step2-r3",
+  "new_capability": "Loop 15 slice four, step 2 r3: dispatch to sia-builder",
+  "objective": "Loop 15 slice four, step 2 r3: dispatch to sia-builder",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "b9d8ffb29ff693e5536f047291627382d47cedd6",
+    "path": "docs/loops/loop-15-slice-4-step2-r3-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Timeouts, by class, not by test. P4 in s4-g1-records.test.ts timed out at 5 s in 2 of 2 full runs on Plumb. It takes 4.5 s alone. Give every slice-four test file that spawns tsx or the CLI a timeout at the describe level, as policies.test.ts does (describe(…, { timeout: 120_000 }, …)): s4-g1 (P4, C6), and the spawning K2 tests in s4-g2, s4-g3 and s4-g5.",
+    "Add a guard: a test that reads each s4-.test.ts and fails if a file calls spawnSync/execFileSync but has no explicit timeout in its describe or it. Show it fires on a planted spawn with no timeout.",
+    "The behavioural S4-6d.3 test (now required). Write a reject G_done record where the 4.3 runner writes it, and a reject G_qa where the 4.4 runner writes it. Then run harness shadow-verdict prepare on a fixture, and assert the verdict, reasons and artifact bytes equal the run without those records.",
+    "QA 242's r03 (prepareShadowVerdict defaults doneGate to the slice's G_done file) must go red.",
+    "Also make the static check refuse a spread (...) inside the prepareShadowVerdict({…}) call, so r02 goes red.",
+    "The disclosure: add runtime.ts to #187's line in the handoff. The four/four split is unchanged.",
+    "The skip guard's residuals from QA 242 §3: the suite alias, and nested parentheses inside a modifier's arguments.",
+    "Open 1, the unattributed vitest RPC timeout on Plumb ([vitest-worker]: Timeout calling \"onTaskUpdate\"). It is environmental: it happens at the base with all 1940 tests passing, it is attributed to no test, and it comes with load.",
+    "S4-9.3 stays as D-082 reads it: the candidate adds no failed test over the base on the same machine, and the PR's CI on tcm is green.",
+    "An unattributed worker error that also occurs at the base is not a failed test.",
+    "Open 2, P4 strictly: yes, it counts. It reproduced 2 of 2, and its time alone is within 10% of the limit. Item 1 fixes the class.",
+    "Open 4: the behavioural test is required (item 2). It is S4-6d's actual property.",
+    "Same branch, from 779be4d6, never forced. Red first, then green, per item. Single files only on the QA PC, with no full suite; QA reruns the suite on Plumb.",
+    "For heavy-run approval, send clark MANUAL MODE → sia-builder: <action> (<why>).",
+    "Append an r3 section to the handoff. Report the SHA to atlas [f21cf4]."
+  ]
+}

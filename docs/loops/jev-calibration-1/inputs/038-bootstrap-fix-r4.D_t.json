@@ -1,0 +1,89 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "R-BF-17: re-run QA 145's non-record JSON probe byte-exact. All seven shapes must now be NOT A RECORD, and move-residue sets them aside.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "A real v3 record, and an older schema that carries schema_version, stay BOOTSTRAPPED.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "What does /start do on each? Report it; its fallback is not this round's.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "R-BF-18: a zero-byte .agents/state.json between a real project and the cwd no longer wins the walk.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "SIA's own root resolves unchanged from its root, open-brain/, open-brain/src/ and docs/.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "state-record.ts is now shared by the root walker and bootstrap. Confirm that every caller of isProjectRoot (9 call sites at r3) still behaves as at r3 on real records.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "R-BF-19: QA 145's install N now reaches (e) with the step Next: names, and no inference. bootstrap.md step 1 matches.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "R-BF-20 and R-BF-21: the failed-undo path through the CLI never says \"refused\" (QA 145's P-UNDO).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "git grep OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK finds nothing in src/.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "No other environment variable or dynamic import() in cli.ts changes how a mutating command behaves.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Regressions: QA 145's rows (qa/bootstrap-fix-r3-qa-tests 2c279ad) and all four installs, re-run with no manual fix. The real session-end hook in install (iii) still writes into the child.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Your own mutants, at least one per ruling.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "38-bootstrap-fix-r4",
+  "new_capability": "The /bootstrap fix round 4: dispatch to a FRESH, HEADLESS QA seat (record session 161)",
+  "objective": "The /bootstrap fix round 4: dispatch to a FRESH, HEADLESS QA seat (record session 161)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "67a67dac562e7d6253fbf45eac297348e14a9b4b",
+    "path": "docs/loops/bootstrap-fix-r4-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "R-BF-17: re-run QA 145's non-record JSON probe byte-exact. All seven shapes must now be NOT A RECORD, and move-residue sets them aside.",
+    "A real v3 record, and an older schema that carries schema_version, stay BOOTSTRAPPED.",
+    "What does /start do on each? Report it; its fallback is not this round's.",
+    "R-BF-18: a zero-byte .agents/state.json between a real project and the cwd no longer wins the walk.",
+    "SIA's own root resolves unchanged from its root, open-brain/, open-brain/src/ and docs/.",
+    "state-record.ts is now shared by the root walker and bootstrap. Confirm that every caller of isProjectRoot (9 call sites at r3) still behaves as at r3 on real records.",
+    "R-BF-19: QA 145's install N now reaches (e) with the step Next: names, and no inference. bootstrap.md step 1 matches.",
+    "R-BF-20 and R-BF-21: the failed-undo path through the CLI never says \"refused\" (QA 145's P-UNDO).",
+    "git grep OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK finds nothing in src/.",
+    "No other environment variable or dynamic import() in cli.ts changes how a mutating command behaves.",
+    "Regressions: QA 145's rows (qa/bootstrap-fix-r3-qa-tests 2c279ad) and all four installs, re-run with no manual fix. The real session-end hook in install (iii) still writes into the child.",
+    "Your own mutants, at least one per ruling."
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/t194-r4-dispatch.md: the planner's r4 scope, items 1 to 6. This is what you score. Note its two rulings: D3 is in scope, and paths outside the repo are now ALLOWED (r3's outside-repo deny is reversed).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "docs/loops/t194-r3-qa-report.md and docs/loops/qa-234/evidence/, on origin/qa/t194-r3-report: QA 234's probes. Re-run Q4 (D3), Q5 (case) and the GH_REPO= probes against the candidate.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "docs/loops/t194-r4-developer-handoff.md at the candidate: its row-to-test map and red-then-green claims. Verify them.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "docs/loops/qa-234-t194-r3-dispatch.md: rows r3-1 to r3-6. None may regress, except the outside-repo deny, which is reversed.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "r4-1, D3: from cwd open-brain/, echo x > src/cli.ts, sed -i … src/cli.ts and a relative Edit are denied. From cwd .agents/, echo {} > state.json is denied. A protected path reached through ../ from a subdirectory cwd is denied. The same writes from a cwd where they land OUTSIDE protected paths are allowed. Test through the real built CLI, with fixture input.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "r4-2, outside the repo is allowed: npm test 2> C:/qa-tmp/log.txt, a Write to a scratch path outside the repo, and a Bash redirect outside the repo are all allowed. A target whose location cannot be determined is denied, with a named cause.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "r4-3, case: OPEN-BRAIN/SRC/cli.ts (absolute and relative) is denied on a Windows drive root.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "r4-4, prefix half: GH_REPO=other/x gh pr merge 1 --squash and env GH_REPO=… gh pr merge 1 are denied, with 0 fetches. QA 234's qa-r32-prefix mutant is now red.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "r4-5, exact grant: a grant for gh pr merge 1 does not cover … --repo other/x. A grant for git push origin loop/x does not cover … --force. The exact command, whitespace-normalised, is allowed and consumes the grant.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "r4-6: gh.exe pr merge 2 and \"gh\" pr merge 2 go through the merge check.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Mutants: the developer's 12 are all red and typecheck. Add at least one of your own for r4-1 and r4-2.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Regression: every r3 row QA 234 scored met still holds (r3-1's outside-repo half is superseded by r4-2), as do every PH and r2 row.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "63-t194-r4",
+  "new_capability": "QA 235: T-194 r4 (the planner seat hook), after QA 234's REJECT",
+  "objective": "QA 235: T-194 r4 (the planner seat hook), after QA 234's REJECT",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "ed0052ef27d1aa22da30839b2589d8d3b3c6822b",
+    "path": "docs/loops/qa-235-t194-r4-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/t194-r4-dispatch.md: the planner's r4 scope, items 1 to 6. This is what you score. Note its two rulings: D3 is in scope, and paths outside the repo are now ALLOWED (r3's outside-repo deny is reversed).",
+    "docs/loops/t194-r3-qa-report.md and docs/loops/qa-234/evidence/, on origin/qa/t194-r3-report: QA 234's probes. Re-run Q4 (D3), Q5 (case) and the GH_REPO= probes against the candidate.",
+    "docs/loops/t194-r4-developer-handoff.md at the candidate: its row-to-test map and red-then-green claims. Verify them.",
+    "docs/loops/qa-234-t194-r3-dispatch.md: rows r3-1 to r3-6. None may regress, except the outside-repo deny, which is reversed.",
+    "r4-1, D3: from cwd open-brain/, echo x > src/cli.ts, sed -i … src/cli.ts and a relative Edit are denied. From cwd .agents/, echo {} > state.json is denied. A protected path reached through ../ from a subdirectory cwd is denied. The same writes from a cwd where they land OUTSIDE protected paths are allowed. Test through the real built CLI, with fixture input.",
+    "r4-2, outside the repo is allowed: npm test 2> C:/qa-tmp/log.txt, a Write to a scratch path outside the repo, and a Bash redirect outside the repo are all allowed. A target whose location cannot be determined is denied, with a named cause.",
+    "r4-3, case: OPEN-BRAIN/SRC/cli.ts (absolute and relative) is denied on a Windows drive root.",
+    "r4-4, prefix half: GH_REPO=other/x gh pr merge 1 --squash and env GH_REPO=… gh pr merge 1 are denied, with 0 fetches. QA 234's qa-r32-prefix mutant is now red.",
+    "r4-5, exact grant: a grant for gh pr merge 1 does not cover … --repo other/x. A grant for git push origin loop/x does not cover … --force. The exact command, whitespace-normalised, is allowed and consumes the grant.",
+    "r4-6: gh.exe pr merge 2 and \"gh\" pr merge 2 go through the merge check.",
+    "Mutants: the developer's 12 are all red and typecheck. Add at least one of your own for r4-1 and r4-2.",
+    "Regression: every r3 row QA 234 scored met still holds (r3-1's outside-repo half is superseded by r4-2), as do every PH and r2 row."
+  ]
+}

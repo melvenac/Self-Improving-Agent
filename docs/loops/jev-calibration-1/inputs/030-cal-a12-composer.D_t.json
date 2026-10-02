@@ -1,0 +1,113 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "FIRST, the planner's suspected defect: R90 may trade one invented claim for another.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "At 7200e1c, closeAndRestore's R90 branch pushes an absent → unobservable (<code>) change and continues. So it neither restores nor adds anything to unrestored.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The summary sentence is chosen by unrestored.length === 0 && changes.length > 0, which prints \"Every file was put back by bytes before any git call read the repository.\"",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "So when the unobservable path is the only change, the report may claim a restore that did not happen, while an unobservable file may still be in the tree.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "This is a planner's READING, not a run. Reproduce it or refute it with Q130-R85-REPO-UNREADABLE-ZEROED's shape and the created-then-unlstatable shape. Report the exact message.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "If it holds, it is a defect under R90's own words: \"never prints invented facts\". Rate its severity yourself.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "R90's stored kind: \"modified\". The ruling said \"never created\". \"modified\" is also a claim that something changed. Search every consumer of ConfigChange.kind (in and beyond configwatch.ts) and say whether any acts on it: counts, a gate, a restore, a message. Say whether the record would be truer with a distinct kind. Report; the planner rules.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "R90–R92, each on its known positives from rulings-20: Q130-R85-REPO-UNREADABLE-ZEROED, Q130-R83-DOTGIT-NOSEARCH (config.worktree created), Q130-R85-VIA-FILE000 and Q130-R86-ABSENT-ANCESTOR-LINK. Each must pass. Take them from qa/loop-15-slice-3-a11-probe (5564ef6) byte-exact.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "R93: the three adopted rows must kill QA 130's own mutants, not only Grok's copies:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "qa/loop-15-slice-3-a11-m-r85-factsdrop (e2cd6cc);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "-m-r88-lstat (5761f3a);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "-m-r85b-via (5bbc4c0).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "R94: check the ci.yml resolution in afe1c3b against both parents. A9's --reporter=verbose and master's test-windows job must both be whole. Run git merge-tree of the candidate against today's origin/master, and report whether it merges cleanly.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "The re-done R85 search (the handoff's table): check it, don't accept it. Search configwatch.ts yourself for every site that builds a side's text. List any site the table misses, or any row whose output differs from what the code prints.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "Regressions: QA 130's full row set, and QA 108's positives, byte-exact. Run the full suite once on the default TEMP.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "Your own mutants, at least one per ruling R90–R92.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "30-cal-a12-composer",
+  "new_capability": "Loop 15 slice three, candidate A12: dispatch to a FRESH, HEADLESS QA seat (record session 149)",
+  "objective": "Loop 15 slice three, candidate A12: dispatch to a FRESH, HEADLESS QA seat (record session 149)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "bc723b8968762232f04d8975dc658ca4fd27f0cd",
+    "path": "docs/loops/loop-15-slice-3-dispatch-qa-a12.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "FIRST, the planner's suspected defect: R90 may trade one invented claim for another.",
+    "At 7200e1c, closeAndRestore's R90 branch pushes an absent → unobservable (<code>) change and continues. So it neither restores nor adds anything to unrestored.",
+    "The summary sentence is chosen by unrestored.length === 0 && changes.length > 0, which prints \"Every file was put back by bytes before any git call read the repository.\"",
+    "So when the unobservable path is the only change, the report may claim a restore that did not happen, while an unobservable file may still be in the tree.",
+    "This is a planner's READING, not a run. Reproduce it or refute it with Q130-R85-REPO-UNREADABLE-ZEROED's shape and the created-then-unlstatable shape. Report the exact message.",
+    "If it holds, it is a defect under R90's own words: \"never prints invented facts\". Rate its severity yourself.",
+    "R90's stored kind: \"modified\". The ruling said \"never created\". \"modified\" is also a claim that something changed. Search every consumer of ConfigChange.kind (in and beyond configwatch.ts) and say whether any acts on it: counts, a gate, a restore, a message. Say whether the record would be truer with a distinct kind. Report; the planner rules.",
+    "R90–R92, each on its known positives from rulings-20: Q130-R85-REPO-UNREADABLE-ZEROED, Q130-R83-DOTGIT-NOSEARCH (config.worktree created), Q130-R85-VIA-FILE000 and Q130-R86-ABSENT-ANCESTOR-LINK. Each must pass. Take them from qa/loop-15-slice-3-a11-probe (5564ef6) byte-exact.",
+    "R93: the three adopted rows must kill QA 130's own mutants, not only Grok's copies:",
+    "qa/loop-15-slice-3-a11-m-r85-factsdrop (e2cd6cc);",
+    "-m-r88-lstat (5761f3a);",
+    "-m-r85b-via (5bbc4c0).",
+    "R94: check the ci.yml resolution in afe1c3b against both parents. A9's --reporter=verbose and master's test-windows job must both be whole. Run git merge-tree of the candidate against today's origin/master, and report whether it merges cleanly.",
+    "The re-done R85 search (the handoff's table): check it, don't accept it. Search configwatch.ts yourself for every site that builds a side's text. List any site the table misses, or any row whose output differs from what the code prints.",
+    "Regressions: QA 130's full row set, and QA 108's positives, byte-exact. Run the full suite once on the default TEMP.",
+    "Your own mutants, at least one per ruling R90–R92."
+  ]
+}

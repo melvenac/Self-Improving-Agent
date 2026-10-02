@@ -1,0 +1,672 @@
+[
+  {
+    "base_sha": "eb14d09c3a0d6a8ea769694091208300b96f5e1e",
+    "case_id": "loop-15-slice-3",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/001-loop-15-slice-3.D_t.json",
+    "group": "headline",
+    "merge_commit": "9ed674c8dac8aa96502c2960b693b75ea6e3afac",
+    "pr": 1,
+    "scored_sha": "9ed674c8dac8aa96502c2960b693b75ea6e3afac"
+  },
+  {
+    "base_sha": "f673d5e78b2486d2e8c27ccd3074dac15506b94f",
+    "case_id": "s3-a4",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/002-s3-a4.D_t.json",
+    "group": "headline",
+    "merge_commit": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+    "pr": 2,
+    "scored_sha": "f9a1aa84209f9d17cac404faeb19e00caf2d3491"
+  },
+  {
+    "base_sha": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+    "case_id": "s3-a5",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/003-s3-a5.D_t.json",
+    "group": "headline",
+    "merge_commit": "4c1287f4e4b3420909428ba8ce007e03b0daafc5",
+    "pr": 3,
+    "scored_sha": "4c1287f4e4b3420909428ba8ce007e03b0daafc5"
+  },
+  {
+    "base_sha": "4c1287f4e4b3420909428ba8ce007e03b0daafc5",
+    "case_id": "s3-a6",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/004-s3-a6.D_t.json",
+    "group": "headline",
+    "merge_commit": "dc35b24869e77d2b62729d12598fb50e5adcd24b",
+    "pr": 4,
+    "scored_sha": "dc35b24869e77d2b62729d12598fb50e5adcd24b"
+  },
+  {
+    "base_sha": "dc35b24869e77d2b62729d12598fb50e5adcd24b",
+    "case_id": "s3-a7",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/005-s3-a7.D_t.json",
+    "group": "headline",
+    "merge_commit": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5",
+    "pr": 5,
+    "scored_sha": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5"
+  },
+  {
+    "base_sha": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5",
+    "case_id": "s3-a8",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/006-s3-a8.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "9e2dd5dd8762f95431cffc80cab65f7c02885724",
+    "pr": 6,
+    "scored_sha": "9e2dd5dd8762f95431cffc80cab65f7c02885724"
+  },
+  {
+    "base_sha": "9bc06e3f7f926956aa9a1c7596b3782e313f4a42",
+    "case_id": "s3-a9",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/008-s3-a9.D_t.json",
+    "group": "headline",
+    "merge_commit": "6bd97f2a573394ce84f986531975f3d509d484c5",
+    "pr": 8,
+    "scored_sha": "6bd97f2a573394ce84f986531975f3d509d484c5"
+  },
+  {
+    "base_sha": "6bd97f2a573394ce84f986531975f3d509d484c5",
+    "case_id": "s3-a10",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/010-s3-a10.D_t.json",
+    "group": "headline",
+    "merge_commit": "4b7a5aebd9a17b0ce8e6ee99545f4f8f5784c90f",
+    "pr": 10,
+    "scored_sha": "4b7a5aebd9a17b0ce8e6ee99545f4f8f5784c90f"
+  },
+  {
+    "base_sha": "063662bb12ca1badead8022dd8d3a0992fa94788",
+    "case_id": "importer-fixes-r4",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/014-importer-fixes-r4.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "78a7d131a2b4ab6bb78be132f9d18be31663538a",
+    "pr": 14,
+    "scored_sha": "78a7d131a2b4ab6bb78be132f9d18be31663538a"
+  },
+  {
+    "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+    "case_id": "t179",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/015-t179.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+    "pr": 15,
+    "scored_sha": "3c0bfdcf917a5bfbc4fd56072a1735020b289189"
+  },
+  {
+    "base_sha": "d2685fde9d7578a0d021ac0687003520a87f2522",
+    "case_id": "s3-b-step1",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/016-s3-b-step1.D_t.json",
+    "group": "headline",
+    "merge_commit": "e815e3d9ed4e43943d9147301afaae24d273b1b2",
+    "pr": 16,
+    "scored_sha": "e815e3d9ed4e43943d9147301afaae24d273b1b2"
+  },
+  {
+    "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+    "case_id": "bootstrap-fix",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/017-bootstrap-fix.D_t.json",
+    "group": "headline",
+    "merge_commit": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
+    "pr": 17,
+    "scored_sha": "6543e8e8b1f7b67076d6996974cdeb775a2414b5"
+  },
+  {
+    "base_sha": "4b7a5aebd9a17b0ce8e6ee99545f4f8f5784c90f",
+    "case_id": "s3-a11",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/018-s3-a11.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da",
+    "pr": 18,
+    "scored_sha": "bbf9d07e81a6ebbc9363586c79b846dfdc4980da"
+  },
+  {
+    "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+    "case_id": "importer-leftovers",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/019-importer-leftovers.D_t.json",
+    "group": "headline",
+    "merge_commit": "d500730953db3f69ef528f431474477149757383",
+    "pr": 19,
+    "scored_sha": "d500730953db3f69ef528f431474477149757383"
+  },
+  {
+    "base_sha": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+    "case_id": "t179-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/020-t179-r2.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "16465675d0d146e00ef29fe8e31ed92216fc3695",
+    "pr": 20,
+    "scored_sha": "16465675d0d146e00ef29fe8e31ed92216fc3695"
+  },
+  {
+    "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+    "case_id": "t171",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/022-t171.D_t.json",
+    "group": "headline",
+    "merge_commit": "b3711763a4b9f5624803e8992234c51e793872ef",
+    "pr": 22,
+    "scored_sha": "b3711763a4b9f5624803e8992234c51e793872ef"
+  },
+  {
+    "base_sha": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
+    "case_id": "bootstrap-fix-r3",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/023-bootstrap-fix-r3.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "7f4ca741e6ba4836590ca9f83d7ae9a2b28bfabf",
+    "pr": 23,
+    "scored_sha": "7f4ca741e6ba4836590ca9f83d7ae9a2b28bfabf"
+  },
+  {
+    "base_sha": "ebda33d5a31629ebc7bdf2028cc94af7f83a8c29",
+    "case_id": "s3-a12",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/025-s3-a12.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "a69f07d1716d7854f7e5a4d3bbe6cdb443fb5017",
+    "pr": 25,
+    "scored_sha": "a69f07d1716d7854f7e5a4d3bbe6cdb443fb5017"
+  },
+  {
+    "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+    "case_id": "t048-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/026-t048-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "5b9a40322d0b05de00ce201e60977f9bc5b68bea",
+    "pr": 26,
+    "scored_sha": "5b9a40322d0b05de00ce201e60977f9bc5b68bea"
+  },
+  {
+    "base_sha": "b3711763a4b9f5624803e8992234c51e793872ef",
+    "case_id": "t171-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/028-t171-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
+    "pr": 28,
+    "scored_sha": "a78a883a08fe7b898addbe32f623de4aa71d98a3"
+  },
+  {
+    "base_sha": "706c029ea749c6e3ec24895fb6fef619554a5c73",
+    "case_id": "t003-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/029-t003-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417",
+    "pr": 29,
+    "scored_sha": "d781b595fd2ee6ee3e1047d9c3a40a75c5728417"
+  },
+  {
+    "base_sha": "ebda33d5a31629ebc7bdf2028cc94af7f83a8c29",
+    "case_id": "cal-a12-composer",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/030-cal-a12-composer.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "7200e1cd2e5d4bcb67e3bae9bfcd112e1ede1f55",
+    "pr": 30,
+    "scored_sha": "7200e1cd2e5d4bcb67e3bae9bfcd112e1ede1f55"
+  },
+  {
+    "base_sha": "a69f07d1716d7854f7e5a4d3bbe6cdb443fb5017",
+    "case_id": "s3-a13",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/031-s3-a13.D_t.json",
+    "group": "headline",
+    "merge_commit": "4b434101e6e93f0b967ca20effa6a0c8ab96735c",
+    "pr": 31,
+    "scored_sha": "4b434101e6e93f0b967ca20effa6a0c8ab96735c"
+  },
+  {
+    "base_sha": "a78a883a08fe7b898addbe32f623de4aa71d98a3",
+    "case_id": "t171-r3",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/032-t171-r3.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "2dcc68a52f8fe1e2423ca5a3530d72ed293cecf8",
+    "pr": 32,
+    "scored_sha": "2dcc68a52f8fe1e2423ca5a3530d72ed293cecf8"
+  },
+  {
+    "base_sha": "e2f202be6ec0c412e7564d8807ef87e7793bc1cb",
+    "case_id": "importer-leftovers-r6",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/033-importer-leftovers-r6.D_t.json",
+    "group": "headline",
+    "merge_commit": "c2ee52dba61a132eabc778ff51d15da6aeddc714",
+    "pr": 33,
+    "scored_sha": "c2ee52dba61a132eabc778ff51d15da6aeddc714"
+  },
+  {
+    "base_sha": "7913c5f20378c90b9c156ae7828bc507a26f2a99",
+    "case_id": "t048-r1b",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/034-t048-r1b.D_t.json",
+    "group": "headline",
+    "merge_commit": "d5b78cb1c107fd08fcb8e52989b38f707ecc7dda",
+    "pr": 34,
+    "scored_sha": "d5b78cb1c107fd08fcb8e52989b38f707ecc7dda"
+  },
+  {
+    "base_sha": "677c1dd54c0030b335bb3e49203e51d96d8fe3b4",
+    "case_id": "s3-b2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/035-s3-b2.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0",
+    "pr": 35,
+    "scored_sha": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0"
+  },
+  {
+    "base_sha": "e201baa324414e52a37b5051aa76e4bdba1d1523",
+    "case_id": "t048-r3",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/036-t048-r3.D_t.json",
+    "group": "headline",
+    "merge_commit": "b048df8a99639ec0480bcb935e1023226fa149ae",
+    "pr": 36,
+    "scored_sha": "b048df8a99639ec0480bcb935e1023226fa149ae"
+  },
+  {
+    "base_sha": "7243fd5f697afb9972a7f4e92dcdd7d6c2b34d7c",
+    "case_id": "t192",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/037-t192.D_t.json",
+    "group": "headline",
+    "merge_commit": "a38ff92a2113392187b228258dee9a981bb7fa6b",
+    "pr": 37,
+    "scored_sha": "a38ff92a2113392187b228258dee9a981bb7fa6b"
+  },
+  {
+    "base_sha": "e201baa324414e52a37b5051aa76e4bdba1d1523",
+    "case_id": "bootstrap-fix-r4",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/038-bootstrap-fix-r4.D_t.json",
+    "group": "headline",
+    "merge_commit": "d74c0e54a936a7a31fab251c43ac68f56ec33764",
+    "pr": 38,
+    "scored_sha": "d74c0e54a936a7a31fab251c43ac68f56ec33764"
+  },
+  {
+    "base_sha": "5b9a40322d0b05de00ce201e60977f9bc5b68bea",
+    "case_id": "t048-r2b",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/039-t048-r2b.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "822f398248d3e98a13610ab48b7ed547d3c4f482",
+    "pr": 39,
+    "scored_sha": "822f398248d3e98a13610ab48b7ed547d3c4f482"
+  },
+  {
+    "base_sha": "bf33fe47c7410c5aa9ef14f59010cc8a1b06b331",
+    "case_id": "qa-driver-cursor-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/040-qa-driver-cursor-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "462403d6eb2e4268352de230274d50c222d0b283",
+    "pr": 40,
+    "scored_sha": "462403d6eb2e4268352de230274d50c222d0b283"
+  },
+  {
+    "base_sha": "bf33fe47c7410c5aa9ef14f59010cc8a1b06b331",
+    "case_id": "t192-d1",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/041-t192-d1.D_t.json",
+    "group": "headline",
+    "merge_commit": "ecd378d676e9d1b702c58a5359e4c4d2c4aec020",
+    "pr": 41,
+    "scored_sha": "ecd378d676e9d1b702c58a5359e4c4d2c4aec020"
+  },
+  {
+    "base_sha": "bf33fe47c7410c5aa9ef14f59010cc8a1b06b331",
+    "case_id": "t046-detector",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/042-t046-detector.D_t.json",
+    "group": "headline",
+    "merge_commit": "3af41f52e3881f6289d4f88ab03600a39e7c33c0",
+    "pr": 42,
+    "scored_sha": "3af41f52e3881f6289d4f88ab03600a39e7c33c0"
+  },
+  {
+    "base_sha": "462403d6eb2e4268352de230274d50c222d0b283",
+    "case_id": "qa-driver-cursor-r3",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/043-qa-driver-cursor-r3.D_t.json",
+    "group": "headline",
+    "merge_commit": "d67c5e7044df129d61deba68c489f9f89cdb87fc",
+    "pr": 43,
+    "scored_sha": "d67c5e7044df129d61deba68c489f9f89cdb87fc"
+  },
+  {
+    "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+    "case_id": "t176-index-direction",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/044-t176-index-direction.D_t.json",
+    "group": "headline",
+    "merge_commit": "6adc07ef34e9021765adacb7816bc0f213806a3c",
+    "pr": 44,
+    "scored_sha": "6adc07ef34e9021765adacb7816bc0f213806a3c"
+  },
+  {
+    "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+    "case_id": "t046-d1",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/045-t046-d1.D_t.json",
+    "group": "headline",
+    "merge_commit": "0081dab8703d93cd2d66d0a41635dd2e5f988e48",
+    "pr": 45,
+    "scored_sha": "0081dab8703d93cd2d66d0a41635dd2e5f988e48"
+  },
+  {
+    "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+    "case_id": "s3-c",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/046-s3-c.D_t.json",
+    "group": "headline",
+    "merge_commit": "2035e893497cf37f4224835dd95a7d3838e45cca",
+    "pr": 46,
+    "scored_sha": "2035e893497cf37f4224835dd95a7d3838e45cca"
+  },
+  {
+    "base_sha": "2035e893497cf37f4224835dd95a7d3838e45cca",
+    "case_id": "s3-c-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/047-s3-c-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "8054f9fd35394eb77a639206611bf3320983527d",
+    "pr": 47,
+    "scored_sha": "8054f9fd35394eb77a639206611bf3320983527d"
+  },
+  {
+    "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+    "case_id": "t178-ci-on-push",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/048-t178-ci-on-push.D_t.json",
+    "group": "headline",
+    "merge_commit": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
+    "pr": 48,
+    "scored_sha": "bc6c6d206a6b3261b43cccc3972fff23b5d86791"
+  },
+  {
+    "base_sha": "8054f9fd35394eb77a639206611bf3320983527d",
+    "case_id": "s3-c-r3",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/049-s3-c-r3.D_t.json",
+    "group": "headline",
+    "merge_commit": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+    "pr": 49,
+    "scored_sha": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410"
+  },
+  {
+    "base_sha": "d67c5e7044df129d61deba68c489f9f89cdb87fc",
+    "case_id": "qa-driver-cursor-r5",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/050-qa-driver-cursor-r5.D_t.json",
+    "group": "headline",
+    "merge_commit": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7",
+    "pr": 50,
+    "scored_sha": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7"
+  },
+  {
+    "base_sha": "8467cb10837d2da4b13237c22a8be4e8bc5d6a1a",
+    "case_id": "t195",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/051-t195.D_t.json",
+    "group": "headline",
+    "merge_commit": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
+    "pr": 51,
+    "scored_sha": "603be51e4c0a639ef08a0d04fc02fce6669aba02"
+  },
+  {
+    "base_sha": "603be51e4c0a639ef08a0d04fc02fce6669aba02",
+    "case_id": "t195-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/052-t195-r2.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "647cc74ebb66eae6cd36acc9c09d0804b2972387",
+    "pr": 52,
+    "scored_sha": "647cc74ebb66eae6cd36acc9c09d0804b2972387"
+  },
+  {
+    "base_sha": "474b65245b026c8587aa81b60abf81c0c3e76f7f",
+    "case_id": "t158",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/053-t158.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720",
+    "pr": 53,
+    "scored_sha": "c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720"
+  },
+  {
+    "base_sha": "334fee548634e94e4a5ba33ea0e23ab1ae0ae64d",
+    "case_id": "t196-t197",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/054-t196-t197.D_t.json",
+    "group": "headline",
+    "merge_commit": "929673b1babe26db5a22d683c0e642245117c722",
+    "pr": 54,
+    "scored_sha": "929673b1babe26db5a22d683c0e642245117c722"
+  },
+  {
+    "base_sha": "a74982101fcfc94bbb5b055dc56c1bf764c0d192",
+    "case_id": "t198",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/055-t198.D_t.json",
+    "group": "headline",
+    "merge_commit": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+    "pr": 55,
+    "scored_sha": "231f501f99b217fd65ab496139cb0d11feba8eb1"
+  },
+  {
+    "base_sha": "bf33fe47c7410c5aa9ef14f59010cc8a1b06b331",
+    "case_id": "qa-probes-on-master",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/056-qa-probes-on-master.D_t.json",
+    "group": "headline",
+    "merge_commit": "dabc7fe2d448a3c6172897e0bf7e42d09163e80d",
+    "pr": 56,
+    "scored_sha": "dabc7fe2d448a3c6172897e0bf7e42d09163e80d"
+  },
+  {
+    "base_sha": "c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720",
+    "case_id": "t158-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/057-t158-r2.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "e23e622813a540e18bed0849779040cf181ff9b7",
+    "pr": 57,
+    "scored_sha": "e23e622813a540e18bed0849779040cf181ff9b7"
+  },
+  {
+    "base_sha": "929673b1babe26db5a22d683c0e642245117c722",
+    "case_id": "t196-t197-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/058-t196-t197-r2.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "3059ca9cc5b0cb668216561b7b77c8b0119abad3",
+    "pr": 58,
+    "scored_sha": "3059ca9cc5b0cb668216561b7b77c8b0119abad3"
+  },
+  {
+    "base_sha": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+    "case_id": "t198-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/059-t198-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+    "pr": 59,
+    "scored_sha": "f172e280aa1532c7a246a9017e1dd79c65e7028a"
+  },
+  {
+    "base_sha": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+    "case_id": "s3-c-r4",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/060-s3-c-r4.D_t.json",
+    "group": "headline",
+    "merge_commit": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+    "pr": 60,
+    "scored_sha": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd"
+  },
+  {
+    "base_sha": "c933a4444f05ef241ca425fc22de460eaa37dd9b",
+    "case_id": "t194-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/061-t194-r2.D_t.json",
+    "group": "headline",
+    "merge_commit": "699789e1a21763d1e7e4e15a6a501cbbf4756f83",
+    "pr": 61,
+    "scored_sha": "699789e1a21763d1e7e4e15a6a501cbbf4756f83"
+  },
+  {
+    "base_sha": "5ace9ff7e50b4aebc0302bc12980feafa7a41f37",
+    "case_id": "t194-r3",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/062-t194-r3.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97",
+    "pr": 62,
+    "scored_sha": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97"
+  },
+  {
+    "base_sha": "729d2b2b27d69feae33d7ba78741f9a1e4fb3b2d",
+    "case_id": "t194-r4",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/063-t194-r4.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "d37e09dc4bd38cec0306e542773c3ab881602d6e",
+    "pr": 63,
+    "scored_sha": "d37e09dc4bd38cec0306e542773c3ab881602d6e"
+  },
+  {
+    "base_sha": "c204d1d4a6eef31aaefe8d607f539e367e5b090c",
+    "case_id": "t216",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/064-t216.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "b3ab05ca5da67f947f0c1666228c28b10f912cef",
+    "pr": 64,
+    "scored_sha": "9a0973f0d330b3b85a4ce5e23f8a0ef583de2070"
+  },
+  {
+    "base_sha": "ec7138bb435c0fa87f7f02aabc40a31221eeb1d1",
+    "case_id": "t214",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/065-t214.D_t.json",
+    "group": "headline",
+    "merge_commit": "29014f2dd25fd0962d30bdeb5a41155045b42668",
+    "pr": 65,
+    "scored_sha": "caebe8b6ecaa32db8defaf979e19df435a5b60f3"
+  },
+  {
+    "base_sha": "d37e09dc4bd38cec0306e542773c3ab881602d6e",
+    "case_id": "t194-r5",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/066-t194-r5.D_t.json",
+    "group": "headline",
+    "merge_commit": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
+    "pr": 66,
+    "scored_sha": "7a3a444135aa9f3049c40f17f8519421ccb4458b"
+  },
+  {
+    "base_sha": "2448a6ea9d41df5780b2657516c53799a75d93e2",
+    "case_id": "loop-15-slice-4-step2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/067-loop-15-slice-4-step2.D_t.json",
+    "group": "headline",
+    "merge_commit": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+    "pr": 67,
+    "scored_sha": "2d4cd863ca159d737a1ee2efed02b9b85be26770"
+  },
+  {
+    "base_sha": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+    "case_id": "loop-15-slice-4-step2-r2",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/068-loop-15-slice-4-step2-r2.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+    "pr": 68,
+    "scored_sha": "779be4d657b0c84ebc7e5ea57044f1e9548f3607"
+  },
+  {
+    "base_sha": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
+    "case_id": "t194-r6",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/069-t194-r6.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "9cf8c7eb427f732022c23baefa8092571d94daca",
+    "pr": 69,
+    "scored_sha": "9cf8c7eb427f732022c23baefa8092571d94daca"
+  },
+  {
+    "base_sha": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+    "case_id": "loop-15-slice-4-step2-r3",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/070-loop-15-slice-4-step2-r3.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d",
+    "pr": 70,
+    "scored_sha": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d"
+  },
+  {
+    "base_sha": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d",
+    "case_id": "loop-15-slice-4-step2-r4",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/071-loop-15-slice-4-step2-r4.D_t.json",
+    "group": "headline",
+    "merge_commit": "8a6cfb2db4f33787c09721c97a095ad8430fcf82",
+    "pr": 71,
+    "scored_sha": "8a6cfb2db4f33787c09721c97a095ad8430fcf82"
+  },
+  {
+    "base_sha": "9cf8c7eb427f732022c23baefa8092571d94daca",
+    "case_id": "t194-r7",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/072-t194-r7.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "71ea310188e14d530988c6b3cb17cb70e75997cc",
+    "pr": 72,
+    "scored_sha": "71ea310188e14d530988c6b3cb17cb70e75997cc"
+  },
+  {
+    "base_sha": "c34866d37e3fb54e2a2c78aa0507417911f684da",
+    "case_id": "t217-t218",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/073-t217-t218.D_t.json",
+    "group": "headline",
+    "merge_commit": "1dc71dbed014cff1063373ef5affbb68f3494119",
+    "pr": 73,
+    "scored_sha": "1a38e3f2bc2ce0b850d2bf68949823c5812c2576"
+  },
+  {
+    "base_sha": "bea385b2f5fe2b375dadf614a687933d29981b69",
+    "case_id": "t164-t211",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/074-t164-t211.D_t.json",
+    "group": "leak_group",
+    "merge_commit": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e",
+    "pr": 74,
+    "scored_sha": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e"
+  },
+  {
+    "base_sha": "8961ba1fede1a69ce53c143fcacd9efacd95d34f",
+    "case_id": "t221-t222",
+    "checks": "none",
+    "dt": "docs/loops/jev-calibration-1/inputs/075-t221-t222.D_t.json",
+    "group": "headline",
+    "merge_commit": "9ab021fdd2df605aacdff2de4db4b963f131d32d",
+    "pr": 75,
+    "scored_sha": "9ab021fdd2df605aacdff2de4db4b963f131d32d"
+  }
+]

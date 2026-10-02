@@ -1,0 +1,47 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "BE-5 (backward compatibility) against one test edit. Between red and green, tests/harness/schema.test.ts's shared fixture gained order: \"shown\", because a met row with no order is now refused. The developer calls that BE-5.2's rule (\"the pre-B form is refused on purpose\"). Rule on it from BE-5's text: is refusing a pre-B met row what BE-5 asks, or a break it forbids? Name every existing E_t producer and fixture this refuses.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "mut-b (a met row with no order accepted) also failed BE-7.1, \"because that invalid file is the same row\". Say whether one row is doing two jobs, and whether BE-7's validator row is separately killable.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "mut-a left the empty and newline loop ids green. Are those rows guarded by something else, or unguarded?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "BE-1.3: a loop that is not the run's returns evidence-loop-mismatch once and writes no E_t.json. Check that nothing is written on the refusal path, by reading the filesystem, not the return value.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "BE-7: there is no writer, only a validator (harness validate evidence <file>).",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "35-s3-b2",
+  "new_capability": "Loop 15 slice three, candidate B part 2 (E_t, R10): QA dispatch (record 189)",
+  "objective": "Loop 15 slice three, candidate B part 2 (E_t, R10): QA dispatch (record 189)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "fac40a0bf837bba38ea0a2c49f50572fb8d4d804",
+    "path": "docs/loops/loop-15-slice-3-b2-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "BE-5 (backward compatibility) against one test edit. Between red and green, tests/harness/schema.test.ts's shared fixture gained order: \"shown\", because a met row with no order is now refused. The developer calls that BE-5.2's rule (\"the pre-B form is refused on purpose\"). Rule on it from BE-5's text: is refusing a pre-B met row what BE-5 asks, or a break it forbids? Name every existing E_t producer and fixture this refuses.",
+    "mut-b (a met row with no order accepted) also failed BE-7.1, \"because that invalid file is the same row\". Say whether one row is doing two jobs, and whether BE-7's validator row is separately killable.",
+    "mut-a left the empty and newline loop ids green. Are those rows guarded by something else, or unguarded?",
+    "BE-1.3: a loop that is not the run's returns evidence-loop-mismatch once and writes no E_t.json. Check that nothing is written on the refusal path, by reading the filesystem, not the return value.",
+    "BE-7: there is no writer, only a validator (harness validate evidence <file>)."
+  ]
+}

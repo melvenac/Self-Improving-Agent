@@ -1,0 +1,89 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Rulings-17 (R77–R80) and rulings-18 (R77 as applied in eight readings, R82 and its two precisions: scraped codes, and ENOENT/ENOTDIR as absence). Both are on master. Rulings-18 was made in the hub during the build, and it binds.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Your predecessor's report: QA 104's, on origin/qa/loop-15-slice-3-a9-report (e80acd4): the verdict, §9, §11 and §13. Its probes (qa104-a9-probe.test.ts) are in the candidate's tree now. Score them there, and check that each is byte-identical to QA 104's (git hash-object).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Known positives: A9 6bd97f2 for A9-1/A9-2 (probe3, probe2); the developer's redcheck branches (loop/15-slice-3-a10-redcheck, -redcheck2, -redcheck3, -redcheck-hardlink, -redcheck-r78) and each mut- branch the handoff names.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Known negative: FIX-before-facts (qa/loop-15-slice-3-a9-fix-before-facts) heals the three unreadable shapes.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Every row is re-run. Win32 rows run locally (this PC can make symlinks and junctions). POSIX rows run on CI on tcm, which is free: confirm the runner, at most 10 runs, shared with other seats. Hosted Actions minutes are exhausted until 2026-10-01, so a hosted run will not start, and dispatching one proves nothing.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "R77, by class: the window always completes. Produce at least one shape of your own per helper (identify, listTree, readState, the stop before git), not only the developer's rows. Check the one the planner found hardest to see: a restore must never act on the OLD path. d14a874 chmodded through a planted hook symlink, and a kind === 'file' guard does not stop a hard link. Build a hard-link and a symlink shape of your own.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "R82 on win32: a junction on an XDG config (R35) and an ENOENT resolution must never be machine-config-unobservable. tcm cannot run the junction, so this PC is the only place it runs.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "R78–R80: the texts, the labels, and the facts on every record. In the type-change and absent→symlink texts, the LINK's lstat facts and the labelled resolved facts must both be present.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Every existing test whose assertion changed (the handoff lists them): check each change against the ruling the handoff cites, and say whether any narrowed a protection. R61's narrowed detector was validated by a mutant. Re-validate it with one of your own.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Regressions: everything QA 104 found closed stays closed, and QA 99's R71-UNREADABLE-START/-AT-BASE (on its probe branch) are re-scored in R79's form.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "The full suite once, at the frozen SHA, captured unpiped, with the processes recorded before and after.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Plain sync in a scratch clone. /sync --check after gitnexus analyze is unrun (no gitnexus here).",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "10-s3-a10",
+  "new_capability": "Loop 15 slice three: dispatch of candidate A10 to a FRESH, HEADLESS QA seat (record session 108)",
+  "objective": "Loop 15 slice three: dispatch of candidate A10 to a FRESH, HEADLESS QA seat (record session 108)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "a8e5d610dc3e157c28470b2f179671ac6752c981",
+    "path": "docs/loops/loop-15-slice-3-dispatch-qa-a10.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Rulings-17 (R77–R80) and rulings-18 (R77 as applied in eight readings, R82 and its two precisions: scraped codes, and ENOENT/ENOTDIR as absence). Both are on master. Rulings-18 was made in the hub during the build, and it binds.",
+    "Your predecessor's report: QA 104's, on origin/qa/loop-15-slice-3-a9-report (e80acd4): the verdict, §9, §11 and §13. Its probes (qa104-a9-probe.test.ts) are in the candidate's tree now. Score them there, and check that each is byte-identical to QA 104's (git hash-object).",
+    "Known positives: A9 6bd97f2 for A9-1/A9-2 (probe3, probe2); the developer's redcheck branches (loop/15-slice-3-a10-redcheck, -redcheck2, -redcheck3, -redcheck-hardlink, -redcheck-r78) and each mut- branch the handoff names.",
+    "Known negative: FIX-before-facts (qa/loop-15-slice-3-a9-fix-before-facts) heals the three unreadable shapes.",
+    "Every row is re-run. Win32 rows run locally (this PC can make symlinks and junctions). POSIX rows run on CI on tcm, which is free: confirm the runner, at most 10 runs, shared with other seats. Hosted Actions minutes are exhausted until 2026-10-01, so a hosted run will not start, and dispatching one proves nothing.",
+    "R77, by class: the window always completes. Produce at least one shape of your own per helper (identify, listTree, readState, the stop before git), not only the developer's rows. Check the one the planner found hardest to see: a restore must never act on the OLD path. d14a874 chmodded through a planted hook symlink, and a kind === 'file' guard does not stop a hard link. Build a hard-link and a symlink shape of your own.",
+    "R82 on win32: a junction on an XDG config (R35) and an ENOENT resolution must never be machine-config-unobservable. tcm cannot run the junction, so this PC is the only place it runs.",
+    "R78–R80: the texts, the labels, and the facts on every record. In the type-change and absent→symlink texts, the LINK's lstat facts and the labelled resolved facts must both be present.",
+    "Every existing test whose assertion changed (the handoff lists them): check each change against the ruling the handoff cites, and say whether any narrowed a protection. R61's narrowed detector was validated by a mutant. Re-validate it with one of your own.",
+    "Regressions: everything QA 104 found closed stays closed, and QA 99's R71-UNREADABLE-START/-AT-BASE (on its probe branch) are re-scored in R79's form.",
+    "The full suite once, at the frozen SHA, captured unpiped, with the processes recorded before and after.",
+    "Plain sync in a scratch clone. /sync --check after gitnexus analyze is unrun (no gitnexus here)."
+  ]
+}

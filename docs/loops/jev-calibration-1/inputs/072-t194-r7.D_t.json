@@ -1,0 +1,167 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/t194-r7-dispatch.md: P0a, P0b, P0c, P0d, the D-C fix, and CI on Linux (D-084). This is what you score.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "QA 241's report and docs/loops/qa-241/ on origin/qa/t194-r6-report (8d69bed5): D-A to D-F and its generators.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "docs/loops/t194-r7-developer-handoff.md at the candidate, plus docs/loops/t194-r7/. Verify them.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "No one-pass mutant run. Under memory pressure the 139 mutants ran in 35 chunks of 4 with one worker. Five survived, and the source changed after that. Run all 139 in ONE sequential pass at the candidate, and report killed, survived and typecheck failures.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Nothing ran on Linux or in CI. The case rows are platform-aware but untested. CI is required (below). A red Linux test job is a REJECT.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "The allow-list (61 entries, each with a reason) is the builder's judgement. For each entry, judge whether the command can write a file or run code its own arguments name; tee, cp, mv, sed, curl and ssh are examples. If it can, check that P1 or a restriction covers it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Beyond the dispatch:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "extra env refusals: PATH, HOME, NODE_OPTIONS, GH_TOKEN and similar;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "a quoted non-ASCII write target is refused.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "R7-P0a, characters.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Your own generator: every Unicode separator, dash and quote PowerShell 5.1 honours, in every position. All must be refused.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Confirm in real PowerShell that each one is honoured.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Bash non-ASCII inside ASCII quotes, in a non-target word such as a commit message, is allowed.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "R7-P0b, one validator. Re-run QA 241's D-A probes (PowerShell redirect ::, drive-relative). Each must be refused. Write one mutant that bypasses the validator for one source, and show it goes red.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "R7-P0c, the command allow-list.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "Your own generator: at least 100 command words not on the list, in command position. All must be refused.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "Every inline-code spelling for node (-e, -e'…', --eval=, -p, --print, -r, --import, attached forms) must be refused.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "QA 241's D-D and D-E must be refused.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T19",
+      "observable": "R7-P0d, environment. QA 241's D-F (GIT_CONFIG_, GIT_CONFIG_PARAMETERS), GH_REPO and GH_HOST must all be refused.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T20",
+      "observable": "R7-D-C. New-Item -Name x -ItemType File, run from a protected cwd, must be refused or decided correctly, in real PowerShell.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T21",
+      "observable": "R7-regression.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T22",
+      "observable": "QA 241's met rows still hold: QA 237's D1 to D17, D8, D9, the non-merge rule and git -c.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T23",
+      "observable": "QA 241's own generators re-run.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T24",
+      "observable": "R7-cost. Review the cost list (49 rows). Name any common planner command it makes impossible to express at all.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T25",
+      "observable": "Mutants: all 139 in one pass, plus at least one of your own each for P0a, P0b, P0c and P0d.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "72-t194-r7",
+  "new_capability": "QA 246: T-194 r7 (the planner seat hook: characters and command words allow-listed)",
+  "objective": "QA 246: T-194 r7 (the planner seat hook: characters and command words allow-listed)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "37a3f7b95db0870f68d01328cbe16fbf90a25fae",
+    "path": "docs/loops/qa-246-t194-r7-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/t194-r7-dispatch.md: P0a, P0b, P0c, P0d, the D-C fix, and CI on Linux (D-084). This is what you score.",
+    "QA 241's report and docs/loops/qa-241/ on origin/qa/t194-r6-report (8d69bed5): D-A to D-F and its generators.",
+    "docs/loops/t194-r7-developer-handoff.md at the candidate, plus docs/loops/t194-r7/. Verify them.",
+    "No one-pass mutant run. Under memory pressure the 139 mutants ran in 35 chunks of 4 with one worker. Five survived, and the source changed after that. Run all 139 in ONE sequential pass at the candidate, and report killed, survived and typecheck failures.",
+    "Nothing ran on Linux or in CI. The case rows are platform-aware but untested. CI is required (below). A red Linux test job is a REJECT.",
+    "The allow-list (61 entries, each with a reason) is the builder's judgement. For each entry, judge whether the command can write a file or run code its own arguments name; tee, cp, mv, sed, curl and ssh are examples. If it can, check that P1 or a restriction covers it.",
+    "Beyond the dispatch:",
+    "extra env refusals: PATH, HOME, NODE_OPTIONS, GH_TOKEN and similar;",
+    "a quoted non-ASCII write target is refused.",
+    "R7-P0a, characters.",
+    "Your own generator: every Unicode separator, dash and quote PowerShell 5.1 honours, in every position. All must be refused.",
+    "Confirm in real PowerShell that each one is honoured.",
+    "Bash non-ASCII inside ASCII quotes, in a non-target word such as a commit message, is allowed.",
+    "R7-P0b, one validator. Re-run QA 241's D-A probes (PowerShell redirect ::, drive-relative). Each must be refused. Write one mutant that bypasses the validator for one source, and show it goes red.",
+    "R7-P0c, the command allow-list.",
+    "Your own generator: at least 100 command words not on the list, in command position. All must be refused.",
+    "Every inline-code spelling for node (-e, -e'…', --eval=, -p, --print, -r, --import, attached forms) must be refused.",
+    "QA 241's D-D and D-E must be refused.",
+    "R7-P0d, environment. QA 241's D-F (GIT_CONFIG_, GIT_CONFIG_PARAMETERS), GH_REPO and GH_HOST must all be refused.",
+    "R7-D-C. New-Item -Name x -ItemType File, run from a protected cwd, must be refused or decided correctly, in real PowerShell.",
+    "R7-regression.",
+    "QA 241's met rows still hold: QA 237's D1 to D17, D8, D9, the non-merge rule and git -c.",
+    "QA 241's own generators re-run.",
+    "R7-cost. Review the cost list (49 rows). Name any common planner command it makes impossible to express at all.",
+    "Mutants: all 139 in one pass, plus at least one of your own each for P0a, P0b, P0c and P0d."
+  ]
+}

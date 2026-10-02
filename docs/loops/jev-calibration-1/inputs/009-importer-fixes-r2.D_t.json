@@ -1,0 +1,83 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/importer-fixes-round-2-brief.md §3, rows IF-9 to IF-15, plus round 1's IF-1 to IF-8, which must still hold (docs/loops/importer-fixes-brief.md). Both files are on origin/docs/session-100-qa99-dispatch.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "IF-15's full-suite clause is moved here, before any verdict. The developer could find no moment when every session on the shared machine was idle, and this PC is quiet by construction (D-045). You run the full suite once, at aba35de, captured unpiped, with the processes on this PC recorded before and after. The row's other parts stand: /sync shows no new issue, and CI is green on tcm.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Your predecessor's report: QA 102's, on origin/qa/importer-fixes-report. Its probes, scripts and evidence are in docs/loops/qa-scripts-importer/ there. Re-run its probes.mjs and mutants.mjs against aba35de yourself. The developer reports 26/26 on its own build; do not inherit that. Copy scripts byte-exact: the developer's first copy went through PowerShell's ascii encoding and gave 5 false FAILs.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Limits the developer states, which you check rather than accept:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "PROBE-10 (a stale input with a future-session heading) is now could-not-tell: narrowed, not closed;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "the path where the rollback itself fails is written, but no test induces it. Induce it if you can (for example, a snapshot file made read-only before the rollback), and record what the project is left as.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Set up worktrees at aba35de and at 65e3a89 (round 1, as the control), plus a fresh A2A-Hub archive at e0bc3f8.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Every IF row, 1 to 15, re-run by you through the built CLI, not only through the developer's tests.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "The class, not the instance: for R2-1, try every encoding shape this PC's tools write: UTF-8 with and without a BOM, UTF-16 LE with a BOM (PowerShell 5.1's >), and CRLF. For R2-4, try each of -x, x, two positionals, and a non-existent directory, before and after the flag.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Mutants: re-run QA 102's set and one per new protection, and check that each of the developer's reverts only what it claims.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "The full suite (above), and plain sync in a scratch clone. /sync --check after gitnexus analyze is unrun.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "9-importer-fixes-r2",
+  "new_capability": "Importer fixes round 2: dispatch to a FRESH, HEADLESS QA seat (record session 106)",
+  "objective": "Importer fixes round 2: dispatch to a FRESH, HEADLESS QA seat (record session 106)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "9704ea4f35d926a02be4e561e7c3a31edb24ef7c",
+    "path": "docs/loops/importer-fixes-r2-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/importer-fixes-round-2-brief.md §3, rows IF-9 to IF-15, plus round 1's IF-1 to IF-8, which must still hold (docs/loops/importer-fixes-brief.md). Both files are on origin/docs/session-100-qa99-dispatch.",
+    "IF-15's full-suite clause is moved here, before any verdict. The developer could find no moment when every session on the shared machine was idle, and this PC is quiet by construction (D-045). You run the full suite once, at aba35de, captured unpiped, with the processes on this PC recorded before and after. The row's other parts stand: /sync shows no new issue, and CI is green on tcm.",
+    "Your predecessor's report: QA 102's, on origin/qa/importer-fixes-report. Its probes, scripts and evidence are in docs/loops/qa-scripts-importer/ there. Re-run its probes.mjs and mutants.mjs against aba35de yourself. The developer reports 26/26 on its own build; do not inherit that. Copy scripts byte-exact: the developer's first copy went through PowerShell's ascii encoding and gave 5 false FAILs.",
+    "Limits the developer states, which you check rather than accept:",
+    "PROBE-10 (a stale input with a future-session heading) is now could-not-tell: narrowed, not closed;",
+    "the path where the rollback itself fails is written, but no test induces it. Induce it if you can (for example, a snapshot file made read-only before the rollback), and record what the project is left as.",
+    "Set up worktrees at aba35de and at 65e3a89 (round 1, as the control), plus a fresh A2A-Hub archive at e0bc3f8.",
+    "Every IF row, 1 to 15, re-run by you through the built CLI, not only through the developer's tests.",
+    "The class, not the instance: for R2-1, try every encoding shape this PC's tools write: UTF-8 with and without a BOM, UTF-16 LE with a BOM (PowerShell 5.1's >), and CRLF. For R2-4, try each of -x, x, two positionals, and a non-existent directory, before and after the flag.",
+    "Mutants: re-run QA 102's set and one per new protection, and check that each of the developer's reverts only what it claims.",
+    "The full suite (above), and plain sync in a scratch clone. /sync --check after gitnexus analyze is unrun."
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "SILENT 4: in ob_recall, a recordRecallEvent that throws while a session is live prints its own NOT LOGGED line naming the error, and the hits are still returned. The no-session line is unchanged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "SILENT 9: MCP ob_end prints formatRecalledResolution's line, the same text the session-end hook prints. \"No session id\" and \"no recall_log rows\" print different lines. The rejected-file line is kept.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "T048-D1, the server.ts half: ob_sync --score and ob_score print the invocation-log state in r2b's wording, and print nothing extra when the state is ran. Check a missing, a corrupt and an unreadable log.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Preserve: a recall never fails because logging failed, ob_end still finishes, r2b's cli.ts output is unchanged, and the audit's INTENDED and SAFE rows are untouched.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Your own mutants, at least two, including one the developer did not run.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "36-t048-r3",
+  "new_capability": "T-048 round 3 (server.ts: SILENT 4, SILENT 9, T048-D1's two score renderers): QA dispatch (record 182)",
+  "objective": "T-048 round 3 (server.ts: SILENT 4, SILENT 9, T048-D1's two score renderers): QA dispatch (record 182)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "9c1a1ae03742fc33adc44a3bc1c8d56178e81b24",
+    "path": "docs/loops/t048-r3-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "SILENT 4: in ob_recall, a recordRecallEvent that throws while a session is live prints its own NOT LOGGED line naming the error, and the hits are still returned. The no-session line is unchanged.",
+    "SILENT 9: MCP ob_end prints formatRecalledResolution's line, the same text the session-end hook prints. \"No session id\" and \"no recall_log rows\" print different lines. The rejected-file line is kept.",
+    "T048-D1, the server.ts half: ob_sync --score and ob_score print the invocation-log state in r2b's wording, and print nothing extra when the state is ran. Check a missing, a corrupt and an unreadable log.",
+    "Preserve: a recall never fails because logging failed, ob_end still finishes, r2b's cli.ts output is unchanged, and the audit's INTENDED and SAFE rows are untouched.",
+    "Your own mutants, at least two, including one the developer did not run."
+  ]
+}

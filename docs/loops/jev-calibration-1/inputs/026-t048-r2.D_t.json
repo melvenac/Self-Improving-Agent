@@ -1,0 +1,95 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Each distinction is a distinct printed value, on real inputs, not only on fixtures.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "A recalled id whose knowledge_index row is deleted, against an omitted judgment (SILENT 5). The omitted judgment is still never stored as neutral.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "A feedback_log write that throws (SILENT 16): Feedback: N counts only writes that landed.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "A missing, a corrupt and an unreadable invocation log (SILENT 6), and what the health score reports for each.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "An unreadable session db against no db holding the session (SILENT 14).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "All four summary skip causes (SILENT 15). The developer reports that a garbage db file used to THROW SQLITE_NOTADB: confirm at 1646567, and confirm it is now a named skip.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Nothing becomes a crash. Session end must still finish, and the session-end hook must still exit as before. Run the built hook in a scratch home.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Preserve:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "the helpful/neutral rule;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "SAFE and INTENDED rows untouched;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "server.ts NOT edited: verify it, since SILENT 4 and 9 are out of scope.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "The scorer and types changes: check they add no scoring behaviour beyond naming the log state.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Your own mutants, at least one per SILENT row.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "26-t048-r2",
+  "new_capability": "T-048 round 2 (session end tells a missing thing from an unreadable thing): dispatch to a FRESH, HEADLESS QA seat (record session 157)",
+  "objective": "T-048 round 2 (session end tells a missing thing from an unreadable thing): dispatch to a FRESH, HEADLESS QA seat (record session 157)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "523010985f3a7a11b9186f615360b8ecdd2363ff",
+    "path": "docs/loops/t048-r2-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Each distinction is a distinct printed value, on real inputs, not only on fixtures.",
+    "A recalled id whose knowledge_index row is deleted, against an omitted judgment (SILENT 5). The omitted judgment is still never stored as neutral.",
+    "A feedback_log write that throws (SILENT 16): Feedback: N counts only writes that landed.",
+    "A missing, a corrupt and an unreadable invocation log (SILENT 6), and what the health score reports for each.",
+    "An unreadable session db against no db holding the session (SILENT 14).",
+    "All four summary skip causes (SILENT 15). The developer reports that a garbage db file used to THROW SQLITE_NOTADB: confirm at 1646567, and confirm it is now a named skip.",
+    "Nothing becomes a crash. Session end must still finish, and the session-end hook must still exit as before. Run the built hook in a scratch home.",
+    "Preserve:",
+    "the helpful/neutral rule;",
+    "SAFE and INTENDED rows untouched;",
+    "server.ts NOT edited: verify it, since SILENT 4 and 9 are out of scope.",
+    "The scorer and types changes: check they add no scoring behaviour beyond naming the log state.",
+    "Your own mutants, at least one per SILENT row."
+  ]
+}

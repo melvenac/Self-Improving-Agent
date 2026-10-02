@@ -1,0 +1,101 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "QA 125's report (origin/qa/t179-report 7df2ed0): every defect, D1 to D8, as ruled.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "docs/loops/t179-rulings-qa125.md IN FULL, with amendments 1, 2 and 3. Amendment 1 re-ruled R179-1: order by first_rev, never by session number. Amendment 2 added R179-8, done-task retention by revision. Amendment 3 accepted three departures.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "D1 is closed by construction. Re-run QA 125's c1-attack.mjs A6, A6b and A6c: no erasure at all. Then attack the new rule:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "can a caller influence first_rev or closed_rev?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "does any comparison anywhere still use the session number? Search for it;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "a wrong number on a done task (1124);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "A2's gap of 11 and A5's jump to 500 now pass.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "D2 (R179-2), narrower as accepted: a uuid recorded under a different checkout is refused. Confirm that the same-checkout A7, A8 and A9 are stated in the handoff and end.md as not fixed (T-003). Do NOT score them as failures.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "R179-3: each legacy handoff is superseded by its seat's first keyed handoff, and record-erasure explains the removal. Legacy session records are never superseded.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "R179-4, the checklist: walk ALL SEVEN steps in a scratch clone, as a stranger would. The developer walked only 1 and 2. Migrate a copy of SIA's live record (rev 132 on origin/docs/session-100-qa99-dispatch) AND a copy of ~/Projects/A2A-Hub's shape if you can reproduce it (v2), counting every uuid before and after with two instruments. Is the migration idempotent?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "R179-5: setup.mjs registers the SessionEnd hook. Run it against a scratch home or settings file, never the real one.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "R179-6/7: end.md claims only what the code does. The R179-7 fixture kills erasure-blind-rev60 on CI.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Your own mutants, at least: first_rev taken from the caller; the number comparison restored in one of lastSession, retention or done-task retention; and the different-checkout refusal skipped.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "The full suite, once, as the Defender-on control, and the importer probes (QA 122's probes-r4, QA 111's probes-r3) byte-exact.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "20-t179-r2",
+  "new_capability": "T-179 + T-163, round 2: dispatch to a FRESH, HEADLESS QA seat (record session 134)",
+  "objective": "T-179 + T-163, round 2: dispatch to a FRESH, HEADLESS QA seat (record session 134)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "6bbe19ef2dabc8cfe302f46f94675f4fc1b0f4fa",
+    "path": "docs/loops/t179-r2-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "QA 125's report (origin/qa/t179-report 7df2ed0): every defect, D1 to D8, as ruled.",
+    "docs/loops/t179-rulings-qa125.md IN FULL, with amendments 1, 2 and 3. Amendment 1 re-ruled R179-1: order by first_rev, never by session number. Amendment 2 added R179-8, done-task retention by revision. Amendment 3 accepted three departures.",
+    "D1 is closed by construction. Re-run QA 125's c1-attack.mjs A6, A6b and A6c: no erasure at all. Then attack the new rule:",
+    "can a caller influence first_rev or closed_rev?",
+    "does any comparison anywhere still use the session number? Search for it;",
+    "a wrong number on a done task (1124);",
+    "A2's gap of 11 and A5's jump to 500 now pass.",
+    "D2 (R179-2), narrower as accepted: a uuid recorded under a different checkout is refused. Confirm that the same-checkout A7, A8 and A9 are stated in the handoff and end.md as not fixed (T-003). Do NOT score them as failures.",
+    "R179-3: each legacy handoff is superseded by its seat's first keyed handoff, and record-erasure explains the removal. Legacy session records are never superseded.",
+    "R179-4, the checklist: walk ALL SEVEN steps in a scratch clone, as a stranger would. The developer walked only 1 and 2. Migrate a copy of SIA's live record (rev 132 on origin/docs/session-100-qa99-dispatch) AND a copy of ~/Projects/A2A-Hub's shape if you can reproduce it (v2), counting every uuid before and after with two instruments. Is the migration idempotent?",
+    "R179-5: setup.mjs registers the SessionEnd hook. Run it against a scratch home or settings file, never the real one.",
+    "R179-6/7: end.md claims only what the code does. The R179-7 fixture kills erasure-blind-rev60 on CI.",
+    "Your own mutants, at least: first_rev taken from the caller; the number comparison restored in one of lastSession, retention or done-task retention; and the different-checkout refusal skipped.",
+    "The full suite, once, as the Defender-on control, and the importer probes (QA 122's probes-r4, QA 111's probes-r3) byte-exact."
+  ]
+}

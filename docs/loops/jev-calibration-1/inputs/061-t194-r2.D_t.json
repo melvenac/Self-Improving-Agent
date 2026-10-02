@@ -1,0 +1,53 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "You are QA 233. The report's last line is exactly QA-233: REPORT COMPLETE.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Push only through node docs/loops/qa-233/push-qa.mjs. The prefix is unchanged, t194-r2, and so are the report path and branch.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "QA 231 already pushed qa/t194-r2-ci-candidate (699789e1) and qa/t194-r2-ci-base (c933a44), and their tcm runs were queued. Read those runs' conclusions (gh run list --branch qa/t194-r2-ci-candidate) instead of pushing again. If they were cancelled or never ran, push again and quote the new run ids.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Run your own mutants locally, and push them to qa/t194-r2-mut- only as the record (T-207).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Add one row, from D-066 (Aaron, 2026-09-30): .agents/assignments.json is on the docs-only allowlist. Say whether the candidate's allowlist includes it. It predates D-066, so a miss is expected: report it for the planner, and don't score it as a defect.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "If a model refusal or usage limit stops you, write it into the report's \"Open for the planner\" section and finish the report. Do not retry in a loop.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "61-t194-r2",
+  "new_capability": "QA 233: record 214 r2 (T-194, the planner seat hook), re-dispatched on Composer",
+  "objective": "QA 233: record 214 r2 (T-194, the planner seat hook), re-dispatched on Composer",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "aac077f5c5648d4245d779687b87542d0876c718",
+    "path": "docs/loops/qa-233-t194-r2-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "You are QA 233. The report's last line is exactly QA-233: REPORT COMPLETE.",
+    "Push only through node docs/loops/qa-233/push-qa.mjs. The prefix is unchanged, t194-r2, and so are the report path and branch.",
+    "QA 231 already pushed qa/t194-r2-ci-candidate (699789e1) and qa/t194-r2-ci-base (c933a44), and their tcm runs were queued. Read those runs' conclusions (gh run list --branch qa/t194-r2-ci-candidate) instead of pushing again. If they were cancelled or never ran, push again and quote the new run ids.",
+    "Run your own mutants locally, and push them to qa/t194-r2-mut- only as the record (T-207).",
+    "Add one row, from D-066 (Aaron, 2026-09-30): .agents/assignments.json is on the docs-only allowlist. Say whether the candidate's allowlist includes it. It predates D-066, so a miss is expected: report it for the planner, and don't score it as a defect.",
+    "If a model refusal or usage limit stops you, write it into the report's \"Open for the planner\" section and finish the report. Do not retry in a loop."
+  ]
+}

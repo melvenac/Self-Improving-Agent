@@ -1,0 +1,77 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/importer-fixes-round-4-brief.md §1 and §3, rows IF-21 to IF-25 (on origin/docs/session-100-qa99-dispatch), plus IF-1 to IF-20 from the round 1–3 briefs.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Your predecessors' scripts, byte-exact: QA 106's (probes-r2.mjs, probe-existing-snapshot.mjs, mutants-r2.mjs) and QA 111's (probes-r3.mjs, mutants-r3-qa.mjs, on origin/qa/importer-fixes-r3-report). The developer reports probes-r2 at 24/1 and probes-r3 at 17/4, and says every FAIL is a row checking \"all STALE and bare --commit refuses\", which R3-2 or R4-1 changed. Re-derive that for each FAIL row, and name the ruling that changed each. A FAIL no ruling covers is a defect.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "R4-1, check, not accept:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "QA 111's four append shapes (PS 5.1 >> onto UTF-8, onto UTF-8 with a BOM and onto 1252, and a stray NUL), plus UTF-16LE and UTF-16BE with no BOM. Write them with Windows PowerShell 5.1 itself here, not only as bytes. A bare --commit exits 1 and leaves the tree identical (sha256, size, mtime, the read-only bit), and --accept-stale completes.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "IF-22's list says unreadable is the only blocking could-not-tell reason, and that no_session_log, no_declared_session and ahead_of_latest do not block. Check it against index.ts (the table at about :457), and check that IF-10's +13/+1 still commit.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Look for another shape: an input that is readable but judged unreadable, or unreadable but judged readable. Candidates include a UTF-8 BOM followed by UTF-16, a file that is all NULs, a zero-byte file, and a file that another process holds open for writing.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "R4-2 and R4-3: QA 111's N5, Q1, Q17 and Q20 must be red. The developer reports N5 at 1/45.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "The developer's own claim to check: QA 106's mutants-r2.mjs runs a fixed list of five test files. That is why R4-2's test was duplicated into state-import-r2.test.ts. Confirm that the duplicate is the same test.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Merge check: 9473b0d (T-185, accepted with a round 2) and 78a7d13 in a scratch clone (git merge --no-commit --no-ff, then abort): no conflict in cli.ts, and tsc clean on the merged tree. Report it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "O7 was not done (which snapshot to name is an open question). Record your view on it under \"Open\".",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "14-importer-fixes-r4",
+  "new_capability": "Importer fixes round 4: dispatch to a FRESH, HEADLESS QA seat (record session 122)",
+  "objective": "Importer fixes round 4: dispatch to a FRESH, HEADLESS QA seat (record session 122)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "879cde3c65df8c66cc4f9dece1ddb8949a1476aa",
+    "path": "docs/loops/importer-fixes-r4-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/importer-fixes-round-4-brief.md §1 and §3, rows IF-21 to IF-25 (on origin/docs/session-100-qa99-dispatch), plus IF-1 to IF-20 from the round 1–3 briefs.",
+    "Your predecessors' scripts, byte-exact: QA 106's (probes-r2.mjs, probe-existing-snapshot.mjs, mutants-r2.mjs) and QA 111's (probes-r3.mjs, mutants-r3-qa.mjs, on origin/qa/importer-fixes-r3-report). The developer reports probes-r2 at 24/1 and probes-r3 at 17/4, and says every FAIL is a row checking \"all STALE and bare --commit refuses\", which R3-2 or R4-1 changed. Re-derive that for each FAIL row, and name the ruling that changed each. A FAIL no ruling covers is a defect.",
+    "R4-1, check, not accept:",
+    "QA 111's four append shapes (PS 5.1 >> onto UTF-8, onto UTF-8 with a BOM and onto 1252, and a stray NUL), plus UTF-16LE and UTF-16BE with no BOM. Write them with Windows PowerShell 5.1 itself here, not only as bytes. A bare --commit exits 1 and leaves the tree identical (sha256, size, mtime, the read-only bit), and --accept-stale completes.",
+    "IF-22's list says unreadable is the only blocking could-not-tell reason, and that no_session_log, no_declared_session and ahead_of_latest do not block. Check it against index.ts (the table at about :457), and check that IF-10's +13/+1 still commit.",
+    "Look for another shape: an input that is readable but judged unreadable, or unreadable but judged readable. Candidates include a UTF-8 BOM followed by UTF-16, a file that is all NULs, a zero-byte file, and a file that another process holds open for writing.",
+    "R4-2 and R4-3: QA 111's N5, Q1, Q17 and Q20 must be red. The developer reports N5 at 1/45.",
+    "The developer's own claim to check: QA 106's mutants-r2.mjs runs a fixed list of five test files. That is why R4-2's test was duplicated into state-import-r2.test.ts. Confirm that the duplicate is the same test.",
+    "Merge check: 9473b0d (T-185, accepted with a round 2) and 78a7d13 in a scratch clone (git merge --no-commit --no-ff, then abort): no conflict in cli.ts, and tsc clean on the merged tree. Report it.",
+    "O7 was not done (which snapshot to name is an open question). Record your view on it under \"Open\"."
+  ]
+}

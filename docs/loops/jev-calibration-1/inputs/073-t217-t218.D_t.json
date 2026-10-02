@@ -1,0 +1,71 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Confined: git diff c34866d3 1a38e3f2 touches only t216-loop-id.test.ts, t214-declared-blank.test.ts, the handoff and docs/loops/t217-t218/mutants/. Nothing under open-brain/src changes.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "T-217:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "QA 236's M6 and M7 go red on the candidate's tests.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Write one mutant of your own: PlanSchema.loop uses a regex equal in source and flags but built as a new RegExp(LOOP_ID_PATTERN.source). Report whether L3b's identity check catches it; it should.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "T-218:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "QA 239's q5 goes red.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Your own mutant: strip only a leading TAB, not spaces. Report whether J3 catches it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Full suite once at the candidate. Expect 0 failed tests; an unattributed vitest RPC error is environmental (D-083).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "CI: gh now works on Plumb. Push qa/t217-t218-ci-candidate and quote the run id, headSha, conclusion and test job. Use 1 run.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "73-t217-t218",
+  "new_capability": "QA 247: T-217 + T-218 (two test guards; a narrow check)",
+  "objective": "QA 247: T-217 + T-218 (two test guards; a narrow check)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "e0324cd6e66ed938a5332e21bf34c5fc7fe14f89",
+    "path": "docs/loops/qa-247-t217-t218-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Confined: git diff c34866d3 1a38e3f2 touches only t216-loop-id.test.ts, t214-declared-blank.test.ts, the handoff and docs/loops/t217-t218/mutants/. Nothing under open-brain/src changes.",
+    "T-217:",
+    "QA 236's M6 and M7 go red on the candidate's tests.",
+    "Write one mutant of your own: PlanSchema.loop uses a regex equal in source and flags but built as a new RegExp(LOOP_ID_PATTERN.source). Report whether L3b's identity check catches it; it should.",
+    "T-218:",
+    "QA 239's q5 goes red.",
+    "Your own mutant: strip only a leading TAB, not spaces. Report whether J3 catches it.",
+    "Full suite once at the candidate. Expect 0 failed tests; an unattributed vitest RPC error is environmental (D-083).",
+    "CI: gh now works on Plumb. Push qa/t217-t218-ci-candidate and quote the run id, headSha, conclusion and test job. Use 1 run."
+  ]
+}

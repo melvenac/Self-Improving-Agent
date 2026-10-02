@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "T171-D2, done properly. The REPLACED line quotes from the first differing CHARACTER.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "QA 144's C4b: the real T-169 note, 3,256 characters on one line, first 200 kept. It must quote from the change, not \"Session 78, planner…\".",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "QA 158's fallback shape.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "A one-word change inside a single-line note.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Try your own: a change in the first character, a change in the last character, an append only, a whitespace-only change, and a multi-byte character at the boundary.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Preserve: everything QA 158 accepted. D1's authorship, the refusals, the three D3 rows, and the dry run and write reporting identically.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Your own mutants, at least two, run on tcm.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "32-t171-r3",
+  "new_capability": "T-171 round 3 (quote from the first changed character): QA dispatch (record 177)",
+  "objective": "T-171 round 3 (quote from the first changed character): QA dispatch (record 177)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "7859373a3abcd8654a937c64b538298a26e06fd3",
+    "path": "docs/loops/t171-r3-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "T171-D2, done properly. The REPLACED line quotes from the first differing CHARACTER.",
+    "QA 144's C4b: the real T-169 note, 3,256 characters on one line, first 200 kept. It must quote from the change, not \"Session 78, planner…\".",
+    "QA 158's fallback shape.",
+    "A one-word change inside a single-line note.",
+    "Try your own: a change in the first character, a change in the last character, an append only, a whitespace-only change, and a multi-byte character at the boundary.",
+    "Preserve: everything QA 158 accepted. D1's authorship, the refusals, the three D3 rows, and the dry run and write reporting identically.",
+    "Your own mutants, at least two, run on tcm."
+  ]
+}

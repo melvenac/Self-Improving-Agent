@@ -1,0 +1,707 @@
+{
+  "headline": [
+    "bootstrap-fix",
+    "bootstrap-fix-r4",
+    "importer-leftovers",
+    "importer-leftovers-r6",
+    "loop-15-slice-3",
+    "loop-15-slice-4-step2",
+    "loop-15-slice-4-step2-r4",
+    "qa-driver-cursor-r2",
+    "qa-driver-cursor-r3",
+    "qa-driver-cursor-r5",
+    "qa-probes-on-master",
+    "s3-a10",
+    "s3-a13",
+    "s3-a4",
+    "s3-a5",
+    "s3-a6",
+    "s3-a7",
+    "s3-a9",
+    "s3-b-step1",
+    "s3-c",
+    "s3-c-r2",
+    "s3-c-r3",
+    "s3-c-r4",
+    "t003-r2",
+    "t046-d1",
+    "t046-detector",
+    "t048-r1b",
+    "t048-r2",
+    "t048-r3",
+    "t171",
+    "t171-r2",
+    "t176-index-direction",
+    "t178-ci-on-push",
+    "t192",
+    "t192-d1",
+    "t194-r2",
+    "t194-r5",
+    "t195",
+    "t196-t197",
+    "t198",
+    "t198-r2",
+    "t214",
+    "t217-t218",
+    "t221-t222"
+  ],
+  "headline_accept": 26,
+  "headline_meets_minimum": false,
+  "headline_n": 44,
+  "headline_pool_unsampled": {
+    "accept": 26,
+    "reject": 18
+  },
+  "headline_reject": 18,
+  "leak_group": [
+    "bootstrap-fix-r3",
+    "cal-a12-composer",
+    "importer-fixes-r4",
+    "loop-15-slice-4-step2-r2",
+    "loop-15-slice-4-step2-r3",
+    "s3-a11",
+    "s3-a12",
+    "s3-a8",
+    "s3-b2",
+    "t048-r2b",
+    "t158",
+    "t158-r2",
+    "t164-t211",
+    "t171-r3",
+    "t179",
+    "t179-r2",
+    "t194-r3",
+    "t194-r4",
+    "t194-r6",
+    "t194-r7",
+    "t195-r2",
+    "t196-t197-r2",
+    "t216"
+  ],
+  "leak_group_accept": 10,
+  "leak_group_n": 23,
+  "leak_group_reject": 13,
+  "leak_rule": "(?<![-\\w])(reject(?:ed|s|ion)?|accept(?:ed|s)?|accept)(?![-\\w])",
+  "min_scored_required": 50,
+  "must_include": {
+    "T-194 r1..r8": [
+      {
+        "case_id": "t194-r1",
+        "placed": "not-in-pool"
+      },
+      {
+        "case_id": "t194-r2",
+        "placed": "headline"
+      },
+      {
+        "case_id": "t194-r3",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t194-r4",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t194-r5",
+        "placed": "headline"
+      },
+      {
+        "case_id": "t194-r6",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t194-r7",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t194-r8",
+        "placed": "not-in-pool"
+      }
+    ],
+    "candidate A rejected rounds": [
+      {
+        "case_id": "s3-a4",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a5",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a6",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a7",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a8",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "s3-a9",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a10",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a11",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "s3-a12",
+        "placed": "leak_group"
+      }
+    ],
+    "slice-four (all ACCEPTED)": [
+      {
+        "case_id": "s3-b-step1",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-a13",
+        "placed": "headline"
+      },
+      {
+        "case_id": "s3-b2",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "s3-c-r4",
+        "placed": "headline"
+      },
+      {
+        "case_id": "t195-r2",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t158-r2",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t196-t197-r2",
+        "placed": "leak_group"
+      },
+      {
+        "case_id": "t198-r2",
+        "placed": "headline"
+      }
+    ]
+  },
+  "seed": 20261002,
+  "status_by_case": {
+    "bootstrap-fix": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "bootstrap-fix-r3": {
+      "label": "ACCEPT",
+      "leak_count": 12,
+      "leak_hits": [
+        "accepted",
+        "accepts"
+      ],
+      "status": "leak-wording"
+    },
+    "bootstrap-fix-r4": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "cal-a12-composer": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accept"
+      ],
+      "status": "leak-wording"
+    },
+    "importer-fixes": {
+      "label": null,
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "excluded: ambiguous-verdict"
+    },
+    "importer-fixes-r2": {
+      "label": null,
+      "leak_count": 2,
+      "leak_hits": [
+        "accept"
+      ],
+      "status": "excluded: ambiguous-verdict"
+    },
+    "importer-fixes-r3": {
+      "label": null,
+      "leak_count": 2,
+      "leak_hits": [
+        "accept"
+      ],
+      "status": "excluded: ambiguous-verdict"
+    },
+    "importer-fixes-r4": {
+      "label": "ACCEPT",
+      "leak_count": 4,
+      "leak_hits": [
+        "accept",
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "importer-leftovers": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "importer-leftovers-r5": {
+      "label": null,
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "excluded: ambiguous-verdict"
+    },
+    "importer-leftovers-r6": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "loop-15-slice-3": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "loop-15-slice-4-step2": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "loop-15-slice-4-step2-r2": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "rejects"
+      ],
+      "status": "leak-wording"
+    },
+    "loop-15-slice-4-step2-r3": {
+      "label": "REJECT",
+      "leak_count": 4,
+      "leak_hits": [
+        "reject"
+      ],
+      "status": "leak-wording"
+    },
+    "loop-15-slice-4-step2-r4": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "qa-driver-cursor-r2": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "qa-driver-cursor-r3": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "qa-driver-cursor-r5": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "qa-probes-on-master": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-a10": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-a11": {
+      "label": "REJECT",
+      "leak_count": 4,
+      "leak_hits": [
+        "accept",
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "s3-a12": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accept"
+      ],
+      "status": "leak-wording"
+    },
+    "s3-a13": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-a4": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-a5": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-a6": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-a7": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-a8": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "s3-a9": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-b-step1": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-b2": {
+      "label": "ACCEPT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "s3-c": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-c-r2": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-c-r3": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "s3-c-r4": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t003": {
+      "label": null,
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "excluded: ambiguous-verdict"
+    },
+    "t003-r2": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t046-d1": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t046-detector": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t048-r1": {
+      "label": null,
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "excluded: ambiguous-verdict"
+    },
+    "t048-r1b": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t048-r2": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t048-r2b": {
+      "label": "ACCEPT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "t048-r3": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t158": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "t158-r2": {
+      "label": "ACCEPT",
+      "leak_count": 2,
+      "leak_hits": [
+        "rejected"
+      ],
+      "status": "leak-wording"
+    },
+    "t164-t211": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accepts"
+      ],
+      "status": "leak-wording"
+    },
+    "t171": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t171-r2": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t171-r3": {
+      "label": "ACCEPT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "t176-index-direction": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t178-ci-on-push": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t179": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "t179-r2": {
+      "label": "ACCEPT",
+      "leak_count": 4,
+      "leak_hits": [
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "t183": {
+      "label": null,
+      "leak_count": 4,
+      "leak_hits": [
+        "accept",
+        "accepted"
+      ],
+      "status": "excluded: ambiguous-verdict"
+    },
+    "t185": {
+      "label": null,
+      "leak_count": 10,
+      "leak_hits": [
+        "accept",
+        "accepted",
+        "accepts"
+      ],
+      "status": "excluded: ambiguous-verdict"
+    },
+    "t192": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t192-d1": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t194-r2": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t194-r3": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "reject"
+      ],
+      "status": "leak-wording"
+    },
+    "t194-r4": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "reject"
+      ],
+      "status": "leak-wording"
+    },
+    "t194-r5": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t194-r6": {
+      "label": "REJECT",
+      "leak_count": 4,
+      "leak_hits": [
+        "accepted"
+      ],
+      "status": "leak-wording"
+    },
+    "t194-r7": {
+      "label": "REJECT",
+      "leak_count": 2,
+      "leak_hits": [
+        "reject"
+      ],
+      "status": "leak-wording"
+    },
+    "t195": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t195-r2": {
+      "label": "ACCEPT",
+      "leak_count": 2,
+      "leak_hits": [
+        "rejected"
+      ],
+      "status": "leak-wording"
+    },
+    "t196-t197": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t196-t197-r2": {
+      "label": "ACCEPT",
+      "leak_count": 2,
+      "leak_hits": [
+        "rejected"
+      ],
+      "status": "leak-wording"
+    },
+    "t198": {
+      "label": "REJECT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t198-r2": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t214": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t216": {
+      "label": "ACCEPT",
+      "leak_count": 4,
+      "leak_hits": [
+        "accept"
+      ],
+      "status": "leak-wording"
+    },
+    "t217-t218": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    },
+    "t221-t222": {
+      "label": "ACCEPT",
+      "leak_count": 0,
+      "leak_hits": [],
+      "status": "headline-pool"
+    }
+  }
+}

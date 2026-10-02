@@ -1,0 +1,83 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "R171-1: ~/.claude/commands/end.md (Aaron's global copy, outside the repo) is replaced by T-179's install step (its after-merge checklist). T-171 does not edit it. After merge, its stale note? lines fail closed, with a refusal that names the fix. Verify that the refusal does name it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "R171-2: update_gap replacing what, evidence and recommended_update wholesale is the same class. It becomes a task, not this round.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Nothing replaces a note silently: every op that can change a note (search state-writer.ts and every caller), bare note refused, append_note never removing text, and the dry run and write reporting identically.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "note_by: attack it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Can a caller set it?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Does appending add the writer's uuid?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Does the migration's null (unknown) behave as \"another session's\", as the handoff says, so that replacing any existing note needs the flag?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Is the schema rule (note_by is [] exactly when the note is empty) enforced in every path?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Every caller listed in the handoff (the importer, templates, docs, /end's old steps): is each updated or shown unaffected? Search for note: in ops yourself.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "The T-169 shape: a long note plus an \"update\" meant as an addition. Under the new ops, can a caller still lose the text without being told?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Your own mutants, at least: append_note implemented as replace; the dry run silent; note_by ignored for the override.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "22-t171",
+  "new_capability": "T-171 (a note is never replaced silently), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 144)",
+  "objective": "T-171 (a note is never replaced silently), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 144)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "9d05b3261494b10d7d2c199867f28dc532f3a180",
+    "path": "docs/loops/t171-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "R171-1: ~/.claude/commands/end.md (Aaron's global copy, outside the repo) is replaced by T-179's install step (its after-merge checklist). T-171 does not edit it. After merge, its stale note? lines fail closed, with a refusal that names the fix. Verify that the refusal does name it.",
+    "R171-2: update_gap replacing what, evidence and recommended_update wholesale is the same class. It becomes a task, not this round.",
+    "Nothing replaces a note silently: every op that can change a note (search state-writer.ts and every caller), bare note refused, append_note never removing text, and the dry run and write reporting identically.",
+    "note_by: attack it.",
+    "Can a caller set it?",
+    "Does appending add the writer's uuid?",
+    "Does the migration's null (unknown) behave as \"another session's\", as the handoff says, so that replacing any existing note needs the flag?",
+    "Is the schema rule (note_by is [] exactly when the note is empty) enforced in every path?",
+    "Every caller listed in the handoff (the importer, templates, docs, /end's old steps): is each updated or shown unaffected? Search for note: in ops yourself.",
+    "The T-169 shape: a long note plus an \"update\" meant as an addition. Under the new ops, can a caller still lose the text without being told?",
+    "Your own mutants, at least: append_note implemented as replace; the dry run silent; note_by ignored for the override."
+  ]
+}

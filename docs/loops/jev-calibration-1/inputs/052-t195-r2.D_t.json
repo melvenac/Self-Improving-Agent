@@ -1,0 +1,85 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Code at 647cc74ebb66eae6cd36acc9c09d0804b2972387 on origin/loop/t195-dt-plan-gate. The tip 71810ea adds only the handoff. The base is 8467cb1.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The brief: docs/loops/t194-t195-dispatch.md §\"Record 215\", with rows DT-1 to DT-8, plus DT-9a to DT-9d as docs/loops/t195-dispatch-qa.md defines them.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "This is r2. QA 216 REJECTED 603be51 (qa/t195-report 73728dd). Read that report first. Every row it scored met must still be met.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The full-suite regression. tests/harness/spawn-sites.test.ts (CA-4b/R16) failed because GATE_RECORD_RE.exec read as a spawn. Show it green on tcm, and show that the guard's planted positives still bite.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "DT-7 is wired.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Forge's shape is node open-brain/build/harness/cli.js dispatch <brief> --say \"...\" --repo <root>: it runs the check, then sends the hub turn only on exit 0.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Confirm that a refused check sends nothing. Use the stub transport, and also inspect what the command would send.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Score DT-7 met only if the send is unreachable without passing the check.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "DT-4 never overwrites. Two records at the same timestamp now produce two files, through an exclusive create. Repeat QA 216's same-timestamp probe.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "The DT-7 mutant b450ad5 must typecheck and go red on the new DT-7 test.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "52-t195-r2",
+  "new_capability": "QA 222: record 215 r2 (T-195, a D_t beside every brief, judged by the plan gate)",
+  "objective": "QA 222: record 215 r2 (T-195, a D_t beside every brief, judged by the plan gate)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "3bfad4389c4d2d3994f95c60a23f9effae3ca30e",
+    "path": "docs/loops/qa-222-t195-r2-dispatch.md"
+  },
+  "repair_targets": [
+    "The full-suite regression. tests/harness/spawn-sites.test.ts (CA-4b/R16) failed because GATE_RECORD_RE.exec read as a spawn. Show it green on tcm, and show that the guard's planted positives still bite.",
+    "DT-7 is wired.",
+    "Forge's shape is node open-brain/build/harness/cli.js dispatch <brief> --say \"...\" --repo <root>: it runs the check, then sends the hub turn only on exit 0.",
+    "Confirm that a refused check sends nothing. Use the stub transport, and also inspect what the command would send.",
+    "Score DT-7 met only if the send is unreachable without passing the check.",
+    "DT-4 never overwrites. Two records at the same timestamp now produce two files, through an exclusive create. Repeat QA 216's same-timestamp probe.",
+    "The DT-7 mutant b450ad5 must typecheck and go red on the new DT-7 test."
+  ],
+  "tasks": [
+    "Code at 647cc74ebb66eae6cd36acc9c09d0804b2972387 on origin/loop/t195-dt-plan-gate. The tip 71810ea adds only the handoff. The base is 8467cb1.",
+    "The brief: docs/loops/t194-t195-dispatch.md §\"Record 215\", with rows DT-1 to DT-8, plus DT-9a to DT-9d as docs/loops/t195-dispatch-qa.md defines them.",
+    "This is r2. QA 216 REJECTED 603be51 (qa/t195-report 73728dd). Read that report first. Every row it scored met must still be met.",
+    "The full-suite regression. tests/harness/spawn-sites.test.ts (CA-4b/R16) failed because GATE_RECORD_RE.exec read as a spawn. Show it green on tcm, and show that the guard's planted positives still bite.",
+    "DT-7 is wired.",
+    "Forge's shape is node open-brain/build/harness/cli.js dispatch <brief> --say \"...\" --repo <root>: it runs the check, then sends the hub turn only on exit 0.",
+    "Confirm that a refused check sends nothing. Use the stub transport, and also inspect what the command would send.",
+    "Score DT-7 met only if the send is unreachable without passing the check.",
+    "DT-4 never overwrites. Two records at the same timestamp now produce two files, through an exclusive create. Repeat QA 216's same-timestamp probe.",
+    "The DT-7 mutant b450ad5 must typecheck and go red on the new DT-7 test."
+  ]
+}
