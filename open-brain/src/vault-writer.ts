@@ -104,9 +104,9 @@ export function experiencePath(vaultDir: string, project: string, key: string): 
  * Deleting the index row while leaving the markdown was the divergence found in
  * the v0.12.0 audit: `skill-scan` reads `Experiences/` recursively, so a deleted
  * entry kept inflating skill clusters while being unreachable by `ob_recall`.
- * Moving rather than unlinking is deliberate — apoptosis fires automatically,
- * and irreversibly destroying a human-readable note with no human in the loop is
- * the wrong default. `Archive/` sits outside the scanned directories, so nothing
+ * Moving rather than unlinking is deliberate — irreversibly destroying a
+ * human-readable note is the wrong default (apoptosis, once the automatic
+ * caller, is cut; `ob_forget` is the caller now). `Archive/` sits outside the scanned directories, so nothing
  * downstream has to remember to skip it.
  *
  * Returns null when there is nothing to move, or when the path lies outside the

@@ -93,7 +93,10 @@ describe('indexKnowledge upsert', () => {
     expect(after.helpful).toBe(before.helpful);
     expect(after.harmful).toBe(before.harmful);
     expect(after.neutral).toBe(before.neutral);
-    expect(after.success_rate).toBe(before.success_rate);
+    // success_rate is cut: a new database does not declare the column, so the row has no
+    // such key (T-215: comparing it before/after was undefined === undefined).
+    expect(before).not.toHaveProperty('success_rate');
+    expect(after).not.toHaveProperty('success_rate');
     expect(after.maturity).toBe(before.maturity);
     expect(after.recall_count).toBe(before.recall_count);
     expect(after.last_recalled_at).toBe(before.last_recalled_at);
@@ -123,13 +126,12 @@ describe('indexKnowledge upsert', () => {
       helpful: 99,
       harmful: 0,
       neutral: 0,
-      successRate: 1.0,
     });
 
     const after = row();
     expect(after.maturity).toBe(before.maturity);
     expect(after.helpful).toBe(before.helpful);
-    expect(after.success_rate).toBe(before.success_rate);
+    expect(after).not.toHaveProperty('success_rate');
   });
 
   it('does not unclassify an entry when project_dir / fact_kind are omitted', () => {

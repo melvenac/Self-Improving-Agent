@@ -49,7 +49,7 @@ try {
              helpful  AS helpful_count,
              harmful  AS harmful_count,
              neutral  AS neutral_count,
-             success_rate, archived_into, vault_path
+             archived_into, vault_path
       FROM knowledge_index`);
   }
 
@@ -245,7 +245,7 @@ function getStats() {
 
   const maturityDist = db
     .prepare(
-      "SELECT COALESCE(maturity, 'progenitor') as maturity, COUNT(*) as count FROM knowledge GROUP BY maturity ORDER BY count DESC"
+      "SELECT COALESCE(maturity, 'unlabelled') as maturity, COUNT(*) as count FROM knowledge GROUP BY maturity ORDER BY count DESC"
     )
     .all();
 
@@ -466,10 +466,7 @@ function getHTML() {
 
   /* Badges */
   .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 500; }
-  .badge-progenitor { background: var(--bg3); color: var(--fg3); }
-  .badge-proven { background: #1a3a2a; color: var(--green); }
-  .badge-mature { background: #2a3a1a; color: var(--yellow); }
-  .badge-retired { background: #3a1a1a; color: var(--red); }
+  .badge-frozen { background: var(--bg3); color: var(--fg3); }
   .badge-category { background: var(--bg3); color: var(--purple); }
   .badge-source { background: var(--bg3); color: var(--orange); }
 
@@ -530,7 +527,7 @@ function getHTML() {
     <div class="stats-grid" id="statsGrid"></div>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px;">
       <div>
-        <h3 style="color:var(--fg3); margin-bottom:12px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">Maturity Distribution</h3>
+        <h3 style="color:var(--fg3); margin-bottom:12px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">Maturity Distribution (pre-Loop-10, frozen: nothing writes or computes it)</h3>
         <div id="maturityChart" class="bar-chart"></div>
       </div>
       <div>
@@ -567,11 +564,7 @@ function getHTML() {
     <div class="controls">
       <input type="text" id="knowledgeSearch" placeholder="Search key, content, tags (FTS5)...">
       <select id="knowledgeMaturity">
-        <option value="">All Maturity</option>
-        <option value="progenitor">Progenitor</option>
-        <option value="proven">Proven</option>
-        <option value="mature">Mature</option>
-        <option value="retired">Retired</option>
+        <option value="">All Maturity (pre-Loop-10, frozen)</option>
       </select>
       <select id="knowledgeSource">
         <option value="">All Sources</option>
@@ -579,7 +572,7 @@ function getHTML() {
     </div>
     <table>
       <thead><tr>
-        <th data-col="id" onclick="sortBy('knowledge','id')">ID</th><th data-col="key" onclick="sortBy('knowledge','key')">Key</th><th data-col="source" onclick="sortBy('knowledge','source')">Source</th><th data-col="maturity" onclick="sortBy('knowledge','maturity')">Maturity</th><th data-col="success_rate" onclick="sortBy('knowledge','success_rate')">Rate</th><th data-col="recall_count" onclick="sortBy('knowledge','recall_count')">Recalls</th><th data-col="tags" onclick="sortBy('knowledge','tags')">Tags</th><th data-col="created_at" onclick="sortBy('knowledge','created_at')">Created</th>
+        <th data-col="id" onclick="sortBy('knowledge','id')">ID</th><th data-col="key" onclick="sortBy('knowledge','key')">Key</th><th data-col="source" onclick="sortBy('knowledge','source')">Source</th><th data-col="maturity" onclick="sortBy('knowledge','maturity')">Maturity (pre-Loop-10, frozen)</th><th data-col="recall_count" onclick="sortBy('knowledge','recall_count')">Recalls</th><th data-col="tags" onclick="sortBy('knowledge','tags')">Tags</th><th data-col="created_at" onclick="sortBy('knowledge','created_at')">Created</th>
       </tr></thead>
       <tbody id="knowledgeBody"></tbody>
     </table>
@@ -745,8 +738,8 @@ function fmtBytes(b) {
   return (b / 1048576).toFixed(1) + ' MB';
 }
 function maturityBadge(m) {
-  const v = m || 'progenitor';
-  return '<span class="badge badge-' + v + '">' + v + '</span>';
+  const v = m || 'unlabelled';
+  return '<span class="badge badge-frozen">' + esc(v) + '</span>';
 }
 function categoryBadge(c) {
   return '<span class="badge badge-category">' + esc(c) + '</span>';
@@ -754,9 +747,19 @@ function categoryBadge(c) {
 function sourceBadge(s) {
   return '<span class="badge badge-source">' + esc(s) + '</span>';
 }
+// The filter lists the labels actually stored, so no label is hard-coded here.
+function fillMaturityFilter(dist) {
+  const sel = document.getElementById('knowledgeMaturity');
+  if (sel.options.length > 1) return;
+  for (const r of dist) {
+    const o = document.createElement('option');
+    o.value = r.maturity;
+    o.textContent = r.maturity + ' (' + r.count + ')';
+    sel.appendChild(o);
+  }
+}
 function barColor(label) {
-  const colors = { progenitor: 'var(--fg3)', proven: 'var(--green)', mature: 'var(--yellow)', retired: 'var(--red)' };
-  return colors[label] || 'var(--accent)';
+  return 'var(--fg3)'; // a frozen label, not a live signal: one muted colour for every value
 }
 
 async function api(endpoint, params = {}) {
@@ -806,6 +809,7 @@ async function loadOverview() {
     card('DB Size', fmtBytes(d.db_size_bytes));
 
   renderBars('maturityChart', d.maturity_distribution, r => r.maturity, r => r.count, barColor);
+  fillMaturityFilter(d.maturity_distribution);
   renderBars('tagsChart', d.top_tags, r => r.tag, r => r.count, () => 'var(--accent)');
   renderBars('categoriesChart', d.categories, r => r.category, r => r.count, () => 'var(--purple)');
 
@@ -881,7 +885,6 @@ function renderKnowledgeRows() {
     '<td>' + esc(truncate(r.key, 40)) + '</td>' +
     '<td>' + sourceBadge(r.source) + '</td>' +
     '<td>' + maturityBadge(r.maturity) + '</td>' +
-    '<td>' + (r.success_rate != null ? (r.success_rate * 100).toFixed(0) + '%' : '-') + '</td>' +
     '<td>' + (r.recall_count || 0) + '</td>' +
     '<td>' + esc(truncate(r.tags, 30)) + '</td>' +
     '<td>' + fmtDate(r.created_at) + '</td></tr>'
@@ -926,10 +929,10 @@ function toggleKnowledge(tr, id) {
   // For now, the content is available in the row data via a data attribute approach.
   // Let's use a simpler approach: fetch from API
   fetch('/api/knowledge/' + id).then(r => r.json()).then(k => {
-    detail.innerHTML = '<td colspan="8"><div class="content-full">' +
+    detail.innerHTML = '<td colspan="7"><div class="content-full">' +
       '<strong>Key:</strong> ' + esc(k.key) + '\\n' +
       '<strong>Source:</strong> ' + esc(k.source) + '  <strong>Project:</strong> ' + esc(k.project_dir || 'global') + '\\n' +
-      '<strong>Maturity:</strong> ' + esc(k.maturity) + '  <strong>Success Rate:</strong> ' + (k.success_rate != null ? (k.success_rate * 100).toFixed(0) + '%' : 'N/A') + '\\n' +
+      '<strong>Maturity (pre-Loop-10, frozen label):</strong> ' + esc(k.maturity) + '\\n' +
       '<strong>Recalls:</strong> ' + (k.recall_count || 0) + '  <strong>Last Recalled:</strong> ' + fmtDate(k.last_recalled) + '\\n' +
       '<strong>Helpful:</strong> ' + (k.helpful_count || 0) + '  <strong>Harmful:</strong> ' + (k.harmful_count || 0) + '  <strong>Neutral:</strong> ' + (k.neutral_count || 0) + '\\n' +
       '<strong>Tags:</strong> ' + esc(k.tags) + '\\n' +

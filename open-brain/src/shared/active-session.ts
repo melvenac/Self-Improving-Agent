@@ -177,8 +177,8 @@ export function resolveWorkspaceDir(
  *
  * Cursor already sends `model` and `cursor_version` on every SessionStart and we
  * were recording that the keys existed while discarding both values. Without the
- * model, the maturity lifecycle rates entries with no idea what produced them and
- * shadow recall scores across an uncontrolled confound.
+ * model, feedback ratings carry no idea what produced them and shadow recall
+ * scores across an uncontrolled confound.
  *
  * `user_email` is in the same payload and is deliberately NOT read here. The
  * slot file records diagnostics, not identity.

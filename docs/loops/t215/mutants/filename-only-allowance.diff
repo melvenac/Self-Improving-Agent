@@ -1,0 +1,13 @@
+diff --git a/open-brain/tests/harness/s4-guards.test.ts b/open-brain/tests/harness/s4-guards.test.ts
+index e1e89508..ecafe57b 100644
+--- a/open-brain/tests/harness/s4-guards.test.ts
++++ b/open-brain/tests/harness/s4-guards.test.ts
+@@ -68,7 +68,7 @@ export function testCountFindings(rows: { file: string; before: number; after: n
+   const findings: string[] = [];
+   for (const r of rows) {
+     if (r.after >= r.before) continue;
+-    const a = allowances.find((x) => x.file === r.file && x.before === r.before && x.after === r.after);
++    const a = allowances.find((x) => x.file === r.file);
+     if (a === undefined) findings.push(`${r.file} lost a test (${r.before} -> ${r.after}) with no matching allowance`);
+   }
+   for (const a of allowances) {
