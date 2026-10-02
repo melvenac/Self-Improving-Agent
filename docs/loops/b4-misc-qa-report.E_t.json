@@ -1,0 +1,70 @@
+{
+  "loop": "qa-258-b4-misc",
+  "candidate_git": {
+    "sha": "117dc4e3621dd9d5cb69a5461b945598d60023e3",
+    "branch": "origin/master (dispatch tree)",
+    "frozen_at": "2026-10-02T12:28:00Z"
+  },
+  "candidates": [
+    { "task": "T-208", "sha": "be32de21d7d448b5c91b4cfa5411698842c97d80", "branch": "origin/loop/t208-fetch-first", "pr": 289, "verdict": "ACCEPT" },
+    { "task": "T-212", "sha": "f707a09c6b61833d5499998d22403037908ebd01", "branch": "origin/loop/t212-trailer-attribution", "pr": 290, "verdict": "ACCEPT" },
+    { "task": "T-215", "sha": "39c3cca738081670ab6bb593645f210eab73917e", "branch": "origin/loop/t215-maturity-cut", "pr": 294, "verdict": "ACCEPT" },
+    { "task": "T-050", "sha": "483061d04bafe0ac64c4c5692e1dc19e6840b16a", "branch": "origin/loop/t050-foreign-writer", "pr": 299, "verdict": "ACCEPT" },
+    { "task": "T-048", "sha": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60", "branch": "origin/loop/t048-dropped-counts", "pr": 302, "verdict": "REJECT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit at each head and at the batch merge",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 9000,
+      "detail": "All five heads and the merged result 7c874ba5 exit 0."
+    },
+    "unit": {
+      "command": "npx vitest run <one touched test file> per invocation",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 140000,
+      "detail": "LIGHT job, no full suite. Merged result: 12 touched files, 172 tests, all exit 0. CI test=pass: #289 37005482571, #290 37004018054, #294 37004853773, #299 36981306790/36981312652, #302 36982043381/36982048552."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q258-289-1", "status": "met", "order": "shown", "evidence": "11 files, all T-208 (cli-bootstrap, drift-line new, tree-currency, 2 tests, handoff, 5 mutants)." },
+    { "id": "Q258-289-2", "status": "met", "order": "red-first", "evidence": "tree-currency-fetch base 12 failed (12), head 12 passed; drift-line base 6 failed | 1 passed (7), head 7 passed." },
+    { "id": "Q258-289-3", "status": "met", "order": "shown", "evidence": "dev last-stderr-line 1 failed | 11 passed; QA attempted-time-as-last-fetch 3 failed | 9 passed." },
+    { "id": "Q258-289-4", "status": "met", "order": "shown", "evidence": "test pass 2m49s run 37005482571 at be32de21." },
+    { "id": "Q258-289-5", "status": "met", "order": "shown", "evidence": "Failed fetch with origin 2 ahead: hook startup/resume, ob_start, /sync print fetch FAILED and the last successful fetch time, no 'level'; cause is the fatal: line for SSH-style stderr; drift named/none/not checked on startup and resume; hanging remote bounded at 16390/16453/16517 ms." },
+    { "id": "Q258-290-1", "status": "met", "order": "shown", "evidence": "5 files, all T-212." },
+    { "id": "Q258-290-2", "status": "met", "order": "red-first", "evidence": "handoff-guard base 6 failed | 11 passed (17), head 17 passed." },
+    { "id": "Q258-290-3", "status": "met", "order": "shown", "evidence": "dev identity-fallback 1 failed | 16 passed; QA body-scan survives unit file, killed by QA fixture 8f." },
+    { "id": "Q258-290-4", "status": "met", "order": "shown", "evidence": "test pass 2m40s run 37004018054 at f707a09c." },
+    { "id": "Q258-290-6", "status": "met", "order": "shown", "evidence": "626f7d13..9b076970 open-brain diff non-empty: 3 session-start files = T-208 removed by rebase (equal to 79d1f5d9), ci-runs-on.test.ts = master's change; T-212 files empty; range-diff '='. 9b076970..f707a09c docs-only. Rows 8a-8e, 10 re-run: 18 passed (18)." },
+    { "id": "Q258-294-1", "status": "met", "order": "shown", "evidence": "17 files, all R-011/T-215." },
+    { "id": "Q258-294-2", "status": "met", "order": "red-first", "evidence": "base guard on head 1 failed | 12 passed; head guard on base 1 failed | 13 passed; retirements-live base 1 failed | 1 passed; head all green." },
+    { "id": "Q258-294-3", "status": "met", "order": "shown", "evidence": "dev dashboard-success-rate red on retirements-live; QA success_rate re-declare 2 failed | 8 passed on index-upsert." },
+    { "id": "Q258-294-4", "status": "met", "order": "shown", "evidence": "test pass 2m35s run 37004853773 at 39c3cca7." },
+    { "id": "Q258-294-7", "status": "met", "order": "shown", "evidence": "Table counts match guard regex (cli-flags 19->18, ranking 11->10); third file fires.test.ts loss fails; filename-only mutant 1 failed | 13 passed; retirements 0 unexpected, R-011 owed 0; dashboard no success_rate, maturity labelled frozen; backfill script deleted." },
+    { "id": "Q258-299-1", "status": "met", "order": "shown", "evidence": "5 files, all T-050." },
+    { "id": "Q258-299-2", "status": "met", "order": "red-first", "evidence": "recalled-ids base 6 failed | 17 passed (23), head 23 passed." },
+    { "id": "Q258-299-3", "status": "met", "order": "shown", "evidence": "dev ids-appended killed by FW-5; QA absent-as-not-checked killed by FW-3; QA silent-unparseable killed by FW-4." },
+    { "id": "Q258-299-4", "status": "met", "order": "shown", "evidence": "test pass runs 36981306790, 36981312652 at 483061d0." },
+    { "id": "Q258-299-8", "status": "met", "order": "shown", "evidence": "No fs writes in detector; detectForeignWriter only called at recalled-ids.ts:250 after resolveRecalledIds; results only to formatForeignWriter; absent 'none present', no session 'not checked'. Gap: unreadable path (EISDIR) also 'none present'." },
+    { "id": "Q258-302-1", "status": "met", "order": "shown", "evidence": "13 files, DC-1..DC-8; barred sync/checks.ts, sync/index.ts untouched." },
+    { "id": "Q258-302-2", "status": "met", "order": "red-first", "evidence": "t048-dropped-counts base 9 failed (9), head 9 passed; checks-state base 2 failed | 20 passed (22), head 22 passed." },
+    { "id": "Q258-302-3", "status": "met", "order": "shown", "evidence": "dev M1 (rebuilt from description) killed by DC-1; QA Q1 killed by DC-8; QA Q2 killed by DC-5." },
+    { "id": "Q258-302-4", "status": "met", "order": "shown", "evidence": "test pass runs 36982043381, 36982048552 at ac4323f4." },
+    { "id": "Q258-302-9", "status": "partial", "order": "red-first", "evidence": "Invocations and merge-markers print 0 counts; recalled-ids prints Dropped only if non-zero (recalled-ids.ts:167), pinned by DC-3b; DC-4/5/6 silent at zero; DC-7 unusable_roots unread." },
+    { "id": "Q258-10", "status": "met", "order": "shown", "evidence": "Merge order #290, #289, #294, #302, #299 on 117dc4e3: all clean, no conflict; tsc 0; 12 touched files 172 passed." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "T-208: hung upload-pack/ssh child left running after the 15 s fetch timeout.",
+    "T-208: an INBOX.md that disagrees with state.json still reads 'Drift: none' (disclosed).",
+    "T-212: no developer test pins trailer-in-final-paragraph-only; id match is substring.",
+    "T-215: no CHANGELOG entry; NULL maturity filter 'unlabelled' matches nothing.",
+    "T-050: an existing but unreadable .recalled-entries.json reads 'none present' (readFile wrapper swallows non-ENOENT errors).",
+    "T-048: DC-3..DC-6 silent at zero; DC-7 unusable_roots not surfaced."
+  ],
+  "notes": "QA 258, dispatch tree 117dc4e3621dd9d5cb69a5461b945598d60023e3. No live Jev call; no real-origin fetch in any fixture. Batch verdict REJECT (T-048); B4 ACCEPTs need Aaron's word."
+}
