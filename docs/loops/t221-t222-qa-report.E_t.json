@@ -1,0 +1,48 @@
+{
+  "loop": "qa-250-t221-t222",
+  "candidate_git": {
+    "sha": "9ab021fdd2df605aacdff2de4db4b963f131d32d",
+    "branch": "origin/loop/t221-ci-concurrency",
+    "frozen_at": "2026-10-02T05:38:31Z"
+  },
+  "candidates": [
+    { "task": "T-221", "sha": "9ab021fdd2df605aacdff2de4db4b963f131d32d", "branch": "origin/loop/t221-ci-concurrency", "pr": 274, "verdict": "ACCEPT" },
+    { "task": "T-222", "sha": "7b42ed6fe22539efd48f4ceaa774a0b33e3236c9", "branch": "origin/loop/t222-attempts", "pr": 277, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc (CI Typecheck in test job, runs 36970268385 on 9ab021fd and 36968787919 on 7b42ed6f)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 420000,
+      "detail": "tcm test job succeeded on both heads; QA push run 36970268385 on qa/t221-t222-ci-candidate headSha 9ab021fd"
+    },
+    "unit": {
+      "command": "npx vitest run on touched files (ci-runs-on 20/20 at T-221; t222-attempts, s4-g3-done, s4-g1-records, s4-g6-closeout 52/52 at T-222); full suite by CI",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 30000,
+      "detail": "LIGHT job: no local full suite. CI full suite green on 36970268385, 36969845163, 36969848539 (T-221) and 36968787919 (T-222 PR run; T-222 push run 36968774375 cancelled by the old shared group)"
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q250-1", "status": "met", "order": "shown", "evidence": "diff origin/master...9ab021fd: ci.yml, ci-runs-on.test.ts, t221 handoff only." },
+    { "id": "Q250-2", "status": "met", "order": "shown", "evidence": "group format('ci-{0}-{1}', event_name, head_ref||ref_name): push loop/x -> ci-push-loop/x, PR -> ci-pull_request-loop/x, master cancel false, dispatch ci-dispatch-{run_id}." },
+    { "id": "Q250-3", "status": "met", "order": "shown", "evidence": "A: 36967616444/36967619519 success on 770da4e4, overlapping. B: 36968459049 ended 05:24:51 > 36968808326 created 05:24:43; 36968462359 ended 05:25:03 > 36968811679 created 05:24:46; successors success." },
+    { "id": "Q250-4", "status": "met", "order": "shown", "evidence": "QA push run 36970268385 on 9ab021fd success, test=success; gh run list --commit 9ab021fd: 3 runs, all success, overlapping, none cancelled." },
+    { "id": "Q250-5", "status": "met", "order": "red-first", "evidence": "master ci.yml: 1 failed | 19 passed (push group expected 'ci-loop/t221-x' not to be 'ci-loop/t221-x'); candidate ci.yml: 20/20." },
+    { "id": "Q250-6", "status": "partial", "order": "shown", "evidence": "Mutant push-only event in group survives (20/20). Row needs exact group strings or a push-x/x collision case." },
+    { "id": "Q250-7", "status": "met", "order": "shown", "evidence": "diff origin/master...7b42ed6f: 5 harness sources, 2 tests, regenerated close-out, handoff." },
+    { "id": "Q250-8", "status": "met", "order": "shown", "evidence": "count-attempts on real records: exit 0, attempts 15, retries 0; git diff origin/master 7b42ed6f -- slice-4-records empty." },
+    { "id": "Q250-9", "status": "met", "order": "shown", "evidence": "Own fixtures exit 1 VIOLATION: re-roll after answer, auth with answer, 4 transport retries, unreadable parent (absent and garbled); control exit 0." },
+    { "id": "Q250-10", "status": "met", "order": "shown", "evidence": "Mutant (a) catch->true killed by F5.5 and own unreadable-parent; mutant (b) answer check dropped killed by F5.4 and own auth-with-answer." },
+    { "id": "Q250-11", "status": "met", "order": "shown", "evidence": "F6 'no deterministic checks were supplied'; F7 dry-run G_done with outside E_t: checks_source E_t:@a685c193...; F8 closeout-tables --check exit 0, diff is the 4.4 header only." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "T-221: the new ci-runs-on row does not pin the event in the PR group (QA mutant push-only survives); non-blocking.",
+    "T-222 head push run 36968774375 cancelled by its PR run under master's old concurrency group (the T-221 defect); PR run success."
+  ],
+  "notes": "QA 250, dispatch tree 5b7e034fe505d2995272c4d045968e0a5b65c5c5. No live Jev call (shadow-done ran --mode dry-run, sent false). Pair verdict ACCEPT."
+}
