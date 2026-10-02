@@ -164,7 +164,8 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
  */
 export function formatRecalledResolution(resolved: RecalledIdsSource, indent = "  "): string[] {
   const lines = [`${indent}Recalled ids: ${resolved.ids.length} from ${resolved.origin}`];
-  if (resolved.droppedEntries) {
+  // T-048 round 2: printed at zero too. `droppedEntries` is set only for origin "file"; 0 means every entry had an id.
+  if (resolved.droppedEntries !== undefined) {
     lines.push(`${indent}Dropped ${resolved.droppedEntries} of ${resolved.entriesInFile} entries in the file: no numeric id, so they were not rated`);
   }
   if (resolved.rejected) {

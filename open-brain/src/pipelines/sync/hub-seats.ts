@@ -100,6 +100,7 @@ export function checkHubSeats(projectRoot: string): CheckResult {
   return {
     name: "hub-seats",
     severity: "pass",
-    message: `hub-partner-seats.json matches worktree-seats.json and the readers map ob_start reads (${cursorSeats.length} Cursor room(s): ${cursorSeats.join(", ")})`,
+    report: true,
+    message: `hub-partner-seats.json matches worktree-seats.json and the readers map ob_start reads (${cursorSeats.length} Cursor room(s): ${cursorSeats.join(", ")}); ${ignoredSeatNames} seat names ignored`,
   };
 }

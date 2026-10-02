@@ -53,6 +53,8 @@ export interface ActiveSessionEntry {
   dir_source?: string;
   /** How many workspace roots the payload offered. 0 with the key present is the bug. */
   workspace_root_count?: number;
+  /** T-048: workspace_roots entries present but unusable (0 when none). Beside workspace_root_count so a reader can tell 'one root' from 'three roots, two unusable'. */
+  workspace_unusable_roots?: number;
   /** Model that drove the session, when the host reports one. */
   model?: string;
   /** Host CLI/app version, when reported. Lets a harness regression be dated. */

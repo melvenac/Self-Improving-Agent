@@ -73,13 +73,13 @@ describe("T-048 session-end: recalled-entries ids that cannot be rated are count
     expect(formatRecalledResolution(r)).toContain("  Dropped 2 of 4 entries in the file: no numeric id, so they were not rated");
   });
 
-  it("DC-3b: a clean file says nothing extra (nothing was dropped), and the explicit/recall-log origins carry no count", () => {
+  it("DC-3b (round 2, inverted): a clean file says 'Dropped 0 of N' (zero is printed), and the explicit/recall-log origins carry no count", () => {
     const db = new Database(":memory:");
     initSchemaV2(db);
     const file = JSON.stringify({ session_id: "S", entries: [{ id: 1 }] });
     const r = resolveRecalledIds({ db, sessionId: "S", filePaths: ["/f"], readFile: () => file });
     expect(r.droppedEntries).toBe(0);
-    expect(formatRecalledResolution(r).join("\n")).not.toContain("Dropped");
+    expect(formatRecalledResolution(r)).toContain("  Dropped 0 of 1 entries in the file: no numeric id, so they were not rated");
     expect(resolveRecalledIds({ db, sessionId: "S", explicitIds: [9], filePaths: [], readFile: () => null }).droppedEntries).toBeUndefined();
   });
 });

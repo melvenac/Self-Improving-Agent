@@ -10,6 +10,8 @@ export interface HealthWarning {
 
 export interface HealthCheckResult {
   warnings: HealthWarning[];
+  /** T-048: transcript directories that could not be listed; null when ~/.claude/projects was not scanned. */
+  transcriptDirsUnreadable: number | null;
 }
 
 /**
@@ -18,6 +20,7 @@ export interface HealthCheckResult {
  */
 export function runHealthChecks(homePath: string): HealthCheckResult {
   const warnings: HealthWarning[] = [];
+  let transcriptDirsUnreadable: number | null = null;
   let pendingSkillProposals = 0;
 
   // 1. Obsidian backup freshness
@@ -78,6 +81,7 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
       }
 
       // T-048: the newest-transcript judgement below rests on the directories that WERE readable.
+      transcriptDirsUnreadable = unreadableDirs;
       if (unreadableDirs > 0) {
         warnings.push({
           category: "pipeline",
@@ -128,5 +132,5 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
   // of which was ever acted on. `.skill-proposals-pending.json` is left on disk
   // untouched — nothing reads it now and nothing writes it.
 
-  return { warnings };
+  return { warnings, transcriptDirsUnreadable };
 }

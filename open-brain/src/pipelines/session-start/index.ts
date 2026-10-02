@@ -28,6 +28,8 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
       session.skippedReason = "no .agents/SESSIONS/ dir — log not created";
     } else {
       const unreadableLogs: string[] = [];
+      let searched = false;
+      searched = sessionId !== null && sessionId !== "";
       const existing = findExistingSessionLog(options.projectRoot, sessionId, (name) => unreadableLogs.push(name));
       // T-048: a log that could not be read may have been this session's own; say so rather than mint a duplicate in silence.
       if (unreadableLogs.length > 0) {
@@ -51,6 +53,8 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
           sessionNumberSource: source,
         };
       }
+      // T-048: the count is set whenever the search ran, so 0 (looked, none unreadable) differs from undefined (did not look).
+      if (searched) session.unreadableLogs = unreadableLogs.length;
     }
   }
 
