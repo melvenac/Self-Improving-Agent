@@ -96,6 +96,37 @@ describe("describeLatestBrief — T-210", () => {
     expect(describeLatestBrief(root)).toBe("Latest brief: docs/loops/kept-brief.md (2026-09-01)");
   });
 
+  // T-233 C: the name must END in brief / rebrief, or an -amendment-N of either.
+  it.each([
+    "loop-9-brief.md",
+    "loop-15-slice-3-grok-brief.md",
+    "t201-spec-brief.md",
+    "loop-16-rebrief-amendment-2.md",
+    "loop-16-brief-amendment-3.md",
+    "brief.md",
+  ])("T233-C kept: %s is a brief", (name) => {
+    const root = repo();
+    commit(root, "loop-1-brief.md", "2026-09-01T12:00:00+00:00");
+    commit(root, name, "2026-09-20T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBe(`Latest brief: docs/loops/${name} (2026-09-20)`);
+  });
+
+  it.each([
+    "loop-15-slice-4-brief-draft.md",
+    "research-brief-jev-mcp.md",
+    "t201-brief-response-developer-handoff.md",
+    "loop-9-brief-2.md",
+    "loop-9-brief.json",
+    "loop-9-brief-amendment-x.md",
+    "followups-briefs.md",
+    "notabrief.md",
+  ])("T233-C excluded: %s is not a brief, even when newer than one", (name) => {
+    const root = repo();
+    commit(root, "loop-1-brief.md", "2026-09-01T12:00:00+00:00");
+    commit(root, name, "2026-09-20T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBe("Latest brief: docs/loops/loop-1-brief.md (2026-09-01)");
+  });
+
   it("T210-6: a directory that is not a git repository says so, rather than claiming there is no brief", () => {
     const root = mkdtempSync(join(tmpdir(), "latest-brief-"));
     made.push(root);

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/latest-brief.ts b/open-brain/src/pipelines/session-start/latest-brief.ts
+index 709867f4..c38c84d3 100644
+--- a/open-brain/src/pipelines/session-start/latest-brief.ts
++++ b/open-brain/src/pipelines/session-start/latest-brief.ts
+@@ -55,7 +55,7 @@ export function describeLatestBrief(projectRoot: string): string | null {
+  * old test was a substring (`includes("brief")`), so a `-draft`, a research note or a handoff whose name happened to
+  * contain the word could be named the latest brief.
+  */
+-export const BRIEF_NAME = /(^|-)(re)?brief(-amendment-\d+)?\.md$/;
++export const BRIEF_NAME = /(^|-)(re)?brief/;
+ 
+ export function isBrief(path: string): boolean {
+   const base = path.split("/").pop() ?? "";
