@@ -1,0 +1,51 @@
+{
+  "loop": "qa-262-t008r3",
+  "candidate_git": {
+    "sha": "3413e4f24051f1eb765646b1471228d29e5cfde8",
+    "branch": "qa/t008r3-merge (local scratch merge of #295, #298, #306, #309 onto origin/master e940571b; not pushed)",
+    "frozen_at": "2026-10-02T17:26:34Z"
+  },
+  "candidates": [
+    { "task": "T-008", "sha": "931998db3b5736cfb157e654669c58727dfb865f", "branch": "origin/loop/t008-mcp-paths", "pr": 295, "verdict": "ACCEPT" },
+    { "task": "T-008b", "sha": "3b485b7c6e9168282d05f8ac3751c5a96951d604", "branch": "origin/loop/t008b-mcp-sources", "pr": 298, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit (open-brain, on scratch merge 3413e4f2)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 20000,
+      "detail": "CI test job success on 37039012145 (931998db) and 37039129218 (3b485b7c); test-windows skipped"
+    },
+    "unit": {
+      "command": "npx vitest run, one touched file per invocation, on the merge: checks 102/102, hook-registration 7/7, mcp-command-paths 30/30, mirror-parity 13/13, t048-counts-parity 7/7, t048-counts 20/20",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 15000,
+      "detail": "LIGHT job: no local full suite. checks first gave 12 failed (better-sqlite3 binding not built under --ignore-scripts); after npm rebuild better-sqlite3 in the scratch tree, 102/102."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q262-1", "status": "met", "order": "shown", "evidence": "#295: null, string, number (and true, 0, '') beside good give warn 'Not checked 1: broken (global): entry is not an object'. #298: same with 'not checked: broken (global): entry is not an object', and in project, checkout .mcp.json and plugin .mcp.json sources. #298 absent settings.json + good: pass, message ends 'Skipped: settings.json absent: no plugins enabled, none examined.'; present {} / enabledPlugins {} / BOM / null: pass with no note." },
+    { "id": "Q262-2", "status": "met", "order": "shown", "evidence": "QA 260 probe cases unchanged in severity on both heads: ${...}, non-string, no command/no url, empty command warn; url named pass; G, G' warn; J warn; absent manifest pass; {} settings pass. On #298 the absence note is appended to fixtures with no settings.json (D-106 change, severity unchanged)." },
+    { "id": "Q262-3", "status": "met", "order": "red-first", "evidence": "#295 on 7312a292: 1 failed | 15 passed, head 16/16. #298 on 7afd7f1b: 3 failed | 27 passed, head 30/30. The present-settings guard row passes on the old head by construction (noted)." },
+    { "id": "Q262-4", "status": "met", "order": "shown", "evidence": "#295 dev nonobject-dropped 1 red; QA nonobject->skipped 1 red. #298 dev absent-unnamed 1 red; QA A settingsAbsent=true 1 red; QA B settingsAbsent=!settings.ok SURVIVED (gap: unreadable settings not pinned against the absence note). All reverted, trees clean." },
+    { "id": "Q262-5", "status": "met", "order": "shown", "evidence": "range-diff #295: 3 old commits identical (=), 23 master commits as new base a30fa359, + r3 commits 9955358b, 931998db. #298: 1d02c78b!7ad5601b context-only (#295 r3 block), 2 identical, + r3 441d1a12, 3b485b7c. Nothing else." },
+    { "id": "Q262-6", "status": "met", "order": "shown", "evidence": "gh pr checks: #295 run 37039012145, #298 run 37039129218, changed+test pass, test-windows skipping; headSha equals pinned heads." },
+    { "id": "Q262-7", "status": "met", "order": "shown", "evidence": "Both heads: 'skip | not checked: no mcpServers entry with a command in ~/.claude.json. This is not a pass.' Real config: 0 global/project mcpServers, 0 enabled plugins, settings.json present, installed_plugins.json absent: nothing exercised." },
+    { "id": "Q262-8", "status": "met", "order": "shown", "evidence": "From origin/master e940571b (no open-brain change since a30fa359): #295 9eff6dc7, #298 91a43479, #306 6e1c8022 clean; #309 3413e4f2 one hunk on the node:fs import line (node:path identical, auto-resolved), resolved by union; 6 touched sync test files 179 passed; tsc --noEmit exit 0." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "R2-a: on #298 the absence note now also appears on WARN results and on QA 260 fixtures with no settings.json; severity unchanged (the D-106 change).",
+    "R4-a: QA mutant settingsAbsent = !settings.ok survives; no test pins that an unreadable settings.json carries no 'absent' note. Behaviour correct today.",
+    "The absence note is added on PASS and WARN only; ISSUE and SKIP results with absent settings.json do not name it. D-106 asks for PASS only.",
+    "Wrong-type containers (project mcpServers a string, checkout .mcp.json an array) beside a good server still give a silent pass (QA 260 gap 1, carried forward; not entries).",
+    "An array entry is reported as 'no command and no url' rather than 'entry is not an object' (WARN and named).",
+    "#298's present-settings guard row cannot go red on the previous head (row 3).",
+    "Row 7: this machine's real config has no MCP servers or plugins; nothing exercised.",
+    "The dispatch names node:path for the conflict; the conflicting line is node:fs (node:path identical on both sides)."
+  ],
+  "notes": "QA 262, dispatch tree e940571bb8f730320e5dce6dc850fbb1b96f879d. No live Jev call. Not under the overnight pre-approval: any merge waits for Aaron. #295 ACCEPT, #298 ACCEPT; batch merge mechanics clean."
+}
