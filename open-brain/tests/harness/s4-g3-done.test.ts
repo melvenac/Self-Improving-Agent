@@ -145,10 +145,11 @@ describe("G3 — the 4.3 shadow done-gate runner", { timeout: 120_000 }, () => {
     expect(none.record.checks_source).toBe("none");
     expect(none.record.checks_passed).toBe(false);
     expect(none.decision?.verdict).toBe("reject");
-    expect(none.decision?.reasons.join(" ")).toContain("deterministic checks failed");
+    expect(none.decision?.reasons.join(" ")).toContain("no deterministic checks were supplied"); // T-222 F6
+    expect(none.decision?.reasons.join(" ")).not.toContain("checks failed");
 
-    const checks = checksFromEvidence(join(repo.root, "docs/loops/x.E_t.json"));
-    expect(checks.source).toMatch(/^E_t:.*x\.E_t\.json@[0-9a-f]{40}$/);
+    const checks = checksFromEvidence(join(repo.root, "docs/loops/x.E_t.json"), repo.root);
+    expect(checks.source).toMatch(/^E_t:docs\/loops\/x\.E_t\.json@[0-9a-f]{40}$/); // T-222 F7: repo-relative
     const green = await run({ checks, at: new Date("2026-10-01T00:00:01.000Z"), ledgerPath: join(side, "second.jsonl") });
     expect(green.record.checks_passed).toBe(true);
     expect(green.decision?.verdict).toBe("proceed");

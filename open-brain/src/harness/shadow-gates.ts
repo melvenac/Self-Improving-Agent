@@ -158,14 +158,17 @@ export interface ChecksInput {
 export const NO_CHECKS: ChecksInput = { source: "none", build_exit: null, unit_exit: null };
 
 /** Read `runtime_checks` out of an `E_t`, naming the file and its blob as the source. */
-export function checksFromEvidence(path: string): ChecksInput {
+export function checksFromEvidence(path: string, repoRoot?: string): ChecksInput {
   const abs = resolve(path);
   const bytes = readFileSync(abs);
   const json = JSON.parse(bytes.toString("utf-8")) as { runtime_checks?: { build?: { exit_code?: number | null }; unit?: { exit_code?: number | null } } };
   const build = json.runtime_checks?.build?.exit_code;
   const unit = json.runtime_checks?.unit?.exit_code;
   if (typeof build !== "number" || typeof unit !== "number") return NO_CHECKS;
-  return { source: `E_t:${toPosix(path)}@${gitBlobSha(bytes)}`, build_exit: build, unit_exit: unit };
+  // T-222 F7: a repo-relative path, or the blob alone. Never a machine path.
+  const rel = repoRoot === undefined ? "" : toPosix(relative(resolve(repoRoot), abs));
+  const inRepo = rel !== "" && !rel.startsWith("..") && !/^[A-Za-z]:/.test(rel) && !rel.startsWith("/");
+  return { source: `E_t:${inRepo ? rel : ""}@${gitBlobSha(bytes)}`, build_exit: build, unit_exit: unit };
 }
 
 export interface RunShadowDoneOptions {
@@ -279,7 +282,7 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
   });
 
   const answers = result.answer?.answers ?? null;
-  const decision = answers === null ? null : decideDoneGate(answers, policy, { checksPassed });
+  const decision = answers === null ? null : decideDoneGate(answers, policy, { checksPassed, checksSource: options.checks.source });
   const record: ShadowDoneRecord = {
     gate: "developer-done",
     loop: plan.loop,
