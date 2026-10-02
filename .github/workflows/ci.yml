@@ -12,12 +12,11 @@ on:
       - "loop/**"
       - "qa/**"
   pull_request:
-    # D-055: a PR that changes only docs or the README does not start CI.
-    # Anything else, including .agents/state.json, still runs. push and
-    # workflow_dispatch are not filtered.
-    paths-ignore:
-      - "docs/**"
-      - "README.md"
+    # D-091 (T-219): no paths filter. D-055 filtered a docs-only PR out here, and a
+    # workflow that never starts never reports `test`, which master's ruleset (D-090)
+    # requires, so every docs-only PR was blocked forever. A docs-only PR now starts
+    # the workflow and the changed job decides: skip=true skips `test` at the job level,
+    # and a skipped job reports Skipped. push and workflow_dispatch are not filtered.
   workflow_dispatch:
     inputs:
       hosted:
@@ -64,7 +63,7 @@ jobs:
   # list, or a first push (before is all zeros) prints skip=false, and the test
   # job runs. skip=true only when every path is under docs/ or is README.md.
   changed:
-    if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/master')
     runs-on: ${{ inputs.hosted && 'ubuntu-latest' || fromJSON('["self-hosted", "linux", "tcm"]') }}
     outputs:
       skip: ${{ steps.diff.outputs.skip }}
@@ -73,7 +72,16 @@ jobs:
         with:
           fetch-depth: 0
       - id: diff
-        run: node open-brain/scripts/ci-seat-skip.mjs "${{ github.event.before }}" "${{ github.sha }}" >> "$GITHUB_OUTPUT" || echo "skip=false" >> "$GITHUB_OUTPUT"
+        # A push diffs before..sha. A pull request diffs from the MERGE-BASE of the base and head
+        # (D-091): base.sha..head.sha would also hold master's changes since the branch point and
+        # keep a docs-only PR from skipping. A merge-base that cannot be computed prints an empty
+        # argument, and the script reads that as skip=false, so the suite runs.
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            node open-brain/scripts/ci-seat-skip.mjs "$(git merge-base "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" || true)" "${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT" || echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            node open-brain/scripts/ci-seat-skip.mjs "${{ github.event.before }}" "${{ github.sha }}" >> "$GITHUB_OUTPUT" || echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
 
   test:
     # Every run, including a push to master, runs on the self-hosted runner on tcm,
