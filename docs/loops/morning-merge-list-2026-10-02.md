@@ -32,7 +32,17 @@ Merge order: #293, #292, #320.
 | #292 | T-224: placeholder reason and the `\s` fix | `c77dce55` | ACCEPT | CLEAN |
 | #320 | T-228: hub-talk exit codes 0 to 3 (A2A Loop 13). Send relay-a2a its merge SHA | `c9b5e757` | ACCEPT | CLEAN |
 
-## Not yet QA'd
+## Added after GREEN at 16:50Z: QA 260 (B2 round 2) and QA 261 (#302 round 2)
 
-- **B2 round 2, QA 260:** #295, #298, #306, #309. It waits for a QA slot under the AMBER cap of 2.
-- **#302 round 2.**
+These two reports came after the morning list was first written. Both are outside D-103.
+
+| PR | Task | QA'd head | Verdict | State and order |
+|---|---|---|---|---|
+| #306 | T-048: sync checks state their counts | `3f30e825` | ACCEPT (QA 260, `0f53d867`) | Merge **before** #309 |
+| #309 | T-048: hook-configs, nested and typed hooks | `f1c2a338` | ACCEPT (QA 260) | Merge **after** #306. #295 and #309 conflict on the `node:path` import line; the second to merge rebases |
+| #302 | T-048: dropped counts printed at zero (round 2) | `7e92b6f6` | ACCEPT (QA 261, `f395ee84`) | **Rebase first.** The one import-line conflict with master in `server.ts` is resolved by keeping both imports. sia-forge rebases it, and the planner reviews the range-diff before listing the new head. QA's follow-up row, mutant Q1 (`ob_start` prints the zero lines), becomes a separate task (T-230) |
+
+## Still not accepted
+
+- **#295 (T-008) and #298 (T-008b):** QA 260 REJECTED both. #295 lets a non-object `mcpServers` entry pass silently.
+  #298 does not name the skip for an absent `settings.json`. Round 3 is with sia-forge, then QA 262.
