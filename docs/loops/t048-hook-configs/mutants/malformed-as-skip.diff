@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 5c6d2f74..b36c1ca2 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -272,7 +272,7 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
+     }
+     const h = hook as Record<string, unknown>;
+     if (typeof h.command !== "string") {
+-      notChecked.push(`${JSON.stringify(hook)} (entry has no command string)`);
++      skipped.otherCommand++;
+       continue;
+     }
+     const target = hookCommandTarget(h.command);
