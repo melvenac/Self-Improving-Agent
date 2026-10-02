@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { checkHookConfigs, checkHookRegistration } from "../../../src/pipelines/sync/checks.js";
+import { checkHookConfigs, checkHookRegistration, checkVaultPathRefs } from "../../../src/pipelines/sync/checks.js";
 
 /**
  * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to
@@ -90,6 +90,48 @@ describe("T-048 sync counts", () => {
       expect(r.message).toContain("2 script registration(s) counted");
     });
   });
-});
 
-void mkdirSync;
+  // B2 ruling (QA 256 row 5, #306): an input that was not examined caps the result at WARN.
+  describe("B2 row 5: unreadable and unparseable inputs", () => {
+    it("hook-configs: an unparseable settings.json is an ISSUE, and does not throw", () => {
+      const p = join(dir, "settings.json");
+      writeFileSync(p, "{ not json", "utf-8");
+      let r;
+      expect(() => { r = checkHookConfigs(p); }).not.toThrow();
+      expect(r!.severity).toBe("issue");
+      expect(r!.message).toBe("settings.json is not valid JSON");
+    });
+
+    function vaultFixture(): { root: string; home: string } {
+      const root = join(dir, "proj");
+      const home = join(dir, "home");
+      mkdirSync(join(root, ".claude", "commands"), { recursive: true });
+      mkdirSync(home, { recursive: true });
+      writeFileSync(join(root, ".claude", "commands", "clean.md"), "nothing about a vault here\n");
+      return { root, home };
+    }
+
+    it("vault-path-refs: one clean file beside an UNREADABLE named file is WARN, not pass", () => {
+      const { root, home } = vaultFixture();
+      mkdirSync(join(root, "CLAUDE.md")); // a directory where a file is named: EISDIR
+      const r = checkVaultPathRefs(root, home);
+      expect(r.severity, r.message).toBe("warn");
+      expect(r.message).toContain("1 .md file(s) scanned");
+      expect(r.message).toContain("1 unreadable");
+      expect(r.message).toContain("not a full pass");
+    });
+
+    it("vault-path-refs: the same clean file with nothing unreadable is still a pass", () => {
+      const { root, home } = vaultFixture();
+      const r = checkVaultPathRefs(root, home);
+      expect(r.severity, r.message).toBe("pass");
+    });
+
+    it("vault-path-refs: only an unreadable file is still SKIP, not a pass", () => {
+      const { root, home } = vaultFixture();
+      mkdirSync(join(root, "CLAUDE.md"));
+      rmSync(join(root, ".claude", "commands", "clean.md"));
+      expect(checkVaultPathRefs(root, home).severity).toBe("skip");
+    });
+  });
+});

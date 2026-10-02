@@ -154,7 +154,13 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
   if (!existsSync(settingsPath)) {
     return { name: "hook-configs", severity: "warn", message: "settings.json not found" };
   }
-  const settings = JSON.parse(readFileSync(settingsPath, "utf-8"));
+  let settings: { hooks?: unknown };
+  try {
+    settings = JSON.parse(readFileSync(settingsPath, "utf-8").replace(/^﻿/, ""));
+  } catch {
+    // Matches hook-registration; an unparseable file used to throw and take /sync down (QA 256).
+    return { name: "hook-configs", severity: "issue", message: "settings.json is not valid JSON" };
+  }
   const hooks: unknown[] = [];
   if (settings.hooks && typeof settings.hooks === "object") {
     for (const hookList of Object.values(settings.hooks)) {
@@ -365,6 +371,10 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
   }
   if (scanned === 0) {
     return { name: "vault-path-refs", severity: "skip", message: `not checked: no file was read. ${counts}. This is not a pass.` };
+  }
+  if (left.unreadable > 0) {
+    // A file or directory we could not read may hold a reference: capped at warn even though the count is named (B2 ruling).
+    return { name: "vault-path-refs", severity: "warn", message: `No v1-vault references found, but ${left.unreadable} path(s) were unreadable and not checked: this is not a full pass. ${counts}` };
   }
   return { name: "vault-path-refs", severity: "pass", message: `No v1-vault references in docs or commands (${counts})` };
 }
