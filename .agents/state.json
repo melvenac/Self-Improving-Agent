@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 277,
+  "revision": 278,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1234,6 +1234,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "QA 250 row 6 (docs/loops/t221-t222-qa-report.md on 75d7ec48): a group of format('ci-{0}{1}', event=='push' && 'push-' || '', branch) passes all 20 rows; it collides a PR from head 'push-foo' with a push to 'foo'. One assertion fixes it: expect the exact PR group string ci-pull_request-<branch>, or a collision case.",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-224",
+      "title": "Standing-cron reader says 'status_to is missing' for an unfilled <placeholder>; say 'unfilled placeholder' or tell the template reader to replace <...> values",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "QA 251 N1 (docs/loops/t164-t211-r2-qa-report.md on d4dea22a): readStatusKeys (agent-identity.ts:128 at 3b0b8188) skips any value starting with '<', so copying the template's example verbatim prints INVALID ... status_to is missing although the key is present. Non-blocking; ruled in D-099.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
@@ -3771,6 +3785,12 @@
       "title": "Jev calibration 1 rulings-2: freeze 3a8d2891 verified; balance OVERRULED (headline uses all 44 eligible, 26/18, with per-class rates and balanced accuracy, re-freeze before any call); builder's five calls confirmed/accepted",
       "date": "2026-10-02",
       "note": "docs/loops/jev-calibration-1-rulings-2.md. Planner re-derived at 3a8d2891: MANIFEST sha256 d0c61d66...093b, counts (pool 75 = 36/31/8 ambiguous; headline 18/18 from 26/18 eligible; leak 23; 70 qa + 5 dev dispatch), inputs.mjs reads only dispatches.json + dispatch blobs, branch diff only docs/loops/jev-calibration-1/** + handoff. The brief orders N>=50 before balance; balancing 44 to 36 reversed that. Calls: bootstrap-fix REJECT confirmed; importer-fixes-r2 ambiguous hold-out confirmed; builder's per-question confidence accepted as method of record (labelled as the builder's operationalisation); 5 dev-dispatch D_t accepted with a source_kind split; env/unrelated/superseded tags detector-only, stated as a limitation. Zero Jev calls so far."
+    },
+    {
+      "id": "D-099",
+      "title": "QA 251 ACCEPT: T-164 r2 (#270 892f7644) and T-211 r2 (#272 3b0b8188); F4 ruled on the 'as documented' reading; N1 opened as T-224",
+      "date": "2026-10-02",
+      "note": "Report origin/qa/t164-t211-r2-report d4dea22a (docs/loops/t164-t211-r2-qa-report.md). Planner re-derived at session 157: git grep nextFreeSessionNumber 892f7644 -- open-brain = 0 lines; state-schema.ts:368-370 nextSessionNumber = max(n)+1 (1 when empty); state-writer.ts:267 refusal calls it; gh run view 36976283947/36976289271 (892f7644) and 36976284517/36976288445 (3b0b8188) all success; range-diff bea385b2..9f6fcea4 vs f7ac983d..3b0b8188 = 6 round-1 patches '=' plus 3 new. F4: QA 249's F4 was the inline '# comment' breaking a FILLED example; angle-bracket values are this template's placeholder convention and the reader deliberately treats them as unset, so the 'as documented' reading is the right one. Both PRs touch code: merge needs Aaron's word naming each PR; #272 is stacked on #270, so #270 first."
     }
   ],
   "handoffs": [
