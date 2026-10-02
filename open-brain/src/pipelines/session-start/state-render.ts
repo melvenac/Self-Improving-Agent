@@ -68,8 +68,13 @@ export function renderState(state: State, version?: string, options: RenderState
   // reader and hid the newest at 40 open gaps. Sorted on a copy; the record's order is untouched.
   const openGaps = state.gaps.filter(isOpenGap).sort(newestGapFirst);
   lines.push(`\nGaps (${openGaps.length}):`);
-  for (const g of openGaps) {
+  // D-100: only the newest GAPS_SHOWN are printed. The count line is computed from the record's gaps, never
+  // from what was printed, so the cap cannot make it understate (a mutant that counts lines goes red).
+  for (const g of openGaps.slice(0, GAPS_SHOWN)) {
     lines.push(`  ${g.id} — ${clip(g.what, GAP_CLIP, `gaps[${g.id}]`)} (opened session ${g.opened_session})`);
+  }
+  if (openGaps.length > GAPS_SHOWN) {
+    lines.push(`  … and ${openGaps.length - GAPS_SHOWN} older open gaps (${openGaps.length} open in all): state.json gaps[]`);
   }
   if (openGaps.length === 0) lines.push(`  (none)`);
 
@@ -103,9 +108,13 @@ export function renderState(state: State, version?: string, options: RenderState
  * A task's rationale is its `note` in `.agents/state.json` under `tasks[]` —
  * reference material for working a task, not for choosing one.
  */
+function clipTitle(title: string): string {
+  return title.length > TITLE_CLIP ? `${title.slice(0, TITLE_CLIP).trimEnd()}…` : title;
+}
+
 function formatTask(t: Task): string {
   const sup = t.supersedes ? ` (supersedes ${t.supersedes})` : "";
-  return `[${t.status}] ${t.id} ${t.title}${sup}`;
+  return `[${t.status}] ${t.id} ${clipTitle(t.title)}${sup}`;
 }
 
 /** Open session descending, then id descending. Ids compare by their number (G-1000 after G-999), then as text. */
@@ -123,6 +132,10 @@ export function newestGapFirst(a: { id: string; opened_session: number }, b: { i
  * alone was a third of it. Their full text stays in state.json.
  */
 export const GAP_CLIP = 140;
+/** D-100: the greeting prints this many open gaps, newest first (T-209 order), then a count line. */
+export const GAPS_SHOWN = 10;
+/** D-100: a task title longer than this is cut to this many characters and ends with an ellipsis. Ids and statuses are never clipped. */
+export const TITLE_CLIP = 100;
 export const VERIFIED_CLIP = 100;
 /** Verified is its count plus the newest this many (planner ruling (a), T-183). */
 export const VERIFIED_SHOWN = 10;
