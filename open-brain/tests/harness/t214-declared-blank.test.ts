@@ -132,6 +132,27 @@ describe("T-214 P-blank", () => {
     expect(refused(doc("qa-declared", ["[unrunnable]", " ", "A-1: x"]))).toBe(true);
   });
 
+  it("J3 T-218: leading whitespace on a header or an item is refused, under both fence kinds", () => {
+    const rows: [Kind, string[]][] = [
+      ["qa-declared", [" [unrunnable]", "A-1: x"]],
+      ["qa-declared", ["\t[unrunnable]", "A-1: x"]],
+      ["qa-declared", ["[unrunnable]", "  A-1: x"]],
+      ["qa-declared", ["[unrunnable]", "\tA-1: x"]],
+      ["qa-declared", ["[unrunnable]", "A-1: x", " [out-of-scope]", "B-1: y"]],
+      ["qa-unrunnable", ["  A-1: x"]],
+      ["qa-unrunnable", ["\tA-1: x"]],
+      ["qa-unrunnable", ["A-1: x", "  A-2: y"]],
+      // A header has no meaning under the frozen fence: leading space or not, it is not an item.
+      ["qa-unrunnable", [" [unrunnable]", "A-1: x"]],
+    ];
+    for (const [kind, lines] of rows) {
+      expect(refused(doc(kind, lines)), `${kind} ${JSON.stringify(lines)}`).toBe(true);
+    }
+    // The same lines WITHOUT the leading whitespace parse, so each refusal above is the whitespace's doing.
+    expect(parseDeclared(doc("qa-declared", ["[unrunnable]", "A-1: x"]))).toEqual({ present: true, unrunnable: ["A-1"], outOfScope: [] });
+    expect(parseDeclared(doc("qa-unrunnable", ["A-1: x", "A-2: y"]))).toEqual({ present: true, unrunnable: ["A-1", "A-2"], outOfScope: [] });
+  });
+
   it("E1 a block of only blank lines is present and empty, never absent", () => {
     for (const kind of ["qa-declared", "qa-unrunnable"] as const) {
       for (const lines of [[], [""], ["", " ", "\t"], ["\r", "   "]]) {

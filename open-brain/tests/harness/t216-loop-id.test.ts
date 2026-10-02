@@ -10,7 +10,9 @@ import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import {
   EVIDENCE_LOOP_PATTERN,
+  EvidenceSchema,
   LOOP_ID_PATTERN,
+  PlanSchema,
   validateDeveloperReport,
   validatePlan,
 } from "../../src/harness/schema.js";
@@ -54,6 +56,30 @@ describe("T-216 shared loop-id rule", { timeout: 120_000 }, () => {
     for (const loop of ["", "15/slice", "../x", "15", "15-slice.4", "15 slice", "15-slice-4\n"]) {
       expect(validatePlan(plan(loop)).ok, JSON.stringify(loop)).toBe(false);
     }
+  });
+
+  it("L2b T-217: plan refuses upper case, which a case-insensitive copy of the pattern would accept", () => {
+    for (const loop of ["T001", "15-Slice-4", "15-SLICE-4", "t001A"]) {
+      expect(validatePlan(plan(loop)).ok, JSON.stringify(loop)).toBe(false);
+    }
+  });
+
+  /** The regex a schema's `loop` field applies, read from zod's own check list. */
+  const loopRegex = (schema: unknown): RegExp => {
+    const checks = (schema as { shape: { loop: { _zod: { def: { checks: { _zod: { def: { format?: string; pattern?: RegExp } } }[] } } } } }).shape.loop._zod.def.checks;
+    const found = checks.filter((c) => c._zod.def.format === "regex");
+    expect(found, "the loop field must carry exactly one regex check").toHaveLength(1);
+    return found[0]!._zod.def.pattern as RegExp;
+  };
+
+  it("L3b T-217: PlanSchema's and EvidenceSchema's loop regex IS LOOP_ID_PATTERN, by identity", () => {
+    expect(loopRegex(PlanSchema)).toBe(LOOP_ID_PATTERN);
+    expect(loopRegex(EvidenceSchema)).toBe(LOOP_ID_PATTERN);
+    // Identity, not equality: a copy with the same source and an added flag, or an identical literal,
+    // survives the derived JSON Schema (it drops flags and compares text) and every row that only
+    // reads accept and refuse.
+    expect(loopRegex(PlanSchema)).not.toBe(/^(?:t\d{3,}|[0-9]+(?:-[a-z0-9]+)+)$/);
+    expect(loopRegex(PlanSchema).flags).toBe("");
   });
 
   it("L3 plan and evidence use the same exported constant", () => {
