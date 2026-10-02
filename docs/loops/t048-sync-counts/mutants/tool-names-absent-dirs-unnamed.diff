@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 3f976448..06c4624e 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -1023,7 +1023,7 @@ export function checkCommandToolNames(projectRoot: string, home = homedir()): Ch
+   return {
+     name,
+     severity: "pass",
+-    message: `${namesChecked} tool references across ${scanned} command files (${absentNote}) all resolve to ${registered.size} registered tools (names only — this cannot tell whether a tool's description is true)`,
++    message: `${namesChecked} tool references across ${scanned} command files all resolve to ${registered.size} registered tools (names only — this cannot tell whether a tool's description is true)`,
+     report: true,
+   };
+ }

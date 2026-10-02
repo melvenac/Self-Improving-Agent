@@ -284,11 +284,13 @@ describe("validation checks", () => {
   });
 
   describe("checkHookConfigs", () => {
-    it("passes when settings.json has no hooks", () => {
+    it("is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')", () => {
       const settingsPath = join(tempDir, "settings.json");
       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));
       const result = checkHookConfigs(settingsPath);
-      expect(result.severity).toBe("pass");
+      expect(result.severity).toBe("skip");
+      expect(result.message).toContain("not checked");
+      expect(result.message).toContain("0 hook command file(s) checked");
     });
 
     it("issues when a hook references a missing file", () => {
@@ -455,7 +457,14 @@ describe("validation checks", () => {
       writeDoc(tempDir, "project-template/CHANGELOG.md", "Exported to `Obsidian Vault/Checkpoints/` in v1.");
       writeDoc(tempDir, "scripts/tests/fixture.md", "Path: ~/Obsidian Vault/Experiences");
       writeDoc(tempDir, "project-template/superpowers/plans/2026-03-26-x.md", "Write to ~/Obsidian Vault/Sessions/");
-      expect(checkVaultPathRefs(tempDir, home).severity).toBe("pass");
+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.
+      expect(checkVaultPathRefs(tempDir, home).severity).toBe("skip");
+      writeDoc(tempDir, "project-template/README.md", "clean");
+      const r = checkVaultPathRefs(tempDir, home);
+      expect(r.severity).toBe("pass");
+      expect(r.message).toContain("1 .md file(s) scanned");
+      expect(r.message).toContain("1 CHANGELOG.md");
+      expect(r.message).toContain("2 skipped directories");
     });
 
     it("scans live user directories outside the repo", () => {

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 3f976448..d2c4d171 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -877,7 +877,7 @@ export function checkCommandParity(projectRoot: string, home = homedir()): Check
+   for (const f of template) {
+     if (!repo.includes(f)) {
+       if (TEMPLATE_ONLY_ALLOWED.has(f)) {
+-        templateOnly.push(f);
++        void f;
+         continue;
+       }
+       problems.push(`${f} is in the template but not in .claude/commands`);

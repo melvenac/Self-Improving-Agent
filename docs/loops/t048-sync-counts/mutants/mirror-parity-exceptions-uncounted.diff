@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 3f976448..281fcc55 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -662,7 +662,7 @@ export function checkMirrorParity(projectRoot: string, home = homedir()): CheckR
+ 
+     for (const file of all) {
+       if (MIRROR_EXCEPTIONS[file]) {
+-        excepted.push(`${file} (${label})`);
++        void label;
+         continue;
+       }
+ 

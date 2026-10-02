@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 3f976448..2494741b 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -337,7 +337,6 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
+         continue;
+       }
+       if (skipFiles.has(entry.name)) {
+-        left.changelog++;
+         continue;
+       }
+       if (!entry.name.endsWith(".md")) {
