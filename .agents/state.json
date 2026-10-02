@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 272,
+  "revision": 273,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3733,6 +3733,12 @@
       "title": "T-221 ruled option (a): ci.yml concurrency group includes github.event_name, so a branch's push run and its PR run never cancel each other; T-178's newer-cancels-older is kept within each event, master's no-cancel and the dispatch group unchanged. Not (b) (an API lookup in the workflow fails open when stale) nor (c) (QA ci-candidate pushes have no PR and would lose CI)",
       "date": "2026-10-02",
       "note": "Planner session 156. Dispatch docs/loops/t221-dispatch.md; live acceptance rows A-D (both runs complete with no re-run, newer-cancels-older per event, master expression unchanged, red-first test). Cost accepted: a branch with an open PR runs the suite twice per commit on tcm. Same session: QA 249 dispatched for T-164 + T-211 (Plumb, HEAVY); T-222 dispatch written; Aaron's usage rule now at most 3 dev + 2 QA jobs, with new work going to IDLE seats (relayed by clark from Aaron first-hand, about 05:05Z)."
+    },
+    {
+      "id": "D-095",
+      "title": "QA 249 (T-164 port + T-211) REJECT on F1 alone: the SC-2 refusal names the LOWEST unused session number (1 on the live record 76,147..156) instead of max(n)+1, which the greeting uses. Round 2: one function for both; QA's live-shaped SC-2 test adopted; F2/F3 SR rows for QA's surviving mutants; F4 template example; F5 row text; both branches rebased onto master",
+      "date": "2026-10-02",
+      "note": "Planner session 156. Rulings: docs/loops/qa-249-rulings.md; dispatch docs/loops/t164-t211-r2-dispatch.md. F1 confirmed by the planner at fbf94ae6 state-schema.ts:364. Everything else in QA 249 is met: the port is faithful, SC-1/3/4/5, the live case (16 logs + record 155 greets 156, reuse), SR-1..6, the developer's mutants, the full suite (2110 passed, 0 failed) and CI 36968685032. The live record already holds TWO sessions numbered 156 (planner 83f0e630 and builder 734793c2), the T-164 collision in practice; recorded as they are, no record edited. Also session 156: docs-only standing merge rule confirmed by Aaron in the planner's window; v0.45.0 released (#275, tag 49c67c8a); Jev calibration 1 briefed (#278) and Phase 1 dispatched to sia-builder; QA 250 (T-221 + T-222) launched on Plumb."
     }
   ],
   "handoffs": [
