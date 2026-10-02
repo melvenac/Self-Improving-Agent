@@ -113,7 +113,6 @@ describe("scorePipelineHealth", () => {
     const result = scorePipelineHealth({
       lastHookRun: null,
       scoreTrend: "unknown",
-      lastShadowRecall: null,
     });
     expect(result.score).toBe(0);
   });

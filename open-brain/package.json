@@ -12,6 +12,7 @@
     "prebuild": "node -e \"require('node:fs').rmSync('build',{recursive:true,force:true})\"",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
+    "typecheck:tests": "tsc -p tsconfig.tests.json",
     "dev": "npx tsx src/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest",

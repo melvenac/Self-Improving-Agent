@@ -38,7 +38,7 @@ describe("topics generator", () => {
     mkdirSync(join(vault, "Experiences", folder), { recursive: true });
     writeFileSync(path, `# ${name}\n`, "utf8");
     indexKnowledge(db, {
-      vaultPath: path, key: `${folder}-${name}`, content: "c", tags, source: "agent", projectDir,
+      vaultPath: path, key: `${folder}-${name}`, content: "c", tags, source: "agent", projectDir: projectDir ?? undefined,
     });
   }
 

@@ -122,7 +122,9 @@ describe("state-schema (Loop 2, read side)", () => {
 
   it("serializeState is idempotent and canonical across key orders", () => {
     const once = serializeState(valid());
-    const again = serializeState(parseState(once).data!);
+    const parsed = parseState(once);
+    if (!parsed.ok) throw new Error(`serializeState output did not parse: ${parsed.error}`);
+    const again = serializeState(parsed.data);
     expect(again).toBe(once);
 
     const reordered = JSON.stringify(reorderKeys(JSON.parse(fixtureText)));

@@ -27,6 +27,7 @@ interface Record_ {
   decision: { verdict: string } | null;
   model_resolved: string | null;
   runtime_action: string;
+  note?: string;
 }
 
 /** Every file under a directory, recursively, as [path, text]. */

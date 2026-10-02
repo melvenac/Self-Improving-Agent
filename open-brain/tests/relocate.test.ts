@@ -144,7 +144,7 @@ describe("relocate", () => {
     it("ignores global entries, which have no directory to check", () => {
       indexKnowledge(db, {
         vaultPath: join(vault, "Experiences", "General", "g.md"),
-        key: "g", content: "c", tags: "alpha", source: "agent", projectDir: null,
+        key: "g", content: "c", tags: "alpha", source: "agent", projectDir: undefined,
       });
 
       expect(detectMissingProjects(db)).toHaveLength(0);

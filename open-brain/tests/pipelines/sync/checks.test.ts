@@ -917,7 +917,7 @@ describe("checkRetirements", () => {
   const WIDGETIZER = {
     historical: [".agents/retirements.json", "CHANGELOG.md"],
     retirements: [
-      { id: "R-1", name: "widgetizer", pattern: "\\bwidgetizer\\b", event: "cut", ruled: "2026-09-15", classes: ["cli-subcommand"], allowed_referrers: [] },
+      { id: "R-1", name: "widgetizer", pattern: "\\bwidgetizer\\b", event: "cut", ruled: "2026-09-15", classes: ["cli-subcommand"], allowed_referrers: [] as Array<{ path: string; class: string; why: string }> },
     ],
   };
 

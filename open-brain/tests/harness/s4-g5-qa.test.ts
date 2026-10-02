@@ -248,7 +248,7 @@ describe("S4-6b/6c/6d — the runner", { timeout: 120_000 }, () => {
     expect(a.record.missing).toContain("res:requirements:R1");
     expect(a.decision?.verdict).toBe("reject");
 
-    const failNoSeverity = { ...PASS_ALL, "res:requirements:R1": { choice: "fail" } };
+    const failNoSeverity: Record<string, unknown> = { ...PASS_ALL, "res:requirements:R1": { choice: "fail" } };
     delete failNoSeverity["sev:requirements:R1"];
     const b = await run({ transport: fakeTransport(failNoSeverity), at: new Date("2026-10-01T00:01:00.000Z"), ledgerPath: join(side, "b.jsonl") });
     expect(b.record.results.find((x) => x.id === "R1")).toMatchObject({ result: "fail", severity: null });

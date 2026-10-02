@@ -25,9 +25,9 @@ vi.mock("node:fs", async (importOriginal) => {
     }) as F;
   return {
     ...actual,
-    readFileSync: guard("readFileSync", actual.readFileSync),
-    readdirSync: guard("readdirSync", actual.readdirSync),
-    statSync: guard("statSync", actual.statSync),
+    readFileSync: guard("readFileSync", actual.readFileSync as unknown as (...a: unknown[]) => unknown),
+    readdirSync: guard("readdirSync", actual.readdirSync as unknown as (...a: unknown[]) => unknown),
+    statSync: guard("statSync", actual.statSync as unknown as (...a: unknown[]) => unknown),
   };
 });
 

@@ -43,7 +43,7 @@ describe("rating_method", () => {
   function seed(name: string, tags: string): number {
     const path = join(vault, "Experiences", "General", `${name}.md`);
     indexKnowledge(db, {
-      vaultPath: path, key: name, content: "c", tags, source: "agent", projectDir: null,
+      vaultPath: path, key: name, content: "c", tags, source: "agent", projectDir: undefined,
     });
     return (db.prepare(`SELECT id FROM knowledge_index WHERE key = ?`).get(name) as { id: number }).id;
   }
@@ -53,7 +53,7 @@ describe("rating_method", () => {
       .all() as Array<{ knowledge_id: number; rating: string; rating_method: string | null }>;
 
   it("is part of the schema and bumps the version by construction", () => {
-    const cols = db.pragma("table_info(feedback_log)").map((c: { name: string }) => c.name);
+    const cols = (db.pragma("table_info(feedback_log)") as Array<{ name: string }>).map((c) => c.name);
     expect(cols).toContain("rating_method");
     // 1 base + 4 added columns (fact_kind, recall_trigger, rating_origin, rating_method)
     expect(SCHEMA_VERSION).toBe(5);
@@ -152,13 +152,13 @@ describe("rating_method", () => {
     // The DDL no-ops on an existing table (CREATE TABLE IF NOT EXISTS), so the
     // append is migrateAddedColumns' job — the same split openV2Database uses.
     initSchemaV2(old);
-    expect(old.pragma("table_info(feedback_log)").map((c: { name: string }) => c.name))
+    expect((old.pragma("table_info(feedback_log)") as Array<{ name: string }>).map((c) => c.name))
       .not.toContain("rating_method");
 
     const added = migrateAddedColumns(old);
 
     expect(added).toContain("feedback_log.rating_method");
-    expect(old.pragma("table_info(feedback_log)").map((c: { name: string }) => c.name))
+    expect((old.pragma("table_info(feedback_log)") as Array<{ name: string }>).map((c) => c.name))
       .toContain("rating_method");
     old.close();
   });

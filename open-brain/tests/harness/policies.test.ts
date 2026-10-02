@@ -243,6 +243,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const policy = loadPolicies().plan;
       const d = decidePlanGate({ ...PLAN_ANSWERS, has_observable_acceptance: undefined }, policy, {
         deterministicFailure: false,
+        hasPriorFailures: false,
         qaHistorySupportsStopShip: false,
       });
       expect(d.verdict).toBe("reject");
@@ -253,6 +254,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const policy = loadPolicies().plan;
       const d = decidePlanGate({ ...PLAN_ANSWERS, scope_size: { type: "score", score: 2 } }, policy, {
         deterministicFailure: false,
+        hasPriorFailures: false,
         qaHistorySupportsStopShip: false,
       });
       expect(d.missing).toContain("scope_size");
@@ -264,7 +266,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const unsupported = decidePlanGate(
         { ...PLAN_ANSWERS, plan_mode: { type: "choice", choice: "stop_ship", confidence: 0.99 } },
         policy,
-        { deterministicFailure: false, qaHistorySupportsStopShip: false },
+        { deterministicFailure: false, qaHistorySupportsStopShip: false, hasPriorFailures: false },
       );
       expect(unsupported.verdict).toBe("reject");
       expect(unsupported.reasons.join(" ")).toContain("a halt on the gate alone is refused");
@@ -272,7 +274,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const supported = decidePlanGate(
         { ...PLAN_ANSWERS, plan_mode: { type: "choice", choice: "stop_ship", confidence: 0.99 } },
         policy,
-        { deterministicFailure: true, qaHistorySupportsStopShip: true },
+        { deterministicFailure: true, qaHistorySupportsStopShip: true, hasPriorFailures: false },
       );
       expect(supported.verdict).toBe("halt");
     });
@@ -365,6 +367,15 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const d = decidePlanGate(answers, loadPolicies().plan, ctx({ hasPriorFailures: true }));
       expect(d.verdict).toBe("reject");
       expect(d.reasons.join(" ")).toContain("addresses_top_failures");
+    });
+
+    it("with prior failures AND a plan that addresses them, the gate proceeds and the rule is applicable (hasPriorFailures: true)", () => {
+      // T-152 round 2: the other call sites in this file pass hasPriorFailures: false (the value their
+      // missing field already meant). This row keeps the true side with an otherwise-passing answer.
+      const answers = { ...PLAN_ANSWERS, addresses_top_failures: { type: "noul", noul: 0.9 } };
+      const d = decidePlanGate(answers, loadPolicies().plan, ctx({ hasPriorFailures: true }));
+      expect(d.verdict).toBe("proceed");
+      expect(d.notApplicable ?? []).not.toContain("addresses_top_failures");
     });
 
     it("records the applicability in the decision, so a reader is not left to infer it", () => {

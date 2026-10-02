@@ -12,6 +12,9 @@ describe("detectDrift", () => {
     nextSession: null,
     hasAgents: true,
     hasMeta: false,
+    // detectDrift reads neither; the fields exist on the type since the state.json greeting
+    sizes: [],
+    stateJson: { present: false, valid: false },
   };
 
   it("returns empty array when no drift detected", () => {

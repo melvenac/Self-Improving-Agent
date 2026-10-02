@@ -13,7 +13,7 @@ const payload = (): GatePayload => ({
   gate: "plan",
   loop: "t001",
   model: "jev-latest",
-  questions: [{ id: "bounded", kind: "score", prompt: "Is this bounded?", legend: ["no", "yes"] }],
+  questions: [{ id: "bounded", kind: "score", prompt: "Is this bounded?" }],
   context: { plan: { objective: "run a loop" } },
 });
 
