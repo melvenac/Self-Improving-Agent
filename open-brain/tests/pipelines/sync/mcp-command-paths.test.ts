@@ -270,4 +270,35 @@ describe("checkMcpCommandPaths: .mcp.json and plugins (T-008b)", () => {
     expect(r.message).not.toContain("plugin off");
     expect(r.severity).toBe("skip");
   });
+
+  // QA 256 row 5 G and J (B2 ruling): an input that was not examined is never a pass.
+  it("G: a good global config and an UNPARSEABLE ~/.claude/settings.json is WARN, plugins not examined", () => {
+    writeFileSync(join(home, ".claude.json"), JSON.stringify({ mcpServers: { good: { command: onPath("goodserver") } } }));
+    mkdirSync(join(home, ".claude"), { recursive: true });
+    writeFileSync(join(home, ".claude", "settings.json"), "{ not json");
+    const r = run();
+    expect(r.severity, r.message).toBe("warn");
+    expect(r.message).toContain("settings unreadable, plugins not examined");
+  });
+
+  it("an ABSENT ~/.claude/settings.json enables nothing and stays a pass", () => {
+    writeFileSync(join(home, ".claude.json"), JSON.stringify({ mcpServers: { good: { command: onPath("goodserver") } } }));
+    expect(run().severity).toBe("pass");
+  });
+
+  it("J: an enabled plugin with a GARBLED plugin.json beside a good root .mcp.json is WARN, the manifest recorded as not checked", () => {
+    plugin("thing@market", {
+      ".claude-plugin/plugin.json": "{ not json",
+      ".mcp.json": JSON.stringify({ mcpServers: { ok: { command: onPath("goodserver") } } }),
+    });
+    const r = run();
+    expect(r.severity, r.message).toBe("warn");
+    expect(r.message).toMatch(/not checked: plugin thing: .*plugin.json could not be read as JSON/);
+  });
+
+  it("an ABSENT plugin.json beside a good root .mcp.json is a pass: nothing was left unread", () => {
+    plugin("thing@market", { ".mcp.json": JSON.stringify({ mcpServers: { ok: { command: onPath("goodserver") } } }) });
+    const r = run();
+    expect(r.severity, r.message).toBe("pass");
+  });
 });

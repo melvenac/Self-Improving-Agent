@@ -891,6 +891,11 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, 
   const enabled = settings.ok
     ? Object.entries(asMcpServers((settings.value as { enabledPlugins?: unknown } | null)?.enabledPlugins)).filter(([, on]) => (on as unknown) === true).map(([k]) => k)
     : [];
+  // Absent settings enable nothing, which is a normal state. Present but unreadable means no plugin
+  // was examined: that is a gap, not an empty list (QA 256 G).
+  if (!settings.ok && !settings.cause.endsWith("does not exist")) {
+    notChecked.push(`${settings.cause}: settings unreadable, plugins not examined`);
+  }
   if (enabled.length > 0) {
     const installed = readJsonFile(join(home, ".claude", "plugins", "installed_plugins.json"));
     for (const key of enabled) {
@@ -908,6 +913,9 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, 
         notChecked.push(`${label}: ${manifest.cause}`);
         continue;
       }
+      // A garbled manifest beside a good root .mcp.json is still a source we could not read (QA 256 J);
+      // an ABSENT manifest is normal for a plugin that declares servers only in .mcp.json.
+      if (!manifest.ok && !manifest.cause.endsWith("does not exist")) notChecked.push(`${label}: ${manifest.cause}`);
       if (manifest.ok) {
         let decl = (manifest.value as { mcpServers?: unknown } | null)?.mcpServers;
         if (typeof decl === "string") {
