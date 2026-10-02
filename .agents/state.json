@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 290,
+  "revision": 291,
   "project": {
     "name": "self-improving-agent"
   },
@@ -25,12 +25,13 @@
       "id": "T-008",
       "title": "Add a `/sync` validator that stats every MCP command path in `~/.claude.json`",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 51,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "NEW (Session 51). GitNexus MCP had been **disconnected for an unknown period**: the registration pointed at `C:\\Program Files\\nodejs\\gitnexus.cmd`, which does not exist, while the npm prefix is `AppData\\Roaming\\npm`. Nothing reported it — the tools were simply absent, and the CLI kept working, which is exactly why nobody noticed. `codebase-memory-mcp` was also disconnected. Sibling to `checkHookRegistration`; same class as ADR-018. Cost roughly an hour this session and would have been a one-line check. (Session 51)",
-      "closed_rev": null
+      "note": "NEW (Session 51). GitNexus MCP had been **disconnected for an unknown period**: the registration pointed at `C:\\Program Files\\nodejs\\gitnexus.cmd`, which does not exist, while the npm prefix is `AppData\\Roaming\\npm`. Nothing reported it — the tools were simply absent, and the CLI kept working, which is exactly why nobody noticed. `codebase-memory-mcp` was also disconnected. Sibling to `checkHookRegistration`; same class as ADR-018. Cost roughly an hour this session and would have been a one-line check. (Session 51) — Closed session 157: merged #295 (37fd9dfb) and #298 (T-008b, b67949f9) after QA 256 REJECT, r2 QA 260 REJECT, r3 QA 262 ACCEPT; rebased after #309 with a planner-reviewed range-diff; Aaron approved the new heads. Follow-up T-231 (malformed containers).",
+      "note_by": null,
+      "closed_rev": 291
     },
     {
       "id": "T-014",
@@ -3997,6 +3998,12 @@
       "title": "Aaron's word (AskUserQuestion in clark's window, ~18:2xZ): 'Merge all 10'. Merged in list order, each pinned to its QA'd or reviewed head, CLEAN, with CI green: #290 67cdf0a2, #289 5440cfa9, #294 e82ce7e2, #299 2a26a91b, #293 baa7e302, #292 1008b52b, #320 a6059ff9, #306 179ebc18, #309 d546cd17, #302 19b79b39. His second word, 'Merge #295 and #298' at 931998db and 3b485b7c, could not be executed: #295 went DIRTY after #309 merged (the node:fs import line QA 262 predicted). A rebase moves the head off the approved SHA, so sia-forge rebases, the planner reviews the range-diff, and Aaron re-confirms #295 (and #298 on top) at the new heads.",
       "date": "2026-10-02",
       "note": "relay-a2a told: T-228 is merged at a6059ff9. Master push CI on 19b79b39 was in progress at the roll; the next session checks it first."
+    },
+    {
+      "id": "D-109",
+      "title": "#295 and #298 MERGED at their rebased heads on Aaron's AskUserQuestion answer in the planner's window ('Merge #295 then #298'): #295 04312e8a -> 37fd9dfb, #298 e6bdd29a -> b67949f9. Planner-reviewed range-diffs: #295 commit 1 differs only in import and hunk context from master (#309's node:path line, #306's hook-registration message), commits 2-5 '='; #298 all 5 '='. All 12 PRs on the morning list are merged. HANDOFF ITEM (2) IS DONE: the next planner starts at item (1), master CI, then (3), dispatching the seats.",
+      "date": "2026-10-02",
+      "note": "Supersedes the 'OPEN NOW (2)' in the rev-290 planner handoff. Master push CI was green through 19b79b39 before these two merges."
     }
   ],
   "handoffs": [
