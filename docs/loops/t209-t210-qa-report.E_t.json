@@ -1,0 +1,49 @@
+{
+  "loop": "qa-253-t209-t210",
+  "candidate_git": {
+    "sha": "6c495794145097d47f009963c2c93dadfb1a319b",
+    "branch": "origin/loop/t209-t210-render",
+    "frozen_at": "2026-10-02T07:34:08Z"
+  },
+  "candidates": [
+    { "task": "T-209", "sha": "6c495794145097d47f009963c2c93dadfb1a319b", "branch": "origin/loop/t209-t210-render", "pr": 287, "verdict": "REJECT" },
+    { "task": "T-210", "sha": "6c495794145097d47f009963c2c93dadfb1a319b", "branch": "origin/loop/t209-t210-render", "pr": 287, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit (qa253-cand/open-brain)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 30000,
+      "detail": "local typecheck clean on 6c495794"
+    },
+    "unit": {
+      "command": "npx vitest run state-render, latest-brief, record-session-number, standing-cron, session-log, sync/start-parity (74/74); tests/server.test.ts -t 'renders the State section' (1 failed); full suite by CI",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 300000,
+      "detail": "CI runs 36979243129 (push) and 36979246332 (pull_request) on 5ceb6eef: conclusion failure, test=failure, 1 failed | 151 passed test files; server.test.ts:199 asserts the old oldest-first gap order. No CI runs on 6c495794 itself. Base 79d1f5d9 push run 36978283502 success."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q253-1", "status": "met", "order": "shown", "evidence": "diff 79d1f5d9...6c495794: latest-brief.ts (new), state-render.ts, server.ts, latest-brief.test.ts, state-render.test.ts. server.ts: import + one Latest brief line after Drift, omitted on null." },
+    { "id": "Q253-2", "status": "not_met", "order": "red-first", "evidence": "Base: T209-1 fails (append order). Candidate: T209-1 passes; own 54/150/65 fixture passes; own G-99/G-100 renders [G-99, G-100] and G-2/G-10/G-9 renders [G-9, G-2, G-10]. Regex in newestGapFirst is /(d+)s*$/ (no backslashes), so the tie-break is text order. Restoring \\d\\s fixes it (diagnostic only)." },
+    { "id": "Q253-3", "status": "met", "order": "shown", "evidence": "Mutant id-only (opened_session compare deleted): killed by dev T209-1 and own Q253-2a, Q253-2d." },
+    { "id": "Q253-4", "status": "met", "order": "shown", "evidence": "handleStart on scratch worktree at 6c495794 with HOME/DB redirected: render newest-first (G-049 first); state.json byte-identical, gaps[] ids identical before/after." },
+    { "id": "Q253-5", "status": "met", "order": "shown", "evidence": "Own git fixtures (GIT_COMMITTER_DATE only): (a) t201 wins; (b) touched old brief does not win; (c) null and no line in handleStart; (d) deleted brief not named; (e) debrief.md and briefing-notes.md ARE taken (non-blocking); (f) not a repo -> not determined (git: fatal: not a git repository ...), no git on PATH -> not determined (git: spawnSync git ENOENT)." },
+    { "id": "Q253-6", "status": "met", "order": "shown", "evidence": "Mutant (a) path sort: 6 failed (dev T210-3, T210-4; own 5a2, 5a3, 5b, 5e). Mutant (b) mtime: 12 failed; file choice wrong in dev T210-1, T210-3 and own 5a3, 5b." },
+    { "id": "Q253-7", "status": "met", "order": "shown", "evidence": "Latest brief: docs/loops/jev-calibration-1-brief.md (2026-10-02); git log -1 %cI 2026-10-02T00:27:50-05:00, newest of 67 briefs (next loop-15-slice-4-brief.md 2026-09-30T19:57:39-05:00). CLI 'open-brain start' does not call handleStart and prints no such line." },
+    { "id": "Q253-8", "status": "partial", "order": "shown", "evidence": "Touched + neighbours 74/74; tsc --noEmit exit 0. tests/server.test.ts handleStart 'renders the State section' fails on candidate, passes on base." },
+    { "id": "Q253-9", "status": "not_met", "order": "shown", "evidence": "gh run list --commit 6c495794: none. --commit 5ceb6eef: 36979243129 push failure test=failure; 36979246332 pull_request failure test=failure." }
+  ],
+  "regressions": [
+    "tests/server.test.ts:199 (handleStart renders the State section) fails on 6c495794: expects 'Gaps (5):\\n  G-001 ...' (old order); passes on base 79d1f5d9. CI test job red on both runs."
+  ],
+  "gaps": [
+    "T-209: newestGapFirst regex lost its backslashes (/(d+)s*$/); same-session ids compare as text, G-99 before G-100. Dev T209-1 fixture is text-order-consistent so it does not catch this.",
+    "T-210: the *brief* match also takes drafts, amendments, rebrief, plural briefs, subdirectories, and would take debrief.md / briefing-notes.md; non-blocking.",
+    "TMPDIR could not be set from the shell in this session (permission rule); repo tests used the default tmp; own fixtures under ~/qa-scratch/qa253-fix."
+  ],
+  "notes": "QA 253, dispatch tree 00552846cc6d2b7469d3b202407b949bc2d3fc8c. No live Jev call. T-209 REJECT, T-210 ACCEPT on its own rows (ships in the same commit). Pair verdict REJECT."
+}

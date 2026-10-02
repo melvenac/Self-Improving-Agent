@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 280,
+  "revision": 281,
   "project": {
     "name": "self-improving-agent"
   },
@@ -36,12 +36,13 @@
       "id": "T-014",
       "title": "Make point-of-use rating reachable",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 55,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "**`/end` is the wrong and only moment** (Aaron's question, Session 49). Ratings happen once, at `/end`, in a batch where the agent retro-rates a dozen entries long after the reasoning they informed. **Rating at *retrieval* is not the fix** — at recall time you know the match was plausible, not that it helped, so it measures the retriever rather than the knowledge, and retrieval is *already* recorded deterministically (`recall_count`, `last_recalled_at`, `recall_log`: 685 recalls across 175 of 357 entries). The right moment is point-of-use: when an entry demonstrably changes a decision, minutes after recall. **`ob_feedback` is already callable at any time — nothing enforces `/end`.** The actual blocker is that `/start` injects recalled entries as prose without their IDs, so mid-session rating is not *reachable*. Surfacing `[id]` alongside each injected entry is the small deterministic unblock; keep `/end` as the sweep for whatever went unrated in flight. Pairs with the apoptosis item above — earlier timing alone will not produce a \"harmful\" the rater was never going to give. Current coverage: **104 entries recalled but never rated**, 80 of 357 ever rated.",
-      "closed_rev": null
+      "note": "**`/end` is the wrong and only moment** (Aaron's question, Session 49). Ratings happen once, at `/end`, in a batch where the agent retro-rates a dozen entries long after the reasoning they informed. **Rating at *retrieval* is not the fix** — at recall time you know the match was plausible, not that it helped, so it measures the retriever rather than the knowledge, and retrieval is *already* recorded deterministically (`recall_count`, `last_recalled_at`, `recall_log`: 685 recalls across 175 of 357 entries). The right moment is point-of-use: when an entry demonstrably changes a decision, minutes after recall. **`ob_feedback` is already callable at any time — nothing enforces `/end`.** The actual blocker is that `/start` injects recalled entries as prose without their IDs, so mid-session rating is not *reachable*. Surfacing `[id]` alongside each injected entry is the small deterministic unblock; keep `/end` as the sweep for whatever went unrated in flight. Pairs with the apoptosis item above — earlier timing alone will not produce a \"harmful\" the rater was never going to give. Current coverage: **104 entries recalled but never rated**, 80 of 357 ever rated. — Closed OBSOLETE session 157 per backlog audit (#304): session-start injection suspended (Loop 10 C2; start.md:189-191); D-004/D-006/D-037.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-022",
@@ -58,12 +59,13 @@
       "id": "T-023",
       "title": "Improve state-side classifier precision",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 48,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "**with labels, not regexes** reading all 41 state-classified entries, roughly 15–20 are genuinely state; the rest are lessons that *mention* a path/port/threshold, caught by the `path is` / `threshold is` markers. Separating \"about the value\" from \"mentions the value\" is semantic and belongs to the model leg, per the dream-design split. **Do not tune the regexes against the current corpus** — that is fitting to noise on a sample of 41. (Session 48)",
-      "closed_rev": null
+      "note": "**with labels, not regexes** reading all 41 state-classified entries, roughly 15–20 are genuinely state; the rest are lessons that *mention* a path/port/threshold, caught by the `path is` / `threshold is` markers. Separating \"about the value\" from \"mentions the value\" is semantic and belongs to the model leg, per the dream-design split. **Do not tune the regexes against the current corpus** — that is fitting to noise on a sample of 41. (Session 48) — Closed OBSOLETE session 157 per backlog audit (#304): the regex state classifier was removed in e05ad9a7 (Loop 10 CUTs).",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-024",
@@ -102,12 +104,13 @@
       "id": "T-034",
       "title": "Move the session-start recall into `cli-bootstrap`",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 52,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "**IF the census says prose is failing to comply** (Atlas + Forge, Session 52; gated, self-closing). No deterministic path labels the pushed arm today: the hook performs no recall, so 100% of `trigger: \"start\"` labeling rests on `/start` prose compliance. Do NOT fix before measuring — the same rule as \"no LIFECYCLE_CONFIG constant may be tuned before the sample is real.\" Gate: after ~10 sessions on the v0.19.0 default, read the `ob_stats` trigger census; if `'unspecified'` is non-trivial, prose is failing — move the session-start recall into `cli-bootstrap` so the hook labels it deterministically, composed with the surface-entry-IDs item (same call site). If `'unspecified'` stays near zero, prose is complying and the change buys nothing but risk — close the item. (Session 52)",
-      "closed_rev": null
+      "note": "**IF the census says prose is failing to comply** (Atlas + Forge, Session 52; gated, self-closing). No deterministic path labels the pushed arm today: the hook performs no recall, so 100% of `trigger: \"start\"` labeling rests on `/start` prose compliance. Do NOT fix before measuring — the same rule as \"no LIFECYCLE_CONFIG constant may be tuned before the sample is real.\" Gate: after ~10 sessions on the v0.19.0 default, read the `ob_stats` trigger census; if `'unspecified'` is non-trivial, prose is failing — move the session-start recall into `cli-bootstrap` so the hook labels it deterministically, composed with the surface-entry-IDs item (same call site). If `'unspecified'` stays near zero, prose is complying and the change buys nothing but risk — close the item. (Session 52) — Closed OBSOLETE session 157 per backlog audit (#304): /start recall injection suspended (Loop 10 C2); cli-bootstrap has no recall.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-042",
@@ -201,12 +204,13 @@
       "id": "T-061",
       "title": "Collect shadow-recall sessions",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 41,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "**1 of 10** the harness has exactly one real evaluated session (produced from Cursor). **No `LIFECYCLE_CONFIG` constant may be tuned before the sample is real**; the report deliberately refuses to name a winner below 10. Early signal worth watching, not acting on: `no_maturity` and `recency_strong` both beat `live` on MRR while losing on nDCG. Remember the metric favours the incumbent — `live` carried 6/10 labeled results against 4-6 for the variants, so *beating* live is strong evidence and tying is weak. (Session 41)",
-      "closed_rev": null
+      "note": "**1 of 10** the harness has exactly one real evaluated session (produced from Cursor). **No `LIFECYCLE_CONFIG` constant may be tuned before the sample is real**; the report deliberately refuses to name a winner below 10. Early signal worth watching, not acting on: `no_maturity` and `recency_strong` both beat `live` on MRR while losing on nDCG. Remember the metric favours the incumbent — `live` carried 6/10 labeled results against 4-6 for the variants, so *beating* live is strong evidence and tying is weak. (Session 41) — Closed OBSOLETE session 157 per backlog audit (#304): LIFECYCLE_CONFIG tuning premise rests on the suspended maturity lifecycle (D-004/D-006).",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-065",
@@ -223,34 +227,37 @@
       "id": "T-067",
       "title": "Close the remaining 153 open checkboxes across session logs",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 41,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "or adopt the RUNBOOK rule that logs are append-only and live state belongs in INBOX only. Right now an auditor sees 153 apparently-open items with no way to tell which are long done. (Session 41)",
-      "closed_rev": null
+      "note": "or adopt the RUNBOOK rule that logs are append-only and live state belongs in INBOX only. Right now an auditor sees 153 apparently-open items with no way to tell which are long done. (Session 41) — Closed session 157 per backlog audit (#304): the RUNBOOK rule branch is satisfied, RUNBOOK.md:134-136 'Session logs are write-once ... Track live state in INBOX.md only'.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-091",
       "title": "v0.7.1 .gitignore patch",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 55,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Three runtime artifacts to add: `.recalled-entries.json`, `/open-brain/.agents/`, `AGENTS.md` (gitnexus auto-generated). Patch already in working tree as of Session 37, uncommitted; lands with v0.7.1 release.",
-      "closed_rev": null
+      "note": "Three runtime artifacts to add: `.recalled-entries.json`, `/open-brain/.agents/`, `AGENTS.md` (gitnexus auto-generated). Patch already in working tree as of Session 37, uncommitted; lands with v0.7.1 release. — Closed session 157 per backlog audit (#304); planner verified .gitignore:84-86 holds /.recalled-entries.json, /open-brain/.agents/, AGENTS.md.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-093",
       "title": "Archive Atlas-Forge mailbox thread",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 55,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "5+ messages each side. Capture decisions in DECISIONS.md, truncate both files.",
-      "closed_rev": null
+      "note": "5+ messages each side. Capture decisions in DECISIONS.md, truncate both files. — Closed OBSOLETE session 157 per backlog audit (#304): mailbox retired Loop 12 (D-014, PR #27).",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-101",
@@ -278,23 +285,25 @@
       "id": "T-103",
       "title": "Retire the mailbox as *transport*, keep it as *archive",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 53,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": "T-104",
-      "note": "* (Aaron's ask, Session 53; spec at `docs/mailbox-transport-retirement-spec.md`). **The protocol is SIA's, the store is not** — reader `pipelines/session-start/agent-identity.ts` (`readMailboxState`), emitter `cli-bootstrap.ts:135–141`, and it **ships to every template consumer** via `project-template/.agents/AGENT.md:5,14–21` and `start.md:54`; the data lives in `~/.agents/`, a separate repo, and `/sync` validates none of it. Note the name collision — `<project>/.agents/` (gitignored, `.gitignore:9`) is not `~/.agents/`. **The archive half works** (26 commits, 25 touching message files, truncate-to-latest ran clean at `6454bbc`); the transport half is obsolete. Session 53 is its own evidence: Aaron hand-carried the inbox file, Forge then reached Atlas live four times, and the live channel **corrected the file twice** (v0.17.0 had already shipped; delta numbering moved from `#5 before #2` to names after 455/456 renumbered) — so the reply committed at `44dfd8b` was stale on both counts *within the session that wrote it*. **Root cause is one function.** In `readMailboxState`, `lastDecision` parses `^## (\\d{4}-\\d{2}-\\d{2})` and sorts — date-aware; `messageCount` counts `^## \\[` with no age, ever. The durable half already knows about time and the ephemeral half does not, which is why five dead channels (TCM 2026-04-24, worthit 06-04, nexcrm 06-09, a2a-hub and openlaser 07-22) announce themselves identically to the one live one. **Same dropped-count invariant as the four instances in P1** — a letter has no status field, cannot represent *answered* or *superseded*, so absence of resolution reads as currency. **Fix (deterministic-first rule #2, remove the trigger):** surface a message **only when it postdates its channel's last decision** — no timeout constant, nothing to tune, cannot drift; unparseable headers count as unresolved and are *reported*, not skipped. Then document live `SendMessage` as primary with the mailbox as the fallback for a peer that isn't running, state the durable contract (*if it must survive the session it is a decision or a task, written in that form*), and move the five dead channels under `archive/`. **Stageable today with no code change** — a blank `mailbox_channel` already skips the surface (`AGENT.md:21`); the code change only sets the default. Supersedes the item below, which asked for the same thing from the other end. Do **not** conflate the `AGENT.md` edits with the personalization-leak item in P0 — same file, separate changes. (Session 53)",
-      "closed_rev": null
+      "note": "* (Aaron's ask, Session 53; spec at `docs/mailbox-transport-retirement-spec.md`). **The protocol is SIA's, the store is not** — reader `pipelines/session-start/agent-identity.ts` (`readMailboxState`), emitter `cli-bootstrap.ts:135–141`, and it **ships to every template consumer** via `project-template/.agents/AGENT.md:5,14–21` and `start.md:54`; the data lives in `~/.agents/`, a separate repo, and `/sync` validates none of it. Note the name collision — `<project>/.agents/` (gitignored, `.gitignore:9`) is not `~/.agents/`. **The archive half works** (26 commits, 25 touching message files, truncate-to-latest ran clean at `6454bbc`); the transport half is obsolete. Session 53 is its own evidence: Aaron hand-carried the inbox file, Forge then reached Atlas live four times, and the live channel **corrected the file twice** (v0.17.0 had already shipped; delta numbering moved from `#5 before #2` to names after 455/456 renumbered) — so the reply committed at `44dfd8b` was stale on both counts *within the session that wrote it*. **Root cause is one function.** In `readMailboxState`, `lastDecision` parses `^## (\\d{4}-\\d{2}-\\d{2})` and sorts — date-aware; `messageCount` counts `^## \\[` with no age, ever. The durable half already knows about time and the ephemeral half does not, which is why five dead channels (TCM 2026-04-24, worthit 06-04, nexcrm 06-09, a2a-hub and openlaser 07-22) announce themselves identically to the one live one. **Same dropped-count invariant as the four instances in P1** — a letter has no status field, cannot represent *answered* or *superseded*, so absence of resolution reads as currency. **Fix (deterministic-first rule #2, remove the trigger):** surface a message **only when it postdates its channel's last decision** — no timeout constant, nothing to tune, cannot drift; unparseable headers count as unresolved and are *reported*, not skipped. Then document live `SendMessage` as primary with the mailbox as the fallback for a peer that isn't running, state the durable contract (*if it must survive the session it is a decision or a task, written in that form*), and move the five dead channels under `archive/`. **Stageable today with no code change** — a blank `mailbox_channel` already skips the surface (`AGENT.md:21`); the code change only sets the default. Supersedes the item below, which asked for the same thing from the other end. Do **not** conflate the `AGENT.md` edits with the personalization-leak item in P0 — same file, separate changes. (Session 53) — Closed OBSOLETE session 157 per backlog audit (#304): mailbox retired as transport (D-014, 8bdd13b4); planner verified git grep readMailboxState is empty.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-114",
       "title": "Update /start monthly maintenance",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 55,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Show maturity distribution, flag manual entries below apoptosis threshold, flag high-neutral/low-helpful entries (retrieval quality issue).",
-      "closed_rev": null
+      "note": "Show maturity distribution, flag manual entries below apoptosis threshold, flag high-neutral/low-helpful entries (retrieval quality issue). — Closed OBSOLETE session 157 per backlog audit (#304): maturity/apoptosis retired (D-004, R-011); nothing to flag.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-146",
@@ -458,24 +467,25 @@
       "id": "T-163",
       "title": "Close-outs must APPEND a per-seat record, not overwrite a shared slot — plus a /sync check that no close-out reduces the recorded seat-uuid count for an open loop",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 77,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Opened session 77 from the Loop 16 correction. Measured: rev 61's QA close-out removed the developer's uuid (1 -> 0) and added its own (0 -> 2) in the same commit; rev 62 did the same in the other direction. The slot therefore only ever holds the last seat to close, and every loop whose seats close in sequence loses all but one seat's evidence with nothing noticing. This is why the developer's uuid was missing from the QA seat's tree a day later and why a correctly-run grep there returned a true zero that read as absence. DETERMINISTIC FIX (Aaron's stated preference over prompt-level guidance): make the slot a list keyed by seat so a close-out can only append its own entry. CHECK SHAPE, proposed by the developer seat and attributed to it: 'no close-out removes a uuid another seat's close-out added', cheap to implement against the rendered views. A /sync assertion turns a silent overwrite into a failed check. Not add_gap: R28 holds until T-158 lands.",
-      "closed_rev": null
+      "note": "Opened session 77 from the Loop 16 correction. Measured: rev 61's QA close-out removed the developer's uuid (1 -> 0) and added its own (0 -> 2) in the same commit; rev 62 did the same in the other direction. The slot therefore only ever holds the last seat to close, and every loop whose seats close in sequence loses all but one seat's evidence with nothing noticing. This is why the developer's uuid was missing from the QA seat's tree a day later and why a correctly-run grep there returned a true zero that read as absence. DETERMINISTIC FIX (Aaron's stated preference over prompt-level guidance): make the slot a list keyed by seat so a close-out can only append its own entry. CHECK SHAPE, proposed by the developer seat and attributed to it: 'no close-out removes a uuid another seat's close-out added', cheap to implement against the rendered views. A /sync assertion turns a silent overwrite into a failed check. Not add_gap: R28 holds until T-158 lands. — Closed session 157: both halves already on master, verified by sia-forge (docs/loops/t163-developer-handoff.md, #301 11c183e4) and by the planner: set_handoff keys by the writing session's uuid (state-writer.ts), and the record-erasure /sync check is registered at open-brain/src/pipelines/sync/index.ts:119 (T163-2), live run 0 erasures since schema v3. #301 adds a regression test only.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-164",
       "title": "The session counter is per-worktree, so a seat can close out on a number that collides with the record's sequence",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 77,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Opened session 77, flagged by the developer seat in its own /start greeting. ob_start greeted the developer as Session #6 and opened .agents/SESSIONS/Session_6.md while the record's last session is #76; .agents/SESSIONS/Session_*.md is gitignored, so the counter reflects logs in THAT checkout only. A seat that closes out on its local number writes a colliding session id into a shared record. This is T-003's shape (session identity keyed per project, not per session) observed concretely in the worktree regime, and it is live for every seat session from here on: three seats now run in three checkouts, each with its own counter. Until it is fixed, a seat must be told its record session number rather than using the one its greeting shows. Related: T-149 (per-seat worktrees), T-003. — LIVE AGAIN session 149: the planner's greeting said Session #12 (sia-planner's local log count) while the record's last session was #148; the planner used 149. DISPATCHED as record 221 to cursor-builder, after it posts T-194 (brief docs/loops/t158-t164-dispatch.md).",
+      "note": "Opened session 77, flagged by the developer seat in its own /start greeting. ob_start greeted the developer as Session #6 and opened .agents/SESSIONS/Session_6.md while the record's last session is #76; .agents/SESSIONS/Session_*.md is gitignored, so the counter reflects logs in THAT checkout only. A seat that closes out on its local number writes a colliding session id into a shared record. This is T-003's shape (session identity keyed per project, not per session) observed concretely in the worktree regime, and it is live for every seat session from here on: three seats now run in three checkouts, each with its own counter. Until it is fixed, a seat must be told its record session number rather than using the one its greeting shows. Related: T-149 (per-seat worktrees), T-003. — LIVE AGAIN session 149: the planner's greeting said Session #12 (sia-planner's local log count) while the record's last session was #148; the planner used 149. DISPATCHED as record 221 to cursor-builder, after it posts T-194 (brief docs/loops/t158-t164-dispatch.md). — Closed session 157: merged #270 (bd07f604), QA 251 ACCEPT, D-099.",
       "note_by": null,
-      "closed_rev": null
+      "closed_rev": 281
     },
     {
       "id": "T-165",
@@ -548,12 +558,13 @@
       "id": "T-171",
       "title": "update_task REPLACES a task's note, and neither the dry run nor the write says so: an op written to append a correction silently erases the whole note",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 78,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Found session 78 by the planner, by reading state-writer.ts:293 (`if (op.note !== undefined) t.note = op.note;`) BEFORE the real write, after a dry run of update_task on T-169 with a one-sentence correction reported only 'Applied (1): update_task T-169'. Had it been written, T-169's 1,869-character note would have been replaced by that sentence. The dry run gave no sign that it was a replacement or of how much text would go. SAME CLASS AS G-024 (retention evicts quietly) and G-010 (close_gap destroys rather than marks): a record operation whose destructive half is not reported. Close notes are write-once, and this makes open notes write-over with no warning. FIX SHAPE, for the developer to design: (a) the dry run and the write both report 'note REPLACED: N chars -> M chars' whenever a note changes; or (b) separate append_note and replace_note, so the destructive one is named at the call site. (b) is structural and (a) is a report; prefer (b) under deterministic-first. Workaround until then: read the current note and pass it back whole with the edit inside it, as was done for T-169 at rev 81.",
-      "closed_rev": null
+      "note": "Found session 78 by the planner, by reading state-writer.ts:293 (`if (op.note !== undefined) t.note = op.note;`) BEFORE the real write, after a dry run of update_task on T-169 with a one-sentence correction reported only 'Applied (1): update_task T-169'. Had it been written, T-169's 1,869-character note would have been replaced by that sentence. The dry run gave no sign that it was a replacement or of how much text would go. SAME CLASS AS G-024 (retention evicts quietly) and G-010 (close_gap destroys rather than marks): a record operation whose destructive half is not reported. Close notes are write-once, and this makes open notes write-over with no warning. FIX SHAPE, for the developer to design: (a) the dry run and the write both report 'note REPLACED: N chars -> M chars' whenever a note changes; or (b) separate append_note and replace_note, so the destructive one is named at the call site. (b) is structural and (a) is a report; prefer (b) under deterministic-first. Workaround until then: read the current note and pass it back whole with the edit inside it, as was done for T-169 at rev 81. — Closed session 157 per backlog audit (#304): PR #183 (a2499ee9); planner verified state-writer.ts:57-58 append_note/replace_note.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-172",
@@ -640,12 +651,13 @@
       "id": "T-179",
       "title": "Replace /end with a small 'store lessons' step: each session's lessons stored with the key that would have caught them (T-170); the record is written as work happens, and the rest of /end is cut",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 90,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Opened record session 90 (planner), 2026-09-24, on Aaron's word in the planner session. He asked: 'We have not been using end command to close out session work. I'm wondering if we need it or if we can reduce the scope of what end does.' He then answered 'yes' to recording this as a task after slice three, adding, verbatim: 'the plan is to migrate all other projects to the new sia convention so I'm not too concerned about the other projects as you stated.' So compatibility with other projects' /end is NOT a constraint; they will migrate to SIA's convention. THE PLANNER'S READING of /end (.claude/commands/end.md, 3076 words, A1-A14): (1) the RECORD half (A7b: set_handoff, add_decision, set_objective through ob_state) is already done by seats as work happens, which is better than once at the end because a dead session loses nothing; (2) A2-A7 hand-edit the prose views, only for projects without state.json; (3) the session summary, auto-feedback and logging run in the SessionEnd hook without /end; (4) A14's self-rating fed the maturity lifecycle cut in Loop 10; (5) A9's drift audit and A13's Obsidian summary duplicate /sync and the hook; (6) A11-A12, storing lessons in the knowledge store, is the ONE step nothing else does, and without it the recall trigger (G-039, V-062) has nothing new to fire on. /end is also blocked today by T-163 (its end_session overwrites the shared last_session slot). SCOPE: a replacement command that stores each lesson with the deterministic key T-170 requires (a command pattern, path or error string); the record write is dropped from it (seats write the record as they go); the other steps are cut or left to the hook. It must not write last_session until T-163 lands. SEQUENCING: after slice three closes (D-033/D-036), so candidate A is not interrupted. Relates to T-170, T-163 and T-044.",
-      "closed_rev": null
+      "note": "Opened record session 90 (planner), 2026-09-24, on Aaron's word in the planner session. He asked: 'We have not been using end command to close out session work. I'm wondering if we need it or if we can reduce the scope of what end does.' He then answered 'yes' to recording this as a task after slice three, adding, verbatim: 'the plan is to migrate all other projects to the new sia convention so I'm not too concerned about the other projects as you stated.' So compatibility with other projects' /end is NOT a constraint; they will migrate to SIA's convention. THE PLANNER'S READING of /end (.claude/commands/end.md, 3076 words, A1-A14): (1) the RECORD half (A7b: set_handoff, add_decision, set_objective through ob_state) is already done by seats as work happens, which is better than once at the end because a dead session loses nothing; (2) A2-A7 hand-edit the prose views, only for projects without state.json; (3) the session summary, auto-feedback and logging run in the SessionEnd hook without /end; (4) A14's self-rating fed the maturity lifecycle cut in Loop 10; (5) A9's drift audit and A13's Obsidian summary duplicate /sync and the hook; (6) A11-A12, storing lessons in the knowledge store, is the ONE step nothing else does, and without it the recall trigger (G-039, V-062) has nothing new to fire on. /end is also blocked today by T-163 (its end_session overwrites the shared last_session slot). SCOPE: a replacement command that stores each lesson with the deterministic key T-170 requires (a command pattern, path or error string); the record write is dropped from it (seats write the record as they go); the other steps are cut or left to the hook. It must not write last_session until T-163 lands. SEQUENCING: after slice three closes (D-033/D-036), so candidate A is not interrupted. Relates to T-170, T-163 and T-044. — Closed session 157 per backlog audit (#304): commit 57a20254 cut end.md to one job (store lessons, then ob_end), on master.",
+      "note_by": null,
+      "closed_rev": 281
     },
     {
       "id": "T-180",
@@ -763,13 +775,13 @@
       "id": "T-190",
       "title": "QA PC speed without hiding Windows failures: the QA driver sets TEMP=TMP=C:\\qa-tmp for probes and mutants, QA seats keep scratch in C:\\qa-scratch (both Defender-excluded by Aaron), and each QA seat runs the full suite ONCE with the default TEMP as the Defender-on, user-like control",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 100,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Session 100. MISSED, not deliberate: QA 99's report (section 5.1) recorded Windows Defender at 2h16m of CPU on desktop-o4egb1e, scanning the files the tests create, and said it had not measured the cost to the suite. The planner read that line when ruling and turned it into nothing, until Aaron asked through the home-directory session why exclusions had not been done. Design (sent to Aaron): the suite's about 60 mkdtemp prefixes all sit under os.tmpdir(), and excluding all of %TEMP% would be the broadest hole, so the tests' temp is moved to a dedicated folder instead. Node's os.tmpdir() follows TEMP/TMP. Aaron adds `Add-MpPreference -ExclusionPath 'C:\\qa-tmp','C:\\qa-scratch'` himself: a security setting, his machine. NOT process exclusions for node.exe or git.exe: they would cover npm install scripts from the internet. Risk kept visible: Defender scanning is a classic cause of EBUSY/EPERM on rename and delete, which SIA's product code does (state-writer's temp-then-rename; the importer's round-2 rollback), and users run Defender, hence the one full-suite control run with the default TEMP per candidate. The driver change goes into docs/loops/qa-99/drive.ps1's template via qa-driver-copy.mjs, for the next QA seat after 104 and 106. — MACHINE ROLES CHANGED, planner session 150 (D-065): the laptop is the default QA machine; the QA PC runs developer seats and is used for SIA QA only when no developer suite is running there. The TEMP/scratch rules here still apply on whichever machine runs QA. A 'quiet' lease (Clark's proposal) waits on Aaron. — Lease APPROVED by Aaron (via worktrees-d5), and opened as its own task in session 150 (rev 180). Until it ships, the QA PC is not used for SIA QA.",
+      "note": "Session 100. MISSED, not deliberate: QA 99's report (section 5.1) recorded Windows Defender at 2h16m of CPU on desktop-o4egb1e, scanning the files the tests create, and said it had not measured the cost to the suite. The planner read that line when ruling and turned it into nothing, until Aaron asked through the home-directory session why exclusions had not been done. Design (sent to Aaron): the suite's about 60 mkdtemp prefixes all sit under os.tmpdir(), and excluding all of %TEMP% would be the broadest hole, so the tests' temp is moved to a dedicated folder instead. Node's os.tmpdir() follows TEMP/TMP. Aaron adds `Add-MpPreference -ExclusionPath 'C:\\qa-tmp','C:\\qa-scratch'` himself: a security setting, his machine. NOT process exclusions for node.exe or git.exe: they would cover npm install scripts from the internet. Risk kept visible: Defender scanning is a classic cause of EBUSY/EPERM on rename and delete, which SIA's product code does (state-writer's temp-then-rename; the importer's round-2 rollback), and users run Defender, hence the one full-suite control run with the default TEMP per candidate. The driver change goes into docs/loops/qa-99/drive.ps1's template via qa-driver-copy.mjs, for the next QA seat after 104 and 106. — MACHINE ROLES CHANGED, planner session 150 (D-065): the laptop is the default QA machine; the QA PC runs developer seats and is used for SIA QA only when no developer suite is running there. The TEMP/scratch rules here still apply on whichever machine runs QA. A 'quiet' lease (Clark's proposal) waits on Aaron. — Lease APPROVED by Aaron (via worktrees-d5), and opened as its own task in session 150 (rev 180). Until it ships, the QA PC is not used for SIA QA. — Closed session 157 per backlog audit (#304): docs/loops/qa-driver-template/drive.ps1:30-39 sets TEMP=TMP=C:\\qa-tmp; commit 56d7bdd5.",
       "note_by": null,
-      "closed_rev": null
+      "closed_rev": 281
     },
     {
       "id": "T-191",
@@ -871,17 +883,18 @@
       "id": "T-198",
       "title": "ob_start prints one line per partner seat from the hub's presence endpoint (listening or not, unread turns and since when), and says so visibly when the hub is unreachable, never silently",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 149,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron's 'yes and move the hub's Loop 8b ahead of Funnel', relayed 2026-09-28 by worktrees-d5 to the planner (session 149). Two links: Aaron -> worktrees-d5 -> Atlas. PROBLEM: tracked text does not make a planner check its seats. A2A-Hub's tracked shared.md (a2a-planner .agents/roles/shared.md:147-166, per worktrees-d5) already says 'check presence before assuming a seat sees a turn', and Relay's /start still never checked. In SIA, builder and Forge sat on turns 57/217 for about an hour this session, and the planner learned it only from a listener's 'unread by' line. INSTRUMENT, verified by the planner 2026-09-28: GET http://100.124.212.87:4000/a2a/agents/presence (hub v1.13.0, hub T-077) returns 200 with agents[].{name, state, lastSeen, lastSeenAgeMs, rooms[].{sessionId, unread, pollingNow, pollAgeMs}}. It IGNORES an ?agents= filter (the whole roster came back), so the client must filter by name. GOAL: at /start, for each partner seat (names and rooms from T-196's tracked data file; until that exists, a named interim source), print '<seat>: polling|not polling, N unread since <time>'. A hub timeout, non-2xx or unparseable body prints a visible 'presence: UNKNOWN (<cause>)' line, never nothing (shared.md 'Skip is not pass'). Bounded timeout so /start never hangs. ROWS: PR-1 polling seat; PR-2 not polling with unread; PR-3 hub unreachable -> UNKNOWN line with its cause; PR-4 a seat absent from the presence roster is printed as absent, not skipped; PR-5 a mutant that swallows the fetch error goes red on PR-3. Fixture HTTP server only; no live hub in tests. RULING: its own task, not folded into T-191. T-191 is sequenced after T-183 and is about which sections a seat sees; this is a new instrument every planner needs now. It serves both projects' planners because both run SIA's ob_start. Seat: Forge (sia-forge), now that record 215 is in QA; candidate C r4 takes precedence if QA 213 rejects C r3. — CORRECTION from Relay, 2026-09-28: the presence route reads ONLY ?name=<one agent> (A2A-Hub src/index.ts:542-548 at 63ab401) and silently ignores any other parameter. Relay opened that as hub T-079 (P2). Until it is fixed, either call ?name= once per seat or fetch the roster and filter client-side. Both meet PR-1 to PR-4; say which one was chosen. — LIVE CASE, from A2A-Hub's Loop 8b spike (Relay to Atlas, 2026-09-28, 00:45Z; hub T-076 rev 88): a background hub-listen.sh started by Rivet's Cursor marked turn 111 read by writing it to a file, and presence showed 'polling, unread=0' while the agent itself had not seen the turn. So 'polling' means a LISTENER PROCESS is polling, and 0 unread means that process consumed the turn, not that the seat read it. T-198's line must not print 'polling' in a way a planner reads as 'the seat has seen my turn'. Word it as 'listener polling', or pair it with the seat's last POST (its latest turn number and time), which only the agent can produce. QA for record 217 should probe this case. — QA 225 (GPT, QA PC; origin/qa/t198-report a8a5612) REJECT of 231f501; the rejection stands. Majors: listener activity is presented as seat presence (the planner's note above, confirmed); structurally malformed bodies escape the UNKNOWN contract; the new block is missing from greeting-size; five fixture-server tests fail on tcm (no network egress in CI). Returned as record 217 r2 to Forge (hub turn 235), AFTER candidate C r4, adopting record 219's seat-file blob. — FIFTH REQUIRED FIX FOR r2, planner 2026-09-30, from A2A-Hub's D-033(6) strict-auth check (Relay read tcm's auth-log): the candidate HARDCODES the key: open-brain/src/pipelines/session-start/hub-presence.ts:124 sends headers { \"X-Agent-Key\": \"dev-key\" }. tcm holds dev-key for no agent (devKeyHeldByNone), so every presence read logs 'unknown X-Agent-Key on GET /agents/presence' and would get a 403 under AUTH_MODE=strict, so the presence line breaks silently. r2 must send the seat's OWN key (the one hub-talk uses from its key dir), and a missing or unreadable key must print presence UNKNOWN with that cause, never fall back to dev-key. Strict on tcm waits on this and on T-196 (the key in the tracked seat file). Also: the 8 unknown-key presence reads Relay found (2026-09-29 00:13-03:45Z) were the planner's own dev-key probes, plus QA 225's one permitted read-only call; the planner has stopped using dev-key. — r2 BUILT LOCALLY, planner session 150, 2026-09-30 (Forge, sia-forge-90): 6306ffe (red rows, T-196 superset seat file adopted unchanged), f172e28 (product), a40fc77 (handoff). Five mutants. Base red at 231f501 under a no-network tripwire: 5 failed, the same five QA 225 saw on tcm. Full suite: 2 failures, the same two as at 5f7c9a0. The greeting-size worst-case bound adds 194 characters. The tcm no-egress run is QA's row (D-061). Push cleared. FINDING -> G-049: builder and infra checkouts resolve to Forge's identity, so their presence keys are never looked up. — QA 230 ACCEPT, planner session 150 (report origin/qa/t198-r2-report 1cc2fe3, docs/loops/t198-r2-qa-report.md; laptop). The planner read every row: PR-1..PR-6 and R1..R5 met, no defects. R4 was shown on tcm: candidate run 36681338277 fails only T-171 r3b (the same at r1 36681343536 and base 36681349895), and all five r1 fixture-server failures pass. The live GET was skipped (the QA account has no hub key) and dev-key was never used. THE ACCEPT STANDS. The branch merges clean with master; a PR has been opened for Aaron's merge. D-063: strict auth waits on T-198 r2 and T-196 (#220) merged, plus forge's key; when both PRs are merged, tell Relay. — MERGE, planner session 150: Aaron, directly in the planner session: 'merging #223 (T-198 r2)'. update-branch REFUSED: a conflict in .agents/SYSTEM/hub-partner-seats.json (add/add). #220 merged master's superset copy (with talk_tokens), and T-198 carries the older blob 344bd46. Resolution: take master's copy, since the T-198 parser ignores extra keys (QA 228). The builder makes loop/t198-merge with a merge-base cmp check and a new PR; #223 closes in its favour. Aaron's word covers the identical code. Also: QA 232 (C r4) was LAUNCHED by the planner at Aaron's direction (his launch line failed to paste) at 08:27:57Z, laptop pid 3704, Opus headless; log C:\\qa-tmp\\qa-232.log. — Planner session 153: #227 (T-198 r2 merged with master) MERGED as c1296f2b on Aaron's 'merge' in the planner session. First update-branch to 304a24ad, whose code was cmp-identical to QA 230's b8a6004 (the diff outside docs/.agents was 0 bytes); the PR CI test job passed on 304a24ad. It showed UNSTABLE only because the push-event duplicate run is cancelled on every push. #223 auto-closed as merged, since its head a40fc77 is inside #227.",
+      "note": "AUTHORITY: Aaron's 'yes and move the hub's Loop 8b ahead of Funnel', relayed 2026-09-28 by worktrees-d5 to the planner (session 149). Two links: Aaron -> worktrees-d5 -> Atlas. PROBLEM: tracked text does not make a planner check its seats. A2A-Hub's tracked shared.md (a2a-planner .agents/roles/shared.md:147-166, per worktrees-d5) already says 'check presence before assuming a seat sees a turn', and Relay's /start still never checked. In SIA, builder and Forge sat on turns 57/217 for about an hour this session, and the planner learned it only from a listener's 'unread by' line. INSTRUMENT, verified by the planner 2026-09-28: GET http://100.124.212.87:4000/a2a/agents/presence (hub v1.13.0, hub T-077) returns 200 with agents[].{name, state, lastSeen, lastSeenAgeMs, rooms[].{sessionId, unread, pollingNow, pollAgeMs}}. It IGNORES an ?agents= filter (the whole roster came back), so the client must filter by name. GOAL: at /start, for each partner seat (names and rooms from T-196's tracked data file; until that exists, a named interim source), print '<seat>: polling|not polling, N unread since <time>'. A hub timeout, non-2xx or unparseable body prints a visible 'presence: UNKNOWN (<cause>)' line, never nothing (shared.md 'Skip is not pass'). Bounded timeout so /start never hangs. ROWS: PR-1 polling seat; PR-2 not polling with unread; PR-3 hub unreachable -> UNKNOWN line with its cause; PR-4 a seat absent from the presence roster is printed as absent, not skipped; PR-5 a mutant that swallows the fetch error goes red on PR-3. Fixture HTTP server only; no live hub in tests. RULING: its own task, not folded into T-191. T-191 is sequenced after T-183 and is about which sections a seat sees; this is a new instrument every planner needs now. It serves both projects' planners because both run SIA's ob_start. Seat: Forge (sia-forge), now that record 215 is in QA; candidate C r4 takes precedence if QA 213 rejects C r3. — CORRECTION from Relay, 2026-09-28: the presence route reads ONLY ?name=<one agent> (A2A-Hub src/index.ts:542-548 at 63ab401) and silently ignores any other parameter. Relay opened that as hub T-079 (P2). Until it is fixed, either call ?name= once per seat or fetch the roster and filter client-side. Both meet PR-1 to PR-4; say which one was chosen. — LIVE CASE, from A2A-Hub's Loop 8b spike (Relay to Atlas, 2026-09-28, 00:45Z; hub T-076 rev 88): a background hub-listen.sh started by Rivet's Cursor marked turn 111 read by writing it to a file, and presence showed 'polling, unread=0' while the agent itself had not seen the turn. So 'polling' means a LISTENER PROCESS is polling, and 0 unread means that process consumed the turn, not that the seat read it. T-198's line must not print 'polling' in a way a planner reads as 'the seat has seen my turn'. Word it as 'listener polling', or pair it with the seat's last POST (its latest turn number and time), which only the agent can produce. QA for record 217 should probe this case. — QA 225 (GPT, QA PC; origin/qa/t198-report a8a5612) REJECT of 231f501; the rejection stands. Majors: listener activity is presented as seat presence (the planner's note above, confirmed); structurally malformed bodies escape the UNKNOWN contract; the new block is missing from greeting-size; five fixture-server tests fail on tcm (no network egress in CI). Returned as record 217 r2 to Forge (hub turn 235), AFTER candidate C r4, adopting record 219's seat-file blob. — FIFTH REQUIRED FIX FOR r2, planner 2026-09-30, from A2A-Hub's D-033(6) strict-auth check (Relay read tcm's auth-log): the candidate HARDCODES the key: open-brain/src/pipelines/session-start/hub-presence.ts:124 sends headers { \"X-Agent-Key\": \"dev-key\" }. tcm holds dev-key for no agent (devKeyHeldByNone), so every presence read logs 'unknown X-Agent-Key on GET /agents/presence' and would get a 403 under AUTH_MODE=strict, so the presence line breaks silently. r2 must send the seat's OWN key (the one hub-talk uses from its key dir), and a missing or unreadable key must print presence UNKNOWN with that cause, never fall back to dev-key. Strict on tcm waits on this and on T-196 (the key in the tracked seat file). Also: the 8 unknown-key presence reads Relay found (2026-09-29 00:13-03:45Z) were the planner's own dev-key probes, plus QA 225's one permitted read-only call; the planner has stopped using dev-key. — r2 BUILT LOCALLY, planner session 150, 2026-09-30 (Forge, sia-forge-90): 6306ffe (red rows, T-196 superset seat file adopted unchanged), f172e28 (product), a40fc77 (handoff). Five mutants. Base red at 231f501 under a no-network tripwire: 5 failed, the same five QA 225 saw on tcm. Full suite: 2 failures, the same two as at 5f7c9a0. The greeting-size worst-case bound adds 194 characters. The tcm no-egress run is QA's row (D-061). Push cleared. FINDING -> G-049: builder and infra checkouts resolve to Forge's identity, so their presence keys are never looked up. — QA 230 ACCEPT, planner session 150 (report origin/qa/t198-r2-report 1cc2fe3, docs/loops/t198-r2-qa-report.md; laptop). The planner read every row: PR-1..PR-6 and R1..R5 met, no defects. R4 was shown on tcm: candidate run 36681338277 fails only T-171 r3b (the same at r1 36681343536 and base 36681349895), and all five r1 fixture-server failures pass. The live GET was skipped (the QA account has no hub key) and dev-key was never used. THE ACCEPT STANDS. The branch merges clean with master; a PR has been opened for Aaron's merge. D-063: strict auth waits on T-198 r2 and T-196 (#220) merged, plus forge's key; when both PRs are merged, tell Relay. — MERGE, planner session 150: Aaron, directly in the planner session: 'merging #223 (T-198 r2)'. update-branch REFUSED: a conflict in .agents/SYSTEM/hub-partner-seats.json (add/add). #220 merged master's superset copy (with talk_tokens), and T-198 carries the older blob 344bd46. Resolution: take master's copy, since the T-198 parser ignores extra keys (QA 228). The builder makes loop/t198-merge with a merge-base cmp check and a new PR; #223 closes in its favour. Aaron's word covers the identical code. Also: QA 232 (C r4) was LAUNCHED by the planner at Aaron's direction (his launch line failed to paste) at 08:27:57Z, laptop pid 3704, Opus headless; log C:\\qa-tmp\\qa-232.log. — Planner session 153: #227 (T-198 r2 merged with master) MERGED as c1296f2b on Aaron's 'merge' in the planner session. First update-branch to 304a24ad, whose code was cmp-identical to QA 230's b8a6004 (the diff outside docs/.agents was 0 bytes); the PR CI test job passed on 304a24ad. It showed UNSTABLE only because the push-event duplicate run is cancelled on every push. #223 auto-closed as merged, since its head a40fc77 is inside #227. — Closed session 157 per backlog audit (#304): PR #227 (c1296f2b), QA 230 ACCEPT; hub-presence.ts.",
       "note_by": [
         "c407df9c-3dd7-4273-891b-798b4bd527f4",
         "e50107b1-ac67-452c-9da1-3fc4c3beda97",
-        "6e083614-965f-462b-ad59-62091a0be5e1"
+        "6e083614-965f-462b-ad59-62091a0be5e1",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 281
     },
     {
       "id": "T-199",
@@ -1058,16 +1071,17 @@
       "id": "T-211",
       "title": "Each seat's status-cron minutes live in seat data, and /start reads them",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 153,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Clark startup audit (d), accepted by planner session 153. The status-cron times exist only in handoff watch-outs, so they drift and collide: atlas :04/:34, relay :07/:37, the same minutes as Clark's own check. Put each seat's minutes in AGENT.local.md or roles data, and have /start print them so the seat creates the cron from data. (Clark's proposal (c), the AGENT.md/seat mismatch, was WITHDRAWN: AGENT.local.md overrides the tracked default by design.) — Session 154 (Clark startup audit): the case this task exists for happened. The planner standing reporting rule (30-min status to clark, :04/:34) was dropped from the planner handoff at the session-153 roll, and session 154 started with no cron until Clark audited it. A cadence held only in handoff text is lost at the first roll that does not copy it.",
+      "note": "Clark startup audit (d), accepted by planner session 153. The status-cron times exist only in handoff watch-outs, so they drift and collide: atlas :04/:34, relay :07/:37, the same minutes as Clark's own check. Put each seat's minutes in AGENT.local.md or roles data, and have /start print them so the seat creates the cron from data. (Clark's proposal (c), the AGENT.md/seat mismatch, was WITHDRAWN: AGENT.local.md overrides the tracked default by design.) — Session 154 (Clark startup audit): the case this task exists for happened. The planner standing reporting rule (30-min status to clark, :04/:34) was dropped from the planner handoff at the session-153 roll, and session 154 started with no cron until Clark audited it. A cadence held only in handoff text is lost at the first roll that does not copy it. — Closed session 157: merged #272 (79d1f5d9), QA 251 ACCEPT, D-099.",
       "note_by": [
         "6e083614-965f-462b-ad59-62091a0be5e1",
-        "54064a65-6810-4df0-8748-ee932cc7f5bd"
+        "54064a65-6810-4df0-8748-ee932cc7f5bd",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 281
     },
     {
       "id": "T-212",
@@ -1173,57 +1187,61 @@
       "id": "T-219",
       "title": "ci.yml: docs-only PRs report 'test' as Skipped instead of no check (D-091)",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 156,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Per D-091. Edit .github/workflows/ci.yml only (plus a test if ci-seat-skip.mjs gains PR args). Live acceptance: docs-only PR -> test Skipped + mergeable; code PR -> suite runs; master push -> suite runs. Unblocks #259 and every future docs-only PR under ruleset 24343321. Needs a dev slot booked via clark.",
+      "note": "Per D-091. Edit .github/workflows/ci.yml only (plus a test if ci-seat-skip.mjs gains PR args). Live acceptance: docs-only PR -> test Skipped + mergeable; code PR -> suite runs; master push -> suite runs. Unblocks #259 and every future docs-only PR under ruleset 24343321. Needs a dev slot booked via clark. — Closed session 157: merged #262 (f13307e1); D-091 proven. Found open by the backlog audit (docs/loops/backlog-audit-2026-10-02.md, #304).",
       "note_by": [
-        "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+        "83f0e630-9247-40d4-adcd-7f4292a16ddb",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 281
     },
     {
       "id": "T-220",
       "title": "closeout-tables: label 'no E_t' only when no E_t exists, 'not called' separately; G_plan writes repo-relative paths (QA 245 F2, F4)",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 156,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Per D-092. F2 must be fixed before the slice-four step-4 re-run, since close-out tables are generated, never typed. F4 (absolute C:\\qa-scratch paths in G_plan brief/dt/spec_excerpt) is the low-priority clause. Also the doubled full stop in 'No scored records..'. Red first.",
+      "note": "Per D-092. F2 must be fixed before the slice-four step-4 re-run, since close-out tables are generated, never typed. F4 (absolute C:\\qa-scratch paths in G_plan brief/dt/spec_excerpt) is the low-priority clause. Also the doubled full stop in 'No scored records..'. Red first. — Closed session 157: merged #266 (460c9a49). Found open by the backlog audit (#304).",
       "note_by": [
-        "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+        "83f0e630-9247-40d4-adcd-7f4292a16ddb",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 281
     },
     {
       "id": "T-221",
       "title": "ci.yml concurrency: a push run cancelled by its branch's PR run leaves a CANCELLED `test` on the head SHA, which ruleset 24343321 reads as failing (BLOCKED)",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 156,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Found on #262 (session 156). The PR run 36961198095 was green, but push run 36961195272 on the same head 7a046880 had test=cancelled through the shared group ci-{head_ref||ref_name} (T-178), so #262 was BLOCKED. Re-running the push run gave test=skipped (docs-only diff) and #262 became CLEAN. That is also the LIVE proof D-091 needed: the ruleset accepts a job-skipped `test` alongside a passing one. It hits every PR from loop/** or qa/** (those branches trigger push AND pull_request); docs/* branches trigger only pull_request. Workaround until fixed: re-run the cancelled run. Fix options for the planner to rule: (a) separate concurrency groups per event, so neither cancels the other (costs a duplicate suite on tcm); (b) on push, skip `test` when the branch has an open PR; (c) drop the push trigger for loop/** and qa/** and rely on pull_request. Needs a live run on each path (feedback: live run on the path).",
+      "note": "Found on #262 (session 156). The PR run 36961198095 was green, but push run 36961195272 on the same head 7a046880 had test=cancelled through the shared group ci-{head_ref||ref_name} (T-178), so #262 was BLOCKED. Re-running the push run gave test=skipped (docs-only diff) and #262 became CLEAN. That is also the LIVE proof D-091 needed: the ruleset accepts a job-skipped `test` alongside a passing one. It hits every PR from loop/** or qa/** (those branches trigger push AND pull_request); docs/* branches trigger only pull_request. Workaround until fixed: re-run the cancelled run. Fix options for the planner to rule: (a) separate concurrency groups per event, so neither cancels the other (costs a duplicate suite on tcm); (b) on push, skip `test` when the branch has an open PR; (c) drop the push trigger for loop/** and qa/** and rely on pull_request. Needs a live run on each path (feedback: live run on the path). — Closed session 157: merged #274 (2b39e5cc), QA 250 ACCEPT, D-097.",
       "note_by": [
-        "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+        "83f0e630-9247-40d4-adcd-7f4292a16ddb",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 281
     },
     {
       "id": "T-222",
       "title": "count-attempts exits 1 on an attempt chained to an unanswered auth record (QA 248 F5); plus done-gate reason text for checks 'none', repo-relative checks_source, 4.4 'E_t commit' column (F6-F8)",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 156,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Per D-093. F5: a fresh attempt after a non-retryable outcome (auth) with no answer must not count as a retry, so either the runner stops setting retry_of in that case or the counter applies D-092 ruling 3; count-attempts must exit 0 on the slice-four records as they stand, with no record edited. F6: decision.reasons says 'the deterministic checks failed (read from process exit codes)' when checks_source is 'none'. F7: G_done checks_source holds a scratch path; write repo-relative or the blob only. F8: the closeout-tables 4.4 'scored SHA' column holds the qa/* E_t commit, so relabel it 'E_t commit'. Red first.",
+      "note": "Per D-093. F5: a fresh attempt after a non-retryable outcome (auth) with no answer must not count as a retry, so either the runner stops setting retry_of in that case or the counter applies D-092 ruling 3; count-attempts must exit 0 on the slice-four records as they stand, with no record edited. F6: decision.reasons says 'the deterministic checks failed (read from process exit codes)' when checks_source is 'none'. F7: G_done checks_source holds a scratch path; write repo-relative or the blob only. F8: the closeout-tables 4.4 'scored SHA' column holds the qa/* E_t commit, so relabel it 'E_t commit'. Red first. — Closed session 157: merged #277 (0ae1fb33), QA 250 ACCEPT, D-097.",
       "note_by": [
-        "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+        "83f0e630-9247-40d4-adcd-7f4292a16ddb",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 281
     },
     {
       "id": "T-223",
@@ -3832,6 +3850,12 @@
       "title": "Jev calibration 1 COMPLETE (QA 252, report d495032c): done-gate rejects all 44 headline cases under (a) AND (b); Brier 0.2708 vs 0.25 for p=0.5; no driving answer reaches 0.9. Recommendation ACCEPTED: keep G_done in shadow, change NO threshold, human QA stays in front of every candidate. G_qa uncalibratable as built. T-183 cuts ruled.",
       "date": "2026-10-02",
       "note": "Planner re-derived from origin/qa/jev-cal-1-report d495032c at session 157: 67 records, all mode live, sent true, outcome_class answered, every decision verdict reject; ledger attempts.jsonl = 134 lines = 67 begin + 67 end; MANIFEST/score.mjs/runlist byte-identical to freeze a26e44d0; key-scan pass 4 exit 0 with known positive 1/1. Report finding 1 (score.mjs drivers() under-counts the checks rule) has a derived cause: T-222's F6 (#277, merged after the freeze, inside DISPATCH ada4701a) changed the reason text to 'no deterministic checks were supplied', and score.mjs was frozen matching the old 'the deterministic checks' string. Verdicts and calibration unaffected; fix rides calibration 2 (T-225). Finding 2 (fitted cuts collapse to 0.388 on the leak group) is why no threshold changes. T-183 ruling on sia-builder's measurement (51,520 chars; role files 45.6%, shared.md 34.3%, tasks 23.4%, gaps 13.8%): ACCEPT newest-10 gaps plus a count line and task titles clipped at 100 chars; REFUSE shared.md as a pointer for now (it is the rule set every seat must actually read; a smaller shared.md is an edit to the rules, not a render cut)."
+    },
+    {
+      "id": "D-101",
+      "title": "QA 253 REJECT on T-209 (6c495794, #287): newestGapFirst's regex lost its backslashes (bytes /(d+)s*$/ at state-render.ts:114-115) so the numeric tie-break is dead and ids sort as text; tests/server.test.ts:199 still asserts oldest-first and CI run 36979243129 failed on it. T-210 ACCEPTED on its own rows but ships in the same commit. Round 2 dispatched to sia-builder; #291 and #297 rebase onto it.",
+      "date": "2026-10-02",
+      "note": "Report origin/qa/t209-t210-report a753fb7f (docs/loops/t209-t210-qa-report.md). Planner re-derived at session 157: cat -A of 6c495794:open-brain/src/pipelines/session-start/state-render.ts lines 114-115 shows /(d+)s*$/; the same bytes are at 3b207dc6:129 (#291); gh run view 36979243129 conclusion failure. QA's own T-210 (e) note: the *brief* glob also takes drafts, debrief.md and briefing-notes.md, non-blocking."
     }
   ],
   "handoffs": [
