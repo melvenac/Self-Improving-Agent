@@ -1,0 +1,46 @@
+{
+  "loop": "qa-261-t048r2",
+  "candidate_git": {
+    "sha": "897e6f89754344cbc2227269782ab8f9a47ce4f8",
+    "branch": "origin/master (dispatch tree)",
+    "frozen_at": "2026-10-02T17:04:52Z"
+  },
+  "candidates": [
+    { "task": "T-048", "sha": "7e92b6f641ad776d886037e54139cb0e6fd4b617", "branch": "origin/loop/t048-dropped-counts", "pr": 302, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit at the head and at the batch merge",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 9000,
+      "detail": "Head 7e92b6f6 and merged result ee86e4d5 (master a30fa359 + #289 be32de21 + #302 7e92b6f6, server.ts import conflict resolved by keeping both) exit 0."
+    },
+    "unit": {
+      "command": "npx vitest run <one touched test file> per invocation",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 180000,
+      "detail": "LIGHT job, no full suite. Head: t048-zero-case 5, cli-bootstrap 14, t048-dropped-counts 9, checks-state 22, server 30, recalled-ids 17, active-session 43, hub-seats 5, all exit 0. Merge: same plus drift-line 7, tree-currency-fetch 12, all exit 0. CI test=pass run 37010576779 at 7e92b6f6."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q261-302-1", "status": "met", "order": "shown", "evidence": "13 files (+149/-6), commits b4d929ae (code) and 7e92b6f6 (handoff only); cli-bootstrap.ts one line '+    workspace_unusable_roots: workspace.unusable_roots,'; sync/checks.ts and sync/index.ts untouched." },
+    { "id": "Q261-302-2", "status": "met", "order": "shown", "evidence": "Real entry points on scratch: ob_start 'Session logs unreadable: 0' / 'Transcript directories unreadable: 0' vs 'not searched (...)' / 'not scanned (...)', and 1/1 with fixtures; ob_end file origin 'Dropped 0 of 2 entries in the file'; ob_sync and CLI sync REPORTED block 'hub-seats [pass]: ...; 0 seat names ignored'; real hook slot workspace_unusable_roots=0 / 2 / 0 (dir_source fallback:absent)." },
+    { "id": "Q261-302-3", "status": "met", "order": "red-first", "evidence": "On ac4323f4 source: t048-zero-case import fails; with head scan-counts.ts copied in 3 failed | 2 passed (5) (DC-4z, DC-5z, DC-6z); cli-bootstrap 1 failed | 13 passed (14) (DC-7 row); t048-dropped-counts 1 failed | 8 passed (9) (DC-3b). Head: 5/5, 14/14, 9/9." },
+    { "id": "Q261-302-4", "status": "met", "order": "shown", "evidence": "D1 killed by DC-3b; D2 killed by formatter row; D3 killed by DC-6z; D4 killed by cli-bootstrap DC-7 row; QA Q2 (searched=true) killed by DC-4z; QA Q3 (report:true removed) killed by DC-6z; QA Q1 (server.ts formatScanCounts push removed) SURVIVED t048-zero-case 5, server 30, t048-dropped-counts 9, killed only by QA's uncommitted handleStart demo 1 failed | 3 passed." },
+    { "id": "Q261-302-5", "status": "met", "order": "shown", "evidence": "t048-dropped-counts 9, checks-state 22, server 30, recalled-ids 17, active-session 43, hub-seats 5, each exit 0; tsc --noEmit exit 0." },
+    { "id": "Q261-302-6", "status": "met", "order": "shown", "evidence": "gh pr checks 302: changed pass 8s, test pass 2m35s, test-windows skipping; run 37010576779 headSha 7e92b6f6 push success." },
+    { "id": "Q261-302-7", "status": "met", "order": "shown", "evidence": "origin/master a30fa359 + #289 be32de21 clean; + #302 7e92b6f6 CONFLICT open-brain/src/server.ts import lines (master's latest-brief from 6c495794 T-209/T-210 vs scan-counts), not from #289; gh reports #302 CONFLICTING vs master. Resolved in scratch by keeping both, merged ee86e4d5: 10 touched files all pass, tsc 0." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "T-048: no committed test pins ob_start printing the scan-count lines (QA mutant Q1 survives); one server.test.ts row needed.",
+    "T-048: #302 conflicts with master on a server.ts import line (6c495794); needs a rebase or the keep-both resolution.",
+    "T-048: payload with no workspace_roots writes workspace_unusable_roots 0; disambiguated only by dir_source fallback:absent.",
+    "T-048: ActiveSessionEntry.workspace_root_count doc says 'offered' but stores the usable count.",
+    "Pre-existing: CLI 'open-brain start' prints neither health warnings nor scan counts (outside dispatch scope)."
+  ],
+  "notes": "QA 261, dispatch tree 897e6f89754344cbc2227269782ab8f9a47ce4f8. No live Jev call; gh read-only. Verdict ACCEPT for #302, conditional on the rebase; not under the overnight pre-approval, so it waits for Aaron's word."
+}
