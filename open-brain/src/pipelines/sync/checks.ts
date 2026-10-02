@@ -211,6 +211,11 @@ export function hookCommandTarget(cmd: string): HookTarget {
   const base = head.replace(/\\/g, "/").split("/").pop()!.toLowerCase().replace(/\.(exe|cmd|bat)$/, "");
   const rest = words.slice(i + 1);
   let script: string | undefined;
+  if ((base === "bash" || base === "sh") && rest.some((w) => /^-[A-Za-z]*c$/.test(w))) {
+    // `-c` makes the next word an inline script, not a file: there is nothing to stat, and reading the quoted
+    // string as a "script" would report a missing file that was never a file.
+    return { kind: "unparseable", reason: "inline shell (-c), the script is the string itself" };
+  }
   if (base === "node" || base === "bash" || base === "sh") {
     script = rest.find((w) => !w.startsWith("-"));
   } else if (base === "npx") {

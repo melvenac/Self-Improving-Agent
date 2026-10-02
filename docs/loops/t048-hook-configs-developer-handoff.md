@@ -29,5 +29,5 @@ nested groups pass with the right counts; a missing script behind a group is an 
 ## Notes
 
 - This branch adds `posix as pathPosix, win32 as pathWin32` to the `node:path` import in `checks.ts`. #295 (T-008) adds the same two aliases to the same line, so whichever merges second has a trivial import-line conflict, not a behaviour one.
-- A command that launches through a shell wrapper (`cmd /c ...`, `sh -c "..."`) has a bare or path head that is not the script; `cmd` is counted as skipped and `sh -c "..."` would read `-c` as a flag and the quoted string as the "script", which is then not a file and would be reported as missing. None of this PC's hooks are shaped that way; say if you want `-c` handled.
+- `sh -c` / `bash -c` (added on the planner's ruling): `-c` (also `-lc` and similar) makes the next word an inline script, so the command is `not checked: inline shell (-c)`, a warn, never a missing-script FAIL. Row: four inline-shell forms warn and none says "missing files"; `bash <script file>` without `-c` is still stat'ed. Against the previous source that row is red (the quoted string was read as a script and reported missing). `cmd /c` is still counted as a skipped bare head.
 - Not run: the full suite or a real `/sync` report.

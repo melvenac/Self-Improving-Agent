@@ -115,6 +115,19 @@ describe("T-048 sync counts", () => {
       }
     });
 
+    it("sh -c / bash -c is 'not checked: inline shell (-c)', a warn, never a missing-script FAIL", () => {
+      for (const cmd of [`sh -c "echo hello && true"`, `bash -c 'node /does/not/exist.js'`, `/bin/bash -lc "run it"`, `bash -c "x"`]) {
+        const r = checkHookConfigs(settings({ hooks: { A: [group(cmd), group(`node "${fwd(join(scripts, "boot.js"))}"`)] } }));
+        expect(r.severity, `${cmd}: ${r.message}`).toBe("warn");
+        expect(r.message).toContain("inline shell (-c)");
+        expect(r.message).toContain(cmd);
+        expect(r.message).not.toContain("Hook commands reference missing files");
+        expect(r.message).toContain("1 hook command file(s) checked");
+      }
+      // a shell running a real script file (no -c) is still stat'ed
+      expect(checkHookConfigs(settings({ hooks: { A: [group(`bash "${fwd(join(scripts, "boot.js"))}"`)] } })).severity).toBe("pass");
+    });
+
     it("a bare non-launching command (echo) is skipped and counted, and the legacy flat shape is still read", () => {
       const p = settings({
         hooks: {
