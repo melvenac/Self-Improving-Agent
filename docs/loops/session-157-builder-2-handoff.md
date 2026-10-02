@@ -77,3 +77,15 @@ Green on the real `ci.yml`: 21 passed (21).
 ## Report
 
 Reported to atlas-sia. The three code SHAs above are what QA should freeze.
+
+## Dispatch 3 (a): P2 and P3 as count lines, new commit on `loop/t183-render-cut`
+
+**New code SHA to freeze: `3b207dc64668dfcecffce0f0a8012273ab70617a`.** (It supersedes `9f8f0cd0` for this branch; the PR is #291.)
+- `  [P2] N active: INBOX.md` and `  [P3] N active: INBOX.md`, counted from `tasks[]` (done excluded, blocked and in-progress included). P0 and P1 render their titles as before. A priority with no active task has no line.
+- Red before (4 new rows `P3-1` to `P3-4`): 4 failed | 41 passed (45). Green after: 45 passed (45).
+- One existing row narrowed: the real-record row "every active task title" now asserts P0 and P1 titles only (P2/P3 are counts by ruling).
+- Mutant, count taken from the rendered task lines instead of `tasks[]`: `P3-2` and `P3-4` go red (2 failed | 43 passed). Reverted.
+- `tsc --noEmit` exit 0. **Live re-measure** (state rev 278, 80 active): `handleStart` total **40,672** characters (from 42,629); Tasks section 6,158 (from 8,120).
+  **`sync` `greeting-size`: PASS, 39,625 of 40,000** (it was 41,586). `sync --check`: 32 passed, 0 fixed, 2 warnings, 3 issues, 1 skipped (the `greeting-size` issue is gone; the other three are the standing ones).
+  Live lines: `[P2] 16 active: INBOX.md`, `[P3] 3 active: INBOX.md`.
+- Note: `handleStart`'s own total (40,672) is above 40,000 because it counts the mode, drift, session, warnings and sizes lines that the check does not; the check is what the limit is defined on.
