@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 255 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 262 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed): step 2 MERGED (#254, 17767aac) on Aaron's 'merge all PRs' after r5 (1311c2a7) scoped the slice guards (SCOPES table read by the planner; PR CI green on push and pull_request; QA 244 accepted r4). NEXT: step 4, the QA seat's live calls on the LAPTOP (D-087) once TYPESAFE_API_KEY exists there (checked 20:4xZ: NOT SET; Aaron's one-line stdin transfer did not take, or did not run): 4.2 one plan-gate call, 4.3 eight shadow-done, 4.4 five shadow-qa; <=14 + <=3 transport retries; then the close-out (4.3 reported four/four). T-194 r7 with Forge. T-215, T-213, T-217, T-218 open. _(since session 155)_
+Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed): step 2 MERGED (#254); step 4 RUN: QA 245 made the live Jev calls on the laptop and exited VERDICT: COMPLETE (report origin/qa/s4-step4-report 4cc476f0, NOT YET READ OR RULED). NEXT: read QA 245's report + close-out against the criteria's live rows (S4-2, S4-3a.2, S4-3b.2 key scan, S4-7 count <=17, S4-4.1, S4-4a.6, S4-5a tables, S4-6b.4/6c.1, S4-8.2/.4, 4.3 reported three ways), open the PR for its records + close-out, then the ONE release for slices three and four (D-073). T-194: option 3 then 2 (D-089); master ruleset 24343321 LIVE (D-090); r8 HELD; next ruling: whether r7 merges as the courtesy layer, then the sparse planner checkout. T-215, T-213 and the /start items open. _(since session 155)_
 
 ## Top tasks
 
