@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts
+index 5216bbff..b45f506d 100644
+--- a/open-brain/src/pipelines/session-start/agent-identity.ts
++++ b/open-brain/src/pipelines/session-start/agent-identity.ts
+@@ -102,7 +102,7 @@ export function cronProblem(cron: string): string | null {
+         const named = spec.names?.indexOf(bound.toUpperCase()) ?? -1;
+         const value = named >= 0 ? named + (spec.name === "month" ? 1 : 0) : /^\d+$/.test(bound) ? Number(bound) : Number.NaN;
+         if (Number.isNaN(value)) return `status_cron ${spec.name} field "${field}" is not a valid cron expression`;
+-        if (value < spec.min || value > spec.max) {
++        if (value < spec.min || value > spec.max + (i === 0 ? 1 : 0)) {
+           return `status_cron ${spec.name} field "${field}" is out of range ${spec.min}-${spec.max}`;
+         }
+       }

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts
+index 5216bbff..af552967 100644
+--- a/open-brain/src/pipelines/session-start/agent-identity.ts
++++ b/open-brain/src/pipelines/session-start/agent-identity.ts
+@@ -138,7 +138,7 @@ function readStatusKeys(path: string): StatusKeys | null {
+ export function readStandingCron(cwd: string): string {
+   for (const file of ["AGENT.local.md", "AGENT.md"]) {
+     const keys = readStatusKeys(join(cwd, ".agents", file));
+-    if (keys === null) continue;
++    if (keys === null || (Object.keys(keys).length === 1 && keys.status_to !== undefined)) continue;
+     const where = `.agents/${file}`;
+     for (const key of ["status_cron", "status_to", "status_rule"] as const) {
+       if (keys[key] === undefined) return `Standing cron: INVALID in ${where}: ${key} is missing`;
