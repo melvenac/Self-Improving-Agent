@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { renderState, VERIFIED_FULL_TEXT, GAP_CLIP } from "../../../src/pipelines/session-start/state-render.js";
+import { renderState, newestGapFirst, VERIFIED_FULL_TEXT, GAP_CLIP } from "../../../src/pipelines/session-start/state-render.js";
 import { newestHandoffPerInstance, newestHandoffForSeat } from "../../../src/shared/state-schema.js";
 import type { State } from "../../../src/shared/state-schema.js";
 import { readRepoRecord } from "../../helpers/repo-record.js";
@@ -365,5 +365,54 @@ describe("renderState — T183-3 the real record's handoffs are verbatim", () =>
     const active = real.tasks.filter((t) => t.status !== "done");
     expect(active.length).toBeGreaterThan(0);
     for (const t of active) expect(text).toContain(`${t.id} ${t.title}`);
+  });
+});
+
+/**
+ * T-209: the gaps list is newest-first. At 40 open gaps the old order (append order,
+ * so oldest first) showed a starting session G-001..G-007 and hid G-049 and G-042..G-045,
+ * the ones that bite. Open session descending, then id descending.
+ */
+describe("renderState — T-209 gaps newest-first", () => {
+  const gap = (id: string, opened_session: number) => ({ id, what: `gap ${id}`, evidence: "", recommended_update: "", opened_session });
+  // Append order is NOT session order (G-005 was opened before G-002), and G-002/G-003 tie on session.
+  const fixture: State = {
+    ...state,
+    gaps: [gap("G-001", 54), gap("G-005", 54), gap("G-002", 60), gap("G-003", 60), gap("G-049", 150), gap("G-1000", 60)],
+  } as unknown as State;
+  const rendered = () => renderState(fixture, "x").filter((l) => /^ {2}G-\d+ — /.test(l)).map((l) => /^ {2}(G-\d+)/.exec(l)![1]);
+
+  it("T209-1: the newest gap renders first; ties break by id, highest first", () => {
+    // 150; then the 60s by id descending (numeric: G-1000 > G-003 > G-002); then the 54s.
+    expect(rendered()).toEqual(["G-049", "G-1000", "G-003", "G-002", "G-005", "G-001"]);
+  });
+
+  it("T209-2: the render does not mutate the record's gap order", () => {
+    const before = fixture.gaps.map((g) => g.id);
+    renderState(fixture, "x");
+    expect(fixture.gaps.map((g) => g.id)).toEqual(before);
+  });
+
+  it("T209-3: the count line and the closed-gap filter are unchanged", () => {
+    const withClosed = { ...fixture, gaps: [...fixture.gaps, { ...gap("G-999", 200), status: "closed" as const, closed_session: 201, closed_rev: 3 }] } as unknown as State;
+    const text = renderState(withClosed, "x").join("\n");
+    expect(text).toContain("Gaps (6):");
+    expect(text).not.toContain("G-999");
+  });
+
+  it("T209-4: ids tie-break by NUMBER, not by text: G-100 before G-99 in one session", () => {
+    const s: State = { ...state, gaps: [gap("G-99", 70), gap("G-100", 70), gap("G-98", 70)] } as unknown as State;
+    expect(renderState(s, "x").filter((l) => /^ {2}G-\d+ — /.test(l)).map((l) => /^ {2}(G-\d+)/.exec(l)![1])).toEqual(["G-100", "G-99", "G-98"]);
+  });
+
+  it("T209-5: G-10, G-9 and G-2 in one session render 10, 9, 2 (text order would give 9, 2, 10)", () => {
+    const s: State = { ...state, gaps: [gap("G-2", 70), gap("G-10", 70), gap("G-9", 70)] } as unknown as State;
+    expect(renderState(s, "x").filter((l) => /^ {2}G-\d+ — /.test(l)).map((l) => /^ {2}(G-\d+)/.exec(l)![1])).toEqual(["G-10", "G-9", "G-2"]);
+  });
+
+  it("T209-6: the comparator itself, so a fixture where text and number order differ is in the candidate's own tests", () => {
+    const ids = ["G-9", "G-100", "G-2", "G-10", "G-99"].map((id) => ({ id, opened_session: 5 }));
+    expect([...ids].sort(newestGapFirst).map((g) => g.id)).toEqual(["G-100", "G-99", "G-10", "G-9", "G-2"]);
+    expect(newestGapFirst({ id: "G-1", opened_session: 9 }, { id: "G-999", opened_session: 8 })).toBeLessThan(0);
   });
 });
