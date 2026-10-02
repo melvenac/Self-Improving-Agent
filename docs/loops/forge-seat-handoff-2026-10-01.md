@@ -24,3 +24,10 @@ Full account in `docs/loops/t194-r7-developer-handoff.md`. 1101 tests green, bui
 - Heavy runs (npm ci, full vitest, mutants) need Aaron's approval in the window; a peer relaying approval is not his approval.
 - Mutant runs on the QA PC: one vitest worker, chunks of 4, skip under 1.2 GB free; the system reaper kills background jobs under memory pressure, and a kill can leave a mutant applied (`git checkout` the file first).
 - Anything a later session must read goes in a tracked file before the A2A exchange ends.
+
+## Update at the second roll (2026-10-02)
+
+- **T-221 is DONE and FROZEN** at `9ab021fd` on `loop/t221-ci-concurrency` (PR #274, not merged by me). It goes to QA 250 with T-222. Handoff: `docs/loops/t221-developer-handoff.md`.
+- **Queued for me: T-164/T-211 r2 (D-095).** Its DISPATCH_SHA will be PR #280's merge commit; Atlas (`atlas-sia`) sends it after the roll. Do not start it from this note: wait for the dispatch.
+- T-194 stays PAUSED (D-089), at `71ea3101`, awaiting QA 246. The hub post stays with Aaron.
+- Reports go to `atlas-sia`; `clark` is the fallback. The `ctx_*` (context-mode) tools were NOT available before the roll; check with ToolSearch "ctx_execute" after the restart and tell Clark yes or no.
