@@ -1,0 +1,327 @@
+{
+  "gate": "developer-done",
+  "loop": "3-s3-a5",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:51.599Z",
+  "answered_at": "2026-10-02T07:26:52.062Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "3-s3-a5",
+        "objective": "Loop 15 slice three: dispatch of candidate A5 to a FRESH QA seat (record session 92)",
+        "tasks": [
+          "35947532386 | 70ec18c | A5's first cut | failure: its own R55 CONTROL (an in-place edit produced no finding). This is why 63a7932 exists",
+          "35949006640 | 8bd34aa on loop/15-slice-3-a5-redcheck | A5's tests on f9a1aa8, with no implementation | 6 failed: R55 H, J and R, R57, R59 rollBack, and R59's read half",
+          "35949008244 | 845dfaa | A5's code at its last code commit | 1134 passed, 6 skipped, 0 failed",
+          "35949009974 | 23269d3 on …-a5-mut-b3 | mutant: restore chmods through the link | 1 failed: R58 (b)3 only",
+          "35949011700 | c9232ad on …-a5-mut-r29 | mutant: the gate reads through the link | 12 failed, R58 R29 among them. A broad mutant: it breaks the whole gate. Decide whether R29's test is shown able to fail by a mutant that narrow",
+          "35949013391 | 4e3a850 on …-a5-mut-r35 | mutant: the base note omits type and readlink | 2 failed: the R35 symlink test, and R46 baseNotes",
+          "The criteria FINAL at 6672e83, read with rulings-9 to rulings-12 on master:",
+          "R55 sharpens R49's definition (the object and route); R49's rule, its absent-at-base sentence and R54's two baselines are unchanged;",
+          "R56: CA-4f's \"both hashes\" for a path absent at base is read with R49 (your predecessor's reading);",
+          "R57: the repository begin read is gated against the loop's base (a unit test plus a mutant; U3 means it is not a probe);",
+          "R58: from A5 on, a test that cannot fail is not evidence for its row. Each test needs a code mutant or an earlier SHA that turns it red;",
+          "R59: a record's words come from what the runtime did (\"not read\", and rollBack's \"reverted\").",
+          "Rulings-12 has a table of every row these touch. Score those rows as that table says.",
+          "Your predecessor's handoff: QA report A4 §14 (docs/loops/loop-15-slice-3-qa-report-a4.md).",
+          "The tools: docs/loops/qa-scripts-a4/, and QA 89's Linux probe: open-brain/tests/harness/qa89-a4-probe.test.ts on origin/qa/loop-15-slice-3-a4-probe (9f58fbc). A4 is the known positive for A4-1 in run 35928008495.",
+          "Every row is re-run.",
+          "Every CA-15 probe runs against A5, A4 f9a1aa8 and A3 5010199, in git archive copies and never in the main tree. A4 is the known positive for A4-1, and A3 is the known positive for A3-1 to A3-3.",
+          "A4-1 on Linux: put QA 89's probe file on f9a1aa8 and on 4c1287f, each on your own qa/ branch, and dispatch CI on both (D-040). H, J, R and LOOP must be red at A4 and green at A5. The in-place CONTROL must be green at both.",
+          "R55 is read by the CODE PATH as well as the record (report A4 §3.4): a traceless read passes the probes. Look for a sibling of A4-1 before scoring: whether anything a base link leads to, at any position, is still outside the compared route. Also check the other direction, as 35947532386 showed: whether any allowed read (the same object by the same route) is now suppressed.",
+          "One mutant per protection: R55's route walk, R57's gate and R59's two texts, each revertible alone. Check that each of the developer's named mutants reverts the protection it claims to.",
+          "Read R58's tests against their rows (report A4 §3.3's table). Print the value that lets each assertion fail.",
+          "Take plain sync's exit code in a scratch clone.",
+          "FULL SUITE: ask the live planner first. A quiet machine is required (G-042):",
+          "A2A-Hub's local stack must be stopped (ports 3210, 4000 and 5173 free on this machine);",
+          "no A2A-Hub seat is running, and no session in another project is busy;",
+          "the planner stays idle."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "35947532386 | 70ec18c | A5's first cut | failure: its own R55 CONTROL (an in-place edit produced no finding). This is why 63a7932 exists",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "35949006640 | 8bd34aa on loop/15-slice-3-a5-redcheck | A5's tests on f9a1aa8, with no implementation | 6 failed: R55 H, J and R, R57, R59 rollBack, and R59's read half",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "35949008244 | 845dfaa | A5's code at its last code commit | 1134 passed, 6 skipped, 0 failed",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "35949009974 | 23269d3 on …-a5-mut-b3 | mutant: restore chmods through the link | 1 failed: R58 (b)3 only",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "35949011700 | c9232ad on …-a5-mut-r29 | mutant: the gate reads through the link | 12 failed, R58 R29 among them. A broad mutant: it breaks the whole gate. Decide whether R29's test is shown able to fail by a mutant that narrow",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "35949013391 | 4e3a850 on …-a5-mut-r35 | mutant: the base note omits type and readlink | 2 failed: the R35 symlink test, and R46 baseNotes",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The criteria FINAL at 6672e83, read with rulings-9 to rulings-12 on master:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "R55 sharpens R49's definition (the object and route); R49's rule, its absent-at-base sentence and R54's two baselines are unchanged;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "R56: CA-4f's \"both hashes\" for a path absent at base is read with R49 (your predecessor's reading);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "R57: the repository begin read is gated against the loop's base (a unit test plus a mutant; U3 means it is not a probe);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "R58: from A5 on, a test that cannot fail is not evidence for its row. Each test needs a code mutant or an earlier SHA that turns it red;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "R59: a record's words come from what the runtime did (\"not read\", and rollBack's \"reverted\").",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Rulings-12 has a table of every row these touch. Score those rows as that table says.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Your predecessor's handoff: QA report A4 §14 (docs/loops/loop-15-slice-3-qa-report-a4.md).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "The tools: docs/loops/qa-scripts-a4/, and QA 89's Linux probe: open-brain/tests/harness/qa89-a4-probe.test.ts on origin/qa/loop-15-slice-3-a4-probe (9f58fbc). A4 is the known positive for A4-1 in run 35928008495.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Every row is re-run.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "Every CA-15 probe runs against A5, A4 f9a1aa8 and A3 5010199, in git archive copies and never in the main tree. A4 is the known positive for A4-1, and A3 is the known positive for A3-1 to A3-3.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "A4-1 on Linux: put QA 89's probe file on f9a1aa8 and on 4c1287f, each on your own qa/ branch, and dispatch CI on both (D-040). H, J, R and LOOP must be red at A4 and green at A5. The in-place CONTROL must be green at both.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "R55 is read by the CODE PATH as well as the record (report A4 §3.4): a traceless read passes the probes. Look for a sibling of A4-1 before scoring: whether anything a base link leads to, at any position, is still outside the compared route. Also check the other direction, as 35947532386 showed: whether any allowed read (the same object by the same route) is now suppressed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "One mutant per protection: R55's route walk, R57's gate and R59's two texts, each revertible alone. Check that each of the developer's named mutants reverts the protection it claims to.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "Read R58's tests against their rows (report A4 §3.3's table). Print the value that lets each assertion fail.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "Take plain sync's exit code in a scratch clone.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "FULL SUITE: ask the live planner first. A quiet machine is required (G-042):",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "A2A-Hub's local stack must be stopped (ports 3210, 4000 and 5173 free on this machine);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T25",
+            "observable": "no A2A-Hub seat is running, and no session in another project is busy;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T26",
+            "observable": "the planner stays idle.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice three: dispatch of candidate A5 to a FRESH QA seat (record session 92)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-dispatch-qa-a5.md",
+          "blob": "220bac5f6d9ad4a6bd10377ffbd9182e1b8c4720"
+        }
+      },
+      "candidate": "4c1287f4e4b3420909428ba8ce007e03b0daafc5",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-a5-developer-handoff.md",
+        "open-brain/src/harness/configwatch.ts",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/tests/harness/config-channel.test.ts",
+        "open-brain/tests/harness/configwatch-links.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 3,
+        "base_sha": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+        "scored_sha": "4c1287f4e4b3420909428ba8ce007e03b0daafc5",
+        "merge_commit": "4c1287f4e4b3420909428ba8ce007e03b0daafc5"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.27
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.19,
+      "confidence": 0.72,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.87,
+        "1": 0.08,
+        "2": 0.05
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 4150,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.27 is below the required 0.7",
+      "local_tests_support_claim 0.47 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:52.051Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "3e0dae45-df4a-4ca5-b76f-607111c43f8c",
+  "subject": {
+    "gate": "developer-done",
+    "key": "4c1287f4e4b3420909428ba8ce007e03b0daafc5",
+    "blob": "5441015291960764a13221c473bf65ffd1760eab"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:51.599Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 3,
+  "merge_commit": "4c1287f4e4b3420909428ba8ce007e03b0daafc5",
+  "scored_sha": "4c1287f4e4b3420909428ba8ce007e03b0daafc5",
+  "base_sha": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/003-s3-a5.D_t.json",
+    "blob": "5441015291960764a13221c473bf65ffd1760eab"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-a5-developer-handoff.md",
+    "open-brain/src/harness/configwatch.ts",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/tests/harness/config-channel.test.ts",
+    "open-brain/tests/harness/configwatch-links.test.ts"
+  ]
+}

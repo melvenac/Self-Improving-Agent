@@ -1,0 +1,279 @@
+{
+  "gate": "developer-done",
+  "loop": "65-t214",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:26.472Z",
+  "answered_at": "2026-10-02T07:27:26.886Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "65-t214",
+        "objective": "QA 239: T-214, a blank line inside a declared block is not content (slice four, step 1)",
+        "tasks": [
+          "docs/loops/loop-15-slice-4-dispatch.md, \"Step 1\": the property P-blank and its clauses. This is what you score. The rule is D-075.",
+          "docs/loops/t214-developer-handoff.md at the candidate: its clause-to-test map, generator counts and mutants. Verify it; do not take it.",
+          "T214-1, P-blank, scored with YOUR OWN generator. Do not import the builder's.",
+          "From valid qa-declared and qa-unrunnable blocks, insert whitespace-only lines (\"\", spaces, tabs, a lone \\r, and mixes of them) at every position: before the first header, between sections, between items, at the end, and directly after the opening fence. Each variant must parse equal to the original, with ids in the same order.",
+          "Use at least 200 variants, CRLF files included. Report every disagreement.",
+          "T214-2, nothing else loosens. Each of these is still refused:",
+          "a non-blank junk line;",
+          "an item before any header in qa-declared;",
+          "an id in both lists, or twice in one list;",
+          "two blocks;",
+          "a header or item with leading whitespace.",
+          "Also judge characters outside [ \\t\\r], such as NBSP, \\f, \\v and a zero-width space. The builder keeps NBSP as junk. Say whether refusing them matches D-075's \"whitespace-only\" or is a gap, and give your reason.",
+          "T214-3, present-but-empty vs absent. A block with only blank lines is present and empty. No block is absent.",
+          "T214-4, the real file. parseDeclared on docs/loops/loop-15-slice-3-c-criteria.md, as committed, is refused at the base with the blank-line message, which the builder did not capture. Capture it. At the candidate it parses to CC-23, 24 and 25 unrunnable and CC-26, 27, 28 and 21 out-of-scope. Confirm the file, C's shadow artifact and the ledger are byte-identical at base and candidate.",
+          "Mutants: re-run the builder's 5, and add at least 2 of your own. One must target the BLANK_RE character class.",
+          "Regression: every existing declared, shadow-merge and tests/harness test passes unchanged.",
+          "Downstream, report only: does shadow-verdict prepare change any outcome for a criteria file that has blank lines? It must not rewrite any existing artifact. Do not re-run C's episode."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "docs/loops/loop-15-slice-4-dispatch.md, \"Step 1\": the property P-blank and its clauses. This is what you score. The rule is D-075.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "docs/loops/t214-developer-handoff.md at the candidate: its clause-to-test map, generator counts and mutants. Verify it; do not take it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "T214-1, P-blank, scored with YOUR OWN generator. Do not import the builder's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "From valid qa-declared and qa-unrunnable blocks, insert whitespace-only lines (\"\", spaces, tabs, a lone \\r, and mixes of them) at every position: before the first header, between sections, between items, at the end, and directly after the opening fence. Each variant must parse equal to the original, with ids in the same order.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Use at least 200 variants, CRLF files included. Report every disagreement.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "T214-2, nothing else loosens. Each of these is still refused:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "a non-blank junk line;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "an item before any header in qa-declared;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "an id in both lists, or twice in one list;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "two blocks;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "a header or item with leading whitespace.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Also judge characters outside [ \\t\\r], such as NBSP, \\f, \\v and a zero-width space. The builder keeps NBSP as junk. Say whether refusing them matches D-075's \"whitespace-only\" or is a gap, and give your reason.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "T214-3, present-but-empty vs absent. A block with only blank lines is present and empty. No block is absent.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "T214-4, the real file. parseDeclared on docs/loops/loop-15-slice-3-c-criteria.md, as committed, is refused at the base with the blank-line message, which the builder did not capture. Capture it. At the candidate it parses to CC-23, 24 and 25 unrunnable and CC-26, 27, 28 and 21 out-of-scope. Confirm the file, C's shadow artifact and the ledger are byte-identical at base and candidate.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "Mutants: re-run the builder's 5, and add at least 2 of your own. One must target the BLANK_RE character class.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Regression: every existing declared, shadow-merge and tests/harness test passes unchanged.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "Downstream, report only: does shadow-verdict prepare change any outcome for a criteria file that has blank lines? It must not rewrite any existing artifact. Do not re-run C's episode.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 239: T-214, a blank line inside a declared block is not content (slice four, step 1)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-239-t214-dispatch.md",
+          "blob": "8c75e0a1e9154a5fa0074943ae3ec3ff677eaba4"
+        }
+      },
+      "candidate": "caebe8b6ecaa32db8defaf979e19df435a5b60f3",
+      "diffstat": [
+        "docs/loops/t214-developer-handoff.md",
+        "docs/loops/t214/mutants/m1-blank-only-before-header.diff",
+        "docs/loops/t214/mutants/m2-whitespace-only-not-blank.diff",
+        "docs/loops/t214/mutants/m3-junk-accepted.diff",
+        "docs/loops/t214/mutants/m4-qa-unrunnable-not-covered.diff",
+        "docs/loops/t214/mutants/m5-blank-only-block-absent.diff",
+        "open-brain/src/harness/declared.ts",
+        "open-brain/tests/harness/t214-declared-blank.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 65,
+        "base_sha": "ec7138bb435c0fa87f7f02aabc40a31221eeb1d1",
+        "scored_sha": "caebe8b6ecaa32db8defaf979e19df435a5b60f3",
+        "merge_commit": "29014f2dd25fd0962d30bdeb5a41155045b42668"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.52
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.52
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.17,
+      "confidence": 0.74,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.84,
+        "1": 0.14,
+        "2": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2785,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.52 is below the required 0.7",
+      "local_tests_support_claim 0.52 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:26.876Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "10dbb68d-77f4-4e3b-a0b9-387c91f2658c",
+  "subject": {
+    "gate": "developer-done",
+    "key": "caebe8b6ecaa32db8defaf979e19df435a5b60f3",
+    "blob": "dcfa80337d1fd8211c235192acd89a59be0d0aae"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:26.472Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 65,
+  "merge_commit": "29014f2dd25fd0962d30bdeb5a41155045b42668",
+  "scored_sha": "caebe8b6ecaa32db8defaf979e19df435a5b60f3",
+  "base_sha": "ec7138bb435c0fa87f7f02aabc40a31221eeb1d1",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/065-t214.D_t.json",
+    "blob": "dcfa80337d1fd8211c235192acd89a59be0d0aae"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t214-developer-handoff.md",
+    "docs/loops/t214/mutants/m1-blank-only-before-header.diff",
+    "docs/loops/t214/mutants/m2-whitespace-only-not-blank.diff",
+    "docs/loops/t214/mutants/m3-junk-accepted.diff",
+    "docs/loops/t214/mutants/m4-qa-unrunnable-not-covered.diff",
+    "docs/loops/t214/mutants/m5-blank-only-block-absent.diff",
+    "open-brain/src/harness/declared.ts",
+    "open-brain/tests/harness/t214-declared-blank.test.ts"
+  ]
+}

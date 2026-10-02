@@ -1,0 +1,209 @@
+{
+  "gate": "developer-done",
+  "loop": "35-s3-b2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:07.624Z",
+  "answered_at": "2026-10-02T07:27:08.023Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "35-s3-b2",
+        "objective": "Loop 15 slice three, candidate B part 2 (E_t, R10): QA dispatch (record 189)",
+        "tasks": [
+          "BE-5 (backward compatibility) against one test edit. Between red and green, tests/harness/schema.test.ts's shared fixture gained order: \"shown\", because a met row with no order is now refused. The developer calls that BE-5.2's rule (\"the pre-B form is refused on purpose\"). Rule on it from BE-5's text: is refusing a pre-B met row what BE-5 asks, or a break it forbids? Name every existing E_t producer and fixture this refuses.",
+          "mut-b (a met row with no order accepted) also failed BE-7.1, \"because that invalid file is the same row\". Say whether one row is doing two jobs, and whether BE-7's validator row is separately killable.",
+          "mut-a left the empty and newline loop ids green. Are those rows guarded by something else, or unguarded?",
+          "BE-1.3: a loop that is not the run's returns evidence-loop-mismatch once and writes no E_t.json. Check that nothing is written on the refusal path, by reading the filesystem, not the return value.",
+          "BE-7: there is no writer, only a validator (harness validate evidence <file>)."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "BE-5 (backward compatibility) against one test edit. Between red and green, tests/harness/schema.test.ts's shared fixture gained order: \"shown\", because a met row with no order is now refused. The developer calls that BE-5.2's rule (\"the pre-B form is refused on purpose\"). Rule on it from BE-5's text: is refusing a pre-B met row what BE-5 asks, or a break it forbids? Name every existing E_t producer and fixture this refuses.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "mut-b (a met row with no order accepted) also failed BE-7.1, \"because that invalid file is the same row\". Say whether one row is doing two jobs, and whether BE-7's validator row is separately killable.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "mut-a left the empty and newline loop ids green. Are those rows guarded by something else, or unguarded?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "BE-1.3: a loop that is not the run's returns evidence-loop-mismatch once and writes no E_t.json. Check that nothing is written on the refusal path, by reading the filesystem, not the return value.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "BE-7: there is no writer, only a validator (harness validate evidence <file>).",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice three, candidate B part 2 (E_t, R10): QA dispatch (record 189)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-b2-dispatch-qa.md",
+          "blob": "fac40a0bf837bba38ea0a2c49f50572fb8d4d804"
+        }
+      },
+      "candidate": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-b2-developer-handoff.md",
+        "open-brain/src/harness/cli.ts",
+        "open-brain/src/harness/declared.ts",
+        "open-brain/src/harness/index.ts",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/src/harness/schema.ts",
+        "open-brain/src/harness/schemas/evidence.schema.json",
+        "open-brain/tests/harness/b2-et.test.ts",
+        "open-brain/tests/harness/schema.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 35,
+        "base_sha": "677c1dd54c0030b335bb3e49203e51d96d8fe3b4",
+        "scored_sha": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0",
+        "merge_commit": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.39
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.45
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.26,
+      "confidence": 0.61,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.8,
+        "1": 0.14,
+        "2": 0.06
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1766,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.39 is below the required 0.7",
+      "local_tests_support_claim 0.45 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:08.019Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "ba5d9218-f4e7-491d-b070-6da67cd8ddf0",
+  "subject": {
+    "gate": "developer-done",
+    "key": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0",
+    "blob": "981d3aedc150f0396babd48e214d52698d23c59c"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:07.624Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 35,
+  "merge_commit": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0",
+  "scored_sha": "8c7769ff6c5c16cacdb7b08cd47144af04d15ef0",
+  "base_sha": "677c1dd54c0030b335bb3e49203e51d96d8fe3b4",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/035-s3-b2.D_t.json",
+    "blob": "981d3aedc150f0396babd48e214d52698d23c59c"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-b2-developer-handoff.md",
+    "open-brain/src/harness/cli.ts",
+    "open-brain/src/harness/declared.ts",
+    "open-brain/src/harness/index.ts",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/src/harness/schema.ts",
+    "open-brain/src/harness/schemas/evidence.schema.json",
+    "open-brain/tests/harness/b2-et.test.ts",
+    "open-brain/tests/harness/schema.test.ts"
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "gate": "developer-done",
+  "loop": "45-t046-d1",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:13.869Z",
+  "answered_at": "2026-10-02T07:27:14.293Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "45-t046-d1",
+        "objective": "Record 207 (QA 197's D1: cursor-hook-compat never passes without reading): QA dispatch (record 209)",
+        "tasks": [
+          "All three rows exist and were red on master: a missing, an empty, and a nonexistent installPath each give SKIP or ISSUE, naming the plugin and saying the check could not read it. The developer's report quoted ONE red row; check all three.",
+          "Preserve: zero installs, or an install with no hooks/hooks.json, stays PASS. The T-046 detection rows from record 194 are unchanged.",
+          "Fixture isolation (G-044): no row reads the real profile.",
+          "Your own mutants, at least two, on qa/t046-d1-mut-."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "All three rows exist and were red on master: a missing, an empty, and a nonexistent installPath each give SKIP or ISSUE, naming the plugin and saying the check could not read it. The developer's report quoted ONE red row; check all three.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Preserve: zero installs, or an install with no hooks/hooks.json, stays PASS. The T-046 detection rows from record 194 are unchanged.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Fixture isolation (G-044): no row reads the real profile.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Your own mutants, at least two, on qa/t046-d1-mut-.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Record 207 (QA 197's D1: cursor-hook-compat never passes without reading): QA dispatch (record 209)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t046-d1-dispatch-qa.md",
+          "blob": "34850e2465455f99ac979136deb4b59b25b702ff"
+        }
+      },
+      "candidate": "0081dab8703d93cd2d66d0a41635dd2e5f988e48",
+      "diffstat": [
+        "docs/loops/t046-d1-developer-handoff.md",
+        "open-brain/src/pipelines/sync/cursor-hook-compat.ts",
+        "open-brain/tests/pipelines/sync/cursor-hook-compat.test.ts",
+        "open-brain/tests/pipelines/sync/t046-d1-qa.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 45,
+        "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+        "scored_sha": "0081dab8703d93cd2d66d0a41635dd2e5f988e48",
+        "merge_commit": "0081dab8703d93cd2d66d0a41635dd2e5f988e48"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 1.19,
+      "confidence": 0.47,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.08,
+        "1": 0.65,
+        "2": 0.27
+      }
+    },
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.45
+    }
+  },
+  "usage": {
+    "input_tokens": 1439,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.45 is below the required 0.7",
+      "local_tests_support_claim 0.47 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:14.282Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "39dd6a55-3f07-41ef-9883-4e8aea24a40a",
+  "subject": {
+    "gate": "developer-done",
+    "key": "0081dab8703d93cd2d66d0a41635dd2e5f988e48",
+    "blob": "53c9daecd9592bf2374ad6be1b14e108f5c929eb"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:13.869Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 45,
+  "merge_commit": "0081dab8703d93cd2d66d0a41635dd2e5f988e48",
+  "scored_sha": "0081dab8703d93cd2d66d0a41635dd2e5f988e48",
+  "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/045-t046-d1.D_t.json",
+    "blob": "53c9daecd9592bf2374ad6be1b14e108f5c929eb"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t046-d1-developer-handoff.md",
+    "open-brain/src/pipelines/sync/cursor-hook-compat.ts",
+    "open-brain/tests/pipelines/sync/cursor-hook-compat.test.ts",
+    "open-brain/tests/pipelines/sync/t046-d1-qa.test.ts"
+  ]
+}

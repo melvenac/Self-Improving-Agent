@@ -1,0 +1,305 @@
+{
+  "gate": "developer-done",
+  "loop": "38-bootstrap-fix-r4",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:09.456Z",
+  "answered_at": "2026-10-02T07:27:09.888Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "38-bootstrap-fix-r4",
+        "objective": "The /bootstrap fix round 4: dispatch to a FRESH, HEADLESS QA seat (record session 161)",
+        "tasks": [
+          "R-BF-17: re-run QA 145's non-record JSON probe byte-exact. All seven shapes must now be NOT A RECORD, and move-residue sets them aside.",
+          "A real v3 record, and an older schema that carries schema_version, stay BOOTSTRAPPED.",
+          "What does /start do on each? Report it; its fallback is not this round's.",
+          "R-BF-18: a zero-byte .agents/state.json between a real project and the cwd no longer wins the walk.",
+          "SIA's own root resolves unchanged from its root, open-brain/, open-brain/src/ and docs/.",
+          "state-record.ts is now shared by the root walker and bootstrap. Confirm that every caller of isProjectRoot (9 call sites at r3) still behaves as at r3 on real records.",
+          "R-BF-19: QA 145's install N now reaches (e) with the step Next: names, and no inference. bootstrap.md step 1 matches.",
+          "R-BF-20 and R-BF-21: the failed-undo path through the CLI never says \"refused\" (QA 145's P-UNDO).",
+          "git grep OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK finds nothing in src/.",
+          "No other environment variable or dynamic import() in cli.ts changes how a mutating command behaves.",
+          "Regressions: QA 145's rows (qa/bootstrap-fix-r3-qa-tests 2c279ad) and all four installs, re-run with no manual fix. The real session-end hook in install (iii) still writes into the child.",
+          "Your own mutants, at least one per ruling."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "R-BF-17: re-run QA 145's non-record JSON probe byte-exact. All seven shapes must now be NOT A RECORD, and move-residue sets them aside.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "A real v3 record, and an older schema that carries schema_version, stay BOOTSTRAPPED.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "What does /start do on each? Report it; its fallback is not this round's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "R-BF-18: a zero-byte .agents/state.json between a real project and the cwd no longer wins the walk.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "SIA's own root resolves unchanged from its root, open-brain/, open-brain/src/ and docs/.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "state-record.ts is now shared by the root walker and bootstrap. Confirm that every caller of isProjectRoot (9 call sites at r3) still behaves as at r3 on real records.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "R-BF-19: QA 145's install N now reaches (e) with the step Next: names, and no inference. bootstrap.md step 1 matches.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "R-BF-20 and R-BF-21: the failed-undo path through the CLI never says \"refused\" (QA 145's P-UNDO).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "git grep OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK finds nothing in src/.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "No other environment variable or dynamic import() in cli.ts changes how a mutating command behaves.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Regressions: QA 145's rows (qa/bootstrap-fix-r3-qa-tests 2c279ad) and all four installs, re-run with no manual fix. The real session-end hook in install (iii) still writes into the child.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Your own mutants, at least one per ruling.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "The /bootstrap fix round 4: dispatch to a FRESH, HEADLESS QA seat (record session 161)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/bootstrap-fix-r4-dispatch-qa.md",
+          "blob": "67a67dac562e7d6253fbf45eac297348e14a9b4b"
+        }
+      },
+      "candidate": "d74c0e54a936a7a31fab251c43ac68f56ec33764",
+      "diffstat": [
+        "CHANGELOG.md",
+        "README.md",
+        "docs/loops/bootstrap-fix-acceptance-transcript.md",
+        "docs/loops/bootstrap-fix-developer-handoff.md",
+        "docs/loops/bootstrap-fix-r2-developer-handoff.md",
+        "docs/loops/bootstrap-fix-r2-run4-transcript.md",
+        "docs/loops/bootstrap-fix-r3-acceptance-known-positive-6543e8e.md",
+        "docs/loops/bootstrap-fix-r3-acceptance-transcript.md",
+        "docs/loops/bootstrap-fix-r3-developer-handoff.md",
+        "docs/loops/bootstrap-fix-r4-developer-handoff.md",
+        "docs/loops/dev-scripts-bf-r2/mutants-bf-r2.cjs",
+        "docs/loops/dev-scripts-bf-r2/mutants-local.json",
+        "docs/loops/dev-scripts-bf-r3/accept-bf-r3.mjs",
+        "docs/loops/dev-scripts-bf-r3/mutants-bf-r3.cjs",
+        "docs/loops/dev-scripts-bf-r3/mutants-local.json",
+        "open-brain/src/cli-spec.ts",
+        "open-brain/src/cli.ts",
+        "open-brain/src/pipelines/bootstrap/index.ts",
+        "open-brain/src/pipelines/session-start/role-files.ts",
+        "open-brain/src/pipelines/state-import/index.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/repo-root.ts",
+        "open-brain/src/shared/state-record.ts",
+        "open-brain/tests/pipelines/bootstrap-fix-r3.test.ts",
+        "open-brain/tests/pipelines/bootstrap-fix-r4.test.ts",
+        "open-brain/tests/pipelines/bootstrap-fix.test.ts",
+        "open-brain/tests/pipelines/qa135-bootstrap.test.ts",
+        "open-brain/tests/pipelines/session-start/role-files.test.ts",
+        "open-brain/tests/pipelines/template-seed.test.ts",
+        "open-brain/tests/shared/cli-args.test.ts",
+        "project-template/.agents/state.json",
+        "project-template/.claude/commands/bootstrap.md",
+        "project-template/CLAUDE.md",
+        "project-template/README.md",
+        "project-template/gitattributes",
+        "project-template/gitignore"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 38,
+        "base_sha": "e201baa324414e52a37b5051aa76e4bdba1d1523",
+        "scored_sha": "d74c0e54a936a7a31fab251c43ac68f56ec33764",
+        "merge_commit": "d74c0e54a936a7a31fab251c43ac68f56ec33764"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.46
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.51
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.07
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.26,
+      "confidence": 0.61,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.78,
+        "1": 0.19,
+        "2": 0.03
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2592,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.46 is below the required 0.7",
+      "local_tests_support_claim 0.51 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:09.877Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "8aa10a24-1916-4cb8-a1bf-1a8060e4ecc8",
+  "subject": {
+    "gate": "developer-done",
+    "key": "d74c0e54a936a7a31fab251c43ac68f56ec33764",
+    "blob": "045423efa8225206413e18bab3b090372f962d43"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:09.456Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 38,
+  "merge_commit": "d74c0e54a936a7a31fab251c43ac68f56ec33764",
+  "scored_sha": "d74c0e54a936a7a31fab251c43ac68f56ec33764",
+  "base_sha": "e201baa324414e52a37b5051aa76e4bdba1d1523",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/038-bootstrap-fix-r4.D_t.json",
+    "blob": "045423efa8225206413e18bab3b090372f962d43"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "CHANGELOG.md",
+    "README.md",
+    "docs/loops/bootstrap-fix-acceptance-transcript.md",
+    "docs/loops/bootstrap-fix-developer-handoff.md",
+    "docs/loops/bootstrap-fix-r2-developer-handoff.md",
+    "docs/loops/bootstrap-fix-r2-run4-transcript.md",
+    "docs/loops/bootstrap-fix-r3-acceptance-known-positive-6543e8e.md",
+    "docs/loops/bootstrap-fix-r3-acceptance-transcript.md",
+    "docs/loops/bootstrap-fix-r3-developer-handoff.md",
+    "docs/loops/bootstrap-fix-r4-developer-handoff.md",
+    "docs/loops/dev-scripts-bf-r2/mutants-bf-r2.cjs",
+    "docs/loops/dev-scripts-bf-r2/mutants-local.json",
+    "docs/loops/dev-scripts-bf-r3/accept-bf-r3.mjs",
+    "docs/loops/dev-scripts-bf-r3/mutants-bf-r3.cjs",
+    "docs/loops/dev-scripts-bf-r3/mutants-local.json",
+    "open-brain/src/cli-spec.ts",
+    "open-brain/src/cli.ts",
+    "open-brain/src/pipelines/bootstrap/index.ts",
+    "open-brain/src/pipelines/session-start/role-files.ts",
+    "open-brain/src/pipelines/state-import/index.ts",
+    "open-brain/src/server.ts",
+    "open-brain/src/shared/repo-root.ts",
+    "open-brain/src/shared/state-record.ts",
+    "open-brain/tests/pipelines/bootstrap-fix-r3.test.ts",
+    "open-brain/tests/pipelines/bootstrap-fix-r4.test.ts",
+    "open-brain/tests/pipelines/bootstrap-fix.test.ts",
+    "open-brain/tests/pipelines/qa135-bootstrap.test.ts",
+    "open-brain/tests/pipelines/session-start/role-files.test.ts",
+    "open-brain/tests/pipelines/template-seed.test.ts",
+    "open-brain/tests/shared/cli-args.test.ts",
+    "project-template/.agents/state.json",
+    "project-template/.claude/commands/bootstrap.md",
+    "project-template/CLAUDE.md",
+    "project-template/README.md",
+    "project-template/gitattributes",
+    "project-template/gitignore"
+  ]
+}

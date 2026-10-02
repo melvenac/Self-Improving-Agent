@@ -1,0 +1,355 @@
+{
+  "gate": "developer-done",
+  "loop": "2-s3-a4",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:50.954Z",
+  "answered_at": "2026-10-02T07:26:51.368Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "2-s3-a4",
+        "objective": "Loop 15 slice three: dispatch of candidate A4 to a FRESH QA seat (record session 89)",
+        "tasks": [
+          "The criteria FINAL at 6672e83, read with rulings-9, rulings-10 and rulings-11 on master:",
+          "R43 and R44 are superseded for reads by R49;",
+          "R44's attribution is replaced by R54;",
+          "R51 to R53 answer QA report A3 §11;",
+          "R53 says a clause binds on shapes beyond the listed probes.",
+          "Your predecessor's handoff: QA report A3 §14 (docs/loops/loop-15-slice-3-qa-report-a3.md).",
+          "The tools: docs/loops/qa-scripts-a3/ (probe15.mts, probe2.mts, the mutants, and a README with the rebase notes and the known positives).",
+          "Every row is re-run.",
+          "Every CA-15 probe runs against A4, A3 5010199, A2 2add792 and 3b19287, in git archive copies and never in the main tree.",
+          "A3 is the known positive for A3-1, A3-2 and A3-3.",
+          "A2 is the known positive for A2-1 to A2-5.",
+          "R49 is read by the CODE PATH as well as the record (QA report A3 §14.2): a traceless read passes the probes.",
+          "The R44 test's QA-stage assertion now expects no finding under R54, with reread asserted undefined.",
+          "Its no-read evidence in the QA stage therefore rests on code reading and a mutant. Score it that way.",
+          "One mutant per protection.",
+          "R49's repository side (repositoryResolutionDiff) and machine side (resolutionMismatch) are each revertible alone.",
+          "So is R54's attribution (attributionChange).",
+          "R52's five POSIX tests are read from CI's per-test lines: the verbose reporter, ANSI codes stripped, the ✓/↓ lines. Not from the counts.",
+          "Take plain sync's exit code in a scratch clone.",
+          "FULL SUITE: ask the live planner first. A quiet machine is required (G-042):",
+          "A2A-Hub's local stack was STOPPED on Aaron's word, and must stay stopped through your run;",
+          "the A2A-Hub seats hold (their record, rev 25);",
+          "the planner stays idle.",
+          "both exited 1, on the onTaskUpdate heartbeat only, in ~/Worktrees/sia-forge, with 0 tests failed at 2db806a;",
+          "every idle run in ~/Worktrees/sia-qa tonight was clean."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "The criteria FINAL at 6672e83, read with rulings-9, rulings-10 and rulings-11 on master:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "R43 and R44 are superseded for reads by R49;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "R44's attribution is replaced by R54;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "R51 to R53 answer QA report A3 §11;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "R53 says a clause binds on shapes beyond the listed probes.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Your predecessor's handoff: QA report A3 §14 (docs/loops/loop-15-slice-3-qa-report-a3.md).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The tools: docs/loops/qa-scripts-a3/ (probe15.mts, probe2.mts, the mutants, and a README with the rebase notes and the known positives).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Every row is re-run.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Every CA-15 probe runs against A4, A3 5010199, A2 2add792 and 3b19287, in git archive copies and never in the main tree.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "A3 is the known positive for A3-1, A3-2 and A3-3.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "A2 is the known positive for A2-1 to A2-5.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "R49 is read by the CODE PATH as well as the record (QA report A3 §14.2): a traceless read passes the probes.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "The R44 test's QA-stage assertion now expects no finding under R54, with reread asserted undefined.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Its no-read evidence in the QA stage therefore rests on code reading and a mutant. Score it that way.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "One mutant per protection.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "R49's repository side (repositoryResolutionDiff) and machine side (resolutionMismatch) are each revertible alone.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "So is R54's attribution (attributionChange).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "R52's five POSIX tests are read from CI's per-test lines: the verbose reporter, ANSI codes stripped, the ✓/↓ lines. Not from the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "Take plain sync's exit code in a scratch clone.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "FULL SUITE: ask the live planner first. A quiet machine is required (G-042):",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "A2A-Hub's local stack was STOPPED on Aaron's word, and must stay stopped through your run;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "the A2A-Hub seats hold (their record, rev 25);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "the planner stays idle.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "both exited 1, on the onTaskUpdate heartbeat only, in ~/Worktrees/sia-forge, with 0 tests failed at 2db806a;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T25",
+            "observable": "every idle run in ~/Worktrees/sia-qa tonight was clean.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice three: dispatch of candidate A4 to a FRESH QA seat (record session 89)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-dispatch-qa-a4.md",
+          "blob": "64be67a4dd9b3756d21c57711237b1e6f73ec3f2"
+        }
+      },
+      "candidate": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+      "diffstat": [
+        ".github/workflows/ci.yml",
+        "docs/loops/loop-15-slice-3-a2-grok-handoff.md",
+        "docs/loops/loop-15-slice-3-a3-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-a4-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-candidate-a-developer-handoff.md",
+        "docs/loops/loop-15-slice-3-qa-criteria-a.md",
+        "open-brain/src/harness/artifacts.ts",
+        "open-brain/src/harness/checks.ts",
+        "open-brain/src/harness/configwatch.ts",
+        "open-brain/src/harness/git.ts",
+        "open-brain/src/harness/process.ts",
+        "open-brain/src/harness/refwatch.ts",
+        "open-brain/src/harness/roles.ts",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/src/harness/schema.ts",
+        "open-brain/tests/harness/candidate-a-fixture.ts",
+        "open-brain/tests/harness/config-channel.test.ts",
+        "open-brain/tests/harness/configwatch-links.test.ts",
+        "open-brain/tests/harness/process-role.test.ts",
+        "open-brain/tests/harness/refwatch-stage.test.ts",
+        "open-brain/tests/harness/runtime.test.ts",
+        "open-brain/tests/harness/spawn-sites.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 2,
+        "base_sha": "f673d5e78b2486d2e8c27ccd3074dac15506b94f",
+        "scored_sha": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+        "merge_commit": "f9a1aa84209f9d17cac404faeb19e00caf2d3491"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.42
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.13,
+      "confidence": 0.81,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.9,
+        "1": 0.07,
+        "2": 0.03
+      }
+    },
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.27
+    }
+  },
+  "usage": {
+    "input_tokens": 3248,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.27 is below the required 0.7",
+      "local_tests_support_claim 0.42 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:51.356Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "94c6222e-aad0-474d-847a-2fd1cbab58aa",
+  "subject": {
+    "gate": "developer-done",
+    "key": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+    "blob": "675c78f559f41d363f727ab5724512640651a6ae"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:50.954Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 2,
+  "merge_commit": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+  "scored_sha": "f9a1aa84209f9d17cac404faeb19e00caf2d3491",
+  "base_sha": "f673d5e78b2486d2e8c27ccd3074dac15506b94f",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/002-s3-a4.D_t.json",
+    "blob": "675c78f559f41d363f727ab5724512640651a6ae"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".github/workflows/ci.yml",
+    "docs/loops/loop-15-slice-3-a2-grok-handoff.md",
+    "docs/loops/loop-15-slice-3-a3-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-a4-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-candidate-a-developer-handoff.md",
+    "docs/loops/loop-15-slice-3-qa-criteria-a.md",
+    "open-brain/src/harness/artifacts.ts",
+    "open-brain/src/harness/checks.ts",
+    "open-brain/src/harness/configwatch.ts",
+    "open-brain/src/harness/git.ts",
+    "open-brain/src/harness/process.ts",
+    "open-brain/src/harness/refwatch.ts",
+    "open-brain/src/harness/roles.ts",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/src/harness/schema.ts",
+    "open-brain/tests/harness/candidate-a-fixture.ts",
+    "open-brain/tests/harness/config-channel.test.ts",
+    "open-brain/tests/harness/configwatch-links.test.ts",
+    "open-brain/tests/harness/process-role.test.ts",
+    "open-brain/tests/harness/refwatch-stage.test.ts",
+    "open-brain/tests/harness/runtime.test.ts",
+    "open-brain/tests/harness/spawn-sites.test.ts"
+  ]
+}

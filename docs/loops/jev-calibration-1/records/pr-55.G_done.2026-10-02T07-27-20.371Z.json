@@ -1,0 +1,257 @@
+{
+  "gate": "developer-done",
+  "loop": "55-t198",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:20.371Z",
+  "answered_at": "2026-10-02T07:27:20.768Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "55-t198",
+        "objective": "QA 225: record 217 (T-198, /start shows whether each seat is listening)",
+        "tasks": [
+          "Code at the tip, 231f501f99b217fd65ab496139cb0d11feba8eb1, on origin/loop/t198-presence. Its last commit changes hub-presence.ts, so the tip is the code. The base is a749821.",
+          "Built by Grok (Forge).",
+          "The brief: docs/loops/t198-presence-dispatch.md, with rows PR-1 to PR-6.",
+          "The mutant: -mut-swallow bbf4b78.",
+          "No live hub in tests. Fixture HTTP server only. You may make ONE read-only live call, GET http://100.124.212.87:4000/a2a/agents/presence (header X-Agent-Key: dev-key), to show the fixture's shape matches the real one. Quote the field names, never the values.",
+          "The listener-versus-seat case (planner note, 2026-09-28).",
+          "In A2A-Hub's Loop 8b spike, a background hub-listen.sh marked a turn read, and presence showed \"polling, unread=0\" while the agent itself had never seen the turn.",
+          "So \"polling\" means a LISTENER process is polling, not that the seat read anything.",
+          "Say whether the candidate's printed line could lead a planner to read \"polling, 0 unread\" as \"the seat has seen my turn\". If it could, score it as a defect against PR-1/PR-2 wording.",
+          "PR-3.",
+          "A timeout, a non-2xx response and a malformed body each print one visible UNKNOWN line with its cause.",
+          "The timeout is bounded. Measure how long /start waits against an unreachable host.",
+          "PR-6. Report the greeting-size number with the block and without it.",
+          "The seat-file collision with record 219 (see QA 224, item 4). Say whether this parser still reads the extended file at origin/loop/t196-hub-knowledge (blob 344bd46)."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Code at the tip, 231f501f99b217fd65ab496139cb0d11feba8eb1, on origin/loop/t198-presence. Its last commit changes hub-presence.ts, so the tip is the code. The base is a749821.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Built by Grok (Forge).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "The brief: docs/loops/t198-presence-dispatch.md, with rows PR-1 to PR-6.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "The mutant: -mut-swallow bbf4b78.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "No live hub in tests. Fixture HTTP server only. You may make ONE read-only live call, GET http://100.124.212.87:4000/a2a/agents/presence (header X-Agent-Key: dev-key), to show the fixture's shape matches the real one. Quote the field names, never the values.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "The listener-versus-seat case (planner note, 2026-09-28).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "In A2A-Hub's Loop 8b spike, a background hub-listen.sh marked a turn read, and presence showed \"polling, unread=0\" while the agent itself had never seen the turn.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "So \"polling\" means a LISTENER process is polling, not that the seat read anything.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Say whether the candidate's printed line could lead a planner to read \"polling, 0 unread\" as \"the seat has seen my turn\". If it could, score it as a defect against PR-1/PR-2 wording.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "PR-3.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "A timeout, a non-2xx response and a malformed body each print one visible UNKNOWN line with its cause.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "The timeout is bounded. Measure how long /start waits against an unreachable host.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "PR-6. Report the greeting-size number with the block and without it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "The seat-file collision with record 219 (see QA 224, item 4). Say whether this parser still reads the extended file at origin/loop/t196-hub-knowledge (blob 344bd46).",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 225: record 217 (T-198, /start shows whether each seat is listening)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-225-t198-dispatch.md",
+          "blob": "8551547c70c4c8262ddaab4ef655fafbdf33e736"
+        }
+      },
+      "candidate": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+      "diffstat": [
+        ".agents/SYSTEM/hub-partner-seats.json",
+        ".gitignore",
+        "docs/loops/t198-developer-handoff.md",
+        "open-brain/src/pipelines/session-start/hub-presence.ts",
+        "open-brain/src/server.ts",
+        "open-brain/tests/pipelines/session-start/hub-presence.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 55,
+        "base_sha": "a74982101fcfc94bbb5b055dc56c1bf764c0d192",
+        "scored_sha": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+        "merge_commit": "231f501f99b217fd65ab496139cb0d11feba8eb1"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.57
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.44
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.07,
+      "confidence": 0.89,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.95,
+        "1": 0.03,
+        "2": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2409,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.57 is below the required 0.7",
+      "local_tests_support_claim 0.44 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:20.764Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "354b520a-29c5-4e94-9593-589c460b1b8d",
+  "subject": {
+    "gate": "developer-done",
+    "key": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+    "blob": "04c747d7689c5f69182c92ce559c06e1581962cf"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:20.371Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 55,
+  "merge_commit": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+  "scored_sha": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+  "base_sha": "a74982101fcfc94bbb5b055dc56c1bf764c0d192",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/055-t198.D_t.json",
+    "blob": "04c747d7689c5f69182c92ce559c06e1581962cf"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/SYSTEM/hub-partner-seats.json",
+    ".gitignore",
+    "docs/loops/t198-developer-handoff.md",
+    "open-brain/src/pipelines/session-start/hub-presence.ts",
+    "open-brain/src/server.ts",
+    "open-brain/tests/pipelines/session-start/hub-presence.test.ts"
+  ]
+}

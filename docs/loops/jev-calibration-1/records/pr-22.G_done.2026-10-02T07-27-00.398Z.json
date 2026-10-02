@@ -1,0 +1,393 @@
+{
+  "gate": "developer-done",
+  "loop": "22-t171",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:00.398Z",
+  "answered_at": "2026-10-02T07:27:00.800Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "22-t171",
+        "objective": "T-171 (a note is never replaced silently), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 144)",
+        "tasks": [
+          "R171-1: ~/.claude/commands/end.md (Aaron's global copy, outside the repo) is replaced by T-179's install step (its after-merge checklist). T-171 does not edit it. After merge, its stale note? lines fail closed, with a refusal that names the fix. Verify that the refusal does name it.",
+          "R171-2: update_gap replacing what, evidence and recommended_update wholesale is the same class. It becomes a task, not this round.",
+          "Nothing replaces a note silently: every op that can change a note (search state-writer.ts and every caller), bare note refused, append_note never removing text, and the dry run and write reporting identically.",
+          "note_by: attack it.",
+          "Can a caller set it?",
+          "Does appending add the writer's uuid?",
+          "Does the migration's null (unknown) behave as \"another session's\", as the handoff says, so that replacing any existing note needs the flag?",
+          "Is the schema rule (note_by is [] exactly when the note is empty) enforced in every path?",
+          "Every caller listed in the handoff (the importer, templates, docs, /end's old steps): is each updated or shown unaffected? Search for note: in ops yourself.",
+          "The T-169 shape: a long note plus an \"update\" meant as an addition. Under the new ops, can a caller still lose the text without being told?",
+          "Your own mutants, at least: append_note implemented as replace; the dry run silent; note_by ignored for the override."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "R171-1: ~/.claude/commands/end.md (Aaron's global copy, outside the repo) is replaced by T-179's install step (its after-merge checklist). T-171 does not edit it. After merge, its stale note? lines fail closed, with a refusal that names the fix. Verify that the refusal does name it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "R171-2: update_gap replacing what, evidence and recommended_update wholesale is the same class. It becomes a task, not this round.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Nothing replaces a note silently: every op that can change a note (search state-writer.ts and every caller), bare note refused, append_note never removing text, and the dry run and write reporting identically.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "note_by: attack it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Can a caller set it?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Does appending add the writer's uuid?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Does the migration's null (unknown) behave as \"another session's\", as the handoff says, so that replacing any existing note needs the flag?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Is the schema rule (note_by is [] exactly when the note is empty) enforced in every path?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Every caller listed in the handoff (the importer, templates, docs, /end's old steps): is each updated or shown unaffected? Search for note: in ops yourself.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "The T-169 shape: a long note plus an \"update\" meant as an addition. Under the new ops, can a caller still lose the text without being told?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Your own mutants, at least: append_note implemented as replace; the dry run silent; note_by ignored for the override.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "T-171 (a note is never replaced silently), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 144)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t171-dispatch-qa.md",
+          "blob": "9d05b3261494b10d7d2c199867f28dc532f3a180"
+        }
+      },
+      "candidate": "b3711763a4b9f5624803e8992234c51e793872ef",
+      "diffstat": [
+        ".agents/retirements.json",
+        ".claude/commands/end.md",
+        "CHANGELOG.md",
+        "README.md",
+        "docs/loops/dev-scripts-t171/evidence/ci-red-36280808413.txt",
+        "docs/loops/dev-scripts-t171/evidence/migrate-live-copy-origin-master-7640b93.txt",
+        "docs/loops/dev-scripts-t171/evidence/mutants-local-foreign-allowed.json",
+        "docs/loops/dev-scripts-t171/evidence/mutants-local-summary.json",
+        "docs/loops/dev-scripts-t171/evidence/mutants-local.txt",
+        "docs/loops/dev-scripts-t171/evidence/red-local-bc34347.txt",
+        "docs/loops/dev-scripts-t171/mutants-t171.cjs",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/mutants-r4.out",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/mutants-v3.out",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.json",
+        "docs/loops/dev-scripts-t179-merge/greeting.sh",
+        "docs/loops/dev-scripts-t179-merge/mutants-v3.cjs",
+        "docs/loops/dev-scripts-t179-r2/evidence/ci-runs.txt",
+        "docs/loops/dev-scripts-t179-r2/evidence/mutants-local-summary.json",
+        "docs/loops/dev-scripts-t179-r2/evidence/mutants-local.txt",
+        "docs/loops/dev-scripts-t179-r2/mutants-r2.cjs",
+        "docs/loops/t179-developer-handoff.md",
+        "docs/loops/t179-merge-developer-handoff.md",
+        "docs/loops/t179-r2-developer-handoff.md",
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/cli-session-end.ts",
+        "open-brain/src/cli-spec.ts",
+        "open-brain/src/cli.ts",
+        "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+        "open-brain/src/pipelines/session-start/role-files.ts",
+        "open-brain/src/pipelines/session-start/state-render.ts",
+        "open-brain/src/pipelines/state-import/index.ts",
+        "open-brain/src/pipelines/state-migrate/index.ts",
+        "open-brain/src/pipelines/state-views/index.ts",
+        "open-brain/src/pipelines/sync/checks-state.ts",
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/src/pipelines/sync/record-erasure.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/handoff-guard.ts",
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/cli-flags.test.ts",
+        "open-brain/tests/fixtures-state/state.json",
+        "open-brain/tests/helpers/repo-record.ts",
+        "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+        "open-brain/tests/pipelines/session-start/state-render.test.ts",
+        "open-brain/tests/pipelines/state-import-r2.test.ts",
+        "open-brain/tests/pipelines/state-import-v3.test.ts",
+        "open-brain/tests/pipelines/state-import.test.ts",
+        "open-brain/tests/pipelines/state-migrate.test.ts",
+        "open-brain/tests/pipelines/state-views.test.ts",
+        "open-brain/tests/pipelines/sync/checks.test.ts",
+        "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+        "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+        "open-brain/tests/pipelines/template-seed.test.ts",
+        "open-brain/tests/server.test.ts",
+        "open-brain/tests/setup-hooks.test.ts",
+        "open-brain/tests/shared/cli-args.test.ts",
+        "open-brain/tests/shared/closeout-erasure.test.ts",
+        "open-brain/tests/shared/handoff-guard.test.ts",
+        "open-brain/tests/shared/session-order.test.ts",
+        "open-brain/tests/shared/state-schema.test.ts",
+        "open-brain/tests/shared/state-writer-notes.test.ts",
+        "open-brain/tests/shared/state-writer.test.ts",
+        "project-template/.agents/state.json",
+        "project-template/.claude/commands/bootstrap.md",
+        "project-template/.claude/commands/end.md",
+        "project-template/.claude/rules/agents.md",
+        "project-template/.cursor/commands/end.md",
+        "project-template/.cursor/commands/sync.md",
+        "scripts/setup-hooks.mjs",
+        "scripts/setup.mjs"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 22,
+        "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+        "scored_sha": "b3711763a4b9f5624803e8992234c51e793872ef",
+        "merge_commit": "b3711763a4b9f5624803e8992234c51e793872ef"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.53
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.28,
+      "confidence": 0.58,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.77,
+        "1": 0.18,
+        "2": 0.05
+      }
+    },
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.54
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.3
+    }
+  },
+  "usage": {
+    "input_tokens": 3578,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.54 is below the required 0.7",
+      "local_tests_support_claim 0.53 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:00.796Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "513ba123-c356-4544-bde6-7cab8b27e4ee",
+  "subject": {
+    "gate": "developer-done",
+    "key": "b3711763a4b9f5624803e8992234c51e793872ef",
+    "blob": "f35bc658cc0b5bba9c634a97bd3e0ac9fa03fc81"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:00.398Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 22,
+  "merge_commit": "b3711763a4b9f5624803e8992234c51e793872ef",
+  "scored_sha": "b3711763a4b9f5624803e8992234c51e793872ef",
+  "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/022-t171.D_t.json",
+    "blob": "f35bc658cc0b5bba9c634a97bd3e0ac9fa03fc81"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/retirements.json",
+    ".claude/commands/end.md",
+    "CHANGELOG.md",
+    "README.md",
+    "docs/loops/dev-scripts-t171/evidence/ci-red-36280808413.txt",
+    "docs/loops/dev-scripts-t171/evidence/migrate-live-copy-origin-master-7640b93.txt",
+    "docs/loops/dev-scripts-t171/evidence/mutants-local-foreign-allowed.json",
+    "docs/loops/dev-scripts-t171/evidence/mutants-local-summary.json",
+    "docs/loops/dev-scripts-t171/evidence/mutants-local.txt",
+    "docs/loops/dev-scripts-t171/evidence/red-local-bc34347.txt",
+    "docs/loops/dev-scripts-t171/mutants-t171.cjs",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/mutants-r4.out",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/mutants-v3.out",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.json",
+    "docs/loops/dev-scripts-t179-merge/greeting.sh",
+    "docs/loops/dev-scripts-t179-merge/mutants-v3.cjs",
+    "docs/loops/dev-scripts-t179-r2/evidence/ci-runs.txt",
+    "docs/loops/dev-scripts-t179-r2/evidence/mutants-local-summary.json",
+    "docs/loops/dev-scripts-t179-r2/evidence/mutants-local.txt",
+    "docs/loops/dev-scripts-t179-r2/mutants-r2.cjs",
+    "docs/loops/t179-developer-handoff.md",
+    "docs/loops/t179-merge-developer-handoff.md",
+    "docs/loops/t179-r2-developer-handoff.md",
+    "open-brain/src/cli-bootstrap.ts",
+    "open-brain/src/cli-session-end.ts",
+    "open-brain/src/cli-spec.ts",
+    "open-brain/src/cli.ts",
+    "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+    "open-brain/src/pipelines/session-start/role-files.ts",
+    "open-brain/src/pipelines/session-start/state-render.ts",
+    "open-brain/src/pipelines/state-import/index.ts",
+    "open-brain/src/pipelines/state-migrate/index.ts",
+    "open-brain/src/pipelines/state-views/index.ts",
+    "open-brain/src/pipelines/sync/checks-state.ts",
+    "open-brain/src/pipelines/sync/checks.ts",
+    "open-brain/src/pipelines/sync/index.ts",
+    "open-brain/src/pipelines/sync/record-erasure.ts",
+    "open-brain/src/server.ts",
+    "open-brain/src/shared/handoff-guard.ts",
+    "open-brain/src/shared/state-schema.ts",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/cli-flags.test.ts",
+    "open-brain/tests/fixtures-state/state.json",
+    "open-brain/tests/helpers/repo-record.ts",
+    "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+    "open-brain/tests/pipelines/session-start/state-render.test.ts",
+    "open-brain/tests/pipelines/state-import-r2.test.ts",
+    "open-brain/tests/pipelines/state-import-v3.test.ts",
+    "open-brain/tests/pipelines/state-import.test.ts",
+    "open-brain/tests/pipelines/state-migrate.test.ts",
+    "open-brain/tests/pipelines/state-views.test.ts",
+    "open-brain/tests/pipelines/sync/checks.test.ts",
+    "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+    "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+    "open-brain/tests/pipelines/template-seed.test.ts",
+    "open-brain/tests/server.test.ts",
+    "open-brain/tests/setup-hooks.test.ts",
+    "open-brain/tests/shared/cli-args.test.ts",
+    "open-brain/tests/shared/closeout-erasure.test.ts",
+    "open-brain/tests/shared/handoff-guard.test.ts",
+    "open-brain/tests/shared/session-order.test.ts",
+    "open-brain/tests/shared/state-schema.test.ts",
+    "open-brain/tests/shared/state-writer-notes.test.ts",
+    "open-brain/tests/shared/state-writer.test.ts",
+    "project-template/.agents/state.json",
+    "project-template/.claude/commands/bootstrap.md",
+    "project-template/.claude/commands/end.md",
+    "project-template/.claude/rules/agents.md",
+    "project-template/.cursor/commands/end.md",
+    "project-template/.cursor/commands/sync.md",
+    "scripts/setup-hooks.mjs",
+    "scripts/setup.mjs"
+  ]
+}

@@ -1,0 +1,437 @@
+{
+  "gate": "developer-done",
+  "loop": "66-t194-r5",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:27.073Z",
+  "answered_at": "2026-10-02T07:27:27.486Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "66-t194-r5",
+        "objective": "QA 237: T-194 r5 (the planner seat hook), redefined by property",
+        "tasks": [
+          "docs/loops/t194-r5-dispatch.md: P1, P2, P3, the required evidence, and the out-of-scope list. This is what you score.",
+          "docs/loops/t194-r5-developer-handoff.md at the candidate: the clause-to-test map, the mutant runs, \"Supersedes\", \"Out of reach\", and \"Not covered\". Verify it; do not take it.",
+          "The rulings made after the r5 dispatch, all in scope:",
+          "Ruling 1: a cd, pushd or Set-Location on the same line as a write is refused, even when the write lands outside the repo.",
+          "Ruling 2: P2b, git. merge and tag always need a grant. A push stands without one only when it is origin, every refspec is a plain branch under loop/, qa/, docs/ or chore/, and there is no force, delete, +, --tags, --mirror, --all, --prune, bare push or substituted argument.",
+          "Ruling 3: mv and Move-Item check their SOURCE as well as their destination.",
+          "The earlier QA probe scripts. Forge did not have the QA 233 and 234 scripts and rebuilt those rows from the reports' tables. Use the scripts themselves:",
+          "QA 233: docs/loops/qa-233/evidence/qa233-probe.mjs (and qa233-run.mjs) on origin/qa/t194-r2-report",
+          "QA 234: docs/loops/qa-234/evidence/qa234-probe.mjs and qa234-probe2.mjs on origin/qa/t194-r3-report",
+          "QA 235: docs/loops/qa-235/evidence/qa235-probe.mjs on origin/qa/t194-r4-report (e6e1d085)",
+          "R5-P1, the canonicaliser, in both directions. \"Protected if, and only if\" has two halves, so score both:",
+          "A literal write that LANDS under a protected path is denied, whatever its spelling.",
+          "A literal write that lands OUTSIDE every protected path, with no cd on the line, is ALLOWED. A deny there is a defect unless it names one of the stated causes (non-literal, cd, or an 8.3 short name past the root).",
+          "A non-literal target (~, $, backtick, ? [, {, () is refused with a named cause.",
+          "R5-P2, the gh merge grammar. Anything gh would run as pr merge is a merge. The only form allowed without a grant is the exact grammar in the r5 dispatch, and even that is READ and judged docs-only or code. Check that a non-merge gh command is not swept in.",
+          "R5-P2b, git (ruling 2). Score the standing-push definition as a property. A push that is not exactly standing needs a grant, and a grant matches exactly (r4-5).",
+          "R5-P3, PowerShell. PowerShell is in the matcher; P1 applies to the cmdlets and redirects the dispatch lists, and P2 to & gh and .\\gh.exe. Invoke-Expression, iex, Invoke-Command and a script block that writes are refused with a named cause.",
+          "R5-limit, the limit text. BASH_WRITE_LIMIT (or its successor) states every item in the handoff's \"Out of reach\". Check it in both directions. Nothing out of reach may be described only in the handoff. Nothing the text calls out of reach may in fact be caught, or the text is wrong."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "docs/loops/t194-r5-dispatch.md: P1, P2, P3, the required evidence, and the out-of-scope list. This is what you score.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "docs/loops/t194-r5-developer-handoff.md at the candidate: the clause-to-test map, the mutant runs, \"Supersedes\", \"Out of reach\", and \"Not covered\". Verify it; do not take it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "The rulings made after the r5 dispatch, all in scope:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Ruling 1: a cd, pushd or Set-Location on the same line as a write is refused, even when the write lands outside the repo.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Ruling 2: P2b, git. merge and tag always need a grant. A push stands without one only when it is origin, every refspec is a plain branch under loop/, qa/, docs/ or chore/, and there is no force, delete, +, --tags, --mirror, --all, --prune, bare push or substituted argument.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Ruling 3: mv and Move-Item check their SOURCE as well as their destination.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The earlier QA probe scripts. Forge did not have the QA 233 and 234 scripts and rebuilt those rows from the reports' tables. Use the scripts themselves:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "QA 233: docs/loops/qa-233/evidence/qa233-probe.mjs (and qa233-run.mjs) on origin/qa/t194-r2-report",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "QA 234: docs/loops/qa-234/evidence/qa234-probe.mjs and qa234-probe2.mjs on origin/qa/t194-r3-report",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "QA 235: docs/loops/qa-235/evidence/qa235-probe.mjs on origin/qa/t194-r4-report (e6e1d085)",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "R5-P1, the canonicaliser, in both directions. \"Protected if, and only if\" has two halves, so score both:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "A literal write that LANDS under a protected path is denied, whatever its spelling.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "A literal write that lands OUTSIDE every protected path, with no cd on the line, is ALLOWED. A deny there is a defect unless it names one of the stated causes (non-literal, cd, or an 8.3 short name past the root).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "A non-literal target (~, $, backtick, ? [, {, () is refused with a named cause.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "R5-P2, the gh merge grammar. Anything gh would run as pr merge is a merge. The only form allowed without a grant is the exact grammar in the r5 dispatch, and even that is READ and judged docs-only or code. Check that a non-merge gh command is not swept in.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "R5-P2b, git (ruling 2). Score the standing-push definition as a property. A push that is not exactly standing needs a grant, and a grant matches exactly (r4-5).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "R5-P3, PowerShell. PowerShell is in the matcher; P1 applies to the cmdlets and redirects the dispatch lists, and P2 to & gh and .\\gh.exe. Invoke-Expression, iex, Invoke-Command and a script block that writes are refused with a named cause.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "R5-limit, the limit text. BASH_WRITE_LIMIT (or its successor) states every item in the handoff's \"Out of reach\". Check it in both directions. Nothing out of reach may be described only in the handoff. Nothing the text calls out of reach may in fact be caught, or the text is wrong.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 237: T-194 r5 (the planner seat hook), redefined by property",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-237-t194-r5-dispatch.md",
+          "blob": "54fa25fd972aa562b8ca422d1cf065ae4b3f12da"
+        }
+      },
+      "candidate": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
+      "diffstat": [
+        ".agents/SESSIONS/next-session.md",
+        ".agents/SYSTEM/ENTITIES.md",
+        ".agents/SYSTEM/PRD.md",
+        ".agents/SYSTEM/SUMMARY.md",
+        ".agents/TASKS/INBOX.md",
+        ".agents/TASKS/task.md",
+        ".agents/retirements.json",
+        ".agents/skills/self-improving-agent-guide/SKILL.md",
+        ".agents/state.json",
+        "README.md",
+        "docs/loops/loop-15-slice-3-closeout.md",
+        "docs/loops/loop-15-slice-4-brief-draft.md",
+        "docs/loops/qa-235-headless-prompt.md",
+        "docs/loops/qa-235-t194-r4-dispatch.md",
+        "docs/loops/qa-235/push-qa.mjs",
+        "docs/loops/t169-developer-handoff.md",
+        "docs/loops/t169-dispatch.md",
+        "docs/loops/t194-r5-developer-handoff.md",
+        "docs/loops/t194-r5-dispatch.md",
+        "docs/loops/t194-r5/mutants/make-diffs.mjs",
+        "docs/loops/t194-r5/mutants/p1-brace-allowed.diff",
+        "docs/loops/t194-r5/mutants/p1-case-folded-off.diff",
+        "docs/loops/t194-r5/mutants/p1-cd-allowed.diff",
+        "docs/loops/t194-r5/mutants/p1-cp-t-ignored.diff",
+        "docs/loops/t194-r5/mutants/p1-cwd-ignored.diff",
+        "docs/loops/t194-r5/mutants/p1-dollar-backtick-allowed.diff",
+        "docs/loops/t194-r5/mutants/p1-filetool-literal-off.diff",
+        "docs/loops/t194-r5/mutants/p1-glob-allowed.diff",
+        "docs/loops/t194-r5/mutants/p1-heredoc-body-parsed.diff",
+        "docs/loops/t194-r5/mutants/p1-longpath-off.diff",
+        "docs/loops/t194-r5/mutants/p1-mv-source-ignored.diff",
+        "docs/loops/t194-r5/mutants/p1-nested-not-parsed.diff",
+        "docs/loops/t194-r5/mutants/p1-ntfs-dots-off.diff",
+        "docs/loops/t194-r5/mutants/p1-paren-allowed.diff",
+        "docs/loops/t194-r5/mutants/p1-sed-e-files.diff",
+        "docs/loops/t194-r5/mutants/p1-shortname-off.diff",
+        "docs/loops/t194-r5/mutants/p1-tee-first-only.diff",
+        "docs/loops/t194-r5/mutants/p1-tilde-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2-any-flag-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2-boundary-ignored.diff",
+        "docs/loops/t194-r5/mutants/p2-gh-case-sensitive.diff",
+        "docs/loops/t194-r5/mutants/p2-gh-extension-kept.diff",
+        "docs/loops/t194-r5/mutants/p2-nested-merge-not-seen.diff",
+        "docs/loops/t194-r5/mutants/p2-redirect-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2-repo-flag-ignored.diff",
+        "docs/loops/t194-r5/mutants/p2-subshell-callop.diff",
+        "docs/loops/t194-r5/mutants/p2-substituted-name-not-gh.diff",
+        "docs/loops/t194-r5/mutants/p2b-bare-push-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2b-delete-refspec-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2b-expanded-git-word-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2b-expanded-push-arg-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2b-expanded-subcommand-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2b-force-long-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2b-force-short-cluster.diff",
+        "docs/loops/t194-r5/mutants/p2b-git-case-sensitive.diff",
+        "docs/loops/t194-r5/mutants/p2b-global-option-values.diff",
+        "docs/loops/t194-r5/mutants/p2b-leading-options-not-skipped.diff",
+        "docs/loops/t194-r5/mutants/p2b-merge-tag-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2b-nested-git-not-seen.diff",
+        "docs/loops/t194-r5/mutants/p2b-plus-refspec-allowed.diff",
+        "docs/loops/t194-r5/mutants/p2b-remote-any.diff",
+        "docs/loops/t194-r5/mutants/p2b-standing-prefix-off.diff",
+        "docs/loops/t194-r5/mutants/p2b-tags-mirror-allowed.diff",
+        "docs/loops/t194-r5/mutants/p3-dynamic-allowed.diff",
+        "docs/loops/t194-r5/mutants/p3-matcher-without-powershell.diff",
+        "docs/loops/t194-r5/mutants/p3-move-source-ignored.diff",
+        "docs/loops/t194-r5/mutants/p3-newitem-name-ignored.diff",
+        "docs/loops/t194-r5/mutants/p3-param-prefix-off.diff",
+        "docs/loops/t194-r5/mutants/p3-powershell-tool-ignored.diff",
+        "docs/loops/t194-r5/mutants/p3-tool-name-case.diff",
+        "docs/loops/t194-r5/mutants/results-run1.json",
+        "docs/loops/t194-r5/mutants/results-run2-survivors.json",
+        "docs/loops/t194-r5/mutants/results-run3-longpath.json",
+        "docs/loops/t194-r5/mutants/run-mutants.mjs",
+        "docs/loops/t194-r5/mutants/specs.mjs",
+        "open-brain/src/planner-hook/bash.ts",
+        "open-brain/src/planner-hook/git.ts",
+        "open-brain/src/planner-hook/paths.ts",
+        "open-brain/src/planner-hook/registration.ts",
+        "open-brain/src/planner-hook/run.ts",
+        "open-brain/src/planner-hook/shell-words.ts",
+        "open-brain/tests/planner-hook/r5-fixture.ts",
+        "open-brain/tests/planner-hook/r5-property.test.ts",
+        "open-brain/tests/planner-hook/r5.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 66,
+        "base_sha": "d37e09dc4bd38cec0306e542773c3ab881602d6e",
+        "scored_sha": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
+        "merge_commit": "7a3a444135aa9f3049c40f17f8519421ccb4458b"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.6
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.49
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.09,
+      "confidence": 0.87,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.93,
+        "1": 0.06,
+        "2": 0.01
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 4820,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.6 is below the required 0.7",
+      "local_tests_support_claim 0.49 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:27.476Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "ae3b55c1-2945-46a2-b48c-db1351a1b1f9",
+  "subject": {
+    "gate": "developer-done",
+    "key": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
+    "blob": "56126b39f9a5db56791d6843304dbdca380e5e95"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:27.073Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 66,
+  "merge_commit": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
+  "scored_sha": "7a3a444135aa9f3049c40f17f8519421ccb4458b",
+  "base_sha": "d37e09dc4bd38cec0306e542773c3ab881602d6e",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/066-t194-r5.D_t.json",
+    "blob": "56126b39f9a5db56791d6843304dbdca380e5e95"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/SESSIONS/next-session.md",
+    ".agents/SYSTEM/ENTITIES.md",
+    ".agents/SYSTEM/PRD.md",
+    ".agents/SYSTEM/SUMMARY.md",
+    ".agents/TASKS/INBOX.md",
+    ".agents/TASKS/task.md",
+    ".agents/retirements.json",
+    ".agents/skills/self-improving-agent-guide/SKILL.md",
+    ".agents/state.json",
+    "README.md",
+    "docs/loops/loop-15-slice-3-closeout.md",
+    "docs/loops/loop-15-slice-4-brief-draft.md",
+    "docs/loops/qa-235-headless-prompt.md",
+    "docs/loops/qa-235-t194-r4-dispatch.md",
+    "docs/loops/qa-235/push-qa.mjs",
+    "docs/loops/t169-developer-handoff.md",
+    "docs/loops/t169-dispatch.md",
+    "docs/loops/t194-r5-developer-handoff.md",
+    "docs/loops/t194-r5-dispatch.md",
+    "docs/loops/t194-r5/mutants/make-diffs.mjs",
+    "docs/loops/t194-r5/mutants/p1-brace-allowed.diff",
+    "docs/loops/t194-r5/mutants/p1-case-folded-off.diff",
+    "docs/loops/t194-r5/mutants/p1-cd-allowed.diff",
+    "docs/loops/t194-r5/mutants/p1-cp-t-ignored.diff",
+    "docs/loops/t194-r5/mutants/p1-cwd-ignored.diff",
+    "docs/loops/t194-r5/mutants/p1-dollar-backtick-allowed.diff",
+    "docs/loops/t194-r5/mutants/p1-filetool-literal-off.diff",
+    "docs/loops/t194-r5/mutants/p1-glob-allowed.diff",
+    "docs/loops/t194-r5/mutants/p1-heredoc-body-parsed.diff",
+    "docs/loops/t194-r5/mutants/p1-longpath-off.diff",
+    "docs/loops/t194-r5/mutants/p1-mv-source-ignored.diff",
+    "docs/loops/t194-r5/mutants/p1-nested-not-parsed.diff",
+    "docs/loops/t194-r5/mutants/p1-ntfs-dots-off.diff",
+    "docs/loops/t194-r5/mutants/p1-paren-allowed.diff",
+    "docs/loops/t194-r5/mutants/p1-sed-e-files.diff",
+    "docs/loops/t194-r5/mutants/p1-shortname-off.diff",
+    "docs/loops/t194-r5/mutants/p1-tee-first-only.diff",
+    "docs/loops/t194-r5/mutants/p1-tilde-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2-any-flag-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2-boundary-ignored.diff",
+    "docs/loops/t194-r5/mutants/p2-gh-case-sensitive.diff",
+    "docs/loops/t194-r5/mutants/p2-gh-extension-kept.diff",
+    "docs/loops/t194-r5/mutants/p2-nested-merge-not-seen.diff",
+    "docs/loops/t194-r5/mutants/p2-redirect-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2-repo-flag-ignored.diff",
+    "docs/loops/t194-r5/mutants/p2-subshell-callop.diff",
+    "docs/loops/t194-r5/mutants/p2-substituted-name-not-gh.diff",
+    "docs/loops/t194-r5/mutants/p2b-bare-push-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2b-delete-refspec-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2b-expanded-git-word-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2b-expanded-push-arg-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2b-expanded-subcommand-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2b-force-long-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2b-force-short-cluster.diff",
+    "docs/loops/t194-r5/mutants/p2b-git-case-sensitive.diff",
+    "docs/loops/t194-r5/mutants/p2b-global-option-values.diff",
+    "docs/loops/t194-r5/mutants/p2b-leading-options-not-skipped.diff",
+    "docs/loops/t194-r5/mutants/p2b-merge-tag-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2b-nested-git-not-seen.diff",
+    "docs/loops/t194-r5/mutants/p2b-plus-refspec-allowed.diff",
+    "docs/loops/t194-r5/mutants/p2b-remote-any.diff",
+    "docs/loops/t194-r5/mutants/p2b-standing-prefix-off.diff",
+    "docs/loops/t194-r5/mutants/p2b-tags-mirror-allowed.diff",
+    "docs/loops/t194-r5/mutants/p3-dynamic-allowed.diff",
+    "docs/loops/t194-r5/mutants/p3-matcher-without-powershell.diff",
+    "docs/loops/t194-r5/mutants/p3-move-source-ignored.diff",
+    "docs/loops/t194-r5/mutants/p3-newitem-name-ignored.diff",
+    "docs/loops/t194-r5/mutants/p3-param-prefix-off.diff",
+    "docs/loops/t194-r5/mutants/p3-powershell-tool-ignored.diff",
+    "docs/loops/t194-r5/mutants/p3-tool-name-case.diff",
+    "docs/loops/t194-r5/mutants/results-run1.json",
+    "docs/loops/t194-r5/mutants/results-run2-survivors.json",
+    "docs/loops/t194-r5/mutants/results-run3-longpath.json",
+    "docs/loops/t194-r5/mutants/run-mutants.mjs",
+    "docs/loops/t194-r5/mutants/specs.mjs",
+    "open-brain/src/planner-hook/bash.ts",
+    "open-brain/src/planner-hook/git.ts",
+    "open-brain/src/planner-hook/paths.ts",
+    "open-brain/src/planner-hook/registration.ts",
+    "open-brain/src/planner-hook/run.ts",
+    "open-brain/src/planner-hook/shell-words.ts",
+    "open-brain/tests/planner-hook/r5-fixture.ts",
+    "open-brain/tests/planner-hook/r5-property.test.ts",
+    "open-brain/tests/planner-hook/r5.test.ts"
+  ]
+}

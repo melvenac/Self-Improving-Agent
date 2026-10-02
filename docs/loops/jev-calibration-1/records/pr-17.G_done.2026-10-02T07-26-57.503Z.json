@@ -1,0 +1,395 @@
+{
+  "gate": "developer-done",
+  "loop": "17-bootstrap-fix",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:57.503Z",
+  "answered_at": "2026-10-02T07:26:57.933Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "17-bootstrap-fix",
+        "objective": "The /bootstrap fix (stacked on T-179 round 2): dispatch to a FRESH, HEADLESS QA seat (record session 135)",
+        "tasks": [
+          "docs/loops/bootstrap-fix-brief.md, rows BF-1 to BF-8, and its acceptance (a)–(e).",
+          "The acceptance list: docs/loops/t181-frogger-pilot-report.md, F1–F15. Every finding the brief put in scope must be closed.",
+          "A fresh install, by you, following the merged bootstrap.md literally, as a stranger would. Do it in two scratch projects:",
+          "(i) frogger's real shape: an existing CLAUDE.md, a leftover .agents/reflection-queue.json, no git, core.autocrlf=true;",
+          "(ii) a clean empty folder.",
+          "open-brain bootstrap check | move-residue | scaffold: residue is moved aside and named, never deleted. An existing CLAUDE.md is offered an append, never overwritten. What counts as \"not bootstrapped\"? Try an .agents/ holding only a state.json, and one holding only TASKS/.",
+          "BF-2: no template state.json reaches a new project, and the importer is the only producer. BF-1: a draft with 0 parsed tasks WARNS.",
+          "BF-5: a fresh install is role: none, and /start says NOT A SEAT with no false \"refused\" claim.",
+          "BF-7: line endings. With autocrlf=true, state.json survives a checkout round trip, and the next ob_state write works.",
+          "Forge 133's note: bootstrap check after step 4 says \"IMPORT path, not a fresh install\". Is the wording misleading to a stranger?",
+          "Mutants of your own, at least: the residue rule deletes instead of moving; the 0-task warning is removed; the template state.json is copied again."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "docs/loops/bootstrap-fix-brief.md, rows BF-1 to BF-8, and its acceptance (a)–(e).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "The acceptance list: docs/loops/t181-frogger-pilot-report.md, F1–F15. Every finding the brief put in scope must be closed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "A fresh install, by you, following the merged bootstrap.md literally, as a stranger would. Do it in two scratch projects:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "(i) frogger's real shape: an existing CLAUDE.md, a leftover .agents/reflection-queue.json, no git, core.autocrlf=true;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "(ii) a clean empty folder.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "open-brain bootstrap check | move-residue | scaffold: residue is moved aside and named, never deleted. An existing CLAUDE.md is offered an append, never overwritten. What counts as \"not bootstrapped\"? Try an .agents/ holding only a state.json, and one holding only TASKS/.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "BF-2: no template state.json reaches a new project, and the importer is the only producer. BF-1: a draft with 0 parsed tasks WARNS.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "BF-5: a fresh install is role: none, and /start says NOT A SEAT with no false \"refused\" claim.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "BF-7: line endings. With autocrlf=true, state.json survives a checkout round trip, and the next ob_state write works.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Forge 133's note: bootstrap check after step 4 says \"IMPORT path, not a fresh install\". Is the wording misleading to a stranger?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Mutants of your own, at least: the residue rule deletes instead of moving; the 0-task warning is removed; the template state.json is copied again.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "The /bootstrap fix (stacked on T-179 round 2): dispatch to a FRESH, HEADLESS QA seat (record session 135)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/bootstrap-fix-dispatch-qa.md",
+          "blob": "dd93ba6684bc4219ea825a05de3b79fdc8aaa003"
+        }
+      },
+      "candidate": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
+      "diffstat": [
+        ".agents/retirements.json",
+        ".claude/commands/end.md",
+        "CHANGELOG.md",
+        "README.md",
+        "docs/loops/bootstrap-fix-acceptance-transcript.md",
+        "docs/loops/bootstrap-fix-developer-handoff.md",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/mutants-r4.out",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/mutants-v3.out",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.json",
+        "docs/loops/dev-scripts-t179-merge/greeting.sh",
+        "docs/loops/dev-scripts-t179-merge/mutants-v3.cjs",
+        "docs/loops/dev-scripts-t179-r2/evidence/ci-runs.txt",
+        "docs/loops/dev-scripts-t179-r2/evidence/mutants-local-summary.json",
+        "docs/loops/dev-scripts-t179-r2/evidence/mutants-local.txt",
+        "docs/loops/dev-scripts-t179-r2/mutants-r2.cjs",
+        "docs/loops/t179-developer-handoff.md",
+        "docs/loops/t179-merge-developer-handoff.md",
+        "docs/loops/t179-r2-developer-handoff.md",
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/cli-session-end.ts",
+        "open-brain/src/cli-spec.ts",
+        "open-brain/src/cli.ts",
+        "open-brain/src/pipelines/bootstrap/index.ts",
+        "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+        "open-brain/src/pipelines/session-start/role-files.ts",
+        "open-brain/src/pipelines/session-start/state-render.ts",
+        "open-brain/src/pipelines/state-import/index.ts",
+        "open-brain/src/pipelines/state-migrate/index.ts",
+        "open-brain/src/pipelines/state-views/index.ts",
+        "open-brain/src/pipelines/sync/checks-state.ts",
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/src/pipelines/sync/record-erasure.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/handoff-guard.ts",
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/cli-flags.test.ts",
+        "open-brain/tests/fixtures-state/state.json",
+        "open-brain/tests/helpers/repo-record.ts",
+        "open-brain/tests/pipelines/bootstrap-fix.test.ts",
+        "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+        "open-brain/tests/pipelines/session-start/role-files.test.ts",
+        "open-brain/tests/pipelines/session-start/state-render.test.ts",
+        "open-brain/tests/pipelines/state-import-r2.test.ts",
+        "open-brain/tests/pipelines/state-import-v3.test.ts",
+        "open-brain/tests/pipelines/state-import.test.ts",
+        "open-brain/tests/pipelines/state-migrate.test.ts",
+        "open-brain/tests/pipelines/state-views.test.ts",
+        "open-brain/tests/pipelines/sync/checks.test.ts",
+        "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+        "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+        "open-brain/tests/pipelines/template-seed.test.ts",
+        "open-brain/tests/server.test.ts",
+        "open-brain/tests/setup-hooks.test.ts",
+        "open-brain/tests/shared/cli-args.test.ts",
+        "open-brain/tests/shared/closeout-erasure.test.ts",
+        "open-brain/tests/shared/handoff-guard.test.ts",
+        "open-brain/tests/shared/session-order.test.ts",
+        "open-brain/tests/shared/state-schema.test.ts",
+        "open-brain/tests/shared/state-writer.test.ts",
+        "project-template/.agents/state.json",
+        "project-template/.claude/commands/bootstrap.md",
+        "project-template/.claude/commands/end.md",
+        "project-template/.claude/rules/agents.md",
+        "project-template/.cursor/commands/end.md",
+        "project-template/.cursor/commands/sync.md",
+        "project-template/CLAUDE.md",
+        "project-template/README.md",
+        "project-template/gitattributes",
+        "project-template/gitignore",
+        "scripts/setup-hooks.mjs",
+        "scripts/setup.mjs"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 17,
+        "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+        "scored_sha": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
+        "merge_commit": "6543e8e8b1f7b67076d6996974cdeb775a2414b5"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.62
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.3
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.52
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.06
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.15,
+      "confidence": 0.78,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.89,
+        "1": 0.08,
+        "2": 0.03
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 3526,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.62 is below the required 0.7",
+      "local_tests_support_claim 0.52 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:57.922Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "3cfcc891-dbd2-49b6-b994-61b2dd631ba3",
+  "subject": {
+    "gate": "developer-done",
+    "key": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
+    "blob": "27dc25eb429c434679504748779173dc33ef0a93"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:57.503Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 17,
+  "merge_commit": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
+  "scored_sha": "6543e8e8b1f7b67076d6996974cdeb775a2414b5",
+  "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/017-bootstrap-fix.D_t.json",
+    "blob": "27dc25eb429c434679504748779173dc33ef0a93"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/retirements.json",
+    ".claude/commands/end.md",
+    "CHANGELOG.md",
+    "README.md",
+    "docs/loops/bootstrap-fix-acceptance-transcript.md",
+    "docs/loops/bootstrap-fix-developer-handoff.md",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/mutants-r4.out",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/mutants-v3.out",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.json",
+    "docs/loops/dev-scripts-t179-merge/greeting.sh",
+    "docs/loops/dev-scripts-t179-merge/mutants-v3.cjs",
+    "docs/loops/dev-scripts-t179-r2/evidence/ci-runs.txt",
+    "docs/loops/dev-scripts-t179-r2/evidence/mutants-local-summary.json",
+    "docs/loops/dev-scripts-t179-r2/evidence/mutants-local.txt",
+    "docs/loops/dev-scripts-t179-r2/mutants-r2.cjs",
+    "docs/loops/t179-developer-handoff.md",
+    "docs/loops/t179-merge-developer-handoff.md",
+    "docs/loops/t179-r2-developer-handoff.md",
+    "open-brain/src/cli-bootstrap.ts",
+    "open-brain/src/cli-session-end.ts",
+    "open-brain/src/cli-spec.ts",
+    "open-brain/src/cli.ts",
+    "open-brain/src/pipelines/bootstrap/index.ts",
+    "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+    "open-brain/src/pipelines/session-start/role-files.ts",
+    "open-brain/src/pipelines/session-start/state-render.ts",
+    "open-brain/src/pipelines/state-import/index.ts",
+    "open-brain/src/pipelines/state-migrate/index.ts",
+    "open-brain/src/pipelines/state-views/index.ts",
+    "open-brain/src/pipelines/sync/checks-state.ts",
+    "open-brain/src/pipelines/sync/checks.ts",
+    "open-brain/src/pipelines/sync/index.ts",
+    "open-brain/src/pipelines/sync/record-erasure.ts",
+    "open-brain/src/server.ts",
+    "open-brain/src/shared/handoff-guard.ts",
+    "open-brain/src/shared/state-schema.ts",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/cli-flags.test.ts",
+    "open-brain/tests/fixtures-state/state.json",
+    "open-brain/tests/helpers/repo-record.ts",
+    "open-brain/tests/pipelines/bootstrap-fix.test.ts",
+    "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+    "open-brain/tests/pipelines/session-start/role-files.test.ts",
+    "open-brain/tests/pipelines/session-start/state-render.test.ts",
+    "open-brain/tests/pipelines/state-import-r2.test.ts",
+    "open-brain/tests/pipelines/state-import-v3.test.ts",
+    "open-brain/tests/pipelines/state-import.test.ts",
+    "open-brain/tests/pipelines/state-migrate.test.ts",
+    "open-brain/tests/pipelines/state-views.test.ts",
+    "open-brain/tests/pipelines/sync/checks.test.ts",
+    "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+    "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+    "open-brain/tests/pipelines/template-seed.test.ts",
+    "open-brain/tests/server.test.ts",
+    "open-brain/tests/setup-hooks.test.ts",
+    "open-brain/tests/shared/cli-args.test.ts",
+    "open-brain/tests/shared/closeout-erasure.test.ts",
+    "open-brain/tests/shared/handoff-guard.test.ts",
+    "open-brain/tests/shared/session-order.test.ts",
+    "open-brain/tests/shared/state-schema.test.ts",
+    "open-brain/tests/shared/state-writer.test.ts",
+    "project-template/.agents/state.json",
+    "project-template/.claude/commands/bootstrap.md",
+    "project-template/.claude/commands/end.md",
+    "project-template/.claude/rules/agents.md",
+    "project-template/.cursor/commands/end.md",
+    "project-template/.cursor/commands/sync.md",
+    "project-template/CLAUDE.md",
+    "project-template/README.md",
+    "project-template/gitattributes",
+    "project-template/gitignore",
+    "scripts/setup-hooks.mjs",
+    "scripts/setup.mjs"
+  ]
+}

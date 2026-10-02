@@ -1,0 +1,319 @@
+{
+  "gate": "developer-done",
+  "loop": "16-s3-b-step1",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:56.896Z",
+  "answered_at": "2026-10-02T07:26:57.282Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "16-s3-b-step1",
+        "objective": "Candidate B, Step 1 (the G-042 repair): dispatch to a FRESH, HEADLESS QA seat to SCORE it (record session 129)",
+        "tasks": [
+          "e815e3d, pinned on origin/loop/15-slice-3-b-step1-candidate. The handoff is on origin/loop/15-slice-3-b-step1 at 285a8b2, and the diff after e815e3d is docs/ only. Base: d2685fd plus tools = ee0566d, pinned on -base. Built by Forge 126, effort medium (read from its transcript, 239 of 239 records).",
+          "The developer's claims (the planner checked the six counted runs' SHAs and conclusions, and that the diff touches no open-brain/src/):",
+          "B-1: R1 red 3/3 and RH red 1/1, at the base.",
+          "B-2: R1 green 3/3 (36224895526, 36224899537, 36224903440).",
+          "B-3: RH green 3/3 (36224907891, 36224912574, 36224916869).",
+          "B-4: every ELD row under 30 s. The worst is runtime.test.ts at 26.8 s (RH), a margin of 1.12×.",
+          "B-7.3: 1.075× the wall time.",
+          "E-4 is its own commit (a984b15).",
+          "The fix is 7 test files converted to awaited spawns through tests/spawn-async.ts, one commit per file, 117 hunks listed in handoff §5.",
+          "B-0, the static checks, first: git diff of the tools against b32d3b8; E-4's commit is the only change to them, and it is named. Check for retries, timeouts, timer patches and skips. Test counts ≥ the base's.",
+          "B-5.2, the revert mutant, which is yours: revert every hunk in handoff §5, keep everything else, then dispatch R1 once. Pass means the worst ELD row is ≥ 30 000 ms.",
+          "Re-read every counted run's B-8 record yourself (the six above, plus B-1's and B-7's), from the logs and artifacts, not the handoff. A run whose TOP5 shows another heavy process is discounted under §1's rule. Note: RH #3's baseline showed a claude process on the laptop (5 %, 364 MB). Say whether it counts under the rule and whether it matters.",
+          "Your own runs: at most 4 more laptop dispatches (for example, a second RH ×1 at the candidate, to see runtime.test.ts's 26.8 s margin again, or a heavier row). The laptop is B's during your run. Aaron is told.",
+          "spawn-async.ts: read it as the product it now is for 7 files. Does an awaited spawn keep each test's assertions and exit-code checks exactly? Are there orphaned children on timeout? It has its own tests and mutants; check them.",
+          "The developer's unresolved EPERM (1 in 15 desktop runs of the converted state-import-staleness, from the rename in runCommit): try to reproduce it here on the QA PC's NTFS. Is it the Windows rename-flake class QA 122 recorded, or something the conversion introduced?",
+          "Laptop: the counted runs in (2) and (4), at most 5 dispatches in total, one at a time. tcm: at most 4.",
+          "Push only qa/b-step1-, through node docs/loops/qa-129/push-qa.mjs <branch>. git push is denied.",
+          "Never: master, merges, PRs, tags, releases, other seats' branches, or this PC's or the laptop's configuration.",
+          "Path: docs/loops/loop-15-slice-3-b-step1-qa-report.md. Put the verdict first, then B-0 to B-9 each with pass or fail and its evidence, then your runs, what could not be verified, defects, disagreements, your error entries, reproduction, and \"Open for the planner\".",
+          "Model and effort from your process command line and transcript.",
+          "Commit it to qa/b-step1-report, and push with push-qa.mjs.",
+          "The LAST line is exactly QA-129: REPORT COMPLETE. No /end (T-163)."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "e815e3d, pinned on origin/loop/15-slice-3-b-step1-candidate. The handoff is on origin/loop/15-slice-3-b-step1 at 285a8b2, and the diff after e815e3d is docs/ only. Base: d2685fd plus tools = ee0566d, pinned on -base. Built by Forge 126, effort medium (read from its transcript, 239 of 239 records).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "The developer's claims (the planner checked the six counted runs' SHAs and conclusions, and that the diff touches no open-brain/src/):",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "B-1: R1 red 3/3 and RH red 1/1, at the base.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "B-2: R1 green 3/3 (36224895526, 36224899537, 36224903440).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "B-3: RH green 3/3 (36224907891, 36224912574, 36224916869).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "B-4: every ELD row under 30 s. The worst is runtime.test.ts at 26.8 s (RH), a margin of 1.12×.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "B-7.3: 1.075× the wall time.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "E-4 is its own commit (a984b15).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "The fix is 7 test files converted to awaited spawns through tests/spawn-async.ts, one commit per file, 117 hunks listed in handoff §5.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "B-0, the static checks, first: git diff of the tools against b32d3b8; E-4's commit is the only change to them, and it is named. Check for retries, timeouts, timer patches and skips. Test counts ≥ the base's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "B-5.2, the revert mutant, which is yours: revert every hunk in handoff §5, keep everything else, then dispatch R1 once. Pass means the worst ELD row is ≥ 30 000 ms.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Re-read every counted run's B-8 record yourself (the six above, plus B-1's and B-7's), from the logs and artifacts, not the handoff. A run whose TOP5 shows another heavy process is discounted under §1's rule. Note: RH #3's baseline showed a claude process on the laptop (5 %, 364 MB). Say whether it counts under the rule and whether it matters.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Your own runs: at most 4 more laptop dispatches (for example, a second RH ×1 at the candidate, to see runtime.test.ts's 26.8 s margin again, or a heavier row). The laptop is B's during your run. Aaron is told.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "spawn-async.ts: read it as the product it now is for 7 files. Does an awaited spawn keep each test's assertions and exit-code checks exactly? Are there orphaned children on timeout? It has its own tests and mutants; check them.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "The developer's unresolved EPERM (1 in 15 desktop runs of the converted state-import-staleness, from the rename in runCommit): try to reproduce it here on the QA PC's NTFS. Is it the Windows rename-flake class QA 122 recorded, or something the conversion introduced?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Laptop: the counted runs in (2) and (4), at most 5 dispatches in total, one at a time. tcm: at most 4.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "Push only qa/b-step1-, through node docs/loops/qa-129/push-qa.mjs <branch>. git push is denied.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "Never: master, merges, PRs, tags, releases, other seats' branches, or this PC's or the laptop's configuration.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "Path: docs/loops/loop-15-slice-3-b-step1-qa-report.md. Put the verdict first, then B-0 to B-9 each with pass or fail and its evidence, then your runs, what could not be verified, defects, disagreements, your error entries, reproduction, and \"Open for the planner\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "Model and effort from your process command line and transcript.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "Commit it to qa/b-step1-report, and push with push-qa.mjs.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "The LAST line is exactly QA-129: REPORT COMPLETE. No /end (T-163).",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Candidate B, Step 1 (the G-042 repair): dispatch to a FRESH, HEADLESS QA seat to SCORE it (record session 129)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-b-dispatch-qa.md",
+          "blob": "c04957b42327ffd31ef0bf29505357eb0a2f7996"
+        }
+      },
+      "candidate": "e815e3d9ed4e43943d9147301afaae24d273b1b2",
+      "diffstat": [
+        ".github/workflows/ci.yml",
+        "open-brain/scripts/load-generator.mjs",
+        "open-brain/tests/cli-bootstrap.test.ts",
+        "open-brain/tests/eld-setup.ts",
+        "open-brain/tests/pipelines/session-start/derived-artifacts.test.ts",
+        "open-brain/tests/pipelines/state-import-r2.test.ts",
+        "open-brain/tests/pipelines/state-import-r4.test.ts",
+        "open-brain/tests/pipelines/state-import-staleness.test.ts",
+        "open-brain/tests/pipelines/sync/staleness.test.ts",
+        "open-brain/tests/spawn-async.test.ts",
+        "open-brain/tests/spawn-async.ts",
+        "open-brain/tests/trigger/hook.test.ts",
+        "open-brain/vitest.config.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 16,
+        "base_sha": "d2685fde9d7578a0d021ac0687003520a87f2522",
+        "scored_sha": "e815e3d9ed4e43943d9147301afaae24d273b1b2",
+        "merge_commit": "e815e3d9ed4e43943d9147301afaae24d273b1b2"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.64
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.54
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.06,
+      "confidence": 0.91,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.95,
+        "1": 0.04,
+        "2": 0.01
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 3847,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.64 is below the required 0.7",
+      "local_tests_support_claim 0.54 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:57.271Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "42d58f06-c82d-4499-a705-75d3f5cb2ba8",
+  "subject": {
+    "gate": "developer-done",
+    "key": "e815e3d9ed4e43943d9147301afaae24d273b1b2",
+    "blob": "7b0ef8caea051176646558d648bc82e536fbf4a3"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:56.896Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 16,
+  "merge_commit": "e815e3d9ed4e43943d9147301afaae24d273b1b2",
+  "scored_sha": "e815e3d9ed4e43943d9147301afaae24d273b1b2",
+  "base_sha": "d2685fde9d7578a0d021ac0687003520a87f2522",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/016-s3-b-step1.D_t.json",
+    "blob": "7b0ef8caea051176646558d648bc82e536fbf4a3"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".github/workflows/ci.yml",
+    "open-brain/scripts/load-generator.mjs",
+    "open-brain/tests/cli-bootstrap.test.ts",
+    "open-brain/tests/eld-setup.ts",
+    "open-brain/tests/pipelines/session-start/derived-artifacts.test.ts",
+    "open-brain/tests/pipelines/state-import-r2.test.ts",
+    "open-brain/tests/pipelines/state-import-r4.test.ts",
+    "open-brain/tests/pipelines/state-import-staleness.test.ts",
+    "open-brain/tests/pipelines/sync/staleness.test.ts",
+    "open-brain/tests/spawn-async.test.ts",
+    "open-brain/tests/spawn-async.ts",
+    "open-brain/tests/trigger/hook.test.ts",
+    "open-brain/vitest.config.ts"
+  ]
+}

@@ -1,0 +1,414 @@
+{
+  "gate": "developer-done",
+  "loop": "19-importer-leftovers",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:58.841Z",
+  "answered_at": "2026-10-02T07:26:59.422Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "19-importer-leftovers",
+        "objective": "Importer leftovers (R4-4, R4-5, O7, O14), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 138)",
+        "tasks": [
+          "R4-4: QA 122's D11 shapes (qa/importer-fixes-r4-d11 aff7135): UTF-32LE, UTF-32BE and UTF-7 are unreadable and block. Also a BOM that lies, zero bytes (O12), a UTF-8 BOM then UTF-16, and a judged input with no readable # title. Write each shape with Windows PowerShell 5.1 itself, not only as bytes. IF-10's +13/+1 still commit.",
+          "The no-title rule's reach: it makes any judged input whose first heading is not # unreadable. Search for legitimate inputs it would now block: a project whose INBOX starts with a front-matter block, a comment or a blank line. The planner checked co-op-mailer's three inputs (each has a # title on line 1). Find a real shape it would wrongly block, or say none was found.",
+          "R4-5: a DECISIONS.md with NUL bytes does not block. The report, --draft and --commit each name its NUL count, first byte, the ADRs imported and those NOT imported.",
+          "O7: the two-marker refusal names the OLDEST snapshot. O14: the reason is required by type.",
+          "Forge 131's finding that contradicts QA 122's O13: on Forge's PC, Node 22.23.2's readFileSync gets EBUSY on a file held with FileShare.None. Reproduce it on this PC. If it holds, the importer's own EBUSY read path is untested (Forge 131's §7 item 2). Test what the importer does: refuse, or crash?",
+          "The probes, byte-exact: QA 111's probes-r3 (expected 17/4, with the same R3-2 FAIL ids) and QA 122's probes-r4 (expected 16/0 with the recorded one-line hold diff; say whether the unmodified script crashes here).",
+          "Mutants of your own, at least: the UTF-32 check after UTF-16 again; the no-title rule removed; R4-5's naming dropped from --commit's output."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "R4-4: QA 122's D11 shapes (qa/importer-fixes-r4-d11 aff7135): UTF-32LE, UTF-32BE and UTF-7 are unreadable and block. Also a BOM that lies, zero bytes (O12), a UTF-8 BOM then UTF-16, and a judged input with no readable # title. Write each shape with Windows PowerShell 5.1 itself, not only as bytes. IF-10's +13/+1 still commit.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "The no-title rule's reach: it makes any judged input whose first heading is not # unreadable. Search for legitimate inputs it would now block: a project whose INBOX starts with a front-matter block, a comment or a blank line. The planner checked co-op-mailer's three inputs (each has a # title on line 1). Find a real shape it would wrongly block, or say none was found.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "R4-5: a DECISIONS.md with NUL bytes does not block. The report, --draft and --commit each name its NUL count, first byte, the ADRs imported and those NOT imported.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "O7: the two-marker refusal names the OLDEST snapshot. O14: the reason is required by type.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Forge 131's finding that contradicts QA 122's O13: on Forge's PC, Node 22.23.2's readFileSync gets EBUSY on a file held with FileShare.None. Reproduce it on this PC. If it holds, the importer's own EBUSY read path is untested (Forge 131's §7 item 2). Test what the importer does: refuse, or crash?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "The probes, byte-exact: QA 111's probes-r3 (expected 17/4, with the same R3-2 FAIL ids) and QA 122's probes-r4 (expected 16/0 with the recorded one-line hold diff; say whether the unmodified script crashes here).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Mutants of your own, at least: the UTF-32 check after UTF-16 again; the no-title rule removed; R4-5's naming dropped from --commit's output.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Importer leftovers (R4-4, R4-5, O7, O14), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 138)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/importer-leftovers-dispatch-qa.md",
+          "blob": "7dece6639bda6033698d52095fb0eb797cc6c86e"
+        }
+      },
+      "candidate": "d500730953db3f69ef528f431474477149757383",
+      "diffstat": [
+        ".agents/retirements.json",
+        ".claude/commands/end.md",
+        "README.md",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/ci-36229195715-red.txt",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/ci-36229390124-green.txt",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/ci-36230714062-final.txt",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/importer-files-e222124.out",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/importer-files-ec6b3ce.out",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M1-utf32-first.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M10-no-nul-strip.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M11-no-filter.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M12-o7-reversed.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M13-o7-unsorted.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M14-o7-one-marker-text.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M15-o14-optional.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M16-o14-producer.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M2-le-bom-nul.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M3-be-bom-nul.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M4-no-title.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M5-not-judged-line.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M6-report-block.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M7-draft-source.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M8-commit-output.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M9-draft-output.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/mutants-leftovers.out",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/probes-r3-e222124.out",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/probes-r4-e222124.out",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/probes-r4-noNone-e222124.out",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/probes-r4-noNone.diff",
+        "docs/loops/dev-scripts-importer-leftovers/evidence/red-local-f618b73.out",
+        "docs/loops/dev-scripts-importer-leftovers/mutants-leftovers.cjs",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/mutants-r4.out",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/mutants-v3.out",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.json",
+        "docs/loops/dev-scripts-t179-merge/greeting.sh",
+        "docs/loops/dev-scripts-t179-merge/mutants-v3.cjs",
+        "docs/loops/dev-scripts-t179-r2/evidence/ci-runs.txt",
+        "docs/loops/dev-scripts-t179-r2/evidence/mutants-local-summary.json",
+        "docs/loops/dev-scripts-t179-r2/evidence/mutants-local.txt",
+        "docs/loops/dev-scripts-t179-r2/mutants-r2.cjs",
+        "docs/loops/importer-leftovers-developer-handoff.md",
+        "docs/loops/t179-developer-handoff.md",
+        "docs/loops/t179-merge-developer-handoff.md",
+        "docs/loops/t179-r2-developer-handoff.md",
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/cli-session-end.ts",
+        "open-brain/src/cli-spec.ts",
+        "open-brain/src/cli.ts",
+        "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+        "open-brain/src/pipelines/session-start/role-files.ts",
+        "open-brain/src/pipelines/session-start/state-render.ts",
+        "open-brain/src/pipelines/state-import/index.ts",
+        "open-brain/src/pipelines/state-migrate/index.ts",
+        "open-brain/src/pipelines/state-views/index.ts",
+        "open-brain/src/pipelines/sync/checks-state.ts",
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/src/pipelines/sync/record-erasure.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/handoff-guard.ts",
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/cli-flags.test.ts",
+        "open-brain/tests/fixtures-state/state.json",
+        "open-brain/tests/helpers/repo-record.ts",
+        "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+        "open-brain/tests/pipelines/session-start/state-render.test.ts",
+        "open-brain/tests/pipelines/state-import-leftovers.test.ts",
+        "open-brain/tests/pipelines/state-import-qa122.test.ts",
+        "open-brain/tests/pipelines/state-import-r2.test.ts",
+        "open-brain/tests/pipelines/state-import-v3.test.ts",
+        "open-brain/tests/pipelines/state-import.test.ts",
+        "open-brain/tests/pipelines/state-migrate.test.ts",
+        "open-brain/tests/pipelines/state-views.test.ts",
+        "open-brain/tests/pipelines/sync/checks.test.ts",
+        "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+        "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+        "open-brain/tests/pipelines/template-seed.test.ts",
+        "open-brain/tests/server.test.ts",
+        "open-brain/tests/setup-hooks.test.ts",
+        "open-brain/tests/shared/cli-args.test.ts",
+        "open-brain/tests/shared/closeout-erasure.test.ts",
+        "open-brain/tests/shared/handoff-guard.test.ts",
+        "open-brain/tests/shared/session-order.test.ts",
+        "open-brain/tests/shared/state-schema.test.ts",
+        "open-brain/tests/shared/state-writer.test.ts",
+        "project-template/.agents/state.json",
+        "project-template/.claude/commands/bootstrap.md",
+        "project-template/.claude/commands/end.md",
+        "project-template/.claude/rules/agents.md",
+        "project-template/.cursor/commands/end.md",
+        "project-template/.cursor/commands/sync.md",
+        "scripts/setup-hooks.mjs",
+        "scripts/setup.mjs"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 19,
+        "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+        "scored_sha": "d500730953db3f69ef528f431474477149757383",
+        "merge_commit": "d500730953db3f69ef528f431474477149757383"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.41
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.31
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.44
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.15,
+      "confidence": 0.77,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.88,
+        "1": 0.08,
+        "2": 0.04
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 4471,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.41 is below the required 0.7",
+      "touches_out_of_scope 0.31 is above the permitted 0.3",
+      "local_tests_support_claim 0.44 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:59.411Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "9c3a9ae6-8fdc-4e5c-84c6-c7b9575ff406",
+  "subject": {
+    "gate": "developer-done",
+    "key": "d500730953db3f69ef528f431474477149757383",
+    "blob": "b38abc7a8a060d7997ce8a36402b806457b3fd41"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:58.841Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 19,
+  "merge_commit": "d500730953db3f69ef528f431474477149757383",
+  "scored_sha": "d500730953db3f69ef528f431474477149757383",
+  "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/019-importer-leftovers.D_t.json",
+    "blob": "b38abc7a8a060d7997ce8a36402b806457b3fd41"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/retirements.json",
+    ".claude/commands/end.md",
+    "README.md",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/ci-36229195715-red.txt",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/ci-36229390124-green.txt",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/ci-36230714062-final.txt",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/importer-files-e222124.out",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/importer-files-ec6b3ce.out",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M1-utf32-first.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M10-no-nul-strip.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M11-no-filter.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M12-o7-reversed.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M13-o7-unsorted.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M14-o7-one-marker-text.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M15-o14-optional.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M16-o14-producer.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M2-le-bom-nul.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M3-be-bom-nul.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M4-no-title.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M5-not-judged-line.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M6-report-block.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M7-draft-source.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M8-commit-output.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/M9-draft-output.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/mutants/mutants-leftovers.out",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/probes-r3-e222124.out",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/probes-r4-e222124.out",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/probes-r4-noNone-e222124.out",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/probes-r4-noNone.diff",
+    "docs/loops/dev-scripts-importer-leftovers/evidence/red-local-f618b73.out",
+    "docs/loops/dev-scripts-importer-leftovers/mutants-leftovers.cjs",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/mutants-r4.out",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/mutants-v3.out",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.json",
+    "docs/loops/dev-scripts-t179-merge/greeting.sh",
+    "docs/loops/dev-scripts-t179-merge/mutants-v3.cjs",
+    "docs/loops/dev-scripts-t179-r2/evidence/ci-runs.txt",
+    "docs/loops/dev-scripts-t179-r2/evidence/mutants-local-summary.json",
+    "docs/loops/dev-scripts-t179-r2/evidence/mutants-local.txt",
+    "docs/loops/dev-scripts-t179-r2/mutants-r2.cjs",
+    "docs/loops/importer-leftovers-developer-handoff.md",
+    "docs/loops/t179-developer-handoff.md",
+    "docs/loops/t179-merge-developer-handoff.md",
+    "docs/loops/t179-r2-developer-handoff.md",
+    "open-brain/src/cli-bootstrap.ts",
+    "open-brain/src/cli-session-end.ts",
+    "open-brain/src/cli-spec.ts",
+    "open-brain/src/cli.ts",
+    "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+    "open-brain/src/pipelines/session-start/role-files.ts",
+    "open-brain/src/pipelines/session-start/state-render.ts",
+    "open-brain/src/pipelines/state-import/index.ts",
+    "open-brain/src/pipelines/state-migrate/index.ts",
+    "open-brain/src/pipelines/state-views/index.ts",
+    "open-brain/src/pipelines/sync/checks-state.ts",
+    "open-brain/src/pipelines/sync/checks.ts",
+    "open-brain/src/pipelines/sync/index.ts",
+    "open-brain/src/pipelines/sync/record-erasure.ts",
+    "open-brain/src/server.ts",
+    "open-brain/src/shared/handoff-guard.ts",
+    "open-brain/src/shared/state-schema.ts",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/cli-flags.test.ts",
+    "open-brain/tests/fixtures-state/state.json",
+    "open-brain/tests/helpers/repo-record.ts",
+    "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+    "open-brain/tests/pipelines/session-start/state-render.test.ts",
+    "open-brain/tests/pipelines/state-import-leftovers.test.ts",
+    "open-brain/tests/pipelines/state-import-qa122.test.ts",
+    "open-brain/tests/pipelines/state-import-r2.test.ts",
+    "open-brain/tests/pipelines/state-import-v3.test.ts",
+    "open-brain/tests/pipelines/state-import.test.ts",
+    "open-brain/tests/pipelines/state-migrate.test.ts",
+    "open-brain/tests/pipelines/state-views.test.ts",
+    "open-brain/tests/pipelines/sync/checks.test.ts",
+    "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+    "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+    "open-brain/tests/pipelines/template-seed.test.ts",
+    "open-brain/tests/server.test.ts",
+    "open-brain/tests/setup-hooks.test.ts",
+    "open-brain/tests/shared/cli-args.test.ts",
+    "open-brain/tests/shared/closeout-erasure.test.ts",
+    "open-brain/tests/shared/handoff-guard.test.ts",
+    "open-brain/tests/shared/session-order.test.ts",
+    "open-brain/tests/shared/state-schema.test.ts",
+    "open-brain/tests/shared/state-writer.test.ts",
+    "project-template/.agents/state.json",
+    "project-template/.claude/commands/bootstrap.md",
+    "project-template/.claude/commands/end.md",
+    "project-template/.claude/rules/agents.md",
+    "project-template/.cursor/commands/end.md",
+    "project-template/.cursor/commands/sync.md",
+    "scripts/setup-hooks.mjs",
+    "scripts/setup.mjs"
+  ]
+}
