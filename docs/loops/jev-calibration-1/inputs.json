@@ -1,0 +1,375 @@
+{
+  "built": [
+    {
+      "case_id": "loop-15-slice-3",
+      "case_no": 1,
+      "file": "inputs/001-loop-15-slice-3.D_t.json"
+    },
+    {
+      "case_id": "s3-a4",
+      "case_no": 2,
+      "file": "inputs/002-s3-a4.D_t.json"
+    },
+    {
+      "case_id": "s3-a5",
+      "case_no": 3,
+      "file": "inputs/003-s3-a5.D_t.json"
+    },
+    {
+      "case_id": "s3-a6",
+      "case_no": 4,
+      "file": "inputs/004-s3-a6.D_t.json"
+    },
+    {
+      "case_id": "s3-a7",
+      "case_no": 5,
+      "file": "inputs/005-s3-a7.D_t.json"
+    },
+    {
+      "case_id": "s3-a8",
+      "case_no": 6,
+      "file": "inputs/006-s3-a8.D_t.json"
+    },
+    {
+      "case_id": "importer-fixes",
+      "case_no": 7,
+      "file": "inputs/007-importer-fixes.D_t.json"
+    },
+    {
+      "case_id": "s3-a9",
+      "case_no": 8,
+      "file": "inputs/008-s3-a9.D_t.json"
+    },
+    {
+      "case_id": "importer-fixes-r2",
+      "case_no": 9,
+      "file": "inputs/009-importer-fixes-r2.D_t.json"
+    },
+    {
+      "case_id": "s3-a10",
+      "case_no": 10,
+      "file": "inputs/010-s3-a10.D_t.json"
+    },
+    {
+      "case_id": "importer-fixes-r3",
+      "case_no": 11,
+      "file": "inputs/011-importer-fixes-r3.D_t.json"
+    },
+    {
+      "case_id": "t183",
+      "case_no": 12,
+      "file": "inputs/012-t183.D_t.json"
+    },
+    {
+      "case_id": "t185",
+      "case_no": 13,
+      "file": "inputs/013-t185.D_t.json"
+    },
+    {
+      "case_id": "importer-fixes-r4",
+      "case_no": 14,
+      "file": "inputs/014-importer-fixes-r4.D_t.json"
+    },
+    {
+      "case_id": "t179",
+      "case_no": 15,
+      "file": "inputs/015-t179.D_t.json"
+    },
+    {
+      "case_id": "s3-b-step1",
+      "case_no": 16,
+      "file": "inputs/016-s3-b-step1.D_t.json"
+    },
+    {
+      "case_id": "bootstrap-fix",
+      "case_no": 17,
+      "file": "inputs/017-bootstrap-fix.D_t.json"
+    },
+    {
+      "case_id": "s3-a11",
+      "case_no": 18,
+      "file": "inputs/018-s3-a11.D_t.json"
+    },
+    {
+      "case_id": "importer-leftovers",
+      "case_no": 19,
+      "file": "inputs/019-importer-leftovers.D_t.json"
+    },
+    {
+      "case_id": "t179-r2",
+      "case_no": 20,
+      "file": "inputs/020-t179-r2.D_t.json"
+    },
+    {
+      "case_id": "t003",
+      "case_no": 21,
+      "file": "inputs/021-t003.D_t.json"
+    },
+    {
+      "case_id": "t171",
+      "case_no": 22,
+      "file": "inputs/022-t171.D_t.json"
+    },
+    {
+      "case_id": "bootstrap-fix-r3",
+      "case_no": 23,
+      "file": "inputs/023-bootstrap-fix-r3.D_t.json"
+    },
+    {
+      "case_id": "t048-r1",
+      "case_no": 24,
+      "file": "inputs/024-t048-r1.D_t.json"
+    },
+    {
+      "case_id": "s3-a12",
+      "case_no": 25,
+      "file": "inputs/025-s3-a12.D_t.json"
+    },
+    {
+      "case_id": "t048-r2",
+      "case_no": 26,
+      "file": "inputs/026-t048-r2.D_t.json"
+    },
+    {
+      "case_id": "importer-leftovers-r5",
+      "case_no": 27,
+      "file": "inputs/027-importer-leftovers-r5.D_t.json"
+    },
+    {
+      "case_id": "t171-r2",
+      "case_no": 28,
+      "file": "inputs/028-t171-r2.D_t.json"
+    },
+    {
+      "case_id": "t003-r2",
+      "case_no": 29,
+      "file": "inputs/029-t003-r2.D_t.json"
+    },
+    {
+      "case_id": "cal-a12-composer",
+      "case_no": 30,
+      "file": "inputs/030-cal-a12-composer.D_t.json"
+    },
+    {
+      "case_id": "s3-a13",
+      "case_no": 31,
+      "file": "inputs/031-s3-a13.D_t.json"
+    },
+    {
+      "case_id": "t171-r3",
+      "case_no": 32,
+      "file": "inputs/032-t171-r3.D_t.json"
+    },
+    {
+      "case_id": "importer-leftovers-r6",
+      "case_no": 33,
+      "file": "inputs/033-importer-leftovers-r6.D_t.json"
+    },
+    {
+      "case_id": "t048-r1b",
+      "case_no": 34,
+      "file": "inputs/034-t048-r1b.D_t.json"
+    },
+    {
+      "case_id": "s3-b2",
+      "case_no": 35,
+      "file": "inputs/035-s3-b2.D_t.json"
+    },
+    {
+      "case_id": "t048-r3",
+      "case_no": 36,
+      "file": "inputs/036-t048-r3.D_t.json"
+    },
+    {
+      "case_id": "t192",
+      "case_no": 37,
+      "file": "inputs/037-t192.D_t.json"
+    },
+    {
+      "case_id": "bootstrap-fix-r4",
+      "case_no": 38,
+      "file": "inputs/038-bootstrap-fix-r4.D_t.json"
+    },
+    {
+      "case_id": "t048-r2b",
+      "case_no": 39,
+      "file": "inputs/039-t048-r2b.D_t.json"
+    },
+    {
+      "case_id": "qa-driver-cursor-r2",
+      "case_no": 40,
+      "file": "inputs/040-qa-driver-cursor-r2.D_t.json"
+    },
+    {
+      "case_id": "t192-d1",
+      "case_no": 41,
+      "file": "inputs/041-t192-d1.D_t.json"
+    },
+    {
+      "case_id": "t046-detector",
+      "case_no": 42,
+      "file": "inputs/042-t046-detector.D_t.json"
+    },
+    {
+      "case_id": "qa-driver-cursor-r3",
+      "case_no": 43,
+      "file": "inputs/043-qa-driver-cursor-r3.D_t.json"
+    },
+    {
+      "case_id": "t176-index-direction",
+      "case_no": 44,
+      "file": "inputs/044-t176-index-direction.D_t.json"
+    },
+    {
+      "case_id": "t046-d1",
+      "case_no": 45,
+      "file": "inputs/045-t046-d1.D_t.json"
+    },
+    {
+      "case_id": "s3-c",
+      "case_no": 46,
+      "file": "inputs/046-s3-c.D_t.json"
+    },
+    {
+      "case_id": "s3-c-r2",
+      "case_no": 47,
+      "file": "inputs/047-s3-c-r2.D_t.json"
+    },
+    {
+      "case_id": "t178-ci-on-push",
+      "case_no": 48,
+      "file": "inputs/048-t178-ci-on-push.D_t.json"
+    },
+    {
+      "case_id": "s3-c-r3",
+      "case_no": 49,
+      "file": "inputs/049-s3-c-r3.D_t.json"
+    },
+    {
+      "case_id": "qa-driver-cursor-r5",
+      "case_no": 50,
+      "file": "inputs/050-qa-driver-cursor-r5.D_t.json"
+    },
+    {
+      "case_id": "t195",
+      "case_no": 51,
+      "file": "inputs/051-t195.D_t.json"
+    },
+    {
+      "case_id": "t195-r2",
+      "case_no": 52,
+      "file": "inputs/052-t195-r2.D_t.json"
+    },
+    {
+      "case_id": "t158",
+      "case_no": 53,
+      "file": "inputs/053-t158.D_t.json"
+    },
+    {
+      "case_id": "t196-t197",
+      "case_no": 54,
+      "file": "inputs/054-t196-t197.D_t.json"
+    },
+    {
+      "case_id": "t198",
+      "case_no": 55,
+      "file": "inputs/055-t198.D_t.json"
+    },
+    {
+      "case_id": "qa-probes-on-master",
+      "case_no": 56,
+      "file": "inputs/056-qa-probes-on-master.D_t.json"
+    },
+    {
+      "case_id": "t158-r2",
+      "case_no": 57,
+      "file": "inputs/057-t158-r2.D_t.json"
+    },
+    {
+      "case_id": "t196-t197-r2",
+      "case_no": 58,
+      "file": "inputs/058-t196-t197-r2.D_t.json"
+    },
+    {
+      "case_id": "t198-r2",
+      "case_no": 59,
+      "file": "inputs/059-t198-r2.D_t.json"
+    },
+    {
+      "case_id": "s3-c-r4",
+      "case_no": 60,
+      "file": "inputs/060-s3-c-r4.D_t.json"
+    },
+    {
+      "case_id": "t194-r2",
+      "case_no": 61,
+      "file": "inputs/061-t194-r2.D_t.json"
+    },
+    {
+      "case_id": "t194-r3",
+      "case_no": 62,
+      "file": "inputs/062-t194-r3.D_t.json"
+    },
+    {
+      "case_id": "t194-r4",
+      "case_no": 63,
+      "file": "inputs/063-t194-r4.D_t.json"
+    },
+    {
+      "case_id": "t216",
+      "case_no": 64,
+      "file": "inputs/064-t216.D_t.json"
+    },
+    {
+      "case_id": "t214",
+      "case_no": 65,
+      "file": "inputs/065-t214.D_t.json"
+    },
+    {
+      "case_id": "t194-r5",
+      "case_no": 66,
+      "file": "inputs/066-t194-r5.D_t.json"
+    },
+    {
+      "case_id": "loop-15-slice-4-step2",
+      "case_no": 67,
+      "file": "inputs/067-loop-15-slice-4-step2.D_t.json"
+    },
+    {
+      "case_id": "loop-15-slice-4-step2-r2",
+      "case_no": 68,
+      "file": "inputs/068-loop-15-slice-4-step2-r2.D_t.json"
+    },
+    {
+      "case_id": "t194-r6",
+      "case_no": 69,
+      "file": "inputs/069-t194-r6.D_t.json"
+    },
+    {
+      "case_id": "loop-15-slice-4-step2-r3",
+      "case_no": 70,
+      "file": "inputs/070-loop-15-slice-4-step2-r3.D_t.json"
+    },
+    {
+      "case_id": "loop-15-slice-4-step2-r4",
+      "case_no": 71,
+      "file": "inputs/071-loop-15-slice-4-step2-r4.D_t.json"
+    },
+    {
+      "case_id": "t194-r7",
+      "case_no": 72,
+      "file": "inputs/072-t194-r7.D_t.json"
+    },
+    {
+      "case_id": "t217-t218",
+      "case_no": 73,
+      "file": "inputs/073-t217-t218.D_t.json"
+    },
+    {
+      "case_id": "t164-t211",
+      "case_no": 74,
+      "file": "inputs/074-t164-t211.D_t.json"
+    }
+  ],
+  "dropped": []
+}

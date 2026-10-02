@@ -1,0 +1,77 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "T171-D1: a replace that removes nothing keeps the previous authors in note_by and adds the writer.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "An unrecorded (null) note stays null.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The same session's next replace can no longer remove another session's text without replace_other_sessions. Use QA 144's C2h shape.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "T171-D3: QA 144's three mutants, re-applied to a78a883 and run on tcm, must each be killed now:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "dry-run-hides-replace;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "removes-by-length;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "superset-foreign-unflagged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "T171-D2: the REPLACED line quotes the first old line the new text does not contain. Try a prefix-keeping edit, a middle deletion, and an edit that keeps every line but changes one word.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Regressions: QA 144's checks 1–4 on the new tip, and the T-169 shape.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Your own mutants, at least one per defect.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "28-t171-r2",
+  "new_capability": "T-171 round 2 (note authorship): dispatch to a FRESH, HEADLESS QA seat (record session 158)",
+  "objective": "T-171 round 2 (note authorship): dispatch to a FRESH, HEADLESS QA seat (record session 158)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "0e57896f631a44fe0c3ad152186cd455fd0b1540",
+    "path": "docs/loops/t171-r2-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "T171-D1: a replace that removes nothing keeps the previous authors in note_by and adds the writer.",
+    "An unrecorded (null) note stays null.",
+    "The same session's next replace can no longer remove another session's text without replace_other_sessions. Use QA 144's C2h shape.",
+    "T171-D3: QA 144's three mutants, re-applied to a78a883 and run on tcm, must each be killed now:",
+    "dry-run-hides-replace;",
+    "removes-by-length;",
+    "superset-foreign-unflagged.",
+    "T171-D2: the REPLACED line quotes the first old line the new text does not contain. Try a prefix-keeping edit, a middle deletion, and an edit that keeps every line but changes one word.",
+    "Regressions: QA 144's checks 1–4 on the new tip, and the T-169 shape.",
+    "Your own mutants, at least one per defect."
+  ]
+}

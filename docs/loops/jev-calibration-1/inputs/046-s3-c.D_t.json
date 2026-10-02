@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "The developer's full local vitest exited 1 (\"timeouts plus the pre-existing Windows symlink EPERM\"). Run the full suite on tcm at 2035e89 and at the base, and say whether any failure is new.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "CC-13.2: the diff touches only pipelines/sync/index.ts, not checks.ts. Confirm that the /sync check exists, runs on every sync, and fails on a malformed ledger line.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Coverage: the handoff shows 17 tests for about 24 rows. Name every row that no test asserts.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Your own mutants, at least two, on qa/c-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "46-s3-c",
+  "new_capability": "Candidate C (T-155, the shadow merge gate): QA dispatch (record 204)",
+  "objective": "Candidate C (T-155, the shadow merge gate): QA dispatch (record 204)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "7163aaf3f3f524147a4f5c7c9411dfe35369dbe5",
+    "path": "docs/loops/loop-15-slice-3-c-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "The developer's full local vitest exited 1 (\"timeouts plus the pre-existing Windows symlink EPERM\"). Run the full suite on tcm at 2035e89 and at the base, and say whether any failure is new.",
+    "CC-13.2: the diff touches only pipelines/sync/index.ts, not checks.ts. Confirm that the /sync check exists, runs on every sync, and fails on a malformed ledger line.",
+    "Coverage: the handoff shows 17 tests for about 24 rows. Name every row that no test asserts.",
+    "Your own mutants, at least two, on qa/c-mut-."
+  ]
+}

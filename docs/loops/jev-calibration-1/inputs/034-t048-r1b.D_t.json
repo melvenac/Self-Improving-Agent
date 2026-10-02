@@ -1,0 +1,71 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "D1:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "module-boundary and template-personal-names never return before naming every real finding;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "retirements lists real findings before unreadables.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Use QA 151's shape: an unreadable path beside a real personal name, a real crossing and a real retired name. All three must be named.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "D2: FALLBACK and PARTIAL stay in the message when there is also a finding.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "D3: the scope statement is complete in every check.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Preserve: everything QA 151 passed. Every truly unreadable path is still an ISSUE naming it, and sync --check on this repository gives the same verdicts as at 7913c5f.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "QA 151's real-unreadable-path probes (icacls, share-None, EISDIR, ENOENT) may run locally, ONE CLI invocation each, against a scratch clone. That is light, and no window opens.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Your own mutants, at least one per item.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "34-t048-r1b",
+  "new_capability": "T-048 round 1b: QA dispatch (record 173)",
+  "objective": "T-048 round 1b: QA dispatch (record 173)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "7e5c7f8ce5f955426fa1f5a9ecf72be06080b2fe",
+    "path": "docs/loops/t048-r1b-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "D1:",
+    "module-boundary and template-personal-names never return before naming every real finding;",
+    "retirements lists real findings before unreadables.",
+    "Use QA 151's shape: an unreadable path beside a real personal name, a real crossing and a real retired name. All three must be named.",
+    "D2: FALLBACK and PARTIAL stay in the message when there is also a finding.",
+    "D3: the scope statement is complete in every check.",
+    "Preserve: everything QA 151 passed. Every truly unreadable path is still an ISSUE naming it, and sync --check on this repository gives the same verdicts as at 7913c5f.",
+    "QA 151's real-unreadable-path probes (icacls, share-None, EISDIR, ENOENT) may run locally, ONE CLI invocation each, against a scratch clone. That is light, and no window opens.",
+    "Your own mutants, at least one per item."
+  ]
+}

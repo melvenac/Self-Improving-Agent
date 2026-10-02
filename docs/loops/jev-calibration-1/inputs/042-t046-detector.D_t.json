@@ -1,0 +1,53 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Detection. A non-empty PreToolUse in an installed plugin's hooks/hooks.json is an ISSUE when %LOCALAPPDATA%\\cursor-agent exists. The message names the plugin, the version, the matchers, T-046 and the remedy. The registry and hooks.json are parsed, not pattern-matched. \"PreToolUse\" appearing in a description or another matcher is not a finding.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Skip is not pass. No registry, an unreadable or malformed registry or hooks.json, or no Cursor CLI: each is a SKIP or an ISSUE that says why, never a PASS. Look for an input that yields PASS without the check having looked: a missing installPath, a plugin listed with zero installs, hooks.json absent, or a non-Windows host with no LOCALAPPDATA.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Fixture isolation (G-044). Tests use a fixture home and never read the real profile or inherited process.env silently.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The real machine. Run /sync (read-only, --check if available) on the QA machine and quote the cursor-hook-compat line. Say whether it matches the real plugin cache there.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Preserve. Every other /sync check's result is unchanged, and the check is registered in runSync once.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Your own mutants, at least two, on qa/t046-detector-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "42-t046-detector",
+  "new_capability": "Record 194 (T-046's cursor-hook-compat /sync detector): QA dispatch (record 197)",
+  "objective": "Record 194 (T-046's cursor-hook-compat /sync detector): QA dispatch (record 197)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "ad04ffe5032a6341eee02c15d70d291d6fbdf6c6",
+    "path": "docs/loops/t046-detector-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Detection. A non-empty PreToolUse in an installed plugin's hooks/hooks.json is an ISSUE when %LOCALAPPDATA%\\cursor-agent exists. The message names the plugin, the version, the matchers, T-046 and the remedy. The registry and hooks.json are parsed, not pattern-matched. \"PreToolUse\" appearing in a description or another matcher is not a finding.",
+    "Skip is not pass. No registry, an unreadable or malformed registry or hooks.json, or no Cursor CLI: each is a SKIP or an ISSUE that says why, never a PASS. Look for an input that yields PASS without the check having looked: a missing installPath, a plugin listed with zero installs, hooks.json absent, or a non-Windows host with no LOCALAPPDATA.",
+    "Fixture isolation (G-044). Tests use a fixture home and never read the real profile or inherited process.env silently.",
+    "The real machine. Run /sync (read-only, --check if available) on the QA machine and quote the cursor-hook-compat line. Say whether it matches the real plugin cache there.",
+    "Preserve. Every other /sync check's result is unchanged, and the check is registered in runSync once.",
+    "Your own mutants, at least two, on qa/t046-detector-mut-."
+  ]
+}

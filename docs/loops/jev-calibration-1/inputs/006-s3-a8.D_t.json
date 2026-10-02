@@ -1,0 +1,125 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "The criteria FINAL at 6672e83 (docs/loops/loop-15-slice-3-qa-criteria-a.md), read with rulings-9 to rulings-15 on master. D-042 (R67) is in force, and D-046 records that Aaron accepted R69. Rulings-15's \"Rows touched\" table says how each touched row is scored.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Your predecessor's handoff: QA report A7 §14. Read all of it; its items 2 and 3 say which old probe assertions are obsolete and how to compare changes rather than rows.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Known positives: A7 d223d1d and A6 dc35b24 for A7-1 (ABSENT-BASE-LOOP, TWO-NAME-LATER, R65-FACTS, WRITEONLY-LATER) and A7-2 (UNREAD-BASE, STAGE-START-UNREAD); QA 96's probe files are in docs/loops/qa-scripts-a7/.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Set up. Your tree is detached at the planner's dispatch commit. Examine the candidate in a separate worktree or git archive copy at 9e2dd5d, and the known positives the same way. Build each with npm ci and npm run build in its open-brain.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Every row is re-run. Win32 rows run locally on this PC, which is dedicated and quiet: this is the machine D-045 moved QA to so that local measurement costs nothing. POSIX rows (symlinks) need Linux, which here is CI only.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "R69 widens what is read. Probe its edges, each against A8 and with a mutant where one protects:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "a file that appears as a hard link (nlink 2) is not read;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "a symlink that appears at the name is not read;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "the parent directory replaced by a link to elsewhere (the parent's realpath differs) is not read;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "a renamed appearance (a different name in the same place) is not read;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "git config --global's first write on a machine with no ~/.gitconfig at base is read, with both hashes.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "The gap between the realpath check and open is R37's named limit (rulings-15, R70). Record it; do not score it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "R70: show a mutant dropping only the nlink comparison reads HANDLE-NLINK's file, independently of the developer's mut-nlink.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "R68 and R71 on both sides: every unread path carries type, dev, ino, nlink, size, mtimeNs; stage-start facts show as \"before\"; a failed read says \"unreadable\", never \"absent\"; an unread repository record never prints two identical placeholder sides.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "Regressions: A4-1 H, J and LOOP stay unread; D-042's trade holds both ways; A6-1, A6-2 and A7's closed rows stay closed.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "One mutant per protection; check that each of the developer's four reverts what it claims.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "The full suite once, alone, locally, at 9e2dd5d, captured unpiped (npx vitest run > file; SUITE_EXIT=$?). Record the processes running on this PC just before and just after it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "Plain sync's exit code in a scratch clone. If gitnexus is not available here, say so and mark /sync --check unrun. Do not install global tools.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "6-s3-a8",
+  "new_capability": "Loop 15 slice three: dispatch of candidate A8 to a FRESH, HEADLESS QA seat (record session 99)",
+  "objective": "Loop 15 slice three: dispatch of candidate A8 to a FRESH, HEADLESS QA seat (record session 99)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "aebab7eadd20f7a870295cf8cd4289823b44b37a",
+    "path": "docs/loops/loop-15-slice-3-dispatch-qa-a8.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "The criteria FINAL at 6672e83 (docs/loops/loop-15-slice-3-qa-criteria-a.md), read with rulings-9 to rulings-15 on master. D-042 (R67) is in force, and D-046 records that Aaron accepted R69. Rulings-15's \"Rows touched\" table says how each touched row is scored.",
+    "Your predecessor's handoff: QA report A7 §14. Read all of it; its items 2 and 3 say which old probe assertions are obsolete and how to compare changes rather than rows.",
+    "Known positives: A7 d223d1d and A6 dc35b24 for A7-1 (ABSENT-BASE-LOOP, TWO-NAME-LATER, R65-FACTS, WRITEONLY-LATER) and A7-2 (UNREAD-BASE, STAGE-START-UNREAD); QA 96's probe files are in docs/loops/qa-scripts-a7/.",
+    "Set up. Your tree is detached at the planner's dispatch commit. Examine the candidate in a separate worktree or git archive copy at 9e2dd5d, and the known positives the same way. Build each with npm ci and npm run build in its open-brain.",
+    "Every row is re-run. Win32 rows run locally on this PC, which is dedicated and quiet: this is the machine D-045 moved QA to so that local measurement costs nothing. POSIX rows (symlinks) need Linux, which here is CI only.",
+    "R69 widens what is read. Probe its edges, each against A8 and with a mutant where one protects:",
+    "a file that appears as a hard link (nlink 2) is not read;",
+    "a symlink that appears at the name is not read;",
+    "the parent directory replaced by a link to elsewhere (the parent's realpath differs) is not read;",
+    "a renamed appearance (a different name in the same place) is not read;",
+    "git config --global's first write on a machine with no ~/.gitconfig at base is read, with both hashes.",
+    "The gap between the realpath check and open is R37's named limit (rulings-15, R70). Record it; do not score it.",
+    "R70: show a mutant dropping only the nlink comparison reads HANDLE-NLINK's file, independently of the developer's mut-nlink.",
+    "R68 and R71 on both sides: every unread path carries type, dev, ino, nlink, size, mtimeNs; stage-start facts show as \"before\"; a failed read says \"unreadable\", never \"absent\"; an unread repository record never prints two identical placeholder sides.",
+    "Regressions: A4-1 H, J and LOOP stay unread; D-042's trade holds both ways; A6-1, A6-2 and A7's closed rows stay closed.",
+    "One mutant per protection; check that each of the developer's four reverts what it claims.",
+    "The full suite once, alone, locally, at 9e2dd5d, captured unpiped (npx vitest run > file; SUITE_EXIT=$?). Record the processes running on this PC just before and just after it.",
+    "Plain sync's exit code in a scratch clone. If gitnexus is not available here, say so and mark /sync --check unrun. Do not install global tools."
+  ]
+}

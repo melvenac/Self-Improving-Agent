@@ -1,0 +1,107 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "The criteria FINAL at 6672e83, read with rulings-9 to rulings-14 on master. D-042 (R67) amends D-041: the read gate is the same real path, plus either the base file (nlink ignored) or a single-name regular file, re-checked on the handle. The row table in rulings-14 says how each touched row is scored.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Your predecessor's handoff: QA report A6 §14.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Known positives:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "A6 dc35b24: GITCONFIG-LOOP, EXISTBETWEEN, and R29's instrument;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "A5 4c1287f: A5-1's eight Linux shapes (qa/loop-15-slice-3-a5-probe);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "A4 f9a1aa8: A4-1 (qa/loop-15-slice-3-a4-probe). Under D-042, A4-1's R shape is now READ; H, J and LOOP stay unread.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Every row is re-run. The probe files run on CI against A7 and A6 on your own qa/ branches (D-040).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Three things the planner wants looked at specifically:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "(a) No mutant has yet turned the R29 seam test red. The redcheck's R29 red was the instrument's fault. Build one: for example, a mutant whose gate reads through a link the role planted. Show that the R29 test turns red under it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "(b) R67's protective direction has no mutant. mut-r67 reddens only the \"allowed read\" rows. Build the narrow one: drop the nlink === 1 condition, so that any new file at the same real path is read. Show that a hard link to an outside file (A4-1 H) is then read and turns red.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "(c) D-042's trade, both ways, and a third case if one exists: - a lock-and-rename is read; - a hard link made elsewhere does not stop reads; - a new two-name file is not read.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "R65: every watched path, in every stage record, in one state, with true texts (\"unreadable\", never \"absent\"; stage-start facts as \"before\").",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "One mutant per protection; check that each of the developer's eight reverts what it claims.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "Take plain sync's exit code in a scratch clone.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "LOCAL MEASUREMENT (mutants, probes, the full suite): tell the live planner BEFORE you start. A2A-Hub's seats will be stopped for the WHOLE window, not only the suite, because load can make a mutant falsely red. Record ListAgents at the start and the end of the window.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "5-s3-a7",
+  "new_capability": "Loop 15 slice three: dispatch of candidate A7 to a FRESH QA seat (record session 96)",
+  "objective": "Loop 15 slice three: dispatch of candidate A7 to a FRESH QA seat (record session 96)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "757717dfb01fda66609818cb051c2d334cb69e03",
+    "path": "docs/loops/loop-15-slice-3-dispatch-qa-a7.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "The criteria FINAL at 6672e83, read with rulings-9 to rulings-14 on master. D-042 (R67) amends D-041: the read gate is the same real path, plus either the base file (nlink ignored) or a single-name regular file, re-checked on the handle. The row table in rulings-14 says how each touched row is scored.",
+    "Your predecessor's handoff: QA report A6 §14.",
+    "Known positives:",
+    "A6 dc35b24: GITCONFIG-LOOP, EXISTBETWEEN, and R29's instrument;",
+    "A5 4c1287f: A5-1's eight Linux shapes (qa/loop-15-slice-3-a5-probe);",
+    "A4 f9a1aa8: A4-1 (qa/loop-15-slice-3-a4-probe). Under D-042, A4-1's R shape is now READ; H, J and LOOP stay unread.",
+    "Every row is re-run. The probe files run on CI against A7 and A6 on your own qa/ branches (D-040).",
+    "Three things the planner wants looked at specifically:",
+    "(a) No mutant has yet turned the R29 seam test red. The redcheck's R29 red was the instrument's fault. Build one: for example, a mutant whose gate reads through a link the role planted. Show that the R29 test turns red under it.",
+    "(b) R67's protective direction has no mutant. mut-r67 reddens only the \"allowed read\" rows. Build the narrow one: drop the nlink === 1 condition, so that any new file at the same real path is read. Show that a hard link to an outside file (A4-1 H) is then read and turns red.",
+    "(c) D-042's trade, both ways, and a third case if one exists: - a lock-and-rename is read; - a hard link made elsewhere does not stop reads; - a new two-name file is not read.",
+    "R65: every watched path, in every stage record, in one state, with true texts (\"unreadable\", never \"absent\"; stage-start facts as \"before\").",
+    "One mutant per protection; check that each of the developer's eight reverts what it claims.",
+    "Take plain sync's exit code in a scratch clone.",
+    "LOCAL MEASUREMENT (mutants, probes, the full suite): tell the live planner BEFORE you start. A2A-Hub's seats will be stopped for the WHOLE window, not only the suite, because load can make a mutant falsely red. Record ListAgents at the start and the end of the window."
+  ]
+}

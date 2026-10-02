@@ -1,0 +1,95 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Confined.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "git diff bea385b2 fbf94ae6 touches only the session-numbering code (server.ts, state-schema.ts, state-writer.ts and the session-start pipeline), their tests and the handoff.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "git diff fbf94ae6 9f6fcea4 touches only agent-identity.ts, server.ts handleStart, .claude/commands/start.md and its template copy, cursor-start-differences.json, the template AGENT.md, the tests and the handoff.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Name every file outside those lists.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "The T-164 port is faithful. Compare 38417eb3 and 567657af with their cherry-picks. Any hunk that differs from the original must be explained by master's movement; list each hunk with its reason.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "SC-1 to SC-5, on the T-164 candidate. SC-2 gets your own test, not the developer's: two fixture checkouts at the same revision each greet N. The first write registers N for uuid A. The second write tries N for uuid B and is refused, and the refusal names N+1.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "The live case: a fixture with 16 local logs and the record's last session at 155 greets 156 and creates Session_156.md. Also re-run ob_start in the same session and confirm the greeting says reused and that no new log appears (SC-5).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "SR-1 to SR-6, on the T-211 candidate. Write one mutant of your own for each of these, and report whether a row catches it:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "(a) a local file that has only status_to no longer shadows AGENT.md (the \"first file with ANY key wins\" rule);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "(b) a cron range check that accepts 60 in the minute field.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "The developer's mutants: reproduce the SC-4 mutant and the two SR-5 mutants, and show each one goes red.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Full suite once, at 9f6fcea4. Expect 0 failed tests. An unattributed vitest RPC error is environmental (D-083). Quote the counts.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "CI: push qa/t164-t211-ci-candidate at 9f6fcea4. Quote the run id, headSha, conclusion and the test job. Use 1 run.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "74-t164-t211",
+  "new_capability": "QA 249: T-164 port + T-211 standing cron",
+  "objective": "QA 249: T-164 port + T-211 standing cron",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "c256ef4dcb81a9fdb0f7ec2d76c08c1b174a26c1",
+    "path": "docs/loops/qa-249-t164-t211-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Confined.",
+    "git diff bea385b2 fbf94ae6 touches only the session-numbering code (server.ts, state-schema.ts, state-writer.ts and the session-start pipeline), their tests and the handoff.",
+    "git diff fbf94ae6 9f6fcea4 touches only agent-identity.ts, server.ts handleStart, .claude/commands/start.md and its template copy, cursor-start-differences.json, the template AGENT.md, the tests and the handoff.",
+    "Name every file outside those lists.",
+    "The T-164 port is faithful. Compare 38417eb3 and 567657af with their cherry-picks. Any hunk that differs from the original must be explained by master's movement; list each hunk with its reason.",
+    "SC-1 to SC-5, on the T-164 candidate. SC-2 gets your own test, not the developer's: two fixture checkouts at the same revision each greet N. The first write registers N for uuid A. The second write tries N for uuid B and is refused, and the refusal names N+1.",
+    "The live case: a fixture with 16 local logs and the record's last session at 155 greets 156 and creates Session_156.md. Also re-run ob_start in the same session and confirm the greeting says reused and that no new log appears (SC-5).",
+    "SR-1 to SR-6, on the T-211 candidate. Write one mutant of your own for each of these, and report whether a row catches it:",
+    "(a) a local file that has only status_to no longer shadows AGENT.md (the \"first file with ANY key wins\" rule);",
+    "(b) a cron range check that accepts 60 in the minute field.",
+    "The developer's mutants: reproduce the SC-4 mutant and the two SR-5 mutants, and show each one goes red.",
+    "Full suite once, at 9f6fcea4. Expect 0 failed tests. An unattributed vitest RPC error is environmental (D-083). Quote the counts.",
+    "CI: push qa/t164-t211-ci-candidate at 9f6fcea4. Quote the run id, headSha, conclusion and the test job. Use 1 run."
+  ]
+}

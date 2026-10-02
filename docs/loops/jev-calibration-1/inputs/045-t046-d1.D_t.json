@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "All three rows exist and were red on master: a missing, an empty, and a nonexistent installPath each give SKIP or ISSUE, naming the plugin and saying the check could not read it. The developer's report quoted ONE red row; check all three.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Preserve: zero installs, or an install with no hooks/hooks.json, stays PASS. The T-046 detection rows from record 194 are unchanged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Fixture isolation (G-044): no row reads the real profile.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Your own mutants, at least two, on qa/t046-d1-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "45-t046-d1",
+  "new_capability": "Record 207 (QA 197's D1: cursor-hook-compat never passes without reading): QA dispatch (record 209)",
+  "objective": "Record 207 (QA 197's D1: cursor-hook-compat never passes without reading): QA dispatch (record 209)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "34850e2465455f99ac979136deb4b59b25b702ff",
+    "path": "docs/loops/t046-d1-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "All three rows exist and were red on master: a missing, an empty, and a nonexistent installPath each give SKIP or ISSUE, naming the plugin and saying the check could not read it. The developer's report quoted ONE red row; check all three.",
+    "Preserve: zero installs, or an install with no hooks/hooks.json, stays PASS. The T-046 detection rows from record 194 are unchanged.",
+    "Fixture isolation (G-044): no row reads the real profile.",
+    "Your own mutants, at least two, on qa/t046-d1-mut-."
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Candidate 9ed674c (on origin/loop/15-slice-3-forge-candidate, tip 5759008, which adds only the developer handoff). Criteria 17c9056 on origin/loop/15-slice-3, which you wrote before the candidate existed. Fast-forward loop/15-slice-3 to 5759008 in your own tree.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Read-only, frozen SHA; report \"tree moved\" and \"tree dirty\" separately; verdicts from exit codes only; the baseline at eb14d09 is not assumed green (criteria §7, V-076).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Full-suite run (T-168): call ListAgents immediately before the run and record every peer's state beside the result. Limits: registration lag means an empty listing is not evidence of idleness, and non-Claude load is invisible. Tell Forge and the planner before you start the run, and again when it ends.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Report into a tracked docs/loops/loop-15-slice-3-qa-report.md on your branch, then message the planner. Aaron merges; a relay is not his approval.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "1-loop-15-slice-3",
+  "new_capability": "Loop 15 slice three: dispatch 2, the loop resumes",
+  "objective": "Loop 15 slice three: dispatch 2, the loop resumes",
+  "out_of_scope": [
+    "Atlas (planner) | 78",
+    "Probe (QA) | 79",
+    "Forge (developer) | 80"
+  ],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "8739a47f7d6a9c809207c2cd9b6a10ba0d75531d",
+    "path": "docs/loops/loop-15-slice-3-dispatch-2.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Candidate 9ed674c (on origin/loop/15-slice-3-forge-candidate, tip 5759008, which adds only the developer handoff). Criteria 17c9056 on origin/loop/15-slice-3, which you wrote before the candidate existed. Fast-forward loop/15-slice-3 to 5759008 in your own tree.",
+    "Read-only, frozen SHA; report \"tree moved\" and \"tree dirty\" separately; verdicts from exit codes only; the baseline at eb14d09 is not assumed green (criteria §7, V-076).",
+    "Full-suite run (T-168): call ListAgents immediately before the run and record every peer's state beside the result. Limits: registration lag means an empty listing is not evidence of idleness, and non-Claude load is invisible. Tell Forge and the planner before you start the run, and again when it ends.",
+    "Report into a tracked docs/loops/loop-15-slice-3-qa-report.md on your branch, then message the planner. Aaron merges; a relay is not his approval."
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/t194-r6-dispatch.md: P0, the parse gate, and the rulings on QA 237's open items (D-081). This is what you score.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "docs/loops/t194-r5-qa-report.md and docs/loops/qa-237/ on origin/qa/t194-r5-report (1a658b39): QA 237's defects D1 to D17, generators and probes.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "docs/loops/t194-r6-developer-handoff.md at the candidate, and docs/loops/t194-r6/ (the cost list, the QA 237 row extractor, mutants and logs). Verify them.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The mutants were never run in one pass against the final tests.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "The full pass was stopped for low memory, so the mutants were run in 14 batches against tests that kept growing.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Re-run all 105 (docs/loops/t194-r6/mutants/) in one sequential pass at the candidate.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Report killed, survived and typecheck failures. Any survivor is a test gap.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Nothing ran on Linux or in CI. Use CI for the candidate (below).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "The parser did not get smaller. The gate is about 750 lines in front of r5's code, and r5's paths are kept but are now mostly unreachable through the hook. Score the property, not the size. Report whether any r5 path is still reachable through the hook in a way P0 should have refused.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "The PowerShell 5.1 parameter tables are the builder's own. An unknown parameter is refused, which fails closed. Find any known parameter whose value the tables mishandle.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Bash has no allow-list of command words. An inline-code runner is not refused by name, for example node -e …, python -c …, perl -e …, ruby -e …, or awk '…system(…)…'. Judge this:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "such code that writes a protected file is either refused, or stated in the limit text as out of reach;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "a silent allow is a defect.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "R6-P0, the gate. Use YOUR OWN generator, not the builder's, built from the r6 dispatch's refused and accepted lists.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "At least 300 refused cases, each refused as not statically parseable and naming its construct.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "At least 150 accepted cases that then go through P1 to P3.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "Confirm every fail-open in a real shell, as QA 237 did.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "Aim at what the gate might mis-tokenise: quotes inside words, -Param:\"value\" forms, unquoted commas, ; vs newline, CRLF, Unicode lookalikes (fullwidth ＞, NBSP), and PowerShell's backtick escape.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T19",
+      "observable": "R6-rulings:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T20",
+      "observable": "D8: unquoted #N is refused, and a quoted '#7' reads PR 7.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T21",
+      "observable": "D9: a foreign pull URL needs a grant and is not read.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T22",
+      "observable": "Non-merge: decided by gh's first two positional words.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T23",
+      "observable": "git -c with alias., remote., url., include., includeIf. or core. needs a grant.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T24",
+      "observable": "The limit text, in both directions.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T25",
+      "observable": "QA 237's rows: re-run QA 237's own scripts (gen-p.mjs, probe-holes.mjs, probe-merge-async.mjs, probe-comma.mjs, fail-closed.mjs) against the candidate. Every D1 to D17 fail-open must now be refused or decided correctly. List what changed.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T26",
+      "observable": "Fail-closed cost: check cost-list.txt against what a working planner types. Name any common command it makes impossible to express at all, not merely harder to write.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T27",
+      "observable": "Mutants: all 105 in one pass, plus at least one of your own per P0 refusal family (Bash quoting, comments and keywords, wrappers, shells fed code, PowerShell parameters, PowerShell dynamic code).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T28",
+      "observable": "Regression: r5's met rows (non-literal, file tools, standing push, exact grant) still hold. The r4 test files hook.test.ts and r3.test.ts are unchanged. Every changed earlier test is listed in the handoff's \"Supersedes\", and you confirm each change follows a ruling.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "69-t194-r6",
+  "new_capability": "QA 241: T-194 r6 (the planner seat hook, inverted by a parse gate)",
+  "objective": "QA 241: T-194 r6 (the planner seat hook, inverted by a parse gate)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "d7e269f0da747b64f2e3dd37e643d4032fbf6a15",
+    "path": "docs/loops/qa-241-t194-r6-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/t194-r6-dispatch.md: P0, the parse gate, and the rulings on QA 237's open items (D-081). This is what you score.",
+    "docs/loops/t194-r5-qa-report.md and docs/loops/qa-237/ on origin/qa/t194-r5-report (1a658b39): QA 237's defects D1 to D17, generators and probes.",
+    "docs/loops/t194-r6-developer-handoff.md at the candidate, and docs/loops/t194-r6/ (the cost list, the QA 237 row extractor, mutants and logs). Verify them.",
+    "The mutants were never run in one pass against the final tests.",
+    "The full pass was stopped for low memory, so the mutants were run in 14 batches against tests that kept growing.",
+    "Re-run all 105 (docs/loops/t194-r6/mutants/) in one sequential pass at the candidate.",
+    "Report killed, survived and typecheck failures. Any survivor is a test gap.",
+    "Nothing ran on Linux or in CI. Use CI for the candidate (below).",
+    "The parser did not get smaller. The gate is about 750 lines in front of r5's code, and r5's paths are kept but are now mostly unreachable through the hook. Score the property, not the size. Report whether any r5 path is still reachable through the hook in a way P0 should have refused.",
+    "The PowerShell 5.1 parameter tables are the builder's own. An unknown parameter is refused, which fails closed. Find any known parameter whose value the tables mishandle.",
+    "Bash has no allow-list of command words. An inline-code runner is not refused by name, for example node -e …, python -c …, perl -e …, ruby -e …, or awk '…system(…)…'. Judge this:",
+    "such code that writes a protected file is either refused, or stated in the limit text as out of reach;",
+    "a silent allow is a defect.",
+    "R6-P0, the gate. Use YOUR OWN generator, not the builder's, built from the r6 dispatch's refused and accepted lists.",
+    "At least 300 refused cases, each refused as not statically parseable and naming its construct.",
+    "At least 150 accepted cases that then go through P1 to P3.",
+    "Confirm every fail-open in a real shell, as QA 237 did.",
+    "Aim at what the gate might mis-tokenise: quotes inside words, -Param:\"value\" forms, unquoted commas, ; vs newline, CRLF, Unicode lookalikes (fullwidth ＞, NBSP), and PowerShell's backtick escape.",
+    "R6-rulings:",
+    "D8: unquoted #N is refused, and a quoted '#7' reads PR 7.",
+    "D9: a foreign pull URL needs a grant and is not read.",
+    "Non-merge: decided by gh's first two positional words.",
+    "git -c with alias., remote., url., include., includeIf. or core. needs a grant.",
+    "The limit text, in both directions.",
+    "QA 237's rows: re-run QA 237's own scripts (gen-p.mjs, probe-holes.mjs, probe-merge-async.mjs, probe-comma.mjs, fail-closed.mjs) against the candidate. Every D1 to D17 fail-open must now be refused or decided correctly. List what changed.",
+    "Fail-closed cost: check cost-list.txt against what a working planner types. Name any common command it makes impossible to express at all, not merely harder to write.",
+    "Mutants: all 105 in one pass, plus at least one of your own per P0 refusal family (Bash quoting, comments and keywords, wrappers, shells fed code, PowerShell parameters, PowerShell dynamic code).",
+    "Regression: r5's met rows (non-literal, file tools, standing push, exact grant) still hold. The r4 test files hook.test.ts and r3.test.ts are unchanged. Every changed earlier test is listed in the handoff's \"Supersedes\", and you confirm each change follows a ruling."
+  ]
+}

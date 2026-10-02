@@ -1,0 +1,95 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "R185-1: cli-bootstrap.ts (the SessionStart --ide hook) does NOT refuse. The developer's reasoning is accepted. The host passes arguments written by setup.mjs, a refusal would fail every session on the machine over a registration typo, and the payload's IDE detection overrides the flag. Check that the reasoning holds: that detectIde does override, and that an unknown flag there changes nothing written.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "R185-2: --help and -h on a subcommand now REFUSE, and that is accepted. The brief said they \"keep working where they exist today\". They did not exist per subcommand: sync --help ran the FIXING sync. Refusing is strictly safer. Verify the old behaviour at 8af41dd, in a scratch clone only.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "R185-3: malformed values exit 2. Accepted.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "R185-4: state import adopts the shared helper after importer round 4 merges. That is a task, not part of T-185. R2-4 is not on master, because importer rounds 2–4 are unmerged. Check that 9473b0d and origin/loop/importer-fixes-r3 (00244d3) merge without a conflict in cli.ts, in a scratch clone (git merge --no-commit, then abort), and report the result.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "The retirements ISSUE on ENTITIES.md is pre-existing and not T-185's (QA 111 and QA 114 saw it too).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "docs/loops/t185-cli-flags-brief.md (on origin/docs/session-100-qa99-dispatch): T185-1 (the shared rule, the directory check, and the parser list in handoff §3, which is the deliverable) and T185-2 (the tests).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Check, not accept:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Every mutating command in the brief's table refuses its typo with exit 2, names the token, and leaves the target byte-identical. For detach that means HEAD and the tree; for sync, no file touched; for start, no session log; for state migrate, the file unchanged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Try your own typos beyond the developer's: --dry_run, —dry-run (an em dash), -n, --check=1, a flag after the positional, a flag twice, and a bare -.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Every documented invocation still parses. Search the tracked tree, .github/, project-template/, .claude/commands and setup.mjs for cli.js/open-brain <sub> calls. The developer did this, so re-derive it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "The hooks are unaffected. SessionStart (cli-bootstrap), SessionEnd and the recall trigger run as setup.mjs registers them.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "inScratch(): confirm that no test can spawn against the real checkout. Try to make one do it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Mutants of your own: at least one that accepts a single-dash token, and one that walks up from a missing directory.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "13-t185",
+  "new_capability": "T-185 (unrecognised flags refuse): dispatch to a FRESH, HEADLESS QA seat (record session 120), with the planner's rulings",
+  "objective": "T-185 (unrecognised flags refuse): dispatch to a FRESH, HEADLESS QA seat (record session 120), with the planner's rulings",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "d753ccb2517d93da7068ba42db4c8d28458d2905",
+    "path": "docs/loops/t185-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "R185-1: cli-bootstrap.ts (the SessionStart --ide hook) does NOT refuse. The developer's reasoning is accepted. The host passes arguments written by setup.mjs, a refusal would fail every session on the machine over a registration typo, and the payload's IDE detection overrides the flag. Check that the reasoning holds: that detectIde does override, and that an unknown flag there changes nothing written.",
+    "R185-2: --help and -h on a subcommand now REFUSE, and that is accepted. The brief said they \"keep working where they exist today\". They did not exist per subcommand: sync --help ran the FIXING sync. Refusing is strictly safer. Verify the old behaviour at 8af41dd, in a scratch clone only.",
+    "R185-3: malformed values exit 2. Accepted.",
+    "R185-4: state import adopts the shared helper after importer round 4 merges. That is a task, not part of T-185. R2-4 is not on master, because importer rounds 2–4 are unmerged. Check that 9473b0d and origin/loop/importer-fixes-r3 (00244d3) merge without a conflict in cli.ts, in a scratch clone (git merge --no-commit, then abort), and report the result.",
+    "The retirements ISSUE on ENTITIES.md is pre-existing and not T-185's (QA 111 and QA 114 saw it too).",
+    "docs/loops/t185-cli-flags-brief.md (on origin/docs/session-100-qa99-dispatch): T185-1 (the shared rule, the directory check, and the parser list in handoff §3, which is the deliverable) and T185-2 (the tests).",
+    "Check, not accept:",
+    "Every mutating command in the brief's table refuses its typo with exit 2, names the token, and leaves the target byte-identical. For detach that means HEAD and the tree; for sync, no file touched; for start, no session log; for state migrate, the file unchanged.",
+    "Try your own typos beyond the developer's: --dry_run, —dry-run (an em dash), -n, --check=1, a flag after the positional, a flag twice, and a bare -.",
+    "Every documented invocation still parses. Search the tracked tree, .github/, project-template/, .claude/commands and setup.mjs for cli.js/open-brain <sub> calls. The developer did this, so re-derive it.",
+    "The hooks are unaffected. SessionStart (cli-bootstrap), SessionEnd and the recall trigger run as setup.mjs registers them.",
+    "inScratch(): confirm that no test can spawn against the real checkout. Try to make one do it.",
+    "Mutants of your own: at least one that accepts a single-dash token, and one that walks up from a missing directory."
+  ]
+}

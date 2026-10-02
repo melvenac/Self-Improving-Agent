@@ -1,0 +1,47 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Ahead, behind and diverged are reported distinctly. Diverged, and an indexed SHA that is not in the repository, are each an ISSUE naming both SHAs, never a PASS. Build real throwaway repos for each case.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Preserve: an index at HEAD is PASS; no .gitnexus is SKIP with its reason; --check writes nothing.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The detached-branch trap (CLAUDE.md: \"the recorded branch is not evidence\"): a current index whose recorded branch is dead reads current.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The developer's evidence is local only: confirm red on master and green on the candidate on tcm, and that each mutant fails.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Your own mutants, at least two, on qa/t176-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "44-t176-index-direction",
+  "new_capability": "Record 200 (T-176: the index check measures distance in both directions): QA dispatch (record 208)",
+  "objective": "Record 200 (T-176: the index check measures distance in both directions): QA dispatch (record 208)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "05e61e247bdbaf35cf9a6aada165bddd365101d6",
+    "path": "docs/loops/t176-index-direction-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Ahead, behind and diverged are reported distinctly. Diverged, and an indexed SHA that is not in the repository, are each an ISSUE naming both SHAs, never a PASS. Build real throwaway repos for each case.",
+    "Preserve: an index at HEAD is PASS; no .gitnexus is SKIP with its reason; --check writes nothing.",
+    "The detached-branch trap (CLAUDE.md: \"the recorded branch is not evidence\"): a current index whose recorded branch is dead reads current.",
+    "The developer's evidence is local only: confirm red on master and green on the candidate on tcm, and that each mutant fails.",
+    "Your own mutants, at least two, on qa/t176-mut-."
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/t194-r5-dispatch.md: P1, P2, P3, the required evidence, and the out-of-scope list. This is what you score.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "docs/loops/t194-r5-developer-handoff.md at the candidate: the clause-to-test map, the mutant runs, \"Supersedes\", \"Out of reach\", and \"Not covered\". Verify it; do not take it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The rulings made after the r5 dispatch, all in scope:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Ruling 1: a cd, pushd or Set-Location on the same line as a write is refused, even when the write lands outside the repo.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Ruling 2: P2b, git. merge and tag always need a grant. A push stands without one only when it is origin, every refspec is a plain branch under loop/, qa/, docs/ or chore/, and there is no force, delete, +, --tags, --mirror, --all, --prune, bare push or substituted argument.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Ruling 3: mv and Move-Item check their SOURCE as well as their destination.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "The earlier QA probe scripts. Forge did not have the QA 233 and 234 scripts and rebuilt those rows from the reports' tables. Use the scripts themselves:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "QA 233: docs/loops/qa-233/evidence/qa233-probe.mjs (and qa233-run.mjs) on origin/qa/t194-r2-report",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "QA 234: docs/loops/qa-234/evidence/qa234-probe.mjs and qa234-probe2.mjs on origin/qa/t194-r3-report",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "QA 235: docs/loops/qa-235/evidence/qa235-probe.mjs on origin/qa/t194-r4-report (e6e1d085)",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "R5-P1, the canonicaliser, in both directions. \"Protected if, and only if\" has two halves, so score both:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "A literal write that LANDS under a protected path is denied, whatever its spelling.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "A literal write that lands OUTSIDE every protected path, with no cd on the line, is ALLOWED. A deny there is a defect unless it names one of the stated causes (non-literal, cd, or an 8.3 short name past the root).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "A non-literal target (~, $, backtick, ? [, {, () is refused with a named cause.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "R5-P2, the gh merge grammar. Anything gh would run as pr merge is a merge. The only form allowed without a grant is the exact grammar in the r5 dispatch, and even that is READ and judged docs-only or code. Check that a non-merge gh command is not swept in.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "R5-P2b, git (ruling 2). Score the standing-push definition as a property. A push that is not exactly standing needs a grant, and a grant matches exactly (r4-5).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "R5-P3, PowerShell. PowerShell is in the matcher; P1 applies to the cmdlets and redirects the dispatch lists, and P2 to & gh and .\\gh.exe. Invoke-Expression, iex, Invoke-Command and a script block that writes are refused with a named cause.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "R5-limit, the limit text. BASH_WRITE_LIMIT (or its successor) states every item in the handoff's \"Out of reach\". Check it in both directions. Nothing out of reach may be described only in the handoff. Nothing the text calls out of reach may in fact be caught, or the text is wrong.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "66-t194-r5",
+  "new_capability": "QA 237: T-194 r5 (the planner seat hook), redefined by property",
+  "objective": "QA 237: T-194 r5 (the planner seat hook), redefined by property",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "54fa25fd972aa562b8ca422d1cf065ae4b3f12da",
+    "path": "docs/loops/qa-237-t194-r5-dispatch.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/t194-r5-dispatch.md: P1, P2, P3, the required evidence, and the out-of-scope list. This is what you score.",
+    "docs/loops/t194-r5-developer-handoff.md at the candidate: the clause-to-test map, the mutant runs, \"Supersedes\", \"Out of reach\", and \"Not covered\". Verify it; do not take it.",
+    "The rulings made after the r5 dispatch, all in scope:",
+    "Ruling 1: a cd, pushd or Set-Location on the same line as a write is refused, even when the write lands outside the repo.",
+    "Ruling 2: P2b, git. merge and tag always need a grant. A push stands without one only when it is origin, every refspec is a plain branch under loop/, qa/, docs/ or chore/, and there is no force, delete, +, --tags, --mirror, --all, --prune, bare push or substituted argument.",
+    "Ruling 3: mv and Move-Item check their SOURCE as well as their destination.",
+    "The earlier QA probe scripts. Forge did not have the QA 233 and 234 scripts and rebuilt those rows from the reports' tables. Use the scripts themselves:",
+    "QA 233: docs/loops/qa-233/evidence/qa233-probe.mjs (and qa233-run.mjs) on origin/qa/t194-r2-report",
+    "QA 234: docs/loops/qa-234/evidence/qa234-probe.mjs and qa234-probe2.mjs on origin/qa/t194-r3-report",
+    "QA 235: docs/loops/qa-235/evidence/qa235-probe.mjs on origin/qa/t194-r4-report (e6e1d085)",
+    "R5-P1, the canonicaliser, in both directions. \"Protected if, and only if\" has two halves, so score both:",
+    "A literal write that LANDS under a protected path is denied, whatever its spelling.",
+    "A literal write that lands OUTSIDE every protected path, with no cd on the line, is ALLOWED. A deny there is a defect unless it names one of the stated causes (non-literal, cd, or an 8.3 short name past the root).",
+    "A non-literal target (~, $, backtick, ? [, {, () is refused with a named cause.",
+    "R5-P2, the gh merge grammar. Anything gh would run as pr merge is a merge. The only form allowed without a grant is the exact grammar in the r5 dispatch, and even that is READ and judged docs-only or code. Check that a non-merge gh command is not swept in.",
+    "R5-P2b, git (ruling 2). Score the standing-push definition as a property. A push that is not exactly standing needs a grant, and a grant matches exactly (r4-5).",
+    "R5-P3, PowerShell. PowerShell is in the matcher; P1 applies to the cmdlets and redirects the dispatch lists, and P2 to & gh and .\\gh.exe. Invoke-Expression, iex, Invoke-Command and a script block that writes are refused with a named cause.",
+    "R5-limit, the limit text. BASH_WRITE_LIMIT (or its successor) states every item in the handoff's \"Out of reach\". Check it in both directions. Nothing out of reach may be described only in the handoff. Nothing the text calls out of reach may in fact be caught, or the text is wrong."
+  ]
+}

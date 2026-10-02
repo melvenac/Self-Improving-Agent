@@ -1,0 +1,143 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/t179-t163-end-brief.md (T163-1, T163-2, T179-1, T179-2) and t179-merge-round-brief.md.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The planner's rulings, given to the developer by message (as their handoffs quote them):",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "checkout retention;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "the greeting renders only the newest handoff per (seat, checkout);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "the migration keeps every uuid;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Addition 1 as re-ruled: the greeting may grow by a FIXED label cost (measured at +86 to +87 characters per seat), but must not grow with the number of sessions. Test that directly. Build a record with 1, 10 and 50 sessions per seat, all within retention, and show the greeting is the same size at each, apart from the one count label.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "the importer's v3 rule (an import writes legacy entries, stamped by no session), accepted.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Nobody can erase another session's record. Try it as an attacker would:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "set_handoff with another uuid in the op (the brief says it is not an argument, so confirm that it is not);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "two sessions of the same seat in the same checkout;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "a session with no registered id;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "delete or update ops against another uuid's entry;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "a retention drop that is not the newest per (seat, checkout);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "update_task replacing another session's note. This is T-171, and it is known and NOT fixed. Confirm it is the only remaining path, and say so.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "The migration, v2 → v3, on a COPY of this repository's live record (rev 132 at origin/docs/session-100-qa99-dispatch, and master's rev 131). Count every uuid before and after, with two instruments. Run the migration twice: it must be idempotent. Then run an ob_state write on the migrated copy.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "T163-2, the history scan: run state erasures on this repository's full history (a full clone, not shallow). Rev 60→61 and 61→62 must be flagged, as the known positives. Report the total, and spot-check three flagged entries by reading the two revisions yourself.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "T179-1: the new end.md (59 lines) writes no project state. Run it as written in a scratch project, and show state.json is byte-identical before and after. Its lessons step stores through ob_store/ob_store_chunk and ob_end. What would a stranger's project need for that to work?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "T179-2: a session that commits on loop/ with no handoff gets the SessionEnd warning, and never a block. Also test that a session WITH a handoff gets none, and that the next greeting shows the warning exactly once.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T19",
+      "observable": "The importer on v3: QA 122's probes-r4.mjs and QA 111's probes-r3.mjs byte-exact on 3c0bfdc. Every FAIL either names a ruling that changed it or is a defect.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T20",
+      "observable": "The after-merge steps (handoff §7): rebuild, reconnect, migrate the live record, and install the new end.md. Walk them in a scratch clone as a stranger would, and say what is missing or out of order.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T21",
+      "observable": "Mutants of your own: at least retention's (seat, checkout) key widened to seat only; the uuid check skipped for delete; and the erasure scan blind to one revision.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "15-t179",
+  "new_capability": "T-179 + T-163 (/end cut to a lessons step; a close-out cannot erase another session's record): dispatch to a FRESH, HEADLESS QA seat (record session 125)",
+  "objective": "T-179 + T-163 (/end cut to a lessons step; a close-out cannot erase another session's record): dispatch to a FRESH, HEADLESS QA seat (record session 125)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "d270b9ff5c486e0160c09bd29adb1b2094f0d757",
+    "path": "docs/loops/t179-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/t179-t163-end-brief.md (T163-1, T163-2, T179-1, T179-2) and t179-merge-round-brief.md.",
+    "The planner's rulings, given to the developer by message (as their handoffs quote them):",
+    "checkout retention;",
+    "the greeting renders only the newest handoff per (seat, checkout);",
+    "the migration keeps every uuid;",
+    "Addition 1 as re-ruled: the greeting may grow by a FIXED label cost (measured at +86 to +87 characters per seat), but must not grow with the number of sessions. Test that directly. Build a record with 1, 10 and 50 sessions per seat, all within retention, and show the greeting is the same size at each, apart from the one count label.",
+    "the importer's v3 rule (an import writes legacy entries, stamped by no session), accepted.",
+    "Nobody can erase another session's record. Try it as an attacker would:",
+    "set_handoff with another uuid in the op (the brief says it is not an argument, so confirm that it is not);",
+    "two sessions of the same seat in the same checkout;",
+    "a session with no registered id;",
+    "delete or update ops against another uuid's entry;",
+    "a retention drop that is not the newest per (seat, checkout);",
+    "update_task replacing another session's note. This is T-171, and it is known and NOT fixed. Confirm it is the only remaining path, and say so.",
+    "The migration, v2 → v3, on a COPY of this repository's live record (rev 132 at origin/docs/session-100-qa99-dispatch, and master's rev 131). Count every uuid before and after, with two instruments. Run the migration twice: it must be idempotent. Then run an ob_state write on the migrated copy.",
+    "T163-2, the history scan: run state erasures on this repository's full history (a full clone, not shallow). Rev 60→61 and 61→62 must be flagged, as the known positives. Report the total, and spot-check three flagged entries by reading the two revisions yourself.",
+    "T179-1: the new end.md (59 lines) writes no project state. Run it as written in a scratch project, and show state.json is byte-identical before and after. Its lessons step stores through ob_store/ob_store_chunk and ob_end. What would a stranger's project need for that to work?",
+    "T179-2: a session that commits on loop/ with no handoff gets the SessionEnd warning, and never a block. Also test that a session WITH a handoff gets none, and that the next greeting shows the warning exactly once.",
+    "The importer on v3: QA 122's probes-r4.mjs and QA 111's probes-r3.mjs byte-exact on 3c0bfdc. Every FAIL either names a ruling that changed it or is a defect.",
+    "The after-merge steps (handoff §7): rebuild, reconnect, migrate the live record, and install the new end.md. Walk them in a scratch clone as a stranger would, and say what is missing or out of order.",
+    "Mutants of your own: at least retention's (seat, checkout) key widened to seat only; the uuid check skipped for delete; and the erasure scan blind to one revision."
+  ]
+}

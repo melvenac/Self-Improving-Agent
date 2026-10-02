@@ -1,0 +1,47 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "QA 195's defect is fixed. A non-qa/ ref that the QA seat moves to a commit it created DURING the run reads ref_violations. Reproduce QA 195's own §4 case against the new Audit-NonQaRefs, and look for a second path to the same false negative: an amended commit, a cherry-pick, or a commit created in another worktree of the same repository.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "No new false positive. Another seat's mid-run push still reads ref_moved_elsewhere.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Push forms, through real cursor-agent: the plain and PowerShell push-qa.mjs forms and cmd /c cd … && pass; every git push form, including & git push, is denied.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The mutant. The ordinary harness against 462403d (the start-of-run rule) exits nonzero on the seat-new row.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Your own mutants, at least two, on qa/qa-driver-r3-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "43-qa-driver-cursor-r3",
+  "new_capability": "Record 192 r3 (Cursor QA driver: mid-run seat attribution): QA dispatch (record 202)",
+  "objective": "Record 192 r3 (Cursor QA driver: mid-run seat attribution): QA dispatch (record 202)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "9e5d04156f0aba20868b1bfa5f301c8f6c1ff14a",
+    "path": "docs/loops/qa-driver-cursor-r3-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "QA 195's defect is fixed. A non-qa/ ref that the QA seat moves to a commit it created DURING the run reads ref_violations. Reproduce QA 195's own §4 case against the new Audit-NonQaRefs, and look for a second path to the same false negative: an amended commit, a cherry-pick, or a commit created in another worktree of the same repository.",
+    "No new false positive. Another seat's mid-run push still reads ref_moved_elsewhere.",
+    "Push forms, through real cursor-agent: the plain and PowerShell push-qa.mjs forms and cmd /c cd … && pass; every git push form, including & git push, is denied.",
+    "The mutant. The ordinary harness against 462403d (the start-of-run rule) exits nonzero on the seat-new row.",
+    "Your own mutants, at least two, on qa/qa-driver-r3-mut-."
+  ]
+}

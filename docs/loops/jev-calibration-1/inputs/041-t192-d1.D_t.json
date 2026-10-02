@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "T192-D1. After a successful gh run view, a missing test job reads failure (steps not read: job test absent in run view). A steps that is not an array reads failure (steps not read: steps field missing). steps: [] stays never-started, and a real failure and a success are unchanged. Look for a job shape that still reports without having looked (for example steps present but its entries unreadable, or two jobs named test).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "T-048 r3 rows. handleSync (score) and handleScore now assert missing and unreadable, as well as corrupt and ran. These rows passed on the unfixed product. Confirm they are guards: mut-routes kills them. Say whether any one row would pass if its route dropped the suffix.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Preserve. Every other ci-status state and the invocationLogSuffix strings are unchanged. Nothing outside ci-status and the two test files changes behaviour.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Your own mutants, at least two, on qa/t192-d1-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "41-t192-d1",
+  "new_capability": "Record 193 (T192-D1 + T-048 r3's missing server rows): QA dispatch (record 196)",
+  "objective": "Record 193 (T192-D1 + T-048 r3's missing server rows): QA dispatch (record 196)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "81ee659b5d3777e555a3766500c771f844df9c3b",
+    "path": "docs/loops/t192-d1-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "T192-D1. After a successful gh run view, a missing test job reads failure (steps not read: job test absent in run view). A steps that is not an array reads failure (steps not read: steps field missing). steps: [] stays never-started, and a real failure and a success are unchanged. Look for a job shape that still reports without having looked (for example steps present but its entries unreadable, or two jobs named test).",
+    "T-048 r3 rows. handleSync (score) and handleScore now assert missing and unreadable, as well as corrupt and ran. These rows passed on the unfixed product. Confirm they are guards: mut-routes kills them. Say whether any one row would pass if its route dropped the suffix.",
+    "Preserve. Every other ci-status state and the invocationLogSuffix strings are unchanged. Nothing outside ci-status and the two test files changes behaviour.",
+    "Your own mutants, at least two, on qa/t192-d1-mut-."
+  ]
+}

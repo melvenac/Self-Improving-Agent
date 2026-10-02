@@ -1,0 +1,227 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "R-BF-14 (§6.1): ACCEPTED. The widened isProjectRoot is in scope as R-BF-9's sibling.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Why: the same walk-up serves sync, ob_score, detach and the session-end hook. In a non-Node child it resolved to a Node parent, which is the D2 class (a wrong-project write) that R-BF-9 exists to stop. Fixing only state import would have left the class open in four other doors.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "What the change can and cannot do: it only ADDS roots, so a walk stops at a nearer directory, never a farther one. This is the fail-closed direction.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The planner derived these before ruling: - b45900f required package.json plus one of .agents/SYSTEM, .agents/META or open-brain/. - 7f4ca74 accepts .agents/SYSTEM, .agents/META or .agents/state.json alone, or package.json beside open-brain/. - On this desktop, ~/.agents/ holds only mailbox/ and reflection-queue.json, so the home directory does not become a root.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "project-template/ becoming a root is accepted. It IS a project layout, and sync inside it answering for the template is the truthful answer.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "R-BF-15 (§6.2): ACCEPTED. archive/ is never residue. \"Never nest\" cannot hold otherwise.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "R-BF-16 (§6.3): ACCEPTED, bounded. move-residue may move state.json ONLY when check calls it NOT A RECORD. A parseable record is never residue.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "The not-done item: \"READER'S SEAT UNRESOLVED\" on a not-a-seat checkout (handoff §8) is out of this round and becomes a task. It is not a defect of round 3.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "The developer's own error entry is accepted as that seat's, as written in handoff §9: the handoff commit a1f5baf was made on a 4-issue sync and pushed. The candidate's code is unaffected. Do not re-score it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "R-BF-9 to R-BF-13, each against its row.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "QA 135's D1–D5 tests, unmodified: the file's blob must be 85ae260. Check that yourself with git hash-object.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Each must be green at 7f4ca74 and red at 6543e8e.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Read each ruling's wording against the code, not against the handoff's table.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "R-BF-14: attack the root walker.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "Find EVERY caller of isProjectRoot, resolveRepoRoot and resolveHookProjectDir by searching the source. Do not take the handoff's list; gitnexus is unavailable and the developer's index was 113 commits behind.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "For each caller, is a nearer root ever WRONG? Look for a directory with a stray .agents/state.json or .agents/SYSTEM/ sitting between a real project and the cwd.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "SIA's own root must resolve unchanged from SIA's root, open-brain/, open-brain/src/ and docs/. The stray open-brain/.agents/ must not be a root.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "A home directory with a mailbox-only ~/.agents/ must not be a root. Make it a known-negative row.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T19",
+      "observable": "Run the real built session-end hook (open-brain/build/cli-session-end.js) in install (iii). Aim HOME, USERPROFILE and KNOWLEDGE_V2_DB at scratch. Show that its writes land in the CHILD and the parent gains nothing. The developer ran only the resolver (handoff §7, honest limits). This is the row that decides whether R-BF-14 holds.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T20",
+      "observable": "R-BF-15:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T21",
+      "observable": "An archive/ that exists before move-residue is untouched, and nothing nests inside a new residue folder.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T22",
+      "observable": "Does gitState ignoring every UNTRACKED archive/ path also hide a TRACKED, modified file under archive/? It must not.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T23",
+      "observable": "R-BF-16:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T24",
+      "observable": "A valid, parseable state.json is never moved.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T25",
+      "observable": "A tracked zero-byte state.json that gets moved shows as deleted in git status.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T26",
+      "observable": "Next: names restore-from-git.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T27",
+      "observable": "The acceptance, re-run by you, not read:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T28",
+      "observable": "installs (i) frogger's shape, (ii) an empty folder, and (iii-a)/(iii-b), all with no manual fix;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T29",
+      "observable": "the developer's driver may be reused, but validate it against 6543e8e first. It must fail there, as the known-positive transcript says.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T30",
+      "observable": "Add one install of your own design that the developer did not try. A candidate: a child inside the parent's repository that is NOT its own repository (handoff §7's \"nested and untracked\"). check must STOP, and it must name what to do.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T31",
+      "observable": "Your own mutants, at least:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T32",
+      "observable": "isProjectRoot reverted to b45900f's rule: the hook row must go red;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T33",
+      "observable": "archive/ treated as residue;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T34",
+      "observable": "move-residue accepting a parseable state.json;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T35",
+      "observable": "the SCAFFOLDED state removed.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "23-bootstrap-fix-r3",
+  "new_capability": "The /bootstrap fix round 3, stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 145)",
+  "objective": "The /bootstrap fix round 3, stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 145)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "a3bed58d32fa78e59ba16409bd51dd501d9dcb1a",
+    "path": "docs/loops/bootstrap-fix-r3-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "R-BF-14 (§6.1): ACCEPTED. The widened isProjectRoot is in scope as R-BF-9's sibling.",
+    "Why: the same walk-up serves sync, ob_score, detach and the session-end hook. In a non-Node child it resolved to a Node parent, which is the D2 class (a wrong-project write) that R-BF-9 exists to stop. Fixing only state import would have left the class open in four other doors.",
+    "What the change can and cannot do: it only ADDS roots, so a walk stops at a nearer directory, never a farther one. This is the fail-closed direction.",
+    "The planner derived these before ruling: - b45900f required package.json plus one of .agents/SYSTEM, .agents/META or open-brain/. - 7f4ca74 accepts .agents/SYSTEM, .agents/META or .agents/state.json alone, or package.json beside open-brain/. - On this desktop, ~/.agents/ holds only mailbox/ and reflection-queue.json, so the home directory does not become a root.",
+    "project-template/ becoming a root is accepted. It IS a project layout, and sync inside it answering for the template is the truthful answer.",
+    "R-BF-15 (§6.2): ACCEPTED. archive/ is never residue. \"Never nest\" cannot hold otherwise.",
+    "R-BF-16 (§6.3): ACCEPTED, bounded. move-residue may move state.json ONLY when check calls it NOT A RECORD. A parseable record is never residue.",
+    "The not-done item: \"READER'S SEAT UNRESOLVED\" on a not-a-seat checkout (handoff §8) is out of this round and becomes a task. It is not a defect of round 3.",
+    "The developer's own error entry is accepted as that seat's, as written in handoff §9: the handoff commit a1f5baf was made on a 4-issue sync and pushed. The candidate's code is unaffected. Do not re-score it.",
+    "R-BF-9 to R-BF-13, each against its row.",
+    "QA 135's D1–D5 tests, unmodified: the file's blob must be 85ae260. Check that yourself with git hash-object.",
+    "Each must be green at 7f4ca74 and red at 6543e8e.",
+    "Read each ruling's wording against the code, not against the handoff's table.",
+    "R-BF-14: attack the root walker.",
+    "Find EVERY caller of isProjectRoot, resolveRepoRoot and resolveHookProjectDir by searching the source. Do not take the handoff's list; gitnexus is unavailable and the developer's index was 113 commits behind.",
+    "For each caller, is a nearer root ever WRONG? Look for a directory with a stray .agents/state.json or .agents/SYSTEM/ sitting between a real project and the cwd.",
+    "SIA's own root must resolve unchanged from SIA's root, open-brain/, open-brain/src/ and docs/. The stray open-brain/.agents/ must not be a root.",
+    "A home directory with a mailbox-only ~/.agents/ must not be a root. Make it a known-negative row.",
+    "Run the real built session-end hook (open-brain/build/cli-session-end.js) in install (iii). Aim HOME, USERPROFILE and KNOWLEDGE_V2_DB at scratch. Show that its writes land in the CHILD and the parent gains nothing. The developer ran only the resolver (handoff §7, honest limits). This is the row that decides whether R-BF-14 holds.",
+    "R-BF-15:",
+    "An archive/ that exists before move-residue is untouched, and nothing nests inside a new residue folder.",
+    "Does gitState ignoring every UNTRACKED archive/ path also hide a TRACKED, modified file under archive/? It must not.",
+    "R-BF-16:",
+    "A valid, parseable state.json is never moved.",
+    "A tracked zero-byte state.json that gets moved shows as deleted in git status.",
+    "Next: names restore-from-git.",
+    "The acceptance, re-run by you, not read:",
+    "installs (i) frogger's shape, (ii) an empty folder, and (iii-a)/(iii-b), all with no manual fix;",
+    "the developer's driver may be reused, but validate it against 6543e8e first. It must fail there, as the known-positive transcript says.",
+    "Add one install of your own design that the developer did not try. A candidate: a child inside the parent's repository that is NOT its own repository (handoff §7's \"nested and untracked\"). check must STOP, and it must name what to do.",
+    "Your own mutants, at least:",
+    "isProjectRoot reverted to b45900f's rule: the hook row must go red;",
+    "archive/ treated as residue;",
+    "move-residue accepting a parseable state.json;",
+    "the SCAFFOLDED state removed."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "QA 153 D1. A latest session log of the odd-length FE FF shape is named in the report, the --draft stdout and the --commit stdout. Its date never silently becomes the migration date. The output names the date used and why. Re-run QA 153's shapes: origin/qa/importer-leftovers-r5-report, its scripts and rows.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The DECISIONS.md line. \"ADRs NOT imported: none found\" must not print when ADRs are in the bytes but could not be read. It says \"could not be read\".",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Preserve: everything QA 153 passed, meaning R5-1, R5-3, R5-4, O-e, and QA 138's §1 shapes (32/0).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Your own mutants, at least one per item.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "33-importer-leftovers-r6",
+  "new_capability": "Importer leftovers round 6: QA dispatch (record 172)",
+  "objective": "Importer leftovers round 6: QA dispatch (record 172)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "51519fdd95eb57331133ce5f6e0b0092120baa7d",
+    "path": "docs/loops/importer-leftovers-r6-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "QA 153 D1. A latest session log of the odd-length FE FF shape is named in the report, the --draft stdout and the --commit stdout. Its date never silently becomes the migration date. The output names the date used and why. Re-run QA 153's shapes: origin/qa/importer-leftovers-r5-report, its scripts and rows.",
+    "The DECISIONS.md line. \"ADRs NOT imported: none found\" must not print when ADRs are in the bytes but could not be read. It says \"could not be read\".",
+    "Preserve: everything QA 153 passed, meaning R5-1, R5-3, R5-4, O-e, and QA 138's §1 shapes (32/0).",
+    "Your own mutants, at least one per item."
+  ]
+}

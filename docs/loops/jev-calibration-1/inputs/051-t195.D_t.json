@@ -1,0 +1,77 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Full suite on tcm at 603be51 and at the base 8467cb1. Say whether any failure is new. Master CI runs tests again from c933a44 (#200), so a green run now means tests ran; quote the test job's conclusion, not only the run's.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Fails closed (DT-6): each of these must refuse, exit nonzero and name its cause. Never a pass.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "a missing TYPESAFE_API_KEY;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "a transport error;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "a non-2xx response;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "a malformed envelope.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Blocks dispatch (DT-7): name the mechanism Forge chose (harness dispatch-check). Say whether anything in the planner's actual dispatch path calls it. If nothing does, score DT-7 partial and say what would have to call it. A check that nothing runs is a tool, not a gate.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "DT-9 compares content, not ancestry: try DT-9b yourself with a real brief in a scratch clone, not only through the test.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Preserved (DT-8): validate evidence, the runtime's plan gate, the done-gate and both policy files are unchanged. Diff them against 8467cb1.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Your own mutants, at least two, on qa/t195-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "51-t195",
+  "new_capability": "Record 215 (T-195: a D_t beside every brief, judged by the plan gate): QA dispatch (record 216)",
+  "objective": "Record 215 (T-195: a D_t beside every brief, judged by the plan gate): QA dispatch (record 216)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "3eff7387be7bf33afde12e04bca84765493e9a60",
+    "path": "docs/loops/t195-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Full suite on tcm at 603be51 and at the base 8467cb1. Say whether any failure is new. Master CI runs tests again from c933a44 (#200), so a green run now means tests ran; quote the test job's conclusion, not only the run's.",
+    "Fails closed (DT-6): each of these must refuse, exit nonzero and name its cause. Never a pass.",
+    "a missing TYPESAFE_API_KEY;",
+    "a transport error;",
+    "a non-2xx response;",
+    "a malformed envelope.",
+    "Blocks dispatch (DT-7): name the mechanism Forge chose (harness dispatch-check). Say whether anything in the planner's actual dispatch path calls it. If nothing does, score DT-7 partial and say what would have to call it. A check that nothing runs is a tool, not a gate.",
+    "DT-9 compares content, not ancestry: try DT-9b yourself with a real brief in a scratch clone, not only through the test.",
+    "Preserved (DT-8): validate evidence, the runtime's plan gate, the done-gate and both policy files are unchanged. Diff them against 8467cb1.",
+    "Your own mutants, at least two, on qa/t195-mut-."
+  ]
+}

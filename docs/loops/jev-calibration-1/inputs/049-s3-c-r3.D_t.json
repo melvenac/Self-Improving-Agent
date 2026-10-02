@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Full suite on tcm at 20c2dfd and at the base d1e8674: say whether any failure is new.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "QA 212's defect is closed: every SHA input (candidate, criteria, merged, replaced) is refused unless it is 40 lowercase hex, in the function and the CLI, before any write. Try the CLI and a direct call. Re-check the C-204 fixes did not regress.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Coverage: name every row that still has no asserting test. QA 212 listed its own.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Your own mutants, at least two, on qa/c-r3-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "49-s3-c-r3",
+  "new_capability": "Candidate C (T-155, the shadow merge gate): QA dispatch (record 213), candidate C r3",
+  "objective": "Candidate C (T-155, the shadow merge gate): QA dispatch (record 213), candidate C r3",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "bca1ca166a93431ab77195496d78125e3d392e02",
+    "path": "docs/loops/loop-15-slice-3-c-r3-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Full suite on tcm at 20c2dfd and at the base d1e8674: say whether any failure is new.",
+    "QA 212's defect is closed: every SHA input (candidate, criteria, merged, replaced) is refused unless it is 40 lowercase hex, in the function and the CLI, before any write. Try the CLI and a direct call. Re-check the C-204 fixes did not regress.",
+    "Coverage: name every row that still has no asserting test. QA 212 listed its own.",
+    "Your own mutants, at least two, on qa/c-r3-mut-."
+  ]
+}

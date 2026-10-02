@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "T048-D1, the cli.ts half: sync --score prints the invocation-log state. Check it on a missing, a corrupt, an unreadable and an empty log.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "D2: a readable db with no session_meta says \"holds no session\".",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "D3: QA 157's three survivors are killed. Re-apply QA 157's own mutant branches (origin/qa/t048-r2-) to 822f398, and run them on tcm.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "D4: the comment and type are correct.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "D5: the labels are honest for a zero-byte log, an events table with no rows, and a missing sessions directory.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Preserve: everything QA 157 accepted. Session end still finishes, and no crash is introduced.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Your own mutants, at least two.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "39-t048-r2b",
+  "new_capability": "T-048 round 2b (QA 157's findings, outside server.ts): QA dispatch (record 178)",
+  "objective": "T-048 round 2b (QA 157's findings, outside server.ts): QA dispatch (record 178)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "5740d61ac3703d7faaa90bc11d41a570408ffccf",
+    "path": "docs/loops/t048-r2b-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "T048-D1, the cli.ts half: sync --score prints the invocation-log state. Check it on a missing, a corrupt, an unreadable and an empty log.",
+    "D2: a readable db with no session_meta says \"holds no session\".",
+    "D3: QA 157's three survivors are killed. Re-apply QA 157's own mutant branches (origin/qa/t048-r2-) to 822f398, and run them on tcm.",
+    "D4: the comment and type are correct.",
+    "D5: the labels are honest for a zero-byte log, an events table with no rows, and a missing sessions directory.",
+    "Preserve: everything QA 157 accepted. Session end still finishes, and no crash is introduced.",
+    "Your own mutants, at least two."
+  ]
+}

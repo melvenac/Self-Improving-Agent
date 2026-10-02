@@ -1,0 +1,155 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "The criteria FINAL at 6672e83, read with rulings-9 to rulings-16. Rulings-16 is on origin/docs/session-100-qa99-dispatch, and its \"every defect and question, assigned\" table says how each touched row is scored. D-042 and D-046 are in force.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Your predecessor's report: QA 99's, on origin/qa/loop-15-slice-3-a8-report (95727ef). Read the verdict, §9, §11, §14 and §15.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Known positives:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "A8 9e2dd5d for A8-1 (R68-STABLE-UNREAD, R68-NOT-A-FILE, R68-UNREADABLE-STABLE, R70-HANDLE-FACTS);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "A8-2 (WRITEONLY-LATER, R68-UNREADABLE-LATER; Linux);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "A8-3 (R71-BASE-LABEL, R68-TWO-NAME-LATER-FACTS). QA 99's probe files are in docs/loops/qa-scripts-a8/ on its report branch. QA 99's §14 names M-R71-unreadable as a known NEGATIVE for A8-2's shape; use it.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "HANDLE-NLINK-BASE's old assertion is obsolete by rulings-16 (Q3). R74 fixes its text, so score the text.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Every row is re-run.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Win32 locally: this PC is dedicated and quiet, and it can make symlinks and junctions.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "POSIX rows on CI. Probe branches built on 6bd97f2 carry master's ci.yml and run on tcm, which is free. Confirm the runner. At most 10 runs; tcm has two runners and other seats share them.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "R72, both sides:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "an unreadable machine path written in place is reported (Linux);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "an unreadable REPOSITORY file written in place is reported too (the handoff says what it tested);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "a change is never decided from text equality. Check runtime.ts for any remaining string comparison of before and after.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "R73: facts on every record, including stable ones, and the lstat-failure text.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "R74: labels (loop base, stage start, current), type on every side, and the gained-a-name text.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "R75: each named protection has its own candidate test, and a mutant that turns it red. The size mutant's wider kill set is ruled acceptable. Verify the reason the handoff gives.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "Regressions:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T19",
+      "observable": "everything QA 99 found closed stays closed: A7-1's trigger, R69's edges and guards, R70, D-042's trade, A4-1 H/J/LOOP;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T20",
+      "observable": "QA 92's 31 win32 loop probes stay identical apart from the new facts.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T21",
+      "observable": "The merge: confirm, independently, that 5cf0b8b changes nothing of A8's code.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T22",
+      "observable": "The full suite once, at 6bd97f2, captured unpiped. Record the processes before and after. The 8.3-path test should pass here, because R76 brought PR #156.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T23",
+      "observable": "Plain sync in a scratch clone. /sync --check after gitnexus analyze is unrun (no gitnexus).",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "8-s3-a9",
+  "new_capability": "Loop 15 slice three: dispatch of candidate A9 to a FRESH, HEADLESS QA seat (record session 104)",
+  "objective": "Loop 15 slice three: dispatch of candidate A9 to a FRESH, HEADLESS QA seat (record session 104)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "8f9532c40ef93a36c22defde1bb44cd3c775da34",
+    "path": "docs/loops/loop-15-slice-3-dispatch-qa-a9.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "The criteria FINAL at 6672e83, read with rulings-9 to rulings-16. Rulings-16 is on origin/docs/session-100-qa99-dispatch, and its \"every defect and question, assigned\" table says how each touched row is scored. D-042 and D-046 are in force.",
+    "Your predecessor's report: QA 99's, on origin/qa/loop-15-slice-3-a8-report (95727ef). Read the verdict, §9, §11, §14 and §15.",
+    "Known positives:",
+    "A8 9e2dd5d for A8-1 (R68-STABLE-UNREAD, R68-NOT-A-FILE, R68-UNREADABLE-STABLE, R70-HANDLE-FACTS);",
+    "A8-2 (WRITEONLY-LATER, R68-UNREADABLE-LATER; Linux);",
+    "A8-3 (R71-BASE-LABEL, R68-TWO-NAME-LATER-FACTS). QA 99's probe files are in docs/loops/qa-scripts-a8/ on its report branch. QA 99's §14 names M-R71-unreadable as a known NEGATIVE for A8-2's shape; use it.",
+    "HANDLE-NLINK-BASE's old assertion is obsolete by rulings-16 (Q3). R74 fixes its text, so score the text.",
+    "Every row is re-run.",
+    "Win32 locally: this PC is dedicated and quiet, and it can make symlinks and junctions.",
+    "POSIX rows on CI. Probe branches built on 6bd97f2 carry master's ci.yml and run on tcm, which is free. Confirm the runner. At most 10 runs; tcm has two runners and other seats share them.",
+    "R72, both sides:",
+    "an unreadable machine path written in place is reported (Linux);",
+    "an unreadable REPOSITORY file written in place is reported too (the handoff says what it tested);",
+    "a change is never decided from text equality. Check runtime.ts for any remaining string comparison of before and after.",
+    "R73: facts on every record, including stable ones, and the lstat-failure text.",
+    "R74: labels (loop base, stage start, current), type on every side, and the gained-a-name text.",
+    "R75: each named protection has its own candidate test, and a mutant that turns it red. The size mutant's wider kill set is ruled acceptable. Verify the reason the handoff gives.",
+    "Regressions:",
+    "everything QA 99 found closed stays closed: A7-1's trigger, R69's edges and guards, R70, D-042's trade, A4-1 H/J/LOOP;",
+    "QA 92's 31 win32 loop probes stay identical apart from the new facts.",
+    "The merge: confirm, independently, that 5cf0b8b changes nothing of A8's code.",
+    "The full suite once, at 6bd97f2, captured unpiped. Record the processes before and after. The 8.3-path test should pass here, because R76 brought PR #156.",
+    "Plain sync in a scratch clone. /sync --check after gitnexus analyze is unrun (no gitnexus)."
+  ]
+}

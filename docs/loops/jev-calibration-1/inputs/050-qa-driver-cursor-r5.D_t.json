@@ -1,0 +1,83 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "The diagnosis. Reproduce the quote drop on this laptop without the fix: the argv that reaches node loses the embedded quotes. Then show that the fix delivers them intact. Quote both argv.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The r4 row passes here. The ordinary harness on bbfb724 exits 0 on this laptop, with cmd /c denial=False moved=True prompt_quotes_kept=True. Plain and PowerShell still pass, and the three deny rows are still denial=True moved=False. Quote the lines.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "The new check bites. Make a mutant that drops the quotes again (for example, revert the launch to cursor-agent.ps1). The 9994 row must go red, and the failure line must be quoted.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Does the real driver share the defect? This is the question that matters most. The fix is harness-only.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Read the template drive.ps1: how does it launch cursor-agent on PowerShell 5.1?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Does any prompt a real QA run sends (the first prompt, stops.txt, a resume prompt) contain embedded double quotes that would be dropped the same way?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "If yes, real QA seats on this laptop receive mangled instructions. Score it as a defect against the product, not the harness.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Preserve.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "git diff d67c5e7 bbfb724 -- docs/loops/qa-driver-template-cursor/ is empty.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Completion, resume-at-most-3, refusal and denial handling are unchanged.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "At least one mutant of your own, on qa/qa-driver-r5-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "50-qa-driver-cursor-r5",
+  "new_capability": "Record 192 r5 (Cursor QA driver: the laptop push route reaches the agent intact): QA dispatch (record 218)",
+  "objective": "Record 192 r5 (Cursor QA driver: the laptop push route reaches the agent intact): QA dispatch (record 218)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "8255f4da33dbab3c2cd73bf86f1ff73e9749de9c",
+    "path": "docs/loops/qa-driver-cursor-r5-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "The diagnosis. Reproduce the quote drop on this laptop without the fix: the argv that reaches node loses the embedded quotes. Then show that the fix delivers them intact. Quote both argv.",
+    "The r4 row passes here. The ordinary harness on bbfb724 exits 0 on this laptop, with cmd /c denial=False moved=True prompt_quotes_kept=True. Plain and PowerShell still pass, and the three deny rows are still denial=True moved=False. Quote the lines.",
+    "The new check bites. Make a mutant that drops the quotes again (for example, revert the launch to cursor-agent.ps1). The 9994 row must go red, and the failure line must be quoted.",
+    "Does the real driver share the defect? This is the question that matters most. The fix is harness-only.",
+    "Read the template drive.ps1: how does it launch cursor-agent on PowerShell 5.1?",
+    "Does any prompt a real QA run sends (the first prompt, stops.txt, a resume prompt) contain embedded double quotes that would be dropped the same way?",
+    "If yes, real QA seats on this laptop receive mangled instructions. Score it as a defect against the product, not the harness.",
+    "Preserve.",
+    "git diff d67c5e7 bbfb724 -- docs/loops/qa-driver-template-cursor/ is empty.",
+    "Completion, resume-at-most-3, refusal and denial handling are unchanged.",
+    "At least one mutant of your own, on qa/qa-driver-r5-mut-."
+  ]
+}

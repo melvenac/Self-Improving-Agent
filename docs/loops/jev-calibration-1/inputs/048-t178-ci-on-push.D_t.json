@@ -1,0 +1,53 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "Seat pushes run CI: a push to loop/ and to qa/ triggers.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The skip is proven, never inferred: tests are skipped only when EVERY changed file (by git diff before..sha) is under docs/ or is README.md. Code plus docs RUNS; an empty or unreadable list, an all-zero before, a force-push, or a failed changed-files job RUNS. Look for a path that skips code: a rename, a submodule, or fetch-depth too shallow to hold before.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Master is unchanged: a docs-only push to master still runs, and a master run is never cancelled. workflow_dispatch and its inputs are unchanged, and windows stays opt-in.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "No double run: a seat push plus its PR share a concurrency group, and the newer cancels the older.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "The live test: push a throwaway qa/t178-live- branch with one code change and confirm a run starts on its own, quoting the run id. Push a docs-only qa/t178-live-docs- branch and confirm the test job is skipped. This exercises GitHub's trigger, which no unit row can. This works only if ci.yml on the pushed branch is the candidate's: branch from bc6c6d2.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Your own mutants, at least two, on qa/t178-mut-.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "48-t178-ci-on-push",
+  "new_capability": "Record 205 r3 (T-178, P0: CI runs automatically on push to seat branches): QA dispatch (record 211)",
+  "objective": "Record 205 r3 (T-178, P0: CI runs automatically on push to seat branches): QA dispatch (record 211)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "516f2ef0ee0c2f8fe9d7304519258c7978b79563",
+    "path": "docs/loops/t178-ci-on-push-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "Seat pushes run CI: a push to loop/ and to qa/ triggers.",
+    "The skip is proven, never inferred: tests are skipped only when EVERY changed file (by git diff before..sha) is under docs/ or is README.md. Code plus docs RUNS; an empty or unreadable list, an all-zero before, a force-push, or a failed changed-files job RUNS. Look for a path that skips code: a rename, a submodule, or fetch-depth too shallow to hold before.",
+    "Master is unchanged: a docs-only push to master still runs, and a master run is never cancelled. workflow_dispatch and its inputs are unchanged, and windows stays opt-in.",
+    "No double run: a seat push plus its PR share a concurrency group, and the newer cancels the older.",
+    "The live test: push a throwaway qa/t178-live- branch with one code change and confirm a run starts on its own, quoting the run id. Push a docs-only qa/t178-live-docs- branch and confirm the test job is skipped. This exercises GitHub's trigger, which no unit row can. This works only if ci.yml on the pushed branch is the candidate's: branch from bc6c6d2.",
+    "Your own mutants, at least two, on qa/t178-mut-."
+  ]
+}

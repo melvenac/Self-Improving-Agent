@@ -1,0 +1,149 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "e815e3d, pinned on origin/loop/15-slice-3-b-step1-candidate. The handoff is on origin/loop/15-slice-3-b-step1 at 285a8b2, and the diff after e815e3d is docs/ only. Base: d2685fd plus tools = ee0566d, pinned on -base. Built by Forge 126, effort medium (read from its transcript, 239 of 239 records).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The developer's claims (the planner checked the six counted runs' SHAs and conclusions, and that the diff touches no open-brain/src/):",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "B-1: R1 red 3/3 and RH red 1/1, at the base.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "B-2: R1 green 3/3 (36224895526, 36224899537, 36224903440).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "B-3: RH green 3/3 (36224907891, 36224912574, 36224916869).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "B-4: every ELD row under 30 s. The worst is runtime.test.ts at 26.8 s (RH), a margin of 1.12×.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "B-7.3: 1.075× the wall time.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "E-4 is its own commit (a984b15).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "The fix is 7 test files converted to awaited spawns through tests/spawn-async.ts, one commit per file, 117 hunks listed in handoff §5.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "B-0, the static checks, first: git diff of the tools against b32d3b8; E-4's commit is the only change to them, and it is named. Check for retries, timeouts, timer patches and skips. Test counts ≥ the base's.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "B-5.2, the revert mutant, which is yours: revert every hunk in handoff §5, keep everything else, then dispatch R1 once. Pass means the worst ELD row is ≥ 30 000 ms.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "Re-read every counted run's B-8 record yourself (the six above, plus B-1's and B-7's), from the logs and artifacts, not the handoff. A run whose TOP5 shows another heavy process is discounted under §1's rule. Note: RH #3's baseline showed a claude process on the laptop (5 %, 364 MB). Say whether it counts under the rule and whether it matters.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "Your own runs: at most 4 more laptop dispatches (for example, a second RH ×1 at the candidate, to see runtime.test.ts's 26.8 s margin again, or a heavier row). The laptop is B's during your run. Aaron is told.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "spawn-async.ts: read it as the product it now is for 7 files. Does an awaited spawn keep each test's assertions and exit-code checks exactly? Are there orphaned children on timeout? It has its own tests and mutants; check them.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "The developer's unresolved EPERM (1 in 15 desktop runs of the converted state-import-staleness, from the rename in runCommit): try to reproduce it here on the QA PC's NTFS. Is it the Windows rename-flake class QA 122 recorded, or something the conversion introduced?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "Laptop: the counted runs in (2) and (4), at most 5 dispatches in total, one at a time. tcm: at most 4.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "Push only qa/b-step1-, through node docs/loops/qa-129/push-qa.mjs <branch>. git push is denied.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "Never: master, merges, PRs, tags, releases, other seats' branches, or this PC's or the laptop's configuration.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T19",
+      "observable": "Path: docs/loops/loop-15-slice-3-b-step1-qa-report.md. Put the verdict first, then B-0 to B-9 each with pass or fail and its evidence, then your runs, what could not be verified, defects, disagreements, your error entries, reproduction, and \"Open for the planner\".",
+      "type": "blackbox"
+    },
+    {
+      "id": "T20",
+      "observable": "Model and effort from your process command line and transcript.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T21",
+      "observable": "Commit it to qa/b-step1-report, and push with push-qa.mjs.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T22",
+      "observable": "The LAST line is exactly QA-129: REPORT COMPLETE. No /end (T-163).",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "16-s3-b-step1",
+  "new_capability": "Candidate B, Step 1 (the G-042 repair): dispatch to a FRESH, HEADLESS QA seat to SCORE it (record session 129)",
+  "objective": "Candidate B, Step 1 (the G-042 repair): dispatch to a FRESH, HEADLESS QA seat to SCORE it (record session 129)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "c04957b42327ffd31ef0bf29505357eb0a2f7996",
+    "path": "docs/loops/loop-15-slice-3-b-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "e815e3d, pinned on origin/loop/15-slice-3-b-step1-candidate. The handoff is on origin/loop/15-slice-3-b-step1 at 285a8b2, and the diff after e815e3d is docs/ only. Base: d2685fd plus tools = ee0566d, pinned on -base. Built by Forge 126, effort medium (read from its transcript, 239 of 239 records).",
+    "The developer's claims (the planner checked the six counted runs' SHAs and conclusions, and that the diff touches no open-brain/src/):",
+    "B-1: R1 red 3/3 and RH red 1/1, at the base.",
+    "B-2: R1 green 3/3 (36224895526, 36224899537, 36224903440).",
+    "B-3: RH green 3/3 (36224907891, 36224912574, 36224916869).",
+    "B-4: every ELD row under 30 s. The worst is runtime.test.ts at 26.8 s (RH), a margin of 1.12×.",
+    "B-7.3: 1.075× the wall time.",
+    "E-4 is its own commit (a984b15).",
+    "The fix is 7 test files converted to awaited spawns through tests/spawn-async.ts, one commit per file, 117 hunks listed in handoff §5.",
+    "B-0, the static checks, first: git diff of the tools against b32d3b8; E-4's commit is the only change to them, and it is named. Check for retries, timeouts, timer patches and skips. Test counts ≥ the base's.",
+    "B-5.2, the revert mutant, which is yours: revert every hunk in handoff §5, keep everything else, then dispatch R1 once. Pass means the worst ELD row is ≥ 30 000 ms.",
+    "Re-read every counted run's B-8 record yourself (the six above, plus B-1's and B-7's), from the logs and artifacts, not the handoff. A run whose TOP5 shows another heavy process is discounted under §1's rule. Note: RH #3's baseline showed a claude process on the laptop (5 %, 364 MB). Say whether it counts under the rule and whether it matters.",
+    "Your own runs: at most 4 more laptop dispatches (for example, a second RH ×1 at the candidate, to see runtime.test.ts's 26.8 s margin again, or a heavier row). The laptop is B's during your run. Aaron is told.",
+    "spawn-async.ts: read it as the product it now is for 7 files. Does an awaited spawn keep each test's assertions and exit-code checks exactly? Are there orphaned children on timeout? It has its own tests and mutants; check them.",
+    "The developer's unresolved EPERM (1 in 15 desktop runs of the converted state-import-staleness, from the rename in runCommit): try to reproduce it here on the QA PC's NTFS. Is it the Windows rename-flake class QA 122 recorded, or something the conversion introduced?",
+    "Laptop: the counted runs in (2) and (4), at most 5 dispatches in total, one at a time. tcm: at most 4.",
+    "Push only qa/b-step1-, through node docs/loops/qa-129/push-qa.mjs <branch>. git push is denied.",
+    "Never: master, merges, PRs, tags, releases, other seats' branches, or this PC's or the laptop's configuration.",
+    "Path: docs/loops/loop-15-slice-3-b-step1-qa-report.md. Put the verdict first, then B-0 to B-9 each with pass or fail and its evidence, then your runs, what could not be verified, defects, disagreements, your error entries, reproduction, and \"Open for the planner\".",
+    "Model and effort from your process command line and transcript.",
+    "Commit it to qa/b-step1-report, and push with push-qa.mjs.",
+    "The LAST line is exactly QA-129: REPORT COMPLETE. No /end (T-163)."
+  ]
+}

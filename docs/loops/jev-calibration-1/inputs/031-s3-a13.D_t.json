@@ -1,0 +1,77 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "A12-1 is healed on tcm with a real chmod, and on win32 with the wrapped lstat. Use QA 149's shapes, byte-exact from qa/loop-15-slice-3-a12-probe / -probe2: Q149-C1-HOOKS-ONLY, -SUBDIR-ONLY, -MOCK-HOOKS-ONLY and -MOCK-PLUS-CONFIG, and QA 130's Q130-R83-SUBDIR-NOSEARCH-PLANT. For each:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "gitAfterRole is empty;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "the message carries FILE(S) COULD NOT BE PUT BACK and \"Recover by hand\";",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "no \"Every file was put back\".",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "R96: search every consumer of ConfigChange.kind yourself (the handoff lists them). Is there a switch, exhaustive map, count or serializer that treats a fourth value wrongly, or that tsc would not catch?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "R97: the four developer rows assert gitAfterRole AND the summary sentence. Re-apply QA 149's FIX-q149 inverse (drop the push) and your own mutant of the note text; each must go red.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "The note is true: the planted file is still in the tree when the note says \"not removed\". Check that the note never fires for a path that WAS removed or restored.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "The re-done R85 search (the handoff's table, with its unrestored column): check it against your own search of configwatch.ts.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Regressions: QA 130's full row set and QA 149's rows, byte-exact. Run the full suite once on the default TEMP.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Your own mutants, at least one per ruling.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "31-s3-a13",
+  "new_capability": "Loop 15 slice three, candidate A13: dispatch to a FRESH, HEADLESS QA seat (record session 162)",
+  "objective": "Loop 15 slice three, candidate A13: dispatch to a FRESH, HEADLESS QA seat (record session 162)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "cce2c1eb554d756fd3180e47293ae665752e0b47",
+    "path": "docs/loops/loop-15-slice-3-dispatch-qa-a13.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "A12-1 is healed on tcm with a real chmod, and on win32 with the wrapped lstat. Use QA 149's shapes, byte-exact from qa/loop-15-slice-3-a12-probe / -probe2: Q149-C1-HOOKS-ONLY, -SUBDIR-ONLY, -MOCK-HOOKS-ONLY and -MOCK-PLUS-CONFIG, and QA 130's Q130-R83-SUBDIR-NOSEARCH-PLANT. For each:",
+    "gitAfterRole is empty;",
+    "the message carries FILE(S) COULD NOT BE PUT BACK and \"Recover by hand\";",
+    "no \"Every file was put back\".",
+    "R96: search every consumer of ConfigChange.kind yourself (the handoff lists them). Is there a switch, exhaustive map, count or serializer that treats a fourth value wrongly, or that tsc would not catch?",
+    "R97: the four developer rows assert gitAfterRole AND the summary sentence. Re-apply QA 149's FIX-q149 inverse (drop the push) and your own mutant of the note text; each must go red.",
+    "The note is true: the planted file is still in the tree when the note says \"not removed\". Check that the note never fires for a path that WAS removed or restored.",
+    "The re-done R85 search (the handoff's table, with its unrestored column): check it against your own search of configwatch.ts.",
+    "Regressions: QA 130's full row set and QA 149's rows, byte-exact. Run the full suite once on the default TEMP.",
+    "Your own mutants, at least one per ruling."
+  ]
+}

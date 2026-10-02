@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/loop-15-slice-3-rulings-19.md: R83 to R88, plus R85b, ruled in hub turn 155. That text is in this file: \"when observe has no lstat facts, the text says so and prints no zeros; where observe HAS an lstat, it prints those real facts\".",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "Rulings-18 readings 1, 5 and 6, and R82, which must still hold.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Your predecessor QA 108's report (origin/qa/loop-15-slice-3-a10-report d352af3), and its probe files (docs/loops/qa-scripts-a10/, and qa108-a10-probe.test.ts on qa/loop-15-slice-3-a10-probe and -probe2). Re-run them byte-exact.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Each positive that A10 failed must pass now.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "§14 item 2's list is adopted as the obsolete set (rulings-19): re-read each of those in its new form, and say, for each, whether the new form holds.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "The consumer list (R83) and the R85 search in the handoff: check them, don't accept them. Search configwatch.ts yourself for any site that turns an identity or read result into null, or builds a side from a bare word or zeroed facts. Grok's answers on the kind: dir null (:479/:715/:736) and on :227 were accepted by the planner. Check both.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "The mutants: the developer's (loop/15-slice-3-a11-mut-, each run id in the handoff), plus QA 108's own q108-r72-callsite, which R87 must kill. Then at least one of your own per ruling.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "18-s3-a11",
+  "new_capability": "Loop 15 slice three, candidate A11: dispatch to a FRESH, HEADLESS QA seat (record session 130)",
+  "objective": "Loop 15 slice three, candidate A11: dispatch to a FRESH, HEADLESS QA seat (record session 130)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "7dd87b9264d8818c235cb2bff20b187f78a342fd",
+    "path": "docs/loops/loop-15-slice-3-dispatch-qa-a11.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/loop-15-slice-3-rulings-19.md: R83 to R88, plus R85b, ruled in hub turn 155. That text is in this file: \"when observe has no lstat facts, the text says so and prints no zeros; where observe HAS an lstat, it prints those real facts\".",
+    "Rulings-18 readings 1, 5 and 6, and R82, which must still hold.",
+    "Your predecessor QA 108's report (origin/qa/loop-15-slice-3-a10-report d352af3), and its probe files (docs/loops/qa-scripts-a10/, and qa108-a10-probe.test.ts on qa/loop-15-slice-3-a10-probe and -probe2). Re-run them byte-exact.",
+    "Each positive that A10 failed must pass now.",
+    "§14 item 2's list is adopted as the obsolete set (rulings-19): re-read each of those in its new form, and say, for each, whether the new form holds.",
+    "The consumer list (R83) and the R85 search in the handoff: check them, don't accept them. Search configwatch.ts yourself for any site that turns an identity or read result into null, or builds a side from a bare word or zeroed facts. Grok's answers on the kind: dir null (:479/:715/:736) and on :227 were accepted by the planner. Check both.",
+    "The mutants: the developer's (loop/15-slice-3-a11-mut-, each run id in the handoff), plus QA 108's own q108-r72-callsite, which R87 must kill. Then at least one of your own per ruling."
+  ]
+}

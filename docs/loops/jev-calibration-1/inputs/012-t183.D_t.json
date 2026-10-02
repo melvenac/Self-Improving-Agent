@@ -1,0 +1,47 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "docs/loops/t183-greeting-brief.md, with its Amendment 1 (on master's successor branch origin/docs/session-100-qa99-dispatch). T183-1 is an HONEST NO by ruling (the planner set 40,000 when its own estimate was about 45k): score the measured before and after figures, not a pass. T183-6 cannot run here (it needs the main checkout rebuilt after a merge): record it as unrun.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The isolation condition binds: no change to state-schema.ts, state-writer.ts, state.json, the importer, cli.ts or harness/. Check it with git diff --name-only 48acaa8 0f0e7ad.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Verbatim is the protection that matters most (start.md: \"never summarise it, never drop items for length\"): every handoff watch-out and open question byte-identical to state.json, and the role files whole. Test it against this repository's real record at several revisions, not only fixtures.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "Check, not accept: the clip never happens silently (the marker and full length whenever text is cut); a reopened verified claim is always shown whatever its age (the developer's design, accepted by the planner); and the omission line's command (node open-brain/build/cli.js state show --json) really prints what was omitted.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "A finding the developer raised, for you to confirm or refute: greeting-size is a second assembly of handleStart's parts and can drift from it silently. Measure the drift at the candidate (the developer says about 863 characters, uncounted and stated).",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "12-t183",
+  "new_capability": "T-183 (greeting size): dispatch to a FRESH, HEADLESS QA seat (record session 114)",
+  "objective": "T-183 (greeting size): dispatch to a FRESH, HEADLESS QA seat (record session 114)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "3818299e08e9f0f93386d7fea65ba1328b10d89d",
+    "path": "docs/loops/t183-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "docs/loops/t183-greeting-brief.md, with its Amendment 1 (on master's successor branch origin/docs/session-100-qa99-dispatch). T183-1 is an HONEST NO by ruling (the planner set 40,000 when its own estimate was about 45k): score the measured before and after figures, not a pass. T183-6 cannot run here (it needs the main checkout rebuilt after a merge): record it as unrun.",
+    "The isolation condition binds: no change to state-schema.ts, state-writer.ts, state.json, the importer, cli.ts or harness/. Check it with git diff --name-only 48acaa8 0f0e7ad.",
+    "Verbatim is the protection that matters most (start.md: \"never summarise it, never drop items for length\"): every handoff watch-out and open question byte-identical to state.json, and the role files whole. Test it against this repository's real record at several revisions, not only fixtures.",
+    "Check, not accept: the clip never happens silently (the marker and full length whenever text is cut); a reopened verified claim is always shown whatever its age (the developer's design, accepted by the planner); and the omission line's command (node open-brain/build/cli.js state show --json) really prints what was omitted.",
+    "A finding the developer raised, for you to confirm or refute: greeting-size is a second assembly of handleStart's parts and can drift from it silently. Measure the drift at the candidate (the developer says about 863 characters, uncounted and stated)."
+  ]
+}

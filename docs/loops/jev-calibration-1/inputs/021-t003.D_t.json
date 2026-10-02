@@ -1,0 +1,113 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "SessionStart writes open-brain/by-pid/<CLAUDE_PID>.json {session_id, claude_pid, proc_start, …} first. SessionEnd, which fires on /clear, removes it only if it holds its own id.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The server reads by-pid/<process.ppid>.json at every attributed write, never cached. It never uses CLAUDE_PID, which is wrong in an MCP server; the Step 0b trap. A start-time mismatch refuses.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "Slot adoption is removed. ob_set_session is a check. ob_end and ob_store_chunk refuse a foreign id. set_handoff refuses with no proof and names the reason. Recall and feedback say NOT LOGGED with the reason.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "A Cursor server proves nothing, so it refuses attributed writes (the planner's Q2 ruling).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "QA 125's A7, A8 and A9 in the same checkout, the paths T-179 left open (R179-2): each is now refused or attributed correctly. Re-run QA 125's c1-attack.mjs shapes against 706c029 in a scratch home.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Attack the proof:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "a by-pid file forged for another claude PID;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "a stale file after a SessionStart that failed (SessionEnd should have removed it);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "PID reuse (a matching PID with a different start time);",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "a nested server (a claude under a claude), which must use its OWN parent;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "a session_id passed to ob_set_session that differs from the proof;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "two servers under one claude. Is there ANY path where a write lands under an id the server cannot prove?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "The hooks as registered: run setup.mjs against a scratch settings file. Both SessionStart and SessionEnd are present. What happens to attribution if only SessionStart is registered (an old install)?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "Live, if you can: a real headless claude -p with this branch's build and hooks in a scratch config (--settings and --strict-mcp-config, as Forge's Step 0b did), across /clear if headless allows. Otherwise say it could not be shown.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "Row #348's proposed repair (handoff §6): check its reasoning (the owner 1f1d05c2…, 33 recall_log rows) against the data by READING a copy of the DB. Never run the UPDATE.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "Your own mutants, at least: the proof read cached at first use; CLAUDE_PID used instead of ppid; the start-time check skipped; slot adoption restored.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "21-t003",
+  "new_capability": "T-003 (a server knows its OWN session), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 142)",
+  "objective": "T-003 (a server knows its OWN session), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 142)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "70d74592141bf4c62b161c288db183cebff22f22",
+    "path": "docs/loops/t003-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "SessionStart writes open-brain/by-pid/<CLAUDE_PID>.json {session_id, claude_pid, proc_start, …} first. SessionEnd, which fires on /clear, removes it only if it holds its own id.",
+    "The server reads by-pid/<process.ppid>.json at every attributed write, never cached. It never uses CLAUDE_PID, which is wrong in an MCP server; the Step 0b trap. A start-time mismatch refuses.",
+    "Slot adoption is removed. ob_set_session is a check. ob_end and ob_store_chunk refuse a foreign id. set_handoff refuses with no proof and names the reason. Recall and feedback say NOT LOGGED with the reason.",
+    "A Cursor server proves nothing, so it refuses attributed writes (the planner's Q2 ruling).",
+    "QA 125's A7, A8 and A9 in the same checkout, the paths T-179 left open (R179-2): each is now refused or attributed correctly. Re-run QA 125's c1-attack.mjs shapes against 706c029 in a scratch home.",
+    "Attack the proof:",
+    "a by-pid file forged for another claude PID;",
+    "a stale file after a SessionStart that failed (SessionEnd should have removed it);",
+    "PID reuse (a matching PID with a different start time);",
+    "a nested server (a claude under a claude), which must use its OWN parent;",
+    "a session_id passed to ob_set_session that differs from the proof;",
+    "two servers under one claude. Is there ANY path where a write lands under an id the server cannot prove?",
+    "The hooks as registered: run setup.mjs against a scratch settings file. Both SessionStart and SessionEnd are present. What happens to attribution if only SessionStart is registered (an old install)?",
+    "Live, if you can: a real headless claude -p with this branch's build and hooks in a scratch config (--settings and --strict-mcp-config, as Forge's Step 0b did), across /clear if headless allows. Otherwise say it could not be shown.",
+    "Row #348's proposed repair (handoff §6): check its reasoning (the owner 1f1d05c2…, 33 recall_log rows) against the data by READING a copy of the DB. Never run the UPDATE.",
+    "Your own mutants, at least: the proof read cached at first use; CLAUDE_PID used instead of ppid; the start-time check skipped; slot adoption restored."
+  ]
+}

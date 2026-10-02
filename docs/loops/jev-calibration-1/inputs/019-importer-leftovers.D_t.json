@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "R4-4: QA 122's D11 shapes (qa/importer-fixes-r4-d11 aff7135): UTF-32LE, UTF-32BE and UTF-7 are unreadable and block. Also a BOM that lies, zero bytes (O12), a UTF-8 BOM then UTF-16, and a judged input with no readable # title. Write each shape with Windows PowerShell 5.1 itself, not only as bytes. IF-10's +13/+1 still commit.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The no-title rule's reach: it makes any judged input whose first heading is not # unreadable. Search for legitimate inputs it would now block: a project whose INBOX starts with a front-matter block, a comment or a blank line. The planner checked co-op-mailer's three inputs (each has a # title on line 1). Find a real shape it would wrongly block, or say none was found.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "R4-5: a DECISIONS.md with NUL bytes does not block. The report, --draft and --commit each name its NUL count, first byte, the ADRs imported and those NOT imported.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "O7: the two-marker refusal names the OLDEST snapshot. O14: the reason is required by type.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "Forge 131's finding that contradicts QA 122's O13: on Forge's PC, Node 22.23.2's readFileSync gets EBUSY on a file held with FileShare.None. Reproduce it on this PC. If it holds, the importer's own EBUSY read path is untested (Forge 131's §7 item 2). Test what the importer does: refuse, or crash?",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "The probes, byte-exact: QA 111's probes-r3 (expected 17/4, with the same R3-2 FAIL ids) and QA 122's probes-r4 (expected 16/0 with the recorded one-line hold diff; say whether the unmodified script crashes here).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Mutants of your own, at least: the UTF-32 check after UTF-16 again; the no-title rule removed; R4-5's naming dropped from --commit's output.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "19-importer-leftovers",
+  "new_capability": "Importer leftovers (R4-4, R4-5, O7, O14), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 138)",
+  "objective": "Importer leftovers (R4-4, R4-5, O7, O14), stacked on T-179 round 2: dispatch to a FRESH, HEADLESS QA seat (record session 138)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "7dece6639bda6033698d52095fb0eb797cc6c86e",
+    "path": "docs/loops/importer-leftovers-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "R4-4: QA 122's D11 shapes (qa/importer-fixes-r4-d11 aff7135): UTF-32LE, UTF-32BE and UTF-7 are unreadable and block. Also a BOM that lies, zero bytes (O12), a UTF-8 BOM then UTF-16, and a judged input with no readable # title. Write each shape with Windows PowerShell 5.1 itself, not only as bytes. IF-10's +13/+1 still commit.",
+    "The no-title rule's reach: it makes any judged input whose first heading is not # unreadable. Search for legitimate inputs it would now block: a project whose INBOX starts with a front-matter block, a comment or a blank line. The planner checked co-op-mailer's three inputs (each has a # title on line 1). Find a real shape it would wrongly block, or say none was found.",
+    "R4-5: a DECISIONS.md with NUL bytes does not block. The report, --draft and --commit each name its NUL count, first byte, the ADRs imported and those NOT imported.",
+    "O7: the two-marker refusal names the OLDEST snapshot. O14: the reason is required by type.",
+    "Forge 131's finding that contradicts QA 122's O13: on Forge's PC, Node 22.23.2's readFileSync gets EBUSY on a file held with FileShare.None. Reproduce it on this PC. If it holds, the importer's own EBUSY read path is untested (Forge 131's §7 item 2). Test what the importer does: refuse, or crash?",
+    "The probes, byte-exact: QA 111's probes-r3 (expected 17/4, with the same R3-2 FAIL ids) and QA 122's probes-r4 (expected 16/0 with the recorded one-line hold diff; say whether the unmodified script crashes here).",
+    "Mutants of your own, at least: the UTF-32 check after UTF-16 again; the no-title rule removed; R4-5's naming dropped from --commit's output."
+  ]
+}

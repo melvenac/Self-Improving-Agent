@@ -1,0 +1,131 @@
+{
+  "acceptance": [
+    {
+      "id": "T1",
+      "observable": "The brief: docs/loops/importer-fixes-brief.md §3, rows IF-1 to IF-8, written before any candidate existed.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T2",
+      "observable": "The planner's rulings during the build (recorded in the handoff; read them there):",
+      "type": "blackbox"
+    },
+    {
+      "id": "T3",
+      "observable": "\"Could not tell\" does not block --commit. But (a) each such input is a line in the draft report's top section, alongside STALE findings, and carries its reason; and (b) --commit prints one line naming those inputs before it proceeds. Each has a test and a mutant.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T4",
+      "observable": "The fixture directory is listed as historical in .agents/retirements.json, on condition that it holds only importer inputs and no secret.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T5",
+      "observable": "The IF-7 deviation at state-import.test.ts:142-143 is intended: those lines asserted the seeds themselves.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T6",
+      "observable": "Known positive for T-180: A2A-Hub at e0bc3f8. SESSIONS/Session_14.md exists, but next-session.md is Session 13's, and INBOX was last updated at Session 11.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T7",
+      "observable": "Set up: a worktree or git archive copy at f6b6d44, then npm ci and npm run build in open-brain.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T8",
+      "observable": "Every IF row is re-run by you. Do not inherit the developer's results.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T9",
+      "observable": "Check the fixture's fidelity yourself. Clone A2A-Hub read-only from GitHub into a scratch directory (gh is authenticated here). Compare each of the fixture's 7 .agents files, byte for byte, with the same path at e0bc3f8. Record any difference.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T10",
+      "observable": "Scan the fixture for secrets with a pattern you first validate against a planted positive. Report both counts.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T11",
+      "observable": "Probe past the brief's rows. In each case, record what the import says and whether --commit proceeds:",
+      "type": "blackbox"
+    },
+    {
+      "id": "T12",
+      "observable": "an input newer than the latest session;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T13",
+      "observable": "a project with no SESSIONS/ directory;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T14",
+      "observable": "a next-session.md that names no session;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T15",
+      "observable": "an untracked .agents/;",
+      "type": "blackbox"
+    },
+    {
+      "id": "T16",
+      "observable": "a misspelled acknowledgement flag (T-150's rule: it must refuse).",
+      "type": "blackbox"
+    },
+    {
+      "id": "T17",
+      "observable": "One mutant per protection. Check that each of the developer's reverts only what it claims.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T18",
+      "observable": "The full suite once, at f6b6d44, captured unpiped (npx vitest run > file; SUITE_EXIT=$?). Record the processes on this PC just before and after. This base carries PR #156, so the 8.3-path test should pass here.",
+      "type": "blackbox"
+    },
+    {
+      "id": "T19",
+      "observable": "Plain sync in a scratch clone. /sync --check after gitnexus analyze is unrun, because gitnexus is absent. Say so.",
+      "type": "blackbox"
+    }
+  ],
+  "loop": "7-importer-fixes",
+  "new_capability": "Importer fixes (T-175, T-180): dispatch to a FRESH, HEADLESS QA seat (record session 102)",
+  "objective": "Importer fixes (T-175, T-180): dispatch to a FRESH, HEADLESS QA seat (record session 102)",
+  "out_of_scope": [],
+  "preserve": [],
+  "reconstructed_by": "jev-calibration-1/inputs.mjs",
+  "reconstructed_from": {
+    "blob": "c96690810e63b79b7d0b792f07a38990b2b6c12f",
+    "path": "docs/loops/importer-fixes-dispatch-qa.md"
+  },
+  "repair_targets": [],
+  "tasks": [
+    "The brief: docs/loops/importer-fixes-brief.md §3, rows IF-1 to IF-8, written before any candidate existed.",
+    "The planner's rulings during the build (recorded in the handoff; read them there):",
+    "\"Could not tell\" does not block --commit. But (a) each such input is a line in the draft report's top section, alongside STALE findings, and carries its reason; and (b) --commit prints one line naming those inputs before it proceeds. Each has a test and a mutant.",
+    "The fixture directory is listed as historical in .agents/retirements.json, on condition that it holds only importer inputs and no secret.",
+    "The IF-7 deviation at state-import.test.ts:142-143 is intended: those lines asserted the seeds themselves.",
+    "Known positive for T-180: A2A-Hub at e0bc3f8. SESSIONS/Session_14.md exists, but next-session.md is Session 13's, and INBOX was last updated at Session 11.",
+    "Set up: a worktree or git archive copy at f6b6d44, then npm ci and npm run build in open-brain.",
+    "Every IF row is re-run by you. Do not inherit the developer's results.",
+    "Check the fixture's fidelity yourself. Clone A2A-Hub read-only from GitHub into a scratch directory (gh is authenticated here). Compare each of the fixture's 7 .agents files, byte for byte, with the same path at e0bc3f8. Record any difference.",
+    "Scan the fixture for secrets with a pattern you first validate against a planted positive. Report both counts.",
+    "Probe past the brief's rows. In each case, record what the import says and whether --commit proceeds:",
+    "an input newer than the latest session;",
+    "a project with no SESSIONS/ directory;",
+    "a next-session.md that names no session;",
+    "an untracked .agents/;",
+    "a misspelled acknowledgement flag (T-150's rule: it must refuse).",
+    "One mutant per protection. Check that each of the developer's reverts only what it claims.",
+    "The full suite once, at f6b6d44, captured unpiped (npx vitest run > file; SUITE_EXIT=$?). Record the processes on this PC just before and after. This base carries PR #156, so the 8.3-path test should pass here.",
+    "Plain sync in a scratch clone. /sync --check after gitnexus analyze is unrun, because gitnexus is absent. Say so."
+  ]
+}
