@@ -150,6 +150,16 @@ export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunn
   const name = "ci-status";
   const r = run("gh", ["run", "list", "--branch", branch, "--limit", "1", "--json", "databaseId,conclusion,headSha,status"], projectRoot);
   if (!r.ok) {
+    // T-188: gh prints "please run: gh auth login" when the repository's remote is not GitHub at all, and the
+    // auth pattern below matches that hint. A remote that gh cannot read is not an unauthenticated gh, so the
+    // remote is looked at first and named. A genuine auth failure on a GitHub origin falls through unchanged.
+    if (!/ENOENT|not found/i.test(r.error) && /auth|login|token|HTTP 401/i.test(r.error)) {
+      const origin = run("git", ["remote", "get-url", "origin"], projectRoot);
+      const url = origin.ok ? origin.stdout.trim() : "";
+      if (url !== "" && !/(^|[@/.])github.com[:/]/i.test(url)) {
+        return { name, report: true, severity: "skip", message: `skipped — origin ${url} is not a GitHub remote, so gh cannot read its runs; conclusion: unknown (absent is not green)` };
+      }
+    }
     const why = /ENOENT|not found/i.test(r.error) ? "gh is not installed"
       : /auth|login|token|HTTP 401/i.test(r.error) ? "gh is not authenticated"
       : `gh failed: ${r.error.split("\n")[0]}`;
