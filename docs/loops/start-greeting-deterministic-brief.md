@@ -97,3 +97,31 @@ naming each PR, pinned with `--match-head-commit`.
   narrows items 1-6 to what is still missing. Expected to remain: 1 (the whole briefing rendered in
   code), 4 (Usage line), 6 (`resolvedBy`), 3's `*brief*` glob, and T-172's guard so a serving tree
   cannot drift 599 commits again unnoticed.
+
+## Amendment 2 — the rescope, session 158 (~22:1xZ), from sia-forge's Step 0
+
+**Evidence (Forge, static read of master and of the QA PC's serving tree at d030dcd0):** T-164, T-208,
+T-210 and T-211 are on master and in the QA PC serving build (build-info d030dcd0, built 21:45:39Z). The
+QA PC has no user-level `start.md`, so finding 2 does not apply there. Still missing on master: item 1
+(no briefing renderer), item 4 (no slots.json read), item 6 (no resolved flag), the T-172 serving-tree
+guard, and the status_cron removal. Item 3's glob is a substring match. The served-greeting half of Step 0
+needed a `/mcp` reconnect a session cannot do itself. **Ruled:** it moves to acceptance, a fresh session
+against the served build after deploy.
+
+**Scope, one QA batch:**
+- **A. T-172 guard (first).** ob_start's first line names the SERVING build: tree + commit from the
+  running server's build-info.json, plus that tree's distance from origin/master as of its last fetch.
+  Behind gives a loud line. Not checked prints `Serving build: not checked (<why>)`. Read only; the
+  rebuild-or-refuse command is OUT of this loop. Fixtures: behind, level, no build-info.
+- **B. Item 1.** A `## Briefing` block rendered in code by the SHARED session-start renderer (Relay
+  included, by test), carrying: item 4 `Usage: <level> → <consequence>` (path from seat or machine data,
+  not-checked fallback per D-104/D-106); item 6 optional `resolved_by` on open questions (resolved ones
+  omitted, with an `N resolved, not shown` count); the record's session number; the Latest brief line.
+  start.md and the project-template copy reduce to "print it verbatim, then FLAGS".
+- **C. Brief glob, tightened:** basename matches `/(^|-)(re)?brief(-amendment-\d+)?\.md$/`, which keeps
+  every brief and amendment shape on master and excludes drafts, handoffs and responses. One fixture row
+  per kept and excluded shape.
+- **D. status_cron removal** (D-113 is Aaron's word): drop it from the planner's seat data, the
+  `Standing cron:` line and the start.md step.
+
+**Out:** the rebuild-or-refuse command, fast-forwarding seat trees, the dashboard.
