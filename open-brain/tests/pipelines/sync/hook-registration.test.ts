@@ -73,7 +73,10 @@ describe("checkHookRegistration", () => {
     expect(checkHookRegistration(join(dir, "nope.json")).severity).toBe("warn");
   });
 
-  it("handles settings with no hooks block", () => {
-    expect(checkHookRegistration(settings({})).severity).toBe("pass");
+  it("is 'not checked', not a pass, with no hooks block (T-048: zero counted is not 'no duplicates')", () => {
+    const r = checkHookRegistration(settings({}));
+    expect(r.severity).toBe("skip");
+    expect(r.message).toContain("not checked");
+    expect(r.message).toContain("0 script registration(s) counted");
   });
 });

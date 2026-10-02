@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 3f976448..a5a3dff1 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -1266,7 +1266,6 @@ export function checkRetirements(projectRoot: string): CheckResult {
+ 
+     for (const rel of surface) {
+       if (allowed.has(rel)) {
+-        allowedPairsNotScanned++;
+         continue;
+       }
+       const txt = texts.get(rel);

@@ -154,7 +154,13 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
   if (!existsSync(settingsPath)) {
     return { name: "hook-configs", severity: "warn", message: "settings.json not found" };
   }
-  const settings = JSON.parse(readFileSync(settingsPath, "utf-8"));
+  let settings: { hooks?: unknown };
+  try {
+    settings = JSON.parse(readFileSync(settingsPath, "utf-8").replace(/^﻿/, ""));
+  } catch {
+    // Matches hook-registration; an unparseable file used to throw and take /sync down (QA 256).
+    return { name: "hook-configs", severity: "issue", message: "settings.json is not valid JSON" };
+  }
   const hooks: unknown[] = [];
   if (settings.hooks && typeof settings.hooks === "object") {
     for (const hookList of Object.values(settings.hooks)) {
@@ -162,23 +168,52 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
     }
   }
   const missing: string[] = [];
+  // T-048: every entry that is not stat'ed is counted by WHY, and the verdict says how many were
+  // read. A zero here used to print "All hook command files exist".
+  let checked = 0;
+  const skipped = { notAnObject: 0, noCommand: 0, notNodeOrTsx: 0, noFilePath: 0 };
   for (const hook of hooks) {
-    if (!hook || typeof hook !== "object") continue;
+    if (!hook || typeof hook !== "object") {
+      skipped.notAnObject++;
+      continue;
+    }
     const h = hook as Record<string, unknown>;
-    const cmd: string = typeof h.command === "string" ? h.command : "";
-    if (!cmd.includes("node ") && !cmd.includes("npx tsx ")) continue;
+    if (typeof h.command !== "string") {
+      skipped.noCommand++;
+      continue;
+    }
+    const cmd: string = h.command;
+    if (!cmd.includes("node ") && !cmd.includes("npx tsx ")) {
+      skipped.notNodeOrTsx++;
+      continue;
+    }
     // Extract file path: word after "node" or "npx tsx"
     const fileMatch = cmd.match(/(?:node|npx tsx)\s+([^\s]+)/);
-    if (!fileMatch) continue;
+    if (!fileMatch) {
+      skipped.noFilePath++;
+      continue;
+    }
     const filePath = fileMatch[1];
+    checked++;
     if (!existsSync(filePath)) {
       missing.push(filePath);
     }
   }
+  const skippedCount = skipped.notAnObject + skipped.noCommand + skipped.notNodeOrTsx + skipped.noFilePath;
+  const why = [
+    skipped.notAnObject ? `${skipped.notAnObject} not an object` : "",
+    skipped.noCommand ? `${skipped.noCommand} with no command string` : "",
+    skipped.notNodeOrTsx ? `${skipped.notNodeOrTsx} not a node/npx tsx command` : "",
+    skipped.noFilePath ? `${skipped.noFilePath} with no file path after node/npx tsx` : "",
+  ].filter(Boolean).join(", ");
+  const counts = `${checked} hook command file(s) checked; skipped ${skippedCount}${why ? ` (${why})` : ""} of ${hooks.length} entr${hooks.length === 1 ? "y" : "ies"}`;
   if (missing.length > 0) {
-    return { name: "hook-configs", severity: "issue", message: `Hook commands reference missing files: ${missing.join(", ")}` };
+    return { name: "hook-configs", severity: "issue", message: `Hook commands reference missing files: ${missing.join(", ")}. ${counts}` };
   }
-  return { name: "hook-configs", severity: "pass", message: "All hook command files exist" };
+  if (checked === 0) {
+    return { name: "hook-configs", severity: "skip", message: `not checked: no hook command file was read. ${counts}. This is not a pass.` };
+  }
+  return { name: "hook-configs", severity: "pass", message: `All hook command files exist: ${counts}` };
 }
 
 /**
@@ -275,32 +310,55 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
   const skipDirs = new Set(["node_modules", "build", ".git", "tests", "superpowers"]);
   const skipFiles = new Set(["CHANGELOG.md"]);
   const hits: string[] = [];
+  // T-048: what was read and what was left out, counted.
+  let scanned = 0;
+  const left = { nonMd: 0, changelog: 0, skippedDirs: 0, absentDirs: 0, absentFiles: 0, unreadable: 0 };
 
   const scan = (full: string): void => {
     try {
-      if (V1_VAULT_REF.test(readFileSync(full, "utf8"))) hits.push(full);
-    } catch { /* absent or unreadable — not this check's business */ }
+      const text = readFileSync(full, "utf8");
+      scanned++;
+      if (V1_VAULT_REF.test(text)) hits.push(full);
+    } catch (e) {
+      // Absent is expected for the live user files; unreadable is not, and is counted apart.
+      if ((e as NodeJS.ErrnoException).code === "ENOENT") left.absentFiles++;
+      else left.unreadable++;
+    }
   };
 
   const walk = (dir: string): void => {
     let entries;
     try {
       entries = readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return; // absent live dir — same tolerance as the parity check
+    } catch (e) {
+      // absent live dir — same tolerance as the parity check, but counted
+      if ((e as NodeJS.ErrnoException).code === "ENOENT") left.absentDirs++;
+      else left.unreadable++;
+      return;
     }
     for (const entry of entries) {
       if (entry.isDirectory()) {
         if (!skipDirs.has(entry.name)) walk(join(dir, entry.name));
+        else left.skippedDirs++;
         continue;
       }
-      if (!entry.name.endsWith(".md") || skipFiles.has(entry.name)) continue;
+      if (skipFiles.has(entry.name)) {
+        left.changelog++;
+        continue;
+      }
+      if (!entry.name.endsWith(".md")) {
+        left.nonMd++;
+        continue;
+      }
       scan(join(dir, entry.name));
     }
   };
 
   for (const root of roots) walk(root);
   for (const file of files) scan(file);
+  const counts =
+    `${scanned} .md file(s) scanned; not scanned: ${left.nonMd} non-.md, ${left.changelog} CHANGELOG.md, ${left.skippedDirs} skipped director${left.skippedDirs === 1 ? "y" : "ies"} ` +
+    `(${[...skipDirs].join(", ")}), ${left.absentDirs} absent director${left.absentDirs === 1 ? "y" : "ies"}, ${left.absentFiles} absent named file(s), ${left.unreadable} unreadable`;
 
   if (hits.length > 0) {
     const shown = hits.slice(0, 5).map((h) => h.replace(projectRoot, ".").replace(home, "~"));
@@ -308,10 +366,17 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
     return {
       name: "vault-path-refs",
       severity: "issue",
-      message: `Docs reference the retired v1 vault: ${shown.join(", ")}${more}`,
+      message: `Docs reference the retired v1 vault: ${shown.join(", ")}${more}. ${counts}`,
     };
   }
-  return { name: "vault-path-refs", severity: "pass", message: "No v1-vault references in docs or commands" };
+  if (scanned === 0) {
+    return { name: "vault-path-refs", severity: "skip", message: `not checked: no file was read. ${counts}. This is not a pass.` };
+  }
+  if (left.unreadable > 0) {
+    // A file or directory we could not read may hold a reference: capped at warn even though the count is named (B2 ruling).
+    return { name: "vault-path-refs", severity: "warn", message: `No v1-vault references found, but ${left.unreadable} path(s) were unreadable and not checked: this is not a full pass. ${counts}` };
+  }
+  return { name: "vault-path-refs", severity: "pass", message: `No v1-vault references in docs or commands (${counts})` };
 }
 
 
@@ -571,18 +636,30 @@ export function checkHookRegistration(settingsPath: string): CheckResult {
   }
 
   const duplicates: string[] = [];
+  // T-048: registrations counted, and what was not counted said by reason.
+  let registrations = 0;
+  let events = 0;
+  const skipped = { noCommand: 0, noScriptName: 0 };
 
   for (const [event, matchers] of Object.entries(parsed.hooks ?? {})) {
     const counts = new Map<string, number>();
+    events++;
 
     for (const matcher of matchers ?? []) {
       for (const hook of matcher.hooks ?? []) {
         const command = hook.command;
-        if (!command) continue;
+        if (!command) {
+          skipped.noCommand++;
+          continue;
+        }
         // Key on the script filename so path spelling differences (slashes,
         // drive-letter case) still collapse to the same registration.
         const script = (command.match(/[\w.-]+\.(?:js|mjs|cjs|ts)/g) ?? []).pop();
-        if (!script) continue;
+        if (!script) {
+          skipped.noScriptName++;
+          continue;
+        }
+        registrations++;
         counts.set(script, (counts.get(script) ?? 0) + 1);
       }
     }
@@ -592,15 +669,22 @@ export function checkHookRegistration(settingsPath: string): CheckResult {
     }
   }
 
+  const skippedCount = skipped.noCommand + skipped.noScriptName;
+  const counts =
+    `${registrations} script registration(s) counted across ${events} event(s); skipped ${skippedCount}` +
+    (skippedCount > 0 ? ` (${skipped.noCommand} with no command, ${skipped.noScriptName} with no recognisable script filename)` : "");
   if (duplicates.length > 0) {
     return {
       name: "hook-registration",
       severity: "issue",
-      message: `Duplicate hook registrations — ${duplicates.join("; ")}`,
+      message: `Duplicate hook registrations — ${duplicates.join("; ")}. ${counts}`,
     };
   }
+  if (registrations === 0) {
+    return { name: "hook-registration", severity: "skip", message: `not checked: no hook script registration was read. ${counts}. This is not a pass.` };
+  }
 
-  return { name: "hook-registration", severity: "pass", message: "No duplicate hook registrations" };
+  return { name: "hook-registration", severity: "pass", message: `No duplicate hook registrations: ${counts}` };
 }
 
 /**
@@ -627,11 +711,17 @@ export function checkMirrorParity(projectRoot: string, home = homedir()): CheckR
 
   const problems: string[] = [];
   let compared = 0;
+  // T-048: what the check did NOT compare, counted, so "N comparisons" cannot read as "everything".
+  const excepted: string[] = [];
+  const skippedPairs: string[] = [];
+  let ignoredNonMd = 0;
 
   // The template's Cursor set is asserted against an explicit list, since the
   // pairwise comparison below can only see files that exist on both sides.
   if (existsSync(templateCursor)) {
-    const actual = readdirSync(templateCursor).filter((f) => f.endsWith(".md")).sort();
+    const entries = readdirSync(templateCursor);
+    ignoredNonMd += entries.filter((f) => !f.endsWith(".md")).length;
+    const actual = entries.filter((f) => f.endsWith(".md")).sort();
     const expected = [...CURSOR_COMMAND_SET].sort();
     for (const file of expected) {
       if (!actual.includes(file)) problems.push(`template (.cursor): ${file} missing`);
@@ -649,16 +739,24 @@ export function checkMirrorParity(projectRoot: string, home = homedir()): CheckR
 
     if (!aExists || !bExists) {
       if (required) problems.push(`${label}: missing directory`);
+      else skippedPairs.push(`${label} (${!aExists ? a : b} does not exist)`);
       continue;
     }
 
-    const listMd = (d: string) => readdirSync(d).filter((f) => f.endsWith(".md")).sort();
+    const listMd = (d: string) => {
+      const entries = readdirSync(d);
+      ignoredNonMd += entries.filter((f) => !f.endsWith(".md")).length;
+      return entries.filter((f) => f.endsWith(".md")).sort();
+    };
     const aFiles = listMd(a);
     const bFiles = listMd(b);
     const all = [...new Set([...aFiles, ...bFiles])].sort();
 
     for (const file of all) {
-      if (MIRROR_EXCEPTIONS[file]) continue;
+      if (MIRROR_EXCEPTIONS[file]) {
+        excepted.push(`${file} (${label})`);
+        continue;
+      }
 
       const inA = aFiles.includes(file);
       const inB = bFiles.includes(file);
@@ -679,18 +777,24 @@ export function checkMirrorParity(projectRoot: string, home = homedir()): CheckR
     }
   }
 
+  const tail =
+    `${compared} file comparison(s) + ${existsSync(templateCursor) ? "the template Cursor set asserted" : "no template Cursor set to assert"}; ${excepted.length} excepted${excepted.length ? ` [${excepted.join(", ")}]` : ""}; ` +
+    `${ignoredNonMd} non-.md file(s) ignored; ${skippedPairs.length} optional pair(s) skipped${skippedPairs.length ? ` [${skippedPairs.join("; ")}]` : ""}`;
   if (problems.length > 0) {
     return {
       name: "mirror-parity",
       severity: "issue",
-      message: `Slash-command mirrors out of sync — ${problems.join("; ")}`,
+      message: `Slash-command mirrors out of sync — ${problems.join("; ")}. ${tail}`,
     };
+  }
+  if (compared === 0 && !existsSync(templateCursor)) {
+    return { name: "mirror-parity", severity: "skip", message: `not checked: no file was compared and the template Cursor set was not asserted. ${tail}. This is not a pass.` };
   }
 
   return {
     name: "mirror-parity",
     severity: "pass",
-    message: `Slash-command mirrors in sync (${compared} file comparison(s))`,
+    message: `Slash-command mirrors in sync (${tail})`,
   };
 }
 
@@ -828,6 +932,19 @@ function listCommands(dir: string): string[] {
   }
 }
 
+/**
+ * listCommands with what it dropped (T-048): the non-.md files it ignored, counted, and a directory it
+ * could not read, reported instead of becoming an empty list.
+ */
+function listCommandsCounted(dir: string): { files: string[]; ignoredNonMd: number; unreadable: string | null } {
+  try {
+    const entries = readdirSync(dir);
+    return { files: entries.filter((f) => f.endsWith(".md")).sort(), ignoredNonMd: entries.filter((f) => !f.endsWith(".md")).length, unreadable: null };
+  } catch (e) {
+    return { files: [], ignoredNonMd: 0, unreadable: (e as Error).message.split("\n")[0] };
+  }
+}
+
 export function checkCommandParity(projectRoot: string, home = homedir()): CheckResult {
   const name = "command-parity";
   const repoDir = join(projectRoot, ".claude", "commands");
@@ -837,14 +954,24 @@ export function checkCommandParity(projectRoot: string, home = homedir()): Check
     return { name, severity: "skip", message: "skipped — .claude/commands or project-template/.claude/commands absent" };
   }
 
-  const repo = listCommands(repoDir);
-  const template = listCommands(templateDir);
+  const repoList = listCommandsCounted(repoDir);
+  const templateList = listCommandsCounted(templateDir);
+  const repo = repoList.files;
+  const template = templateList.files;
   const problems: string[] = [];
+  // T-048: what this check does not compare, counted.
+  const templateOnly: string[] = [];
+  let ignoredNonMd = repoList.ignoredNonMd + templateList.ignoredNonMd;
+  if (repoList.unreadable) problems.push(`.claude/commands could not be listed (${repoList.unreadable})`);
+  if (templateList.unreadable) problems.push(`project-template/.claude/commands could not be listed (${templateList.unreadable})`);
 
   // Tier 1: repo vs template.
   for (const f of template) {
     if (!repo.includes(f)) {
-      if (TEMPLATE_ONLY_ALLOWED.has(f)) continue;
+      if (TEMPLATE_ONLY_ALLOWED.has(f)) {
+        templateOnly.push(f);
+        continue;
+      }
       problems.push(`${f} is in the template but not in .claude/commands`);
       continue;
     }
@@ -858,6 +985,7 @@ export function checkCommandParity(projectRoot: string, home = homedir()): Check
   }
 
   const shared = template.filter((f) => repo.includes(f)).length;
+  const notCompared = (ignored: number) => `excepted ${templateOnly.length} template-only${templateOnly.length ? ` [${templateOnly.join(", ")}]` : ""}; ${ignored} non-.md file(s) ignored`;
 
   // Tier 2: user scope. Absent is a skip for that tier, never a failure.
   const userDir = join(home, ".claude", "commands");
@@ -865,14 +993,20 @@ export function checkCommandParity(projectRoot: string, home = homedir()): Check
     return {
       name,
       severity: "pass",
-      message: `${shared} shared commands identical to the template (user scope absent — not checked)`,
+      message: `${shared} shared commands identical to the template (user scope absent — not checked; ${notCompared(ignoredNonMd)})`,
       report: true,
     };
   }
 
   const userDrift: string[] = [];
-  for (const f of listCommands(userDir)) {
-    if (!repo.includes(f)) continue; // user-only commands are their own business
+  const userList = listCommandsCounted(userDir);
+  ignoredNonMd += userList.ignoredNonMd;
+  let userOnly = 0;
+  for (const f of userList.files) {
+    if (!repo.includes(f)) {
+      userOnly++; // user-only commands are their own business, and are counted
+      continue;
+    }
     const a = readFileSync(join(repoDir, f), "utf8");
     const b = readFileSync(join(userDir, f), "utf8");
     if (!sameCommandContent(a, b)) userDrift.push(f);
@@ -882,7 +1016,7 @@ export function checkCommandParity(projectRoot: string, home = homedir()): Check
     return {
       name,
       severity: "warn",
-      message: `${shared} shared commands identical to the template; user-scope copies differ: ${userDrift.join(", ")}`,
+      message: `${shared} shared commands identical to the template; user-scope copies differ: ${userDrift.join(", ")} (${userOnly} user-only command(s) not compared; ${notCompared(ignoredNonMd)})`,
       report: true,
     };
   }
@@ -890,7 +1024,7 @@ export function checkCommandParity(projectRoot: string, home = homedir()): Check
   return {
     name,
     severity: "pass",
-    message: `${shared} shared commands identical across repo, template and user scope`,
+    message: `${shared} shared commands identical across repo, template and user scope (${userOnly} user-only command(s) not compared; ${notCompared(ignoredNonMd)})`,
     report: true,
   };
 }
@@ -936,13 +1070,16 @@ export function checkCommandToolNames(projectRoot: string, home = homedir()): Ch
     return { name, severity: "skip", message: "skipped — no ob_* registrations found in server.ts (registration shape changed?)" };
   }
 
-  const dirs = [
+  const allDirs = [
     join(projectRoot, ".claude", "commands"),
     join(projectRoot, "project-template", ".claude", "commands"),
     join(projectRoot, "project-template", ".cursor", "commands"),
     join(home, ".claude", "commands"),
     join(home, ".cursor", "commands"),
-  ].filter(existsSync);
+  ];
+  const dirs = allDirs.filter(existsSync);
+  // T-048: a directory that is not there is not scanned; the verdict names which, instead of dropping it silently.
+  const absentNote = `${dirs.length} of ${allDirs.length} command directories scanned${dirs.length < allDirs.length ? `; absent: ${allDirs.filter((d) => !existsSync(d)).map((d) => (d.startsWith(home) ? "~" + d.slice(home.length) : d.slice(projectRoot.length + 1)).replace(/\\/g, "/")).join(", ")}` : ""}`;
 
   if (dirs.length === 0) {
     return { name, severity: "skip", message: "skipped — no command directories found" };
@@ -978,7 +1115,7 @@ export function checkCommandToolNames(projectRoot: string, home = homedir()): Ch
   return {
     name,
     severity: "pass",
-    message: `${namesChecked} tool references across ${scanned} command files all resolve to ${registered.size} registered tools (names only — this cannot tell whether a tool's description is true)`,
+    message: `${namesChecked} tool references across ${scanned} command files (${absentNote}) all resolve to ${registered.size} registered tools (names only — this cannot tell whether a tool's description is true)`,
     report: true,
   };
 }
@@ -1024,13 +1161,15 @@ export function checkCommandNames(projectRoot: string, home = homedir()): CheckR
   /** Host commands, not this project's. Grows by explicit act, never inferred. */
   const BUILTINS = new Set(["compact", "init"]);
 
-  const commandDirs = [
+  const allCommandDirs = [
     join(projectRoot, ".claude", "commands"),
     join(projectRoot, "project-template", ".claude", "commands"),
     join(projectRoot, "project-template", ".cursor", "commands"),
     join(home, ".claude", "commands"),
     join(home, ".cursor", "commands"),
-  ].filter(existsSync);
+  ];
+  const commandDirs = allCommandDirs.filter(existsSync);
+  const absentNote = `${commandDirs.length} of ${allCommandDirs.length} command directories scanned${commandDirs.length < allCommandDirs.length ? `; absent: ${allCommandDirs.filter((d) => !existsSync(d)).map((d) => (d.startsWith(home) ? "~" + d.slice(home.length) : d.slice(projectRoot.length + 1)).replace(/\\/g, "/")).join(", ")}` : ""}`;
 
   if (commandDirs.length === 0) {
     return { name, severity: "skip", message: "skipped — no command directories found" };
@@ -1093,7 +1232,7 @@ export function checkCommandNames(projectRoot: string, home = homedir()): CheckR
   return {
     name,
     severity: "pass",
-    message: `${namesChecked} command references across ${surface.length} instruction files all resolve to ${registered.size} command files or ${BUILTINS.size} declared host commands (names only — this cannot tell whether a command's description is true)`,
+    message: `${namesChecked} command references across ${surface.length} instruction files (${absentNote}) all resolve to ${registered.size} command files or ${BUILTINS.size} declared host commands (names only — this cannot tell whether a command's description is true)`,
     report: true,
   };
 }
@@ -1188,6 +1327,8 @@ export function checkRetirements(projectRoot: string): CheckResult {
   const unexpected: string[] = [];
   const stale: string[] = [];
   let verified = 0;
+  // T-048: (file, retirement) pairs the unexpected-name scan skipped because the file is a declared referrer.
+  let allowedPairsNotScanned = 0;
   const classes = new Set<string>();
   const events = new Set<string>();
 
@@ -1216,7 +1357,10 @@ export function checkRetirements(projectRoot: string): CheckResult {
     }
 
     for (const rel of surface) {
-      if (allowed.has(rel)) continue;
+      if (allowed.has(rel)) {
+        allowedPairsNotScanned++;
+        continue;
+      }
       const txt = texts.get(rel);
       if (txt !== undefined && re().test(txt)) unexpected.push(`${rel} names ${r.name} (retired ${r.ruled}, ${r.event})`);
     }
@@ -1259,7 +1403,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
     severity: "pass",
     message:
       `${retirements.length} retirements across ${events.size} event classes, ${verified} allowed referrers all present and still naming their retirement, ` +
-      `0 unexpected across ${surface.length} live files read (${listing.label}); ${excludedNote}; ${live.length === listing.files.length ? "historical: none" : `historical: ${listing.files.length - live.length} (by rule)`} — ` +
+      `0 unexpected across ${surface.length} live files read (${listing.label}), with ${allowedPairsNotScanned} (file, retirement) pair(s) not scanned because the file is a declared referrer; ${excludedNote}; ${live.length === listing.files.length ? "historical: none" : `historical: ${listing.files.length - live.length} (by rule)`} — ` +
       `resolvable against a registry: ${RESOLVABLE.join(", ")}; guarded by this record alone: ${unresolvable.join(", ")} ` +
       `(green means every RECORDED retirement is finished, not that every retirement is recorded)`,
     report: true,
@@ -1473,6 +1617,9 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
   const valueEdges = new Map<string, string[]>();
   const nativeImporters = new Set<string>();
   let unresolved = 0;
+  // T-048: the two kinds of import that are NOT edges of this graph, counted instead of dropped silently.
+  let typeOnlyImports = 0;
+  let packageImports = 0;
 
   for (const rel of files) {
     const src = sources.get(rel);
@@ -1481,9 +1628,13 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
     let m: RegExpExecArray | null;
     specPattern.lastIndex = 0;
     while ((m = specPattern.exec(src)) !== null) {
-      if (m[1] !== undefined) continue; // type-only
+      if (m[1] !== undefined) {
+        typeOnlyImports++; // type-only: erased by tsc, not a runtime edge
+        continue;
+      }
       const spec = m[2] ?? m[3];
       if (!spec.startsWith(".")) {
+        packageImports++;
         if (spec === "better-sqlite3") nativeImporters.add(rel);
         continue;
       }
@@ -1538,7 +1689,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
     if (nativeImporters.has(rel)) violations.push(`${rel} -> better-sqlite3 (native build, direct)`);
   }
 
-  const scale = `${files.length} file(s), ${files.filter((f) => !isMemorySide(f)).length} core; excluded ${excluded} non-.ts file(s), not modules in the graph`;
+  const scale = `${files.length} file(s), ${files.filter((f) => !isMemorySide(f)).length} core; excluded ${excluded} non-.ts file(s), not modules in the graph; ${typeOnlyImports} type-only and ${packageImports} package import(s) are not edges`;
   const unreadNote = unreadable.length > 0
     ? `${unreadable.length} unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: ${unreadable.slice(0, 4).join(", ")}${unreadable.length > 4 ? ` (+${unreadable.length - 4} more)` : ""}. `
     : "";

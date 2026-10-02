@@ -1,0 +1,14 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index a963b81f..9477e85a 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -157,7 +157,8 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
+   let settings: { hooks?: unknown };
+   try {
+     settings = JSON.parse(readFileSync(settingsPath, "utf-8").replace(/^﻿/, ""));
+-  } catch {
++  } catch (e) {
++    if (e) throw e;
+     // Matches hook-registration; an unparseable file used to throw and take /sync down (QA 256).
+     return { name: "hook-configs", severity: "issue", message: "settings.json is not valid JSON" };
+   }

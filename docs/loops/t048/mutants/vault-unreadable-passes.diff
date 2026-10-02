@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index a963b81f..bbea6844 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -372,7 +372,7 @@ export function checkVaultPathRefs(projectRoot: string, home = homedir()): Check
+   if (scanned === 0) {
+     return { name: "vault-path-refs", severity: "skip", message: `not checked: no file was read. ${counts}. This is not a pass.` };
+   }
+-  if (left.unreadable > 0) {
++  if (left.unreadable > 0 && Date.now() < 0) {
+     // A file or directory we could not read may hold a reference: capped at warn even though the count is named (B2 ruling).
+     return { name: "vault-path-refs", severity: "warn", message: `No v1-vault references found, but ${left.unreadable} path(s) were unreadable and not checked: this is not a full pass. ${counts}` };
+   }

@@ -113,7 +113,10 @@ describe("checkMirrorParity", () => {
     write(tmplCmds(), "bootstrap.md", "# /bootstrap\n");
 
     const result = checkMirrorParity(root, home);
-    expect(result.severity).toBe("pass");
+    // T-048: only exceptions were present, so NOTHING was compared; that is "not checked", not a pass.
+    expect(result.severity).toBe("skip");
+    expect(result.message).toContain("0 file comparison(s)");
+    expect(result.message).toContain("2 excepted");
   });
 
   it("does not fail when the live user directories are absent", () => {

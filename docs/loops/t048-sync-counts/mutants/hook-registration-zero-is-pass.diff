@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 3f976448..8a4ed422 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -588,7 +588,7 @@ export function checkHookRegistration(settingsPath: string): CheckResult {
+       message: `Duplicate hook registrations — ${duplicates.join("; ")}. ${counts}`,
+     };
+   }
+-  if (registrations === 0) {
++  if (registrations === 0 && Date.now() < 0) {
+     return { name: "hook-registration", severity: "skip", message: `not checked: no hook script registration was read. ${counts}. This is not a pass.` };
+   }
+ 

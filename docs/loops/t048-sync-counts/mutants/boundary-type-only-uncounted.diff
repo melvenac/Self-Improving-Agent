@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 3f976448..8a2349d6 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -1537,7 +1537,6 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
+     specPattern.lastIndex = 0;
+     while ((m = specPattern.exec(src)) !== null) {
+       if (m[1] !== undefined) {
+-        typeOnlyImports++; // type-only: erased by tsc, not a runtime edge
+         continue;
+       }
+       const spec = m[2] ?? m[3];
