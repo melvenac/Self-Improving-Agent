@@ -1,0 +1,2 @@
+{"event":"begin","attempt_id":"f07f9cf9-ab57-47b0-a3aa-5e67fd2a7785","gate":"plan","subject":{"gate":"plan","key":"docs/loops/loop-15-slice-4-brief.D_t.json","blob":"21bc448783f319542a915cf3f40a5a2b74945101"},"attempt":1,"retry_of":null,"record_path":"docs/loops/loop-15-slice-4-brief.G_plan.2026-10-02T00-47-29.272Z.json","attempted_at":"2026-10-02T00:47:29.272Z","mode":"live"}
+{"event":"end","attempt_id":"f07f9cf9-ab57-47b0-a3aa-5e67fd2a7785","outcome_class":"auth","completed_at":"2026-10-02T00:47:29.572Z"}
