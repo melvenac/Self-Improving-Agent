@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 282,
+  "revision": 283,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1298,6 +1298,20 @@
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
       "closed_rev": null
+    },
+    {
+      "id": "T-227",
+      "title": "CI on GitHub-hosted runners: Linux jobs on ubuntu-latest with fetch-depth 0, push only on master, per-PR cancel of superseded commits only, tcm self-hosted as opt-in",
+      "priority": "P0",
+      "status": "done",
+      "opened_session": 157,
+      "closed_session": 157,
+      "supersedes": null,
+      "note": "Aaron approved clark's plan around 08:36Z 2026-10-02; built by sia-forge (docs/loops/t227-developer-handoff.md); planner verified the live runs (36985740012 hosted green, 2122 tests; 36985270934 superseded and cancelled; 36985354203 docs-only test skipped; tcm opt-in 36985450437 green on tcm-2). — Closed session 157: merged #310 as 02b505c2 (clark merged it on Aaron's AskUserQuestion answer).",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+      ],
+      "closed_rev": 283
     }
   ],
   "verified": [
@@ -3856,6 +3870,12 @@
       "title": "QA 253 REJECT on T-209 (6c495794, #287): newestGapFirst's regex lost its backslashes (bytes /(d+)s*$/ at state-render.ts:114-115) so the numeric tie-break is dead and ids sort as text; tests/server.test.ts:199 still asserts oldest-first and CI run 36979243129 failed on it. T-210 ACCEPTED on its own rows but ships in the same commit. Round 2 dispatched to sia-builder; #291 and #297 rebase onto it.",
       "date": "2026-10-02",
       "note": "Report origin/qa/t209-t210-report a753fb7f (docs/loops/t209-t210-qa-report.md). Planner re-derived at session 157: cat -A of 6c495794:open-brain/src/pipelines/session-start/state-render.ts lines 114-115 shows /(d+)s*$/; the same bytes are at 3b207dc6:129 (#291); gh run view 36979243129 conclusion failure. QA's own T-210 (e) note: the *brief* glob also takes drafts, debrief.md and briefing-notes.md, non-blocking."
+    },
+    {
+      "id": "D-102",
+      "title": "QA 254: T-208 REJECT (e442b955, #289), T-212 ACCEPT (626f7d13, #290). T-208 takes 'last fetch' from FETCH_HEAD's mtime, so a FAILED fetch that rewrites FETCH_HEAD makes the FAILED line and later ob_start and /sync read 'level ... compared against the last fetch (<fresh time>)' while origin is ahead; its cause is the last stderr line, 'and the repository exists.' for every SSH failure. Round 2 to sia-forge; T-212 rebases off T-208 to merge alone.",
+      "date": "2026-10-02",
+      "note": "Report origin/qa/t208-t212-report 6a908ebf (docs/loops/t208-t212-qa-report.md). Planner confirmed in e442b955: tree-currency.ts lines 345-379 date the last fetch by FETCH_HEAD's mtime, and line 133 takes the last non-empty stderr line as the cause. Batch QA from the 11:50Z reset: B1 QA 255, B2 QA 256, B3 QA 257 (docs/loops/qa-25{5,6,7}-*-dispatch.md); #294 is out of B3 (CI red, S4-9.2 'cli-flags.test.ts lost a test'), #293 out (needs re-pin against #310's ci.yml), #292 out (needs the \\s fix)."
     }
   ],
   "handoffs": [
