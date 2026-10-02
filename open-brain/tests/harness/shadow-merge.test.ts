@@ -25,7 +25,9 @@ async function load(): Promise<{
   try {
     const mod = await import("../../src/harness/shadow-merge.js");
     if (typeof mod.computeShadowMergeVerdict !== "function") throw new Error("no verdict function");
-    return mod;
+    // src's functions take narrower inputs than the loose Record<string, unknown> this test feeds them
+    // (it builds evidence by hand); the declared type is the test's, not src's.
+    return mod as unknown as Awaited<ReturnType<typeof load>>;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.startsWith("no verdict")) throw err;

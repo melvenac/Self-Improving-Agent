@@ -243,6 +243,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const policy = loadPolicies().plan;
       const d = decidePlanGate({ ...PLAN_ANSWERS, has_observable_acceptance: undefined }, policy, {
         deterministicFailure: false,
+        hasPriorFailures: false,
         qaHistorySupportsStopShip: false,
       });
       expect(d.verdict).toBe("reject");
@@ -253,6 +254,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const policy = loadPolicies().plan;
       const d = decidePlanGate({ ...PLAN_ANSWERS, scope_size: { type: "score", score: 2 } }, policy, {
         deterministicFailure: false,
+        hasPriorFailures: false,
         qaHistorySupportsStopShip: false,
       });
       expect(d.missing).toContain("scope_size");
@@ -264,7 +266,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const unsupported = decidePlanGate(
         { ...PLAN_ANSWERS, plan_mode: { type: "choice", choice: "stop_ship", confidence: 0.99 } },
         policy,
-        { deterministicFailure: false, qaHistorySupportsStopShip: false },
+        { deterministicFailure: false, qaHistorySupportsStopShip: false, hasPriorFailures: false },
       );
       expect(unsupported.verdict).toBe("reject");
       expect(unsupported.reasons.join(" ")).toContain("a halt on the gate alone is refused");
@@ -272,7 +274,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       const supported = decidePlanGate(
         { ...PLAN_ANSWERS, plan_mode: { type: "choice", choice: "stop_ship", confidence: 0.99 } },
         policy,
-        { deterministicFailure: true, qaHistorySupportsStopShip: true },
+        { deterministicFailure: true, qaHistorySupportsStopShip: true, hasPriorFailures: false },
       );
       expect(supported.verdict).toBe("halt");
     });

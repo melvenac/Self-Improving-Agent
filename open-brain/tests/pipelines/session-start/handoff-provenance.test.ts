@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { findHandoffCommit } from "../../../src/pipelines/session-start/handoff-provenance.js";
+import type { Handoff } from "../../../src/shared/state-schema.js";
 
 /**
  * The close-out SHA is DERIVED because it cannot be stored: the commit that
@@ -60,8 +61,14 @@ function writeV1(dir: string, revision: number, handoff: unknown): void {
   );
 }
 
+/** The v2-shaped entry written to disk by writeV2; passed to findHandoffCommit through `asCurrent`. */
 function handoff(seat: string, pick_up: string, session = 1) {
   return { seat, pick_up, watch_out: [], open_questions: [], session, loop_state: null };
+}
+
+/** The entry as findHandoffCommit's `current` (a v3 Handoff); the fixture shape is looser than the type and must stay so on disk. */
+function asCurrent(h: object): Handoff {
+  return h as Handoff;
 }
 
 function commit(dir: string, message: string): string {
@@ -171,7 +178,7 @@ describe("findHandoffCommit", () => {
     // Same shape the greeting is in mid-/end: HEAD still has the old entry, the
     // caller is rendering the new one.
     const rewritten = handoff("developer", "REWRITTEN in the working tree, not committed", 5);
-    const p = findHandoffCommit(dir, "developer", undefined, rewritten);
+    const p = findHandoffCommit(dir, "developer", undefined, asCurrent(rewritten));
 
     expect(p.commit).toBeNull();
     expect(p.note).toMatch(/uncommitted/);
@@ -188,7 +195,7 @@ describe("findHandoffCommit", () => {
     const committed = commit(dir, "developer close-out");
 
     const same = handoff("developer", "committed words", 5);
-    const p = findHandoffCommit(dir, "developer", undefined, same);
+    const p = findHandoffCommit(dir, "developer", undefined, asCurrent(same));
     expect(p.commit).toBe(committed);
     expect(p.note).toBeNull();
   });
@@ -203,7 +210,7 @@ describe("findHandoffCommit", () => {
       ...handoff("qa", "same words", 5),
       loop_state: { open_prs: [], frozen_sha: "abc", questions_for_aaron: [], rulings: [] },
     };
-    expect(findHandoffCommit(dir, "qa", undefined, withRows).commit).toBe(committed);
+    expect(findHandoffCommit(dir, "qa", undefined, asCurrent(withRows)).commit).toBe(committed);
   });
 
   it("CROSSES THE v2 → v3 MIGRATION: a migrated entry is traced to the v2 commit that wrote its words (T-163)", () => {
@@ -226,8 +233,8 @@ describe("findHandoffCommit", () => {
     writeV3(dir, 2, [forge, builder]);
     const builderCommit = commit(dir, "builder hands off");
 
-    expect(findHandoffCommit(dir, "developer", undefined, forge).commit).toBe(forgeCommit);
-    expect(findHandoffCommit(dir, "developer", undefined, builder).commit).toBe(builderCommit);
+    expect(findHandoffCommit(dir, "developer", undefined, asCurrent(forge)).commit).toBe(forgeCommit);
+    expect(findHandoffCommit(dir, "developer", undefined, asCurrent(builder)).commit).toBe(builderCommit);
   });
 
   it("says there is nothing to trace when that seat has no handoff", () => {

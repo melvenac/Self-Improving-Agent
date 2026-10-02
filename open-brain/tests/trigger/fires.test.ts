@@ -17,7 +17,7 @@ import type { TriggerPolicy } from '../../src/trigger/policy.js';
  */
 
 const SESSION = '11111111-2222-3333-4444-555555555555';
-const POLICY: TriggerPolicy = { relevance_floor: 0, max_injected: 1 };
+const POLICY: TriggerPolicy = { relevance_floor: 0, max_injected: 1, deadline_ms: 2000, provenance: 'test fixture' };
 const G039 = 'npx vitest run 2>&1 | tail -8; echo $?';
 
 const ENTRY_299 = [
@@ -123,7 +123,7 @@ describe('the fire record — three states, one row each', () => {
     // The constraint R5 is built to make structural. A silent fire consulted
     // the store and touched rows; none of them may reach the rated set,
     // because ratings there move success_rate, which gates apoptosis.
-    const highFloor: TriggerPolicy = { relevance_floor: 1e9, max_injected: 1 };
+    const highFloor: TriggerPolicy = { relevance_floor: 1e9, max_injected: 1, deadline_ms: 2000, provenance: 'test fixture' };
     const outcome = runTrigger({ db, sessionUuid: SESSION, command: G039, policy: highFloor });
 
     expect(outcome.state).toBe('silent');
@@ -159,7 +159,7 @@ describe('the fire record — three states, one row each', () => {
     // /start's pruning maintenance reads when it asks what has never been
     // recalled. Both columns asserted, because bumping one without the other
     // is a state nothing else in the store would explain.
-    const highFloor: TriggerPolicy = { relevance_floor: 1e9, max_injected: 1 };
+    const highFloor: TriggerPolicy = { relevance_floor: 1e9, max_injected: 1, deadline_ms: 2000, provenance: 'test fixture' };
     const outcome = runTrigger({ db, sessionUuid: SESSION, command: G039, policy: highFloor });
     expect(outcome.state).toBe('silent');
 

@@ -2,7 +2,7 @@
 
 **By:** Forge (developer seat, `sia-forge`, Claude Sonnet 5.5), 2026-10-02. **Branch:** `loop/t152-typecheck-tests` from `origin/master` `8b7aa952`. **Dispatch:** atlas-sia, session 157 (LIGHT, measure first).
 
-## Result: 40 errors, above the 30 you set, so I STOPPED. No test was edited, CI is unchanged, no PR opened.
+## Round 1 result: 40 errors, above the 30 you set, so I STOPPED. (Round 2 below: 4 remain.)
 
 The branch carries only the measuring instrument and this table, so the numbers are in a tracked file and not only in A2A.
 
@@ -45,7 +45,35 @@ The branch carries only the measuring instrument and this table, so the numbers 
 
 By code: TS2345 12, TS2322 7, TS2739 7, TS2353 5, TS2571 4, TS2339 2, TS2551 1, TS2741 1, TS2305 1.
 
-## Findings (not fixed, per the brief)
+## Round 2 (planner ruling, session 157): categories A and C fixed in test files only
+
+**40 to 4.** `npm run typecheck:tests` now reports exactly the **4 category-B errors** (`ranking.test.ts:4` and `:32`, `index-upsert.test.ts:126`, `shadow-strategies.test.ts:33`), which wait for #294. 18 test files changed; no `src/` file and no CI change. `tsc --noEmit` on src is still 0, and the 18 touched test files pass (369 tests). The enforcement PR (`typecheck:tests` into CI's test job) comes after B, as ruled.
+
+**`harness/shadow-merge.test.ts:28`: the TEST is wrong, src is fine.** The loader declares each function as taking `Record<string, unknown>`; src takes narrower input objects (`computeShadowMergeVerdict` wants `evidence`, `candidateSha`, `policy` and so on), and a function that needs more cannot be called as one that accepts anything. The test builds its inputs by hand as loose records on purpose, so the fix is one `as unknown as` at the loader's boundary, with a comment. No finding against src.
+
+How each group was fixed. All are behaviour-neutral; where a value had to be chosen it is the one the code already treated the missing field as.
+
+| Files | Fix | Why it changes nothing |
+| --- | --- | --- |
+| `harness/policies.test.ts` (4) | `hasPriorFailures: false` on the plan-gate contexts | the rule reads `!ctx.hasPriorFailures`; undefined and false are the same |
+| `trigger/fires.test.ts` (3) | `deadline_ms: 2000, provenance: 'test fixture'` | `runTrigger` reads only `relevance_floor` and `max_injected` (`run.ts:96-97`) |
+| `session-start/state-render.test.ts` (3) | `session_uuid`, `checkout`, `first_rev` set to `null` on the in-memory State literals | the legacy-entry shape the renderer already handles |
+| `session-start/handoff-provenance.test.ts` (5) | a cast helper `asCurrent` at the five `findHandoffCommit` calls | the fixtures are also WRITTEN to disk as v2 JSON, so they must not gain v3 fields |
+| `session-start/drift-detector.test.ts` (1) | `sizes: []` and `stateJson: { present: false, valid: false }` | `detectDrift` reads neither |
+| `state-import.test.ts` (1) | `template_copy: false` | the reader is `if (r.inbox.template_copy)`; undefined and false are the same |
+| `sync/scorer.test.ts` (1) | dropped `lastShadowRecall: null` | the field is gone from the type and was never read |
+| `harness/gate.test.ts` (1) | dropped `legend: ["no", "yes"]` | see finding 1 |
+| `harness/gate-artifacts.test.ts` (1) | `note?: string` on the local `Record_` type | the file already reads `.note` at runtime |
+| `rating-method` (4), `relocate` (1), `topics` (1) | `projectDir: undefined` for `null`; pragma results cast to `Array<{ name: string }>` | `indexKnowledge` does `input.projectDir ?? null` |
+| `db-v2` (1), `sync/checks.test` (3), `sync/t048-r1b` (3), `harness/s4-g5-qa` (1), `shared/state-schema` (1) | typed casts and annotations; `parseState(...).data!` became a narrowed read that throws if not ok | the runtime values are identical |
+
+**Findings, none fixed here:**
+
+1. `gate.test.ts` sent `legend`, which is the key the RESPONSE returns; the request field is `criteria`. src never read `legend`, so it did nothing, and I removed it. The test may have meant `criteria`, which would change the payload; that is for whoever owns the test.
+2. `policies.test.ts` now passes `hasPriorFailures: false` everywhere, so nothing in that file exercises the `true` side of that gate rule. A coverage gap, not a type error.
+3. `fires.test.ts` and `ranking.test.ts` still carry present-tense comments about the cut lifecycle (the area of #294).
+
+## Round 1 findings (not fixed, per the brief)
 
 - **No error is confirmed as "the test is right and src is wrong".** I did not open each site. The one worth a look before anyone edits it is `harness/shadow-merge.test.ts:28` (a module namespace where a function-shaped type is expected), which may mean src exports a shape the test cannot call.
 - **Category A is the substantive one:** 20 places where a fixture drifted from a type that src changed. Several (handoff-provenance, state-render) sit around the schema v3 handoff fields, so they ran green only because the runtime does not validate the literal.

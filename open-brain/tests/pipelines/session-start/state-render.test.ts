@@ -289,9 +289,12 @@ describe("renderState — R183-1 the loop state and other seats' lines are not c
           questions_for_aaron: [long("QUESTION")],
           rulings: [long("RULING")],
         },
+        session_uuid: null,
+        checkout: null,
+        first_rev: null,
       },
-      { seat: "developer", session: 60, pick_up: `${mid}\nsecond line`, watch_out: [], open_questions: [], loop_state: null },
-      { seat: "qa", session: 59, pick_up: over, watch_out: [], open_questions: [], loop_state: null },
+      { seat: "developer", session: 60, pick_up: `${mid}\nsecond line`, watch_out: [], open_questions: [], loop_state: null, session_uuid: null, checkout: null, first_rev: null },
+      { seat: "qa", session: 59, pick_up: over, watch_out: [], open_questions: [], loop_state: null, session_uuid: null, checkout: null, first_rev: null },
     ],
   };
 

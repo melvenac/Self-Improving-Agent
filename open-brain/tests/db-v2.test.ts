@@ -45,7 +45,7 @@ describe('db-v2 schema', () => {
   it('creates knowledge_index with vault_path column', () => {
     initSchemaV2(db);
 
-    const columns = db.pragma('table_info(knowledge_index)').map((c: any) => c.name);
+    const columns = (db.pragma('table_info(knowledge_index)') as Array<{ name: string }>).map((c) => c.name);
 
     expect(columns).toContain('vault_path');
     expect(columns).toContain('key');

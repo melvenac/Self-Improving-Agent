@@ -52,7 +52,7 @@ function inboxReport(): ImportReport["inbox"] {
   return {
     items: 0, box_counts: zero(), by_priority: { P0: zero(), P1: zero(), P2: zero(), P3: zero() }, by_status: zero(),
     completed_section_items: 0, unparsed: [], superseded_links: [], sessions: { parsed: 0, inferred_open_as_current: 0, inferred_done_as_retention_edge: 0 },
-    title_fallbacks: [], retention_eligible_done: 0,
+    title_fallbacks: [], retention_eligible_done: 0, template_copy: false,
   };
 }
 
