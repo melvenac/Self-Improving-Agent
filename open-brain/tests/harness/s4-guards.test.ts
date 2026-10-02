@@ -213,7 +213,9 @@ describe("slice four guards", { timeout: 120_000 }, () => {
     // a third file losing a test still fails
     expect(testCountFindings([...pair, { file: "open-brain/tests/other.test.ts", before: 5, after: 4 }], table)).toHaveLength(1);
     // the allowed file losing MORE than recorded fails (before/after match exactly)
-    expect(testCountFindings([{ ...pair[0], after: x.after - 1 }, pair[1]], table).length).toBeGreaterThan(0);
+    const more = testCountFindings([{ ...pair[0], after: x.after - 1 }, pair[1]], table);
+    expect(more).toHaveLength(2); // BOTH: it lost a test the table does not cover, and the entry is stale
+    expect(more.some((m) => m.includes("lost a test"))).toBe(true);
     // a stale entry (file restored to its base count, or no longer modified) is a finding
     expect(testCountFindings([{ ...pair[0], after: x.before }, pair[1]], table)).toHaveLength(1);
     expect(testCountFindings([pair[1]], table)).toHaveLength(1);
