@@ -1,20 +1,21 @@
-# Jev calibration 1, Phase 1 (BUILD): developer handoff, FROZEN
+# Jev calibration 1, Phase 1 (BUILD): developer handoff, FROZEN (re-frozen under rulings-2, D-098)
 
 **By:** Forge (builder, sia-builder), 2026-10-02. **Dispatch:** Atlas, record session 157, `DISPATCH_SHA f7ac983d`
 (origin/master). **Brief:** `docs/loops/jev-calibration-1-brief.md`. **Rulings applied:** `jev-calibration-1-rulings-1.md` (D-096).
 **Branch:** `loop/jev-calibration-1-set`, continued from `e66cfbd4`.
 
-**FROZEN SHA: `3a8d28915dfbdfae60fca5d89e38603baac5e50d`** (one commit; this handoff is the next, docs-only commit).
-**MANIFEST.json sha256:** `d0c61d66e00c2b844a9682bc78cf6b84a29e8c924d57b2191843e7b7ac93093b`.
+**FROZEN SHA: `a26e44d0559b9ad855578d3297c3e61debaee71e`** (re-freeze under rulings-2; this handoff is a later docs-only commit).
+**MANIFEST.json sha256:** `8169ac9b5576b40b9f54d397825453dd486e128eaac860cf529586cbb1bcdd67`.
+**Superseded first freeze:** `3a8d2891` (manifest `d0c61d66...`, balanced headline of 36). Do not use it. The sections below describe the current freeze.
 **Zero Jev calls were made. No policy file or threshold was touched. Not merged. No PR, issue or comment opened.**
 Only `sample.mjs`, `manifest.mjs`, `score.mjs` are new scripts; no `open-brain/` file changed, so no test file was run
 (the dispatch said touched test files only; there are none).
 
-## The headline problem: the headline set is 36, not 50
+## The headline problem: the headline set is 44, not 50
 
-Rulings-1 item 5 excludes every `D_t` that carries verdict wording from the headline. That leaves **36** headline cases
-(18 ACCEPT, 18 REJECT), under the brief's 50. I report the real N and did not relax the rule or edit any text.
-The 23 leak-wording cases (10 ACCEPT, 13 REJECT) are scored as their own group. **59 cases are scored in all.**
+Rulings-1 item 5 excludes every `D_t` that carries verdict wording from the headline. That leaves **44** headline cases
+(26 ACCEPT, 18 REJECT; `meets_50` false), under the brief's 50. Rulings-2 overruled my balanced draw: N outranks balance, so the headline is every eligible case. The first freeze drew a balanced 36. I report the real N and did not relax the rule or edit any text.
+The 23 leak-wording cases (10 ACCEPT, 13 REJECT) are scored as their own group. **67 cases are scored in all.**
 
 | | n | ACCEPT | REJECT |
 |---|---|---|---|
@@ -23,11 +24,10 @@ The 23 leak-wording cases (10 ACCEPT, 13 REJECT) are scored as their own group. 
 | labelled, not excluded | 67 | 36 | 31 |
 | excluded `ambiguous-verdict` | 8 | | |
 | headline-eligible (no verdict wording) | 44 | 26 | 18 |
-| **headline (balanced draw, seed 20261002)** | **36** | 18 | 18 |
+| **headline (all eligible; no draw)** | **44** | 26 | 18 |
 | leak-wording group | 23 | 10 | 13 |
 
-- The pool is ACCEPT-heavy once the leak cases leave (26 v 18), so the balanced draw drops 8 ACCEPTs. Using all 44
-  would give N = 44 at 41/59. I kept the brief's near-50/50. **Atlas's call** if N matters more than balance.
+- The headline is 26/18, ACCEPT-heavy, so raw accuracy flatters a gate that proceeds on everything. `score.mjs` therefore reports per-class rates and balanced accuracy beside raw accuracy, and a `source_kind` split (qa-dispatch v dev-dispatch). `--selftest` is 8/8.
 - **Verdict-wording detector:** `LEAK_RE` in `sample.mjs`, run on the VALUES of each `D_t` (keys are skipped, so the field
   `acceptance` never counts): `reject`/`rejected`/`rejects`/`accept`/`accepted`/`accepts`, case-insensitive, and not
   `accept-stale` or `acceptance`. It flags **27 of 75** `D_t`, which matches your 27. It is broad: some hits are
@@ -94,8 +94,8 @@ Phase 2 runs `node open-brain/node_modules/tsx/dist/cli.mjs docs/loops/jev-calib
   `touches_out_of_scope` and `stuck_repeating_prior_failure` -> 1 - noul; `risk_of_regression` -> 1 - score/2. Stance is
   ACCEPT at p >= 0.5; confidence is max(p, 1-p); bands <0.7, 0.7-0.9, >=0.9; Brier = mean (p - y)^2. A confident miss is
   confidence >= 0.9 and wrong. The primary table uses the two driving questions; all five are in a second table.
-- The runlist (`runlist.json`) gives `--pr <case_no> --merge-commit --scored-sha --base-sha --dt --checks none` for each of the
-  59 scored cases. `--pr` is the case number so a record maps back to its case. Phase 2's run command is not in this freeze.
+- The runlist (`runlist.json`, 67 cases) gives `--pr <case_no> --merge-commit --scored-sha --base-sha --dt --checks none` for each of the
+  67 scored cases. `--pr` is the case number so a record maps back to its case. Phase 2's run command is not in this freeze.
 - Retried records: `score.mjs` uses the last `answered` record per case and lists cases with none under `unscored`.
 
 ## B-1 to B-4 evidence
@@ -107,17 +107,17 @@ Phase 2 runs `node open-brain/node_modules/tsx/dist/cli.mjs docs/loops/jev-calib
   `grep -nE "readJson|readFileSync|git\(|import " docs/loops/jev-calibration-1/inputs.mjs` gives lines 18-21, 106 and 114 only.
   `collect.mjs` does read reports (the brief allows it, to find the candidate); it writes no verdict.
 - **B-2: two full runs give an identical manifest.** collect, inputs, labels, sample, manifest run twice in a row:
-  `d0c61d66e00c2b844a9682bc78cf6b84a29e8c924d57b2191843e7b7ac93093b` both times. The case set is a function of the origin refs,
+  `8169ac9b5576b40b9f54d397825453dd486e128eaac860cf529586cbb1bcdd67` both times. The case set is a function of the origin refs,
   so the manifest records `origin/master` (`f7ac983d`) and the tip of each of 359 refs as a sha256
   (`03a1df50c7c45fa3feb58deabbb93892b3eb80312349cb8cf780fe1e1f9a8a03`). A later ref would change the set; a re-run is only
   comparable against those tips. The manifest holds no timestamp or host path.
 - **B-3: no gate record in the freeze.** `git ls-tree -r HEAD docs/loops/jev-calibration-1 | grep -c records/` gives 0, and
   there is no `records/` directory.
-- **B-4: the PR touches only the set and the handoff.** `git diff --name-only origin/master...3a8d2891` lists nothing outside
+- **B-4: the PR touches only the set and the handoff.** `git diff --name-only origin/master...a26e44d0` lists nothing outside
   `docs/loops/jev-calibration-1/`; with this handoff, one more path, `docs/loops/jev-calibration-1-set-handoff.md`.
   The earlier WIP handoff (`jev-calibration-1-developer-handoff.md`) is deleted in the freeze commit.
 
 ## For Phase 2
 
-Start from the freeze commit or a master that contains it (`git merge-base --is-ancestor 3a8d2891 HEAD`). Rulings-1 item 3
+Start from the freeze commit or a master that contains it (`git merge-base --is-ancestor a26e44d0 HEAD`). Rulings-1 item 3
 means the done-gate rejects every case under `--checks none`, so (a) will read as 100% reject; (b) is where Jev's judgement shows.
