@@ -18,7 +18,7 @@ Merge order: #290, #289, #294, #299.
 |---|---|---|---|---|
 | #290 | T-212: the handoff check attributes commits by trailer | `f707a09c` | ACCEPT | CLEAN |
 | #289 | T-208 r3: fetch before currency, plus the drift line | `be32de21` | ACCEPT | CLEAN |
-| #294 | T-215: the maturity cut, plus the S4-9.2 allowance | `39c3cca7` | ACCEPT | **DIRTY**: conflicts with master after B3. sia-forge has to rebase it, then the planner reviews the range-diff |
+| #294 | T-215: the maturity cut, plus the S4-9.2 allowance | QA'd at `39c3cca7`; **now `26f62934`** | ACCEPT | CLEAN after a rebase onto master, and CI run 37010489213 passed. **Planner reviewed the range-diff (about 13:30Z):** commits 2 to 4 are `=` (patch-identical). Commit 1 differs only in `tests/trigger/fires.test.ts`, where the A8 fixture takes master's full `TriggerPolicy` object (`deadline_ms`, `provenance`) and keeps T-215's comment. That is a trivial resolution with no behaviour change. **Merge it pinned to `26f62934`.** The 3 leftover `typecheck:tests` errors are already on master and stay under T-152 |
 | #299 | T-050: foreign-writer detector | `483061d0` | ACCEPT, with one follow-up (T-229) | CLEAN |
 | #302 | T-048: dropped counts | `ac4323f4` | **REJECT** (row 9: zero is not printed) | Round 2 is with sia-builder. Not on the list |
 
