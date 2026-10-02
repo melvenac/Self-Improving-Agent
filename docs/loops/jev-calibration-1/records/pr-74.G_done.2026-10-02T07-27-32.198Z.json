@@ -1,0 +1,273 @@
+{
+  "gate": "developer-done",
+  "loop": "74-t164-t211",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:32.198Z",
+  "answered_at": "2026-10-02T07:27:32.579Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "74-t164-t211",
+        "objective": "QA 249: T-164 port + T-211 standing cron",
+        "tasks": [
+          "Confined.",
+          "git diff bea385b2 fbf94ae6 touches only the session-numbering code (server.ts, state-schema.ts, state-writer.ts and the session-start pipeline), their tests and the handoff.",
+          "git diff fbf94ae6 9f6fcea4 touches only agent-identity.ts, server.ts handleStart, .claude/commands/start.md and its template copy, cursor-start-differences.json, the template AGENT.md, the tests and the handoff.",
+          "Name every file outside those lists.",
+          "The T-164 port is faithful. Compare 38417eb3 and 567657af with their cherry-picks. Any hunk that differs from the original must be explained by master's movement; list each hunk with its reason.",
+          "SC-1 to SC-5, on the T-164 candidate. SC-2 gets your own test, not the developer's: two fixture checkouts at the same revision each greet N. The first write registers N for uuid A. The second write tries N for uuid B and is refused, and the refusal names N+1.",
+          "The live case: a fixture with 16 local logs and the record's last session at 155 greets 156 and creates Session_156.md. Also re-run ob_start in the same session and confirm the greeting says reused and that no new log appears (SC-5).",
+          "SR-1 to SR-6, on the T-211 candidate. Write one mutant of your own for each of these, and report whether a row catches it:",
+          "(a) a local file that has only status_to no longer shadows AGENT.md (the \"first file with ANY key wins\" rule);",
+          "(b) a cron range check that accepts 60 in the minute field.",
+          "The developer's mutants: reproduce the SC-4 mutant and the two SR-5 mutants, and show each one goes red.",
+          "Full suite once, at 9f6fcea4. Expect 0 failed tests. An unattributed vitest RPC error is environmental (D-083). Quote the counts.",
+          "CI: push qa/t164-t211-ci-candidate at 9f6fcea4. Quote the run id, headSha, conclusion and the test job. Use 1 run."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "git diff bea385b2 fbf94ae6 touches only the session-numbering code (server.ts, state-schema.ts, state-writer.ts and the session-start pipeline), their tests and the handoff.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "git diff fbf94ae6 9f6fcea4 touches only agent-identity.ts, server.ts handleStart, .claude/commands/start.md and its template copy, cursor-start-differences.json, the template AGENT.md, the tests and the handoff.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Name every file outside those lists.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "The T-164 port is faithful. Compare 38417eb3 and 567657af with their cherry-picks. Any hunk that differs from the original must be explained by master's movement; list each hunk with its reason.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "SC-1 to SC-5, on the T-164 candidate. SC-2 gets your own test, not the developer's: two fixture checkouts at the same revision each greet N. The first write registers N for uuid A. The second write tries N for uuid B and is refused, and the refusal names N+1.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The live case: a fixture with 16 local logs and the record's last session at 155 greets 156 and creates Session_156.md. Also re-run ob_start in the same session and confirm the greeting says reused and that no new log appears (SC-5).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "SR-1 to SR-6, on the T-211 candidate. Write one mutant of your own for each of these, and report whether a row catches it:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "(a) a local file that has only status_to no longer shadows AGENT.md (the \"first file with ANY key wins\" rule);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "(b) a cron range check that accepts 60 in the minute field.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "The developer's mutants: reproduce the SC-4 mutant and the two SR-5 mutants, and show each one goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Full suite once, at 9f6fcea4. Expect 0 failed tests. An unattributed vitest RPC error is environmental (D-083). Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "CI: push qa/t164-t211-ci-candidate at 9f6fcea4. Quote the run id, headSha, conclusion and the test job. Use 1 run.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 249: T-164 port + T-211 standing cron",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-249-t164-t211-dispatch.md",
+          "blob": "c256ef4dcb81a9fdb0f7ec2d76c08c1b174a26c1"
+        }
+      },
+      "candidate": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e",
+      "diffstat": [
+        "docs/loops/t164-developer-handoff.md",
+        "docs/loops/t164-port-developer-handoff.md",
+        "docs/loops/t164-port/mutants/sc4-local-count-restored.diff",
+        "open-brain/src/pipelines/session-start/index.ts",
+        "open-brain/src/pipelines/session-start/session-log.ts",
+        "open-brain/src/pipelines/session-start/types.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/pipelines/session-start/record-session-number.test.ts",
+        "open-brain/tests/pipelines/session-start/session-log.test.ts",
+        "open-brain/tests/pipelines/state-import.test.ts",
+        "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+        "open-brain/tests/server.test.ts",
+        "open-brain/tests/shared/closeout-erasure.test.ts",
+        "open-brain/tests/shared/session-order.test.ts",
+        "open-brain/tests/shared/state-writer.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 74,
+        "base_sha": "bea385b2f5fe2b375dadf614a687933d29981b69",
+        "scored_sha": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e",
+        "merge_commit": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.1,
+      "confidence": 0.84,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.91,
+        "1": 0.08,
+        "2": 0.01
+      }
+    },
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.43
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.55
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    }
+  },
+  "usage": {
+    "input_tokens": 2641,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.43 is below the required 0.7",
+      "local_tests_support_claim 0.55 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:32.575Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "2f384968-85df-4362-8e9e-ddee34989c6e",
+  "subject": {
+    "gate": "developer-done",
+    "key": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e",
+    "blob": "13e3c6eefa09845a6dedc95bcb922a1c376a3165"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:32.198Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 74,
+  "merge_commit": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e",
+  "scored_sha": "fbf94ae63dcd49c37b96a113e9c5a1f389077b0e",
+  "base_sha": "bea385b2f5fe2b375dadf614a687933d29981b69",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/074-t164-t211.D_t.json",
+    "blob": "13e3c6eefa09845a6dedc95bcb922a1c376a3165"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t164-developer-handoff.md",
+    "docs/loops/t164-port-developer-handoff.md",
+    "docs/loops/t164-port/mutants/sc4-local-count-restored.diff",
+    "open-brain/src/pipelines/session-start/index.ts",
+    "open-brain/src/pipelines/session-start/session-log.ts",
+    "open-brain/src/pipelines/session-start/types.ts",
+    "open-brain/src/server.ts",
+    "open-brain/src/shared/state-schema.ts",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/pipelines/session-start/record-session-number.test.ts",
+    "open-brain/tests/pipelines/session-start/session-log.test.ts",
+    "open-brain/tests/pipelines/state-import.test.ts",
+    "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+    "open-brain/tests/server.test.ts",
+    "open-brain/tests/shared/closeout-erasure.test.ts",
+    "open-brain/tests/shared/session-order.test.ts",
+    "open-brain/tests/shared/state-writer.test.ts"
+  ]
+}

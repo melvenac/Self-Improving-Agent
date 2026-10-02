@@ -1,0 +1,193 @@
+{
+  "gate": "developer-done",
+  "loop": "49-s3-c-r3",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:16.603Z",
+  "answered_at": "2026-10-02T07:27:17.005Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "49-s3-c-r3",
+        "objective": "Candidate C (T-155, the shadow merge gate): QA dispatch (record 213), candidate C r3",
+        "tasks": [
+          "Full suite on tcm at 20c2dfd and at the base d1e8674: say whether any failure is new.",
+          "QA 212's defect is closed: every SHA input (candidate, criteria, merged, replaced) is refused unless it is 40 lowercase hex, in the function and the CLI, before any write. Try the CLI and a direct call. Re-check the C-204 fixes did not regress.",
+          "Coverage: name every row that still has no asserting test. QA 212 listed its own.",
+          "Your own mutants, at least two, on qa/c-r3-mut-."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Full suite on tcm at 20c2dfd and at the base d1e8674: say whether any failure is new.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "QA 212's defect is closed: every SHA input (candidate, criteria, merged, replaced) is refused unless it is 40 lowercase hex, in the function and the CLI, before any write. Try the CLI and a direct call. Re-check the C-204 fixes did not regress.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Coverage: name every row that still has no asserting test. QA 212 listed its own.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Your own mutants, at least two, on qa/c-r3-mut-.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Candidate C (T-155, the shadow merge gate): QA dispatch (record 213), candidate C r3",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-c-r3-dispatch-qa.md",
+          "blob": "bca1ca166a93431ab77195496d78125e3d392e02"
+        }
+      },
+      "candidate": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-c-r2-developer-handoff.md",
+        "open-brain/src/harness/cli.ts",
+        "open-brain/src/harness/shadow-merge.ts",
+        "open-brain/tests/harness/shadow-merge.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 49,
+        "base_sha": "8054f9fd35394eb77a639206611bf3320983527d",
+        "scored_sha": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+        "merge_commit": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.16,
+      "confidence": 0.77,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.88,
+        "1": 0.09,
+        "2": 0.03
+      }
+    },
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.45
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.48
+    }
+  },
+  "usage": {
+    "input_tokens": 1443,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.45 is below the required 0.7",
+      "local_tests_support_claim 0.48 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:16.994Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "a19fd3b0-b9a6-4c2d-8f06-5ad1a374c367",
+  "subject": {
+    "gate": "developer-done",
+    "key": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+    "blob": "b268a728552df84bc2550cb37b26201a9ebc7e2d"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:16.603Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 49,
+  "merge_commit": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+  "scored_sha": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+  "base_sha": "8054f9fd35394eb77a639206611bf3320983527d",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/049-s3-c-r3.D_t.json",
+    "blob": "b268a728552df84bc2550cb37b26201a9ebc7e2d"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-c-r2-developer-handoff.md",
+    "open-brain/src/harness/cli.ts",
+    "open-brain/src/harness/shadow-merge.ts",
+    "open-brain/tests/harness/shadow-merge.test.ts"
+  ]
+}

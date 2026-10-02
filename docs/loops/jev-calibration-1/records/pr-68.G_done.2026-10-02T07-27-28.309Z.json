@@ -1,0 +1,291 @@
+{
+  "gate": "developer-done",
+  "loop": "68-loop-15-slice-4-step2-r2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:28.309Z",
+  "answered_at": "2026-10-02T07:27:28.707Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "68-loop-15-slice-4-step2-r2",
+        "objective": "Loop 15 slice four, step 2 r2: dispatch to sia-builder",
+        "tasks": [
+          "D1. The S4-9.2 guard (s4-guards.test.ts) matches its own it(...) title. Scan for skips in call position only, for example \\b(it|test|describe)(\\.\\w+)\\.(skip|todo|skipIf|runIf)\\b. Show it still fires on a planted it.skip( in a committed file. Untracked files were why r1 looked green.",
+          "D2. R6 in s4-g4-reconstruct.test.ts gets an explicit timeout, as the other spawn tests do (120_000).",
+          "G3. For each runner, a test whose D_t/E_t loop is shaped like t195 asserts source: \"seat\". QA's q05 and q06 must go red.",
+          "G4 and G5. countAttempts fixtures for two cases: a retry_of naming another subject's record, which is refused; and a retry after auth, request-invalid, unexpected-status or malformed-response, which is refused because they are not retryable. q10 and q11 must go red.",
+          "G6. Add shadow-qa.ts (and shadow-gates.ts, which does the same job for the done gate) to THRESHOLD_SCAN_TARGETS. They assemble what the decision receives, so a literal there is a threshold. Update the count in policies.test.ts. q13 must go red.",
+          "G7. A runner-level test where fetch rejects: the outcome is transport, and it is counted as 1 attempt. q12 must go red on your tests, not only on gate-live A3. QA's probe docs/loops/qa-240/qa240-probe-unavailable.test.ts.txt is a model.",
+          "The disclosure (QA 240 §4). Correct the handoff's list of shared code read before the reconstructions.",
+          "#182 touches runtime.ts and schema.ts, not gate.ts.",
+          "Add artifacts.ts (#182), cli.ts (#187, #195, #209) and t195-plan-gate.test.ts (#209).",
+          "The four/four split stands.",
+          "Open 1, S4-9.3 on Plumb. tests/trigger/hook.test.ts fails 9 of 12 identically at base and candidate, because Plumb's npm 9.2.0 prints a warning to stderr. That is environmental. S4-9.3 is read as \"the candidate adds no failure over the base on the same machine, and the PR's CI on tcm is green\". clark has the Plumb npm fix.",
+          "Open 2. Confirmed: S4-4.1, S4-4a.6 on live records, S4-5a's actual tables, S4-6b.4/6c.1 on live records, and S4-8 clauses 2 and 4 are scored by the step-4 close-out.",
+          "Open 4, S4-6d.3. Optional: a test that harness shadow-verdict prepare never passes a G_done or G_qa record as its doneGate. Today it rests on construction, and computeShadowMergeVerdict would act on one if it were wired in. Add the test if it is cheap.",
+          "Same branch, loop/15-slice-4-step2, from 2d4cd863, never forced. Red first, then green, for each item.",
+          "Machine: the QA PC is short of RAM (1.3 to 1.5 GB free). Run single files and the mutants named above. Do not run the full suite there. QA runs it on Plumb.",
+          "Heavy runs need Aaron's approval. If you need it, send clark ONE line, MANUAL MODE → sia-builder: <action> (<why>).",
+          "Handoff: append an r2 section to docs/loops/loop-15-slice-4-step2-developer-handoff.md. Report the SHA to atlas [f21cf4]."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "D1. The S4-9.2 guard (s4-guards.test.ts) matches its own it(...) title. Scan for skips in call position only, for example \\b(it|test|describe)(\\.\\w+)\\.(skip|todo|skipIf|runIf)\\b. Show it still fires on a planted it.skip( in a committed file. Untracked files were why r1 looked green.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "D2. R6 in s4-g4-reconstruct.test.ts gets an explicit timeout, as the other spawn tests do (120_000).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "G3. For each runner, a test whose D_t/E_t loop is shaped like t195 asserts source: \"seat\". QA's q05 and q06 must go red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "G4 and G5. countAttempts fixtures for two cases: a retry_of naming another subject's record, which is refused; and a retry after auth, request-invalid, unexpected-status or malformed-response, which is refused because they are not retryable. q10 and q11 must go red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "G6. Add shadow-qa.ts (and shadow-gates.ts, which does the same job for the done gate) to THRESHOLD_SCAN_TARGETS. They assemble what the decision receives, so a literal there is a threshold. Update the count in policies.test.ts. q13 must go red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "G7. A runner-level test where fetch rejects: the outcome is transport, and it is counted as 1 attempt. q12 must go red on your tests, not only on gate-live A3. QA's probe docs/loops/qa-240/qa240-probe-unavailable.test.ts.txt is a model.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The disclosure (QA 240 §4). Correct the handoff's list of shared code read before the reconstructions.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "#182 touches runtime.ts and schema.ts, not gate.ts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Add artifacts.ts (#182), cli.ts (#187, #195, #209) and t195-plan-gate.test.ts (#209).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "The four/four split stands.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Open 1, S4-9.3 on Plumb. tests/trigger/hook.test.ts fails 9 of 12 identically at base and candidate, because Plumb's npm 9.2.0 prints a warning to stderr. That is environmental. S4-9.3 is read as \"the candidate adds no failure over the base on the same machine, and the PR's CI on tcm is green\". clark has the Plumb npm fix.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Open 2. Confirmed: S4-4.1, S4-4a.6 on live records, S4-5a's actual tables, S4-6b.4/6c.1 on live records, and S4-8 clauses 2 and 4 are scored by the step-4 close-out.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Open 4, S4-6d.3. Optional: a test that harness shadow-verdict prepare never passes a G_done or G_qa record as its doneGate. Today it rests on construction, and computeShadowMergeVerdict would act on one if it were wired in. Add the test if it is cheap.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Same branch, loop/15-slice-4-step2, from 2d4cd863, never forced. Red first, then green, for each item.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "Machine: the QA PC is short of RAM (1.3 to 1.5 GB free). Run single files and the mutants named above. Do not run the full suite there. QA runs it on Plumb.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Heavy runs need Aaron's approval. If you need it, send clark ONE line, MANUAL MODE → sia-builder: <action> (<why>).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "Handoff: append an r2 section to docs/loops/loop-15-slice-4-step2-developer-handoff.md. Report the SHA to atlas [f21cf4].",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice four, step 2 r2: dispatch to sia-builder",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-4-step2-r2-dispatch.md",
+          "blob": "7575c6d8aa81c5a58dce8c17df669ea0569d440a"
+        }
+      },
+      "candidate": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+      "diffstat": [
+        "docs/loops/loop-15-slice-4-step2-developer-handoff.md",
+        "docs/loops/loop-15-slice-4/mutants/qa240-q05-qa-source-inferred-from-loop-id.diff",
+        "docs/loops/loop-15-slice-4/mutants/qa240-q06-done-source-inferred-from-loop-id.diff",
+        "docs/loops/loop-15-slice-4/mutants/qa240-q10-retry-of-any-subject.diff",
+        "docs/loops/loop-15-slice-4/mutants/qa240-q11-auth-made-retryable.diff",
+        "docs/loops/loop-15-slice-4/mutants/qa240-q12-fetch-failure-filed-unavailable.diff",
+        "docs/loops/loop-15-slice-4/mutants/qa240-q13-literal-planted-in-shadow-qa-runner.diff",
+        "open-brain/tests/harness/policies.test.ts",
+        "open-brain/tests/harness/s4-g1-records.test.ts",
+        "open-brain/tests/harness/s4-g3-done.test.ts",
+        "open-brain/tests/harness/s4-g4-reconstruct.test.ts",
+        "open-brain/tests/harness/s4-g5-qa.test.ts",
+        "open-brain/tests/harness/s4-guards.test.ts",
+        "open-brain/tests/harness/threshold-scan.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 68,
+        "base_sha": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+        "scored_sha": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+        "merge_commit": "779be4d657b0c84ebc7e5ea57044f1e9548f3607"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.51
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.21
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.06
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.05,
+      "confidence": 0.93,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.96,
+        "1": 0.04,
+        "2": 0
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 3593,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.51 is below the required 0.7",
+      "local_tests_support_claim 0.47 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:28.696Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "6f12c223-76c3-41f6-8fc4-305eafa6e588",
+  "subject": {
+    "gate": "developer-done",
+    "key": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+    "blob": "e3042e30a81f15966bf6f1bacd325b92dce0dd03"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:28.309Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 68,
+  "merge_commit": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+  "scored_sha": "779be4d657b0c84ebc7e5ea57044f1e9548f3607",
+  "base_sha": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/068-loop-15-slice-4-step2-r2.D_t.json",
+    "blob": "e3042e30a81f15966bf6f1bacd325b92dce0dd03"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-4-step2-developer-handoff.md",
+    "docs/loops/loop-15-slice-4/mutants/qa240-q05-qa-source-inferred-from-loop-id.diff",
+    "docs/loops/loop-15-slice-4/mutants/qa240-q06-done-source-inferred-from-loop-id.diff",
+    "docs/loops/loop-15-slice-4/mutants/qa240-q10-retry-of-any-subject.diff",
+    "docs/loops/loop-15-slice-4/mutants/qa240-q11-auth-made-retryable.diff",
+    "docs/loops/loop-15-slice-4/mutants/qa240-q12-fetch-failure-filed-unavailable.diff",
+    "docs/loops/loop-15-slice-4/mutants/qa240-q13-literal-planted-in-shadow-qa-runner.diff",
+    "open-brain/tests/harness/policies.test.ts",
+    "open-brain/tests/harness/s4-g1-records.test.ts",
+    "open-brain/tests/harness/s4-g3-done.test.ts",
+    "open-brain/tests/harness/s4-g4-reconstruct.test.ts",
+    "open-brain/tests/harness/s4-g5-qa.test.ts",
+    "open-brain/tests/harness/s4-guards.test.ts",
+    "open-brain/tests/harness/threshold-scan.ts"
+  ]
+}

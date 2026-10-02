@@ -1,0 +1,245 @@
+{
+  "gate": "developer-done",
+  "loop": "57-t158-r2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:21.583Z",
+  "answered_at": "2026-10-02T07:27:22.053Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "57-t158-r2",
+        "objective": "QA 227: record 220 r2 (T-158: close_gap tombstones; add_gap never reuses a gap id)",
+        "tasks": [
+          "Code at e23e622813a540e18bed0849779040cf181ff9b7 on origin/loop/t158-gap-tombstone. The tip 6a04048 adds only the handoff. The base is 474b652.",
+          "Built by Composer (cursor-infra). This is r2. QA 223 REJECTED c9ba1db (qa/t158-report 18c97b4). Read that report first. Every row it scored met must still be met.",
+          "The developer's r2 mutants:",
+          "loop/t158-r2-mutant-explicit 652e749 drops the explicit-id check;",
+          "loop/t158-r2-mutant-scan-open 258852f reads every non-zero git grep exit as \"no citations\".",
+          "The r1 mutants -mutant-splice f8c3643 and -mutant-scan 41fe1db still apply. Re-apply all four to e23e622.",
+          "The brief is docs/loops/t158-t164-dispatch.md §\"Record 220\", with rows TG-1 to TG-5.",
+          "Explicit ids.",
+          "An explicit add_gap id goes through the same refusal as a generated one: it is refused if it exists in the record or is cited in the tracked tree.",
+          "Try G-046, G-047 and G-048 explicitly, against a copy of this repo's .agents/state.json, never the live file.",
+          "The citation scan fails closed.",
+          "Only git grep exit 1 means \"no citations\". Any other exit, or a spawn failure, refuses add_gap and names the exit.",
+          "Force a real failure: a corrupt index, a missing git, or an unreadable path, whichever you can do safely in a scratch copy. Show the refusal."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Code at e23e622813a540e18bed0849779040cf181ff9b7 on origin/loop/t158-gap-tombstone. The tip 6a04048 adds only the handoff. The base is 474b652.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Built by Composer (cursor-infra). This is r2. QA 223 REJECTED c9ba1db (qa/t158-report 18c97b4). Read that report first. Every row it scored met must still be met.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "The developer's r2 mutants:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "loop/t158-r2-mutant-explicit 652e749 drops the explicit-id check;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "loop/t158-r2-mutant-scan-open 258852f reads every non-zero git grep exit as \"no citations\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "The r1 mutants -mutant-splice f8c3643 and -mutant-scan 41fe1db still apply. Re-apply all four to e23e622.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The brief is docs/loops/t158-t164-dispatch.md §\"Record 220\", with rows TG-1 to TG-5.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Explicit ids.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "An explicit add_gap id goes through the same refusal as a generated one: it is refused if it exists in the record or is cited in the tracked tree.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Try G-046, G-047 and G-048 explicitly, against a copy of this repo's .agents/state.json, never the live file.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "The citation scan fails closed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Only git grep exit 1 means \"no citations\". Any other exit, or a spawn failure, refuses add_gap and names the exit.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Force a real failure: a corrupt index, a missing git, or an unreadable path, whichever you can do safely in a scratch copy. Show the refusal.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 227: record 220 r2 (T-158: close_gap tombstones; add_gap never reuses a gap id)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-227-t158-r2-dispatch.md",
+          "blob": "7316902792bc7bbfc8880e0f52030236f278b871"
+        }
+      },
+      "candidate": "e23e622813a540e18bed0849779040cf181ff9b7",
+      "diffstat": [
+        "docs/loops/t158-developer-handoff.md",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/shared/state-writer.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 57,
+        "base_sha": "c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720",
+        "scored_sha": "e23e622813a540e18bed0849779040cf181ff9b7",
+        "merge_commit": "e23e622813a540e18bed0849779040cf181ff9b7"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.22
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.45
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.07
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.14,
+      "confidence": 0.79,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.87,
+        "1": 0.11,
+        "2": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2288,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.47 is below the required 0.7",
+      "local_tests_support_claim 0.45 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:22.042Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "611a93c7-fff9-4387-9cf8-3c221e305644",
+  "subject": {
+    "gate": "developer-done",
+    "key": "e23e622813a540e18bed0849779040cf181ff9b7",
+    "blob": "25fd480faeccb43828e5c4f8da3732b40d5c2a63"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:21.583Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 57,
+  "merge_commit": "e23e622813a540e18bed0849779040cf181ff9b7",
+  "scored_sha": "e23e622813a540e18bed0849779040cf181ff9b7",
+  "base_sha": "c9ba1dbf9bf14240ba4ddbe6c96d4cc335461720",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/057-t158-r2.D_t.json",
+    "blob": "25fd480faeccb43828e5c4f8da3732b40d5c2a63"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t158-developer-handoff.md",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/shared/state-writer.test.ts"
+  ]
+}

@@ -1,0 +1,270 @@
+{
+  "gate": "developer-done",
+  "loop": "54-t196-t197",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:19.771Z",
+  "answered_at": "2026-10-02T07:27:20.181Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "54-t196-t197",
+        "objective": "QA 224: record 219 (T-196, the hub procedure as tracked knowledge; T-197, Cursor /start parity)",
+        "tasks": [
+          "One combined candidate: code at 929673b1babe26db5a22d683c0e642245117c722 on origin/loop/t197-cursor-start-parity. The tip d98438b adds only a handoff line.",
+          "That branch holds all of T-196 plus T-197. origin/loop/t196-hub-knowledge (d75f152) differs from it only in T-197's files. Confirm that with a diff, and score both tasks against 929673b. The base is 334fee5.",
+          "The planner.md change, origin/loop/t196-planner-md fcea0ad, is a role-file PR for Aaron. Read it and say whether it matches T-196 scope item 2. Do not score it as code.",
+          "Built by Composer (cursor-infra).",
+          "The brief: docs/loops/t196-t197-dispatch.md, with rows HB-1 to HB-4 and CS-1 to CS-4.",
+          "HB-1, HB-2, HB-3 and CS-4 are live: not_evaluated.",
+          "Mutants: origin/loop/t196-hub-knowledge-mutant b8fd067.",
+          "The live Cursor /start was overwritten during the build. Infra copied its candidate into %USERPROFILE%\\.cursor\\commands\\start.md on the planner's desktop, then restored it. That is not this machine. On THIS machine, read %USERPROFILE%\\.cursor\\commands\\start.md and say whether it matches master's project-template/.cursor/commands/start.md, ignoring CR. Change nothing there.",
+          "CS-2. /sync must fail on an undocumented difference between the Cursor and Claude /start. Plant one undocumented difference in a scratch copy and show the failure.",
+          "CS-3. The candidate's Cursor /start must not instruct a hand edit to any rendered view or to state.json. Grep it, and read the steps.",
+          "The seat-file collision with T-198.",
+          "This candidate and T-198's (origin/loop/t198-presence 231f501) both ADD .agents/SYSTEM/hub-partner-seats.json, with different contents: blob 344bd46 here, 8a616f4 there.",
+          "Say whether T-198's parser (open-brain/src/pipelines/session-start/hub-presence.ts at 231f501) reads this candidate's file correctly. Run it against this file, or show it by reading the code.",
+          "Name the merge-order consequence."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "One combined candidate: code at 929673b1babe26db5a22d683c0e642245117c722 on origin/loop/t197-cursor-start-parity. The tip d98438b adds only a handoff line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "That branch holds all of T-196 plus T-197. origin/loop/t196-hub-knowledge (d75f152) differs from it only in T-197's files. Confirm that with a diff, and score both tasks against 929673b. The base is 334fee5.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "The planner.md change, origin/loop/t196-planner-md fcea0ad, is a role-file PR for Aaron. Read it and say whether it matches T-196 scope item 2. Do not score it as code.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Built by Composer (cursor-infra).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "The brief: docs/loops/t196-t197-dispatch.md, with rows HB-1 to HB-4 and CS-1 to CS-4.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "HB-1, HB-2, HB-3 and CS-4 are live: not_evaluated.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Mutants: origin/loop/t196-hub-knowledge-mutant b8fd067.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The live Cursor /start was overwritten during the build. Infra copied its candidate into %USERPROFILE%\\.cursor\\commands\\start.md on the planner's desktop, then restored it. That is not this machine. On THIS machine, read %USERPROFILE%\\.cursor\\commands\\start.md and say whether it matches master's project-template/.cursor/commands/start.md, ignoring CR. Change nothing there.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "CS-2. /sync must fail on an undocumented difference between the Cursor and Claude /start. Plant one undocumented difference in a scratch copy and show the failure.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "CS-3. The candidate's Cursor /start must not instruct a hand edit to any rendered view or to state.json. Grep it, and read the steps.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "The seat-file collision with T-198.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "This candidate and T-198's (origin/loop/t198-presence 231f501) both ADD .agents/SYSTEM/hub-partner-seats.json, with different contents: blob 344bd46 here, 8a616f4 there.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Say whether T-198's parser (open-brain/src/pipelines/session-start/hub-presence.ts at 231f501) reads this candidate's file correctly. Run it against this file, or show it by reading the code.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Name the merge-order consequence.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 224: record 219 (T-196, the hub procedure as tracked knowledge; T-197, Cursor /start parity)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-224-t196-t197-dispatch.md",
+          "blob": "088e13843035466ad04c300fdb844f6ca682aded"
+        }
+      },
+      "candidate": "929673b1babe26db5a22d683c0e642245117c722",
+      "diffstat": [
+        ".agents/SYSTEM/hub-partner-seats.json",
+        ".cursor/rules/hub-room.mdc",
+        ".gitignore",
+        "docs/loops/cursor-start-differences.json",
+        "docs/loops/t196-developer-handoff.md",
+        "docs/loops/t197-developer-handoff.md",
+        "open-brain/src/pipelines/sync/hub-seats.ts",
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/src/pipelines/sync/start-parity.ts",
+        "open-brain/tests/pipelines/sync/hub-seats.test.ts",
+        "open-brain/tests/pipelines/sync/start-parity.test.ts",
+        "project-template/.cursor/commands/start.md",
+        "project-template/.cursor/rules/hub-room.mdc"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 54,
+        "base_sha": "334fee548634e94e4a5ba33ea0e23ab1ae0ae64d",
+        "scored_sha": "929673b1babe26db5a22d683c0e642245117c722",
+        "merge_commit": "929673b1babe26db5a22d683c0e642245117c722"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.71
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.49
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.05,
+      "confidence": 0.92,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.96,
+        "1": 0.03,
+        "2": 0.01
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2828,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "local_tests_support_claim 0.49 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:20.178Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "eec106ea-5bb4-4311-9701-31cde1dae63d",
+  "subject": {
+    "gate": "developer-done",
+    "key": "929673b1babe26db5a22d683c0e642245117c722",
+    "blob": "ca46b72ba28e027b51591fff0e40f01ecd495496"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:19.771Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 54,
+  "merge_commit": "929673b1babe26db5a22d683c0e642245117c722",
+  "scored_sha": "929673b1babe26db5a22d683c0e642245117c722",
+  "base_sha": "334fee548634e94e4a5ba33ea0e23ab1ae0ae64d",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/054-t196-t197.D_t.json",
+    "blob": "ca46b72ba28e027b51591fff0e40f01ecd495496"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/SYSTEM/hub-partner-seats.json",
+    ".cursor/rules/hub-room.mdc",
+    ".gitignore",
+    "docs/loops/cursor-start-differences.json",
+    "docs/loops/t196-developer-handoff.md",
+    "docs/loops/t197-developer-handoff.md",
+    "open-brain/src/pipelines/sync/hub-seats.ts",
+    "open-brain/src/pipelines/sync/index.ts",
+    "open-brain/src/pipelines/sync/start-parity.ts",
+    "open-brain/tests/pipelines/sync/hub-seats.test.ts",
+    "open-brain/tests/pipelines/sync/start-parity.test.ts",
+    "project-template/.cursor/commands/start.md",
+    "project-template/.cursor/rules/hub-room.mdc"
+  ]
+}

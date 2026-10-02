@@ -1,0 +1,263 @@
+{
+  "gate": "developer-done",
+  "loop": "5-s3-a7",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:52.893Z",
+  "answered_at": "2026-10-02T07:26:53.313Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "5-s3-a7",
+        "objective": "Loop 15 slice three: dispatch of candidate A7 to a FRESH QA seat (record session 96)",
+        "tasks": [
+          "The criteria FINAL at 6672e83, read with rulings-9 to rulings-14 on master. D-042 (R67) amends D-041: the read gate is the same real path, plus either the base file (nlink ignored) or a single-name regular file, re-checked on the handle. The row table in rulings-14 says how each touched row is scored.",
+          "Your predecessor's handoff: QA report A6 §14.",
+          "Known positives:",
+          "A6 dc35b24: GITCONFIG-LOOP, EXISTBETWEEN, and R29's instrument;",
+          "A5 4c1287f: A5-1's eight Linux shapes (qa/loop-15-slice-3-a5-probe);",
+          "A4 f9a1aa8: A4-1 (qa/loop-15-slice-3-a4-probe). Under D-042, A4-1's R shape is now READ; H, J and LOOP stay unread.",
+          "Every row is re-run. The probe files run on CI against A7 and A6 on your own qa/ branches (D-040).",
+          "Three things the planner wants looked at specifically:",
+          "(a) No mutant has yet turned the R29 seam test red. The redcheck's R29 red was the instrument's fault. Build one: for example, a mutant whose gate reads through a link the role planted. Show that the R29 test turns red under it.",
+          "(b) R67's protective direction has no mutant. mut-r67 reddens only the \"allowed read\" rows. Build the narrow one: drop the nlink === 1 condition, so that any new file at the same real path is read. Show that a hard link to an outside file (A4-1 H) is then read and turns red.",
+          "(c) D-042's trade, both ways, and a third case if one exists: - a lock-and-rename is read; - a hard link made elsewhere does not stop reads; - a new two-name file is not read.",
+          "R65: every watched path, in every stage record, in one state, with true texts (\"unreadable\", never \"absent\"; stage-start facts as \"before\").",
+          "One mutant per protection; check that each of the developer's eight reverts what it claims.",
+          "Take plain sync's exit code in a scratch clone.",
+          "LOCAL MEASUREMENT (mutants, probes, the full suite): tell the live planner BEFORE you start. A2A-Hub's seats will be stopped for the WHOLE window, not only the suite, because load can make a mutant falsely red. Record ListAgents at the start and the end of the window."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "The criteria FINAL at 6672e83, read with rulings-9 to rulings-14 on master. D-042 (R67) amends D-041: the read gate is the same real path, plus either the base file (nlink ignored) or a single-name regular file, re-checked on the handle. The row table in rulings-14 says how each touched row is scored.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Your predecessor's handoff: QA report A6 §14.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Known positives:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "A6 dc35b24: GITCONFIG-LOOP, EXISTBETWEEN, and R29's instrument;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "A5 4c1287f: A5-1's eight Linux shapes (qa/loop-15-slice-3-a5-probe);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "A4 f9a1aa8: A4-1 (qa/loop-15-slice-3-a4-probe). Under D-042, A4-1's R shape is now READ; H, J and LOOP stay unread.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Every row is re-run. The probe files run on CI against A7 and A6 on your own qa/ branches (D-040).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Three things the planner wants looked at specifically:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "(a) No mutant has yet turned the R29 seam test red. The redcheck's R29 red was the instrument's fault. Build one: for example, a mutant whose gate reads through a link the role planted. Show that the R29 test turns red under it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "(b) R67's protective direction has no mutant. mut-r67 reddens only the \"allowed read\" rows. Build the narrow one: drop the nlink === 1 condition, so that any new file at the same real path is read. Show that a hard link to an outside file (A4-1 H) is then read and turns red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "(c) D-042's trade, both ways, and a third case if one exists: - a lock-and-rename is read; - a hard link made elsewhere does not stop reads; - a new two-name file is not read.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "R65: every watched path, in every stage record, in one state, with true texts (\"unreadable\", never \"absent\"; stage-start facts as \"before\").",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "One mutant per protection; check that each of the developer's eight reverts what it claims.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Take plain sync's exit code in a scratch clone.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "LOCAL MEASUREMENT (mutants, probes, the full suite): tell the live planner BEFORE you start. A2A-Hub's seats will be stopped for the WHOLE window, not only the suite, because load can make a mutant falsely red. Record ListAgents at the start and the end of the window.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice three: dispatch of candidate A7 to a FRESH QA seat (record session 96)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-3-dispatch-qa-a7.md",
+          "blob": "757717dfb01fda66609818cb051c2d334cb69e03"
+        }
+      },
+      "candidate": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-a7-developer-handoff.md",
+        "open-brain/src/harness/configwatch.ts",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/tests/harness/config-channel.test.ts",
+        "open-brain/tests/harness/configwatch-a7-seam.test.ts",
+        "open-brain/tests/harness/configwatch-links.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 5,
+        "base_sha": "dc35b24869e77d2b62729d12598fb50e5adcd24b",
+        "scored_sha": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5",
+        "merge_commit": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.2
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.53
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.25,
+      "confidence": 0.62,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.78,
+        "1": 0.18,
+        "2": 0.04
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2732,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.47 is below the required 0.7",
+      "local_tests_support_claim 0.53 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:53.300Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "6c12ea71-4b9c-491f-8da7-8414d9bdb2ce",
+  "subject": {
+    "gate": "developer-done",
+    "key": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5",
+    "blob": "25433dd98d4e094b6347f77b3b48359281d11af7"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:52.893Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 5,
+  "merge_commit": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5",
+  "scored_sha": "d223d1dbe4247fdc0131cd92bfc14288c52d7cf5",
+  "base_sha": "dc35b24869e77d2b62729d12598fb50e5adcd24b",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/005-s3-a7.D_t.json",
+    "blob": "25433dd98d4e094b6347f77b3b48359281d11af7"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-a7-developer-handoff.md",
+    "open-brain/src/harness/configwatch.ts",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/tests/harness/config-channel.test.ts",
+    "open-brain/tests/harness/configwatch-a7-seam.test.ts",
+    "open-brain/tests/harness/configwatch-links.test.ts"
+  ]
+}

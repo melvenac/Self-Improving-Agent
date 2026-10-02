@@ -1,0 +1,279 @@
+{
+  "gate": "developer-done",
+  "loop": "62-t194-r3",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:24.577Z",
+  "answered_at": "2026-10-02T07:27:24.973Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "62-t194-r3",
+        "objective": "QA 234: T-194 r3 (the planner seat hook), after QA 233's REJECT",
+        "tasks": [
+          "docs/loops/t194-r3-dispatch.md: the planner's r3 scope, rows 1 to 6. This is what you score.",
+          "docs/loops/t194-r2-qa-report.md and docs/loops/qa-233/evidence/ on origin/qa/t194-r2-report: QA 233's defects D1 and D2, and probes P1 to P15. Re-run P3, P4 and P6 to P15 against the candidate.",
+          "docs/loops/t194-r3-developer-handoff.md at the candidate: its row-to-test map and red-then-green claims. Verify them; do not trust them.",
+          "docs/loops/qa-231-t194-r2-dispatch.md and docs/loops/qa-222-225-common.md: the PH-1..PH-8 and r2-1..r2-4 rows still hold. r3 must not regress any row QA 233 scored met.",
+          "r3-1, D1: absolute paths, in both slash forms, are denied for PH-1, PH-2 and PH-6. A path outside the repo, or one that cannot be made relative, is denied with a named cause. Test through the real CLI with fixture input, and use a cwd that is not the repo root as well as one that is.",
+          "r3-2, D2: a compound command after a docs-only gh pr merge is not allowed without a grant: P3, P4, and variants with ||, ;, |, a newline, $(…) and backticks. A single docs-only merge is still allowed with no grant (r2-1 must not regress).",
+          "r3-3: the grant matches a single invocation only. A grant for gh pr merge 5 does not cover gh pr merge 5 && git push --force origin master.",
+          "r3-4, --repo: --repo, --repo= and -R are denied with a named cause, and nothing is fetched. Assert that no fetch happens.",
+          "r3-5, D-066: .agents/assignments.json is allowed in a docs-only merge (QA 233's P6).",
+          "r3-6, mutants: r1's ph1 to ph3 are replaced by forms that typecheck and are red. The D1 and D2 mutants are red. Add at least one mutant of your own per row r3-1 to r3-4.",
+          "Regression: every PH and r2 row QA 233 scored met is still met."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "docs/loops/t194-r3-dispatch.md: the planner's r3 scope, rows 1 to 6. This is what you score.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "docs/loops/t194-r2-qa-report.md and docs/loops/qa-233/evidence/ on origin/qa/t194-r2-report: QA 233's defects D1 and D2, and probes P1 to P15. Re-run P3, P4 and P6 to P15 against the candidate.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "docs/loops/t194-r3-developer-handoff.md at the candidate: its row-to-test map and red-then-green claims. Verify them; do not trust them.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "docs/loops/qa-231-t194-r2-dispatch.md and docs/loops/qa-222-225-common.md: the PH-1..PH-8 and r2-1..r2-4 rows still hold. r3 must not regress any row QA 233 scored met.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "r3-1, D1: absolute paths, in both slash forms, are denied for PH-1, PH-2 and PH-6. A path outside the repo, or one that cannot be made relative, is denied with a named cause. Test through the real CLI with fixture input, and use a cwd that is not the repo root as well as one that is.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "r3-2, D2: a compound command after a docs-only gh pr merge is not allowed without a grant: P3, P4, and variants with ||, ;, |, a newline, $(…) and backticks. A single docs-only merge is still allowed with no grant (r2-1 must not regress).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "r3-3: the grant matches a single invocation only. A grant for gh pr merge 5 does not cover gh pr merge 5 && git push --force origin master.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "r3-4, --repo: --repo, --repo= and -R are denied with a named cause, and nothing is fetched. Assert that no fetch happens.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "r3-5, D-066: .agents/assignments.json is allowed in a docs-only merge (QA 233's P6).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "r3-6, mutants: r1's ph1 to ph3 are replaced by forms that typecheck and are red. The D1 and D2 mutants are red. Add at least one mutant of your own per row r3-1 to r3-4.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Regression: every PH and r2 row QA 233 scored met is still met.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 234: T-194 r3 (the planner seat hook), after QA 233's REJECT",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-234-t194-r3-dispatch.md",
+          "blob": "7cdbd8529c53df9b789947d8e9b4e151115ac692"
+        }
+      },
+      "candidate": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97",
+      "diffstat": [
+        "docs/loops/t194-developer-handoff.md",
+        "docs/loops/t194-r3-developer-handoff.md",
+        "docs/loops/t194-r3/mutants/d066.diff",
+        "docs/loops/t194-r3/mutants/d1-bash.diff",
+        "docs/loops/t194-r3/mutants/d1-file.diff",
+        "docs/loops/t194-r3/mutants/d2-compound.diff",
+        "docs/loops/t194-r3/mutants/grant-prefix.diff",
+        "docs/loops/t194-r3/mutants/ph1-tc.diff",
+        "docs/loops/t194-r3/mutants/ph2-tc.diff",
+        "docs/loops/t194-r3/mutants/ph3-tc.diff",
+        "docs/loops/t194-r3/mutants/repo-flag.diff",
+        "docs/loops/t194-r3/mutants/results-rerun.json",
+        "docs/loops/t194-r3/mutants/results.json",
+        "open-brain/src/cli-planner-hook.ts",
+        "open-brain/src/planner-hook/bash.ts",
+        "open-brain/src/planner-hook/emit.ts",
+        "open-brain/src/planner-hook/git.ts",
+        "open-brain/src/planner-hook/grant.ts",
+        "open-brain/src/planner-hook/paths.ts",
+        "open-brain/src/planner-hook/prfiles.ts",
+        "open-brain/src/planner-hook/registration.ts",
+        "open-brain/src/planner-hook/run.ts",
+        "open-brain/src/planner-hook/summary.ts",
+        "open-brain/tests/planner-hook/docs-merge.test.ts",
+        "open-brain/tests/planner-hook/hook.test.ts",
+        "open-brain/tests/planner-hook/r3.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 62,
+        "base_sha": "5ace9ff7e50b4aebc0302bc12980feafa7a41f37",
+        "scored_sha": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97",
+        "merge_commit": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.56
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.54
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.06
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.29,
+      "confidence": 0.56,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.76,
+        "1": 0.18,
+        "2": 0.06
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2873,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.56 is below the required 0.7",
+      "local_tests_support_claim 0.54 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:24.960Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "50e7c1ee-0a48-470b-a1dd-c64fa0ca0894",
+  "subject": {
+    "gate": "developer-done",
+    "key": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97",
+    "blob": "7ef2922769467f3c82eab2261f68ca335931b34b"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:24.577Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 62,
+  "merge_commit": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97",
+  "scored_sha": "c1f1cb483c1afcb1a3cb3f28207e2a75153b1c97",
+  "base_sha": "5ace9ff7e50b4aebc0302bc12980feafa7a41f37",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/062-t194-r3.D_t.json",
+    "blob": "7ef2922769467f3c82eab2261f68ca335931b34b"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t194-developer-handoff.md",
+    "docs/loops/t194-r3-developer-handoff.md",
+    "docs/loops/t194-r3/mutants/d066.diff",
+    "docs/loops/t194-r3/mutants/d1-bash.diff",
+    "docs/loops/t194-r3/mutants/d1-file.diff",
+    "docs/loops/t194-r3/mutants/d2-compound.diff",
+    "docs/loops/t194-r3/mutants/grant-prefix.diff",
+    "docs/loops/t194-r3/mutants/ph1-tc.diff",
+    "docs/loops/t194-r3/mutants/ph2-tc.diff",
+    "docs/loops/t194-r3/mutants/ph3-tc.diff",
+    "docs/loops/t194-r3/mutants/repo-flag.diff",
+    "docs/loops/t194-r3/mutants/results-rerun.json",
+    "docs/loops/t194-r3/mutants/results.json",
+    "open-brain/src/cli-planner-hook.ts",
+    "open-brain/src/planner-hook/bash.ts",
+    "open-brain/src/planner-hook/emit.ts",
+    "open-brain/src/planner-hook/git.ts",
+    "open-brain/src/planner-hook/grant.ts",
+    "open-brain/src/planner-hook/paths.ts",
+    "open-brain/src/planner-hook/prfiles.ts",
+    "open-brain/src/planner-hook/registration.ts",
+    "open-brain/src/planner-hook/run.ts",
+    "open-brain/src/planner-hook/summary.ts",
+    "open-brain/tests/planner-hook/docs-merge.test.ts",
+    "open-brain/tests/planner-hook/hook.test.ts",
+    "open-brain/tests/planner-hook/r3.test.ts"
+  ]
+}

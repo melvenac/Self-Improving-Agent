@@ -1,0 +1,211 @@
+{
+  "gate": "developer-done",
+  "loop": "37-t192",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:08.839Z",
+  "answered_at": "2026-10-02T07:27:09.248Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "37-t192",
+        "objective": "T-192 (master's CI to tcm; ci-status names a never-started job; D-055's docs-PR skip): QA dispatch (record 183)",
+        "tasks": [
+          "runs-on: a master push goes to tcm, a dispatch goes to tcm, a dispatch with hosted=true goes to ubuntu-latest, and a push to another branch goes to tcm. Check evalRunsOn in ci-runs-on.test.ts against GitHub's documented expression rules (&&/|| return operands). Say whether a four-case evaluator could pass while the real expression differs.",
+          "ci-status: zero steps is never-started; the steps being unreadable is named (view fails, unparseable, no databaseId); a real failure and a success are unchanged. Look for a path where the check still reports without having looked.",
+          "D-055: pull_request.paths-ignore is exactly docs/ and README.md. push and workflow_dispatch are unfiltered, and a PR touching .agents/state.json still runs.",
+          "Preserve: the egress self-check runs on every self-hosted job; test-windows is still opt-in; the job is still named test.",
+          "Not verifiable before merge: the first real master push landing on tcm. Name it as unrun.",
+          "Your own mutants, at least two."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "runs-on: a master push goes to tcm, a dispatch goes to tcm, a dispatch with hosted=true goes to ubuntu-latest, and a push to another branch goes to tcm. Check evalRunsOn in ci-runs-on.test.ts against GitHub's documented expression rules (&&/|| return operands). Say whether a four-case evaluator could pass while the real expression differs.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "ci-status: zero steps is never-started; the steps being unreadable is named (view fails, unparseable, no databaseId); a real failure and a success are unchanged. Look for a path where the check still reports without having looked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "D-055: pull_request.paths-ignore is exactly docs/ and README.md. push and workflow_dispatch are unfiltered, and a PR touching .agents/state.json still runs.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Preserve: the egress self-check runs on every self-hosted job; test-windows is still opt-in; the job is still named test.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Not verifiable before merge: the first real master push landing on tcm. Name it as unrun.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Your own mutants, at least two.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "T-192 (master's CI to tcm; ci-status names a never-started job; D-055's docs-PR skip): QA dispatch (record 183)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t192-dispatch-qa.md",
+          "blob": "48a75473af1119b023b7b47a4d8b206d513a8f99"
+        }
+      },
+      "candidate": "a38ff92a2113392187b228258dee9a981bb7fa6b",
+      "diffstat": [
+        ".github/workflows/ci.yml",
+        "docs/loops/t192-developer-handoff.md",
+        "open-brain/package-lock.json",
+        "open-brain/package.json",
+        "open-brain/src/pipelines/sync/checks-state.ts",
+        "open-brain/tests/pipelines/sync/checks-state.test.ts",
+        "open-brain/tests/pipelines/sync/ci-runs-on.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 37,
+        "base_sha": "7243fd5f697afb9972a7f4e92dcdd7d6c2b34d7c",
+        "scored_sha": "a38ff92a2113392187b228258dee9a981bb7fa6b",
+        "merge_commit": "a38ff92a2113392187b228258dee9a981bb7fa6b"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.49
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.27
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 1.05,
+      "confidence": 0.13,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.27,
+        "1": 0.42,
+        "2": 0.31
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1758,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.49 is below the required 0.7",
+      "local_tests_support_claim 0.47 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:09.243Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "cdbd094f-1a06-46c3-b458-91261d6645a1",
+  "subject": {
+    "gate": "developer-done",
+    "key": "a38ff92a2113392187b228258dee9a981bb7fa6b",
+    "blob": "a19bf415a21b585cfa024769a25d1e8cfc4bdd48"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:08.839Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 37,
+  "merge_commit": "a38ff92a2113392187b228258dee9a981bb7fa6b",
+  "scored_sha": "a38ff92a2113392187b228258dee9a981bb7fa6b",
+  "base_sha": "7243fd5f697afb9972a7f4e92dcdd7d6c2b34d7c",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/037-t192.D_t.json",
+    "blob": "a19bf415a21b585cfa024769a25d1e8cfc4bdd48"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".github/workflows/ci.yml",
+    "docs/loops/t192-developer-handoff.md",
+    "open-brain/package-lock.json",
+    "open-brain/package.json",
+    "open-brain/src/pipelines/sync/checks-state.ts",
+    "open-brain/tests/pipelines/sync/checks-state.test.ts",
+    "open-brain/tests/pipelines/sync/ci-runs-on.test.ts"
+  ]
+}

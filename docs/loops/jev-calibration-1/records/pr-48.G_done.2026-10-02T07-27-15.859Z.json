@@ -1,0 +1,205 @@
+{
+  "gate": "developer-done",
+  "loop": "48-t178-ci-on-push",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:15.859Z",
+  "answered_at": "2026-10-02T07:27:16.402Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "48-t178-ci-on-push",
+        "objective": "Record 205 r3 (T-178, P0: CI runs automatically on push to seat branches): QA dispatch (record 211)",
+        "tasks": [
+          "Seat pushes run CI: a push to loop/ and to qa/ triggers.",
+          "The skip is proven, never inferred: tests are skipped only when EVERY changed file (by git diff before..sha) is under docs/ or is README.md. Code plus docs RUNS; an empty or unreadable list, an all-zero before, a force-push, or a failed changed-files job RUNS. Look for a path that skips code: a rename, a submodule, or fetch-depth too shallow to hold before.",
+          "Master is unchanged: a docs-only push to master still runs, and a master run is never cancelled. workflow_dispatch and its inputs are unchanged, and windows stays opt-in.",
+          "No double run: a seat push plus its PR share a concurrency group, and the newer cancels the older.",
+          "The live test: push a throwaway qa/t178-live- branch with one code change and confirm a run starts on its own, quoting the run id. Push a docs-only qa/t178-live-docs- branch and confirm the test job is skipped. This exercises GitHub's trigger, which no unit row can. This works only if ci.yml on the pushed branch is the candidate's: branch from bc6c6d2.",
+          "Your own mutants, at least two, on qa/t178-mut-."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Seat pushes run CI: a push to loop/ and to qa/ triggers.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "The skip is proven, never inferred: tests are skipped only when EVERY changed file (by git diff before..sha) is under docs/ or is README.md. Code plus docs RUNS; an empty or unreadable list, an all-zero before, a force-push, or a failed changed-files job RUNS. Look for a path that skips code: a rename, a submodule, or fetch-depth too shallow to hold before.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Master is unchanged: a docs-only push to master still runs, and a master run is never cancelled. workflow_dispatch and its inputs are unchanged, and windows stays opt-in.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "No double run: a seat push plus its PR share a concurrency group, and the newer cancels the older.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "The live test: push a throwaway qa/t178-live- branch with one code change and confirm a run starts on its own, quoting the run id. Push a docs-only qa/t178-live-docs- branch and confirm the test job is skipped. This exercises GitHub's trigger, which no unit row can. This works only if ci.yml on the pushed branch is the candidate's: branch from bc6c6d2.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Your own mutants, at least two, on qa/t178-mut-.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Record 205 r3 (T-178, P0: CI runs automatically on push to seat branches): QA dispatch (record 211)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t178-ci-on-push-dispatch-qa.md",
+          "blob": "516f2ef0ee0c2f8fe9d7304519258c7978b79563"
+        }
+      },
+      "candidate": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
+      "diffstat": [
+        ".github/workflows/ci.yml",
+        "docs/loops/t178-ci-on-push-developer-handoff.md",
+        "open-brain/scripts/ci-seat-skip.mjs",
+        "open-brain/tests/pipelines/sync/ci-runs-on.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 48,
+        "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+        "scored_sha": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
+        "merge_commit": "bc6c6d206a6b3261b43cccc3972fff23b5d86791"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.62
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.49
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.3,
+      "confidence": 0.55,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.76,
+        "1": 0.19,
+        "2": 0.05
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1792,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.62 is below the required 0.7",
+      "local_tests_support_claim 0.49 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:16.391Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "8c84955b-03fd-4fab-8deb-176350ba4fbf",
+  "subject": {
+    "gate": "developer-done",
+    "key": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
+    "blob": "cf22543af161f61f471bb2b359c2476fd09c74f8"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:15.859Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 48,
+  "merge_commit": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
+  "scored_sha": "bc6c6d206a6b3261b43cccc3972fff23b5d86791",
+  "base_sha": "d1e86740bd68827979cfbd5757034f849c38ad41",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/048-t178-ci-on-push.D_t.json",
+    "blob": "cf22543af161f61f471bb2b359c2476fd09c74f8"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".github/workflows/ci.yml",
+    "docs/loops/t178-ci-on-push-developer-handoff.md",
+    "open-brain/scripts/ci-seat-skip.mjs",
+    "open-brain/tests/pipelines/sync/ci-runs-on.test.ts"
+  ]
+}

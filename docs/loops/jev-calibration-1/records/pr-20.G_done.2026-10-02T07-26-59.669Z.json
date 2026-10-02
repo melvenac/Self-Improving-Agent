@@ -1,0 +1,311 @@
+{
+  "gate": "developer-done",
+  "loop": "20-t179-r2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:59.669Z",
+  "answered_at": "2026-10-02T07:27:00.194Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "20-t179-r2",
+        "objective": "T-179 + T-163, round 2: dispatch to a FRESH, HEADLESS QA seat (record session 134)",
+        "tasks": [
+          "QA 125's report (origin/qa/t179-report 7df2ed0): every defect, D1 to D8, as ruled.",
+          "docs/loops/t179-rulings-qa125.md IN FULL, with amendments 1, 2 and 3. Amendment 1 re-ruled R179-1: order by first_rev, never by session number. Amendment 2 added R179-8, done-task retention by revision. Amendment 3 accepted three departures.",
+          "D1 is closed by construction. Re-run QA 125's c1-attack.mjs A6, A6b and A6c: no erasure at all. Then attack the new rule:",
+          "can a caller influence first_rev or closed_rev?",
+          "does any comparison anywhere still use the session number? Search for it;",
+          "a wrong number on a done task (1124);",
+          "A2's gap of 11 and A5's jump to 500 now pass.",
+          "D2 (R179-2), narrower as accepted: a uuid recorded under a different checkout is refused. Confirm that the same-checkout A7, A8 and A9 are stated in the handoff and end.md as not fixed (T-003). Do NOT score them as failures.",
+          "R179-3: each legacy handoff is superseded by its seat's first keyed handoff, and record-erasure explains the removal. Legacy session records are never superseded.",
+          "R179-4, the checklist: walk ALL SEVEN steps in a scratch clone, as a stranger would. The developer walked only 1 and 2. Migrate a copy of SIA's live record (rev 132 on origin/docs/session-100-qa99-dispatch) AND a copy of ~/Projects/A2A-Hub's shape if you can reproduce it (v2), counting every uuid before and after with two instruments. Is the migration idempotent?",
+          "R179-5: setup.mjs registers the SessionEnd hook. Run it against a scratch home or settings file, never the real one.",
+          "R179-6/7: end.md claims only what the code does. The R179-7 fixture kills erasure-blind-rev60 on CI.",
+          "Your own mutants, at least: first_rev taken from the caller; the number comparison restored in one of lastSession, retention or done-task retention; and the different-checkout refusal skipped.",
+          "The full suite, once, as the Defender-on control, and the importer probes (QA 122's probes-r4, QA 111's probes-r3) byte-exact."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "QA 125's report (origin/qa/t179-report 7df2ed0): every defect, D1 to D8, as ruled.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "docs/loops/t179-rulings-qa125.md IN FULL, with amendments 1, 2 and 3. Amendment 1 re-ruled R179-1: order by first_rev, never by session number. Amendment 2 added R179-8, done-task retention by revision. Amendment 3 accepted three departures.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "D1 is closed by construction. Re-run QA 125's c1-attack.mjs A6, A6b and A6c: no erasure at all. Then attack the new rule:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "can a caller influence first_rev or closed_rev?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "does any comparison anywhere still use the session number? Search for it;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "a wrong number on a done task (1124);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "A2's gap of 11 and A5's jump to 500 now pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "D2 (R179-2), narrower as accepted: a uuid recorded under a different checkout is refused. Confirm that the same-checkout A7, A8 and A9 are stated in the handoff and end.md as not fixed (T-003). Do NOT score them as failures.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "R179-3: each legacy handoff is superseded by its seat's first keyed handoff, and record-erasure explains the removal. Legacy session records are never superseded.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "R179-4, the checklist: walk ALL SEVEN steps in a scratch clone, as a stranger would. The developer walked only 1 and 2. Migrate a copy of SIA's live record (rev 132 on origin/docs/session-100-qa99-dispatch) AND a copy of ~/Projects/A2A-Hub's shape if you can reproduce it (v2), counting every uuid before and after with two instruments. Is the migration idempotent?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "R179-5: setup.mjs registers the SessionEnd hook. Run it against a scratch home or settings file, never the real one.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "R179-6/7: end.md claims only what the code does. The R179-7 fixture kills erasure-blind-rev60 on CI.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Your own mutants, at least: first_rev taken from the caller; the number comparison restored in one of lastSession, retention or done-task retention; and the different-checkout refusal skipped.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "The full suite, once, as the Defender-on control, and the importer probes (QA 122's probes-r4, QA 111's probes-r3) byte-exact.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "T-179 + T-163, round 2: dispatch to a FRESH, HEADLESS QA seat (record session 134)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t179-r2-dispatch-qa.md",
+          "blob": "6bbe19ef2dabc8cfe302f46f94675f4fc1b0f4fa"
+        }
+      },
+      "candidate": "16465675d0d146e00ef29fe8e31ed92216fc3695",
+      "diffstat": [
+        ".agents/retirements.json",
+        ".claude/commands/end.md",
+        "README.md",
+        "docs/loops/dev-scripts-t179-merge/greeting.sh",
+        "docs/loops/dev-scripts-t179-r2/evidence/mutants-local-summary.json",
+        "docs/loops/dev-scripts-t179-r2/evidence/mutants-local.txt",
+        "docs/loops/dev-scripts-t179-r2/mutants-r2.cjs",
+        "docs/loops/t179-merge-developer-handoff.md",
+        "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+        "open-brain/src/pipelines/state-import/index.ts",
+        "open-brain/src/pipelines/state-migrate/index.ts",
+        "open-brain/src/pipelines/state-views/index.ts",
+        "open-brain/src/pipelines/sync/record-erasure.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/fixtures-state/state.json",
+        "open-brain/tests/pipelines/state-import-v3.test.ts",
+        "open-brain/tests/pipelines/state-import.test.ts",
+        "open-brain/tests/pipelines/state-migrate.test.ts",
+        "open-brain/tests/pipelines/state-views.test.ts",
+        "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+        "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+        "open-brain/tests/server.test.ts",
+        "open-brain/tests/setup-hooks.test.ts",
+        "open-brain/tests/shared/closeout-erasure.test.ts",
+        "open-brain/tests/shared/session-order.test.ts",
+        "open-brain/tests/shared/state-schema.test.ts",
+        "open-brain/tests/shared/state-writer.test.ts",
+        "project-template/.claude/commands/end.md",
+        "project-template/.cursor/commands/end.md",
+        "scripts/setup-hooks.mjs",
+        "scripts/setup.mjs"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 20,
+        "base_sha": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+        "scored_sha": "16465675d0d146e00ef29fe8e31ed92216fc3695",
+        "merge_commit": "16465675d0d146e00ef29fe8e31ed92216fc3695"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.49
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.2,
+      "confidence": 0.7,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.85,
+        "1": 0.11,
+        "2": 0.04
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 3071,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.47 is below the required 0.7",
+      "local_tests_support_claim 0.49 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:00.190Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "d77844de-a109-4f84-8bd7-3c011c5249d4",
+  "subject": {
+    "gate": "developer-done",
+    "key": "16465675d0d146e00ef29fe8e31ed92216fc3695",
+    "blob": "cf410355b31bb3231455c6d0e07441986e1c327f"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:59.669Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 20,
+  "merge_commit": "16465675d0d146e00ef29fe8e31ed92216fc3695",
+  "scored_sha": "16465675d0d146e00ef29fe8e31ed92216fc3695",
+  "base_sha": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/020-t179-r2.D_t.json",
+    "blob": "cf410355b31bb3231455c6d0e07441986e1c327f"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/retirements.json",
+    ".claude/commands/end.md",
+    "README.md",
+    "docs/loops/dev-scripts-t179-merge/greeting.sh",
+    "docs/loops/dev-scripts-t179-r2/evidence/mutants-local-summary.json",
+    "docs/loops/dev-scripts-t179-r2/evidence/mutants-local.txt",
+    "docs/loops/dev-scripts-t179-r2/mutants-r2.cjs",
+    "docs/loops/t179-merge-developer-handoff.md",
+    "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+    "open-brain/src/pipelines/state-import/index.ts",
+    "open-brain/src/pipelines/state-migrate/index.ts",
+    "open-brain/src/pipelines/state-views/index.ts",
+    "open-brain/src/pipelines/sync/record-erasure.ts",
+    "open-brain/src/server.ts",
+    "open-brain/src/shared/state-schema.ts",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/fixtures-state/state.json",
+    "open-brain/tests/pipelines/state-import-v3.test.ts",
+    "open-brain/tests/pipelines/state-import.test.ts",
+    "open-brain/tests/pipelines/state-migrate.test.ts",
+    "open-brain/tests/pipelines/state-views.test.ts",
+    "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+    "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+    "open-brain/tests/server.test.ts",
+    "open-brain/tests/setup-hooks.test.ts",
+    "open-brain/tests/shared/closeout-erasure.test.ts",
+    "open-brain/tests/shared/session-order.test.ts",
+    "open-brain/tests/shared/state-schema.test.ts",
+    "open-brain/tests/shared/state-writer.test.ts",
+    "project-template/.claude/commands/end.md",
+    "project-template/.cursor/commands/end.md",
+    "scripts/setup-hooks.mjs",
+    "scripts/setup.mjs"
+  ]
+}

@@ -1,0 +1,469 @@
+{
+  "gate": "developer-done",
+  "loop": "67-loop-15-slice-4-step2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:27.690Z",
+  "answered_at": "2026-10-02T07:27:28.109Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "67-loop-15-slice-4-step2",
+        "objective": "Loop 15 slice four, step 2: dispatch to sia-builder",
+        "tasks": [
+          "A strict schema for G_done and G_qa records with source and plan_provenance. Add GateRecordKind \"qa\". Derive the JSON Schema and drift-test it.",
+          "The writer refuses a record that lacks either field, and a harness validate gate-record <file> command (or a name you choose) refuses a hand-written one.",
+          "runLoop's own G_done writer emits source: \"runtime\" and plan_provenance: \"written-before\" (S4-4a.4).",
+          "source is never inferred from the loop id (S4-4a.5).",
+          "Write-ahead attempt records, plus subject, attempt, retry_of and outcome_class.",
+          "A committed counting command that groups records by subject and enforces three things: at most 1 answered record per subject, a valid retry_of on every non-first record, and at most 3 retries in total. Write fixture tests for a legal retry chain and for a re-roll.",
+          "The JEV_ENDPOINT exactly-one-request test, and its pair with the variable deleted, which must make zero requests.",
+          "The model-version comparator, with its unit table. jev-1.9.0 must fail, compared numerically.",
+          "Canary tests by construction, one per writer: runBriefPlanGate, the 4.3 runner and the 4.4 runner. Each uses the hostile echoing fake (200 and 422), walks every output, and includes the known positive and the redact mutant.",
+          "Ruling 6: t195-plan-gate.test.ts's harness() helper takes a constructed env and never spreads process.env. Every existing test in that file passes.",
+          "A CLI subcommand that scores one merged diff through gate.ts, never jev-mcp. It names pr, merge_commit, scored_sha and base_sha, and the reconstructed D_t by path and blob.",
+          "The diffstat comes from base_sha..scored_sha, and checks_source is recorded, with \"none\" meaning checksPassed: false.",
+          "runtime_action says no outcome was changed.",
+          "The flip test and both outcome mutants (S4-6d.4).",
+          "Eight D_t files under docs/loops/loop-15-slice-4-records/, one per diff in loop-15-slice-4-reconstruction-map.md. You reconstruct all eight: none was built in your checkout.",
+          "Each is reconstructed from the diff's prose brief only, not from its code, and carries reconstructed_by and reconstructed_from (path plus blob).",
+          "The plan schema needs both fields. Add them so that a written-before plan without them still validates.",
+          "Each passes harness validate plan. Each loop id is a seat id, not tNNN: T-195's becomes, for example, 15-t195.",
+          "open-brain/src/harness/policies/qa-score.json, its strict schema, the derived JSON Schema, the loader's four refusals, the threshold-scan targets plus a planted-literal mutant, and the A6 temp-dir test.",
+          "One batched request per diff. untested is computed by code for missing evidence. Jev's answer to an evidence-less row is ignored, and there is a mutant for that.",
+          "G_qa is written once, beside a copy of its E_t, under docs/loops/loop-15-slice-4-records/ (ruling 3), with e_t_ref.",
+          "Five diffs only (ruling 2). A, B part 1 and B part 2 are not scored: no E_t.",
+          "A committed generator that builds the close-out tables from the gate records, with N, SHAs, per-diff values, min/max, counts either side, and the PROVISIONAL (N=…) label computed from the records.",
+          "No added line contains the word \"calibrated\" (case-insensitive, whole word). Write \"PROVISIONAL\" instead.",
+          "The three existing policy files are byte-identical. The LOOP_LIMITS string is byte-identical (ruling 4).",
+          "No added jev-mcp reference.",
+          "Add no skip or todo, and delete no test.",
+          "loop-15-slice-3-c-criteria.md, C's shadow_merge.json and ledger.jsonl are untouched.",
+          "Branch from origin/master (2448a6ea or later) as loop/15-slice-4-step2. The criteria, rulings and map are readable at the docs commit named on the dispatch message, before they reach master. Commit red and then green per group (G1 to G6). The handoff maps each S4 row to its test and mutant.",
+          "Machine: this is the QA PC, which is also Chisel's dev box. Run sequentially, and check for at least 1.5 GB free RAM before the mutants. Heavy runs need Aaron's approval in your window. A planner \"go\" is not his approval.",
+          "Locally: npm ci, npm run build and tsc --noEmit, then vitest run in open-brain/ (S4-9.3), with the exit codes quoted. Run no CI (D-061). Keep mutants local, with diffs under docs/loops/loop-15-slice-4/mutants/ (T-207).",
+          "Handoff: docs/loops/loop-15-slice-4-step2-developer-handoff.md.",
+          "Push only loop/15-slice-4-step2, never forced. Report the SHA to atlas.",
+          "If a group's size or an open question stalls you, push what is green and ask. Don't guess across a row."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "A strict schema for G_done and G_qa records with source and plan_provenance. Add GateRecordKind \"qa\". Derive the JSON Schema and drift-test it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "The writer refuses a record that lacks either field, and a harness validate gate-record <file> command (or a name you choose) refuses a hand-written one.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "runLoop's own G_done writer emits source: \"runtime\" and plan_provenance: \"written-before\" (S4-4a.4).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "source is never inferred from the loop id (S4-4a.5).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Write-ahead attempt records, plus subject, attempt, retry_of and outcome_class.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "A committed counting command that groups records by subject and enforces three things: at most 1 answered record per subject, a valid retry_of on every non-first record, and at most 3 retries in total. Write fixture tests for a legal retry chain and for a re-roll.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The JEV_ENDPOINT exactly-one-request test, and its pair with the variable deleted, which must make zero requests.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The model-version comparator, with its unit table. jev-1.9.0 must fail, compared numerically.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Canary tests by construction, one per writer: runBriefPlanGate, the 4.3 runner and the 4.4 runner. Each uses the hostile echoing fake (200 and 422), walks every output, and includes the known positive and the redact mutant.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Ruling 6: t195-plan-gate.test.ts's harness() helper takes a constructed env and never spreads process.env. Every existing test in that file passes.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "A CLI subcommand that scores one merged diff through gate.ts, never jev-mcp. It names pr, merge_commit, scored_sha and base_sha, and the reconstructed D_t by path and blob.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "The diffstat comes from base_sha..scored_sha, and checks_source is recorded, with \"none\" meaning checksPassed: false.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "runtime_action says no outcome was changed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "The flip test and both outcome mutants (S4-6d.4).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "Eight D_t files under docs/loops/loop-15-slice-4-records/, one per diff in loop-15-slice-4-reconstruction-map.md. You reconstruct all eight: none was built in your checkout.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Each is reconstructed from the diff's prose brief only, not from its code, and carries reconstructed_by and reconstructed_from (path plus blob).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "The plan schema needs both fields. Add them so that a written-before plan without them still validates.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "Each passes harness validate plan. Each loop id is a seat id, not tNNN: T-195's becomes, for example, 15-t195.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "open-brain/src/harness/policies/qa-score.json, its strict schema, the derived JSON Schema, the loader's four refusals, the threshold-scan targets plus a planted-literal mutant, and the A6 temp-dir test.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "One batched request per diff. untested is computed by code for missing evidence. Jev's answer to an evidence-less row is ignored, and there is a mutant for that.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "G_qa is written once, beside a copy of its E_t, under docs/loops/loop-15-slice-4-records/ (ruling 3), with e_t_ref.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "Five diffs only (ruling 2). A, B part 1 and B part 2 are not scored: no E_t.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "A committed generator that builds the close-out tables from the gate records, with N, SHAs, per-diff values, min/max, counts either side, and the PROVISIONAL (N=…) label computed from the records.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "No added line contains the word \"calibrated\" (case-insensitive, whole word). Write \"PROVISIONAL\" instead.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T25",
+            "observable": "The three existing policy files are byte-identical. The LOOP_LIMITS string is byte-identical (ruling 4).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T26",
+            "observable": "No added jev-mcp reference.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T27",
+            "observable": "Add no skip or todo, and delete no test.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T28",
+            "observable": "loop-15-slice-3-c-criteria.md, C's shadow_merge.json and ledger.jsonl are untouched.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T29",
+            "observable": "Branch from origin/master (2448a6ea or later) as loop/15-slice-4-step2. The criteria, rulings and map are readable at the docs commit named on the dispatch message, before they reach master. Commit red and then green per group (G1 to G6). The handoff maps each S4 row to its test and mutant.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T30",
+            "observable": "Machine: this is the QA PC, which is also Chisel's dev box. Run sequentially, and check for at least 1.5 GB free RAM before the mutants. Heavy runs need Aaron's approval in your window. A planner \"go\" is not his approval.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T31",
+            "observable": "Locally: npm ci, npm run build and tsc --noEmit, then vitest run in open-brain/ (S4-9.3), with the exit codes quoted. Run no CI (D-061). Keep mutants local, with diffs under docs/loops/loop-15-slice-4/mutants/ (T-207).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T32",
+            "observable": "Handoff: docs/loops/loop-15-slice-4-step2-developer-handoff.md.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T33",
+            "observable": "Push only loop/15-slice-4-step2, never forced. Report the SHA to atlas.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T34",
+            "observable": "If a group's size or an open question stalls you, push what is green and ask. Don't guess across a row.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice four, step 2: dispatch to sia-builder",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-4-step2-dispatch.md",
+          "blob": "c96903c981c6b889d65500ab8e965f56c84e288f"
+        }
+      },
+      "candidate": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+      "diffstat": [
+        "docs/loops/loop-15-slice-4-records/pr-165.D_t.json",
+        "docs/loops/loop-15-slice-4-records/pr-182.D_t.json",
+        "docs/loops/loop-15-slice-4-records/pr-187.D_t.json",
+        "docs/loops/loop-15-slice-4-records/pr-195.D_t.json",
+        "docs/loops/loop-15-slice-4-records/pr-209.D_t.json",
+        "docs/loops/loop-15-slice-4-records/pr-218.D_t.json",
+        "docs/loops/loop-15-slice-4-records/pr-220.D_t.json",
+        "docs/loops/loop-15-slice-4-records/pr-227.D_t.json",
+        "docs/loops/loop-15-slice-4-step2-developer-handoff.md",
+        "docs/loops/loop-15-slice-4/mutants/m01-source-optional.diff",
+        "docs/loops/loop-15-slice-4/mutants/m02-provenance-defaulted.diff",
+        "docs/loops/loop-15-slice-4/mutants/m03-no-write-ahead.diff",
+        "docs/loops/loop-15-slice-4/mutants/m04-reroll-not-flagged.diff",
+        "docs/loops/loop-15-slice-4/mutants/m05-plan-record-not-redacted.diff",
+        "docs/loops/loop-15-slice-4/mutants/m06-transport-redact-dropped.diff",
+        "docs/loops/loop-15-slice-4/mutants/m07-version-compared-as-string.diff",
+        "docs/loops/loop-15-slice-4/mutants/m08-done-gate-exit-on-reject.diff",
+        "docs/loops/loop-15-slice-4/mutants/m09-diffstat-from-merge.diff",
+        "docs/loops/loop-15-slice-4/mutants/m10-checks-assumed-green.diff",
+        "docs/loops/loop-15-slice-4/mutants/m11-qa-takes-jevs-choice-for-missing-evidence.diff",
+        "docs/loops/loop-15-slice-4/mutants/m12-qa-gate-exit-on-reject.diff",
+        "docs/loops/loop-15-slice-4/mutants/m13-qa-result-written-into-et-row.diff",
+        "docs/loops/loop-15-slice-4/mutants/m14-literal-planted-in-qa-decision.diff",
+        "docs/loops/loop-15-slice-4/mutants/m15-literal-planted-in-qa-prompt.diff",
+        "docs/loops/loop-15-slice-4/mutants/m16-label-typed-not-computed.diff",
+        "docs/loops/loop-15-slice-4/mutants/m17-no-e_t-diff-reported-scored.diff",
+        "docs/loops/loop-15-slice-4/mutants/m18-done-record-not-redacted.diff",
+        "docs/loops/loop-15-slice-4/mutants/m19-qa-record-not-redacted.diff",
+        "open-brain/src/harness/artifacts.ts",
+        "open-brain/src/harness/brief-plan-gate.ts",
+        "open-brain/src/harness/cli.ts",
+        "open-brain/src/harness/closeout-tables.ts",
+        "open-brain/src/harness/gate-records.ts",
+        "open-brain/src/harness/gate.ts",
+        "open-brain/src/harness/policies.ts",
+        "open-brain/src/harness/policies/qa-score.json",
+        "open-brain/src/harness/runtime.ts",
+        "open-brain/src/harness/schema.ts",
+        "open-brain/src/harness/schemas/gate-record.schema.json",
+        "open-brain/src/harness/schemas/plan.schema.json",
+        "open-brain/src/harness/schemas/policy-qa-score.schema.json",
+        "open-brain/src/harness/shadow-gates.ts",
+        "open-brain/src/harness/shadow-qa.ts",
+        "open-brain/tests/harness/s4-canary.ts",
+        "open-brain/tests/harness/s4-g1-records.test.ts",
+        "open-brain/tests/harness/s4-g2-key.test.ts",
+        "open-brain/tests/harness/s4-g3-done.test.ts",
+        "open-brain/tests/harness/s4-g4-reconstruct.test.ts",
+        "open-brain/tests/harness/s4-g5-qa.test.ts",
+        "open-brain/tests/harness/s4-g6-closeout.test.ts",
+        "open-brain/tests/harness/s4-guards.test.ts",
+        "open-brain/tests/harness/t195-plan-gate.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 67,
+        "base_sha": "2448a6ea9d41df5780b2657516c53799a75d93e2",
+        "scored_sha": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+        "merge_commit": "2d4cd863ca159d737a1ee2efed02b9b85be26770"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.56
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.51
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.11,
+      "confidence": 0.83,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.9,
+        "1": 0.08,
+        "2": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 5585,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.56 is below the required 0.7",
+      "local_tests_support_claim 0.51 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:28.098Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "4a2b500c-470f-41b3-a368-97cadf3dd3bb",
+  "subject": {
+    "gate": "developer-done",
+    "key": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+    "blob": "ac908ab1461cb5e2f8c287852f8878fb82de66fc"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:27.690Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 67,
+  "merge_commit": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+  "scored_sha": "2d4cd863ca159d737a1ee2efed02b9b85be26770",
+  "base_sha": "2448a6ea9d41df5780b2657516c53799a75d93e2",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/067-loop-15-slice-4-step2.D_t.json",
+    "blob": "ac908ab1461cb5e2f8c287852f8878fb82de66fc"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-4-records/pr-165.D_t.json",
+    "docs/loops/loop-15-slice-4-records/pr-182.D_t.json",
+    "docs/loops/loop-15-slice-4-records/pr-187.D_t.json",
+    "docs/loops/loop-15-slice-4-records/pr-195.D_t.json",
+    "docs/loops/loop-15-slice-4-records/pr-209.D_t.json",
+    "docs/loops/loop-15-slice-4-records/pr-218.D_t.json",
+    "docs/loops/loop-15-slice-4-records/pr-220.D_t.json",
+    "docs/loops/loop-15-slice-4-records/pr-227.D_t.json",
+    "docs/loops/loop-15-slice-4-step2-developer-handoff.md",
+    "docs/loops/loop-15-slice-4/mutants/m01-source-optional.diff",
+    "docs/loops/loop-15-slice-4/mutants/m02-provenance-defaulted.diff",
+    "docs/loops/loop-15-slice-4/mutants/m03-no-write-ahead.diff",
+    "docs/loops/loop-15-slice-4/mutants/m04-reroll-not-flagged.diff",
+    "docs/loops/loop-15-slice-4/mutants/m05-plan-record-not-redacted.diff",
+    "docs/loops/loop-15-slice-4/mutants/m06-transport-redact-dropped.diff",
+    "docs/loops/loop-15-slice-4/mutants/m07-version-compared-as-string.diff",
+    "docs/loops/loop-15-slice-4/mutants/m08-done-gate-exit-on-reject.diff",
+    "docs/loops/loop-15-slice-4/mutants/m09-diffstat-from-merge.diff",
+    "docs/loops/loop-15-slice-4/mutants/m10-checks-assumed-green.diff",
+    "docs/loops/loop-15-slice-4/mutants/m11-qa-takes-jevs-choice-for-missing-evidence.diff",
+    "docs/loops/loop-15-slice-4/mutants/m12-qa-gate-exit-on-reject.diff",
+    "docs/loops/loop-15-slice-4/mutants/m13-qa-result-written-into-et-row.diff",
+    "docs/loops/loop-15-slice-4/mutants/m14-literal-planted-in-qa-decision.diff",
+    "docs/loops/loop-15-slice-4/mutants/m15-literal-planted-in-qa-prompt.diff",
+    "docs/loops/loop-15-slice-4/mutants/m16-label-typed-not-computed.diff",
+    "docs/loops/loop-15-slice-4/mutants/m17-no-e_t-diff-reported-scored.diff",
+    "docs/loops/loop-15-slice-4/mutants/m18-done-record-not-redacted.diff",
+    "docs/loops/loop-15-slice-4/mutants/m19-qa-record-not-redacted.diff",
+    "open-brain/src/harness/artifacts.ts",
+    "open-brain/src/harness/brief-plan-gate.ts",
+    "open-brain/src/harness/cli.ts",
+    "open-brain/src/harness/closeout-tables.ts",
+    "open-brain/src/harness/gate-records.ts",
+    "open-brain/src/harness/gate.ts",
+    "open-brain/src/harness/policies.ts",
+    "open-brain/src/harness/policies/qa-score.json",
+    "open-brain/src/harness/runtime.ts",
+    "open-brain/src/harness/schema.ts",
+    "open-brain/src/harness/schemas/gate-record.schema.json",
+    "open-brain/src/harness/schemas/plan.schema.json",
+    "open-brain/src/harness/schemas/policy-qa-score.schema.json",
+    "open-brain/src/harness/shadow-gates.ts",
+    "open-brain/src/harness/shadow-qa.ts",
+    "open-brain/tests/harness/s4-canary.ts",
+    "open-brain/tests/harness/s4-g1-records.test.ts",
+    "open-brain/tests/harness/s4-g2-key.test.ts",
+    "open-brain/tests/harness/s4-g3-done.test.ts",
+    "open-brain/tests/harness/s4-g4-reconstruct.test.ts",
+    "open-brain/tests/harness/s4-g5-qa.test.ts",
+    "open-brain/tests/harness/s4-g6-closeout.test.ts",
+    "open-brain/tests/harness/s4-guards.test.ts",
+    "open-brain/tests/harness/t195-plan-gate.test.ts"
+  ]
+}

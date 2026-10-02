@@ -1,0 +1,227 @@
+{
+  "gate": "developer-done",
+  "loop": "71-loop-15-slice-4-step2-r4",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:30.336Z",
+  "answered_at": "2026-10-02T07:27:30.725Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "71-loop-15-slice-4-step2-r4",
+        "objective": "Loop 15 slice four, step 2 r4: one test change (dispatch to sia-builder)",
+        "tasks": [
+          "The records directory is tracked (D-076, ruling 3), and prepareShadowVerdict already reads its criteria through git show. A git-based read of gate records is a realistic wiring, so V1 must catch it.",
+          "S4-9.3 is met on Plumb (0 failed tests at base and candidate in every run). R3-1, R3-3 and the regression set are met.",
+          "Commit V1's planted records before the second prepare, as in QA 243's docs/loops/qa-243/mutants/fix-v1-commit-the-records.diff on origin/qa/s4-step2-r3-report.",
+          "Keep s04 as a mutant beside r02 and r03 (docs/loops/loop-15-slice-4/mutants/qa243-s04.diff).",
+          "Show, red then green:",
+          "V1 is green unmutated;",
+          "s04 and r03 are red on V1.",
+          "Same branch, from 36a0fc28, never forced.",
+          "Run s4-g7-merge alone, then the three mutants against it. That is all.",
+          "Add an r4 line to the handoff, and report the SHA to atlas [f21cf4]."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "The records directory is tracked (D-076, ruling 3), and prepareShadowVerdict already reads its criteria through git show. A git-based read of gate records is a realistic wiring, so V1 must catch it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "S4-9.3 is met on Plumb (0 failed tests at base and candidate in every run). R3-1, R3-3 and the regression set are met.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Commit V1's planted records before the second prepare, as in QA 243's docs/loops/qa-243/mutants/fix-v1-commit-the-records.diff on origin/qa/s4-step2-r3-report.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Keep s04 as a mutant beside r02 and r03 (docs/loops/loop-15-slice-4/mutants/qa243-s04.diff).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Show, red then green:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "V1 is green unmutated;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "s04 and r03 are red on V1.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Same branch, from 36a0fc28, never forced.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Run s4-g7-merge alone, then the three mutants against it. That is all.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Add an r4 line to the handoff, and report the SHA to atlas [f21cf4].",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Loop 15 slice four, step 2 r4: one test change (dispatch to sia-builder)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/loop-15-slice-4-step2-r4-dispatch.md",
+          "blob": "50a139856df5e4ed54225a7773edf7edb12992dc"
+        }
+      },
+      "candidate": "8a6cfb2db4f33787c09721c97a095ad8430fcf82",
+      "diffstat": [
+        "docs/loops/loop-15-slice-4-step2-developer-handoff.md",
+        "docs/loops/loop-15-slice-4/mutants/qa243-s04.diff",
+        "open-brain/tests/harness/s4-g7-merge.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 71,
+        "base_sha": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d",
+        "scored_sha": "8a6cfb2db4f33787c09721c97a095ad8430fcf82",
+        "merge_commit": "8a6cfb2db4f33787c09721c97a095ad8430fcf82"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.45
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.04,
+      "confidence": 0.93,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.96,
+        "1": 0.03,
+        "2": 0.01
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1894,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.47 is below the required 0.7",
+      "local_tests_support_claim 0.45 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:30.722Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "d9231c58-a100-43a1-9edb-252963853800",
+  "subject": {
+    "gate": "developer-done",
+    "key": "8a6cfb2db4f33787c09721c97a095ad8430fcf82",
+    "blob": "076b4a20956b302396f4161f4fa5db696e3f98fa"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:30.336Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 71,
+  "merge_commit": "8a6cfb2db4f33787c09721c97a095ad8430fcf82",
+  "scored_sha": "8a6cfb2db4f33787c09721c97a095ad8430fcf82",
+  "base_sha": "36a0fc282e328d8bb32ffb4ccd6e875c95d3dd8d",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/071-loop-15-slice-4-step2-r4.D_t.json",
+    "blob": "076b4a20956b302396f4161f4fa5db696e3f98fa"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-4-step2-developer-handoff.md",
+    "docs/loops/loop-15-slice-4/mutants/qa243-s04.diff",
+    "open-brain/tests/harness/s4-g7-merge.test.ts"
+  ]
+}

@@ -1,0 +1,411 @@
+{
+  "gate": "developer-done",
+  "loop": "15-t179",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:26:56.169Z",
+  "answered_at": "2026-10-02T07:26:56.702Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "15-t179",
+        "objective": "T-179 + T-163 (/end cut to a lessons step; a close-out cannot erase another session's record): dispatch to a FRESH, HEADLESS QA seat (record session 125)",
+        "tasks": [
+          "docs/loops/t179-t163-end-brief.md (T163-1, T163-2, T179-1, T179-2) and t179-merge-round-brief.md.",
+          "The planner's rulings, given to the developer by message (as their handoffs quote them):",
+          "checkout retention;",
+          "the greeting renders only the newest handoff per (seat, checkout);",
+          "the migration keeps every uuid;",
+          "Addition 1 as re-ruled: the greeting may grow by a FIXED label cost (measured at +86 to +87 characters per seat), but must not grow with the number of sessions. Test that directly. Build a record with 1, 10 and 50 sessions per seat, all within retention, and show the greeting is the same size at each, apart from the one count label.",
+          "the importer's v3 rule (an import writes legacy entries, stamped by no session), accepted.",
+          "Nobody can erase another session's record. Try it as an attacker would:",
+          "set_handoff with another uuid in the op (the brief says it is not an argument, so confirm that it is not);",
+          "two sessions of the same seat in the same checkout;",
+          "a session with no registered id;",
+          "delete or update ops against another uuid's entry;",
+          "a retention drop that is not the newest per (seat, checkout);",
+          "update_task replacing another session's note. This is T-171, and it is known and NOT fixed. Confirm it is the only remaining path, and say so.",
+          "The migration, v2 → v3, on a COPY of this repository's live record (rev 132 at origin/docs/session-100-qa99-dispatch, and master's rev 131). Count every uuid before and after, with two instruments. Run the migration twice: it must be idempotent. Then run an ob_state write on the migrated copy.",
+          "T163-2, the history scan: run state erasures on this repository's full history (a full clone, not shallow). Rev 60→61 and 61→62 must be flagged, as the known positives. Report the total, and spot-check three flagged entries by reading the two revisions yourself.",
+          "T179-1: the new end.md (59 lines) writes no project state. Run it as written in a scratch project, and show state.json is byte-identical before and after. Its lessons step stores through ob_store/ob_store_chunk and ob_end. What would a stranger's project need for that to work?",
+          "T179-2: a session that commits on loop/ with no handoff gets the SessionEnd warning, and never a block. Also test that a session WITH a handoff gets none, and that the next greeting shows the warning exactly once.",
+          "The importer on v3: QA 122's probes-r4.mjs and QA 111's probes-r3.mjs byte-exact on 3c0bfdc. Every FAIL either names a ruling that changed it or is a defect.",
+          "The after-merge steps (handoff §7): rebuild, reconnect, migrate the live record, and install the new end.md. Walk them in a scratch clone as a stranger would, and say what is missing or out of order.",
+          "Mutants of your own: at least retention's (seat, checkout) key widened to seat only; the uuid check skipped for delete; and the erasure scan blind to one revision."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "docs/loops/t179-t163-end-brief.md (T163-1, T163-2, T179-1, T179-2) and t179-merge-round-brief.md.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "The planner's rulings, given to the developer by message (as their handoffs quote them):",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "checkout retention;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "the greeting renders only the newest handoff per (seat, checkout);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "the migration keeps every uuid;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Addition 1 as re-ruled: the greeting may grow by a FIXED label cost (measured at +86 to +87 characters per seat), but must not grow with the number of sessions. Test that directly. Build a record with 1, 10 and 50 sessions per seat, all within retention, and show the greeting is the same size at each, apart from the one count label.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "the importer's v3 rule (an import writes legacy entries, stamped by no session), accepted.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Nobody can erase another session's record. Try it as an attacker would:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "set_handoff with another uuid in the op (the brief says it is not an argument, so confirm that it is not);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "two sessions of the same seat in the same checkout;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "a session with no registered id;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "delete or update ops against another uuid's entry;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "a retention drop that is not the newest per (seat, checkout);",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "update_task replacing another session's note. This is T-171, and it is known and NOT fixed. Confirm it is the only remaining path, and say so.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "The migration, v2 → v3, on a COPY of this repository's live record (rev 132 at origin/docs/session-100-qa99-dispatch, and master's rev 131). Count every uuid before and after, with two instruments. Run the migration twice: it must be idempotent. Then run an ob_state write on the migrated copy.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "T163-2, the history scan: run state erasures on this repository's full history (a full clone, not shallow). Rev 60→61 and 61→62 must be flagged, as the known positives. Report the total, and spot-check three flagged entries by reading the two revisions yourself.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "T179-1: the new end.md (59 lines) writes no project state. Run it as written in a scratch project, and show state.json is byte-identical before and after. Its lessons step stores through ob_store/ob_store_chunk and ob_end. What would a stranger's project need for that to work?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "T179-2: a session that commits on loop/ with no handoff gets the SessionEnd warning, and never a block. Also test that a session WITH a handoff gets none, and that the next greeting shows the warning exactly once.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "The importer on v3: QA 122's probes-r4.mjs and QA 111's probes-r3.mjs byte-exact on 3c0bfdc. Every FAIL either names a ruling that changed it or is a defect.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "The after-merge steps (handoff §7): rebuild, reconnect, migrate the live record, and install the new end.md. Walk them in a scratch clone as a stranger would, and say what is missing or out of order.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "Mutants of your own: at least retention's (seat, checkout) key widened to seat only; the uuid check skipped for delete; and the erasure scan blind to one revision.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "T-179 + T-163 (/end cut to a lessons step; a close-out cannot erase another session's record): dispatch to a FRESH, HEADLESS QA seat (record session 125)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/t179-dispatch-qa.md",
+          "blob": "d270b9ff5c486e0160c09bd29adb1b2094f0d757"
+        }
+      },
+      "candidate": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+      "diffstat": [
+        ".claude/commands/end.md",
+        "README.md",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/mutants-r4.out",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/mutants-v3.out",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.json",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.diff",
+        "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.json",
+        "docs/loops/dev-scripts-t179-merge/mutants-v3.cjs",
+        "docs/loops/t179-developer-handoff.md",
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/cli-session-end.ts",
+        "open-brain/src/cli-spec.ts",
+        "open-brain/src/cli.ts",
+        "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+        "open-brain/src/pipelines/session-start/role-files.ts",
+        "open-brain/src/pipelines/session-start/state-render.ts",
+        "open-brain/src/pipelines/state-import/index.ts",
+        "open-brain/src/pipelines/state-migrate/index.ts",
+        "open-brain/src/pipelines/state-views/index.ts",
+        "open-brain/src/pipelines/sync/checks-state.ts",
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/src/pipelines/sync/record-erasure.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/handoff-guard.ts",
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/cli-flags.test.ts",
+        "open-brain/tests/fixtures-state/state.json",
+        "open-brain/tests/helpers/repo-record.ts",
+        "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+        "open-brain/tests/pipelines/session-start/state-render.test.ts",
+        "open-brain/tests/pipelines/state-import-r2.test.ts",
+        "open-brain/tests/pipelines/state-import-v3.test.ts",
+        "open-brain/tests/pipelines/state-import.test.ts",
+        "open-brain/tests/pipelines/state-migrate.test.ts",
+        "open-brain/tests/pipelines/state-views.test.ts",
+        "open-brain/tests/pipelines/sync/checks.test.ts",
+        "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+        "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+        "open-brain/tests/pipelines/template-seed.test.ts",
+        "open-brain/tests/server.test.ts",
+        "open-brain/tests/shared/cli-args.test.ts",
+        "open-brain/tests/shared/closeout-erasure.test.ts",
+        "open-brain/tests/shared/handoff-guard.test.ts",
+        "open-brain/tests/shared/state-schema.test.ts",
+        "open-brain/tests/shared/state-writer.test.ts",
+        "project-template/.agents/state.json",
+        "project-template/.claude/commands/bootstrap.md",
+        "project-template/.claude/commands/end.md",
+        "project-template/.claude/rules/agents.md",
+        "project-template/.cursor/commands/end.md",
+        "project-template/.cursor/commands/sync.md"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 15,
+        "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+        "scored_sha": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+        "merge_commit": "3c0bfdcf917a5bfbc4fd56072a1735020b289189"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.64
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.56
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.24,
+      "confidence": 0.64,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.78,
+        "1": 0.19,
+        "2": 0.03
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 4316,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.64 is below the required 0.7",
+      "local_tests_support_claim 0.56 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:26:56.691Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "8b6b68a8-3e25-43dc-9ff0-24cb7cc74f89",
+  "subject": {
+    "gate": "developer-done",
+    "key": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+    "blob": "efcde7ace1bff33d51edf03e24fc29b49c7d3472"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:26:56.169Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 15,
+  "merge_commit": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+  "scored_sha": "3c0bfdcf917a5bfbc4fd56072a1735020b289189",
+  "base_sha": "aae0dce24a9e9832fbf723b144880fb562589158",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/015-t179.D_t.json",
+    "blob": "efcde7ace1bff33d51edf03e24fc29b49c7d3472"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".claude/commands/end.md",
+    "README.md",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-block.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/R41-refusal.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/r41-d07920b/mutants-r4.out",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/merge-render-session.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/mutants-v3.out",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-session-seat.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-shape.json",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.diff",
+    "docs/loops/dev-scripts-t179-merge/evidence/v3-d07920b/v3-stamp.json",
+    "docs/loops/dev-scripts-t179-merge/mutants-v3.cjs",
+    "docs/loops/t179-developer-handoff.md",
+    "open-brain/src/cli-bootstrap.ts",
+    "open-brain/src/cli-session-end.ts",
+    "open-brain/src/cli-spec.ts",
+    "open-brain/src/cli.ts",
+    "open-brain/src/pipelines/session-start/handoff-provenance.ts",
+    "open-brain/src/pipelines/session-start/role-files.ts",
+    "open-brain/src/pipelines/session-start/state-render.ts",
+    "open-brain/src/pipelines/state-import/index.ts",
+    "open-brain/src/pipelines/state-migrate/index.ts",
+    "open-brain/src/pipelines/state-views/index.ts",
+    "open-brain/src/pipelines/sync/checks-state.ts",
+    "open-brain/src/pipelines/sync/checks.ts",
+    "open-brain/src/pipelines/sync/index.ts",
+    "open-brain/src/pipelines/sync/record-erasure.ts",
+    "open-brain/src/server.ts",
+    "open-brain/src/shared/handoff-guard.ts",
+    "open-brain/src/shared/state-schema.ts",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/cli-flags.test.ts",
+    "open-brain/tests/fixtures-state/state.json",
+    "open-brain/tests/helpers/repo-record.ts",
+    "open-brain/tests/pipelines/session-start/handoff-provenance.test.ts",
+    "open-brain/tests/pipelines/session-start/state-render.test.ts",
+    "open-brain/tests/pipelines/state-import-r2.test.ts",
+    "open-brain/tests/pipelines/state-import-v3.test.ts",
+    "open-brain/tests/pipelines/state-import.test.ts",
+    "open-brain/tests/pipelines/state-migrate.test.ts",
+    "open-brain/tests/pipelines/state-views.test.ts",
+    "open-brain/tests/pipelines/sync/checks.test.ts",
+    "open-brain/tests/pipelines/sync/greeting-size.test.ts",
+    "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+    "open-brain/tests/pipelines/template-seed.test.ts",
+    "open-brain/tests/server.test.ts",
+    "open-brain/tests/shared/cli-args.test.ts",
+    "open-brain/tests/shared/closeout-erasure.test.ts",
+    "open-brain/tests/shared/handoff-guard.test.ts",
+    "open-brain/tests/shared/state-schema.test.ts",
+    "open-brain/tests/shared/state-writer.test.ts",
+    "project-template/.agents/state.json",
+    "project-template/.claude/commands/bootstrap.md",
+    "project-template/.claude/commands/end.md",
+    "project-template/.claude/rules/agents.md",
+    "project-template/.cursor/commands/end.md",
+    "project-template/.cursor/commands/sync.md"
+  ]
+}

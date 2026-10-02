@@ -1,0 +1,207 @@
+{
+  "gate": "developer-done",
+  "loop": "59-t198-r2",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:22.819Z",
+  "answered_at": "2026-10-02T07:27:23.193Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "59-t198-r2",
+        "objective": "QA 230: record 217 r2 (T-198, /start shows whether each seat's hub listener is polling)",
+        "tasks": [
+          "R1, listener is not presence. No printed line or header can be read as \"the seat has seen my turn\". The wording is \"listener polling\" / \"listener not polling\". QA 225's seat-seen mutant must die.",
+          "R2, structural validation. Every malformed body prints exactly one presence: UNKNOWN (malformed body: <path>) line and never throws. Include QA 225's probe body {\"agents\":[{\"name\":\"grok\",\"rooms\":{}}]}, and add at least two malformed shapes of your own.",
+          "R3, greeting-size. The check includes a deterministic worst-case bound for the block, labelled as an upper bound in its own output. It never calls the live hub. Quote the greeting-size line with and without the block.",
+          "R4, no network egress, on tcm. Your candidate CI run passes all five fixture-server tests that failed on tcm in QA 225. Quote the run id and the test job conclusion. This is the row the developer could not run (D-061).",
+          "R5, the reader's own key (turn 236). The header carries the key read from ~/.a2a-hub/keys/<hub-id>/<name>.key, never dev-key. A missing, unreadable or short key prints presence: UNKNOWN (...), and fetch is never called. The key text never appears in any output. Both dev-key mutants must die.",
+          "The key-file mapping in the handoff (G-049). Check the developer's derived table: which checkout resolves to which key file. Report it; don't score it as a defect of T-198. The planner has recorded the shared-identity problem as G-049."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "R1, listener is not presence. No printed line or header can be read as \"the seat has seen my turn\". The wording is \"listener polling\" / \"listener not polling\". QA 225's seat-seen mutant must die.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "R2, structural validation. Every malformed body prints exactly one presence: UNKNOWN (malformed body: <path>) line and never throws. Include QA 225's probe body {\"agents\":[{\"name\":\"grok\",\"rooms\":{}}]}, and add at least two malformed shapes of your own.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "R3, greeting-size. The check includes a deterministic worst-case bound for the block, labelled as an upper bound in its own output. It never calls the live hub. Quote the greeting-size line with and without the block.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "R4, no network egress, on tcm. Your candidate CI run passes all five fixture-server tests that failed on tcm in QA 225. Quote the run id and the test job conclusion. This is the row the developer could not run (D-061).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "R5, the reader's own key (turn 236). The header carries the key read from ~/.a2a-hub/keys/<hub-id>/<name>.key, never dev-key. A missing, unreadable or short key prints presence: UNKNOWN (...), and fetch is never called. The key text never appears in any output. Both dev-key mutants must die.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "The key-file mapping in the handoff (G-049). Check the developer's derived table: which checkout resolves to which key file. Report it; don't score it as a defect of T-198. The planner has recorded the shared-identity problem as G-049.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 230: record 217 r2 (T-198, /start shows whether each seat's hub listener is polling)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-230-t198-r2-dispatch.md",
+          "blob": "a848eb6d11c4e76638d70ba286ff917350a8e108"
+        }
+      },
+      "candidate": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+      "diffstat": [
+        ".agents/SYSTEM/hub-partner-seats.json",
+        "open-brain/src/pipelines/session-start/hub-presence.ts",
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/tests/pipelines/session-start/hub-presence.test.ts",
+        "open-brain/tests/pipelines/sync/greeting-size.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 59,
+        "base_sha": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+        "scored_sha": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+        "merge_commit": "f172e280aa1532c7a246a9017e1dd79c65e7028a"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.37
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.22
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.43
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.1,
+      "confidence": 0.85,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.92,
+        "1": 0.06,
+        "2": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1991,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.37 is below the required 0.7",
+      "local_tests_support_claim 0.43 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:23.181Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "e79770a3-4f5b-4953-bd6c-b1b9152ff4a0",
+  "subject": {
+    "gate": "developer-done",
+    "key": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+    "blob": "7146baf66843a192bd103b7fb0ed10024ebd12fb"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:22.819Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 59,
+  "merge_commit": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+  "scored_sha": "f172e280aa1532c7a246a9017e1dd79c65e7028a",
+  "base_sha": "231f501f99b217fd65ab496139cb0d11feba8eb1",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/059-t198-r2.D_t.json",
+    "blob": "7146baf66843a192bd103b7fb0ed10024ebd12fb"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    ".agents/SYSTEM/hub-partner-seats.json",
+    "open-brain/src/pipelines/session-start/hub-presence.ts",
+    "open-brain/src/pipelines/sync/checks.ts",
+    "open-brain/tests/pipelines/session-start/hub-presence.test.ts",
+    "open-brain/tests/pipelines/sync/greeting-size.test.ts"
+  ]
+}

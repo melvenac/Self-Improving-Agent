@@ -1,0 +1,233 @@
+{
+  "gate": "developer-done",
+  "loop": "50-qa-driver-cursor-r5",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:17.185Z",
+  "answered_at": "2026-10-02T07:27:17.569Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "50-qa-driver-cursor-r5",
+        "objective": "Record 192 r5 (Cursor QA driver: the laptop push route reaches the agent intact): QA dispatch (record 218)",
+        "tasks": [
+          "The diagnosis. Reproduce the quote drop on this laptop without the fix: the argv that reaches node loses the embedded quotes. Then show that the fix delivers them intact. Quote both argv.",
+          "The r4 row passes here. The ordinary harness on bbfb724 exits 0 on this laptop, with cmd /c denial=False moved=True prompt_quotes_kept=True. Plain and PowerShell still pass, and the three deny rows are still denial=True moved=False. Quote the lines.",
+          "The new check bites. Make a mutant that drops the quotes again (for example, revert the launch to cursor-agent.ps1). The 9994 row must go red, and the failure line must be quoted.",
+          "Does the real driver share the defect? This is the question that matters most. The fix is harness-only.",
+          "Read the template drive.ps1: how does it launch cursor-agent on PowerShell 5.1?",
+          "Does any prompt a real QA run sends (the first prompt, stops.txt, a resume prompt) contain embedded double quotes that would be dropped the same way?",
+          "If yes, real QA seats on this laptop receive mangled instructions. Score it as a defect against the product, not the harness.",
+          "Preserve.",
+          "git diff d67c5e7 bbfb724 -- docs/loops/qa-driver-template-cursor/ is empty.",
+          "Completion, resume-at-most-3, refusal and denial handling are unchanged.",
+          "At least one mutant of your own, on qa/qa-driver-r5-mut-."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "The diagnosis. Reproduce the quote drop on this laptop without the fix: the argv that reaches node loses the embedded quotes. Then show that the fix delivers them intact. Quote both argv.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "The r4 row passes here. The ordinary harness on bbfb724 exits 0 on this laptop, with cmd /c denial=False moved=True prompt_quotes_kept=True. Plain and PowerShell still pass, and the three deny rows are still denial=True moved=False. Quote the lines.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "The new check bites. Make a mutant that drops the quotes again (for example, revert the launch to cursor-agent.ps1). The 9994 row must go red, and the failure line must be quoted.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Does the real driver share the defect? This is the question that matters most. The fix is harness-only.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Read the template drive.ps1: how does it launch cursor-agent on PowerShell 5.1?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Does any prompt a real QA run sends (the first prompt, stops.txt, a resume prompt) contain embedded double quotes that would be dropped the same way?",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "If yes, real QA seats on this laptop receive mangled instructions. Score it as a defect against the product, not the harness.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Preserve.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "git diff d67c5e7 bbfb724 -- docs/loops/qa-driver-template-cursor/ is empty.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Completion, resume-at-most-3, refusal and denial handling are unchanged.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "At least one mutant of your own, on qa/qa-driver-r5-mut-.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "Record 192 r5 (Cursor QA driver: the laptop push route reaches the agent intact): QA dispatch (record 218)",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-driver-cursor-r5-dispatch-qa.md",
+          "blob": "8255f4da33dbab3c2cd73bf86f1ff73e9749de9c"
+        }
+      },
+      "candidate": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7",
+      "diffstat": [
+        "docs/loops/qa-driver-cursor-r2-developer-handoff.md",
+        "docs/loops/qa-driver-cursor-r2-harness.ps1",
+        "docs/loops/qa-driver-cursor-r2-launch.ps1"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 50,
+        "base_sha": "d67c5e7044df129d61deba68c489f9f89cdb87fc",
+        "scored_sha": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7",
+        "merge_commit": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.17
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.39
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.39,
+      "confidence": 0.41,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.74,
+        "1": 0.14,
+        "2": 0.12
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1999,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.17 is below the required 0.7",
+      "local_tests_support_claim 0.39 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:17.564Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "f8abdda1-fcd6-4227-bab6-bb46c149395e",
+  "subject": {
+    "gate": "developer-done",
+    "key": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7",
+    "blob": "efe929e479f510bbd1a22fa829ed269ea3817e11"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:17.185Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 50,
+  "merge_commit": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7",
+  "scored_sha": "bbfb7241387d261cf0ffb1cb80ffc1443bd335c7",
+  "base_sha": "d67c5e7044df129d61deba68c489f9f89cdb87fc",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/050-qa-driver-cursor-r5.D_t.json",
+    "blob": "efe929e479f510bbd1a22fa829ed269ea3817e11"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/qa-driver-cursor-r2-developer-handoff.md",
+    "docs/loops/qa-driver-cursor-r2-harness.ps1",
+    "docs/loops/qa-driver-cursor-r2-launch.ps1"
+  ]
+}

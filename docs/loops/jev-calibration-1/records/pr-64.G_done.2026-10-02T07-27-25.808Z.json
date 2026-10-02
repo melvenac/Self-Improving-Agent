@@ -1,0 +1,259 @@
+{
+  "gate": "developer-done",
+  "loop": "64-t216",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:25.808Z",
+  "answered_at": "2026-10-02T07:27:26.284Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "64-t216",
+        "objective": "QA 236: T-216, one loop-id rule for plan and evidence",
+        "tasks": [
+          "docs/loops/t216-dispatch.md: the scope. This is what you score.",
+          "docs/loops/t216-developer-handoff.md at the candidate: its rows and red-then-green claims. Verify them.",
+          "docs/loops/loop-15-slice-4-brief.D_t.json on master: the real file the fix exists for. It must stay unedited.",
+          "T216-1, the real file: harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json exits 1 at the base with \"loop must look like t001\" and exits 0 at the candidate. The file is byte-identical at both SHAs.",
+          "T216-2, one rule: plan and evidence accept the same loop-id set, from ONE exported constant.",
+          "Probe both schemas with seat ids (15-slice-4, 15-slice-3-c), runtime ids (t001, t1234) and refusals (empty, a slash, ../x, 15, T001, 15-, a leading space).",
+          "The two schemas must agree on every probe.",
+          "Builder flagged that its L3 test (the shared constant) stays green under its own mutant, so it guards only the JSON pattern. Build a mutant that gives the plan schema its own copy of the regex and widens or narrows only that copy. Say whether any test kills it.",
+          "T216-3, the derived JSON schema: plan.schema.json was HAND-EDITED, not regenerated. Regenerate it from the zod source with the project's own generator, if one exists, and diff the result against the committed file. Any drift between the zod rule and the JSON pattern is a defect.",
+          "T216-4, the other tNNN assumptions:",
+          "Builder kept DeveloperReportSchema and --loop as tNNN on purpose, and found no loop id in GATE_RECORD_RE.",
+          "Grep open-brain/src for t\\d{3 and t001 yourself, and judge each kept tNNN. A runtime-only concept may stay tNNN; anything a planner brief reaches must accept seat ids.",
+          "T216-5, the dry-run plan gate: harness plan-gate --mode dry-run on a TEMP COPY of the slice-four D_t reaches the gate with no loop-id refusal, makes NO network call, and writes its G_plan record. Assert there were no network calls (an unset key is not proof, per G-044).",
+          "Regression: the b2-et BE-0.1 rows Builder inverted. Confirm the inversion follows the new rule and does not weaken an evidence guarantee B relied on."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "docs/loops/t216-dispatch.md: the scope. This is what you score.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "docs/loops/t216-developer-handoff.md at the candidate: its rows and red-then-green claims. Verify them.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "docs/loops/loop-15-slice-4-brief.D_t.json on master: the real file the fix exists for. It must stay unedited.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "T216-1, the real file: harness validate plan docs/loops/loop-15-slice-4-brief.D_t.json exits 1 at the base with \"loop must look like t001\" and exits 0 at the candidate. The file is byte-identical at both SHAs.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "T216-2, one rule: plan and evidence accept the same loop-id set, from ONE exported constant.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "Probe both schemas with seat ids (15-slice-4, 15-slice-3-c), runtime ids (t001, t1234) and refusals (empty, a slash, ../x, 15, T001, 15-, a leading space).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The two schemas must agree on every probe.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Builder flagged that its L3 test (the shared constant) stays green under its own mutant, so it guards only the JSON pattern. Build a mutant that gives the plan schema its own copy of the regex and widens or narrows only that copy. Say whether any test kills it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "T216-3, the derived JSON schema: plan.schema.json was HAND-EDITED, not regenerated. Regenerate it from the zod source with the project's own generator, if one exists, and diff the result against the committed file. Any drift between the zod rule and the JSON pattern is a defect.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "T216-4, the other tNNN assumptions:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Builder kept DeveloperReportSchema and --loop as tNNN on purpose, and found no loop id in GATE_RECORD_RE.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Grep open-brain/src for t\\d{3 and t001 yourself, and judge each kept tNNN. A runtime-only concept may stay tNNN; anything a planner brief reaches must accept seat ids.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "T216-5, the dry-run plan gate: harness plan-gate --mode dry-run on a TEMP COPY of the slice-four D_t reaches the gate with no loop-id refusal, makes NO network call, and writes its G_plan record. Assert there were no network calls (an unset key is not proof, per G-044).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Regression: the b2-et BE-0.1 rows Builder inverted. Confirm the inversion follows the new rule and does not weaken an evidence guarantee B relied on.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 236: T-216, one loop-id rule for plan and evidence",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-236-t216-dispatch.md",
+          "blob": "0c13922a641838e4af5ec3424324484b7f66e68b"
+        }
+      },
+      "candidate": "9a0973f0d330b3b85a4ce5e23f8a0ef583de2070",
+      "diffstat": [
+        "docs/loops/t216-developer-handoff.md",
+        "docs/loops/t216/mutants/m1-plan-own-narrow-regex.diff",
+        "open-brain/src/harness/index.ts",
+        "open-brain/src/harness/schema.ts",
+        "open-brain/src/harness/schemas/plan.schema.json",
+        "open-brain/tests/harness/b2-et.test.ts",
+        "open-brain/tests/harness/t216-loop-id.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 64,
+        "base_sha": "c204d1d4a6eef31aaefe8d607f539e367e5b090c",
+        "scored_sha": "9a0973f0d330b3b85a4ce5e23f8a0ef583de2070",
+        "merge_commit": "b3ab05ca5da67f947f0c1666228c28b10f912cef"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.54
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.53
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.12,
+      "confidence": 0.82,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.91,
+        "1": 0.07,
+        "2": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2671,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.54 is below the required 0.7",
+      "local_tests_support_claim 0.53 is below the required 0.6",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:26.273Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "5f368768-6d4a-43c1-9fda-ce0343bd68be",
+  "subject": {
+    "gate": "developer-done",
+    "key": "9a0973f0d330b3b85a4ce5e23f8a0ef583de2070",
+    "blob": "6124de5d65c4fac6fe9803422f2b3990565ad33c"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:25.808Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 64,
+  "merge_commit": "b3ab05ca5da67f947f0c1666228c28b10f912cef",
+  "scored_sha": "9a0973f0d330b3b85a4ce5e23f8a0ef583de2070",
+  "base_sha": "c204d1d4a6eef31aaefe8d607f539e367e5b090c",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/064-t216.D_t.json",
+    "blob": "6124de5d65c4fac6fe9803422f2b3990565ad33c"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t216-developer-handoff.md",
+    "docs/loops/t216/mutants/m1-plan-own-narrow-regex.diff",
+    "open-brain/src/harness/index.ts",
+    "open-brain/src/harness/schema.ts",
+    "open-brain/src/harness/schemas/plan.schema.json",
+    "open-brain/tests/harness/b2-et.test.ts",
+    "open-brain/tests/harness/t216-loop-id.test.ts"
+  ]
+}

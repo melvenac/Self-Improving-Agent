@@ -1,0 +1,206 @@
+{
+  "gate": "developer-done",
+  "loop": "60-s3-c-r4",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T07:27:23.405Z",
+  "answered_at": "2026-10-02T07:27:23.799Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "60-s3-c-r4",
+        "objective": "QA 232: candidate C r4 (T-155), re-dispatched on Composer",
+        "tasks": [
+          "You are QA 232. The report's last line is exactly QA-232: REPORT COMPLETE.",
+          "Push only through node docs/loops/qa-232/push-qa.mjs. The prefix is unchanged, c-r4, and so are the report path and branch.",
+          "Run your own mutants locally. Push them to qa/c-r4-mut- as the record, but do not wait on or count CI for them: T-207 will stop CI on mutant refs. CI is for the candidate and the base only.",
+          "If a model refusal or usage limit stops you, write it into the report's \"Open for the planner\" section and finish the report. Do not retry in a loop."
+        ],
+        "out_of_scope": [],
+        "preserve": [],
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "You are QA 232. The report's last line is exactly QA-232: REPORT COMPLETE.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Push only through node docs/loops/qa-232/push-qa.mjs. The prefix is unchanged, c-r4, and so are the report path and branch.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Run your own mutants locally. Push them to qa/c-r4-mut- as the record, but do not wait on or count CI for them: T-207 will stop CI on mutant refs. CI is for the candidate and the base only.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "If a model refusal or usage limit stops you, write it into the report's \"Open for the planner\" section and finish the report. Do not retry in a loop.",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [],
+        "new_capability": "QA 232: candidate C r4 (T-155), re-dispatched on Composer",
+        "reconstructed_by": "jev-calibration-1/inputs.mjs",
+        "reconstructed_from": {
+          "path": "docs/loops/qa-232-c-r4-dispatch.md",
+          "blob": "8ac928b143c7366ed3cd583ea5d9acdc9fddecbd"
+        }
+      },
+      "candidate": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+      "diffstat": [
+        "docs/loops/loop-15-slice-3-c-r3-developer-handoff.md",
+        "open-brain/src/harness/policies.ts",
+        "open-brain/src/harness/policies/merge.json",
+        "open-brain/src/harness/schemas/policy-merge.schema.json",
+        "open-brain/src/harness/shadow-merge.ts",
+        "open-brain/tests/harness/fixtures/shadow-merge/all-attributed.json",
+        "open-brain/tests/harness/fixtures/shadow-merge/skipped-required-live-gate.json",
+        "open-brain/tests/harness/fixtures/shadow-merge/undefined.json",
+        "open-brain/tests/harness/fixtures/shadow-merge/would-merge.json",
+        "open-brain/tests/harness/fixtures/shadow-merge/would-not-merge.json",
+        "open-brain/tests/harness/shadow-merge.test.ts"
+      ],
+      "checks": {
+        "source": "none",
+        "build": {
+          "exit_code": null
+        },
+        "unit": {
+          "exit_code": null
+        }
+      },
+      "prior_failures": [],
+      "scored_diff": {
+        "pr": 60,
+        "base_sha": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+        "scored_sha": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+        "merge_commit": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.61
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.04,
+      "confidence": 0.95,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.97,
+        "1": 0.02,
+        "2": 0.01
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1605,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.18 is below the required 0.7",
+      "no deterministic checks were supplied"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T07:27:23.787Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "c1d2c161-8a50-4b73-912e-375dadf3f617",
+  "subject": {
+    "gate": "developer-done",
+    "key": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+    "blob": "e22d7e011744090f1ce6f50614746a39436f21e6"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T07:27:23.405Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 60,
+  "merge_commit": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+  "scored_sha": "c33942725c73b1aa91ceb46458e6ea7d11c70dcd",
+  "base_sha": "20c2dfd21fd53cd548ce9a0c8b27d99e45b0e410",
+  "dt": {
+    "path": "docs/loops/jev-calibration-1/inputs/060-s3-c-r4.D_t.json",
+    "blob": "e22d7e011744090f1ce6f50614746a39436f21e6"
+  },
+  "checks_source": "none",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/loop-15-slice-3-c-r3-developer-handoff.md",
+    "open-brain/src/harness/policies.ts",
+    "open-brain/src/harness/policies/merge.json",
+    "open-brain/src/harness/schemas/policy-merge.schema.json",
+    "open-brain/src/harness/shadow-merge.ts",
+    "open-brain/tests/harness/fixtures/shadow-merge/all-attributed.json",
+    "open-brain/tests/harness/fixtures/shadow-merge/skipped-required-live-gate.json",
+    "open-brain/tests/harness/fixtures/shadow-merge/undefined.json",
+    "open-brain/tests/harness/fixtures/shadow-merge/would-merge.json",
+    "open-brain/tests/harness/fixtures/shadow-merge/would-not-merge.json",
+    "open-brain/tests/harness/shadow-merge.test.ts"
+  ]
+}
