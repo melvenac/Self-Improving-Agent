@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 270,
+  "revision": 271,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3727,6 +3727,12 @@
       "title": "QA 248 (slice-four step-4 re-run) ACCEPTED: 13/13 live calls answered by jev-1.13.0 (4.2 reject; 4.3 8/8 reject; 4.4 proceed #209 #218, reject #195 #220 #227), 15 attempts <= 17, key scan PASS with the transcript named. Slice four's live half CLOSED, PROVISIONAL (N=8/N=5 seat-built, 0 runtime), no calibration claimed. F5 accepted under D-092 ruling 3; S4-2.1 met (one ANSWERED live G_plan); S4-8.4 met by the planner: first green master run with F11 = 36358116586 (head 2b121d99, 2026-09-27T23:16:08Z)",
       "date": "2026-10-02",
       "note": "Planner session 156. Rulings: docs/loops/qa-248-rulings.md. Checked by the planner, not taken from the report: the report commit 49378d6e has parent 460c9a49 (the T-220 merge); QA 245's two ledger lines are byte-identical to master and its record and report are untouched; the push went through docs/loops/qa-248/push-qa.mjs unmodified (laptop qa248-tools/push.mjs, read over ssh, only spawns it). Spend about $0.0019 (46,062 input tokens, per clark). F6/F7/F8 go to T-222. The 8/8 done-gate rejects are a finding about thresholds or inputs, recorded and not acted on. NEXT: the D-073 release, which is Aaron's under D-019: the CHANGELOG holds three Unreleased sections ([0.45.0] bootstrap, T-003, [0.44.3] importer) and the planner proposes a consolidation before any bump."
+    },
+    {
+      "id": "D-094",
+      "title": "T-221 ruled option (a): ci.yml concurrency group includes github.event_name, so a branch's push run and its PR run never cancel each other; T-178's newer-cancels-older is kept within each event, master's no-cancel and the dispatch group unchanged. Not (b) (an API lookup in the workflow fails open when stale) nor (c) (QA ci-candidate pushes have no PR and would lose CI)",
+      "date": "2026-10-02",
+      "note": "Planner session 156. Dispatch docs/loops/t221-dispatch.md; live acceptance rows A-D (both runs complete with no re-run, newer-cancels-older per event, master expression unchanged, red-first test). Cost accepted: a branch with an open PR runs the suite twice per commit on tcm. Same session: QA 249 dispatched for T-164 + T-211 (Plumb, HEAVY); T-222 dispatch written; Aaron's usage rule now at most 3 dev + 2 QA jobs, with new work going to IDLE seats (relayed by clark from Aaron first-hand, about 05:05Z)."
     }
   ],
   "handoffs": [
@@ -4261,7 +4267,7 @@
     },
     {
       "n": 156,
-      "date": "2026-10-01",
+      "date": "2026-10-02",
       "uuid": "83f0e630-9247-40d4-adcd-7f4292a16ddb",
       "seat": "planner",
       "checkout": "sia-planner",
