@@ -1,0 +1,15 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 424fa1c7..3e179e96 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -241,8 +241,8 @@ export function checkHookConfigs(settingsPath: string): CheckResult {
+       if (!Array.isArray(eventList)) continue;
+       for (const entry of eventList) {
+         const inner = entry && typeof entry === "object" ? (entry as { hooks?: unknown }).hooks : undefined;
+-        if (Array.isArray(inner)) hooks.push(...inner);
+-        else hooks.push(entry);
++        void inner;
++        hooks.push(entry); // mutant: only the top-level list is read, matcher groups are not descended into
+       }
+     }
+   }
