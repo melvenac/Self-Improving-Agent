@@ -1,0 +1,46 @@
+{
+  "loop": "15-slice-4",
+  "candidate_git": {
+    "sha": "c34866d37e3fb54e2a2c78aa0507417911f684da",
+    "branch": "origin/master",
+    "frozen_at": "2026-10-02T00:40:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm run build (open-brain/), then tsc --noEmit",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 0,
+      "detail": "npm ci exit 0; npm run build exit 0 (build stamped c34866d); tsc --noEmit exit 0. Duration not measured."
+    },
+    "unit": {
+      "command": "not run",
+      "exit_code": null,
+      "passed": false,
+      "duration_ms": 0,
+      "detail": "Step 4's dispatch asks for build and tsc only; vitest was not run. No exit code exists, so this is not a pass."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "S4-2", "status": "unmet", "evidence": "One live G_plan (docs/loops/loop-15-slice-4-brief.G_plan.2026-10-02T00-47-29.272Z.json), not ignored, policy_hash equal to sha256 of plan-gate.json at base; but HTTP 401 auth: sent false, answer, usage and model_resolved null. Clauses 1, 3, 4 met; clause 2 unmet." },
+    { "id": "S4-3a", "status": "unmet", "evidence": "Live half (S4-3a.2): no authenticated 200; the only call returned 401 auth, model_resolved null." },
+    { "id": "S4-3b", "status": "met", "evidence": "Live half (S4-3b.2): docs/loops/qa-245/key-scan.mjs read the key from the environment; known positive 1 hit then temp file deleted; 0 matches over 21 gate records and ledger, 55 captured stdout/stderr files, close-out and report (3), and this session's transcript (1). Clause 1 (by construction) was scored at step 2.", "order": "shown" },
+    { "id": "S4-4", "status": "unmet", "evidence": "0 of 8 live G_done: no 4.3 call made after the 4.2 auth failure (seat stopped all items; Open 2)." },
+    { "id": "S4-4a", "status": "not_evaluated", "evidence": "Clause 6 needs live G_done/G_qa records; none exists." },
+    { "id": "S4-5a", "status": "partial", "evidence": "closeout-tables exit 0 and --check on the close-out exit 0; label computed as PROVISIONAL (N=0 seat-built, 0 runtime); N=0 so no spread. The diffs table labels five diffs that have an E_t as 'not scored: no E_t' (F2).", "order": "shown" },
+    { "id": "S4-5b", "status": "unmet", "evidence": "Close-out 0 hits, ledger 0; the live G_plan has 4 whole-word hits, all inside the brief and D_t text copied into request (F3)." },
+    { "id": "S4-6b", "status": "partial", "evidence": "Clause 4: no call was made for A, B part 1, B part 2 (none was made for any diff). Clauses 1-3 have no live record.", "order": "shown" },
+    { "id": "S4-6c", "status": "not_evaluated", "evidence": "No G_qa was written." },
+    { "id": "S4-7", "status": "met", "evidence": "harness count-attempts exit 0: attempts 1, retries 0, answered 0, incomplete 0, no violation; ledger begin line written before the request, end line auth.", "order": "shown" },
+    { "id": "S4-8", "status": "partial", "evidence": "Clause 2 guard: 3b192871 is an ancestor of c34866d3 (exit 0) and LOOP_LIMITS is byte-identical ec7138bb..c34866d3. Clause 4 unmet: no CI run id read (no network call allowed).", "order": "shown" }
+  ],
+  "regressions": [],
+  "gaps": [
+    "TYPESAFE_API_KEY in the laptop environment is rejected by Jev (HTTP 401); step 4 stopped after 1 attempt (Open 1, 2).",
+    "harness validate gate-record refuses G_plan records (F1).",
+    "closeout-tables labels diffs with an E_t as 'not scored: no E_t' when no G_qa ran (F2).",
+    "G_plan requests embed the brief and D_t text, so every G_plan carries the forbidden word (F3)."
+  ],
+  "notes": "QA-245: step 4 stopped at the first live call (401 auth). 1 attempt of 14 budgeted, 0 answered, 0 retries. Report: docs/loops/loop-15-slice-4-step4-qa-report.md."
+}

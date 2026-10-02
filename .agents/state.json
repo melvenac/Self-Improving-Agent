@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 265,
+  "revision": 267,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed): step 2 MERGED (#254); step 4 RUN: QA 245 made the live Jev calls on the laptop and exited VERDICT: COMPLETE (report origin/qa/s4-step4-report 4cc476f0, NOT YET READ OR RULED). NEXT: read QA 245's report + close-out against the criteria's live rows (S4-2, S4-3a.2, S4-3b.2 key scan, S4-7 count <=17, S4-4.1, S4-4a.6, S4-5a tables, S4-6b.4/6c.1, S4-8.2/.4, 4.3 reported three ways), open the PR for its records + close-out, then the ONE release for slices three and four (D-073). T-194: option 3 then 2 (D-089); master ruleset 24343321 LIVE (D-090); r8 HELD; next ruling: whether r7 merges as the courtesy layer, then the sparse planner checkout. T-215, T-213 and the /start items open.",
-    "since_session": 155
+    "text": "Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed): step 2 MERGED (#254); step 4 RUN AND RULED (D-092): QA 245 got HTTP 401 auth on the first live call, 0 answers, so step 4 is INCOMPLETE. NEXT: (1) Aaron checks TYPESAFE_API_KEY on the laptop (rejected by Jev); (2) T-220 (closeout-tables 'no E_t' label) merged; (3) re-run step 4 under docs/loops/qa-245-rulings.md (stop-all on auth, transcript path printed by the key scan, 19 attempts left); then the ONE release for slices three and four (D-073). CI: T-219 (D-091) dispatched to sia-builder so docs-only PRs can merge under ruleset 24343321; #259 is blocked until then (admin merge is Aaron's call). T-194: r7 courtesy-layer ruling pending, r8 HELD, then the sparse planner checkout.",
+    "since_session": 156
   },
   "tasks": [
     {
@@ -1178,6 +1178,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Per D-091. Edit .github/workflows/ci.yml only (plus a test if ci-seat-skip.mjs gains PR args). Live acceptance: docs-only PR -> test Skipped + mergeable; code PR -> suite runs; master push -> suite runs. Unblocks #259 and every future docs-only PR under ruleset 24343321. Needs a dev slot booked via clark.",
+      "note_by": [
+        "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-220",
+      "title": "closeout-tables: label 'no E_t' only when no E_t exists, 'not called' separately; G_plan writes repo-relative paths (QA 245 F2, F4)",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 156,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Per D-092. F2 must be fixed before the slice-four step-4 re-run, since close-out tables are generated, never typed. F4 (absolute C:\\qa-scratch paths in G_plan brief/dt/spec_excerpt) is the low-priority clause. Also the doubled full stop in 'No scored records..'. Red first.",
       "note_by": [
         "83f0e630-9247-40d4-adcd-7f4292a16ddb"
       ],
@@ -3673,6 +3687,12 @@
       "title": "D-055 amended under D-090: a docs-only PR must still REPORT the required 'test' check. Drop pull_request paths-ignore; the existing `changed` job also runs on pull_request and gates `test`, so a docs-only PR gets test=skipped (passes the ruleset) instead of no check at all (blocks forever)",
       "date": "2026-10-02",
       "note": "Planner session 156, ruling the defect clark reported on SIA #259 (Forge handoff, docs/loops/ only, BLOCKED). Cause: ci.yml pull_request has paths-ignore docs/** + README.md (D-055), so a docs-only PR starts no workflow; ruleset 24343321 (D-090) requires 'test'; a check that never reports never passes. Every docs-only PR hits it, including the planner's own close-out PRs. Fix is structural and reuses T-178's mechanism: (1) remove paths-ignore from pull_request; (2) widen `changed`'s if to github.event_name == 'pull_request' as well as non-master push, passing github.event.pull_request.base.sha and github.event.pull_request.head.sha to ci-seat-skip.mjs on a PR; (3) `test` is unchanged: skip=true -> job-level skip -> required check reports Skipped. NOT chosen: a second always-pass workflow with a job named 'test' (two checks of one name on a mixed PR; a green stub could satisfy the gate while the real suite fails). Acceptance needs LIVE runs on both paths (feedback: live run on the path): a docs-only PR must show 'test' Skipped and become mergeable; a PR touching open-brain/ must run the suite; a master push still runs the suite. Assumption to verify live, not from docs: the ruleset accepts Skipped as satisfying a required check. #259 itself: not admin-bypassed by the planner; Aaron's call via clark. Aaron's 'merge' (all that are clear) did not cover #259, r7 (QA 246 REJECT, courtesy ruling pending) or QA 245 (unruled)."
+    },
+    {
+      "id": "D-092",
+      "title": "QA 245 (slice-four step 4) report ACCEPTED as accurate; step 4 INCOMPLETE: 4.2's one live call got HTTP 401 auth, 0 answers. Slice four NOT closed; no release (D-073 holds). Seat's stop-all-on-auth RATIFIED and made the rule; the next 4.2 attempt is not a re-roll (no answer exists) and counts toward the cap (1 used, 19 left)",
+      "date": "2026-10-02",
+      "note": "Planner session 156. Rulings: docs/loops/qa-245-rulings.md. Open 1, the key, goes to Aaron: TYPESAFE_API_KEY on the laptop is set but rejected by Jev; check revoked/rotated/wrong account, then a fresh shell before launch. F1: re-dispatch drops validate gate-record for G_plan. F2: closeout-tables labels diffs 'no E_t' when one exists -> T-220, must merge before the re-run. F3: forbidden word inside G_plan request is a quoted copy of brief/D_t, covered by S4-5b's path exclusion. F4: absolute paths folded into T-220 (low). Open 4: launcher sets TEMP/TMP. K1 (planner finding): key-scan's transcript category is UNPROVEN: the prose names attempts.jsonl as 'the transcript', the script searches the C--Users-Aaron-Worktrees-sia-qa slug while the worktree was C:/qa-scratch/qa245-wt; the re-run must print the scanned transcript's absolute path. The records PR is docs-only, so it travels with this state write until T-219 lands."
     }
   ],
   "handoffs": [
