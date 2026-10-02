@@ -1,0 +1,62 @@
+{
+  "loop": "qa-255-b1-start",
+  "candidate_git": {
+    "sha": "29f81fcc87f0971a594da64d5bdb31c4accb158f",
+    "branch": "local scratch merge of origin/master 50700414 + #287 + #291 + #297 + #312 (not pushed)",
+    "frozen_at": "2026-10-02T12:12:40Z"
+  },
+  "candidates": [
+    { "task": "T-209/T-210", "sha": "0085e78a81e445d942965efce1c358fb9e83f57e", "branch": "origin/loop/t209-t210-render", "pr": 287, "verdict": "ACCEPT" },
+    { "task": "T-183", "sha": "f76392d2963ad549defee2e52fecc5ba8eee20b6", "branch": "origin/loop/t183-render-cut", "pr": 291, "verdict": "ACCEPT" },
+    { "task": "T-226", "sha": "fc71d9696527f97f28ac6a7c4cd8ee572e0fa1f0", "branch": "origin/loop/t226-start-brief-text", "pr": 297, "verdict": "ACCEPT" },
+    { "task": "T-148", "sha": "19714baa42a002d306f118f6b5c4403617bdaf34", "branch": "origin/loop/t148-legend-retire", "pr": 312, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit on each head and on the batch merge",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "exit 0 at 0085e78a, f76392d2, fc71d969, 19714baa and the merge 29f81fcc"
+    },
+    "unit": {
+      "command": "npx vitest run <one touched file> per invocation; full suite by CI",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 120000,
+      "detail": "LIGHT job. CI test success: 36984193973/36984199234 (#287), 36984200811/36984205043 (#291), 36984206826/36984213521 (#297), 36985908808/36985912412 (#312). Merge: latest-brief 10, state-render 48, server 30, start-parity 11, start-legend 4, state-views 14, command-parity 9, mirror-parity 13, all passed."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q255-287-1", "status": "met", "order": "shown", "evidence": "79d1f5d9..0085e78a: latest-brief.ts, state-render.ts, server.ts, 3 tests, handoff." },
+    { "id": "Q255-287-2", "status": "met", "order": "red-first", "evidence": "base: latest-brief suite fails to load; state-render 4 failed|35; server 1 failed|29. head: 10/10, 39/39, 30/30." },
+    { "id": "Q255-287-3", "status": "met", "order": "shown", "evidence": "own ascending tie-break killed (state-render 4, Q253 2, server 1); dev id-order mutant killed 3 failed|36." },
+    { "id": "Q255-287-4", "status": "met", "order": "shown", "evidence": "test success runs 36984193973 (push) and 36984199234 (PR), headSha 0085e78a." },
+    { "id": "Q255-287-5", "status": "met", "order": "shown", "evidence": "qa253-t209 4/4, qa253-t210 9/9, server 30/30; cat -A shows /(\\d+)\\s*$/ at state-render.ts:114-115." },
+    { "id": "Q255-291-1", "status": "met", "order": "shown", "evidence": "0085e78a..f76392d2: state-render.ts, state-render.test.ts, server.test.ts, handoff." },
+    { "id": "Q255-291-2", "status": "met", "order": "red-first", "evidence": "base 0085e78a: state-render 8 failed|40, server 1 failed|29. head: 48/48, 30/30." },
+    { "id": "Q255-291-3", "status": "met", "order": "shown", "evidence": "own >= GAPS_SHOWN killed by C183-2; dev M-clip-99 killed 2 failed|46 (+Q255-6b)." },
+    { "id": "Q255-291-4", "status": "met", "order": "shown", "evidence": "test success runs 36984200811 (push) and 36984205043 (PR), headSha f76392d2." },
+    { "id": "Q255-291-6", "status": "met", "order": "shown", "evidence": "own fixture 3/3: 40 open + 3 closed gaps -> 10 newest lines + '… and 30 older open gaps (40 open in all)'; 250-char title -> 100 + …; P2/P3 count lines. server 30/30. Greeting: 51,827 (#287) -> 40,789 (#291, rev 278); 39,908 at merge (rev 283)." },
+    { "id": "Q255-297-1", "status": "met", "order": "shown", "evidence": "0085e78a..fc71d969: 3 start.md copies, start-parity.test.ts, handoff." },
+    { "id": "Q255-297-2", "status": "met", "order": "red-first", "evidence": "base: start-parity 7 failed|4; head 11/11." },
+    { "id": "Q255-297-3", "status": "met", "order": "shown", "evidence": "own Cursor-only sentence drop killed by checkCursorStartParity + T-226 equality row (2 failed|9). No dev mutant stated; dev red-before reproduced." },
+    { "id": "Q255-297-4", "status": "met", "order": "shown", "evidence": "test success runs 36984206826 (push) and 36984213521 (PR), headSha fc71d969." },
+    { "id": "Q255-297-7", "status": "met", "order": "shown", "evidence": "start-parity 11/11, command-parity 9/9, mirror-parity 13/13." },
+    { "id": "Q255-312-1", "status": "met", "order": "shown", "evidence": "5ec37cdf..19714baa: 3 start.md copies, state-views/index.ts legend, state-views.test.ts, start-legend.test.ts, handoff." },
+    { "id": "Q255-312-2", "status": "met", "order": "red-first", "evidence": "base: start-legend 4 failed, state-views 1 failed|13. head: 4/4, 14/14." },
+    { "id": "Q255-312-3", "status": "met", "order": "shown", "evidence": "own (a) INBOX legend revert killed by start-legend + state-views; own (b) Cursor copy revert killed by start-legend + start-parity. No dev mutant stated; red-before reproduced." },
+    { "id": "Q255-312-4", "status": "met", "order": "shown", "evidence": "test success runs 36985908808 (push) and 36985912412 (PR), headSha 19714baa." },
+    { "id": "Q255-312-7", "status": "met", "order": "shown", "evidence": "start-parity 4/4, command-parity 9/9, mirror-parity 13/13." },
+    { "id": "Q255-B1-8", "status": "met", "order": "shown", "evidence": "origin/master 50700414 + #287, #291, #297, #312 --no-ff: no conflicts (start.md copies auto-merged). All touched files pass one per invocation; tsc exit 0." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "#291: greeting at rev 278 is 40,789 chars, over the 40,000 greeting-size limit by 789; 39,908 at rev 283 (merged batch).",
+    "#291: formatTask's doc comment now sits on clipTitle (cosmetic).",
+    "#297: no row pins 'If that line is absent there is no brief to read.'; an all-three-copies deletion likely survives (not run: .claude edit needed a permission).",
+    "#297: handoff freeze SHA 496762b8 is a patch-identical pre-rebase twin of ba22373c."
+  ],
+  "notes": "QA 255, dispatch tree 507004147df01ec665ff5970257ee400534720ef. No live Jev call. No live state.json or DB written. Batch verdict ACCEPT."
+}
