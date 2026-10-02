@@ -19,6 +19,8 @@ export const BRIEFING_START = "## Briefing (print everything down to the End Bri
 export const BRIEFING_END = "## End Briefing";
 
 export interface BriefingInput {
+  /** describeServingBuild()'s line. The FIRST line of the block: a stale serving build is the one thing the reader must not miss. */
+  serving: string;
   state: State;
   version: string;
   /** The reading seat's role, so its OWN handoff is the pick-up. Null: unresolved, and the briefing says so. */
@@ -41,6 +43,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   const s = i.state;
   const out: string[] = [BRIEFING_START];
 
+  out.push(i.serving);
   out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
   out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}`);

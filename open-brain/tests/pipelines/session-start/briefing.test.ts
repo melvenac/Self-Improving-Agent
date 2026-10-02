@@ -49,6 +49,7 @@ const input = (state: State, over: Partial<BriefingInput> = {}): BriefingInput =
   sessionNote: null,
   date: "2026-10-03",
   drift: [],
+  serving: "Serving build: synthetic",
   usage: "Usage: GREEN → dispatches open",
   latestBrief: "Latest brief: docs/loops/x-brief.md (2026-10-02)",
   workingTree: "Working tree: clean",
@@ -60,23 +61,24 @@ describe("renderBriefing: the sections, from the record alone", () => {
   const state = stateWith({ pick_up: "Do the thing.", watch_out: ["first <b>verbatim</b>", "second"], open_questions: ["still open?"] });
   const out = renderBriefing(input(state));
 
-  it("opens and closes on the marked block, usage first, then the session line", () => {
+  it("opens and closes on the marked block: serving build first, then usage, then the session line", () => {
     expect(out[0]).toBe(BRIEFING_START);
     expect(out[out.length - 1]).toBe(BRIEFING_END);
-    expect(out[1]).toBe("Usage: GREEN → dispatches open");
-    expect(out[2]).toBe(`Session 12 — 2026-10-03 · ${state.project.name} v9.9.9 · state rev ${state.revision}`);
-    expect(out[3]).toBe("Drift: none");
+    expect(out[1]).toBe("Serving build: synthetic");
+    expect(out[2]).toBe("Usage: GREEN → dispatches open");
+    expect(out[3]).toBe(`Session 12 — 2026-10-03 · ${state.project.name} v9.9.9 · state rev ${state.revision}`);
+    expect(out[4]).toBe("Drift: none");
   });
 
   it("the session number is the caller's (the record's), and a missing log says why instead of inventing one", () => {
     const none = renderBriefing(input(state, { sessionNumber: null, sessionNote: "no .agents/SESSIONS/ dir — log not created" }));
-    expect(none[2]).toContain("Session (no .agents/SESSIONS/ dir — log not created)");
-    expect(none[2]).not.toMatch(/^Session \d/);
+    expect(none[3]).toContain("Session (no .agents/SESSIONS/ dir — log not created)");
+    expect(none[3]).not.toMatch(/^Session \d/);
   });
 
   it("drift is named, in one line", () => {
     const d = renderBriefing(input(state, { drift: [{ field: "summary-version", expected: "1.2.3", actual: "0.0.1", fixed: false }] }));
-    expect(d[3]).toBe("Drift detected (1): summary-version: expected 1.2.3, got 0.0.1 (not fixed)");
+    expect(d[4]).toBe("Drift detected (1): summary-version: expected 1.2.3, got 0.0.1 (not fixed)");
   });
 
   it("NEXT is the top 3 by priority with the counts, and says it is a backlog and not a decision", () => {
@@ -390,12 +392,13 @@ describe("ob_start carries the same block, and every /start copy prints it verba
 
     const parsed = parseState(readFileSync(join(root, ".agents", "state.json"), "utf8"));
     if (!parsed.ok) throw new Error(parsed.error);
-    const sessionLine = block[2]!;
+    const sessionLine = block[3]!;
     const n = Number(sessionLine.match(/^Session (\d+) /)![1]);
     const expected = renderBriefing(
       input(parsed.data, {
         version: "1.0.0",
         sessionNumber: n,
+        serving: block[1]!,
         date: new Date().toISOString().slice(0, 10),
         usage: describeUsage(root),
         latestBrief: null,
@@ -409,6 +412,56 @@ describe("ob_start carries the same block, and every /start copy prints it verba
     expect(block).toContain("- w1");
     expect(block).toContain("(1 resolved, not shown)");
     expect(block.join("\n")).not.toContain("q2");
+  });
+
+  /** A serving tree whose build is stamped `behind` commits before origin/master; returns its build directory. */
+  function servingBuildDir(behind: number): string {
+    const base = tmp("t233b-serving-");
+    const origin = join(base, "origin.git");
+    const seed = join(base, "seed");
+    const tree = join(base, "tree");
+    mkdirSync(origin);
+    mkdirSync(seed);
+    const g = (cwd: string, ...a: string[]): string => execFileSync("git", a, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+    g(origin, "init", "-q", "--bare", "-b", "master");
+    g(seed, "init", "-q", "-b", "master");
+    g(seed, "config", "user.email", "t@example.invalid");
+    g(seed, "config", "user.name", "t");
+    g(seed, "remote", "add", "origin", origin);
+    const shas: string[] = [];
+    for (let i = 0; i < behind + 1; i++) {
+      writeFileSync(join(seed, "f.txt"), `v${i}\n`);
+      g(seed, "add", "-A");
+      g(seed, "commit", "-q", "-m", `c${i}`);
+      shas.push(g(seed, "rev-parse", "HEAD"));
+    }
+    g(seed, "push", "-q", "origin", "master");
+    execFileSync("git", ["clone", "-q", origin, tree], { stdio: "ignore" });
+    const buildDir = join(tree, "open-brain", "build");
+    mkdirSync(buildDir, { recursive: true });
+    writeFileSync(join(buildDir, "build-info.json"), JSON.stringify({ commit: shas[0], builtAt: "2026-10-01T10:00:00.000Z", reason: null }));
+    return buildDir;
+  }
+
+  const blockOf = (text: string): string[] => {
+    const lines = text.split("\n");
+    return lines.slice(lines.indexOf(BRIEFING_START), lines.indexOf(BRIEFING_END) + 1);
+  };
+
+  it("T-233 A+B: the Briefing block's FIRST line is the serving-build line, and it is the greeting's first line too (not checked)", async () => {
+    const text = (await handleStart({ project_root: project() })).content[0]!.text;
+    const block = blockOf(text);
+    expect(block[1]!.startsWith("Serving build: not checked (")).toBe(true);
+    expect(block[1]).toBe(text.split("\n")[0]);
+  });
+
+  it("T-233 A+B: a STALE serving build is inside the block, above Usage, and the same line opens the greeting", async () => {
+    const text = (await handleStart({ project_root: project(), serving_build_dir: servingBuildDir(2) })).content[0]!.text;
+    const block = blockOf(text);
+    expect(block[1]!.startsWith("SERVING BUILD IS STALE:")).toBe(true);
+    expect(block[1]).toContain("is 2 commits behind origin/master");
+    expect(block[2]!.startsWith("Usage: ")).toBe(true);
+    expect(block[1]).toBe(text.split("\n")[0]);
   });
 
   it("every start.md copy says to print the block verbatim and no longer carries the assembly template", () => {
