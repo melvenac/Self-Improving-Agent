@@ -40,9 +40,10 @@ These two reports came after the morning list was first written. Both are outsid
 |---|---|---|---|---|
 | #306 | T-048: sync checks state their counts | `3f30e825` | ACCEPT (QA 260, `0f53d867`) | Merge **before** #309 |
 | #309 | T-048: hook-configs, nested and typed hooks | `f1c2a338` | ACCEPT (QA 260) | Merge **after** #306. #295 and #309 conflict on the `node:path` import line; the second to merge rebases |
-| #302 | T-048: dropped counts printed at zero (round 2) | `7e92b6f6` | ACCEPT (QA 261, `f395ee84`) | **Rebase first.** The one import-line conflict with master in `server.ts` is resolved by keeping both imports. sia-forge rebases it, and the planner reviews the range-diff before listing the new head. QA's follow-up row, mutant Q1 (`ob_start` prints the zero lines), becomes a separate task (T-230) |
+| #302 | T-048: dropped counts printed at zero (round 2) | QA'd at `7e92b6f6`; **now `9fe22be5`** | ACCEPT (QA 261, `f395ee84`) | CLEAN, and CI passed (run 37039170029). **The planner reviewed the range-diff:** commits 1, 2 and 4 are `=`. Commit 3 differs only in hunk context: its `formatScanCounts` import now sits after master's `describeLatestBrief` import, and the patch is unchanged. **Merge it pinned to `9fe22be5`.** QA's mutant Q1 follow-up is T-230 |
 
 ## Still not accepted
 
 - **#295 (T-008) and #298 (T-008b):** QA 260 REJECTED both. #295 lets a non-object `mcpServers` entry pass silently.
-  #298 does not name the skip for an absent `settings.json`. Round 3 is with sia-forge, then QA 262.
+  #298 does not name the skip for an absent `settings.json`. **Round 3 is pushed:** #295 is at `931998db` and #298 is
+  at `3b485b7c`; both are CLEAN and CI is green. QA 262 is the narrow re-check.
