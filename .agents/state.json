@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 267,
+  "revision": 268,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1192,6 +1192,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Per D-092. F2 must be fixed before the slice-four step-4 re-run, since close-out tables are generated, never typed. F4 (absolute C:\\qa-scratch paths in G_plan brief/dt/spec_excerpt) is the low-priority clause. Also the doubled full stop in 'No scored records..'. Red first.",
+      "note_by": [
+        "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-221",
+      "title": "ci.yml concurrency: a push run cancelled by its branch's PR run leaves a CANCELLED `test` on the head SHA, which ruleset 24343321 reads as failing (BLOCKED)",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 156,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found on #262 (session 156). The PR run 36961198095 was green, but push run 36961195272 on the same head 7a046880 had test=cancelled through the shared group ci-{head_ref||ref_name} (T-178), so #262 was BLOCKED. Re-running the push run gave test=skipped (docs-only diff) and #262 became CLEAN. That is also the LIVE proof D-091 needed: the ruleset accepts a job-skipped `test` alongside a passing one. It hits every PR from loop/** or qa/** (those branches trigger push AND pull_request); docs/* branches trigger only pull_request. Workaround until fixed: re-run the cancelled run. Fix options for the planner to rule: (a) separate concurrency groups per event, so neither cancels the other (costs a duplicate suite on tcm); (b) on push, skip `test` when the branch has an open PR; (c) drop the push trigger for loop/** and qa/** and rely on pull_request. Needs a live run on each path (feedback: live run on the path).",
       "note_by": [
         "83f0e630-9247-40d4-adcd-7f4292a16ddb"
       ],

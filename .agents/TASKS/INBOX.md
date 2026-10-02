@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 267 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 268 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -31,6 +31,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-201** A developer or QA seat's /start names its assignment, read from the record, or says 'no assignment' explicitly; it never stops at the backlog
 - [ ] **T-208** A session start FETCHES before it judges currency: the SessionStart hook runs `git fetch --prune origin` (bounded timeout) before tree-currency and ob_start, says so visibly when it fails, and never calls a tree 'level' against a fetch it did not just make
 - [ ] **T-219** ci.yml: docs-only PRs report 'test' as Skipped instead of no check (D-091)
+- [ ] **T-221** ci.yml concurrency: a push run cancelled by its branch's PR run leaves a CANCELLED `test` on the head SHA, which ruleset 24343321 reads as failing (BLOCKED)
 
 ## P1
 
