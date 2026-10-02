@@ -1,0 +1,344 @@
+{
+  "gate": "plan",
+  "loop": "15-slice-4",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T04:34:15.660Z",
+  "answered_at": "2026-10-02T04:34:16.131Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "spec_excerpt": "# Loop 15 slice four: Jev scoring on real diffs, with no calibration claimed\n\n**By:** Atlas (planner), record session 153, 2026-10-01. **Supersedes** `loop-15-slice-4-brief-draft.md`. All four of\nits questions are ruled (D-070, D-071). **Status: FINAL for Aaron's go. Not dispatched until he says so.**\n**Plan:** `loop-15-slice-4-brief.D_t.json`, beside this file. It validates with `harness validate plan` (T-195). The\nlive plan gate runs on it as item 4.2.\n\n## 0. Why, and what this slice is not\n\n- D-033 moved \"QA scoring through Jev, with thresholds calibrated against real diffs\" here.\n- **Calibration is not possible yet**, read at master `717a5509`:\n  - 0 tracked `G_plan`, `G_done` or `G_qa` records;\n  - 1 live Jev pair ever (slice two);\n  - a shadow ledger with 1 row, which is `undefined`;\n  - no QA-score gate and no `policies/qa-score.json`.\n- So this slice **collects the first real observations and states them honestly** under A6/R6:\n  - report N, the diffs by SHA, and the spread;\n  - **PROVISIONAL below N=5**;\n  - the word \"calibrated\" is forbidden below N=5.\n- **No gate added here changes an outcome.** Everything runs in shadow.\n- **Precondition, met:** the slice-three close-out and T-169 landed first (D-070): close-out #236, PRD and README\n  #238, the Step-Back Part 6.\n- **Precondition, NOT met: T-216.**\n  - `harness validate plan` refuses this brief's `D_t`, because the plan schema accepts only runtime loop ids\n    (`/^t\\d{3,}$/`, `schema.ts:84` and `:248`).\n  - The evidence schema already accepts seat loop ids like `15-slice-3-c` (`EVIDENCE_LOOP_PATTERN`, `:180`, widened\n    in candidate B).\n  - So T-195's rule (every brief ships a `D_t` that `harness dispatch` validates) cannot be met by any planner brief\n    today.\n  - The `D_t` keeps its true loop id, `15-slice-4`, and this slice is dispatched after T-216 merges. That is a small\n    code fix through QA.\n\n## 1. Rulings this brief carries (Aaron, session 153)\n\n- **D-070:**\n  - the TypeSafe key lives only in Aaron's local dev environment, as a user env var on his machines;\n  - it is never committed, never a CI secret, and never in another person's environment;\n  - each SIA-adopting project brings its own key (README, #238).\n- **D-071:**\n  - Seat-built diffs are scored as **PROVISIONAL** only. Every `G_done` and `G_qa` record carries `source`\n    (`seat` | `runtime`) and `plan_provenance` (`reconstructed-after` | `written-before`).\n  - \"Calibrated\", or any threshold change justified as calibration, needs **N ≥ 5 runtime-produced diffs whose\n    `D_t` was written before the work**.\n  - **Both key properties are required, each with its own test:**\n    - (a) the key reaches the Jev endpoint, proved by an authenticated response carrying the resolved model,\n      version `jev-1.13.0` or later;\n    - (b) the key reaches nothing else: no artifact, log, gate record or transcript contains it, proved by\n      constructing the environment and asserting on the outputs, never by reading the inherited `process.env`\n      (G-044).\n\n## 2. Items, in order\n\n**4.1. T-214: the declared-block parser (first; no Jev).**\n- Choose either rule: (a) tolerate blank lines between sections, or (b) refuse an unparseable `qa-declared` block at\n  authoring, from `/sync` or the criteria step, before any candidate exists.\n- Add a fixture with a blank line, and a mutant.\n- Do not touch `loop-15-slice-3-c-criteria.md`; its shadow artifact is immutable.\n\n**4.2. The live-call preconditions, observed once (1 call).**\n- The main checkout is rebuilt at master. `TYPESAFE_API_KEY` is present in Aaron's environment only.\n- Run ONE live plan-gate call on `loop-15-slice-4-brief.D_t.json` through `harness plan-gate`. This is T-195's\n  named first observation.\n- Record the `G_plan` with the resolved model, and prove D-071's properties (a) and (b) for it.\n\n**4.3. Retrospective done-gate scoring, in shadow (8 calls).**\n- Run the developer done-gate live, through `gate.ts` and never jev-mcp, on the 8 merged Loop 15 seat-b",
+      "plan_summary": "Collect the first real Jev observations on Loop 15's merged diffs, in shadow, under A6/R6: report N, SHAs and spread, label PROVISIONAL, and claim no calibration (D-033, D-070, D-071).",
+      "prior_failures": [
+        "T-214: declared.ts rejects a blank line inside a qa-declared block, which made shadow episode 1 undefined",
+        "G-001",
+        "G-002",
+        "G-003",
+        "G-004",
+        "G-005",
+        "G-007",
+        "G-008",
+        "G-009",
+        "G-010",
+        "G-011",
+        "G-013",
+        "G-014",
+        "G-015",
+        "G-016",
+        "G-017",
+        "G-019",
+        "G-020",
+        "G-021",
+        "G-022",
+        "G-023",
+        "G-024",
+        "G-026",
+        "G-027",
+        "G-028",
+        "G-029",
+        "G-030",
+        "G-031",
+        "G-033",
+        "G-034",
+        "G-035",
+        "G-036",
+        "G-037",
+        "G-038",
+        "G-039",
+        "G-040",
+        "G-042",
+        "G-043",
+        "G-044",
+        "G-045",
+        "G-049"
+      ],
+      "validated_behaviours": [
+        "the shadow merge gate's ledger is append-only and its first artifact (15-slice-3-c) is immutable; loop-15-slice-3-c-criteria.md is not edited",
+        "the TypeSafe key is read only from the environment and never appears in any artifact, log, gate record or transcript (G-044, D-070)",
+        "existing plan-gate.json and developer-done.json thresholds are unchanged",
+        "D-019: Aaron merges to master; no gate merges, pushes or tags",
+        "V-001",
+        "V-002",
+        "V-003",
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007",
+        "V-008",
+        "V-009",
+        "V-010",
+        "V-011",
+        "V-012",
+        "V-013",
+        "V-014",
+        "V-015",
+        "V-016",
+        "V-017",
+        "V-018",
+        "V-019",
+        "V-020",
+        "V-021",
+        "V-022",
+        "V-023",
+        "V-024",
+        "V-025",
+        "V-026",
+        "V-027",
+        "V-028",
+        "V-029",
+        "V-030",
+        "V-031",
+        "V-032",
+        "V-033",
+        "V-034",
+        "V-035",
+        "V-036",
+        "V-037",
+        "V-038",
+        "V-039",
+        "V-040",
+        "V-041",
+        "V-042",
+        "V-043",
+        "V-044",
+        "V-045",
+        "V-046",
+        "V-047",
+        "V-048",
+        "V-049",
+        "V-050",
+        "V-051",
+        "V-052",
+        "V-053",
+        "V-054",
+        "V-055",
+        "V-056",
+        "V-057",
+        "V-058",
+        "V-059",
+        "V-060",
+        "V-061",
+        "V-062",
+        "V-063",
+        "V-064",
+        "V-065",
+        "V-066",
+        "V-067",
+        "V-068",
+        "V-069",
+        "V-070",
+        "V-071",
+        "V-072",
+        "V-073",
+        "V-074",
+        "V-075",
+        "V-076",
+        "V-077",
+        "V-078"
+      ],
+      "changed_area_hints": [
+        "4.1 T-214: the declared-block parser either tolerates a blank line between sections or refuses an unparseable qa-declared block at authoring; fixture row with a blank line; mutant",
+        "4.2 one live plan-gate call on this D_t through harness plan-gate; record G_plan with the resolved model; prove D-071 key properties (a) and (b)",
+        "4.3 live developer done-gate in shadow on the 8 merged Loop 15 seat-built diffs (#182, #165, #187, #195, #209, #227, #220, #218); D_t reconstructed after the work by a non-builder; report the spread as PROVISIONAL",
+        "4.4 the QA-score gate per HOH-JEV section 4 as data (policies/qa-score.json plus schema), shadow only, writing G_qa beside E_t; score the same 8 diffs",
+        "4.5 the F11 answer committed at an ancestor of any candidate that claims green, before the first green CI run",
+        "out-of-scope: turning any gate on or letting a gate decision change a runtime outcome, a QA verdict or a merge",
+        "out-of-scope: changing any threshold file, or using the word calibrated (needs N >= 5 runtime-produced diffs with pre-work plans, D-071)",
+        "out-of-scope: jev-mcp; all calls go through gate.ts",
+        "out-of-scope: T-194, T-213 and T-215, which run alongside and are not part of this slice"
+      ],
+      "plan": {
+        "loop": "15-slice-4",
+        "objective": "Collect the first real Jev observations on Loop 15's merged diffs, in shadow, under A6/R6: report N, SHAs and spread, label PROVISIONAL, and claim no calibration (D-033, D-070, D-071).",
+        "tasks": [
+          "4.1 T-214: the declared-block parser either tolerates a blank line between sections or refuses an unparseable qa-declared block at authoring; fixture row with a blank line; mutant",
+          "4.2 one live plan-gate call on this D_t through harness plan-gate; record G_plan with the resolved model; prove D-071 key properties (a) and (b)",
+          "4.3 live developer done-gate in shadow on the 8 merged Loop 15 seat-built diffs (#182, #165, #187, #195, #209, #227, #220, #218); D_t reconstructed after the work by a non-builder; report the spread as PROVISIONAL",
+          "4.4 the QA-score gate per HOH-JEV section 4 as data (policies/qa-score.json plus schema), shadow only, writing G_qa beside E_t; score the same 8 diffs",
+          "4.5 the F11 answer committed at an ancestor of any candidate that claims green, before the first green CI run"
+        ],
+        "out_of_scope": [
+          "turning any gate on or letting a gate decision change a runtime outcome, a QA verdict or a merge",
+          "changing any threshold file, or using the word calibrated (needs N >= 5 runtime-produced diffs with pre-work plans, D-071)",
+          "jev-mcp; all calls go through gate.ts",
+          "T-194, T-213 and T-215, which run alongside and are not part of this slice"
+        ],
+        "preserve": [
+          "the shadow merge gate's ledger is append-only and its first artifact (15-slice-3-c) is immutable; loop-15-slice-3-c-criteria.md is not edited",
+          "the TypeSafe key is read only from the environment and never appears in any artifact, log, gate record or transcript (G-044, D-070)",
+          "existing plan-gate.json and developer-done.json thresholds are unchanged",
+          "D-019: Aaron merges to master; no gate merges, pushes or tags"
+        ],
+        "acceptance": [
+          {
+            "id": "S4-1",
+            "observable": "A criteria file whose qa-declared block contains a blank line either parses or is refused at authoring with a named cause, before any candidate; a fixture row proves it and its mutant is red",
+            "type": "whitebox"
+          },
+          {
+            "id": "S4-2",
+            "observable": "Exactly one live plan-gate call on loop-15-slice-4-brief.D_t.json writes a G_plan record naming the resolved model at jev-1.13.0 or later",
+            "type": "blackbox"
+          },
+          {
+            "id": "S4-3",
+            "observable": "Key property (a): the authenticated Jev response is recorded; key property (b): a constructed-environment test shows the key value in no artifact, log or gate record; each has its own test",
+            "type": "whitebox"
+          },
+          {
+            "id": "S4-4",
+            "observable": "Eight G_done records exist, one per listed merged diff at its QA'd SHA, each carrying source and plan_provenance; a record without them is refused",
+            "type": "blackbox"
+          },
+          {
+            "id": "S4-5",
+            "observable": "The slice report gives N, the SHAs and the per-score spread, is labelled PROVISIONAL, and the word calibrated appears nowhere in it",
+            "type": "blackbox"
+          },
+          {
+            "id": "S4-6",
+            "observable": "policies/qa-score.json and its schema exist; the QA-score gate writes G_qa beside E_t in shadow; a mutant that lets a gate decision change an outcome goes red",
+            "type": "whitebox"
+          },
+          {
+            "id": "S4-7",
+            "observable": "Live Jev calls counted from gate records are at most 20, and no score was re-run to obtain a different answer",
+            "type": "blackbox"
+          },
+          {
+            "id": "S4-8",
+            "observable": "The F11 answer is committed at an ancestor of any candidate claiming green, and the first green CI run id postdates that commit",
+            "type": "blackbox"
+          }
+        ],
+        "repair_targets": [
+          "T-214: declared.ts rejects a blank line inside a qa-declared block, which made shadow episode 1 undefined"
+        ],
+        "new_capability": "Shadow QA scoring through Jev, recorded beside each QA's E_t with source and plan provenance, plus the first real N of done-gate observations on merged diffs, reported as PROVISIONAL."
+      }
+    },
+    "questions": {
+      "plan_mode": {
+        "type": "choice",
+        "instructions": "What kind of increment is this plan? Judge the plan as written, not what it could become.",
+        "criteria": {
+          "repair_only": "Fixes known defects and adds no new capability.",
+          "capability_increment": "Adds one new capability and repairs nothing.",
+          "mixed": "Both repairs a known defect and adds one new capability.",
+          "stop_ship": "Argues that work should stop rather than continue — the system is in a state where the next increment is not the right move."
+        }
+      },
+      "scope_size": {
+        "type": "score",
+        "instructions": "How large is the increment this plan describes, relative to one testable change? The order of the levels is the scale.",
+        "criteria": [
+          "Too small to observe: nothing about it would be visible in a test or an artifact.",
+          "One testable increment: a single bounded change whose effect can be observed directly.",
+          "Unbounded rewrite: several independent changes, or a change whose extent the plan does not fix."
+        ]
+      },
+      "preserves_validated": {
+        "type": "noul",
+        "instructions": "Does this plan's `preserve` list name the behaviours that are already validated and that this change could break?"
+      },
+      "addresses_top_failures": {
+        "type": "noul",
+        "instructions": "Does this plan's `repair_targets` address the failures most recently observed, rather than easier unrelated ones?"
+      },
+      "has_observable_acceptance": {
+        "type": "noul",
+        "instructions": "Does every acceptance criterion name a concrete observable — a command, an output, a file's content, an exit code — rather than a list of files to change or a restatement of the task?"
+      }
+    }
+  },
+  "answer": {
+    "plan_mode": {
+      "type": "choice",
+      "choice": "mixed",
+      "confidence": 0.97,
+      "probabilities": {
+        "capability_increment": 0.01,
+        "mixed": 0.97,
+        "stop_ship": 0.02,
+        "repair_only": 0
+      }
+    },
+    "scope_size": {
+      "type": "score",
+      "score": 1.98,
+      "confidence": 0.96,
+      "legend": {
+        "0": "Too small to observe: nothing about it would be visible in a test or an artifact.",
+        "1": "One testable increment: a single bounded change whose effect can be observed directly.",
+        "2": "Unbounded rewrite: several independent changes, or a change whose extent the plan does not fix."
+      },
+      "probabilities": {
+        "0": 0,
+        "1": 0.02,
+        "2": 0.98
+      }
+    },
+    "preserves_validated": {
+      "type": "noul",
+      "noul": 0.78
+    },
+    "addresses_top_failures": {
+      "type": "noul",
+      "noul": 0.67
+    },
+    "has_observable_acceptance": {
+      "type": "noul",
+      "noul": 0.77
+    }
+  },
+  "usage": {
+    "input_tokens": 4620,
+    "output_tokens": 129
+  },
+  "decision": {
+    "gate": "plan",
+    "verdict": "reject",
+    "reasons": [
+      "scope_size 1.98 at confidence 0.96 is at or above the rejecting score 1.5 at or above confidence 0.7"
+    ],
+    "applied": {
+      "has_observable_acceptance_min": 0.7,
+      "scope_size_reject_at_or_above": 1.5,
+      "scope_size_reject_confidence_min": 0.7,
+      "preserves_validated_min": 0.6,
+      "addresses_top_failures_min": 0.5,
+      "addresses_top_failures_requires_prior_failures": true,
+      "treat_system_as_feature_complete": false,
+      "stop_ship_requires_deterministic_failure": true,
+      "stop_ship_requires_qa_history": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "rejected by policy (reject)",
+  "note": "answered by jev-1.13.0 at 2026-10-02T04:34:16.126Z. LIMIT: typed output guarantees the interface, not truth.",
+  "brief": "docs/loops/loop-15-slice-4-brief.md",
+  "dt": "docs/loops/loop-15-slice-4-brief.D_t.json",
+  "policy_hash": "57cc12ff8465339206322901a22e754de6cef43b2fba013101cc3a629a176279",
+  "sources": {
+    "spec_excerpt": "brief markdown (docs/loops/loop-15-slice-4-brief.md, first 4000 chars)",
+    "plan_summary": "D_t.objective",
+    "prior_failures": "D_t.repair_targets + state.json gaps[]",
+    "validated_behaviours": "D_t.preserve + state.json verified[]",
+    "changed_area_hints": "D_t.tasks + D_t.out_of_scope"
+  },
+  "attempt_id": "55a3c3e1-b957-4746-898a-fd468960ba7b",
+  "subject": {
+    "gate": "plan",
+    "key": "docs/loops/loop-15-slice-4-brief.D_t.json",
+    "blob": "21bc448783f319542a915cf3f40a5a2b74945101"
+  },
+  "attempt": 2,
+  "retry_of": "docs/loops/loop-15-slice-4-brief.G_plan.2026-10-02T00-47-29.272Z.json",
+  "attempted_at": "2026-10-02T04:34:15.660Z",
+  "outcome_class": "answered",
+  "feedback": "scope_size 1.98 at confidence 0.96 is at or above the rejecting score 1.5 at or above confidence 0.7"
+}

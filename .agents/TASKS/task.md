@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 269 by open-brain v0.44.2 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 270 by open-brain v0.44.2 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed): step 2 MERGED (#254); step 4 RUN AND RULED (D-092): QA 245 got HTTP 401 auth on the first live call, 0 answers, so step 4 is INCOMPLETE. NEXT: (1) Aaron checks TYPESAFE_API_KEY on the laptop (rejected by Jev); (2) T-220 (closeout-tables 'no E_t' label) merged; (3) re-run step 4 under docs/loops/qa-245-rulings.md (stop-all on auth, transcript path printed by the key scan, 19 attempts left); then the ONE release for slices three and four (D-073). CI: T-219 (D-091) dispatched to sia-builder so docs-only PRs can merge under ruleset 24343321; #259 is blocked until then (admin merge is Aaron's call). T-194: r7 courtesy-layer ruling pending, r8 HELD, then the sparse planner checkout. _(since session 156)_
+Loop 15 slice FOUR is CLOSED (PROVISIONAL): step 4 re-run QA 248 ACCEPTED (D-093), 13/13 live Jev calls answered, records merged with the ruling. NEXT: (1) the ONE release for slices three and four (D-073), which is Aaron's under D-019: consolidate the three Unreleased CHANGELOG sections first and propose the version; (2) T-164 port + T-211 standing cron, dispatched to sia-builder at bea385b2 (Aaron's priority); (3) T-221 ruling (cancelled push 'test' blocks loop/qa PRs); (4) T-194 r7 courtesy-layer ruling, then the sparse planner checkout; (5) T-222 (count-attempts and F6-F8). _(since session 156)_
 
 ## Top tasks
 

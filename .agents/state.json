@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "revision": 269,
+  "revision": 270,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Loop 15 slice FOUR (Jev scoring on real diffs, in shadow, no calibration claimed): step 2 MERGED (#254); step 4 RUN AND RULED (D-092): QA 245 got HTTP 401 auth on the first live call, 0 answers, so step 4 is INCOMPLETE. NEXT: (1) Aaron checks TYPESAFE_API_KEY on the laptop (rejected by Jev); (2) T-220 (closeout-tables 'no E_t' label) merged; (3) re-run step 4 under docs/loops/qa-245-rulings.md (stop-all on auth, transcript path printed by the key scan, 19 attempts left); then the ONE release for slices three and four (D-073). CI: T-219 (D-091) dispatched to sia-builder so docs-only PRs can merge under ruleset 24343321; #259 is blocked until then (admin merge is Aaron's call). T-194: r7 courtesy-layer ruling pending, r8 HELD, then the sparse planner checkout.",
+    "text": "Loop 15 slice FOUR is CLOSED (PROVISIONAL): step 4 re-run QA 248 ACCEPTED (D-093), 13/13 live Jev calls answered, records merged with the ruling. NEXT: (1) the ONE release for slices three and four (D-073), which is Aaron's under D-019: consolidate the three Unreleased CHANGELOG sections first and propose the version; (2) T-164 port + T-211 standing cron, dispatched to sia-builder at bea385b2 (Aaron's priority); (3) T-221 ruling (cancelled push 'test' blocks loop/qa PRs); (4) T-194 r7 courtesy-layer ruling, then the sparse planner checkout; (5) T-222 (count-attempts and F6-F8).",
     "since_session": 156
   },
   "tasks": [
@@ -1206,6 +1206,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Found on #262 (session 156). The PR run 36961198095 was green, but push run 36961195272 on the same head 7a046880 had test=cancelled through the shared group ci-{head_ref||ref_name} (T-178), so #262 was BLOCKED. Re-running the push run gave test=skipped (docs-only diff) and #262 became CLEAN. That is also the LIVE proof D-091 needed: the ruleset accepts a job-skipped `test` alongside a passing one. It hits every PR from loop/** or qa/** (those branches trigger push AND pull_request); docs/* branches trigger only pull_request. Workaround until fixed: re-run the cancelled run. Fix options for the planner to rule: (a) separate concurrency groups per event, so neither cancels the other (costs a duplicate suite on tcm); (b) on push, skip `test` when the branch has an open PR; (c) drop the push trigger for loop/** and qa/** and rely on pull_request. Needs a live run on each path (feedback: live run on the path).",
+      "note_by": [
+        "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-222",
+      "title": "count-attempts exits 1 on an attempt chained to an unanswered auth record (QA 248 F5); plus done-gate reason text for checks 'none', repo-relative checks_source, 4.4 'E_t commit' column (F6-F8)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 156,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Per D-093. F5: a fresh attempt after a non-retryable outcome (auth) with no answer must not count as a retry, so either the runner stops setting retry_of in that case or the counter applies D-092 ruling 3; count-attempts must exit 0 on the slice-four records as they stand, with no record edited. F6: decision.reasons says 'the deterministic checks failed (read from process exit codes)' when checks_source is 'none'. F7: G_done checks_source holds a scratch path; write repo-relative or the blob only. F8: the closeout-tables 4.4 'scored SHA' column holds the qa/* E_t commit, so relabel it 'E_t commit'. Red first.",
       "note_by": [
         "83f0e630-9247-40d4-adcd-7f4292a16ddb"
       ],
@@ -3707,6 +3721,12 @@
       "title": "QA 245 (slice-four step 4) report ACCEPTED as accurate; step 4 INCOMPLETE: 4.2's one live call got HTTP 401 auth, 0 answers. Slice four NOT closed; no release (D-073 holds). Seat's stop-all-on-auth RATIFIED and made the rule; the next 4.2 attempt is not a re-roll (no answer exists) and counts toward the cap (1 used, 19 left)",
       "date": "2026-10-02",
       "note": "Planner session 156. Rulings: docs/loops/qa-245-rulings.md. Open 1, the key, goes to Aaron: TYPESAFE_API_KEY on the laptop is set but rejected by Jev; check revoked/rotated/wrong account, then a fresh shell before launch. F1: re-dispatch drops validate gate-record for G_plan. F2: closeout-tables labels diffs 'no E_t' when one exists -> T-220, must merge before the re-run. F3: forbidden word inside G_plan request is a quoted copy of brief/D_t, covered by S4-5b's path exclusion. F4: absolute paths folded into T-220 (low). Open 4: launcher sets TEMP/TMP. K1 (planner finding): key-scan's transcript category is UNPROVEN: the prose names attempts.jsonl as 'the transcript', the script searches the C--Users-Aaron-Worktrees-sia-qa slug while the worktree was C:/qa-scratch/qa245-wt; the re-run must print the scanned transcript's absolute path. The records PR is docs-only, so it travels with this state write until T-219 lands."
+    },
+    {
+      "id": "D-093",
+      "title": "QA 248 (slice-four step-4 re-run) ACCEPTED: 13/13 live calls answered by jev-1.13.0 (4.2 reject; 4.3 8/8 reject; 4.4 proceed #209 #218, reject #195 #220 #227), 15 attempts <= 17, key scan PASS with the transcript named. Slice four's live half CLOSED, PROVISIONAL (N=8/N=5 seat-built, 0 runtime), no calibration claimed. F5 accepted under D-092 ruling 3; S4-2.1 met (one ANSWERED live G_plan); S4-8.4 met by the planner: first green master run with F11 = 36358116586 (head 2b121d99, 2026-09-27T23:16:08Z)",
+      "date": "2026-10-02",
+      "note": "Planner session 156. Rulings: docs/loops/qa-248-rulings.md. Checked by the planner, not taken from the report: the report commit 49378d6e has parent 460c9a49 (the T-220 merge); QA 245's two ledger lines are byte-identical to master and its record and report are untouched; the push went through docs/loops/qa-248/push-qa.mjs unmodified (laptop qa248-tools/push.mjs, read over ssh, only spawns it). Spend about $0.0019 (46,062 input tokens, per clark). F6/F7/F8 go to T-222. The 8/8 done-gate rejects are a finding about thresholds or inputs, recorded and not acted on. NEXT: the D-073 release, which is Aaron's under D-019: the CHANGELOG holds three Unreleased sections ([0.45.0] bootstrap, T-003, [0.44.3] importer) and the planner proposes a consolidation before any bump."
     }
   ],
   "handoffs": [

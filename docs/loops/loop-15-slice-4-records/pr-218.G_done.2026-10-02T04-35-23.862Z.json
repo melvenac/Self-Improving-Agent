@@ -1,0 +1,217 @@
+{
+  "gate": "developer-done",
+  "loop": "15-t158",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-02T04:35:23.862Z",
+  "answered_at": "2026-10-02T04:35:24.270Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "state": {
+      "plan": {
+        "loop": "15-t158",
+        "objective": "Make close_gap never let a gap id be reused: keep a closed gap as a tombstone, and make add_gap skip every id in the record and every gap id cited anywhere in the tracked tree, so a reused id cannot point at the wrong thing and announce nothing.",
+        "tasks": [
+          "make close_gap keep the entry as a tombstone with its status, closed_session and closing rev, instead of splicing it out, and make the rendered views not list a closed gap as open",
+          "make add_gap's next id skip every id that exists in the record, tombstones included, and every gap id cited anywhere in the tracked tree, and name the ids it skipped and why",
+          "prove the citation scan both ways (G-040): a known-cited fixture id is skipped and an uncited one is not",
+          "say whether the schema version changes if gaps[] gains a field, and how an existing rev-156 record reads",
+          "run the full suite locally before posting and quote the Test Files and Tests lines with the exit code"
+        ],
+        "out_of_scope": [
+          "T-164, the record session number, dispatched in the same file",
+          "any CI run: local tests only",
+          "pushing while a QA queue runs"
+        ],
+        "preserve": [
+          "done-task retention (T-157), close_task and the rendered views",
+          "the live record's state-schema check"
+        ],
+        "acceptance": [
+          {
+            "id": "TG-1",
+            "observable": "close_gap keeps the entry as a tombstone with its status, closed_session and closing rev, and the rendered views do not list a closed gap as open",
+            "type": "blackbox"
+          },
+          {
+            "id": "TG-2",
+            "observable": "On today's repo a dry-run add_gap is assigned an id that is none of G-046, G-047 or G-048, and the output names the ids it skipped and why",
+            "type": "blackbox"
+          },
+          {
+            "id": "TG-3",
+            "observable": "A test shows the citation scan skips a known-cited fixture id and does not skip an uncited one",
+            "type": "blackbox"
+          },
+          {
+            "id": "TG-4",
+            "observable": "A mutant that restores the splice and another that drops the citation scan each go red on their row",
+            "type": "blackbox"
+          },
+          {
+            "id": "TG-5",
+            "observable": "Done-task retention, close_task, the rendered views and the state-schema check are unchanged in behaviour",
+            "type": "whitebox"
+          }
+        ],
+        "repair_targets": [
+          "close_gap splices the entry out of gaps[], so nextId hands the next add_gap a closed id: G-046, G-047 and G-048 are cited in tracked files outside state.json and a naive next id would reuse all three"
+        ],
+        "new_capability": "a closed gap id is never reused, and add_gap names the ids it skipped",
+        "reconstructed_by": "sia-builder",
+        "reconstructed_from": {
+          "path": "docs/loops/t158-t164-dispatch.md",
+          "blob": "5aeb9c00fec2494050d63cf54414e8570adafc9d"
+        }
+      },
+      "candidate": "e23e622813a540e18bed0849779040cf181ff9b7",
+      "diffstat": [
+        "docs/loops/t158-developer-handoff.md",
+        "open-brain/src/pipelines/session-start/state-render.ts",
+        "open-brain/src/pipelines/state-views/index.ts",
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/pipelines/session-start/state-render.test.ts",
+        "open-brain/tests/shared/state-writer.test.ts"
+      ],
+      "checks": {
+        "source": "E_t:C:/qa-scratch/qa248-et/pr-218.E_t.json@5facd074851e916d98922443d74d47c1fa0a248d",
+        "build": {
+          "exit_code": 0
+        },
+        "unit": {
+          "exit_code": 1
+        }
+      },
+      "prior_failures": [
+        "close_gap splices the entry out of gaps[], so nextId hands the next add_gap a closed id: G-046, G-047 and G-048 are cited in tracked files outside state.json and a naive next id would reuse all three"
+      ],
+      "scored_diff": {
+        "pr": 218,
+        "base_sha": "474b65245b026c8587aa81b60abf81c0c3e76f7f",
+        "scored_sha": "e23e622813a540e18bed0849779040cf181ff9b7",
+        "merge_commit": "d5dfa745492da495c174df9e839ff05cfad22e4c"
+      }
+    },
+    "questions": {
+      "diff_matches_plan": {
+        "type": "noul",
+        "instructions": "Does the diff implement what `plan` describes, rather than something adjacent to it?"
+      },
+      "touches_out_of_scope": {
+        "type": "noul",
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?"
+      },
+      "local_tests_support_claim": {
+        "type": "noul",
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result."
+      },
+      "stuck_repeating_prior_failure": {
+        "type": "noul",
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?"
+      },
+      "risk_of_regression": {
+        "type": "score",
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ]
+      }
+    }
+  },
+  "answer": {
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.34
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.45
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 1.43,
+      "confidence": 0.25,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.04,
+        "1": 0.5,
+        "2": 0.46
+      }
+    },
+    "diff_matches_plan": {
+      "type": "noul",
+      "noul": 0.29
+    }
+  },
+  "usage": {
+    "input_tokens": 1764,
+    "output_tokens": 101
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "diff_matches_plan 0.29 is below the required 0.7",
+      "touches_out_of_scope 0.34 is above the permitted 0.3",
+      "local_tests_support_claim 0.47 is below the required 0.6",
+      "the deterministic checks failed (read from process exit codes, not from the gate)"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "answered by jev-1.13.0 at 2026-10-02T04:35:24.264Z. LIMIT: typed output guarantees the interface, not truth.",
+  "source": "seat",
+  "plan_provenance": "reconstructed-after",
+  "attempt_id": "5c3e8e04-de77-48e2-89ad-22f354f149f1",
+  "subject": {
+    "gate": "developer-done",
+    "key": "e23e622813a540e18bed0849779040cf181ff9b7",
+    "blob": "87f6f3dd4a29d0f8f1419874c95f3f3e523dbb8a"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-02T04:35:23.862Z",
+  "policy_hash": "91ca0b03c069691e2a057099054551edd48995cddb0b43755f041b90e711c277",
+  "pr": 218,
+  "merge_commit": "d5dfa745492da495c174df9e839ff05cfad22e4c",
+  "scored_sha": "e23e622813a540e18bed0849779040cf181ff9b7",
+  "base_sha": "474b65245b026c8587aa81b60abf81c0c3e76f7f",
+  "dt": {
+    "path": "docs/loops/loop-15-slice-4-records/pr-218.D_t.json",
+    "blob": "87f6f3dd4a29d0f8f1419874c95f3f3e523dbb8a"
+  },
+  "checks_source": "E_t:C:/qa-scratch/qa248-et/pr-218.E_t.json@5facd074851e916d98922443d74d47c1fa0a248d",
+  "checks_passed": false,
+  "diffstat": [
+    "docs/loops/t158-developer-handoff.md",
+    "open-brain/src/pipelines/session-start/state-render.ts",
+    "open-brain/src/pipelines/state-views/index.ts",
+    "open-brain/src/shared/state-schema.ts",
+    "open-brain/src/shared/state-writer.ts",
+    "open-brain/tests/pipelines/session-start/state-render.test.ts",
+    "open-brain/tests/shared/state-writer.test.ts"
+  ]
+}
