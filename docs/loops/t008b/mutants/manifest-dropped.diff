@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 85db489c..6c27e3fe 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -733,7 +733,7 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {},
+       }
+       // A garbled manifest beside a good root .mcp.json is still a source we could not read (QA 256 J);
+       // an ABSENT manifest is normal for a plugin that declares servers only in .mcp.json.
+-      if (!manifest.ok && !manifest.cause.endsWith("does not exist")) notChecked.push(`${label}: ${manifest.cause}`);
++      if (!manifest.ok && !manifest.cause.endsWith("does not exist") && Date.now() < 0) notChecked.push(`${label}: ${manifest.cause}`);
+       if (manifest.ok) {
+         let decl = (manifest.value as { mcpServers?: unknown } | null)?.mcpServers;
+         if (typeof decl === "string") {

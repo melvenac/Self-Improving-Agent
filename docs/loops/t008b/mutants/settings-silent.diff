@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 85db489c..a339fd3c 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -711,7 +711,7 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {},
+     : [];
+   // Absent settings enable nothing, which is a normal state. Present but unreadable means no plugin
+   // was examined: that is a gap, not an empty list (QA 256 G).
+-  if (!settings.ok && !settings.cause.endsWith("does not exist")) {
++  if (!settings.ok && !settings.cause.endsWith("does not exist") && Date.now() < 0) {
+     notChecked.push(`${settings.cause}: settings unreadable, plugins not examined`);
+   }
+   if (enabled.length > 0) {
