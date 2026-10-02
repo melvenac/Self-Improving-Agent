@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 7337a22b..e6e61002 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -802,7 +802,7 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {},
+   if (notChecked.length > 0) {
+     return { name, severity: "warn", message: `${checked} MCP server command(s) resolve to a file, but${notCheckedNote} This is not a full pass.${skippedNote}${absentNote}` };
+   }
+-  return { name, severity: "pass", message: `${checked} MCP server command(s) resolve to a file.${skippedNote}${absentNote}` };
++  return { name, severity: "pass", message: `${checked} MCP server command(s) resolve to a file.${skippedNote}` };
+ }
+ 
+ /**
