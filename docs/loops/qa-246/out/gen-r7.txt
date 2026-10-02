@@ -1,0 +1,69 @@
+{
+ "p0a-ps": {
+  "cases": 882,
+  "ok": 882,
+  "allowed": 0
+ },
+ "p0a-bash-out": {
+  "cases": 420,
+  "ok": 420,
+  "allowed": 0
+ },
+ "p0a-bash-in": {
+  "cases": 152,
+  "ok": 152,
+  "allowed": 152
+ },
+ "p0a-bash-target": {
+  "cases": 76,
+  "ok": 76,
+  "allowed": 0
+ },
+ "p0c-word": {
+  "cases": 2184,
+  "ok": 2184,
+  "allowed": 0
+ },
+ "p0c-spelling": {
+  "cases": 10,
+  "ok": 10,
+  "allowed": 0
+ },
+ "p0c-allowed": {
+  "cases": 208,
+  "ok": 202,
+  "allowed": 202
+ },
+ "p0c-node-inline": {
+  "cases": 38,
+  "ok": 38,
+  "allowed": 0
+ },
+ "p0c-node-ok": {
+  "cases": 6,
+  "ok": 6,
+  "allowed": 6
+ },
+ "p0d": {
+  "cases": 26,
+  "ok": 26,
+  "allowed": 0
+ },
+ "p0d-ok": {
+  "cases": 4,
+  "ok": 4,
+  "allowed": 4
+ },
+ "dc": {
+  "cases": 17,
+  "ok": 17,
+  "allowed": 1
+ }
+}
+words not on the list: 182; characters: 42
+FAIL {"group":"p0c-allowed","command":"\"git README.md\"","want":"not-p0","decision":"deny","reason":"Planner hook: denied — not statically parseable: git alias or external subcommand (README.md). The Bash command is outside the grammar the hook can check, so it is refuse"}
+FAIL {"group":"p0c-allowed","command":"\"ls && git README.md\"","want":"not-p0","decision":"deny","reason":"Planner hook: denied — not statically parseable: git alias or external subcommand (README.md). The Bash command is outside the grammar the hook can check, so it is refuse"}
+FAIL {"group":"p0c-allowed","command":"\"sh -c 'git README.md'\"","want":"not-p0","decision":"deny","reason":"Planner hook: denied — not statically parseable: inside sh -c: git alias or external subcommand (README.md). The Bash command is outside the grammar the hook can check, s"}
+FAIL {"group":"p0c-allowed","command":"\"gh README.md\"","want":"not-p0","decision":"deny","reason":"Planner hook: denied — not statically parseable: gh alias or extension command (README.md). The Bash command is outside the grammar the hook can check, so it is refused r"}
+FAIL {"group":"p0c-allowed","command":"\"ls && gh README.md\"","want":"not-p0","decision":"deny","reason":"Planner hook: denied — not statically parseable: gh alias or extension command (README.md). The Bash command is outside the grammar the hook can check, so it is refused r"}
+FAIL {"group":"p0c-allowed","command":"\"sh -c 'gh README.md'\"","want":"not-p0","decision":"deny","reason":"Planner hook: denied — not statically parseable: inside sh -c: gh alias or extension command (README.md). The Bash command is outside the grammar the hook can check, so i"}

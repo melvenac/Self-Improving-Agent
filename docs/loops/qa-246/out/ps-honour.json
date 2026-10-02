@@ -1,0 +1,271 @@
+{
+ "rows": [
+  {
+   "role": "ws",
+   "cp": "U+00A0",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+1680",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2000",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2001",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2002",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2003",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2004",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2005",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2006",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2007",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2008",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2009",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+200A",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+202F",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+205F",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+3000",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2028",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+2029",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+0085",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+000B",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+000C",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "ws",
+   "cp": "U+200B",
+   "honoured": false,
+   "err": "Set-Content?C:\\qa-scratch\\qa246-honour\\ws-200B.txt : The term 'Set-Content?C:\\qa-scratch\\qa246-honour\\ws-200B.txt' is "
+  },
+  {
+   "role": "ws",
+   "cp": "U+FEFF",
+   "honoured": false,
+   "err": "Set-Content?C:\\qa-scratch\\qa246-honour\\ws-FEFF.txt : The term 'Set-Content?C:\\qa-scratch\\qa246-honour\\ws-FEFF.txt' is "
+  },
+  {
+   "role": "ws",
+   "cp": "U+00AD",
+   "honoured": false,
+   "err": "Set-ContentC:\\qa-scratch\\qa246-honour\\ws-00AD.txt : The term 'Set-ContentC:\\qa-scratch\\qa246-honour\\ws-00AD.txt' is "
+  },
+  {
+   "role": "dash",
+   "cp": "U+2013",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "dash",
+   "cp": "U+2014",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "dash",
+   "cp": "U+2015",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "dash",
+   "cp": "U+2212",
+   "honoured": false,
+   "err": "Set-Content : A positional parameter cannot be found that accepts argument '-Value'."
+  },
+  {
+   "role": "dash",
+   "cp": "U+FF0D",
+   "honoured": false,
+   "err": "Set-Content : A positional parameter cannot be found that accepts argument '-Value'."
+  },
+  {
+   "role": "sq",
+   "cp": "U+2018",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "sq",
+   "cp": "U+2019",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "sq",
+   "cp": "U+201A",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "sq",
+   "cp": "U+201B",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "dq",
+   "cp": "U+201C",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "dq",
+   "cp": "U+201D",
+   "honoured": true,
+   "err": ""
+  },
+  {
+   "role": "dq",
+   "cp": "U+201E",
+   "honoured": true,
+   "err": ""
+  }
+ ],
+ "stray": [],
+ "dc": [
+  {
+   "cmd": "New-Item -Name x.ts -ItemType File",
+   "cwd": "open-brain/src",
+   "target": "open-brain/src/x.ts",
+   "wrote": true
+  },
+  {
+   "cmd": "New-Item -Name open-brain/src/x.ts -ItemType File",
+   "cwd": "",
+   "target": "open-brain/src/x.ts",
+   "wrote": true
+  },
+  {
+   "cmd": "New-Item -Name x.ts -Value y",
+   "cwd": "open-brain/src",
+   "target": "open-brain/src/x.ts",
+   "wrote": true
+  },
+  {
+   "cmd": "New-Item -Na x.ts -I File",
+   "cwd": "open-brain/src",
+   "target": "open-brain/src/x.ts",
+   "wrote": true
+  },
+  {
+   "cmd": "New-Item -Name:x.ts -ItemType File",
+   "cwd": "open-brain/src",
+   "target": "open-brain/src/x.ts",
+   "wrote": true
+  },
+  {
+   "cmd": "ni -Name x.ts -ItemType File",
+   "cwd": "open-brain/src",
+   "target": "open-brain/src/x.ts",
+   "wrote": true
+  },
+  {
+   "cmd": "New-Item -Name ../src/x.ts -ItemType File",
+   "cwd": "open-brain/tests",
+   "target": "open-brain/src/x.ts",
+   "wrote": true
+  },
+  {
+   "cmd": "New-Item -Name ../../open-brain/src/x.ts -ItemType File",
+   "cwd": "docs/loops",
+   "target": "open-brain/src/x.ts",
+   "wrote": true
+  }
+ ]
+}

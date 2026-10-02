@@ -1,0 +1,26 @@
+{
+ "refusedTotal": 339,
+ "refusedOk": 331,
+ "refusedNotP0orWrongName": 8,
+ "acceptedTotal": 170,
+ "acceptedWronglyRefusedByP0": 3,
+ "acceptedDecisions": {
+  "allow": 159,
+  "deny": 11
+ }
+}
+
+-- refused cases that were NOT P0 / wrong construct:
+   {"command":"node -e 'x'","want":"inline code (node -e","reason":"rseable: inline code or an option before the script (node -e); node is allowed only as node <file.js|.mjs|.cjs"}
+   {"command":"node --eval 'x'","want":"inline code (node --eval","reason":"rseable: inline code or an option before the script (node --eval); node is allowed only as node <file.js|.mjs|"}
+   {"command":"python -c 'x'","want":"inline code (python -c","reason":"rseable: command not allowed: python. The Bash command is outside the grammar the hook can check, so it is ref"}
+   {"command":"perl -e 'x'","want":"inline code (perl -e","reason":"rseable: command not allowed: perl. The Bash command is outside the grammar the hook can check, so it is refus"}
+   {"command":"ruby -e 'x'","want":"inline code (ruby -e","reason":"rseable: command not allowed: ruby. The Bash command is outside the grammar the hook can check, so it is refus"}
+   {"command":"php -r 'x'","want":"inline code (php -r","reason":"rseable: command not allowed: php. The Bash command is outside the grammar the hook can check, so it is refuse"}
+   {"command":"find . -exec rm {} ;","want":"find -exec","reason":"rseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so "}
+   {"command":"awk -i inplace 'x' f","want":"awk -i","reason":"rseable: command not allowed: awk. The Bash command is outside the grammar the hook can check, so it is refuse"}
+
+-- accepted cases WRONGLY refused by P0:
+   {"command":"GIT_PAGER=cat git log","reason":"Planner hook: denied — not statically parseable: git/gh config through the environment (GIT_PAGER). The Bash command is outside the grammar "}
+   {"command":"sort README.md","reason":"Planner hook: denied — not statically parseable: command not allowed: sort. The Bash command is outside the grammar the hook can check, so i"}
+   {"command":"awk '{print}' README.md","reason":"Planner hook: denied — not statically parseable: command not allowed: awk. The Bash command is outside the grammar the hook can check, so it"}

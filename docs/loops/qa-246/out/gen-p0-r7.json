@@ -1,0 +1,4652 @@
+{
+ "summary": {
+  "refusedTotal": 339,
+  "refusedOk": 331,
+  "refusedNotP0orWrongName": 8,
+  "acceptedTotal": 170,
+  "acceptedWronglyRefusedByP0": 3,
+  "acceptedDecisions": {
+   "allow": 159,
+   "deny": 11
+  }
+ },
+ "refusedWrongName": [
+  {
+   "command": "node -e 'x'",
+   "want": "inline code (node -e",
+   "reason": "rseable: inline code or an option before the script (node -e); node is allowed only as node <file.js|.mjs|.cjs"
+  },
+  {
+   "command": "node --eval 'x'",
+   "want": "inline code (node --eval",
+   "reason": "rseable: inline code or an option before the script (node --eval); node is allowed only as node <file.js|.mjs|"
+  },
+  {
+   "command": "python -c 'x'",
+   "want": "inline code (python -c",
+   "reason": "rseable: command not allowed: python. The Bash command is outside the grammar the hook can check, so it is ref"
+  },
+  {
+   "command": "perl -e 'x'",
+   "want": "inline code (perl -e",
+   "reason": "rseable: command not allowed: perl. The Bash command is outside the grammar the hook can check, so it is refus"
+  },
+  {
+   "command": "ruby -e 'x'",
+   "want": "inline code (ruby -e",
+   "reason": "rseable: command not allowed: ruby. The Bash command is outside the grammar the hook can check, so it is refus"
+  },
+  {
+   "command": "php -r 'x'",
+   "want": "inline code (php -r",
+   "reason": "rseable: command not allowed: php. The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "command": "find . -exec rm {} ;",
+   "want": "find -exec",
+   "reason": "rseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so "
+  },
+  {
+   "command": "awk -i inplace 'x' f",
+   "want": "awk -i",
+   "reason": "rseable: command not allowed: awk. The Bash command is outside the grammar the hook can check, so it is refuse"
+  }
+ ],
+ "acceptedP0": [
+  {
+   "command": "GIT_PAGER=cat git log",
+   "reason": "Planner hook: denied — not statically parseable: git/gh config through the environment (GIT_PAGER). The Bash command is outside the grammar "
+  },
+  {
+   "command": "sort README.md",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: sort. The Bash command is outside the grammar the hook can check, so i"
+  },
+  {
+   "command": "awk '{print}' README.md",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: awk. The Bash command is outside the grammar the hook can check, so it"
+  }
+ ],
+ "all": [
+  {
+   "id": 0,
+   "sh": "bash",
+   "command": "echo x > x\\y",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 1,
+   "sh": "bash",
+   "command": "cp a.ts x\\y",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 2,
+   "sh": "bash",
+   "command": "git x\\y feature",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 3,
+   "sh": "bash",
+   "command": "gh pr x\\y 2",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 4,
+   "sh": "bash",
+   "command": "env x\\y ls",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 5,
+   "sh": "bash",
+   "command": "ls && x\\y",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 6,
+   "sh": "bash",
+   "command": "tee x\\y < a.ts",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 7,
+   "sh": "bash",
+   "command": "echo x > a\\ b",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 8,
+   "sh": "bash",
+   "command": "cp a.ts a\\ b",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 9,
+   "sh": "bash",
+   "command": "git a\\ b feature",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 10,
+   "sh": "bash",
+   "command": "gh pr a\\ b 2",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 11,
+   "sh": "bash",
+   "command": "env a\\ b ls",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 12,
+   "sh": "bash",
+   "command": "ls && a\\ b",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 13,
+   "sh": "bash",
+   "command": "tee a\\ b < a.ts",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 14,
+   "sh": "bash",
+   "command": "echo x > \\~x",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 15,
+   "sh": "bash",
+   "command": "cp a.ts \\~x",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 16,
+   "sh": "bash",
+   "command": "git \\~x feature",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 17,
+   "sh": "bash",
+   "command": "gh pr \\~x 2",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 18,
+   "sh": "bash",
+   "command": "env \\~x ls",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 19,
+   "sh": "bash",
+   "command": "ls && \\~x",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 20,
+   "sh": "bash",
+   "command": "tee \\~x < a.ts",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 21,
+   "sh": "bash",
+   "command": "echo x > $x",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 22,
+   "sh": "bash",
+   "command": "cp a.ts $x",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 23,
+   "sh": "bash",
+   "command": "git $x feature",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 24,
+   "sh": "bash",
+   "command": "gh pr $x 2",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 25,
+   "sh": "bash",
+   "command": "env $x ls",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 26,
+   "sh": "bash",
+   "command": "ls && $x",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 27,
+   "sh": "bash",
+   "command": "tee $x < a.ts",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 28,
+   "sh": "bash",
+   "command": "echo x > ${x}",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 29,
+   "sh": "bash",
+   "command": "cp a.ts ${x}",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 30,
+   "sh": "bash",
+   "command": "git ${x} feature",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 31,
+   "sh": "bash",
+   "command": "gh pr ${x} 2",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 32,
+   "sh": "bash",
+   "command": "env ${x} ls",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 33,
+   "sh": "bash",
+   "command": "ls && ${x}",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 34,
+   "sh": "bash",
+   "command": "tee ${x} < a.ts",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 35,
+   "sh": "bash",
+   "command": "echo x > $(id)",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 36,
+   "sh": "bash",
+   "command": "cp a.ts $(id)",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 37,
+   "sh": "bash",
+   "command": "git $(id) feature",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 38,
+   "sh": "bash",
+   "command": "gh pr $(id) 2",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 39,
+   "sh": "bash",
+   "command": "env $(id) ls",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 40,
+   "sh": "bash",
+   "command": "ls && $(id)",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 41,
+   "sh": "bash",
+   "command": "tee $(id) < a.ts",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 42,
+   "sh": "bash",
+   "command": "echo x > `id`",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (command substitution). The Bash command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 43,
+   "sh": "bash",
+   "command": "cp a.ts `id`",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (command substitution). The Bash command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 44,
+   "sh": "bash",
+   "command": "git `id` feature",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (command substitution). The Bash command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 45,
+   "sh": "bash",
+   "command": "gh pr `id` 2",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (command substitution). The Bash command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 46,
+   "sh": "bash",
+   "command": "env `id` ls",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (command substitution). The Bash command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 47,
+   "sh": "bash",
+   "command": "ls && `id`",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (command substitution). The Bash command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 48,
+   "sh": "bash",
+   "command": "tee `id` < a.ts",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (command substitution). The Bash command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 49,
+   "sh": "bash",
+   "command": "echo x > $'a'",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 50,
+   "sh": "bash",
+   "command": "cp a.ts $'a'",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 51,
+   "sh": "bash",
+   "command": "git $'a' feature",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 52,
+   "sh": "bash",
+   "command": "gh pr $'a' 2",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 53,
+   "sh": "bash",
+   "command": "env $'a' ls",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 54,
+   "sh": "bash",
+   "command": "ls && $'a'",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 55,
+   "sh": "bash",
+   "command": "tee $'a' < a.ts",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 56,
+   "sh": "bash",
+   "command": "echo x > a(b)",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 57,
+   "sh": "bash",
+   "command": "cp a.ts a(b)",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 58,
+   "sh": "bash",
+   "command": "git a(b) feature",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 59,
+   "sh": "bash",
+   "command": "gh pr a(b) 2",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 60,
+   "sh": "bash",
+   "command": "env a(b) ls",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 61,
+   "sh": "bash",
+   "command": "ls && a(b)",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 62,
+   "sh": "bash",
+   "command": "tee a(b) < a.ts",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 63,
+   "sh": "bash",
+   "command": "echo x > (ls)",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 64,
+   "sh": "bash",
+   "command": "cp a.ts (ls)",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 65,
+   "sh": "bash",
+   "command": "git (ls) feature",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 66,
+   "sh": "bash",
+   "command": "gh pr (ls) 2",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 67,
+   "sh": "bash",
+   "command": "env (ls) ls",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 68,
+   "sh": "bash",
+   "command": "ls && (ls)",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 69,
+   "sh": "bash",
+   "command": "tee (ls) < a.ts",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (subshell, grouping or process substitution). The Bash command is outside the grammar the hook can "
+  },
+  {
+   "id": 70,
+   "sh": "bash",
+   "command": "echo x > a{b,c}",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 71,
+   "sh": "bash",
+   "command": "cp a.ts a{b,c}",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 72,
+   "sh": "bash",
+   "command": "git a{b,c} feature",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 73,
+   "sh": "bash",
+   "command": "gh pr a{b,c} 2",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 74,
+   "sh": "bash",
+   "command": "env a{b,c} ls",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 75,
+   "sh": "bash",
+   "command": "ls && a{b,c}",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 76,
+   "sh": "bash",
+   "command": "tee a{b,c} < a.ts",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 77,
+   "sh": "bash",
+   "command": "echo x > *.ts",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 78,
+   "sh": "bash",
+   "command": "cp a.ts *.ts",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 79,
+   "sh": "bash",
+   "command": "git *.ts feature",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 80,
+   "sh": "bash",
+   "command": "gh pr *.ts 2",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 81,
+   "sh": "bash",
+   "command": "env *.ts ls",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 82,
+   "sh": "bash",
+   "command": "ls && *.ts",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 83,
+   "sh": "bash",
+   "command": "tee *.ts < a.ts",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 84,
+   "sh": "bash",
+   "command": "echo x > a?b",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 85,
+   "sh": "bash",
+   "command": "cp a.ts a?b",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 86,
+   "sh": "bash",
+   "command": "git a?b feature",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 87,
+   "sh": "bash",
+   "command": "gh pr a?b 2",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 88,
+   "sh": "bash",
+   "command": "env a?b ls",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 89,
+   "sh": "bash",
+   "command": "ls && a?b",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 90,
+   "sh": "bash",
+   "command": "tee a?b < a.ts",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 91,
+   "sh": "bash",
+   "command": "echo x > a[1]",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 92,
+   "sh": "bash",
+   "command": "cp a.ts a[1]",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 93,
+   "sh": "bash",
+   "command": "git a[1] feature",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 94,
+   "sh": "bash",
+   "command": "gh pr a[1] 2",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 95,
+   "sh": "bash",
+   "command": "env a[1] ls",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 96,
+   "sh": "bash",
+   "command": "ls && a[1]",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 97,
+   "sh": "bash",
+   "command": "tee a[1] < a.ts",
+   "kind": "refused",
+   "construct": "glob",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: glob character (* ? [ ]). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 98,
+   "sh": "bash",
+   "command": "echo x > ~/x",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (home-directory expansion). The Bash command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 99,
+   "sh": "bash",
+   "command": "cp a.ts ~/x",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (home-directory expansion). The Bash command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 100,
+   "sh": "bash",
+   "command": "git ~/x feature",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (home-directory expansion). The Bash command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 101,
+   "sh": "bash",
+   "command": "gh pr ~/x 2",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (home-directory expansion). The Bash command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 102,
+   "sh": "bash",
+   "command": "env ~/x ls",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (home-directory expansion). The Bash command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 103,
+   "sh": "bash",
+   "command": "ls && ~/x",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (home-directory expansion). The Bash command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 104,
+   "sh": "bash",
+   "command": "tee ~/x < a.ts",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (home-directory expansion). The Bash command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 105,
+   "sh": "bash",
+   "command": "echo x > \"$x\"",
+   "kind": "refused",
+   "construct": "$ inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside double quotes (expansion). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 106,
+   "sh": "bash",
+   "command": "cp a.ts \"$x\"",
+   "kind": "refused",
+   "construct": "$ inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside double quotes (expansion). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 107,
+   "sh": "bash",
+   "command": "git \"$x\" feature",
+   "kind": "refused",
+   "construct": "$ inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside double quotes (expansion). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 108,
+   "sh": "bash",
+   "command": "gh pr \"$x\" 2",
+   "kind": "refused",
+   "construct": "$ inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside double quotes (expansion). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 109,
+   "sh": "bash",
+   "command": "env \"$x\" ls",
+   "kind": "refused",
+   "construct": "$ inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside double quotes (expansion). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 110,
+   "sh": "bash",
+   "command": "ls && \"$x\"",
+   "kind": "refused",
+   "construct": "$ inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside double quotes (expansion). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 111,
+   "sh": "bash",
+   "command": "tee \"$x\" < a.ts",
+   "kind": "refused",
+   "construct": "$ inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside double quotes (expansion). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 112,
+   "sh": "bash",
+   "command": "echo x > \"`id`\"",
+   "kind": "refused",
+   "construct": "backtick inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside double quotes (command substitution). The Bash command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 113,
+   "sh": "bash",
+   "command": "cp a.ts \"`id`\"",
+   "kind": "refused",
+   "construct": "backtick inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside double quotes (command substitution). The Bash command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 114,
+   "sh": "bash",
+   "command": "git \"`id`\" feature",
+   "kind": "refused",
+   "construct": "backtick inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside double quotes (command substitution). The Bash command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 115,
+   "sh": "bash",
+   "command": "gh pr \"`id`\" 2",
+   "kind": "refused",
+   "construct": "backtick inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside double quotes (command substitution). The Bash command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 116,
+   "sh": "bash",
+   "command": "env \"`id`\" ls",
+   "kind": "refused",
+   "construct": "backtick inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside double quotes (command substitution). The Bash command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 117,
+   "sh": "bash",
+   "command": "ls && \"`id`\"",
+   "kind": "refused",
+   "construct": "backtick inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside double quotes (command substitution). The Bash command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 118,
+   "sh": "bash",
+   "command": "tee \"`id`\" < a.ts",
+   "kind": "refused",
+   "construct": "backtick inside double quotes",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside double quotes (command substitution). The Bash command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 119,
+   "sh": "bash",
+   "command": "echo x > \"a\\b\"",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 120,
+   "sh": "bash",
+   "command": "cp a.ts \"a\\b\"",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 121,
+   "sh": "bash",
+   "command": "git \"a\\b\" feature",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 122,
+   "sh": "bash",
+   "command": "gh pr \"a\\b\" 2",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 123,
+   "sh": "bash",
+   "command": "env \"a\\b\" ls",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 124,
+   "sh": "bash",
+   "command": "ls && \"a\\b\"",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 125,
+   "sh": "bash",
+   "command": "tee \"a\\b\" < a.ts",
+   "kind": "refused",
+   "construct": "backslash",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at;"
+  },
+  {
+   "id": 126,
+   "sh": "bash",
+   "command": "if feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (if). The Bash command is outside the grammar the hook can check, so it is refused rather than gu"
+  },
+  {
+   "id": 127,
+   "sh": "bash",
+   "command": "env if ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (if). The Bash command is outside the grammar the hook can check, so it is refused rather than gu"
+  },
+  {
+   "id": 128,
+   "sh": "bash",
+   "command": "if a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (if). The Bash command is outside the grammar the hook can check, so it is refused rather than gu"
+  },
+  {
+   "id": 129,
+   "sh": "bash",
+   "command": "then feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (then). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 130,
+   "sh": "bash",
+   "command": "env then ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (then). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 131,
+   "sh": "bash",
+   "command": "then a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (then). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 132,
+   "sh": "bash",
+   "command": "for feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (for). The Bash command is outside the grammar the hook can check, so it is refused rather than g"
+  },
+  {
+   "id": 133,
+   "sh": "bash",
+   "command": "env for ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (for). The Bash command is outside the grammar the hook can check, so it is refused rather than g"
+  },
+  {
+   "id": 134,
+   "sh": "bash",
+   "command": "for a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (for). The Bash command is outside the grammar the hook can check, so it is refused rather than g"
+  },
+  {
+   "id": 135,
+   "sh": "bash",
+   "command": "while feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (while). The Bash command is outside the grammar the hook can check, so it is refused rather than"
+  },
+  {
+   "id": 136,
+   "sh": "bash",
+   "command": "env while ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (while). The Bash command is outside the grammar the hook can check, so it is refused rather than"
+  },
+  {
+   "id": 137,
+   "sh": "bash",
+   "command": "while a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (while). The Bash command is outside the grammar the hook can check, so it is refused rather than"
+  },
+  {
+   "id": 138,
+   "sh": "bash",
+   "command": "do feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (do). The Bash command is outside the grammar the hook can check, so it is refused rather than gu"
+  },
+  {
+   "id": 139,
+   "sh": "bash",
+   "command": "env do ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (do). The Bash command is outside the grammar the hook can check, so it is refused rather than gu"
+  },
+  {
+   "id": 140,
+   "sh": "bash",
+   "command": "do a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (do). The Bash command is outside the grammar the hook can check, so it is refused rather than gu"
+  },
+  {
+   "id": 141,
+   "sh": "bash",
+   "command": "done feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (done). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 142,
+   "sh": "bash",
+   "command": "env done ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (done). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 143,
+   "sh": "bash",
+   "command": "done a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (done). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 144,
+   "sh": "bash",
+   "command": "case feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (case). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 145,
+   "sh": "bash",
+   "command": "env case ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (case). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 146,
+   "sh": "bash",
+   "command": "case a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (case). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 147,
+   "sh": "bash",
+   "command": "esac feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (esac). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 148,
+   "sh": "bash",
+   "command": "env esac ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (esac). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 149,
+   "sh": "bash",
+   "command": "esac a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (esac). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 150,
+   "sh": "bash",
+   "command": "! feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (!). The Bash command is outside the grammar the hook can check, so it is refused rather than gue"
+  },
+  {
+   "id": 151,
+   "sh": "bash",
+   "command": "env ! ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (!). The Bash command is outside the grammar the hook can check, so it is refused rather than gue"
+  },
+  {
+   "id": 152,
+   "sh": "bash",
+   "command": "! a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (!). The Bash command is outside the grammar the hook can check, so it is refused rather than gue"
+  },
+  {
+   "id": 153,
+   "sh": "bash",
+   "command": "time feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (time). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 154,
+   "sh": "bash",
+   "command": "env time ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (time). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 155,
+   "sh": "bash",
+   "command": "time a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (time). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 156,
+   "sh": "bash",
+   "command": "function feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (function). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 157,
+   "sh": "bash",
+   "command": "env function ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (function). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 158,
+   "sh": "bash",
+   "command": "function a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (function). The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 159,
+   "sh": "bash",
+   "command": "until feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (until). The Bash command is outside the grammar the hook can check, so it is refused rather than"
+  },
+  {
+   "id": 160,
+   "sh": "bash",
+   "command": "env until ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (until). The Bash command is outside the grammar the hook can check, so it is refused rather than"
+  },
+  {
+   "id": 161,
+   "sh": "bash",
+   "command": "until a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (until). The Bash command is outside the grammar the hook can check, so it is refused rather than"
+  },
+  {
+   "id": 162,
+   "sh": "bash",
+   "command": "select feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (select). The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 163,
+   "sh": "bash",
+   "command": "env select ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (select). The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 164,
+   "sh": "bash",
+   "command": "select a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (select). The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 165,
+   "sh": "bash",
+   "command": "coproc feature",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (coproc). The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 166,
+   "sh": "bash",
+   "command": "env coproc ls",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (coproc). The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 167,
+   "sh": "bash",
+   "command": "coproc a.ts",
+   "kind": "refused",
+   "construct": "reserved word",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: reserved word (coproc). The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 168,
+   "sh": "bash",
+   "command": "{ feature",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 169,
+   "sh": "bash",
+   "command": "env { ls",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 170,
+   "sh": "bash",
+   "command": "{ a.ts",
+   "kind": "refused",
+   "construct": "brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 171,
+   "sh": "bash",
+   "command": "#cmt feature",
+   "kind": "refused",
+   "construct": "comment",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 172,
+   "sh": "bash",
+   "command": "env #cmt ls",
+   "kind": "refused",
+   "construct": "comment",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 173,
+   "sh": "bash",
+   "command": "#cmt a.ts",
+   "kind": "refused",
+   "construct": "comment",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 174,
+   "sh": "bash",
+   "command": "ls\nwc",
+   "kind": "refused",
+   "construct": "newline",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: newline outside quotes (use ; between commands). The Bash command is outside the grammar the hook can check, so"
+  },
+  {
+   "id": 175,
+   "sh": "bash",
+   "command": "ls &",
+   "kind": "refused",
+   "construct": "background",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: background & (use && or ;). The Bash command is outside the grammar the hook can check, so it is refused rather"
+  },
+  {
+   "id": 176,
+   "sh": "bash",
+   "command": "ls |& wc",
+   "kind": "refused",
+   "construct": "|& pipe",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: |& pipe. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; r"
+  },
+  {
+   "id": 177,
+   "sh": "bash",
+   "command": "ls >| f",
+   "kind": "refused",
+   "construct": ">| redirect",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: >| redirect. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed a"
+  },
+  {
+   "id": 178,
+   "sh": "bash",
+   "command": "ls >(cat)",
+   "kind": "refused",
+   "construct": "process substitution",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: process substitution. The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 179,
+   "sh": "bash",
+   "command": "ls >& f",
+   "kind": "refused",
+   "construct": ">& redirect",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: >& redirect. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed a"
+  },
+  {
+   "id": 180,
+   "sh": "bash",
+   "command": "ls &>> f",
+   "kind": "refused",
+   "construct": "&>> redirect",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: &>> redirect. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed "
+  },
+  {
+   "id": 181,
+   "sh": "bash",
+   "command": "cat <(ls)",
+   "kind": "refused",
+   "construct": "process substitution or fd redirect",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: process substitution or fd redirect. The Bash command is outside the grammar the hook can check, so it is refus"
+  },
+  {
+   "id": 182,
+   "sh": "bash",
+   "command": "ls 3> f",
+   "kind": "refused",
+   "construct": "file-descriptor redirect",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: file-descriptor redirect other than 2>. The Bash command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 183,
+   "sh": "bash",
+   "command": "ls ;; ",
+   "kind": "refused",
+   "construct": ";; (case terminator)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: ;; (case terminator). The Bash command is outside the grammar the hook can check, so it is refused rather than "
+  },
+  {
+   "id": 184,
+   "sh": "bash",
+   "command": "cat <<EOF",
+   "kind": "refused",
+   "construct": "heredoc or here-string",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: heredoc or here-string. The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 185,
+   "sh": "bash",
+   "command": "cat <<<x",
+   "kind": "refused",
+   "construct": "heredoc or here-string",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: heredoc or here-string. The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 186,
+   "sh": "bash",
+   "command": "timeout 5 ls",
+   "kind": "refused",
+   "construct": "wrapper, shell or code-running command (timeout)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (timeout). The Bash command is outside the grammar the hook can check, s"
+  },
+  {
+   "id": 187,
+   "sh": "bash",
+   "command": "sudo ls",
+   "kind": "refused",
+   "construct": "(sudo)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (sudo). The Bash command is outside the grammar the hook can check, so i"
+  },
+  {
+   "id": 188,
+   "sh": "bash",
+   "command": "nice ls",
+   "kind": "refused",
+   "construct": "(nice)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (nice). The Bash command is outside the grammar the hook can check, so i"
+  },
+  {
+   "id": 189,
+   "sh": "bash",
+   "command": "xargs wc",
+   "kind": "refused",
+   "construct": "(xargs)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (xargs). The Bash command is outside the grammar the hook can check, so "
+  },
+  {
+   "id": 190,
+   "sh": "bash",
+   "command": "eval ls",
+   "kind": "refused",
+   "construct": "(eval)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (eval). The Bash command is outside the grammar the hook can check, so i"
+  },
+  {
+   "id": 191,
+   "sh": "bash",
+   "command": "exec ls",
+   "kind": "refused",
+   "construct": "(exec)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (exec). The Bash command is outside the grammar the hook can check, so i"
+  },
+  {
+   "id": 192,
+   "sh": "bash",
+   "command": "source f",
+   "kind": "refused",
+   "construct": "(source)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (source). The Bash command is outside the grammar the hook can check, so"
+  },
+  {
+   "id": 193,
+   "sh": "bash",
+   "command": ". f",
+   "kind": "refused",
+   "construct": "(.)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (.). The Bash command is outside the grammar the hook can check, so it i"
+  },
+  {
+   "id": 194,
+   "sh": "bash",
+   "command": "watch ls",
+   "kind": "refused",
+   "construct": "(watch)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (watch). The Bash command is outside the grammar the hook can check, so "
+  },
+  {
+   "id": 195,
+   "sh": "bash",
+   "command": "stdbuf -o0 ls",
+   "kind": "refused",
+   "construct": "(stdbuf)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (stdbuf). The Bash command is outside the grammar the hook can check, so"
+  },
+  {
+   "id": 196,
+   "sh": "bash",
+   "command": "env -u X ls",
+   "kind": "refused",
+   "construct": "wrapper with options (env -u)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper with options (env -u). The Bash command is outside the grammar the hook can check, so it is refused rat"
+  },
+  {
+   "id": 197,
+   "sh": "bash",
+   "command": "env -C d ls",
+   "kind": "refused",
+   "construct": "wrapper with options (env -C)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper with options (env -C). The Bash command is outside the grammar the hook can check, so it is refused rat"
+  },
+  {
+   "id": 198,
+   "sh": "bash",
+   "command": "command -v ls",
+   "kind": "refused",
+   "construct": "wrapper with options (command -v)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper with options (command -v). The Bash command is outside the grammar the hook can check, so it is refused"
+  },
+  {
+   "id": 199,
+   "sh": "bash",
+   "command": "nohup -x ls",
+   "kind": "refused",
+   "construct": "wrapper with options (nohup -x)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper with options (nohup -x). The Bash command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 200,
+   "sh": "bash",
+   "command": "echo x | sh",
+   "kind": "refused",
+   "construct": "sh is only parseable",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: sh is only parseable as: sh -c '<string>'. The Bash command is outside the grammar the hook can check, so it is"
+  },
+  {
+   "id": 201,
+   "sh": "bash",
+   "command": "echo x | bash",
+   "kind": "refused",
+   "construct": "bash is only parseable",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: bash is only parseable as: bash -c '<string>'. The Bash command is outside the grammar the hook can check, so i"
+  },
+  {
+   "id": 202,
+   "sh": "bash",
+   "command": "bash -lc 'ls'",
+   "kind": "refused",
+   "construct": "bash is only parseable",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: bash is only parseable as: bash -c '<string>'. The Bash command is outside the grammar the hook can check, so i"
+  },
+  {
+   "id": 203,
+   "sh": "bash",
+   "command": "sh file.sh",
+   "kind": "refused",
+   "construct": "sh is only parseable",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: sh is only parseable as: sh -c '<string>'. The Bash command is outside the grammar the hook can check, so it is"
+  },
+  {
+   "id": 204,
+   "sh": "bash",
+   "command": "node -e 'x'",
+   "kind": "refused",
+   "construct": "inline code (node -e",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: inline code or an option before the script (node -e); node is allowed only as node <file.js|.mjs|.cjs> [args]. "
+  },
+  {
+   "id": 205,
+   "sh": "bash",
+   "command": "node --eval 'x'",
+   "kind": "refused",
+   "construct": "inline code (node --eval",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: inline code or an option before the script (node --eval); node is allowed only as node <file.js|.mjs|.cjs> [arg"
+  },
+  {
+   "id": 206,
+   "sh": "bash",
+   "command": "python -c 'x'",
+   "kind": "refused",
+   "construct": "inline code (python -c",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: python. The Bash command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 207,
+   "sh": "bash",
+   "command": "perl -e 'x'",
+   "kind": "refused",
+   "construct": "inline code (perl -e",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: perl. The Bash command is outside the grammar the hook can check, so it is refused rather "
+  },
+  {
+   "id": 208,
+   "sh": "bash",
+   "command": "ruby -e 'x'",
+   "kind": "refused",
+   "construct": "inline code (ruby -e",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: ruby. The Bash command is outside the grammar the hook can check, so it is refused rather "
+  },
+  {
+   "id": 209,
+   "sh": "bash",
+   "command": "php -r 'x'",
+   "kind": "refused",
+   "construct": "inline code (php -r",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: php. The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 210,
+   "sh": "bash",
+   "command": "find . -exec rm {} ;",
+   "kind": "refused",
+   "construct": "find -exec",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: brace ({ } group or brace expansion). The Bash command is outside the grammar the hook can check, so it is refu"
+  },
+  {
+   "id": 211,
+   "sh": "bash",
+   "command": "awk -i inplace 'x' f",
+   "kind": "refused",
+   "construct": "awk -i",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: awk. The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 212,
+   "sh": "bash",
+   "command": "sed -n 'w out' f",
+   "kind": "refused",
+   "construct": "sed w",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: sed w (writes a file). The Bash command is outside the grammar the hook can check, so it is refused rather than"
+  },
+  {
+   "id": 213,
+   "sh": "bash",
+   "command": "sed -e 's/a/b/w out' f",
+   "kind": "refused",
+   "construct": "sed w",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: sed w (writes a file). The Bash command is outside the grammar the hook can check, so it is refused rather than"
+  },
+  {
+   "id": 214,
+   "sh": "bash",
+   "command": "sed 's/a/b/e' f",
+   "kind": "refused",
+   "construct": "sed e",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: sed e (runs a command). The Bash command is outside the grammar the hook can check, so it is refused rather tha"
+  },
+  {
+   "id": 215,
+   "sh": "bash",
+   "command": "sed -f s.sed f",
+   "kind": "refused",
+   "construct": "sed -f",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: sed -f (a script read from a file). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 216,
+   "sh": "bash",
+   "command": "sed --file=s.sed f",
+   "kind": "refused",
+   "construct": "sed -f",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: sed -f (a script read from a file). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 217,
+   "sh": "bash",
+   "command": "git st",
+   "kind": "refused",
+   "construct": "git alias or external subcommand (st)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: git alias or external subcommand (st). The Bash command is outside the grammar the hook can check, so it is ref"
+  },
+  {
+   "id": 218,
+   "sh": "bash",
+   "command": "git lg",
+   "kind": "refused",
+   "construct": "git alias",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: git alias or external subcommand (lg). The Bash command is outside the grammar the hook can check, so it is ref"
+  },
+  {
+   "id": 219,
+   "sh": "bash",
+   "command": "gh co 5",
+   "kind": "refused",
+   "construct": "gh alias or extension command (co)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: gh alias or extension command (co). The Bash command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 220,
+   "sh": "bash",
+   "command": "gh alias set x y",
+   "kind": "refused",
+   "construct": "gh alias",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: gh alias (defines or runs commands the hook cannot see). The Bash command is outside the grammar the hook can c"
+  },
+  {
+   "id": 221,
+   "sh": "bash",
+   "command": "gh extension list",
+   "kind": "refused",
+   "construct": "gh extension",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: gh extension (defines or runs commands the hook cannot see). The Bash command is outside the grammar the hook c"
+  },
+  {
+   "id": 222,
+   "sh": "bash",
+   "command": "powershell -c ls",
+   "kind": "refused",
+   "construct": "(powershell)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (powershell). The Bash command is outside the grammar the hook can check"
+  },
+  {
+   "id": 223,
+   "sh": "bash",
+   "command": "pwsh -c ls",
+   "kind": "refused",
+   "construct": "(pwsh)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (pwsh). The Bash command is outside the grammar the hook can check, so i"
+  },
+  {
+   "id": 224,
+   "sh": "bash",
+   "command": "cmd /c dir",
+   "kind": "refused",
+   "construct": "(cmd)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wrapper, shell or code-running command (cmd). The Bash command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 225,
+   "sh": "ps",
+   "command": "Set-Content $x -Value x",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 226,
+   "sh": "ps",
+   "command": "Copy-Item a.txt $x",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 227,
+   "sh": "ps",
+   "command": "git $x feature",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 228,
+   "sh": "ps",
+   "command": "gh pr $x 2",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 229,
+   "sh": "ps",
+   "command": "$x | Out-Null",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 230,
+   "sh": "ps",
+   "command": "Set-Content $env:TEMP -Value x",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 231,
+   "sh": "ps",
+   "command": "Copy-Item a.txt $env:TEMP",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 232,
+   "sh": "ps",
+   "command": "git $env:TEMP feature",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 233,
+   "sh": "ps",
+   "command": "gh pr $env:TEMP 2",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 234,
+   "sh": "ps",
+   "command": "$env:TEMP | Out-Null",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 235,
+   "sh": "ps",
+   "command": "Set-Content @a -Value x",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 236,
+   "sh": "ps",
+   "command": "Copy-Item a.txt @a",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 237,
+   "sh": "ps",
+   "command": "git @a feature",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 238,
+   "sh": "ps",
+   "command": "gh pr @a 2",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 239,
+   "sh": "ps",
+   "command": "@a | Out-Null",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 240,
+   "sh": "ps",
+   "command": "Set-Content @{a=1} -Value x",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 241,
+   "sh": "ps",
+   "command": "Copy-Item a.txt @{a=1}",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 242,
+   "sh": "ps",
+   "command": "git @{a=1} feature",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 243,
+   "sh": "ps",
+   "command": "gh pr @{a=1} 2",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 244,
+   "sh": "ps",
+   "command": "@{a=1} | Out-Null",
+   "kind": "refused",
+   "construct": "@ (splat",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: @ (splat, array or hash literal). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 245,
+   "sh": "ps",
+   "command": "Set-Content (gi x) -Value x",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (expression or sub-expression). The PowerShell command is outside the grammar the hook can check, s"
+  },
+  {
+   "id": 246,
+   "sh": "ps",
+   "command": "Copy-Item a.txt (gi x)",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (expression or sub-expression). The PowerShell command is outside the grammar the hook can check, s"
+  },
+  {
+   "id": 247,
+   "sh": "ps",
+   "command": "git (gi x) feature",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (expression or sub-expression). The PowerShell command is outside the grammar the hook can check, s"
+  },
+  {
+   "id": 248,
+   "sh": "ps",
+   "command": "gh pr (gi x) 2",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (expression or sub-expression). The PowerShell command is outside the grammar the hook can check, s"
+  },
+  {
+   "id": 249,
+   "sh": "ps",
+   "command": "(gi x) | Out-Null",
+   "kind": "refused",
+   "construct": "parenthesis",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: parenthesis (expression or sub-expression). The PowerShell command is outside the grammar the hook can check, s"
+  },
+  {
+   "id": 250,
+   "sh": "ps",
+   "command": "Set-Content $(gi x) -Value x",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 251,
+   "sh": "ps",
+   "command": "Copy-Item a.txt $(gi x)",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 252,
+   "sh": "ps",
+   "command": "git $(gi x) feature",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 253,
+   "sh": "ps",
+   "command": "gh pr $(gi x) 2",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 254,
+   "sh": "ps",
+   "command": "$(gi x) | Out-Null",
+   "kind": "refused",
+   "construct": "$",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused "
+  },
+  {
+   "id": 255,
+   "sh": "ps",
+   "command": "Set-Content { ls } -Value x",
+   "kind": "refused",
+   "construct": "script block or brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 256,
+   "sh": "ps",
+   "command": "Copy-Item a.txt { ls }",
+   "kind": "refused",
+   "construct": "script block or brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 257,
+   "sh": "ps",
+   "command": "git { ls } feature",
+   "kind": "refused",
+   "construct": "script block or brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 258,
+   "sh": "ps",
+   "command": "gh pr { ls } 2",
+   "kind": "refused",
+   "construct": "script block or brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 259,
+   "sh": "ps",
+   "command": "{ ls } | Out-Null",
+   "kind": "refused",
+   "construct": "script block or brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 260,
+   "sh": "ps",
+   "command": "Set-Content FileSystem::C:/x -Value x",
+   "kind": "refused",
+   "construct": "provider path (::)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 261,
+   "sh": "ps",
+   "command": "Copy-Item a.txt FileSystem::C:/x",
+   "kind": "refused",
+   "construct": "provider path (::)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 262,
+   "sh": "ps",
+   "command": "git FileSystem::C:/x feature",
+   "kind": "refused",
+   "construct": "provider path (::)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 263,
+   "sh": "ps",
+   "command": "gh pr FileSystem::C:/x 2",
+   "kind": "refused",
+   "construct": "provider path (::)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 264,
+   "sh": "ps",
+   "command": "FileSystem::C:/x | Out-Null",
+   "kind": "refused",
+   "construct": "provider path (::)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 265,
+   "sh": "ps",
+   "command": "Set-Content C:foo -Value x",
+   "kind": "refused",
+   "construct": "drive-relative path",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: drive-relative path (C:name). The PowerShell command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 266,
+   "sh": "ps",
+   "command": "Copy-Item a.txt C:foo",
+   "kind": "refused",
+   "construct": "drive-relative path",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: drive-relative path (C:name). The PowerShell command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 267,
+   "sh": "ps",
+   "command": "git C:foo feature",
+   "kind": "refused",
+   "construct": "drive-relative path",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: drive-relative path (C:name). The PowerShell command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 268,
+   "sh": "ps",
+   "command": "gh pr C:foo 2",
+   "kind": "refused",
+   "construct": "drive-relative path",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: drive-relative path (C:name). The PowerShell command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 269,
+   "sh": "ps",
+   "command": "C:foo | Out-Null",
+   "kind": "refused",
+   "construct": "drive-relative path",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: drive-relative path (C:name). The PowerShell command is outside the grammar the hook can check, so it is refuse"
+  },
+  {
+   "id": 270,
+   "sh": "ps",
+   "command": "Set-Content [int]::x -Value x",
+   "kind": "refused",
+   "construct": "[ ] (type literal",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: [ ] (type literal, index or wildcard). The PowerShell command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 271,
+   "sh": "ps",
+   "command": "Copy-Item a.txt [int]::x",
+   "kind": "refused",
+   "construct": "[ ] (type literal",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: [ ] (type literal, index or wildcard). The PowerShell command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 272,
+   "sh": "ps",
+   "command": "git [int]::x feature",
+   "kind": "refused",
+   "construct": "[ ] (type literal",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: [ ] (type literal, index or wildcard). The PowerShell command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 273,
+   "sh": "ps",
+   "command": "gh pr [int]::x 2",
+   "kind": "refused",
+   "construct": "[ ] (type literal",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: [ ] (type literal, index or wildcard). The PowerShell command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 274,
+   "sh": "ps",
+   "command": "[int]::x | Out-Null",
+   "kind": "refused",
+   "construct": "[ ] (type literal",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: [ ] (type literal, index or wildcard). The PowerShell command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 275,
+   "sh": "ps",
+   "command": "Set-Content a*b -Value x",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 276,
+   "sh": "ps",
+   "command": "Copy-Item a.txt a*b",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 277,
+   "sh": "ps",
+   "command": "git a*b feature",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 278,
+   "sh": "ps",
+   "command": "gh pr a*b 2",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 279,
+   "sh": "ps",
+   "command": "a*b | Out-Null",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 280,
+   "sh": "ps",
+   "command": "Set-Content a?b -Value x",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 281,
+   "sh": "ps",
+   "command": "Copy-Item a.txt a?b",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 282,
+   "sh": "ps",
+   "command": "git a?b feature",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 283,
+   "sh": "ps",
+   "command": "gh pr a?b 2",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 284,
+   "sh": "ps",
+   "command": "a?b | Out-Null",
+   "kind": "refused",
+   "construct": "wildcard",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: wildcard character (* ?). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 285,
+   "sh": "ps",
+   "command": "Set-Content `n -Value x",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (PowerShell escape character). The PowerShell command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 286,
+   "sh": "ps",
+   "command": "Copy-Item a.txt `n",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (PowerShell escape character). The PowerShell command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 287,
+   "sh": "ps",
+   "command": "git `n feature",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (PowerShell escape character). The PowerShell command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 288,
+   "sh": "ps",
+   "command": "gh pr `n 2",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (PowerShell escape character). The PowerShell command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 289,
+   "sh": "ps",
+   "command": "`n | Out-Null",
+   "kind": "refused",
+   "construct": "backtick",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick (PowerShell escape character). The PowerShell command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 290,
+   "sh": "ps",
+   "command": "Set-Content ~/x -Value x",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (PowerShell home-directory expansion). The PowerShell command is outside the grammar the hook can check, "
+  },
+  {
+   "id": 291,
+   "sh": "ps",
+   "command": "Copy-Item a.txt ~/x",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (PowerShell home-directory expansion). The PowerShell command is outside the grammar the hook can check, "
+  },
+  {
+   "id": 292,
+   "sh": "ps",
+   "command": "git ~/x feature",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (PowerShell home-directory expansion). The PowerShell command is outside the grammar the hook can check, "
+  },
+  {
+   "id": 293,
+   "sh": "ps",
+   "command": "gh pr ~/x 2",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (PowerShell home-directory expansion). The PowerShell command is outside the grammar the hook can check, "
+  },
+  {
+   "id": 294,
+   "sh": "ps",
+   "command": "~/x | Out-Null",
+   "kind": "refused",
+   "construct": "tilde",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: tilde (PowerShell home-directory expansion). The PowerShell command is outside the grammar the hook can check, "
+  },
+  {
+   "id": 295,
+   "sh": "ps",
+   "command": "Set-Content #c -Value x",
+   "kind": "refused",
+   "construct": "comment",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a PowerShell word). The PowerShell command is outside the grammar the hook can check"
+  },
+  {
+   "id": 296,
+   "sh": "ps",
+   "command": "Copy-Item a.txt #c",
+   "kind": "refused",
+   "construct": "comment",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a PowerShell word). The PowerShell command is outside the grammar the hook can check"
+  },
+  {
+   "id": 297,
+   "sh": "ps",
+   "command": "git #c feature",
+   "kind": "refused",
+   "construct": "comment",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a PowerShell word). The PowerShell command is outside the grammar the hook can check"
+  },
+  {
+   "id": 298,
+   "sh": "ps",
+   "command": "gh pr #c 2",
+   "kind": "refused",
+   "construct": "comment",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a PowerShell word). The PowerShell command is outside the grammar the hook can check"
+  },
+  {
+   "id": 299,
+   "sh": "ps",
+   "command": "#c | Out-Null",
+   "kind": "refused",
+   "construct": "comment",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a PowerShell word). The PowerShell command is outside the grammar the hook can check"
+  },
+  {
+   "id": 300,
+   "sh": "ps",
+   "command": "Set-Content \"$x\" -Value x",
+   "kind": "refused",
+   "construct": "$ inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside a PowerShell double-quoted string (expansion). The PowerShell command is outside the grammar the hook "
+  },
+  {
+   "id": 301,
+   "sh": "ps",
+   "command": "Copy-Item a.txt \"$x\"",
+   "kind": "refused",
+   "construct": "$ inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside a PowerShell double-quoted string (expansion). The PowerShell command is outside the grammar the hook "
+  },
+  {
+   "id": 302,
+   "sh": "ps",
+   "command": "git \"$x\" feature",
+   "kind": "refused",
+   "construct": "$ inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside a PowerShell double-quoted string (expansion). The PowerShell command is outside the grammar the hook "
+  },
+  {
+   "id": 303,
+   "sh": "ps",
+   "command": "gh pr \"$x\" 2",
+   "kind": "refused",
+   "construct": "$ inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside a PowerShell double-quoted string (expansion). The PowerShell command is outside the grammar the hook "
+  },
+  {
+   "id": 304,
+   "sh": "ps",
+   "command": "\"$x\" | Out-Null",
+   "kind": "refused",
+   "construct": "$ inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: $ inside a PowerShell double-quoted string (expansion). The PowerShell command is outside the grammar the hook "
+  },
+  {
+   "id": 305,
+   "sh": "ps",
+   "command": "Set-Content \"a`nb\" -Value x",
+   "kind": "refused",
+   "construct": "backtick inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside a PowerShell double-quoted string (escape character). The PowerShell command is outside the gra"
+  },
+  {
+   "id": 306,
+   "sh": "ps",
+   "command": "Copy-Item a.txt \"a`nb\"",
+   "kind": "refused",
+   "construct": "backtick inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside a PowerShell double-quoted string (escape character). The PowerShell command is outside the gra"
+  },
+  {
+   "id": 307,
+   "sh": "ps",
+   "command": "git \"a`nb\" feature",
+   "kind": "refused",
+   "construct": "backtick inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside a PowerShell double-quoted string (escape character). The PowerShell command is outside the gra"
+  },
+  {
+   "id": 308,
+   "sh": "ps",
+   "command": "gh pr \"a`nb\" 2",
+   "kind": "refused",
+   "construct": "backtick inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside a PowerShell double-quoted string (escape character). The PowerShell command is outside the gra"
+  },
+  {
+   "id": 309,
+   "sh": "ps",
+   "command": "\"a`nb\" | Out-Null",
+   "kind": "refused",
+   "construct": "backtick inside a PowerShell double-quoted",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: backtick inside a PowerShell double-quoted string (escape character). The PowerShell command is outside the gra"
+  },
+  {
+   "id": 310,
+   "sh": "ps",
+   "command": "Invoke-Expression 'ls'",
+   "kind": "refused",
+   "construct": "code-running or unknown command (Invoke-Expression)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (Invoke-Expression). The PowerShell command is outside the grammar the hook can"
+  },
+  {
+   "id": 311,
+   "sh": "ps",
+   "command": "iex 'ls'",
+   "kind": "refused",
+   "construct": "code-running or unknown command (iex)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (iex). The PowerShell command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 312,
+   "sh": "ps",
+   "command": "Invoke-Command { ls }",
+   "kind": "refused",
+   "construct": "script block or brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 313,
+   "sh": "ps",
+   "command": "Start-Process ls",
+   "kind": "refused",
+   "construct": "code-running or unknown command (Start-Process)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (Start-Process). The PowerShell command is outside the grammar the hook can che"
+  },
+  {
+   "id": 314,
+   "sh": "ps",
+   "command": "saps ls",
+   "kind": "refused",
+   "construct": "code-running or unknown command (saps)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (saps). The PowerShell command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 315,
+   "sh": "ps",
+   "command": "powershell -c ls",
+   "kind": "refused",
+   "construct": "code-running or unknown command (powershell)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (powershell). The PowerShell command is outside the grammar the hook can check,"
+  },
+  {
+   "id": 316,
+   "sh": "ps",
+   "command": "pwsh -c ls",
+   "kind": "refused",
+   "construct": "code-running or unknown command (pwsh)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (pwsh). The PowerShell command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 317,
+   "sh": "ps",
+   "command": "iwr http://x",
+   "kind": "refused",
+   "construct": "code-running or unknown command (iwr)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (iwr). The PowerShell command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 318,
+   "sh": "ps",
+   "command": "curl http://x",
+   "kind": "refused",
+   "construct": "code-running or unknown command (curl)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (curl). The PowerShell command is outside the grammar the hook can check, so it"
+  },
+  {
+   "id": 319,
+   "sh": "ps",
+   "command": "Add-Type -Path x",
+   "kind": "refused",
+   "construct": "code-running or unknown command (Add-Type)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (Add-Type). The PowerShell command is outside the grammar the hook can check, s"
+  },
+  {
+   "id": 320,
+   "sh": "ps",
+   "command": "New-Object X",
+   "kind": "refused",
+   "construct": "code-running or unknown command (New-Object)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (New-Object). The PowerShell command is outside the grammar the hook can check,"
+  },
+  {
+   "id": 321,
+   "sh": "ps",
+   "command": "Import-Module m",
+   "kind": "refused",
+   "construct": "code-running or unknown command (Import-Module)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (Import-Module). The PowerShell command is outside the grammar the hook can che"
+  },
+  {
+   "id": 322,
+   "sh": "ps",
+   "command": "Set-Alias a b",
+   "kind": "refused",
+   "construct": "code-running or unknown command (Set-Alias)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: code-running or unknown command (Set-Alias). The PowerShell command is outside the grammar the hook can check, "
+  },
+  {
+   "id": 323,
+   "sh": "ps",
+   "command": "ForEach-Object { ls }",
+   "kind": "refused",
+   "construct": "script block or brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 324,
+   "sh": "ps",
+   "command": "Where-Object { $_ }",
+   "kind": "refused",
+   "construct": "script block or brace",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rathe"
+  },
+  {
+   "id": 325,
+   "sh": "ps",
+   "command": "ls\nls",
+   "kind": "refused",
+   "construct": "newline",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: newline outside quotes (use ; between commands). The PowerShell command is outside the grammar the hook can che"
+  },
+  {
+   "id": 326,
+   "sh": "ps",
+   "command": "ls || ls",
+   "kind": "refused",
+   "construct": "|| (PowerShell 7",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: || (PowerShell 7 pipeline chain). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 327,
+   "sh": "ps",
+   "command": "ls && ls",
+   "kind": "refused",
+   "construct": "&& (PowerShell 7",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: && (PowerShell 7 pipeline chain). The PowerShell command is outside the grammar the hook can check, so it is re"
+  },
+  {
+   "id": 328,
+   "sh": "ps",
+   "command": "& ls",
+   "kind": "refused",
+   "construct": "& call of anything but gh",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: & call of anything but gh. The PowerShell command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 329,
+   "sh": "ps",
+   "command": "ls; & cat x",
+   "kind": "refused",
+   "construct": "& call of anything but gh",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: & call of anything but gh. The PowerShell command is outside the grammar the hook can check, so it is refused r"
+  },
+  {
+   "id": 330,
+   "sh": "ps",
+   "command": "<# c #> ls",
+   "kind": "refused",
+   "construct": "< (redirect, block comment or here-string)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: < (redirect, block comment or here-string). The PowerShell command is outside the grammar the hook can check, s"
+  },
+  {
+   "id": 331,
+   "sh": "ps",
+   "command": "Microsoft.PowerShell.Management\\Get-Item x",
+   "kind": "refused",
+   "construct": "module-qualified cmdlet",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: module-qualified cmdlet (Microsoft.PowerShell.Management\\Get-Item). The PowerShell command is outside the gramm"
+  },
+  {
+   "id": 332,
+   "sh": "ps",
+   "command": "Set-Content -Bogus x y",
+   "kind": "refused",
+   "construct": "unknown parameter -Bogus for set-content",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: unknown parameter -Bogus for set-content. The PowerShell command is outside the grammar the hook can check, so "
+  },
+  {
+   "id": 333,
+   "sh": "ps",
+   "command": "Set-Content -ErrorAction 0 y x",
+   "kind": "refused",
+   "construct": "unknown parameter -ErrorAction for set-content",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: unknown parameter -ErrorAction for set-content. The PowerShell command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 334,
+   "sh": "ps",
+   "command": "Set-Content -EA 0 y x",
+   "kind": "refused",
+   "construct": "unknown parameter -EA for set-content",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: unknown parameter -EA for set-content. The PowerShell command is outside the grammar the hook can check, so it "
+  },
+  {
+   "id": 335,
+   "sh": "ps",
+   "command": "Set-Content -OutVariable o y x",
+   "kind": "refused",
+   "construct": "unknown parameter -OutVariable for set-content",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: unknown parameter -OutVariable for set-content. The PowerShell command is outside the grammar the hook can chec"
+  },
+  {
+   "id": 336,
+   "sh": "ps",
+   "command": "Get-ChildItem -F",
+   "kind": "refused",
+   "construct": "ambiguous parameter -F for get-childitem",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: ambiguous parameter -F for get-childitem. The PowerShell command is outside the grammar the hook can check, so "
+  },
+  {
+   "id": 337,
+   "sh": "ps",
+   "command": "Export-Csv -Path x",
+   "kind": "refused",
+   "construct": "unknown cmdlet (Export-Csv)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: unknown cmdlet (Export-Csv). The PowerShell command is outside the grammar the hook can check, so it is refused"
+  },
+  {
+   "id": 338,
+   "sh": "ps",
+   "command": "Get-Foo x",
+   "kind": "refused",
+   "construct": "unknown cmdlet (Get-Foo)",
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: unknown cmdlet (Get-Foo). The PowerShell command is outside the grammar the hook can check, so it is refused ra"
+  },
+  {
+   "id": 339,
+   "sh": "bash",
+   "command": "ls",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 340,
+   "sh": "bash",
+   "command": "ls -la",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 341,
+   "sh": "bash",
+   "command": "git status",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 342,
+   "sh": "bash",
+   "command": "git log --oneline -5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 343,
+   "sh": "bash",
+   "command": "git diff HEAD",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 344,
+   "sh": "bash",
+   "command": "git add -A",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 345,
+   "sh": "bash",
+   "command": "git commit -m 'msg'",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 346,
+   "sh": "bash",
+   "command": "git commit -F docs/loops/m.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 347,
+   "sh": "bash",
+   "command": "git fetch origin",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 348,
+   "sh": "bash",
+   "command": "git pull",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 349,
+   "sh": "bash",
+   "command": "git branch -a",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 350,
+   "sh": "bash",
+   "command": "git show HEAD",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 351,
+   "sh": "bash",
+   "command": "git rev-parse HEAD",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 352,
+   "sh": "bash",
+   "command": "git push origin loop/x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 353,
+   "sh": "bash",
+   "command": "git push origin qa/t194-r6-y",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 354,
+   "sh": "bash",
+   "command": "gh pr list",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 355,
+   "sh": "bash",
+   "command": "gh pr view 5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 356,
+   "sh": "bash",
+   "command": "gh pr checkout 5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 357,
+   "sh": "bash",
+   "command": "gh pr comment 5 --body hi",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 358,
+   "sh": "bash",
+   "command": "gh pr diff 5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 359,
+   "sh": "bash",
+   "command": "gh run list",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 360,
+   "sh": "bash",
+   "command": "gh run view 123",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 361,
+   "sh": "bash",
+   "command": "gh api repos/x/y",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 362,
+   "sh": "bash",
+   "command": "cat README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 363,
+   "sh": "bash",
+   "command": "head -5 README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 364,
+   "sh": "bash",
+   "command": "tail -5 README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 365,
+   "sh": "bash",
+   "command": "wc -l README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 366,
+   "sh": "bash",
+   "command": "grep foo README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 367,
+   "sh": "bash",
+   "command": "diff a.txt b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 368,
+   "sh": "bash",
+   "command": "echo hi",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 369,
+   "sh": "bash",
+   "command": "echo hi > C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 370,
+   "sh": "bash",
+   "command": "echo hi >> C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 371,
+   "sh": "bash",
+   "command": "cat a.txt | wc -l",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 372,
+   "sh": "bash",
+   "command": "ls -la | head -5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 373,
+   "sh": "bash",
+   "command": "git status && git log --oneline -3",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 374,
+   "sh": "bash",
+   "command": "ls; wc -l README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 375,
+   "sh": "bash",
+   "command": "ls | grep x || echo none",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 376,
+   "sh": "bash",
+   "command": "git commit -m 'a > b; c'",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 377,
+   "sh": "bash",
+   "command": "git commit -m \"plain text\"",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 378,
+   "sh": "bash",
+   "command": "NODE_ENV=test npm test",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 379,
+   "sh": "bash",
+   "command": "GIT_PAGER=cat git log",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: git/gh config through the environment (GIT_PAGER). The Bash command is outside the grammar the hook can check, "
+  },
+  {
+   "id": 380,
+   "sh": "bash",
+   "command": "cp a.txt C:/qa-tmp/b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 381,
+   "sh": "bash",
+   "command": "mv a.txt C:/qa-tmp/b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 382,
+   "sh": "bash",
+   "command": "tee C:/qa-tmp/o.txt < a.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 383,
+   "sh": "bash",
+   "command": "env ls",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 384,
+   "sh": "bash",
+   "command": "command ls",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 385,
+   "sh": "bash",
+   "command": "nohup ls",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 386,
+   "sh": "bash",
+   "command": "sh -c 'ls'",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 387,
+   "sh": "bash",
+   "command": "sh -c 'git status'",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 388,
+   "sh": "bash",
+   "command": "ls 2> C:/qa-tmp/e.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 389,
+   "sh": "bash",
+   "command": "ls > C:/qa-tmp/o.txt 2>&1",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 390,
+   "sh": "bash",
+   "command": "ls &> C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 391,
+   "sh": "bash",
+   "command": "git -c user.name=q status",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 392,
+   "sh": "bash",
+   "command": "npm test",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 393,
+   "sh": "bash",
+   "command": "npm run build",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 394,
+   "sh": "bash",
+   "command": "npx tsc --noEmit",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 395,
+   "sh": "bash",
+   "command": "node build/x.js",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 396,
+   "sh": "bash",
+   "command": "sed -i 's/a/b/' C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 397,
+   "sh": "bash",
+   "command": "sed 's/a/b/' a.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 398,
+   "sh": "bash",
+   "command": "gh pr merge 2",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 2 gh pr merge is not on the D-032"
+  },
+  {
+   "id": 399,
+   "sh": "bash",
+   "command": "gh pr merge 2 --squash",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 2 --squash gh pr merge is not on "
+  },
+  {
+   "id": 400,
+   "sh": "bash",
+   "command": "gh pr merge '#7'",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge '#7' gh pr merge is not on the D-"
+  },
+  {
+   "id": 401,
+   "sh": "bash",
+   "command": "gh pr merge --squash 2",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge --squash 2 gh pr merge is not on "
+  },
+  {
+   "id": 402,
+   "sh": "bash",
+   "command": "git tag v1",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git tag v1"
+  },
+  {
+   "id": 403,
+   "sh": "bash",
+   "command": "git merge feature",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git merge feature"
+  },
+  {
+   "id": 404,
+   "sh": "bash",
+   "command": "git push --force origin loop/x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: git push --force origin loop/x"
+  },
+  {
+   "id": 405,
+   "sh": "bash",
+   "command": "install a.txt C:/qa-tmp/b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 406,
+   "sh": "bash",
+   "command": "git status -s",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 407,
+   "sh": "bash",
+   "command": "git log -p",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 408,
+   "sh": "bash",
+   "command": "git log --stat",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 409,
+   "sh": "bash",
+   "command": "git diff --cached",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 410,
+   "sh": "bash",
+   "command": "git show --stat HEAD",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 411,
+   "sh": "bash",
+   "command": "git blame README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 412,
+   "sh": "bash",
+   "command": "git stash list",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 413,
+   "sh": "bash",
+   "command": "git remote -v",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 414,
+   "sh": "bash",
+   "command": "git config --get user.name",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 415,
+   "sh": "bash",
+   "command": "git reflog",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 416,
+   "sh": "bash",
+   "command": "git ls-files docs",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 417,
+   "sh": "bash",
+   "command": "git rev-list --count HEAD",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 418,
+   "sh": "bash",
+   "command": "git describe --tags",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 419,
+   "sh": "bash",
+   "command": "git shortlog -s",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 420,
+   "sh": "bash",
+   "command": "gh pr status",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 421,
+   "sh": "bash",
+   "command": "gh pr ready 5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 422,
+   "sh": "bash",
+   "command": "gh issue list",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 423,
+   "sh": "bash",
+   "command": "gh issue view 3",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 424,
+   "sh": "bash",
+   "command": "gh repo view",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 425,
+   "sh": "bash",
+   "command": "gh workflow list",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 426,
+   "sh": "bash",
+   "command": "gh run watch 123",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 427,
+   "sh": "bash",
+   "command": "cat docs/loops/x.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 428,
+   "sh": "bash",
+   "command": "sort README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: sort. The Bash command is outside the grammar the hook can check, so it is refused rather "
+  },
+  {
+   "id": 429,
+   "sh": "bash",
+   "command": "uniq a.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 430,
+   "sh": "bash",
+   "command": "cut -f1 a.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 431,
+   "sh": "bash",
+   "command": "sed 's/a/b/' README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 432,
+   "sh": "bash",
+   "command": "awk '{print}' README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — not statically parseable: command not allowed: awk. The Bash command is outside the grammar the hook can check, so it is refused rather t"
+  },
+  {
+   "id": 433,
+   "sh": "bash",
+   "command": "comm a.txt b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 434,
+   "sh": "bash",
+   "command": "ls docs",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 435,
+   "sh": "bash",
+   "command": "pwd",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 436,
+   "sh": "bash",
+   "command": "whoami",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 437,
+   "sh": "bash",
+   "command": "git commit --amend -m 'x'",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 438,
+   "sh": "bash",
+   "command": "git fetch --all",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 439,
+   "sh": "bash",
+   "command": "git pull --rebase",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 440,
+   "sh": "bash",
+   "command": "git branch -d feature",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 441,
+   "sh": "bash",
+   "command": "git checkout README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 442,
+   "sh": "bash",
+   "command": "git restore README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 443,
+   "sh": "bash",
+   "command": "echo done > C:/qa-tmp/d.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 444,
+   "sh": "bash",
+   "command": "true && echo ok",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 445,
+   "sh": "ps",
+   "command": "Get-ChildItem",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 446,
+   "sh": "ps",
+   "command": "Get-ChildItem docs",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 447,
+   "sh": "ps",
+   "command": "Get-ChildItem -Recurse docs",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 448,
+   "sh": "ps",
+   "command": "Get-Content README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 449,
+   "sh": "ps",
+   "command": "Get-Content README.md -TotalCount 5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 450,
+   "sh": "ps",
+   "command": "Get-Content -Path README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 451,
+   "sh": "ps",
+   "command": "Test-Path README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 452,
+   "sh": "ps",
+   "command": "Select-String foo README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 453,
+   "sh": "ps",
+   "command": "Get-Item README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 454,
+   "sh": "ps",
+   "command": "Write-Output hi",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 455,
+   "sh": "ps",
+   "command": "Write-Host hi",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 456,
+   "sh": "ps",
+   "command": "Set-Content C:/qa-tmp/o.txt -Value x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 457,
+   "sh": "ps",
+   "command": "Set-Content -Path C:/qa-tmp/o.txt -Value x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 458,
+   "sh": "ps",
+   "command": "Set-Content -LiteralPath C:/qa-tmp/o.txt x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 459,
+   "sh": "ps",
+   "command": "Add-Content C:/qa-tmp/o.txt -Value x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 460,
+   "sh": "ps",
+   "command": "Out-File -FilePath C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 461,
+   "sh": "ps",
+   "command": "New-Item -Path C:/qa-tmp/o.txt -ItemType File",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 462,
+   "sh": "ps",
+   "command": "Copy-Item a.txt C:/qa-tmp/b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 463,
+   "sh": "ps",
+   "command": "Move-Item a.txt C:/qa-tmp/b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 464,
+   "sh": "ps",
+   "command": "Remove-Item C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 465,
+   "sh": "ps",
+   "command": "Get-ChildItem docs | Select-Object -First 5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 466,
+   "sh": "ps",
+   "command": "Get-Content README.md | Measure-Object -Line",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 467,
+   "sh": "ps",
+   "command": "Write-Output x > C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 468,
+   "sh": "ps",
+   "command": "Write-Output x >> C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 469,
+   "sh": "ps",
+   "command": "Set-Content -Path:C:/qa-tmp/o.txt -Value x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 470,
+   "sh": "ps",
+   "command": "git status",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 471,
+   "sh": "ps",
+   "command": "git log",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 472,
+   "sh": "ps",
+   "command": "gh pr list",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 473,
+   "sh": "ps",
+   "command": "gh pr merge 2",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "deny",
+   "reason": "Planner hook: denied — shared.md, \"Each outward-facing act needs authority for THAT act\" (D-038 / D-032). Command: gh pr merge 2 gh pr merge is not on the D-032"
+  },
+  {
+   "id": 474,
+   "sh": "ps",
+   "command": "git push origin loop/x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 475,
+   "sh": "ps",
+   "command": "& gh pr list",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 476,
+   "sh": "ps",
+   "command": "Set-Content C:/qa-tmp/o.txt -Value 'a,b'",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 477,
+   "sh": "ps",
+   "command": "Sort-Object",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 478,
+   "sh": "ps",
+   "command": "Get-Date -Format yyyy",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 479,
+   "sh": "ps",
+   "command": "Get-Location",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 480,
+   "sh": "ps",
+   "command": "Set-Content $null",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 481,
+   "sh": "ps",
+   "command": "Get-Content README.md -Tail 5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 482,
+   "sh": "ps",
+   "command": "Get-Content -LiteralPath README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 483,
+   "sh": "ps",
+   "command": "Get-Item -Path README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 484,
+   "sh": "ps",
+   "command": "Test-Path -Path README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 485,
+   "sh": "ps",
+   "command": "Get-ChildItem -File docs",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 486,
+   "sh": "ps",
+   "command": "Get-ChildItem -Directory",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 487,
+   "sh": "ps",
+   "command": "Get-ChildItem -Depth 2 docs",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 488,
+   "sh": "ps",
+   "command": "Select-String -Pattern foo README.md",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 489,
+   "sh": "ps",
+   "command": "Write-Output x | Out-Null",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 490,
+   "sh": "ps",
+   "command": "Measure-Object -Line",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 491,
+   "sh": "ps",
+   "command": "Set-Content C:/qa-tmp/o.txt x -Force",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 492,
+   "sh": "ps",
+   "command": "Add-Content -Path C:/qa-tmp/o.txt -Value x -NoNewline",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 493,
+   "sh": "ps",
+   "command": "Out-File -FilePath C:/qa-tmp/o.txt -Append",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 494,
+   "sh": "ps",
+   "command": "New-Item -Path C:/qa-tmp/d -ItemType Directory",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 495,
+   "sh": "ps",
+   "command": "Copy-Item -Path a.txt -Destination C:/qa-tmp/b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 496,
+   "sh": "ps",
+   "command": "Move-Item -Path a.txt -Destination C:/qa-tmp/b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 497,
+   "sh": "ps",
+   "command": "Remove-Item -Path C:/qa-tmp/o.txt -Force",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 498,
+   "sh": "ps",
+   "command": "Clear-Content C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 499,
+   "sh": "ps",
+   "command": "Rename-Item a.txt b.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 500,
+   "sh": "ps",
+   "command": "git fetch origin",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 501,
+   "sh": "ps",
+   "command": "git log --oneline",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 502,
+   "sh": "ps",
+   "command": "gh pr view 5",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 503,
+   "sh": "ps",
+   "command": "gh run list",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 504,
+   "sh": "ps",
+   "command": "git push origin docs/x",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 505,
+   "sh": "ps",
+   "command": "Set-Content -Path C:/qa-tmp/o.txt -Value x -Encoding utf8",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 506,
+   "sh": "ps",
+   "command": "Tee-Object -FilePath C:/qa-tmp/o.txt",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 507,
+   "sh": "ps",
+   "command": "Get-Content README.md | Select-Object -First 3",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  },
+  {
+   "id": 508,
+   "sh": "ps",
+   "command": "Get-ChildItem | Sort-Object -Property Name",
+   "kind": "accepted",
+   "construct": null,
+   "decision": "allow",
+   "reason": ""
+  }
+ ]
+}

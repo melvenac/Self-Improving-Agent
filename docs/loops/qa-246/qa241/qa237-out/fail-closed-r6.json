@@ -1,0 +1,134 @@
+[
+ {
+  "id": "cd then redirect outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/out.txt (the command line changes directory with cd, pushd or Set-Location and also writes, so where the write lands cannot be determined; split them into two commands)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically p"
+ },
+ {
+  "id": "cd then tee outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/vt.log (the command line changes directory with cd, pushd or Set-Location and also writes, so where the write lands cannot be determined; split them into two commands)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically pa"
+ },
+ {
+  "id": "redirect to $TMPDIR",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — not statically parseable: $ (variable, substitution or $'...' string). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseabl"
+ },
+ {
+  "id": "redirect to ~/notes",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — not statically parseable: tilde (home-directory expansion). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerSh"
+ },
+ {
+  "id": "redirect, target with ( )",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/a (1).txt (contains a parenthesis (process substitution or subshell), so its location cannot be determined)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell must be printable ASCII; Bash may carry"
+ },
+ {
+  "id": "redirect, target with { }",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/{a}.txt (contains a brace expansion, so its location cannot be determined)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell must be printable ASCII; Bash may carry other characters only inside quo"
+ },
+ {
+  "id": "redirect, target with [ ]",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/qa-tmp/a[1].txt (contains a glob pattern, so its location cannot be determined)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell must be printable ASCII; Bash may carry other characters only inside quote"
+ },
+ {
+  "id": "Program Files (x86) target",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/Program Files (x86)/x/a.txt (contains a parenthesis (process substitution or subshell), so its location cannot be determined)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell must be printable ASCII; Bas"
+ },
+ {
+  "id": "8.3 short-name outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via Bash write (C:/PROGRA~1/x.txt contains an 8.3 short name, so its location cannot be determined). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell must be printable ASCII; Bash may carry other characters only inside quote"
+ },
+ {
+  "id": "trailing comment after an outside write",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Power"
+ },
+ {
+  "id": "commented-out write (writes nothing)",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Power"
+ },
+ {
+  "id": "unquoted backslashes (bash writes open-brainsrcx.ts in the root)",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — not statically parseable: backslash. The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell must be printable A"
+ },
+ {
+  "id": "gh comment whose body is the word merge",
+  "decision": "allow",
+  "namedCause": null,
+  "reason": ""
+ },
+ {
+  "id": "gh pr list --label merge",
+  "decision": "allow",
+  "namedCause": null,
+  "reason": ""
+ },
+ {
+  "id": "standing push with a trailing comment",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — not statically parseable: comment (# at the start of a word). The Bash command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. Power"
+ },
+ {
+  "id": "PS -LiteralPath with [ ]",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (C:/qa-tmp/a[1].txt (contains a glob pattern, so its location cannot be determined)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell must be printable ASCII; Bash may carry other characters only inside"
+ },
+ {
+  "id": "PS ForEach-Object script block writing outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — not statically parseable: script block or brace. The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerShell m"
+ },
+ {
+  "id": "PS Set-Location then redirect outside",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — planner.md, \"Authority\" / state changes go through `ob_state` via PowerShell write (C:/qa-tmp/ls.txt (the command line changes directory with cd, pushd or Set-Location and also writes, so where the write lands cannot be determined; split them into two commands)). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statica"
+ },
+ {
+  "id": "PS $env:TEMP target",
+  "decision": "deny",
+  "namedCause": false,
+  "reason": "Planner hook: denied — not statically parseable: $ (variable or expression). The PowerShell command is outside the grammar the hook can check, so it is refused rather than guessed at; rewrite it in plain words (split compound commands, write long text to a file). The hook checks only a command it can fully parse (Bash and PowerShell); anything else is refused as 'not statically parseable'. PowerSh"
+ },
+ {
+  "id": "Write tool, path with [ ]",
+  "decision": "deny",
+  "namedCause": true,
+  "reason": "Planner hook: denied — C:/qa-tmp/a[1].md (contains a glob pattern, so its location cannot be determined) (fail closed). Path: C:/qa-tmp/a[1].md"
+ },
+ {
+  "id": "control: cd with no write",
+  "decision": "allow",
+  "namedCause": null,
+  "reason": ""
+ },
+ {
+  "id": "control: cd with output to /dev/null",
+  "decision": "allow",
+  "namedCause": null,
+  "reason": ""
+ }
+]

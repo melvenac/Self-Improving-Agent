@@ -1,0 +1,15 @@
+deny  hook | realWrote=true  | provider-path redirect to protected abs
+     cmd=Write-Output x > FileSystem::C:\qa-scratch\qa246-rpsr-fx\open-brain\src\x.ts
+     reason=Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the h
+deny  hook | realWrote=true  | full provider redirect to protected abs
+     cmd=Write-Output x > Microsoft.PowerShell.Core\FileSystem::C:\qa-scratch\qa246-rpsr-fx\open-brain\src\x.ts
+     reason=Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the h
+deny  hook | realWrote=true  | provider-path append redirect
+     cmd=Write-Output x >> FileSystem::C:\qa-scratch\qa246-rpsr-fx\open-brain\src\x.ts
+     reason=Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the h
+deny  hook | realWrote=true  | provider-path as Set-Content positional
+     cmd=Set-Content FileSystem::C:\qa-scratch\qa246-rpsr-fx\open-brain\src\x.ts -Value x
+     reason=Planner hook: denied — not statically parseable: provider path (::). The PowerShell command is outside the grammar the h
+deny  hook | realWrote=true  | drive-relative redirect (cwd on C:)
+     cmd=Write-Output x > C:open-brain/src/x.ts
+     reason=Planner hook: denied — not statically parseable: drive-relative path (C:name). The PowerShell command is outside the gra
