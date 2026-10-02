@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 292,
+  "revision": 293,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4024,6 +4024,12 @@
       "title": "Dev start-greeting trim (Aaron 'yes' in the planner's window, ~20:1xZ): dispatch T-191 (per-seat greeting profiles; the dev profile drops Verified, the Sizes block and stale other-seat handoffs, and shows the seat's assignment plus task counts instead of the P0/P1 list, naming every section it omits) and T-203 (resolve the seat by checkout, so a dev never sees another seat's handoff; G-049). AND have a shared.md split PROPOSED: every rule statement stays verbatim in .agents/roles/shared.md, and the provenance and war-story paragraphs move to a linked tracked file. That PR is docs-only, but it goes to AARON for review before merge despite the standing docs-only rule, because it edits the rules text every seat reads.",
       "date": "2026-10-02",
       "note": "Measured basis (sia-builder, docs/loops/session-157-builder-2-handoff.md, rev 278, about 40.7k chars): role files 23.5k (55%; shared.md 17,643 bytes at master), tasks 6.2k, your handoff 3.6k, verified 1.8k, other handoffs 1.0k, sizes 0.5k. The easy cuts are ~9.5k (~23%) without touching the rules. Also opened T-232 for ob_state write-output noise."
+    },
+    {
+      "id": "D-111",
+      "title": "Repo auto-merge ENABLED (Aaron 'yes to auto merge' in the planner's window, ~20:2xZ): allow_auto_merge=true, read back from the REST API. Use `gh pr merge <n> --merge --auto --match-head-commit <sha>` instead of polling CI and then merging. Auto-merge changes NOTHING about authority: docs-only PRs still merge on the standing rule; code PRs still need QA and Aaron's word naming the PR first; --match-head-commit still pins the approved SHA.",
+      "date": "2026-10-02",
+      "note": "Context: the ruleset (D-090) requires 'test' on every PR. Pure docs PRs only run 'changed' (~10 s) and report test Skipped (D-091); records PRs (.agents/state.json) run the full suite on purpose, because tests read the live record (T-205, T-213)."
     }
   ],
   "handoffs": [
