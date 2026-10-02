@@ -1684,25 +1684,24 @@ export function checkGitNexusIndex(projectRoot: string): CheckResult {
   if (gitOut(projectRoot, ["cat-file", "-e", `${indexed}^{commit}`]) === null) {
     return {
       name,
-      severity: "issue",
+      severity: "warn",
       message:
-        `indexed commit ${indexed.slice(0, 7)} is not present in this repository — staleness is UNDEFINED, not zero. Reindex. ${at} ` +
+        `not checked: indexed commit ${indexed.slice(0, 7)} unknown — it is not present in this repository, so staleness is UNDEFINED, not zero. Reindex. ${at} ` +
         `LIMIT: sees that the index is old, not whether anything it indexed changed.`,
       report: true,
     };
   }
 
-  const behindRaw = gitOut(projectRoot, ["rev-list", "--count", `${indexed}..HEAD`]);
-  if (behindRaw === null || !/^\d+$/.test(behindRaw)) {
-    return { name, severity: "issue", message: `could not count commits behind indexed ${indexed.slice(0, 7)} — staleness undefined, not zero. ${at}`, report: true };
+  // BOTH directions in one call (T-176): left = commits only the index has (it is ahead),
+  // right = commits only HEAD has (it is behind). 'At HEAD' needs both to be zero; counting
+  // one direction cannot tell 'same commit' from 'I only looked one way'.
+  const lr = gitOut(projectRoot, ["rev-list", "--left-right", "--count", `${indexed}...HEAD`]);
+  const m = lr === null ? null : /^(\d+)\s+(\d+)$/.exec(lr);
+  if (m === null) {
+    return { name, severity: "issue", message: `could not count commits between indexed ${indexed.slice(0, 7)} and HEAD — staleness undefined, not zero. ${at}`, report: true };
   }
-  const aheadRaw = gitOut(projectRoot, ["rev-list", "--count", `HEAD..${indexed}`]);
-  if (aheadRaw === null || !/^\d+$/.test(aheadRaw)) {
-    return { name, severity: "issue", message: `could not count commits ahead of HEAD to indexed ${indexed.slice(0, 7)} — staleness undefined, not zero. ${at}`, report: true };
-  }
-  const behind = Number(behindRaw);
-  const ahead = Number(aheadRaw);
-
+  const ahead = Number(m[1]);
+  const behind = Number(m[2]);
   const tail = `(indexed ${indexed.slice(0, 7)}, HEAD ${head}; behind=${behind} ahead=${ahead}; ${meta.indexedAt ?? "time unrecorded"}; ${at}) ` +
     `LIMIT: sees that the index is old, not whether anything it indexed changed.${branchNote}`;
 
@@ -1710,19 +1709,20 @@ export function checkGitNexusIndex(projectRoot: string): CheckResult {
     return { name, severity: "pass", message: `index is at HEAD ${tail}`, report: true };
   }
   if (behind > 0 && ahead > 0) {
+    const mb = gitOut(projectRoot, ["merge-base", indexed, "HEAD"]);
     return {
       name,
       severity: "issue",
       message:
-        `index diverged from HEAD — ${behind} commit(s) behind and ${ahead} ahead; neither is an ancestor of the other. Reindex. ${tail}`,
+        `index diverged from HEAD — ${behind} commit(s) behind and ${ahead} ahead, merge-base ${mb === null ? "none (unrelated histories)" : mb.slice(0, 7)}; neither is an ancestor of the other. Reindex. ${tail}`,
       report: true,
     };
   }
   if (ahead > 0) {
     return {
       name,
-      severity: "issue",
-      message: `index is ${ahead} commit(s) ahead of HEAD — indexed ${indexed.slice(0, 7)} is not HEAD ${head}. Reindex. ${tail}`,
+      severity: "warn",
+      message: `index is ${ahead} commit(s) AHEAD of HEAD — HEAD is an ancestor of indexed ${indexed.slice(0, 7)}; the index describes code HEAD does not have yet. ${tail}`,
       report: true,
     };
   }

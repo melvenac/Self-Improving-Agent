@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 56f6dfce..02a06f56 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -1618,7 +1618,7 @@ export function checkGitNexusIndex(projectRoot: string): CheckResult {
+   if (m === null) {
+     return { name, severity: "issue", message: `could not count commits between indexed ${indexed.slice(0, 7)} and HEAD — staleness undefined, not zero. ${at}`, report: true };
+   }
+-  const ahead = Number(m[1]);
++  const ahead = 0 * Number(m[1]); // mutant: only the HEAD-has direction is counted
+   const behind = Number(m[2]);
+   const tail = `(indexed ${indexed.slice(0, 7)}, HEAD ${head}; behind=${behind} ahead=${ahead}; ${meta.indexedAt ?? "time unrecorded"}; ${at}) ` +
+     `LIMIT: sees that the index is old, not whether anything it indexed changed.${branchNote}`;
