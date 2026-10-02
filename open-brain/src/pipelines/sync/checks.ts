@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, accessSync, constants as fsConstants } from "node:fs";
 import { join, posix as pathPosix, win32 as pathWin32 } from "node:path";
 import { homedir } from "node:os";
 import { execSync, execFileSync } from "node:child_process";
@@ -783,6 +783,111 @@ export function checkHookRegistration(settingsPath: string): CheckResult {
   }
 
   return { name: "hook-registration", severity: "pass", message: `No duplicate hook registrations: ${counts}` };
+}
+
+/** How a command is looked up; injectable so tests never depend on the machine's PATH. */
+export interface McpResolveEnv {
+  /** The PATH value. Defaults to `process.env.PATH`. */
+  pathEnv?: string;
+  /** Windows only: the PATHEXT value. Defaults to `process.env.PATHEXT`, then `.COM;.EXE;.BAT;.CMD`. */
+  pathExt?: string;
+  /** Defaults to `process.platform`. */
+  platform?: NodeJS.Platform;
+}
+
+/**
+ * Resolve an MCP server `command` the way a process spawn would: a path (absolute,
+ * or any name with a separator) is stat'ed as it is; a bare name is searched on
+ * PATH, and on Windows each PATHEXT extension is tried too (`npx` is `npx.cmd`).
+ * Returns the file found, or null.
+ */
+export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): string | null {
+  const platform = env.platform ?? process.platform;
+  const win = platform === "win32";
+  const p = win ? pathWin32 : pathPosix;
+  const exts = win ? (env.pathExt ?? process.env.PATHEXT ?? ".COM;.EXE;.BAT;.CMD").split(";").filter(Boolean) : [];
+  const isFile = (f: string): boolean => {
+    try {
+      if (!statSync(f).isFile()) return false;
+      if (!win) accessSync(f, fsConstants.X_OK);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const candidates = (base: string): string[] => [base, ...exts.map((e) => base + e)];
+  const hasSeparator = command.includes("/") || (win && command.includes("\\"));
+  if (p.isAbsolute(command) || hasSeparator) {
+    return candidates(command).find(isFile) ?? null;
+  }
+  const dirs = (env.pathEnv ?? process.env.PATH ?? "").split(win ? ";" : ":").filter(Boolean);
+  for (const dir of dirs) {
+    const hit = candidates(p.join(dir.replace(/^"|"$/g, ""), command)).find(isFile);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+/**
+ * Every `command` registered under `mcpServers` in `~/.claude.json`, global and
+ * per-project, must exist (T-008). GitNexus sat disconnected for an unknown period
+ * because its registration pointed at `C:\Program Files\nodejs\gitnexus.cmd`, which
+ * did not exist; nothing reported it, the tools were simply absent, and the CLI kept
+ * working. A missing command is an ISSUE naming the server and the path. A server
+ * with a `url` has no command to stat and is listed as skipped, with that reason.
+ * An absent or unreadable config is SKIP "not checked: <cause>", never a pass.
+ */
+export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}): CheckResult {
+  const name = "mcp-command-paths";
+  const configPath = join(home, ".claude.json");
+  let config: { mcpServers?: unknown; projects?: unknown };
+  try {
+    config = JSON.parse(readFileSync(configPath, "utf-8").replace(/^\uFEFF/, ""));
+  } catch (e) {
+    const cause = (e as NodeJS.ErrnoException).code === "ENOENT" ? `${configPath} does not exist` : `${configPath} could not be read as JSON (${(e as Error).message.split("\n")[0]})`;
+    return { name, severity: "skip", message: `not checked: ${cause}. This is not a pass.` };
+  }
+
+  type Server = { command?: unknown; url?: unknown; type?: unknown };
+  const scopes: Array<{ scope: string; servers: Record<string, Server> }> = [];
+  const asServers = (v: unknown): Record<string, Server> => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, Server>) : {});
+  scopes.push({ scope: "global", servers: asServers(config.mcpServers) });
+  for (const [proj, v] of Object.entries(asServers(config.projects))) {
+    scopes.push({ scope: `project ${proj}`, servers: asServers((v as { mcpServers?: unknown } | null)?.mcpServers) });
+  }
+
+  const missing = new Map<string, string[]>(); // "server: command" -> scopes
+  const skipped: string[] = [];
+  let checked = 0;
+  for (const { scope, servers } of scopes) {
+    for (const [server, def] of Object.entries(servers)) {
+      if (!def || typeof def !== "object") continue;
+      if (typeof def.command !== "string" || def.command === "") {
+        if (typeof def.url === "string") skipped.push(`${server} (${scope}): url server, no command to stat`);
+        else skipped.push(`${server} (${scope}): no command and no url`);
+        continue;
+      }
+      if (def.command.includes("${")) {
+        skipped.push(`${server} (${scope}): command uses \${...} expansion, not resolved here`);
+        continue;
+      }
+      checked++;
+      if (resolveMcpCommand(def.command, env) === null) {
+        const key = `${server}: ${def.command}`;
+        missing.set(key, [...(missing.get(key) ?? []), scope]);
+      }
+    }
+  }
+
+  const skippedNote = skipped.length > 0 ? ` Skipped ${skipped.length}: ${skipped.join("; ")}.` : "";
+  if (missing.size > 0) {
+    const list = [...missing].map(([k, s]) => `${k} not found (${s.length === 1 ? s[0] : `${s.length} scopes, first ${s[0]}`})`).join("; ");
+    return { name, severity: "issue", message: `MCP command path missing — ${list}. The server cannot start, so its tools are silently absent.${skippedNote}` };
+  }
+  if (checked === 0) {
+    return { name, severity: "skip", message: `not checked: no mcpServers entry with a command in ${configPath}.${skippedNote} This is not a pass.` };
+  }
+  return { name, severity: "pass", message: `${checked} MCP server command(s) resolve to a file.${skippedNote}` };
 }
 
 /**

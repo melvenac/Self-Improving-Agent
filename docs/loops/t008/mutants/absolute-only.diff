@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 5870c813..a1c8cae5 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -556,6 +556,7 @@ export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): str
+   if (p.isAbsolute(command) || hasSeparator) {
+     return candidates(command).find(isFile) ?? null;
+   }
++  if (!hasSeparator && !p.isAbsolute(command)) return command; // mutant: bare names are not resolved, only absolute paths are checked
+   const dirs = (env.pathEnv ?? process.env.PATH ?? "").split(win ? ";" : ":").filter(Boolean);
+   for (const dir of dirs) {
+     const hit = candidates(p.join(dir.replace(/^"|"$/g, ""), command)).find(isFile);
