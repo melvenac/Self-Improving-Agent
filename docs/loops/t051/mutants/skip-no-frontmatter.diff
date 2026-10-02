@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 5dcf05f2..1f02458d 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -407,7 +407,7 @@ export function checkSkillsContract(projectRoot: string): CheckResult {
+     } else {
+       const text = readFileSync(skillMd, "utf-8").replace(/^﻿/, "");
+       const block = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+-      if (!block) fm = "none (no frontmatter)";
++      if (!block) continue; // mutant: a SKILL.md without frontmatter is skipped, not reported
+       else {
+         const m = block[1]!.match(/^name\s*:\s*(.+?)\s*$/m);
+         fm = m ? m[1]!.replace(/^["']|["']$/g, "") : "none (frontmatter has no name)";

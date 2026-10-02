@@ -15,6 +15,7 @@ import {
   checkObsidianVault,
   checkVaultPathRefs,
   checkSkillIndex,
+  checkSkillsContract,
   checkTemplatePersonalNames,
   checkTemplate,
   checkSpecProvenance,
@@ -68,6 +69,7 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkObsidianVault(paths.obsidianVault));
   checks.push(checkVaultPathRefs(options.projectRoot));
   checks.push(checkSkillIndex(paths.obsidianVault));
+  checks.push(checkSkillsContract(options.projectRoot));
   checks.push(checkTemplatePersonalNames(options.projectRoot));
 
   // The memory module's three checks, supplied rather than imported (Loop 13).
