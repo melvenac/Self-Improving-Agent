@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/serving-build.ts b/open-brain/src/pipelines/session-start/serving-build.ts
+index 18b1aa49..0cd7d192 100644
+--- a/open-brain/src/pipelines/session-start/serving-build.ts
++++ b/open-brain/src/pipelines/session-start/serving-build.ts
+@@ -51,7 +51,7 @@ export function describeServingBuild(buildDir: string = runningBuildDir()): stri
+   const builtAt = typeof info.builtAt === "string" ? info.builtAt : "an unrecorded time";
+ 
+   // The tree is the build's grandparent: <tree>/open-brain/build.
+-  const tree = join(buildDir, "..", "..");
++  const tree = join(buildDir, "..");
+   let head: string;
+   try {
+     head = gitIn(tree, ["rev-parse", "HEAD"]);

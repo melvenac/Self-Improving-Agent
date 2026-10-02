@@ -1,0 +1,56 @@
+{
+  "loop": "qa-263-t233",
+  "candidate_git": {
+    "sha": "3fe3a245fe9b2c34abbd955989208250a45a3cd9",
+    "branch": "origin/scratch/t233-batch",
+    "frozen_at": "2026-10-02T22:49:16Z"
+  },
+  "candidates": [
+    { "task": "T-233 C", "sha": "d010692cd478e741f3111767f30a2faadb5815a2", "branch": "origin/loop/t233-c-brief-glob", "pr": 343, "verdict": "ACCEPT" },
+    { "task": "T-233 D", "sha": "8a8270922dfc6b61ab0179346bbdbbaba0016449", "branch": "origin/loop/t233-d-cron", "pr": 344, "verdict": "ACCEPT" },
+    { "task": "T-233 A", "sha": "d20d4925226f8b5238df7f8ffab7e9181ffab6f9", "branch": "origin/loop/t233-a-serving", "pr": 345, "verdict": "ACCEPT" },
+    { "task": "T-233 B", "sha": "724e31fe64a6c5f0b1f915a214a37f3f6f95da05", "branch": "origin/loop/t233-b-briefing", "pr": 346, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit on each head and on the C,D,A,B ordered merge",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "tsc --noEmit exit 0 on d010692c, 8a827092, d20d4925, 724e31fe and the ordered merge. tsconfig.tests.json: 4 errors, identical on 5cd9ed52 (pre-existing, untouched files)."
+    },
+    "unit": {
+      "command": "npx vitest run <one file> per invocation: latest-brief, no-standing-cron, serving-build, briefing, start-parity; QA probes",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "Ordered merge: 24/24, 4/4, 10/10, 39/39, 11/11. Heads: same per touched file. QA probes 7/7. CI test job green on all four heads (runs 37069637515, 37069801610, 37072068944, 37072269471)."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q263-1", "status": "met", "order": "shown", "evidence": "Block toEqual renderBriefing (developer row and QA P2 via MCP stdio); first line = greeting line 1 for not checked, stale (developer) and level (QA P1); start.md x3 print verbatim then FLAGS." },
+    { "id": "Q263-2", "status": "met", "order": "shown", "evidence": "Distance from build-info commit (mutant a-distance-from-tree-head killed); every unreadable branch returns not checked; P2: tools/list lacks serving_build_dir and tools/call with it prints not checked while the same fixture is STALE directly." },
+    { "id": "Q263-3", "status": "met", "order": "shown", "evidence": "Object and bare-string usageLevel; leading word; numeric fields only; <95 nothing, 95-97 hold naming override, >=98 wind down even with override (QA P4); absent/malformed/empty/unknown not checked; path from usage_file or SIA_USAGE_FILE, none hard-coded. No real slots.json on this machine: shape per dispatch, synthetic values." },
+    { "id": "Q263-4", "status": "met", "order": "shown", "evidence": "OpenQuestionSchema string|{text,resolved_by?} in HandoffSchema and set_handoff (writer row); omitted and counted in block and State; next-session view marks '_(resolved by X)_' (QA P7)." },
+    { "id": "Q263-5", "status": "met", "order": "red-first", "evidence": "Master docs/loops: 64 kept, 8 excluded (drafts, records, script, follow-up list, research note, accepted a2-grok-brief-2); red on 5cd9ed52 7 failed / 24, head 24/24." },
+    { "id": "Q263-6", "status": "met", "order": "red-first", "evidence": "No Standing cron line, no step 5b, no template AGENT.md section, claude_only []; status_cron seat prints nothing via MCP (P2); red on 5cd9ed52 4/4 failed, head 4/4." },
+    { "id": "Q263-7", "status": "met", "order": "shown", "evidence": "Call trace MCP ob_start -> handleStart -> renderBriefing (sole caller in src); P2 asserts the MCP-returned block equals renderBriefing output." },
+    { "id": "Q263-8", "status": "met", "order": "shown", "evidence": "Nine planned mutants all killed. Own: A qa-a-names-wrong-tree survives (F1); A+B seam-in-schema, B override-beats-winddown, B view-drops-resolved-mark survive developer files, killed by QA probes; C no-start-anchor killed; C no-end-anchor survives (F5)." },
+    { "id": "Q263-9", "status": "met", "order": "red-first", "evidence": "C 7/24 red, D 4/4 red, A and B fail to load on 5cd9ed52 and on their PR bases, start-parity 3/11 red on d20d4925; all green on heads." },
+    { "id": "Q263-10", "status": "met", "order": "shown", "evidence": "range-diff: product commits differ only in server.ts import context; new commits 95498211 (serving-line integration + StartArgs test seam) and 724e31fe (mutant)." },
+    { "id": "Q263-11", "status": "met", "order": "shown", "evidence": "gh pr checks 343-346: changed pass, test pass, test-windows skipping; run headSha equals each pinned head." },
+    { "id": "Q263-12", "status": "met", "order": "shown", "evidence": "C, D, A, B merged onto origin/master 3a3f3e52 with no conflicts; tree equals dispatch tree apart from the two dispatch files; touched files and tsc green." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "F1 A: no row asserts the serving line names the tree; qa-a-names-wrong-tree survives. Non-blocking.",
+    "F2 B: >=98 with weeklyOverride has no developer row; QA probe P4 covers it. Non-blocking.",
+    "F3 B: next-session view resolved marker has no developer row; QA probe P7 covers it. Non-blocking.",
+    "F4 A+B: serving_build_dir schema absence is unpinned by developer tests; QA probe P2 covers it. Non-blocking.",
+    "F5 C: BRIEF_NAME end anchor unpinned; qa-c-no-end-anchor survives. Non-blocking.",
+    "F6 A: a build ahead of origin/master is reported 'level with origin/master'. Wording, non-blocking.",
+    "F7 B: start.md step 2 omits the serving line from its block list; step 5 still says *brief*.md. Doc nit."
+  ],
+  "notes": "QA 263, dispatch tree 3fe3a245fe9b2c34abbd955989208250a45a3cd9. LIGHT: one file per vitest invocation, HOME/TMPDIR in ~/qa-tmp. No live Jev call, no real config read. Batch verdict ACCEPT; merge waits for Aaron's word naming each PR."
+}

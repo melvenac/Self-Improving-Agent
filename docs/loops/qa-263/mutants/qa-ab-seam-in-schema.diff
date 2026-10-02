@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts
+index f1610879..088d9d41 100644
+--- a/open-brain/src/server.ts
++++ b/open-brain/src/server.ts
+@@ -711,6 +711,7 @@ server.tool(
+   {
+     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
+     state_budget_lines: z.number().int().min(0).optional().describe("Per-file line budget for the state files. Omit for the whole files (default). Truncation is reported per file."),
++    serving_build_dir: z.string().optional(),
+   },
+   async (args) => handleStart(args)
+ );

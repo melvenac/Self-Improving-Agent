@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+index 7a584cb0..536187d4 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -237,7 +237,7 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
+   const weekly: number | null = obj ? num(obj.sevenDayPct) : null;
+   const override = obj && typeof obj.weeklyOverride === "string" && obj.weeklyOverride.trim() !== "" ? obj.weeklyOverride.trim() : null;
+   let weeklyConsequence: string | null = null;
+-  if (weekly !== null && weekly >= 98) weeklyConsequence = "wind down: every seat pushes WIP and a handoff and parks";
++  if (weekly !== null && weekly >= 98 && override === null) weeklyConsequence = "wind down: every seat pushes WIP and a handoff and parks";
+   else if (weekly !== null && weekly >= 95) {
+     weeklyConsequence = override !== null ? `no new QA, tasks or dispatches except ${override} (Aaron's lift)` : "no new QA, tasks or dispatches";
+   }

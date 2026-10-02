@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/state-views/index.ts b/open-brain/src/pipelines/state-views/index.ts
+index 43a2c9ae..4f9a0f60 100644
+--- a/open-brain/src/pipelines/state-views/index.ts
++++ b/open-brain/src/pipelines/state-views/index.ts
+@@ -163,7 +163,7 @@ export function renderNextSession(state: State, o: ViewOptions): string {
+       lines.push("", "### Open questions", "");
+       if (h.open_questions.length === 0) lines.push("_None._");
+       // The view is the record: a resolved question stays listed here, marked. Only the greeting omits it.
+-      for (const q of h.open_questions) lines.push(`- ${questionText(q)}${questionResolvedBy(q) ? ` _(resolved by ${questionResolvedBy(q)})_` : ""}`);
++      for (const q of h.open_questions) lines.push(`- ${questionText(q)}`);
+       lines.push("");
+       if (h.loop_state) {
+         const l = h.loop_state;
