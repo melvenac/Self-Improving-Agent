@@ -49,6 +49,37 @@ const scopedAdded = (scope: keyof typeof SCOPES, cwd: string = REPO, base: strin
 
 const hits = (re: RegExp, lines: string[]): string[] => lines.filter((l) => re.test(l));
 
+/** Test calls in a file's text (it/test, optionally .each). */
+const countTests = (text: string): number => (text.match(/^\s*(?:it|test)(?:\.each\([^)]*\))?\(/gm) ?? []).length;
+
+/**
+ * The ONLY way a test file may end below its BASE count (S4-9.2, ruled by atlas-sia, session 157).
+ * An entry passes a file only when its before AND after counts match EXACTLY, and an entry that no
+ * longer matches is itself a finding, so an allowance cannot outlive the removal it records.
+ */
+export interface TestLossAllowance { file: string; before: number; after: number; reason: string }
+export const ALLOWED_TEST_LOSSES: readonly TestLossAllowance[] = [
+  { file: "open-brain/tests/cli-flags.test.ts", before: 19, after: 18, reason: "T-215 / R-011: backfill-success-rate.mjs deleted; maturity-ordering test proved nothing" },
+  { file: "open-brain/tests/ranking.test.ts", before: 11, after: 10, reason: "T-215 / R-011: backfill-success-rate.mjs deleted; maturity-ordering test proved nothing" },
+];
+
+/** Findings for modified test files (before/after counts) against an allowance table; [] means the guard holds. */
+export function testCountFindings(rows: { file: string; before: number; after: number }[], allowances: readonly TestLossAllowance[]): string[] {
+  const findings: string[] = [];
+  for (const r of rows) {
+    if (r.after >= r.before) continue;
+    const a = allowances.find((x) => x.file === r.file && x.before === r.before && x.after === r.after);
+    if (a === undefined) findings.push(`${r.file} lost a test (${r.before} -> ${r.after}) with no matching allowance`);
+  }
+  for (const a of allowances) {
+    const r = rows.find((x) => x.file === a.file);
+    if (r === undefined || r.before !== a.before || r.after !== a.after) {
+      findings.push(`stale allowance for ${a.file}: expected ${a.before} -> ${a.after}, found ${r === undefined ? "file not modified" : `${r.before} -> ${r.after}`}`);
+    }
+  }
+  return findings;
+}
+
 describe("slice four guards", { timeout: 120_000 }, () => {
   it("G0 the scans fire on a planted line and stay quiet on a clean one", () => {
     expect(hits(FORBIDDEN_WORD, [`the values are ${"calibrat"}${"ed"}`])).toHaveLength(1);
@@ -174,6 +205,22 @@ describe("slice four guards", { timeout: 120_000 }, () => {
     expect(hits(FORBIDDEN_WORD, lines)).toEqual([]);
   });
 
+  it("S4-9.2b the allowance table: the allowed pair passes, a third loss fails, a stale or filename-only entry fails", () => {
+    const table = ALLOWED_TEST_LOSSES;
+    const [x, y] = table;
+    const pair = [{ file: x.file, before: x.before, after: x.after }, { file: y.file, before: y.before, after: y.after }];
+    expect(testCountFindings(pair, table)).toEqual([]);
+    // a third file losing a test still fails
+    expect(testCountFindings([...pair, { file: "open-brain/tests/other.test.ts", before: 5, after: 4 }], table)).toHaveLength(1);
+    // the allowed file losing MORE than recorded fails (before/after match exactly)
+    expect(testCountFindings([{ ...pair[0], after: x.after - 1 }, pair[1]], table).length).toBeGreaterThan(0);
+    // a stale entry (file restored to its base count, or no longer modified) is a finding
+    expect(testCountFindings([{ ...pair[0], after: x.before }, pair[1]], table)).toHaveLength(1);
+    expect(testCountFindings([pair[1]], table)).toHaveLength(1);
+    // a growing file needs no allowance
+    expect(testCountFindings([...pair, { file: "open-brain/tests/g.test.ts", before: 2, after: 3 }], table)).toEqual([]);
+  });
+
   it("S4-9.1 no added line in open-brain/src references the other Jev client", () => {
     expect(hits(JEV_MCP, scopedAdded("jevMcp"))).toEqual([]);
   });
@@ -184,12 +231,12 @@ describe("slice four guards", { timeout: 120_000 }, () => {
     const changed = git(["diff", "--diff-filter=M", "--name-only", BASE, "--", ...SCOPES.skips])
       .split("\n")
       .filter((f) => /\.test\.ts$/.test(f));
-    const count = (text: string): number => (text.match(/^\s*(?:it|test)(?:\.each\([^)]*\))?\(/gm) ?? []).length;
-    for (const f of changed) {
-      const before = count(git(["show", `${BASE}:${f}`]));
-      const after = count(git(["show", `HEAD:${f}`]));
-      expect(after, `${f} lost a test`).toBeGreaterThanOrEqual(before);
-    }
+    const rows = changed.map((file) => ({
+      file,
+      before: countTests(git(["show", `${BASE}:${file}`])),
+      after: countTests(git(["show", `HEAD:${file}`])),
+    }));
+    expect(testCountFindings(rows, ALLOWED_TEST_LOSSES)).toEqual([]);
   });
 
   it("S4-5c.1 the three policy files are unchanged, and qa-score.json is the one added policy", () => {
