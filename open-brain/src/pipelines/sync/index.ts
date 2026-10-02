@@ -66,7 +66,7 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkReadmeRefs(options.projectRoot));
   checks.push(checkHookConfigs(paths.settingsJson));
   checks.push(checkHookRegistration(paths.settingsJson));
-  checks.push(checkMcpCommandPaths(home));
+  checks.push(checkMcpCommandPaths(home, {}, options.projectRoot));
   checks.push(checkSummary(version, options.projectRoot, options.checkOnly));
   checks.push(checkClaudeMd(options.projectRoot));
   checks.push(checkObsidianVault(paths.obsidianVault));

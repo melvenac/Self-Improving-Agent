@@ -1,0 +1,22 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 0681d3f1..3cdc5d9b 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -613,7 +613,7 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {},
+   }
+ 
+   // The checkout's own .mcp.json. Absent is normal and says nothing; present and unreadable is not.
+-  if (projectRoot !== undefined) {
++  if (projectRoot !== undefined && Date.now() < 0) { // mutant: only ~/.claude.json is read
+     const mcpJson = join(projectRoot, ".mcp.json");
+     if (existsSync(mcpJson)) {
+       const r = readJsonFile(mcpJson);
+@@ -627,7 +627,7 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {},
+   const enabled = settings.ok
+     ? Object.entries(asMcpServers((settings.value as { enabledPlugins?: unknown } | null)?.enabledPlugins)).filter(([, on]) => (on as unknown) === true).map(([k]) => k)
+     : [];
+-  if (enabled.length > 0) {
++  if (enabled.length > 0 && Date.now() < 0) { // mutant: only ~/.claude.json is read
+     const installed = readJsonFile(join(home, ".claude", "plugins", "installed_plugins.json"));
+     for (const key of enabled) {
+       const label = `plugin ${key.split("@")[0]}`;

@@ -828,39 +828,112 @@ export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): str
   return null;
 }
 
-/**
- * Every `command` registered under `mcpServers` in `~/.claude.json`, global and
- * per-project, must exist (T-008). GitNexus sat disconnected for an unknown period
- * because its registration pointed at `C:\Program Files\nodejs\gitnexus.cmd`, which
- * did not exist; nothing reported it, the tools were simply absent, and the CLI kept
- * working. A missing command is an ISSUE naming the server and the path. A server
- * with a `url` has no command to stat and is listed as skipped, with that reason.
- * An absent or unreadable config is SKIP "not checked: <cause>", never a pass.
- */
-export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}): CheckResult {
-  const name = "mcp-command-paths";
-  const configPath = join(home, ".claude.json");
-  let config: { mcpServers?: unknown; projects?: unknown };
+type McpServerDef = { command?: unknown; url?: unknown; type?: unknown };
+type McpSource = { scope: string; servers: Record<string, McpServerDef>; pluginRoot?: string };
+
+const asMcpServers = (v: unknown): Record<string, McpServerDef> =>
+  v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, McpServerDef>) : {};
+
+function readJsonFile(path: string): { ok: true; value: unknown } | { ok: false; cause: string } {
   try {
-    config = JSON.parse(readFileSync(configPath, "utf-8").replace(/^\uFEFF/, ""));
+    return { ok: true, value: JSON.parse(readFileSync(path, "utf-8").replace(/^\uFEFF/, "")) };
   } catch (e) {
-    const cause = (e as NodeJS.ErrnoException).code === "ENOENT" ? `${configPath} does not exist` : `${configPath} could not be read as JSON (${(e as Error).message.split("\n")[0]})`;
-    return { name, severity: "skip", message: `not checked: ${cause}. This is not a pass.` };
+    const code = (e as NodeJS.ErrnoException).code;
+    return { ok: false, cause: code === "ENOENT" ? `${path} does not exist` : `${path} could not be read as JSON (${(e as Error).message.split("\n")[0]})` };
+  }
+}
+
+/**
+ * Every `command` Claude Code would try to start, from every place it reads MCP
+ * registrations (T-008, T-008b), must exist:
+ *   - `global` and `project <path>`: `mcpServers` in `~/.claude.json`;
+ *   - `.mcp.json`: the repo-root file of the checkout /sync runs in;
+ *   - `plugin <name>`: each plugin enabled in `~/.claude/settings.json`, located through
+ *     `~/.claude/plugins/installed_plugins.json`, declaring servers inline in
+ *     `.claude-plugin/plugin.json` (`mcpServers`, an object or a path) or in a root `.mcp.json`.
+ * GitNexus sat disconnected for an unknown period because its registration pointed at
+ * `C:\Program Files\nodejs\gitnexus.cmd`, which did not exist; nothing reported it, the
+ * tools were simply absent, and the CLI kept working. A missing command is an ISSUE naming
+ * the server, its source and the path. A server with a `url` has no command to stat and is
+ * listed as skipped, with that reason. A source that exists but cannot be read is listed
+ * as "not checked: <cause>" and makes the result at best a WARN, never a pass; with nothing
+ * checkable at all the result is SKIP. A disabled plugin is not looked at.
+ */
+export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, projectRoot?: string): CheckResult {
+  const name = "mcp-command-paths";
+  const sources: McpSource[] = [];
+  const notChecked: string[] = [];
+
+  const globalPath = join(home, ".claude.json");
+  const global = readJsonFile(globalPath);
+  if (global.ok) {
+    const cfg = (global.value ?? {}) as { mcpServers?: unknown; projects?: unknown };
+    sources.push({ scope: "global", servers: asMcpServers(cfg.mcpServers) });
+    for (const [proj, v] of Object.entries(asMcpServers(cfg.projects))) {
+      sources.push({ scope: `project ${proj}`, servers: asMcpServers((v as { mcpServers?: unknown } | null)?.mcpServers) });
+    }
+  } else {
+    notChecked.push(global.cause);
   }
 
-  type Server = { command?: unknown; url?: unknown; type?: unknown };
-  const scopes: Array<{ scope: string; servers: Record<string, Server> }> = [];
-  const asServers = (v: unknown): Record<string, Server> => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, Server>) : {});
-  scopes.push({ scope: "global", servers: asServers(config.mcpServers) });
-  for (const [proj, v] of Object.entries(asServers(config.projects))) {
-    scopes.push({ scope: `project ${proj}`, servers: asServers((v as { mcpServers?: unknown } | null)?.mcpServers) });
+  // The checkout's own .mcp.json. Absent is normal and says nothing; present and unreadable is not.
+  if (projectRoot !== undefined) {
+    const mcpJson = join(projectRoot, ".mcp.json");
+    if (existsSync(mcpJson)) {
+      const r = readJsonFile(mcpJson);
+      if (r.ok) sources.push({ scope: ".mcp.json", servers: asMcpServers((r.value as { mcpServers?: unknown } | null)?.mcpServers ?? r.value) });
+      else notChecked.push(r.cause);
+    }
+  }
+
+  // Enabled plugins.
+  const settings = readJsonFile(join(home, ".claude", "settings.json"));
+  const enabled = settings.ok
+    ? Object.entries(asMcpServers((settings.value as { enabledPlugins?: unknown } | null)?.enabledPlugins)).filter(([, on]) => (on as unknown) === true).map(([k]) => k)
+    : [];
+  if (enabled.length > 0) {
+    const installed = readJsonFile(join(home, ".claude", "plugins", "installed_plugins.json"));
+    for (const key of enabled) {
+      const label = `plugin ${key.split("@")[0]}`;
+      const entries = installed.ok ? ((installed.value as { plugins?: Record<string, Array<{ installPath?: unknown }>> } | null)?.plugins?.[key] ?? []) : [];
+      const installPath = entries.map((e) => e.installPath).find((p): p is string => typeof p === "string");
+      if (!installPath) {
+        notChecked.push(`${label}: enabled, but ${installed.ok ? `not listed in installed_plugins.json` : installed.cause}, so its install directory is unknown`);
+        continue;
+      }
+      const manifestPath = join(installPath, ".claude-plugin", "plugin.json");
+      const manifest = readJsonFile(manifestPath);
+      const dotMcp = existsSync(join(installPath, ".mcp.json")) ? readJsonFile(join(installPath, ".mcp.json")) : null;
+      if (!manifest.ok && !(dotMcp && dotMcp.ok)) {
+        notChecked.push(`${label}: ${manifest.cause}`);
+        continue;
+      }
+      if (manifest.ok) {
+        let decl = (manifest.value as { mcpServers?: unknown } | null)?.mcpServers;
+        if (typeof decl === "string") {
+          const ref = readJsonFile(join(installPath, decl));
+          if (ref.ok) decl = (ref.value as { mcpServers?: unknown } | null)?.mcpServers ?? ref.value;
+          else {
+            notChecked.push(`${label}: ${ref.cause}`);
+            decl = undefined;
+          }
+        }
+        if (decl !== undefined && Object.keys(asMcpServers(decl)).length > 0) {
+          sources.push({ scope: label, servers: asMcpServers(decl), pluginRoot: installPath });
+        }
+      }
+      if (dotMcp) {
+        if (dotMcp.ok) {
+          sources.push({ scope: label, servers: asMcpServers((dotMcp.value as { mcpServers?: unknown } | null)?.mcpServers ?? dotMcp.value), pluginRoot: installPath });
+        } else notChecked.push(`${label}: ${dotMcp.cause}`);
+      }
+    }
   }
 
   const missing = new Map<string, string[]>(); // "server: command" -> scopes
   const skipped: string[] = []; // url servers: nothing to stat, by design
-  const notChecked: string[] = []; // a command we could not examine: caps the result at warn (B2 ruling)
   let checked = 0;
-  for (const { scope, servers } of scopes) {
+  for (const { scope, servers, pluginRoot } of sources) {
     for (const [server, def] of Object.entries(servers)) {
       // A non-object (or null) entry is malformed input, not an empty one: not checked, and it names its key (QA 260).
       if (!def || typeof def !== "object") {
@@ -872,31 +945,33 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}):
         else notChecked.push(`${server} (${scope}): no command and no url`);
         continue;
       }
-      if (def.command.includes("${")) {
+      // ${CLAUDE_PLUGIN_ROOT} is the one variable whose value is known here.
+      const command = pluginRoot ? def.command.split("${CLAUDE_PLUGIN_ROOT}").join(pluginRoot) : def.command;
+      if (command.includes("${")) {
         notChecked.push(`${server} (${scope}): command uses \${...} expansion, not resolved here`);
         continue;
       }
       checked++;
-      if (resolveMcpCommand(def.command, env) === null) {
-        const key = `${server}: ${def.command}`;
+      if (resolveMcpCommand(command, env) === null) {
+        const key = `${server}: ${command}`;
         missing.set(key, [...(missing.get(key) ?? []), scope]);
       }
     }
   }
 
-  const skippedNote =
-    (skipped.length > 0 ? ` Skipped ${skipped.length}: ${skipped.join("; ")}.` : "") +
-    (notChecked.length > 0 ? ` Not checked ${notChecked.length}: ${notChecked.join("; ")}.` : "");
+  const skippedNote = skipped.length > 0 ? ` Skipped ${skipped.length}: ${skipped.join("; ")}.` : "";
+  const notCheckedNote = notChecked.length > 0 ? ` not checked: ${notChecked.join("; ")}.` : "";
   if (missing.size > 0) {
     const list = [...missing].map(([k, s]) => `${k} not found (${s.length === 1 ? s[0] : `${s.length} scopes, first ${s[0]}`})`).join("; ");
-    return { name, severity: "issue", message: `MCP command path missing — ${list}. The server cannot start, so its tools are silently absent.${skippedNote}` };
+    return { name, severity: "issue", message: `MCP command path missing — ${list}. The server cannot start, so its tools are silently absent.${skippedNote}${notCheckedNote}` };
   }
   if (checked === 0) {
-    return { name, severity: "skip", message: `not checked: no mcpServers entry with a command in ${configPath}.${skippedNote} This is not a pass.` };
+    const why = notChecked.length > 0 ? "" : ` no mcpServers entry with a command in ${globalPath}.`;
+    return { name, severity: "skip", message: `not checked:${notChecked.length > 0 ? ` ${notChecked.join("; ")}.` : why}${skippedNote} This is not a pass.` };
   }
+  // Any input that was not examined caps the result at warn, even when the message names it (B2 ruling).
   if (notChecked.length > 0) {
-    // Any input that was not examined caps the result at warn, even when the message names it.
-    return { name, severity: "warn", message: `${checked} MCP server command(s) resolve to a file, but ${notChecked.length} not checked.${skippedNote} This is not a full pass.` };
+    return { name, severity: "warn", message: `${checked} MCP server command(s) resolve to a file, but${notCheckedNote} This is not a full pass.${skippedNote}` };
   }
   return { name, severity: "pass", message: `${checked} MCP server command(s) resolve to a file.${skippedNote}` };
 }
