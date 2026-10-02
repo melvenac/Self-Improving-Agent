@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "revision": 289,
+  "revision": 290,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "Clear the remaining session-157 code PRs. FIRST, at Aaron's morning word: the merge list in docs/loops/morning-merge-list-2026-10-02.md (B4 #290, #289, #294@26f62934, #299; B5 #293, #292, #320) via ONE AskUserQuestion naming every PR; re-check each head == the QA'd SHA (#294's reviewed rebase head is 26f62934), CI green, not DIRTY; merge pinned; send relay-a2a T-228's (#320) merge SHA. THEN rule QA 260 (B2 r2: #295 #298 #306 #309) and QA 261 (#302 r2) when they report. Then T-152's last 3 typecheck errors plus CI enforcement, T-229, G-052, and the D-073 release (Aaron's, D-019).",
+    "text": "FIRST: check master push CI on 19b79b39 (after 10 merges). THEN finish #295 (T-008) and #298 (T-008b): sia-forge is rebasing #295 onto master (node:fs import union only) and #298 onto it; review both range-diffs; ask Aaron ONE re-confirm naming both at the new heads; merge pinned. THEN, with the backlog gate open, dispatch the seats: T-152 (fix the 3 residual typecheck:tests errors, then put the check in CI), T-229, T-230, T-231, G-052 rows, and the backlog-audit top-10 items not yet done (T-182, T-156, T-168, T-225 item 4). Weekly usage ~91%: at 95% no new QA, tasks or dispatches.",
     "since_session": 157
   },
   "tasks": [
@@ -150,23 +150,25 @@
       "id": "T-048",
       "title": "Audit remaining filters in `open-brain/src` for bare `continue`/`filter` drops",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 52,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": "T-049",
-      "note": "(carried out of the skillRows item, Session 52). The invariant: any filter that drops rows must emit the dropped count — absent and zero must not collapse into one value. Four instances of the class are now on record (harmful-unrepresentable v0.15.0, skillRows v0.17.0, Prime's frontmatter-less SKILL.md, the v0.15.1 unreachable-and-uncountable resolver). One pass over the remaining loops is cheaper than discovering the fifth in production. (Session 52)",
-      "closed_rev": null
+      "note": "(carried out of the skillRows item, Session 52). The invariant: any filter that drops rows must emit the dropped count — absent and zero must not collapse into one value. Four instances of the class are now on record (harmful-unrepresentable v0.15.0, skillRows v0.17.0, Prime's frontmatter-less SKILL.md, the v0.15.1 unreachable-and-uncountable resolver). One pass over the remaining loops is cheaper than discovering the fifth in production. (Session 52) — Closed session 157: the audit plus fixes merged as #302 (19b79b39; QA 258 REJECT, r2 QA 261 ACCEPT), #306 (179ebc18) and #309 (d546cd17) (QA 260 ACCEPT). Follow-up T-230.",
+      "note_by": null,
+      "closed_rev": 290
     },
     {
       "id": "T-050",
       "title": "v0.15.1 made a foreign `.recalled-entries.json` writer unreachable *and* uncountable",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 50,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "(Session 50, surfaced by Prime). Prime confirmed it does not write that path, then correctly advised refusing foreign writers loudly anyway — a future harness version is not bound by today's inventory. That property cannot be built as described: v0.15.1's fix was not a `session_id` comparison but the **removal of the read** (precedence: explicit ids → `recall_log` → the file only if the session is unknown → nothing). On the normal path there is no read, so no refusal, so nothing to report. Net effect: **\"no foreign writer\" and \"a foreign writer never looked at\" are the same observation from inside the resolver.** This is a fourth instance of the dropped-count invariant above, sitting inside the fix that shipped this morning — the bad case was made unreachable and thereby uncountable. Fix: split observation from authority — a detector that reads the file purely to *report* and never to resolve ids, preserving the structural guarantee that the file cannot influence which entries get rated. Do **not** reopen v0.15.1; the correctness fix is right, this adds detection on top. General form worth carrying: **removing a read is not the same as counting what you no longer read** — structural prevention makes a failure impossible and simultaneously invisible, which is correct while the failure cannot recur and a blind spot the moment a new writer can appear.",
-      "closed_rev": null
+      "note": "(Session 50, surfaced by Prime). Prime confirmed it does not write that path, then correctly advised refusing foreign writers loudly anyway — a future harness version is not bound by today's inventory. That property cannot be built as described: v0.15.1's fix was not a `session_id` comparison but the **removal of the read** (precedence: explicit ids → `recall_log` → the file only if the session is unknown → nothing). On the normal path there is no read, so no refusal, so nothing to report. Net effect: **\"no foreign writer\" and \"a foreign writer never looked at\" are the same observation from inside the resolver.** This is a fourth instance of the dropped-count invariant above, sitting inside the fix that shipped this morning — the bad case was made unreachable and thereby uncountable. Fix: split observation from authority — a detector that reads the file purely to *report* and never to resolve ids, preserving the structural guarantee that the file cannot influence which entries get rated. Do **not** reopen v0.15.1; the correctness fix is right, this adds detection on top. General form worth carrying: **removing a read is not the same as counting what you no longer read** — structural prevention makes a failure impossible and simultaneously invisible, which is correct while the failure cannot recur and a blind spot the moment a new writer can appear. — Closed session 157: merged #299 (2a26a91b), QA 258 ACCEPT; follow-up T-229.",
+      "note_by": null,
+      "closed_rev": 290
     },
     {
       "id": "T-051",
@@ -1036,16 +1038,17 @@
       "id": "T-208",
       "title": "A session start FETCHES before it judges currency: the SessionStart hook runs `git fetch --prune origin` (bounded timeout) before tree-currency and ob_start, says so visibly when it fails, and never calls a tree 'level' against a fetch it did not just make",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 150,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Opened planner session 150, 2026-09-30, on Aaron's approval ('send it to Atlas to rule on', relayed Aaron -> clark -> Atlas). EVIDENCE, two stale-fetch misreads within about an hour: (1) the planner read the T-207 probe ref as undeleted from an unpruned remote-tracking ref (rev 196's correction); (2) Forge's /start on the QA PC printed 'HEAD 9c603615, level with origin/master, state rev 178 level with origin/master rev 178' while origin/master was at about rev 194 (#221 7c925a6, #222 cdf079d, including Forge's own rev-183 handoff). ob_start compares against the LAST fetch and says so, but nothing makes the fetch happen, so T-200's 'brief from master' is only as fresh as a fetch nobody ran, and D-062 is defeated at /start again. RULING: DETERMINISTIC, not a prompt step. The SessionStart hook (cli-bootstrap), which already prints tree currency, runs `git fetch --prune origin` FIRST, with a bounded timeout (network), then computes currency. On failure it prints 'fetch FAILED: <cause>; currency is against a fetch from <time>' and the currency line never says 'level' unqualified. ob_start states the fetch time it compared against. The /start command text gets no fetch step, because the hook owns it. ROWS: a fixture with an origin that moved after the last fetch: before the change it reads 'level' (red), after it reads 'behind' (green); an unreachable origin prints the FAILED line and the old fetch time; the fetch is bounded (a hanging remote does not hang /start); a mutant that skips the fetch goes red on the first row; prune is proven (a deleted remote branch is gone after start). NOT THIS TASK: the Cursor copy (T-197 parity follows it). SEQUENCED AFTER T-200 merges (it touches tree-currency, which T-200 also changed). Seat: builder (it built T-200's record source and knows tree-currency). — ACCEPTANCE ROW ADDED, planner session 153 (resumed after a desktop reboot), 2026-10-01, on clark's restart audit (hoh-startup-audit.md): 'fires on SessionStart resume as well as startup, and prints tree currency and drift in one line'. WHY: the planner resumed after hours of downtime. The SessionStart:resume hook did fire and print tree currency (against the last fetch), but nothing ran a fresh fetch or the drift check. The planner fetched by hand (06:28Z) and ran the drift check only when asked: ob_start at 06:3x showed 'Drift: none', level with origin/master rev 222, session log reused. T-208's ruling named 'the SessionStart hook' without naming the event, so resume was implied but not pinned.",
+      "note": "Opened planner session 150, 2026-09-30, on Aaron's approval ('send it to Atlas to rule on', relayed Aaron -> clark -> Atlas). EVIDENCE, two stale-fetch misreads within about an hour: (1) the planner read the T-207 probe ref as undeleted from an unpruned remote-tracking ref (rev 196's correction); (2) Forge's /start on the QA PC printed 'HEAD 9c603615, level with origin/master, state rev 178 level with origin/master rev 178' while origin/master was at about rev 194 (#221 7c925a6, #222 cdf079d, including Forge's own rev-183 handoff). ob_start compares against the LAST fetch and says so, but nothing makes the fetch happen, so T-200's 'brief from master' is only as fresh as a fetch nobody ran, and D-062 is defeated at /start again. RULING: DETERMINISTIC, not a prompt step. The SessionStart hook (cli-bootstrap), which already prints tree currency, runs `git fetch --prune origin` FIRST, with a bounded timeout (network), then computes currency. On failure it prints 'fetch FAILED: <cause>; currency is against a fetch from <time>' and the currency line never says 'level' unqualified. ob_start states the fetch time it compared against. The /start command text gets no fetch step, because the hook owns it. ROWS: a fixture with an origin that moved after the last fetch: before the change it reads 'level' (red), after it reads 'behind' (green); an unreachable origin prints the FAILED line and the old fetch time; the fetch is bounded (a hanging remote does not hang /start); a mutant that skips the fetch goes red on the first row; prune is proven (a deleted remote branch is gone after start). NOT THIS TASK: the Cursor copy (T-197 parity follows it). SEQUENCED AFTER T-200 merges (it touches tree-currency, which T-200 also changed). Seat: builder (it built T-200's record source and knows tree-currency). — ACCEPTANCE ROW ADDED, planner session 153 (resumed after a desktop reboot), 2026-10-01, on clark's restart audit (hoh-startup-audit.md): 'fires on SessionStart resume as well as startup, and prints tree currency and drift in one line'. WHY: the planner resumed after hours of downtime. The SessionStart:resume hook did fire and print tree currency (against the last fetch), but nothing ran a fresh fetch or the drift check. The planner fetched by hand (06:28Z) and ran the drift check only when asked: ob_start at 06:3x showed 'Drift: none', level with origin/master rev 222, session log reused. T-208's ruling named 'the SessionStart hook' without naming the event, so resume was implied but not pinned. — Closed session 157: merged #289 (5440cfa9) after QA 254 REJECT, r2 and r3; QA 258 ACCEPT.",
       "note_by": [
         "e50107b1-ac67-452c-9da1-3fc4c3beda97",
-        "6e083614-965f-462b-ad59-62091a0be5e1"
+        "6e083614-965f-462b-ad59-62091a0be5e1",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 290
     },
     {
       "id": "T-209",
@@ -1097,15 +1100,16 @@
       "id": "T-212",
       "title": "SessionStart missing-handoff check attributes commits by Claude-Session trailer, not git identity",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 153,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "From Relay via Clark (A2A T-080), accepted by planner session 153. The check blamed Relay's session 20 (743b4fed) for 28 commits that are Rivet's. They share the git identity 'Aaron Melven' and carry no Claude-Session trailer, and docs/loops/rivet-handoff-session-20.md covers them. Attribute by the trailer; a commit without a trailer is UNATTRIBUTED, never assigned to the checkout's seat by identity.",
+      "note": "From Relay via Clark (A2A T-080), accepted by planner session 153. The check blamed Relay's session 20 (743b4fed) for 28 commits that are Rivet's. They share the git identity 'Aaron Melven' and carry no Claude-Session trailer, and docs/loops/rivet-handoff-session-20.md covers them. Attribute by the trailer; a commit without a trailer is UNATTRIBUTED, never assigned to the checkout's seat by identity. — Closed session 157: merged #290 (67cdf0a2), QA 254 and QA 258 ACCEPT.",
       "note_by": [
-        "6e083614-965f-462b-ad59-62091a0be5e1"
+        "6e083614-965f-462b-ad59-62091a0be5e1",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 290
     },
     {
       "id": "T-213",
@@ -1140,15 +1144,16 @@
       "id": "T-215",
       "title": "Finish the maturity-lifecycle cut in code: 10 LIVE referrers R-011 now records as owed, including two tests that prove nothing",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 153,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Found by T-169 r2 (branch docs/t169-prd-readme at ef2e3649, planner session 153). R-011 in .agents/retirements.json keeps each of these as an allowed referrer whose why begins 'LIVE REFERENCE, NOT AN OBITUARY — fix owed:'. Each entry names the file:line. Loop 12's rule: a deletion is not finished until nothing names the deleted thing. REAL DEFECTS: (1) open-brain/tests/ranking.test.ts:122-136 asserts success-rate demotion and mature-over-progenitor ordering. That contradicts the cut-pins in the same file, and it passes only on tie order. (2) open-brain/tests/index-upsert.test.ts compares success_rate as undefined to undefined, so it proves nothing. (3) open-brain/scripts/dashboard.mjs still reads and renders success_rate and maturity as live data. (4) open-brain/scripts/backfill-success-rate.mjs writes a column new databases no longer declare. Retire it or record it as historical. STALE COMMENTS, present tense: db-v2.ts, server.ts, recalled-ids.ts (:152 names formatApoptosisQueue, which no longer exists), active-session.ts, vault-writer.ts, and tests/trigger/fires.test.ts. DONE WHEN each file is fixed and its R-011 entry is deleted or reclassified with a true why, and the retirements check still passes. Per the slice-three finding, check this list against the files before building.",
+      "note": "Found by T-169 r2 (branch docs/t169-prd-readme at ef2e3649, planner session 153). R-011 in .agents/retirements.json keeps each of these as an allowed referrer whose why begins 'LIVE REFERENCE, NOT AN OBITUARY — fix owed:'. Each entry names the file:line. Loop 12's rule: a deletion is not finished until nothing names the deleted thing. REAL DEFECTS: (1) open-brain/tests/ranking.test.ts:122-136 asserts success-rate demotion and mature-over-progenitor ordering. That contradicts the cut-pins in the same file, and it passes only on tie order. (2) open-brain/tests/index-upsert.test.ts compares success_rate as undefined to undefined, so it proves nothing. (3) open-brain/scripts/dashboard.mjs still reads and renders success_rate and maturity as live data. (4) open-brain/scripts/backfill-success-rate.mjs writes a column new databases no longer declare. Retire it or record it as historical. STALE COMMENTS, present tense: db-v2.ts, server.ts, recalled-ids.ts (:152 names formatApoptosisQueue, which no longer exists), active-session.ts, vault-writer.ts, and tests/trigger/fires.test.ts. DONE WHEN each file is fixed and its R-011 entry is deleted or reclassified with a true why, and the retirements check still passes. Per the slice-three finding, check this list against the files before building. — Closed session 157: merged #294 (e82ce7e2), QA 258 ACCEPT; rebased to 26f62934 and the range-diff planner-reviewed. Leaves 3 pre-existing typecheck:tests errors (maturityBoost import, successRate in ranking and shadow-strategies), tracked under T-152.",
       "note_by": [
-        "6e083614-965f-462b-ad59-62091a0be5e1"
+        "6e083614-965f-462b-ad59-62091a0be5e1",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 290
     },
     {
       "id": "T-216",
@@ -1257,29 +1262,29 @@
       "id": "T-223",
       "title": "Pin the event in the PR concurrency group in ci-runs-on.test.ts so QA 250's M-push-only mutant dies",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "QA 250 row 6 (docs/loops/t221-t222-qa-report.md on 75d7ec48): a group of format('ci-{0}{1}', event=='push' && 'push-' || '', branch) passes all 20 rows; it collides a PR from head 'push-foo' with a push to 'foo'. One assertion fixes it: expect the exact PR group string ci-pull_request-<branch>, or a collision case.",
+      "note": "QA 250 row 6 (docs/loops/t221-t222-qa-report.md on 75d7ec48): a group of format('ci-{0}{1}', event=='push' && 'push-' || '', branch) passes all 20 rows; it collides a PR from head 'push-foo' with a push to 'foo'. One assertion fixes it: expect the exact PR group string ci-pull_request-<branch>, or a collision case. — Closed session 157: merged #293 (baa7e302), QA 259 ACCEPT.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 290
     },
     {
       "id": "T-224",
       "title": "Standing-cron reader says 'status_to is missing' for an unfilled <placeholder>; say 'unfilled placeholder' or tell the template reader to replace <...> values",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "QA 251 N1 (docs/loops/t164-t211-r2-qa-report.md on d4dea22a): readStatusKeys (agent-identity.ts:128 at 3b0b8188) skips any value starting with '<', so copying the template's example verbatim prints INVALID ... status_to is missing although the key is present. Non-blocking; ruled in D-099.",
+      "note": "QA 251 N1 (docs/loops/t164-t211-r2-qa-report.md on d4dea22a): readStatusKeys (agent-identity.ts:128 at 3b0b8188) skips any value starting with '<', so copying the template's example verbatim prints INVALID ... status_to is missing although the key is present. Non-blocking; ruled in D-099. — Closed session 157: merged #292 (1008b52b), QA 259 ACCEPT.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 290
     },
     {
       "id": "T-225",
@@ -1327,15 +1332,15 @@
       "id": "T-228",
       "title": "Cursor /start: handle hub-talk exit 3 (A2A Loop 13): on exit 3 wait retry-after seconds and run again; after 5 consecutive rc 3 over 2 minutes with no retry-after, stop and report",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "From relay-a2a's Loop 13 design ruling (A2A docs/loops/loop-13-design-ruling.md, master 8e59f58): rc 0 turn printed or one-shot done; rc 1 refused/called wrong, do not retry; rc 2 window elapsed with a healthy last poll, wait again; rc 3 NEW unavailable or throttled, last stderr '[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>'. SIA edit: project-template/.cursor/commands/start.md:107 and its mirrors. Planner ACKed the table (A2A T-008 note, master 2f15ff4). SEQUENCED AFTER batch B1 merges (#297 and #312 edit the same start.md files); sia-builder. Send relay-a2a the merge SHA.",
+      "note": "From relay-a2a's Loop 13 design ruling (A2A docs/loops/loop-13-design-ruling.md, master 8e59f58): rc 0 turn printed or one-shot done; rc 1 refused/called wrong, do not retry; rc 2 window elapsed with a healthy last poll, wait again; rc 3 NEW unavailable or throttled, last stderr '[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>'. SIA edit: project-template/.cursor/commands/start.md:107 and its mirrors. Planner ACKed the table (A2A T-008 note, master 2f15ff4). SEQUENCED AFTER batch B1 merges (#297 and #312 edit the same start.md files); sia-builder. Send relay-a2a the merge SHA. — Closed session 157: merged #320 (a6059ff9), QA 259 ACCEPT; relay-a2a told the SHA.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 290
     },
     {
       "id": "T-229",
@@ -3986,6 +3991,12 @@
       "title": "QA 262: #295 (931998db) and #298 (3b485b7c) ACCEPT on D-106's scope (malformed ENTRIES in every source give WARN; an absent settings.json is a named skip). The B2 set (#295, #298, #306, #309) merges clean on a scratch branch apart from the known node:fs import-line union. Added to the morning list, which is now 12 PRs. QA's gap 4, a malformed CONTAINER (a project mcpServers that is a string, or a .mcp.json that is an array) passing silently, is the same false-pass class and opens as T-231 rather than a fourth round.",
       "date": "2026-10-02",
       "note": "Report f201665d (docs/loops/t008r3-qa-report.md). Heads verified == QA'd SHAs, CLEAN, CI green. Other non-deciding gaps: an unreadable settings.json carrying no absent note is untested (mutant B survives); an array entry is worded 'no command and no url'. The QA 260/262 dispatches named the wrong import line (node:path; it is node:fs)."
+    },
+    {
+      "id": "D-108",
+      "title": "Aaron's word (AskUserQuestion in clark's window, ~18:2xZ): 'Merge all 10'. Merged in list order, each pinned to its QA'd or reviewed head, CLEAN, with CI green: #290 67cdf0a2, #289 5440cfa9, #294 e82ce7e2, #299 2a26a91b, #293 baa7e302, #292 1008b52b, #320 a6059ff9, #306 179ebc18, #309 d546cd17, #302 19b79b39. His second word, 'Merge #295 and #298' at 931998db and 3b485b7c, could not be executed: #295 went DIRTY after #309 merged (the node:fs import line QA 262 predicted). A rebase moves the head off the approved SHA, so sia-forge rebases, the planner reviews the range-diff, and Aaron re-confirms #295 (and #298 on top) at the new heads.",
+      "date": "2026-10-02",
+      "note": "relay-a2a told: T-228 is merged at a6059ff9. Master push CI on 19b79b39 was in progress at the roll; the next session checks it first."
     }
   ],
   "handoffs": [
@@ -4398,54 +4409,38 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Planner session 157 PARKED at usage STOP about 13:45Z 2026-10-02 (5-hour reset 16:50Z; clark sends GREEN). Overnight, under Aaron's pre-approval D-103, merged B1 (#287 #291 #297 #312), #300 #303 from B2 and B3 (#308 #301 #313 #314 #305); master CI is green after each. Rulings D-102 (QA 254), D-104 (batch results; any unchecked input caps a /sync result at WARN), D-105 (B4 #302 REJECT: zero must reach the reader; B5 all ACCEPT). FOR AARON'S MORNING: docs/loops/morning-merge-list-2026-10-02.md lists B4 #290 #289 #294 #299 and B5 #293 #292 #320 (QA-accepted, OUTSIDE D-103). Ask once, naming every PR, then merge pinned in the listed order. #294 was rebased to 26f62934 after B3; the planner reviewed the range-diff (only the A8 fixture line takes master's TriggerPolicy object), so merge it at 26f62934. QUEUED for the reset: QA 260 (DISPATCH 64a70651, B2 round 2) and QA 261 (DISPATCH 897e6f89, #302 round 2). Both seats are parked with their handoffs on master (sia-forge docs/loops/forge-park-handoff-2026-10-02.md; sia-builder builder-roll-handoff + addenda 1 and 2). Restarted seats get a planner re-brief by message (G-049/T-203).",
+      "pick_up": "Planner session 157 ROLLING about 18:4xZ 2026-10-02 at 37% context (roll point 40%). DONE today: 31 code PRs merged with QA (B1, B3, B4, B5, B2 r2 and #302, plus the earlier ones), CI moved to hosted runners (#310), Jev calibration 1 complete (D-100), the backlog audit closed 20 stale tasks, decisions D-097..D-108. OPEN NOW: (1) master push CI on 19b79b39 was running at the roll, so check it. (2) #295 and #298: Aaron said merge both at 931998db and 3b485b7c, but #295 is DIRTY (node:fs import vs the merged #309). sia-forge is rebasing (union import only, then #298 on top). Review both range-diffs, ask Aaron ONE AskUserQuestion naming #295 and #298 at the new heads, merge pinned. (3) The gate is open (fewer than 6 code PRs await QA): dispatch sia-forge and sia-builder (sia-builder is on the /clear list at 31%; re-brief it by message after its /start) with the objective's list. Every rolled dev seat needs a re-brief by message (G-049/T-203).",
       "watch_out": [
-        "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = no new loop briefs, small LIGHT tasks only, QA cap 2; RED (>=85%) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks; the planner merges or closes what is ready under any standing approval). Context roll points: devs 50% left, planners 40%, clark 30%; overnight no rolls, work to 25% then park with a MERGED handoff.",
-        "BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing from 11:50Z 2026-10-02): 4-6 related code PRs per QA run; SIA devs open NO new code PRs while 6 or more open SIA code PRs await QA (they fix REJECT rounds or park); one AskUserQuestion per ACCEPTed batch naming every PR, then merge each pinned with --match-head-commit. D-103's overnight pre-approval covered ONLY QA 255-257 and is spent.",
-        "A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`; '=' commits plus a trivial conflict line may go on as reviewed (as #294 did); anything else needs a narrow re-QA. Check mergeStateStatus: DIRTY after other merges means a rebase is due.",
-        "CI (T-227, #310): Linux CI on GitHub-hosted ubuntu-latest with fetch-depth 0, a few minutes per run; push runs ONLY on master; a qa/** or loop/** branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is a workflow_dispatch opt-in (tcm=true).",
-        "STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned with --match-head-commit; check scope with `git diff --name-only origin/master...<head>`, because `gh pr diff` fails over 20,000 lines. A test file, script, package.json or config takes a PR out of scope (#320 looked docs-only but adds a test). Anything else needs Aaron's typed word NAMING THE PR (in the planner's window, or clark's when clark records it first-hand). Send clark a one-line D-063 notice per merge.",
-        "QA DISPATCHES: the DISPATCH_SHA must contain everything (git cat-file -e <sha>:<path> per file); each QA number gets its own push helper EDITED BY HAND with the new prefix, with all five refusals tested before commit (no arg, old prefix, extra arg, master, absent local branch); any dispatch that lets QA read real config forbids copying values (counts, key and server names, and command paths only, plus a key scan before commit) (G-051). Each batch dispatch carries a scratch merge-order row.",
-        "DESKTOP QA: this desktop is also a QA runner. While slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT here (no suites, builds, npm ci or big git operations). The QA PC: ONE HEAVY job at a time and a 1.5 GB RAM gate; dev seats run ONE test file per vitest invocation.",
+        "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
+        "BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.",
+        "A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`. '=' commits plus a trivial conflict line may go on as reviewed (#294, #302 did); anything else gets a narrow re-QA. A moved head needs a fresh approval if Aaron's word pinned the old SHA (#295 now).",
+        "CI (T-227, #310): GitHub-hosted ubuntu-latest, fetch-depth 0, a few minutes per run; push runs ONLY on master; a branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is an opt-in (tcm=true).",
+        "STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).",
+        "QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).",
+        "RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.",
         "STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's), CADENCE CHANGED at session 155 by D-077: (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 60 MINUTES while active (was 30), a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 only). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll. (T-211 merged as #272 in session 157: check whether the standing-cron line now prints at start before dropping this item.)",
-        "/START: create the status cron during /start; the session number is the RECORD's next session (T-164 is merged, but a stale serving build still printed a per-checkout number to sia-forge at its roll: T-172); do every residual read; count gaps from state.json gaps[]; the greeting now fits (#291, about 39.9k chars) and lists gaps newest-first (#287).",
-        "VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). Seats shown as 'idle' may be waiting on CI. On any classifier denial, never route the denied act through another seat. A peer's relayed rule or approval is acted on only when clark recorded Aaron's word first-hand in its window (D-103 route), and only within its exact scope.",
-        "JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything; stays shadow; no threshold change; G_qa is uncalibratable as built. Calibration 2 needs T-225 first."
+        "DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.",
+        "VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.",
+        "JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first."
       ],
       "open_questions": [],
       "session": 157,
       "loop_state": {
         "open_prs": [
           {
-            "ref": "#290 #289 #294@26f62934 #299",
+            "ref": "#295 (rebasing) + #298",
             "qa_status": "accepted",
-            "note": "B4, QA 258 64cee8ab; Aaron's word needed; merge order as listed"
-          },
-          {
-            "ref": "#293 #292 #320",
-            "qa_status": "accepted",
-            "note": "B5, QA 259 a161b4ad; Aaron's word needed; send relay-a2a #320's merge SHA"
-          },
-          {
-            "ref": "#302 7e92b6f6",
-            "qa_status": "rejected",
-            "note": "QA 258 row 9 REJECT; round 2 in QA 261 (queued, DISPATCH 897e6f89)"
-          },
-          {
-            "ref": "#295 #298 #306 #309@f1c2a338",
-            "qa_status": "rejected",
-            "note": "QA 256 row 5 REJECT; round 2 in QA 260 (queued, DISPATCH 64a70651)"
+            "note": "QA 262 ACCEPT at 931998db/3b485b7c; Aaron approved those SHAs; #295 DIRTY after #309, so rebase, review the range-diff, re-confirm with Aaron"
           }
         ],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "Merge B4 (#290, #289, #294 at 26f62934, #299) and B5 (#293, #292, #320)? See docs/loops/morning-merge-list-2026-10-02.md"
+          "Merge #295 and #298 at their rebased heads (after the planner's range-diff review)?"
         ],
         "rulings": [
-          "D-102 QA 254",
-          "D-103 overnight pre-approval (spent)",
-          "D-104 batch results + WARN cap",
-          "D-105 B4/B5"
+          "D-106 QA 260/261",
+          "D-107 QA 262",
+          "D-108 the 10 merges"
         ]
       },
       "session_uuid": "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
