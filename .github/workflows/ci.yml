@@ -111,6 +111,10 @@ jobs:
           exit "$fail"
 
       - uses: actions/checkout@v4
+        with:
+          # Full history: tests resolve revisions (git rev-parse of an older sha). The default depth of 1 failed 8 tests on
+          # a hosted runner, where tcm's persistent workspace had the history (T-227 addendum, run 36984810269).
+          fetch-depth: 0
 
       # Node 22 LTS — v24 breaks the Smart Connections Obsidian plugin, so the
       # project pins 22 everywhere to keep local and CI on the same runtime.
@@ -158,6 +162,10 @@ jobs:
           exit $fail
 
       - uses: actions/checkout@v4
+        with:
+          # Full history: tests resolve revisions (git rev-parse of an older sha). The default depth of 1 failed 8 tests on
+          # a hosted runner, where tcm's persistent workspace had the history (T-227 addendum, run 36984810269).
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:

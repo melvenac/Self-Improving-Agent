@@ -251,6 +251,24 @@ describe("ci.yml runs-on (T-192)", () => {
     }
   });
 
+  it("T-227 addendum: every checkout in the workflow fetches full history (fetch-depth 0), because the suite reads it", () => {
+    // actions/checkout defaults to depth 1. On a hosted runner 8 tests failed with 'fatal: bad revision' (run 36984810269);
+    // tcm's persistent workspace had hidden it.
+    const doc = parse(readFileSync(workflowPath, "utf-8")) as {
+      jobs: Record<string, { steps?: Array<{ uses?: string; with?: { "fetch-depth"?: number } }> }>;
+    };
+    const seen: string[] = [];
+    for (const [id, job] of Object.entries(doc.jobs)) {
+      for (const step of job.steps ?? []) {
+        if (!step.uses?.startsWith("actions/checkout@")) continue;
+        seen.push(id);
+        expect(step.with?.["fetch-depth"], `${id}: checkout without fetch-depth 0`).toBe(0);
+      }
+    }
+    // the three jobs that check out: changed (diffs against a base), test, test-windows
+    expect(seen.sort()).toEqual(["changed", "test", "test-windows"]);
+  });
+
   it("T-227: the changed job runs on the same runner expression as the test job", () => {
     const doc = workflow() as Workflow & { jobs: Record<string, { "runs-on"?: string }> };
     expect(doc.jobs.changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
