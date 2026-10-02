@@ -1,0 +1,42 @@
+{
+  "loop": "t164-t211-r2",
+  "candidate_git": {
+    "sha": "3b0b8188976a97abe42d899300730bd1112b2d97",
+    "branch": "origin/loop/t211-standing-cron",
+    "frozen_at": "2026-10-02T07:12:00Z"
+  },
+  "runtime_checks": {
+    "build": {
+      "command": "npm ci, then tsc --noEmit (open-brain/), at 892f7644 and 3b0b8188",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 0,
+      "detail": "npm ci added 184 packages in each tree; tsc --noEmit exit 0 at both heads. Duration not measured."
+    },
+    "unit": {
+      "command": "vitest run on touched test files (LIGHT): record-session-number at 892f7644; record-session-number + standing-cron at 3b0b8188; plus neighbours",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 0,
+      "detail": "892f7644: 7 passed. 3b0b8188: 15 passed (2 files); neighbours state-writer, server, session-log, agent-identity, start-parity, template-seed 98 passed. No full suite (LIGHT). CI: push 36976283947 and PR 36976289271 at 892f7644, push 36976284517 and PR 36976288445 at 3b0b8188, all success, test job success, none cancelled."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "R1-confined", "status": "met", "evidence": "range-diff bea385b2..9f6fcea4 f7ac983d..3b0b8188: six round-1 commits '=', new 892f7644 (F1, 4 files), df430553 (F2-F4, standing-cron.test.ts + template AGENT.md), 3b0b8188 (handoffs). Round diffs 58 and 62 files = 54 master-movement files (no overlap, none under open-brain/ or project-template/) + candidate files.", "order": "shown" },
+    { "id": "R2-F1-code", "status": "met", "evidence": "git grep nextFreeSessionNumber over open-brain/src and tests at 892f7644: no match. Greeting session-log.ts:19 and refusal state-writer.ts:267 both call nextSessionNumber (state-schema.ts:368), which returns sessions.length === 0 ? 1 : max(n)+1.", "order": "shown" },
+    { "id": "R3-F1-red-green", "status": "met", "evidence": "qa249-t164.test.ts copied unchanged (blob 1ba635fe): 3 passed at 892f7644; at fbf94ae6 the 76,147..155 case fails: 'next free number is 1' does not contain 'next free number is 157'. record-session-number.test.ts: 7 passed at 892f7644, 6 passed at fbf94ae6; round-2 copy on round-1 code red on the sparse case.", "order": "red_then_green" },
+    { "id": "R4-F2-F3", "status": "met", "evidence": "Mutant (a): SR-2b red at standing-cron.test.ts:53 (toBe 'Standing cron: INVALID in .agents/AGENT.local.md: status_cron is missing'). Mutant (b): SR-4 red at :77 (toBe '... minute field \"60\" is out of range 0-59'). Each 1 failed / 7 passed; tree restored and clean after each.", "order": "shown" },
+    { "id": "R5-F4", "status": "met", "evidence": "QA probe reads project-template/.agents/AGENT.md at run time; example with only <agent-name>/<role> filled prints 'Standing cron: */20 * * * * → status to clark (rule: .agents/roles/planner.md). ...' at 3b0b8188 and 'INVALID ... status_cron has 11 fields, expected 5' at 9f6fcea4. Literally verbatim (placeholders unfilled) prints 'INVALID ... status_to is missing' at both rounds, because readStatusKeys skips values starting with '<' (N1). Guard SR-7 reads the template file at standing-cron.test.ts:108.", "order": "red_then_green" },
+    { "id": "R6-F5", "status": "met", "evidence": "Handoff SR-5 row names SR-6 for 5a. sr5a-line-dropped.diff on 3b0b8188: SR-6 red ('expected [] to deeply equal [ Standing cron: none in seat data. ]'), all other rows green; restored.", "order": "shown" },
+    { "id": "R7-nothing-else", "status": "met", "evidence": "Touched tests: 7/7 at 892f7644, 15/15 at 3b0b8188; neighbours 98/98; tsc --noEmit 0 at both heads.", "order": "shown" },
+    { "id": "R8-CI", "status": "met", "evidence": "892f7644: push 36976283947 success, PR 36976289271 success; 3b0b8188: push 36976284517 success, PR 36976288445 success; test job success in all four; none cancelled.", "order": "shown" }
+  ],
+  "regressions": [],
+  "gaps": [
+    "N1 (minor, T-211): the template example copied with <agent-name> unfilled prints 'INVALID ... status_to is missing'; the reason says missing for an unfilled placeholder, and the template does not say to replace <...> values. Row 5 is met on the 'as documented' reading; a strictly literal reading would not be met.",
+    "TMPDIR could not be set (env-prefixed commands refused); candidate test fixtures went to /tmp and were removed by afterEach. The QA probe used ~/qa-tmp.",
+    "No full suite (LIGHT); CI ran it on both heads."
+  ],
+  "notes": "QA-251: T-164 892f7644 ACCEPT; T-211 3b0b8188 ACCEPT; pair ACCEPT. Report: docs/loops/t164-t211-r2-qa-report.md."
+}
