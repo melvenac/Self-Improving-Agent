@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 275,
+  "revision": 276,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1222,6 +1222,20 @@
       "note": "Per D-093. F5: a fresh attempt after a non-retryable outcome (auth) with no answer must not count as a retry, so either the runner stops setting retry_of in that case or the counter applies D-092 ruling 3; count-attempts must exit 0 on the slice-four records as they stand, with no record edited. F6: decision.reasons says 'the deterministic checks failed (read from process exit codes)' when checks_source is 'none'. F7: G_done checks_source holds a scratch path; write repo-relative or the blob only. F8: the closeout-tables 4.4 'scored SHA' column holds the qa/* E_t commit, so relabel it 'E_t commit'. Red first.",
       "note_by": [
         "83f0e630-9247-40d4-adcd-7f4292a16ddb"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-223",
+      "title": "Pin the event in the PR concurrency group in ci-runs-on.test.ts so QA 250's M-push-only mutant dies",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 157,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "QA 250 row 6 (docs/loops/t221-t222-qa-report.md on 75d7ec48): a group of format('ci-{0}{1}', event=='push' && 'push-' || '', branch) passes all 20 rows; it collides a PR from head 'push-foo' with a push to 'foo'. One assertion fixes it: expect the exact PR group string ci-pull_request-<branch>, or a collision case.",
+      "note_by": [
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
       "closed_rev": null
     }
@@ -3745,6 +3759,12 @@
       "title": "Jev calibration 1 rulings-1: Phase 1 PARKED at the roll on origin/loop/jev-calibration-1-set e66cfbd4 (NOT frozen; pool 74 = 29 ACCEPT / 30 REJECT / 15 excluded). D_t from the round's QA dispatch accepted; ambiguous-verdict tag accepted; score both the gate-as-built AND Jev's judgement alone (recomputed with checksPassed true), because hand_to_qa_requires_green_checks rejects every --checks none case regardless of Jev, which likely explains slice four's 8/8; leak-wording D_t (27/74) excluded from the headline and scored as a separate group; T-194 r1/r8 and A/A2/A3 dropped (no source)",
       "date": "2026-10-02",
       "note": "Planner session 156, written at the roll. Rulings file: docs/loops/jev-calibration-1-rulings-1.md. The next planner resumes Phase 1 on sia-builder from e66cfbd4 (it supersedes the handoff's 'at 6b82ae1c' wording); the freeze still lands before any call; Phase 2 goes to a different seat. If the headline set falls below 50, report the real N; do not relax the leak rule."
+    },
+    {
+      "id": "D-097",
+      "title": "QA 250 ACCEPT: T-221 (#274 9ab021fd) and T-222 (#277 7b42ed6f); pair ACCEPT",
+      "date": "2026-10-02",
+      "note": "Read origin/qa/t221-t222-report 75d7ec48 (docs/loops/t221-t222-qa-report.md) myself and re-derived its load-bearing claims at session 157: ci.yml@9ab021fd lines 59-61 carry the per-event group and master-false cancel expression as reported; gh run view 36970268385/36969848539/36969845163 = success on 9ab021fd and 36968787919 = success on 7b42ed6f; git diff origin/master 7b42ed6f -- docs/loops/loop-15-slice-4-records is empty. T-221 row 6 gap (mutant M-push-only survives: the PR group's event is not pinned) is non-blocking and opened as T-223. #277's push run 36968774375 was cancelled by the old shared group (the T-221 defect) and re-run by the planner after its PR run finished. Both PRs touch code/CI: a merge needs Aaron's typed word naming the PR."
     }
   ],
   "handoffs": [
@@ -3773,58 +3793,6 @@
       "session_uuid": null,
       "checkout": null,
       "first_rev": null
-    },
-    {
-      "seat": "planner",
-      "pick_up": "Read docs/loops/session-147-dispatches.md first (on origin/docs/session-100-qa99-dispatch; newest sections at the end). All three dev rounds are DELIVERED and ruled: record 185 (qa-queue restore + 185b fail-closed harness) ACCEPTED at a planner boundary check, PR #188; record 186 (T-193 worktree-layout check) ACCEPTED, PR #186; record 187 (candidate B part 2, 8c7769f) evidence checked, PR #187, goes to QA 189. MORNING, all Aaron's: (1) merge #186 and #188; (2) QA relaunch: copy qa-queue.ps1 from 78fd6ce to both QA machines, clean both QA trees (laptop stuck at fc8d8cd; QA PC at daec2b8, dirty), launch laptop 189,161,178 and QA PC 182,183 at a commit carrying qa-189 (80f3383 or later); dry-run every line on its target first; (3) his word to remove the four stray scratch worktrees T-193 found (listed in the record 186 section). Candidate A merged (677c1dd); master green on tcm.",
-      "watch_out": [
-        "After ANY context-mode or Grok Build update, re-test Cursor CLI (a headless cursor-agent -p 'echo x' in a scratch dir): context-mode 1.0.169's plugin PreToolUse hook fail-closes every Cursor tool (T-046). The fix (PreToolUse stripped from the plugin cache hooks.json) is NOT durable.",
-        "Cursor seats stop listening when --wait times out after ~1 h; check /a2a/agents/live + /a2a/session/<room>/reads before asking Aaron to nudge, and nudge only for a turn that is unread with no listener.",
-        "Composer (sia-infra, D-060) defaults to evidence with the right SHAPE that cannot fail; its first live rounds (185, 185b) were real, but read the failed log of every red and mutant anyway.",
-        "Master's push CI still runs on GitHub-hosted ubuntu (billing-blocked) until T-192 (a38ff92, QA 183 pending) merges; dispatch tcm CI on master by hand after every merge.",
-        "Derive every time and count in a tracked note from its source (date -u, run ids): three were written as guesses this session.",
-        "QA 189 must rule the BE-5 question: the B2 fixture gained order 'shown' because a met row without order is now refused. Do not rule it from the planner seat."
-      ],
-      "open_questions": [
-        "Aaron: Telegram approval for QA (D-058) is on HOLD by his choice; do not dispatch it until he decides."
-      ],
-      "session": 147,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#186 loop/t193-worktree-check (683b61c)",
-            "qa_status": "accepted",
-            "note": "T-193; planner-accepted; Aaron merges; then close T-193 and T-149"
-          },
-          {
-            "ref": "#187 loop/15-slice-3-candidate-b2 (8c7769f)",
-            "qa_status": "not_started",
-            "note": "candidate B part 2; QA 189 launches in the morning"
-          },
-          {
-            "ref": "#188 loop/qa-queue-restore (78fd6ce)",
-            "qa_status": "accepted",
-            "note": "record 185/185b; planner boundary check (no QA seat overnight); Aaron merges"
-          }
-        ],
-        "frozen_sha": "8c7769f (candidate B part 2, for QA 189)",
-        "questions_for_aaron": [
-          "Merge #186 and #188",
-          "Launch the QA relaunch lines (planner dry-runs them first)",
-          "Remove the four stray scratch worktrees?",
-          "Telegram approval (D-058): on hold until he decides"
-        ],
-        "rulings": [
-          "session-147-dispatches.md: rulings on QA 162/174/177/172/173 (all merged)",
-          "D-055, D-060",
-          "record 184 (Composer replay) result",
-          "record 185/185b ACCEPTED (planner boundary check)",
-          "record 186 (T-193) ACCEPTED"
-        ]
-      },
-      "session_uuid": "4ed2836c-1dd1-43e5-8a06-c829d50548f3",
-      "checkout": "sia-planner",
-      "first_rev": 136
     },
     {
       "seat": "planner",
@@ -4218,14 +4186,6 @@
       "first_rev": null
     },
     {
-      "n": 147,
-      "date": "2026-09-27",
-      "uuid": "4ed2836c-1dd1-43e5-8a06-c829d50548f3",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 136
-    },
-    {
       "n": 148,
       "date": "2026-09-28",
       "uuid": "db06e512-6040-4764-b9b9-038e61d842ee",
@@ -4304,6 +4264,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 265
+    },
+    {
+      "n": 157,
+      "date": "2026-10-02",
+      "uuid": "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 276
     }
   ]
 }
