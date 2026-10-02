@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 295 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 297 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-Planner session 158 (started ~21:15Z 2026-10-02 after the 157 roll). This is an INTERIM handoff written mid-session at clark's request, to put the /START AUDIT GAPS watch-out back into the record; it was dropped at rev 287. State at writing: no PRs open; master 5749a7b4 (#338, D-111) with push CI green on 7bfe22f2, 66accdec and 5749a7b4; #295/#298 merged under D-109. The D-110 dev dispatch (objective items a-e) is HELD: slots.json usageLevel 'RED + WEEKLY95' (5h 87%, 7d 95%, set 21:09Z), and weekly >=95% means no new QA, tasks or dispatches. Dispatch only after clark announces the weekly reset (Aaron's one-time reset, or the 10-07 window). sia-forge is offline (QA PC network drop; Aaron must relaunch it); sia-builder is on Aaron's /clear list. Each needs a re-brief by message after its /start (G-049/T-203). The status cron was created at /start (job c7008754, :04 hourly).
+Planner session 158, ~22:05Z 2026-10-02. NOW: T-233 (deterministic /start greeting, P0, first loop; brief docs/loops/start-greeting-deterministic-brief.md; D-112 lifts the weekly hold for this loop only) is ready to dispatch at clark's GREEN (the 5-hour STOP resets 21:50Z). D-113: Aaron had clark update the DESKTOP serving tree to master (ba1edf70, read back by the planner), and DROPPED the hourly status cron. The planner's cron is deleted; message clark on events only. The QA PC's serving tree is still 429 behind (9c603615): it must be updated before a dev seat's greeting there is trusted. That is Aaron's act (or clark's on his word); the planner reads by SSH only. Seats: sia-builder is on Aaron's roll list (31%), then re-brief it by message with T-233. sia-forge is back online and parked (its tree is 14 behind). After a /mcp reconnect or fresh session on the desktop, check the SERVED greeting and rescope T-233 (see its note). No PRs open; #339 (rev 294) and #340 (rev 295) are merged.
 
 ### Watch out
 
@@ -17,11 +17,11 @@ Planner session 158 (started ~21:15Z 2026-10-02 after the 157 roll). This is an 
 - STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).
 - QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).
 - RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.
-- STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's), CADENCE CHANGED at session 155 by D-077: (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 60 MINUTES while active (was 30), a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 only). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll. (T-211 merged as #272 in session 157: check whether the standing-cron line now prints at start before dropping this item.)
+- REPORTING TO CLARK (D-113, Aaron 2026-10-02 ~21:45Z, AMENDS D-077): the hourly status cadence is DROPPED; create NO status cron at /start. Message `clark` on EVENTS only: verdicts, merges (the one-line D-063 notice), blocks, READY TO ROLL, plus one line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner). Clark reads the dashboard's planner rows for status. If `clark` is not in ListAgents, skip the send. CARRY THIS ITEM FORWARD VERBATIM at every roll until T-233 removes status_cron from seat data.
 - DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.
 - VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.
 - JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.
-- /START AUDIT GAPS (clark's HoH audits of sessions 156 and 158's starts, ~/Worktrees/hoh-startup-audit.md; do NOT repeat; CARRY VERBATIM AT EVERY ROLL — dropping it after session 157 is why items 1-3 regressed at 158): (1) CREATE THE STATUS CRON during /start (CronCreate at :04), before the briefing ends — not as a FLAG. (2) The session number is the RECORD's next session (last n + 1), not ob_start's per-checkout 'Session #N' (T-164; the serving MCP build is stale, T-172, so state it yourself). (3) 'Latest brief' is the newest *brief* by DATE (ls -t docs/loops/*brief*), not by loop number or sort -V; a developer handoff is not a brief (T-210). (4) Read C:\Users\melve\slots.json usageLevel at /start (home root, NOT ~/Worktrees; also the dashboard slots panel; live numbers are quota.claude in http://100.124.212.87:4100/api/sessions) and state the level in the OBJECTIVE line — e.g. RED + weekly 95% means the dispatch is held. (5) git fetch BEFORE the greeting when the tree is behind origin/master. (6) Do not print answered open questions. (7) Do every residual read, including .agents/SYSTEM/domains.json. (8) Count gaps from state.json gaps[], not a truncated render. (9) ob_start returns ~50 KB here (T-183): extract the State block to the scratchpad and read it in parts.
+- /START AUDIT GAPS (clark's HoH audits of sessions 156 and 158's starts, ~/Worktrees/hoh-startup-audit.md; do NOT repeat; CARRY VERBATIM AT EVERY ROLL until T-233 ships AND is served on every machine, then retire it): (0) CHECK THE SERVING TREE FIRST: ~/Projects/Self-Improving-Agent's HEAD vs origin/master on THIS machine (it was 599 behind on the desktop and 429 on the QA PC on 2026-10-02, which is why most items below regressed). If it is behind, say so on the first line and ask Aaron to update it. (1) NO status cron (D-113 dropped D-077's cadence; amended at rev 297). (2) The session number is the RECORD's next session (last n + 1), not ob_start's per-checkout 'Session #N' (T-164; state it yourself if the serving build is stale, T-172). (3) 'Latest brief' is the newest *brief* by DATE (ls -t docs/loops/*brief*), not by loop number or sort -V; a developer handoff is not a brief (T-210). (4) Read C:\Users\melve\slots.json usageLevel at /start (home root, NOT ~/Worktrees; also the dashboard slots panel; live numbers are quota.claude in http://100.124.212.87:4100/api/sessions) and state the level in the OBJECTIVE line — e.g. RED + weekly 95% means the dispatch is held. (5) git fetch BEFORE the greeting when the tree is behind origin/master. (6) Do not print answered open questions. (7) Do every residual read, including .agents/SYSTEM/domains.json. (8) Count gaps from state.json gaps[], not a truncated render. (9) ob_start returns ~50 KB here (T-183): extract the State block to the scratchpad and read it in parts.
 
 ### Open questions
 
@@ -33,12 +33,12 @@ _None._
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** _None._
+**Questions pending for Aaron:** 
+- Update the QA PC's serving tree (C:/Users/AARONM~1/Projects/Self-Improving-Agent, 9c603615, 429 behind) to master before T-233's dev seat starts there?
 
 **Rulings made mid-loop:** 
-- D-109 #295/#298 merged
-- D-110 dev greeting trim
-- D-111 auto-merge enabled
+- D-112 T-233 first loop, weekly hold lifted for it
+- D-113 status cron dropped; desktop serving tree updated
 
 ## developer [sia-builder] _(written session 156)_
 
