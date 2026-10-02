@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 284,
+  "revision": 285,
   "project": {
     "name": "self-improving-agent"
   },
@@ -116,12 +116,13 @@
       "id": "T-042",
       "title": "Vault pollution has a preventer but no detector",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 52,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "(Atlas's framing, Session 52). Today's artifacts were found by accident (an /end step happened to list Summaries/), not by a check. Cheap detector: a /sync check counting `ob-server-*` (and any `mkdtemp`-shaped slug) files in the real vault — a filter-shaped leak deserves a counter (#375). Optionally a root-level vitest config (or a guard script) so a repo-root `npx vitest` either loads the real config or refuses to run, instead of silently running unisolated — the guard makes it loud today, but 23 scattered failures are a worse error message than one refusal. (Session 52)",
-      "closed_rev": null
+      "note": "(Atlas's framing, Session 52). Today's artifacts were found by accident (an /end step happened to list Summaries/), not by a check. Cheap detector: a /sync check counting `ob-server-*` (and any `mkdtemp`-shaped slug) files in the real vault — a filter-shaped leak deserves a counter (#375). Optionally a root-level vitest config (or a guard script) so a repo-root `npx vitest` either loads the real config or refuses to run, instead of silently running unisolated — the guard makes it loud today, but 23 scattered failures are a worse error message than one refusal. (Session 52) — Closed session 157: merged #314 (09aef42c), QA 257 ACCEPT. Gap: no test exercises the default obsidianVaultDir() path (every row passes vaultDir); QA covered it by script. See G-052.",
+      "note_by": null,
+      "closed_rev": 285
     },
     {
       "id": "T-044",
@@ -171,12 +172,13 @@
       "id": "T-051",
       "title": "Add a `/sync` validator for the `.agents/skills/` frontmatter contract, asserting all three identity sources agree",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 50,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "(Session 50, reported by Prime). Prime's harness loads `<repo>/.agents/skills/*/SKILL.md` at boot and found three malformed: `gotchas/` and `seo-optimizer-test/` have a frontmatter `name` that differs from the directory, and `self-improving-agent-guide/SKILL.md` **had no frontmatter at all** so it never loaded — a 192-line architecture document invisible to the router for months (frontmatter added this session; unverified until Prime reboots). Each skill has up to **three** identities — directory name, frontmatter `name`, and the `.agents/skills/INDEX.md` row — and they currently disagree: INDEX.md registers two skills, Prime's loader finds three directories and loads two *different* ones. Neither reader was wrong about its own file; nothing ever checked they described the same set. Validator belongs in `/sync`, **not** the session-end hook — `/sync` is the mandatory pre-commit gate, the hook runs unattended after the fact. Confirmed hand-written, not generated: nothing in the repo writes that path, so there is no emitter to fix instead. **Directory work DONE 2026-08-11** — Aaron greenlit both. `gotchas/` renamed to `self-improving-agent-gotchas/` with INDEX.md's Directory cell updated; all three identity sources now verified in agreement for both remaining skills. `seo-optimizer-test/` moved out of the loader path to `.agents/archive/seo-optimizer-generalized.md` — **archived, not deleted, because the \"leftover fixture\" call was wrong.** It is the *generalized derivative* of TCM's applied `seo-optimizer` (placeholders instead of the hardcoded domain, `[COMMON]`/`[ARCHITECTURAL]`/`[SUBTLE]` tier annotations, plus a Priority Framework and two checklists existing in no other copy — 87 unique content lines). The `-test` suffix was recording a skill-generalization test *output*. Aaron to decide its permanent home. **Lesson worth keeping:** Forge and Prime independently agreed it was a fixture and the agreement read as corroboration — but both had reasoned from the same three indirect signals (`-test` suffix, absence from INDEX.md, wrong subject for the repo) and **neither had opened the file**. Two readers, one evidence set: the convergence carried no more information than either conclusion alone. Remaining scope of this item is the `/sync` validator itself. Original blocked items were: rename `gotchas/` → `self-improving-agent-gotchas/`, and decide `seo-optimizer-test/` — a Next.js SEO skill in a memory-protocol repo, unregistered in INDEX.md, which both agents read as a leftover test fixture (and which is currently the only skill Prime auto-triggers that no human ever declared). **The rename is cheaper than first assessed** (Prime, verified): INDEX.md's *Skill* column already reads `self-improving-agent-gotchas` and only its *Directory* cell says `gotchas/`, so the rename edits one table cell and lands all three identity sources in agreement — no name reconciliation across the registry. Whoever wrote INDEX.md had already judged `gotchas` too generic.",
-      "closed_rev": null
+      "note": "(Session 50, reported by Prime). Prime's harness loads `<repo>/.agents/skills/*/SKILL.md` at boot and found three malformed: `gotchas/` and `seo-optimizer-test/` have a frontmatter `name` that differs from the directory, and `self-improving-agent-guide/SKILL.md` **had no frontmatter at all** so it never loaded — a 192-line architecture document invisible to the router for months (frontmatter added this session; unverified until Prime reboots). Each skill has up to **three** identities — directory name, frontmatter `name`, and the `.agents/skills/INDEX.md` row — and they currently disagree: INDEX.md registers two skills, Prime's loader finds three directories and loads two *different* ones. Neither reader was wrong about its own file; nothing ever checked they described the same set. Validator belongs in `/sync`, **not** the session-end hook — `/sync` is the mandatory pre-commit gate, the hook runs unattended after the fact. Confirmed hand-written, not generated: nothing in the repo writes that path, so there is no emitter to fix instead. **Directory work DONE 2026-08-11** — Aaron greenlit both. `gotchas/` renamed to `self-improving-agent-gotchas/` with INDEX.md's Directory cell updated; all three identity sources now verified in agreement for both remaining skills. `seo-optimizer-test/` moved out of the loader path to `.agents/archive/seo-optimizer-generalized.md` — **archived, not deleted, because the \"leftover fixture\" call was wrong.** It is the *generalized derivative* of TCM's applied `seo-optimizer` (placeholders instead of the hardcoded domain, `[COMMON]`/`[ARCHITECTURAL]`/`[SUBTLE]` tier annotations, plus a Priority Framework and two checklists existing in no other copy — 87 unique content lines). The `-test` suffix was recording a skill-generalization test *output*. Aaron to decide its permanent home. **Lesson worth keeping:** Forge and Prime independently agreed it was a fixture and the agreement read as corroboration — but both had reasoned from the same three indirect signals (`-test` suffix, absence from INDEX.md, wrong subject for the repo) and **neither had opened the file**. Two readers, one evidence set: the convergence carried no more information than either conclusion alone. Remaining scope of this item is the `/sync` validator itself. Original blocked items were: rename `gotchas/` → `self-improving-agent-gotchas/`, and decide `seo-optimizer-test/` — a Next.js SEO skill in a memory-protocol repo, unregistered in INDEX.md, which both agents read as a leftover test fixture (and which is currently the only skill Prime auto-triggers that no human ever declared). **The rename is cheaper than first assessed** (Prime, verified): INDEX.md's *Skill* column already reads `self-improving-agent-gotchas` and only its *Directory* cell says `gotchas/`, so the rename edits one table cell and lands all three identity sources in agreement — no name reconciliation across the registry. Whoever wrote INDEX.md had already judged `gotchas` too generic. — Closed session 157: merged #300 (d06952a2), QA 256 ACCEPT.",
+      "note_by": null,
+      "closed_rev": 285
     },
     {
       "id": "T-055",
@@ -216,12 +218,13 @@
       "id": "T-065",
       "title": "Port `cli.ts` off the v1 database, then repoint `paths.knowledgeDb`",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 41,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "scoring no longer uses it (both routes share `computeScore` against v2), but `createDb()` still expects the v1 schema, so the reference is dormant rather than removed. Once ported, `~/.claude/context-mode/knowledge.db` can go. (Session 41)",
-      "closed_rev": null
+      "note": "scoring no longer uses it (both routes share `computeScore` against v2), but `createDb()` still expects the v1 schema, so the reference is dormant rather than removed. Once ported, `~/.claude/context-mode/knowledge.db` can go. (Session 41) — Closed session 157: merged #313 (55d7f18f), QA 257 ACCEPT. QA's own mutant (knowledgeV2Db default repointed) SURVIVED: non-blocking finding, see G-052.",
+      "note_by": null,
+      "closed_rev": 285
     },
     {
       "id": "T-067",
@@ -320,12 +323,13 @@
       "id": "T-148",
       "title": "The note is required before you RETIRE a task, not only before you work one",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 61,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Clark's framing, session 61, and the deterministic fix for Planner Error 28. The titles-only INBOX.md legend says to read a task's note in state.json when you work the task, not when you pick one. Ruling on a task is neither picking nor working, and the rewrite drew no boundary for it — which is how T-050 came to be classified from its title as being about a writer, when its note says it is about an uncounted read. Not carelessness applying a rule; a rule that did not cover the case. Scope: the INBOX.md legend in state-render.ts and the corresponding line in .claude/commands/start.md plus the project-template mirror. Deliberately kept out of session 61's writes because it touches the renderer and a command file, and those writes were each one thing.",
-      "closed_rev": null
+      "note": "Clark's framing, session 61, and the deterministic fix for Planner Error 28. The titles-only INBOX.md legend says to read a task's note in state.json when you work the task, not when you pick one. Ruling on a task is neither picking nor working, and the rewrite drew no boundary for it — which is how T-050 came to be classified from its title as being about a writer, when its note says it is about an uncounted read. Not carelessness applying a rule; a rule that did not cover the case. Scope: the INBOX.md legend in state-render.ts and the corresponding line in .claude/commands/start.md plus the project-template mirror. Deliberately kept out of session 61's writes because it touches the renderer and a command file, and those writes were each one thing. — Closed session 157: merged #312 (c0c710e4), QA 255 ACCEPT.",
+      "note_by": null,
+      "closed_rev": 285
     },
     {
       "id": "T-149",
@@ -358,7 +362,8 @@
       "opened_session": 63,
       "closed_session": null,
       "supersedes": null,
-      "note": "open-brain/tsconfig.json is `\"include\": [\"src/**/*\"]` and there is exactly one tsconfig, so `tsc` NEVER READS open-brain/tests/. Not 'checked less strictly' — not checked. Found in Loop 12 R-010: cutting `enableHeuristicRatings` left the flag named in six places across four test files and `npx tsc --noEmit` exited 0. The referrers surfaced only at runtime, when assertions happened to trip on them. This reframes '603 tests passing': the suite proves behaviour, and nothing proves the tests' own types. A type error in a test is invisible unless a runtime assertion happens to catch it. Fix is a tsconfig that includes tests (or a second one for typecheck only); the risk is that it surfaces a backlog of existing test type errors, which is the point. Independent of the retirement work — filed, not fixed, in the loop that found it.",
+      "note": "open-brain/tsconfig.json is `\"include\": [\"src/**/*\"]` and there is exactly one tsconfig, so `tsc` NEVER READS open-brain/tests/. Not 'checked less strictly' — not checked. Found in Loop 12 R-010: cutting `enableHeuristicRatings` left the flag named in six places across four test files and `npx tsc --noEmit` exited 0. The referrers surfaced only at runtime, when assertions happened to trip on them. This reframes '603 tests passing': the suite proves behaviour, and nothing proves the tests' own types. A type error in a test is invisible unless a runtime assertion happens to catch it. Fix is a tsconfig that includes tests (or a second one for typecheck only); the risk is that it surfaces a backlog of existing test type errors, which is the point. Independent of the retirement work — filed, not fixed, in the loop that found it. — Session 157: tsconfig.tests.json and typecheck:tests merged as #305 (8961635d), QA 257 ACCEPT; 36 of 40 errors fixed. Remaining: the 4 category-B errors land with #294 (T-215, batch B4), then a separate PR adds typecheck:tests to CI's test job.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -616,12 +621,13 @@
       "id": "T-176",
       "title": "gitnexus-index measures distance in one direction only: an index on a different line of history reads as current",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 81,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Found by the QA seat (Probe, record session 82) running sync --check twice in its tree, 2026-09-23; recorded in docs/loops/loop-15-slice-3-rulings-7.md. With the index built at 3b19287, /sync said 'index is at HEAD' when HEAD was c9947c5 (an ancestor of the indexed commit), and '2 commit(s) behind HEAD' at 980a2b9. The check counts commits HEAD has that the index lacks and never the commits the index has that HEAD lacks, so an index built from another branch, or ahead of HEAD, passes as current. Rule 11's family: a distance that cannot tell 'same commit' from 'I only looked one way'. Fix shape to rule on later: compare both directions (merge-base, or rev-list --left-right --count) and report 'diverged' as an issue. Not investigated beyond QA's two observations. A task, not a gap, because the brief's R28 forbids add_gap until T-158.",
-      "closed_rev": null
+      "note": "Found by the QA seat (Probe, record session 82) running sync --check twice in its tree, 2026-09-23; recorded in docs/loops/loop-15-slice-3-rulings-7.md. With the index built at 3b19287, /sync said 'index is at HEAD' when HEAD was c9947c5 (an ancestor of the indexed commit), and '2 commit(s) behind HEAD' at 980a2b9. The check counts commits HEAD has that the index lacks and never the commits the index has that HEAD lacks, so an index built from another branch, or ahead of HEAD, passes as current. Rule 11's family: a distance that cannot tell 'same commit' from 'I only looked one way'. Fix shape to rule on later: compare both directions (merge-base, or rev-list --left-right --count) and report 'diverged' as an issue. Not investigated beyond QA's two observations. A task, not a gap, because the brief's R28 forbids add_gap until T-158. — Closed session 157: merged #303 (22ae3597), QA 256 ACCEPT.",
+      "note_by": null,
+      "closed_rev": 285
     },
     {
       "id": "T-177",
@@ -697,12 +703,13 @@
       "id": "T-183",
       "title": "ob_start's greeting has grown about 7x since V-025 (2,142 words at rev 14; about 14,900 words, 92,131 characters, at rev 121) and no longer fits one tool result: render gaps and verified by TITLE, as tasks already are",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 100,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Session 100, measured on this session's own ob_start output (rev 121): gaps 36% (39 entries with their full amended text), role files 24%, verified 19% (77 entries), header and tasks 12%, decisions/handoff/others 10%. Both the planner (session 100) and developer 105 hit 'exceeds maximum allowed tokens' and had to page the saved file; a seat that skims it misses the watch-outs. It is the Step-Back's Part 1 finding ('logs wearing the name of state') recurring inside its own fix: gaps only grow, because close_gap destroys their text (G-010) and so nobody closes them (T-158). Deterministic fix: titles in the render, full text read from state.json when a seat works the item. Aaron: the greeting is the evidence the loops work, so its size is not cosmetic.",
-      "closed_rev": null
+      "note": "Session 100, measured on this session's own ob_start output (rev 121): gaps 36% (39 entries with their full amended text), role files 24%, verified 19% (77 entries), header and tasks 12%, decisions/handoff/others 10%. Both the planner (session 100) and developer 105 hit 'exceeds maximum allowed tokens' and had to page the saved file; a seat that skims it misses the watch-outs. It is the Step-Back's Part 1 finding ('logs wearing the name of state') recurring inside its own fix: gaps only grow, because close_gap destroys their text (G-010) and so nobody closes them (T-158). Deterministic fix: titles in the render, full text read from state.json when a seat works the item. Aaron: the greeting is the evidence the loops work, so its size is not cosmetic. — Closed session 157: merged #291 (618a38ac), QA 255 ACCEPT; the cut ruled in D-100 plus P2/P3 count lines; greeting measured 39,908 chars at the batch merge.",
+      "note_by": null,
+      "closed_rev": 285
     },
     {
       "id": "T-184",
@@ -731,12 +738,13 @@
       "id": "T-186",
       "title": "state-views applySummaryRegion has the same startsWith('# ') blind spot as the importer's BOM defect: a SUMMARY.md with a leading BOM is misread",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 100,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Session 100. Found by developer 105 (importer round 2 R2-1). GitNexus rates its upstream impact HIGH (ob_state, /sync), so it was not changed inside the importer loop; the importer writes SUMMARY.md back as plain UTF-8 meanwhile. Same class as QA 102's D2.",
-      "closed_rev": null
+      "note": "Session 100. Found by developer 105 (importer round 2 R2-1). GitNexus rates its upstream impact HIGH (ob_state, /sync), so it was not changed inside the importer loop; the importer writes SUMMARY.md back as plain UTF-8 meanwhile. Same class as QA 102's D2. — Closed session 157: merged #308 (88d1566e), QA 257 ACCEPT; planner read row 7 (BOM fixtures) before merging.",
+      "note_by": null,
+      "closed_rev": 285
     },
     {
       "id": "T-187",
@@ -1043,29 +1051,31 @@
       "id": "T-209",
       "title": "ob_start renders BROKEN gaps newest-first",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 153,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Clark startup audit (a), accepted by planner session 153. ob_start's State block lists gaps oldest-first (G-001..G-007), while /start's briefing says newest first, so session 153's briefing showed the five oldest of 40 gaps and hid G-049 and G-045..G-042. Fix it in the render, deterministically, not in the /start wording.",
+      "note": "Clark startup audit (a), accepted by planner session 153. ob_start's State block lists gaps oldest-first (G-001..G-007), while /start's briefing says newest first, so session 153's briefing showed the five oldest of 40 gaps and hid G-049 and G-045..G-042. Fix it in the render, deterministically, not in the /start wording. — Closed session 157: merged #287 (c6fa53a1), QA 255 ACCEPT after QA 253 REJECT (D-101).",
       "note_by": [
-        "6e083614-965f-462b-ad59-62091a0be5e1"
+        "6e083614-965f-462b-ad59-62091a0be5e1",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 285
     },
     {
       "id": "T-210",
       "title": "ob_start names the newest docs/loops brief by git commit date",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 153,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Clark startup audit (b), accepted by planner session 153. /start's rule 'the largest loop number in docs/loops' no longer fits task-named docs (t201-brief.md, qa-233-*). Session 153 picked loop-16-qa-report-4.md from 2026-09-20. ob_start should emit the newest brief itself, by git commit date, so the briefing does not guess.",
+      "note": "Clark startup audit (b), accepted by planner session 153. /start's rule 'the largest loop number in docs/loops' no longer fits task-named docs (t201-brief.md, qa-233-*). Session 153 picked loop-16-qa-report-4.md from 2026-09-20. ob_start should emit the newest brief itself, by git commit date, so the briefing does not guess. — Closed session 157: merged #287 (c6fa53a1), QA 255 ACCEPT.",
       "note_by": [
-        "6e083614-965f-462b-ad59-62091a0be5e1"
+        "6e083614-965f-462b-ad59-62091a0be5e1",
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 285
     },
     {
       "id": "T-211",
@@ -1289,15 +1299,15 @@
       "id": "T-226",
       "title": "/start text still says 'largest loop number' for the brief; point it at ob_start's new Latest brief line (T-210) in .claude/commands/start.md, the project template and the Cursor mirror",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 157,
       "supersedes": null,
-      "note": "Flagged by sia-builder in the T-209/T-210 handoff (loop/t209-t210-render 5ceb6eef). Lands after T-210 merges.",
+      "note": "Flagged by sia-builder in the T-209/T-210 handoff (loop/t209-t210-render 5ceb6eef). Lands after T-210 merges. — Closed session 157: merged #297 (a0338580), QA 255 ACCEPT.",
       "note_by": [
         "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
       ],
-      "closed_rev": null
+      "closed_rev": 285
     },
     {
       "id": "T-227",
@@ -3103,6 +3113,13 @@
       "evidence": "docs/loops/qa-256-b2-sync-dispatch.md at 50700414 (rows 6-7 read the desktop's real config); clark added a header to the launched prompt: report only counts, key names, server names and command paths, never values, and scan for key/token patterns before commit.",
       "recommended_update": "Every QA dispatch that touches real config carries that rule in its Rules section (done for QA 258, docs/loops/qa-258-b4-dispatch.md). A structural fix would be a pre-commit key scan in each push-qa helper, which refuses to push a commit matching key or token patterns.",
       "opened_session": 157
+    },
+    {
+      "id": "G-052",
+      "what": "Two accepted B3 PRs leave a default-path behaviour untested: #313 (T-065) has no row that pins knowledgeV2Db's default location (QA 257's repoint mutant survived), and #314 (T-042) never exercises the default obsidianVaultDir() resolution (every row passes vaultDir).",
+      "evidence": "docs/loops/b3-misc-qa-report.md on 6533ba75, rows 3 and 9.",
+      "recommended_update": "A LIGHT follow-up adds one row each: paths.test.ts pins the knowledgeV2Db default; vault-pollution.test.ts runs with no vaultDir and an injected home so obsidianVaultDir() is exercised.",
+      "opened_session": 157
     }
   ],
   "decisions": [
@@ -3903,6 +3920,12 @@
       "title": "Overnight merge pre-approval (Aaron, AskUserQuestion in clark's window, ~12:10Z, while asleep 5-6 h): the planner merges every PR its batch QA (QA 255, 256, 257) ACCEPTs, per PR, pinned with --match-head-commit to the exact QA'd head, after CI is green; a REJECT on a sibling does not hold an accepted PR back unless it is stacked on or depends on the rejected one. REJECTED, PARTIAL, held or moved heads wait for Aaron. B4 (QA 258) and later batches are NOT covered.",
       "date": "2026-10-02",
       "note": "Relayed by clark first-hand (two messages ~12:10Z, the second correcting scope to per-PR ACCEPT). Same route as #310's merge (clark-window AskUserQuestion). Also standing from Aaron the same hour: no rolls overnight (seats run to 25% context, then push WIP plus a merged or in-record handoff and park); weekly runs to the cap; WEEKLY WIND-DOWN at >=95% (no new QA, tasks or dispatches) and >=98% (every seat pushes WIP and a merged or in-record handoff and parks; the planner merges or closes what is ready under the pre-approval). One D-063 line to clark per merge."
+    },
+    {
+      "id": "D-104",
+      "title": "Batch QA results under D-103: QA 255 (B1) ACCEPT, merged #287 #291 #297 #312; QA 256 (B2) merged #300 #303, REJECTED #295 #298 #306 (row 5: a pass despite an unchecked input), #309 accepted but held (stacked on #306); QA 257 (B3) ACCEPT, merged #308 #301 #313 #314 #305. Ruling: any input not checked caps a /sync result at WARN even when the message names the skip; a hook entry with no command string is not-checked; a bare builtin head is a legitimate named skip.",
+      "date": "2026-10-02",
+      "note": "Reports: qa/b1-start-report 0736e432 (docs/loops/b1-start-qa-report.md), qa/b2-sync-report 336cf208 (docs/loops/b2-sync-qa-report.md), b3 report 6533ba75 (docs/loops/b3-misc-qa-report.md). Each merge: head == QA'd SHA, CI test green, --match-head-commit; master push CI green after every merge through 8961635d. Planner verified load-bearing rows: B1 regex bytes /(\\d+)\\s*$/ and server.test 30/30; B3 #308 row 7 byte-identical no-BOM output and BOM at offset 0. B2 round 2 by sia-forge (#295 7312a292, #298 7afd7f1b, #306 3f30e825, #309 de8cbbe9+) goes to re-QA as QA 260; not under D-103."
     }
   ],
   "handoffs": [
