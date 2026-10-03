@@ -222,15 +222,35 @@ export const LoopStateSchema = z.strictObject({
  * omits a resolved question and counts it, so a question answered two sessions ago stops being re-asked at every start.
  * A union rather than a new field so every existing record stays valid and nothing needs migrating.
  */
-export const OpenQuestionSchema = z.union([z.string(), z.strictObject({ text: z.string().min(1), resolved_by: z.string().min(1).optional() })]);
+export const OpenQuestionSchema = z.union([
+  z.string(),
+  // T-236 slice 2: `owner` names who the question waits on (e.g. "aaron"). Optional, so every existing record stays valid; the
+  // greeting renders WAITING ON AARON from unresolved questions owned by aaron, and only where the repo opted in.
+  z.strictObject({ text: z.string().min(1), resolved_by: z.string().min(1).optional(), owner: z.string().min(1).optional() }),
+]);
 export type OpenQuestion = z.infer<typeof OpenQuestionSchema>;
 export const questionText = (q: OpenQuestion): string => (typeof q === "string" ? q : q.text);
 export const questionResolvedBy = (q: OpenQuestion): string | null => (typeof q === "string" ? null : q.resolved_by ?? null);
+export const questionOwner = (q: OpenQuestion): string | null => (typeof q === "string" ? null : q.owner ?? null);
+
+/**
+ * A watch-out on a handoff (T-236 slice 2). A bare string is a watch-out exactly as before and renders exactly as before; an
+ * object carries the same text plus an optional `expires`: a SESSION NUMBER (the last session the watch-out prints in) or an
+ * ISO date (YYYY-MM-DD, the last day it prints). After that the greeting drops it and says how many it dropped, where the repo
+ * opted in. A union rather than a new field, like OpenQuestionSchema, so no existing record needs migrating.
+ */
+export const WatchOutSchema = z.union([
+  z.string(),
+  z.strictObject({ text: z.string().min(1), expires: z.union([z.number().int().positive(), z.string().regex(ISO_DATE, "expected YYYY-MM-DD")]).optional() }),
+]);
+export type WatchOut = z.infer<typeof WatchOutSchema>;
+export const watchText = (w: WatchOut): string => (typeof w === "string" ? w : w.text);
+export const watchExpires = (w: WatchOut): number | string | null => (typeof w === "string" ? null : w.expires ?? null);
 
 export const HandoffSchema = z.strictObject({
   seat: SeatName,
   pick_up: z.string(),
-  watch_out: z.array(z.string()),
+  watch_out: z.array(WatchOutSchema),
   open_questions: z.array(OpenQuestionSchema),
   session: sessionNumber,
   loop_state: LoopStateSchema.nullable(),

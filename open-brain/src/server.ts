@@ -31,6 +31,7 @@ import { countWords, estimateTokens } from "./pipelines/session-start/state-read
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
+import { greetingFlag } from "./pipelines/session-start/greeting-flags.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
 import { formatScanCounts } from "./pipelines/session-start/scan-counts.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -372,6 +373,8 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         latestBrief,
         workingTree: describeWorkingTree(projectRoot),
         skills: describeSkills(projectRoot),
+        // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
+        budget: greetingFlag(projectRoot, "briefing_budget"),
       }));
     } else {
       // F3: an unknown schema_version REFUSES, with no prose fallback.
@@ -485,6 +488,8 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
       // reason is added to the refusal below.
       session_uuid: stateSession.id,
       seat: identity && isSeat(identity.role) ? identity.role : null,
+      // T-236 slice 2: OPT-IN per repo; the caps apply to the handoff being written, never to existing ones.
+      handoff_caps: greetingFlag(projectRoot, "handoff_caps"),
     });
     const lines: string[] = [];
     if (!r.ok) {

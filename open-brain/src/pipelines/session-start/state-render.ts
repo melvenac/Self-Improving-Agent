@@ -1,5 +1,5 @@
 import type { State, Task, Handoff, Seat, OpenQuestion } from "../../shared/state-schema.js";
-import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat, questionText, questionResolvedBy } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat, questionText, questionResolvedBy, watchText } from "../../shared/state-schema.js";
 import { findHandoffCommit } from "./handoff-provenance.js";
 
 /**
@@ -246,7 +246,7 @@ function renderOneHandoff(h: Handoff): string[] {
   lines.push(`  pick up: ${h.pick_up}`);
   if (h.watch_out.length > 0) {
     lines.push(`  watch out:`);
-    for (const w of h.watch_out) lines.push(`    - ${w}`);
+    for (const w of h.watch_out) lines.push(`    - ${watchText(w)}`);
   }
   // T-233 B: a resolved question is omitted and COUNTED, so "none" and "N answered" stay different facts.
   const { open, resolved } = splitQuestions(h.open_questions);
