@@ -244,7 +244,7 @@ describe("detectForeignWriter — T-050", () => {
   it("FW-5: the detector's read cannot feed the resolver — ids, origin and rejection are identical with and without it", () => {
     const db = makeDb();
     recordRecallEvent(db, OURS, "q", [351, 365]);
-    const files = { "/p/.recalled-entries.json": fileFor(OTHER_SESSION, [999, 998]) };
+    const files: Record<string, string> = { "/p/.recalled-entries.json": fileFor(OTHER_SESSION, [999, 998]) };
     const input = { db, sessionId: OURS, filePaths: Object.keys(files), readFile: (p: string) => files[p] ?? null };
     const alone = resolveRecalledIds(input);
     const observed = resolveRecalledIdsObserved(input);
