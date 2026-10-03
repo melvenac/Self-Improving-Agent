@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 314,
+  "revision": 315,
   "project": {
     "name": "self-improving-agent"
   },
@@ -974,7 +974,7 @@
       "opened_session": 150,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner session 150, 2026-09-30, from G-049 (Forge's T-198 r2 finding): sia-builder, sia-infra and sia-forge all carry AGENT.local.md identity 'Forge / developer', so T-198's presence block resolves builder and infra to Forge's reader row and to forge.key; cursor-builder.key and cursor-infra.key are never looked up. T-199 already attributes sessions by checkout for the same reason. SCOPE: (1) one tracked source maps each seat worktree (by basename, as sessions[].checkout records it) to seat name, role and hub name; extend .agents/SYSTEM/worktree-seats.json or the T-196 seat file, whichever the developer shows is the single source, and never both; (2) T-198's key lookup and readers lookup resolve through it; (3) a checkout absent from the map prints a visible 'seat unknown for checkout <c>', never a fallback to the identity name; (4) /sync flags an AGENT.local.md whose identity disagrees with the map for its checkout. Rows: builder resolves to cursor-builder (or whatever the map names) and infra likewise; an unmapped checkout gives the visible line; the /sync check fires on the current builder/infra AGENT.local.md; a mutant that falls back to the identity name goes red. SEQUENCED AFTER T-198 r2 merges (it changes T-198's lookup); build on origin/loop/t198-presence until then and name the dependency. Seat: Forge. Closes G-049 when merged. — Session 159: ported by sia-infra (CC Sonnet) from Forge's unmerged 09-30 build (ded9557d, 5b1dc52e) as #376. hub-partner-seats.json is the single source; forge stays `grok` and cursor stays true (unruled data changes dropped). Six mutants were rebuilt. The CHANGELOG-only conflict after #371 was resolved. FROZEN at 09f82a12, CI 37115492972 green. Waiting for the next QA batch. sia-infra's local AGENT.local.md identity is now Infra; seat-identity passes.",
+      "note": "Opened planner session 150, 2026-09-30, from G-049 (Forge's T-198 r2 finding): sia-builder, sia-infra and sia-forge all carry AGENT.local.md identity 'Forge / developer', so T-198's presence block resolves builder and infra to Forge's reader row and to forge.key; cursor-builder.key and cursor-infra.key are never looked up. T-199 already attributes sessions by checkout for the same reason. SCOPE: (1) one tracked source maps each seat worktree (by basename, as sessions[].checkout records it) to seat name, role and hub name; extend .agents/SYSTEM/worktree-seats.json or the T-196 seat file, whichever the developer shows is the single source, and never both; (2) T-198's key lookup and readers lookup resolve through it; (3) a checkout absent from the map prints a visible 'seat unknown for checkout <c>', never a fallback to the identity name; (4) /sync flags an AGENT.local.md whose identity disagrees with the map for its checkout. Rows: builder resolves to cursor-builder (or whatever the map names) and infra likewise; an unmapped checkout gives the visible line; the /sync check fires on the current builder/infra AGENT.local.md; a mutant that falls back to the identity name goes red. SEQUENCED AFTER T-198 r2 merges (it changes T-198's lookup); build on origin/loop/t198-presence until then and name the dependency. Seat: Forge. Closes G-049 when merged. — Session 159: ported by sia-infra (CC Sonnet) from Forge's unmerged 09-30 build (ded9557d, 5b1dc52e) as #376. hub-partner-seats.json is the single source; forge stays `grok` and cursor stays true (unruled data changes dropped). Six mutants were rebuilt. The CHANGELOG-only conflict after #371 was resolved. FROZEN at 09f82a12, CI 37115492972 green. Waiting for the next QA batch. sia-infra's local AGENT.local.md identity is now Infra; seat-identity passes. — QA 266 (Plumb, Opus) ACCEPTED #376 at 09f82a12 (report qa/t203-report @ 9460e90f; all 9 rows). Non-blocking gaps: a mutant survives (greeting-size always uses the planner's partners; every test uses the sia-planner checkout); the /sync message says 'AGENT.local.md says' even on the AGENT.md fallback; the seat-file path is declared 3x. After the five session-159 merges #376 went DIRTY again; sia-infra is merging master. The planner range-diffs the new head against 09f82a12 before asking Aaron to merge.",
       "note_by": [
         "e50107b1-ac67-452c-9da1-3fc4c3beda97",
         "e05907a8-86cf-436b-bee3-ce6f2214e02e"
@@ -1456,7 +1456,7 @@
       "opened_session": 159,
       "closed_session": null,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron, 'Open T-236', in clark's window ~02:5x CDT 2026-10-03 (D-103 route), on the planner's feedback to clark's review docs/loops/greeting-review-2026-10-03.md (copied from ~/Worktrees). Measured: Briefing 9.5 KB / 1,517 words, WATCH OUT 70% of it; ob_start 51.6 KB (T-183). SCOPE (agreed by clark): (a) set_handoff caps: at most 3 watch-outs, one line each, optional `expires` (session or date) after which the renderer drops them; pick_up about 400 chars, next action only. (b) Role docs printed in full only when their sha changed since THIS seat's last read (per-seat last-read sha), else sha + pointer; this closes T-183. A bare pointer is rejected (the PRD-unread failure). (c) FOCUS + SEATS computed from the RECORD only (never the dashboard API), after T-203/T-191 give a per-seat task field; hub presence from ob_start's existing fetch. (d) NEXT dropped unless the objective links task ids. (e) WAITING ON AARON from open_questions with a new owner field. (f) renderBriefing budget about 4 KB / 30 lines with per-section caps and '+N more: <pointer>' overflow, enforced by a test over BOTH SIA and A2A fixture states. A2A CAUTION: Relay's /start shares the renderer and ob_state schema; every new field OPTIONAL with a default, A2A's state renders unchanged, guard a missing hub-partner-seats.json. Already done outside T-236: /START AUDIT GAPS and the CARRY-VERBATIM lines retired in the planner's session-159 handoff; the shorter build/usage wording went into T-234 PR A (hub turn 241). Standing rules in WATCH OUT move to role docs via the D-110 shared.md split, not here. — AMENDMENT (Relay, session 159; the planner accepts): the caps are OPT-IN PER REPO, default OFF. That covers the watch-out cap and expires, the pick_up length cap, and the ~4 KB / 30-line budget. Turn them on with a flag in the repo's record or seat data. SIA turns them on; A2A keeps them off unless Relay and Aaron rule otherwise. Reason: A2A's planner handoff carries 17 long watch-outs, and A2A's /start prints WATCH OUT verbatim, so a default cap would change A2A's render, which is a ruling, not a side effect. A2A FIXTURE: copy A2A's live record .agents/state.json at master 1c200b41f3f22ba8f62f6dfcf77339e0754ec334 (rev 179, schema 3, 259,959 bytes, 7 handoffs) into SIA's fixtures with the SHA in the file name. The test runs over it with the caps OFF and asserts output BYTE-IDENTICAL to today's renderer; over SIA's fixture with the caps ON it asserts the budget.",
+      "note": "AUTHORITY: Aaron, 'Open T-236', in clark's window ~02:5x CDT 2026-10-03 (D-103 route), on the planner's feedback to clark's review docs/loops/greeting-review-2026-10-03.md (copied from ~/Worktrees). Measured: Briefing 9.5 KB / 1,517 words, WATCH OUT 70% of it; ob_start 51.6 KB (T-183). SCOPE (agreed by clark): (a) set_handoff caps: at most 3 watch-outs, one line each, optional `expires` (session or date) after which the renderer drops them; pick_up about 400 chars, next action only. (b) Role docs printed in full only when their sha changed since THIS seat's last read (per-seat last-read sha), else sha + pointer; this closes T-183. A bare pointer is rejected (the PRD-unread failure). (c) FOCUS + SEATS computed from the RECORD only (never the dashboard API), after T-203/T-191 give a per-seat task field; hub presence from ob_start's existing fetch. (d) NEXT dropped unless the objective links task ids. (e) WAITING ON AARON from open_questions with a new owner field. (f) renderBriefing budget about 4 KB / 30 lines with per-section caps and '+N more: <pointer>' overflow, enforced by a test over BOTH SIA and A2A fixture states. A2A CAUTION: Relay's /start shares the renderer and ob_state schema; every new field OPTIONAL with a default, A2A's state renders unchanged, guard a missing hub-partner-seats.json. Already done outside T-236: /START AUDIT GAPS and the CARRY-VERBATIM lines retired in the planner's session-159 handoff; the shorter build/usage wording went into T-234 PR A (hub turn 241). Standing rules in WATCH OUT move to role docs via the D-110 shared.md split, not here. — AMENDMENT (Relay, session 159; the planner accepts): the caps are OPT-IN PER REPO, default OFF. That covers the watch-out cap and expires, the pick_up length cap, and the ~4 KB / 30-line budget. Turn them on with a flag in the repo's record or seat data. SIA turns them on; A2A keeps them off unless Relay and Aaron rule otherwise. Reason: A2A's planner handoff carries 17 long watch-outs, and A2A's /start prints WATCH OUT verbatim, so a default cap would change A2A's render, which is a ruling, not a side effect. A2A FIXTURE: copy A2A's live record .agents/state.json at master 1c200b41f3f22ba8f62f6dfcf77339e0754ec334 (rev 179, schema 3, 259,959 bytes, 7 handoffs) into SIA's fixtures with the SHA in the file name. The test runs over it with the caps OFF and asserts output BYTE-IDENTICAL to today's renderer; over SIA's fixture with the caps ON it asserts the budget. — CORRECTION + DISPATCH (session 159): the A2A fixture is 260,229 BYTES (259,959 is its CHARACTER count, multi-byte UTF-8), sha256 8892464b6608a82c38fa63e878b2458412fbbd12a15471c0d6aea94f21004549, blob 3cc195a5 (equal to GitHub's), at open-brain/tests/fixtures-state/a2a-state-1c200b41.json; caught by sia-infra. Brief docs/loops/t236-brief.md (#389). Slice 1 (role docs by changed sha, closes T-183) is with sia-infra on loop/t236-role-docs-sha; slice 2 (handoff caps, owner, NEXT, budget test) is with sia-forge on loop/t236-slice2-briefing. RULINGS: the opt-in flag file is tracked .agents/SYSTEM/greeting.json (allowlisted in .gitignore by infra; absent file or key means OFF; keys role_docs_by_sha, briefing_budget, handoff_caps, sorted); there is ONE reader, session-start/greeting-flags.ts (readGreetingFlags/greetingFlag), written by infra, which forge takes verbatim; the last-read store is untracked .agents/role-reads.local.json keyed by seat, recorded only after the full text prints; expiry applies only with the flag on, and expires N means the last session it prints in. Forge commits goldens from unchanged master first. FOCUS/SEATS (c) waits for T-203.",
       "note_by": [
         "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
@@ -4506,7 +4506,7 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Planner session 159. Next: rule T-235 Phase 1 round 2 when sia-builder (Cursor, QA PC) posts it (hub room k57098ep, turns 80-81 unread as of 07:0xZ), then dispatch the ruled Phase 2 fixes; review T-234 PR A then B from sia-forge (Cursor, desktop, hub grok, turns 239-241 UNREAD: it needs Aaron's nudge prompt) and book a non-Composer QA for both. T-236 is open (greeting budget + FOCUS), not dispatched. Dev work is unparked, usage GREEN.",
+      "pick_up": "Planner session 159 at its roll point. Next: (1) #376 (T-203, QA 266 ACCEPT at 09f82a12) is being re-merged with master by sia-infra; range-diff the new head against 09f82a12, then ask Aaron via clark 'Merge #376 at <new head>?'. (2) Book QA 267 for #387 + #388 (test-only, frozen) plus the T-236 slices when they land. (3) Rule the T-236 slice PRs. Seats: sia-infra (desktop CC) and sia-forge (QA PC CC) are on T-236; sia-builder (QA PC CC) is blocked on cursor-agent (T-235 P2-2).",
       "watch_out": [
         "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
         "BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.",
@@ -4519,30 +4519,41 @@
         "DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.",
         "VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.",
         "JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.",
-        "CURSOR SEATS (session 159): talk only via the hub; launch as `cursor-agent`, never bare `agent` (desktop resolves Grok's CLI); every work reply starts with a TASK: line (#362); a Cursor seat that ran /start may still not have read its room (check /a2a/session/<room>/reads before assuming it saw a turn). The QA PC sia-builder checkout is the Cursor seat's; the old Claude Code builder there is closed."
+        "DEV SEATS ARE CLAUDE CODE (Aaron via clark, 2026-10-03 ~04:0x CDT): until the A2A hub and waker are proven with Loop 8b, SIA devs run as CC Sonnet seats reached by native SendMessage (sia-infra-1d on the desktop; sia-forge and sia-builder [67472b] on the QA PC over Remote Control, where delivery is unconfirmed until they ack); Cursor seats are parked (handoffs #368-#370). Builds are Sonnet, so QA is Opus on Plumb (builder != judge), launched by clark from a dispatch the planner merges. Run `setup.mjs` live checks yourself under a scratch HOME (QA's permission layer refuses them; see docs/loops/qa-264-row7c-planner.md)."
       ],
       "open_questions": [
-        "Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand on the QA PC, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.",
+        "Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.",
         "Retire the dormant hub name `forge` (QA PC key valid, 39 unread)? The planner reads its 39 turns first; any retirement goes to Relay with Aaron's word (D-115)."
       ],
       "session": 159,
       "loop_state": {
         "open_prs": [
           {
-            "ref": "#358",
-            "qa_status": "not_required",
-            "note": "T-235 Phase 1 audit (docs-only), round 2 owed by sia-builder; the planner rules it."
+            "ref": "#376",
+            "qa_status": "accepted",
+            "note": "T-203, QA 266 ACCEPT at 09f82a12; DIRTY after the 5 merges, sia-infra re-merging master; range-diff before asking Aaron"
+          },
+          {
+            "ref": "#387",
+            "qa_status": "not_started",
+            "note": "T-232 follow-up (test-only), frozen 9d1ed0c5, CI green"
+          },
+          {
+            "ref": "#388",
+            "qa_status": "not_started",
+            "note": "T-229 follow-up (test-only), frozen 913a5a43"
           }
         ],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "Recover killed session 5b3338ac / catch-up task?",
-          "Retire hub name forge after reading its 39 turns?"
+          "Merge #376 at its new head (after the range-diff)?",
+          "Recover killed session 5b3338ac / catch-up task?"
         ],
         "rulings": [
-          "D-115 hub names",
-          "T-235 Phase 1 not accepted (round 2)",
-          "T-236 opened"
+          "Merged on Aaron's word: #373, #372, #371, #374, #377, #378, #379, #382",
+          "Closed: T-152, T-234, T-229, T-230, T-231, T-232",
+          "T-236 dispatched in two slices",
+          "D-116 T-202 approved"
         ]
       },
       "session_uuid": "e05907a8-86cf-436b-bee3-ce6f2214e02e",
