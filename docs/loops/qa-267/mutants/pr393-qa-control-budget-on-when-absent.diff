@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts
+index 997b2e02..6f6d64cf 100644
+--- a/open-brain/src/server.ts
++++ b/open-brain/src/server.ts
+@@ -374,7 +374,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
+         workingTree: describeWorkingTree(projectRoot),
+         skills: describeSkills(projectRoot),
+         // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
+-        budget: greetingFlag(projectRoot, "briefing_budget"),
++        budget: !greetingFlag(projectRoot, "handoff_caps"),
+       }));
+     } else {
+       // F3: an unknown schema_version REFUSES, with no prose fallback.

@@ -1,0 +1,54 @@
+{
+  "loop": "qa-267-s160b",
+  "candidate_git": {
+    "sha": "6e55119baeb6e9b87c5341e03120e16f8de586e7",
+    "branch": "qa/s160b-merge (parent of tip 6906f679)",
+    "frozen_at": "2026-10-03T21:37:11Z"
+  },
+  "candidates": [
+    { "task": "T-232", "sha": "9d1ed0c55751f07dd5fb1a184cfc999c9c43023d", "branch": "origin/loop/t232-summary-once", "pr": 387, "verdict": "ACCEPT" },
+    { "task": "T-229", "sha": "913a5a436c1d45fce1793b2d0454efbbf0a1111a", "branch": "origin/loop/t229-eacces-row", "pr": 388, "verdict": "ACCEPT" },
+    { "task": "T-236", "sha": "b2096051d207344e150e275648a5b6806c2b2aea", "branch": "origin/loop/t236-role-docs-sha", "pr": 391, "verdict": "ACCEPT" },
+    { "task": "T-236", "sha": "4020a42bdd0b20e1299342af3b353e0eb84a90a6", "branch": "origin/loop/t236-slice2-briefing", "pr": 393, "verdict": "REJECT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit and npm run typecheck:tests in each PR tree and in qa267-merge",
+      "exit_code": 2,
+      "passed": false,
+      "duration_ms": 60000,
+      "detail": "0 at each of the four heads. At the batch merge 6e55119b: TS2300 Duplicate identifier 'greetingFlag' at src/server.ts:27 and :35 (both tsc and typecheck:tests). 0 after QA's one-line demonstration commit 6906f679."
+    },
+    "unit": {
+      "command": "npx vitest run <one file> per run (LIGHT job; no full suite)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 120000,
+      "detail": "Heads: server 33/33 (#387), recalled-ids 37/37 (#388), role-docs-by-sha 11/11 + role-files 13/13 (#391), a2a-byte-identical 3, briefing-budget 31, handoff-caps 19, server 35, briefing 48 (#393). Merge: the eight dispatch files all green (35, 37, 11, 13, 3, 31, 19, 48). CI test pass on 37117818217, 37117828586, 37118672284, 37118934612."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q267-1", "status": "met", "order": "shown", "evidence": "diff a68d0393...<head>: 1 / 1 / 8 / 16 files, as the planner counted; none outside the task." },
+    { "id": "Q267-2", "status": "met", "order": "red-first", "evidence": "#391 on master src 5 failed | 6 passed (11), head 11/11. #393 on master src: server 2 failed/35, briefing-budget and handoff-caps fail at import; with only the new modules 30 failed/31 and 9 failed/19; heads green. #387/#388 red evidence is row 3, as ruled." },
+    { "id": "Q267-3", "status": "met", "order": "shown", "evidence": "QA mutants killed: #387 per-kept-id summary (1/33), #388 ENOTDIR absent (1/37), #391 OFF render recordable (4/11), #393 first violation only (1/19). Dev mutants killed: print-twice 1/33, only-EISDIR 7/37, M4 9/11, budget-on-by-default golden 1/3. Each tsc 0, landed, reverted. #387 and #388 QA mutants survive the pre-PR test files." },
+    { "id": "Q267-4", "status": "met", "order": "shown", "evidence": "gh pr checks: test pass on all four, runs 37117818217, 37117828586, 37118672284, 37118934612, headSha equal to the pins." },
+    { "id": "Q267-5", "status": "met", "order": "shown", "evidence": "QA probe: whole ob_start text, SIA and A2A fixtures, flag absent and all-false: 12/12 IDENTICAL to master after masking path/pid/token lines; server-level control mutant makes 4/4 DIFFERENT. f5512b6a adds only golden, fixture, test (parent 2b95434e); golden unchanged to 4020a42b; golden test 3/3 on master src." },
+    { "id": "Q267-6", "status": "met", "order": "shown", "evidence": "Fixture blob 3cc195a5e372ccc6c4b143c361c6f4337886e063 in b2096051, 4020a42b and f5512b6a; 260229 bytes; sha256 8892464b...4549 at both heads." },
+    { "id": "Q267-7", "status": "met", "order": "shown", "evidence": "greeting-flags.ts blob 6168e07e and .gitignore blob 143ad2bb in both PRs; git grep greeting.json in the merged src: code only at greeting-flags.ts:14, the rest comments." },
+    { "id": "Q267-8", "status": "met", "order": "shown", "evidence": "#391 {role_docs_by_sha:true}; #393 {briefing_budget:true, handoff_caps:false}; 4020a42b changes only that file." },
+    { "id": "Q267-9", "status": "met", "order": "shown", "evidence": "recordRoleReads called once, server.ts:425 in handleStart, after lines.push(...roleDocs.lines); describeRoleFiles and composeGreeting never write; dev M4 killed 9/11 incl. 'measuring never records'." },
+    { "id": "Q267-10", "status": "met", "order": "shown", "evidence": "QA probe 9/9: all four violations named in one refusal, state unchanged; boundary accepted; off accepts; expired session/date dropped and counted, last session and today kept; WAITING ON AARON only unresolved aaron; NEXT only with ids; worst case 29 lines / 2948 chars with +N more pointers." },
+    { "id": "Q267-11", "status": "met", "order": "shown", "evidence": "owner?, expires?, watch_out string|object, handoff_caps?, budget? all optional; A2A fixture parses on master schema and matches the golden flag-absent at head and merge." },
+    { "id": "Q267-12", "status": "unmet", "order": "shown", "evidence": "Merge a68d0393 + #387 + #388 + #391 + #393: one greeting.json conflict as predicted, resolved sorted; but server.ts carries two identical greetingFlag imports (lines 27, 35): tsc and typecheck:tests fail TS2300. The eight test files pass (vitest tolerates it); Node ESM refuses a duplicate import binding. One-line removal (6906f679) makes tsc and typecheck:tests 0." }
+  ],
+  "regressions": [
+    "Batch merge of #391 and #393 duplicates `import { greetingFlag }` in open-brain/src/server.ts: tsc TS2300; a built server would not load. Not visible in either PR's own CI."
+  ],
+  "gaps": [
+    "O1 #393: the 4,096-char budget is proven with one-line environment strings; working-tree and skills lines are uncut and unbounded in length.",
+    "O2 #393: an object watch-out written by the new schema is refused by an older build's schema (forward compatibility only).",
+    "O3 #391: role_docs_by_sha wrongly ON is invisible on a first ob_start; the PR's flag-OFF row covers it with two starts plus store absence."
+  ],
+  "notes": "QA 267, dispatch tree 1d6f7ad06069ec7722624a5e747480ec62454b47. No live Jev call; gh read-only. TMPDIR could not be set (permission layer); tests used setup-env's mkdtemp state. Per-PR: #387 ACCEPT, #388 ACCEPT, #391 ACCEPT, #393 REJECT (row 12 only); batch REJECT."
+}

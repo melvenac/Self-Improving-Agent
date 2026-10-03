@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+index b2ba0def..9ea22a3f 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -46,7 +46,7 @@ const NEXT_SHOWN = 3;
+ const GAPS_BRIEFED = 5;
+ 
+ export function renderBriefing(i: BriefingInput): string[] {
+-  if (i.budget === true) return renderBudgeted(i);
++  if (i.budget !== false) return renderBudgeted(i);
+   const s = i.state;
+   const out: string[] = [BRIEFING_START];
+ 

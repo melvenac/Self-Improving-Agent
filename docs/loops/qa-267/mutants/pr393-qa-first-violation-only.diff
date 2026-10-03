@@ -1,0 +1,11 @@
+diff --git a/open-brain/src/shared/handoff-caps.ts b/open-brain/src/shared/handoff-caps.ts
+index 476922ee..c53bf1e2 100644
+--- a/open-brain/src/shared/handoff-caps.ts
++++ b/open-brain/src/shared/handoff-caps.ts
+@@ -30,5 +30,5 @@ export function handoffCapViolations(pickUp: string, watchOut: readonly WatchOut
+       broken.push(`watch-out ${i + 1} is ${text.length} chars, the cap is ${HANDOFF_CAPS.watchOutChars}`);
+     }
+   });
+-  return broken;
++  return broken.slice(0, 1);
+ }

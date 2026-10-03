@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts
+index 54d0300d..773ca778 100644
+--- a/open-brain/src/pipelines/session-end/recalled-ids.ts
++++ b/open-brain/src/pipelines/session-end/recalled-ids.ts
+@@ -91,7 +91,7 @@ export function readRecalledFile(path: string): string | null {
+   try {
+     return readFileSync(path, "utf-8");
+   } catch (err) {
+-    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
++    if ((err as NodeJS.ErrnoException).code !== "EISDIR") return null;
+     throw err;
+   }
+ }

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/role-files.ts b/open-brain/src/pipelines/session-start/role-files.ts
+index c85c4248..f93a652a 100644
+--- a/open-brain/src/pipelines/session-start/role-files.ts
++++ b/open-brain/src/pipelines/session-start/role-files.ts
+@@ -349,7 +349,7 @@ export function renderRoleDocs(projectRoot: string, files: RoleFileReport[], sea
+     lines.push(`\n## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}`);
+     lines.push(f.content.replace(/\s+$/, ""));
+     // Off, nothing is recordable: the repo did not opt in, so this render must leave no trace.
+-    if (bySha) printedFull.push({ rel: f.rel, sha });
++    printedFull.push({ rel: f.rel, sha });
+   }
+   return { lines, printedFull };
+ }

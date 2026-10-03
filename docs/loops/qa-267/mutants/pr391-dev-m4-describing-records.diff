@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/session-start/role-files.ts b/open-brain/src/pipelines/session-start/role-files.ts
+index c85c4248..ac26f6ec 100644
+--- a/open-brain/src/pipelines/session-start/role-files.ts
++++ b/open-brain/src/pipelines/session-start/role-files.ts
+@@ -170,6 +170,7 @@ export function describeRoleFiles(projectRoot: string, seat: AgentIdentity | nul
+     }
+   }
+ 
++  recordRoleReads(projectRoot, seat, files.filter((f) => f.content !== null).map((f) => ({ rel: f.rel, sha: blobSha(f.content as string) })), new Date());
+   return { seat, files, lines: [...lines0, ...render(files, inGit, notASeat)], problems };
+ }
+ 
