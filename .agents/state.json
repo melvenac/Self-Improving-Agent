@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 300,
+  "revision": 301,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1424,6 +1424,20 @@
       "note": "Session 158, from QA 263's report (docs/loops/t233-qa-report.md on qa/t233-report fe33a55a; probes docs/loops/qa-263/qa263-probes.test.ts and six mutants under docs/loops/qa-263/mutants/). Behaviour is correct in all; the gaps are tests a mutant survives. F1: the serving tree's IDENTITY (qa-a-names-wrong-tree survives; nothing catches it). F2: weeklyOverride vs >=98% wind-down (QA probe catches it; the suite does not). F3: resolved_by mark dropped from next-session.md (probe catches it). F4: serving_build_dir added to the MCP zod schema (probe catches it). F5: the brief regex's $ anchor (qa-c-no-end-anchor survives; nothing catches it). F6: a serving tree AHEAD of origin/master is reported as 'level'; it should say 'ahead by N (unmerged local commits)'. F7: a start.md wording nit (see report). Done when: QA's probe rows are in the suite, all six QA mutants go red, and F6 has a fixture row. — Session 159 (2026-10-03, clark's acceptance read of the served /start greeting, session e05907a8): core PASS (Briefing verbatim, serving line first, real Usage line, Session 159 = 158+1, Drift none). Three follow-ups: (1) FALSE STALE — 'SERVING BUILD IS STALE ... 2 commits behind' counted a9785b75 + d36798df, which touch only .agents records (verified by planner: git diff --name-only e833816 origin/master = next-session.md, SUMMARY.md, INBOX.md, task.md, state.json). Count only commits touching served code (open-brain/, .claude/commands) or label them '(records only)'. (2) WRONG USAGE TEXT — 'STOP (5h 14%, resets 02:50Z) + WEEKLY 98% -> everyone parks until the 5-hour reset': the STOP came from the weekly window, which the 5h reset does not lift; when sevenDayPct >= 98 say 'until the weekly reset (or Aaron's one-time reset)' and do not attribute STOP to the 5h window. (3) The /START AUDIT GAPS watch-out item (2) (count the session number by hand) is now done in code and made the planner hedge in FLAGS; retire that item (the whole watch-out retires once T-233 is served on every machine, which rev 299 records). Also: ob_start returned 51.6 KB and spilled to a file (T-183 still open).",
       "note_by": [
         "ae490afb-211a-42c7-b82e-292e88d0a9f4",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-235",
+      "title": "Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 159,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03).",
+      "note_by": [
         "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
       "closed_rev": null
