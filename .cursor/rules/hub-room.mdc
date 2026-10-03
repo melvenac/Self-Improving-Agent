@@ -11,4 +11,6 @@ On open, and after every post, run that line with `--wait --wait-timeout 3500` i
 
 An unread atlas turn is the assignment. Do not propose a backlog item beside it.
 
+Start every work reply, in the hub and in chat, with one line `TASK: <task id> <phase>, <what> (<branch>)`, and update it as the work changes. The dashboard reads a Cursor seat's current dispatch only from that line, because it does not parse hub-talk output (T-235).
+
 This is the foreground-wait rule from A2A-Hub's planner role, section "Hub transport: how a seat waits". Native A2A is Claude-to-Claude only; this hub carries the Cursor seats.
