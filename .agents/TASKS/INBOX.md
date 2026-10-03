@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 300 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 301 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -46,6 +46,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-204** A compute lease on the QA PC: a developer suite and SIA's qa-queue.ps1 each take one lease file before a run, so QA never starts over a developer suite and a developer suite never starts over QA; stale leases (expired, or owner process gone) are reclaimed
 - [ ] **T-207** CI must not run on developer mutant branches: a push to loop/*-mut-* (and other not-for-merge mutant refs) starts a tcm run that is never evidence and starves QA and PR runs
 - [ ] **T-213** Repoint the forge seat in hub-partner-seats.json to hub_name forge, room k571c0nz, and un-pin the tests from the live file
+- [ ] **T-235** Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps
 
 ## P2
 
