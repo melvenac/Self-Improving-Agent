@@ -42,5 +42,16 @@ Phase 0 on this machine (per brief #353): `setup.mjs` run at serving tree 842e46
 | 5 | Audit/dedupe Claude settings hooks under Cursor (`--ide` tagging, avoid double SessionStart) | 5 | M |
 | 6 | Rebuild serving tree on QA PC after master merges (stale MCP build warning in every greeting) | — (ops) | S |
 | 7 | Document `cursor-agent` vs bare `agent` PATH rule in setup output (brief already states) | — | S |
+| 8 | Hub post UTF-8: document Node `readFileSync` or `Get-Content -Encoding UTF8` for `--say` (row A) | A | S |
+| 9 | Seat profile `usage_file` for Cursor usage line (row C) | C | S |
+
+## Rows added from turn-72 /start greeting (Atlas turn 78)
+
+| # | Surface | Observation | Evidence | Gap / note |
+|---|---------|-------------|----------|------------|
+| A | Hub post encoding | Em dashes in the briefing reached Atlas as mojibake (`â€"` — UTF-8 read as cp1252) | First hub post used PowerShell `Get-Content -Raw` without `-Encoding UTF8` on argv to `hub-talk --say`. Repost via Node `fs.readFileSync` (UTF-8) in turn 77. | **Cursor seat procedure:** post hub bodies with Node reading UTF-8 or `Get-Content -Encoding UTF8`. Claude Code seats typically use bash/heredoc or MCP (UTF-8), not cp1252-decoded argv. |
+| B | Launch shell vs hook `SHELL` | Phase 0 says start from **PowerShell**; hook env reports `SHELL=c:\windows\system32\cmd.exe` | Launch: PowerShell; `hooks_context` / session env. | Record both launch shell and hook-visible `SHELL`. |
+| C | Usage line | Briefing: `Usage: not checked (no usage_file in seat data and no SIA_USAGE_FILE)` | Builder seat profile in `ob_start` has no `usage_file` (planner has cron paths). | **Gap:** what path/env should a Cursor seat use — do not set without ruling. |
+| D | Session proof chain | `Session ID: none — no session proof for parent process 11548` | MCP server parent is `cursor-agent` bundled `node.exe` (PID 11548); no `~/.claude/open-brain/by-pid/11548.json`. Cursor `::cursor` slot exists in `active-session.json` but T-003 proof is not wired to the MCP parent. | Same as rows 1–2; explicit parent-chain note for QA. |
 
 **Not measured in this pass:** terminating a `cursor-agent` session to observe `stop`/`sessionEnd` events; full inventory of which Claude plugin hooks fire on each tool type (would need scripted tool calls + log).
