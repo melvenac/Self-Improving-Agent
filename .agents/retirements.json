@@ -552,7 +552,7 @@
         {
           "path": "open-brain/tests/ranking.test.ts",
           "class": "test",
-          "why": "Pins that maturity and success_rate are not ranking inputs: the exact-tie rows (80-120), the success-rate tie row (122-130, T-215 inverted the demotion assertion that passed only on insertion order and deleted the mature-over-older-progenitor one, which was recency) and the SQL absence pin (163-173). Line 31 and the progenitor fixtures use the retained stored label."
+          "why": "Pins that maturity and success_rate are not ranking inputs: the maturity exact-tie rows (79-119) and the SQL absence pin (149-160), which is the success_rate contract. T-152 deleted the success-rate tie row: its fixture passed a successRate the input type no longer has, and indexKnowledge never stored it. Line 31 and the progenitor fixtures use the retained stored label."
         },
         {
           "path": "open-brain/tests/server.test.ts",
@@ -567,7 +567,7 @@
         {
           "path": "open-brain/tests/shadow-strategies.test.ts",
           "class": "test",
-          "why": "Lines 80-99 assert that two entries differing only in maturity score identically and no override can change that (maturity is not a ranking input); 32 and 81 are the retained-label fixture values that test uses."
+          "why": "Lines 79-98 assert that two entries differing only in maturity score identically and no override can change that (maturity is not a ranking input); 32, 80 and 81 are the retained-label fixture values that test uses."
         },
         {
           "path": "open-brain/tests/trigger/fires.test.ts",
