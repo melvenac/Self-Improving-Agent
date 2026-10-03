@@ -77,6 +77,15 @@ describe("state views (Loop 3 C3)", () => {
     expect(text).toContain("## Last session\n\nSession 54 — 2026-09-14 — `f7a1b3d9-ef6d-482f-aba1-ddaa296f722b`");
   });
 
+  it("next-session.md keeps a resolved open question, marked with its resolver (QA 263 F3: only the greeting omits it)", () => {
+    const base = state.handoffs[0];
+    const mixed: State = { ...state, handoffs: [{ ...base, open_questions: ["still open", { text: "answered", resolved_by: "D-1" }] }] };
+    const text = renderNextSession(mixed, opts);
+    expect(text).toContain("- still open\n");
+    expect(text).not.toContain("- still open _(resolved");
+    expect(text).toContain("- answered _(resolved by D-1)_\n");
+  });
+
   it("next-session.md renders the NEWEST handoff per seat and checkout, and counts the rest (T-163)", () => {
     const base = state.handoffs[0];
     const mk = (session: number, uuid: string, checkout: string, pick_up: string) => ({ ...base, session, session_uuid: uuid, checkout, pick_up });
