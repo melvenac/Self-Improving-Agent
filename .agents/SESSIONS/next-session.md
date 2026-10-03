@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 314 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 315 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-Planner session 159. Next: rule T-235 Phase 1 round 2 when sia-builder (Cursor, QA PC) posts it (hub room k57098ep, turns 80-81 unread as of 07:0xZ), then dispatch the ruled Phase 2 fixes; review T-234 PR A then B from sia-forge (Cursor, desktop, hub grok, turns 239-241 UNREAD: it needs Aaron's nudge prompt) and book a non-Composer QA for both. T-236 is open (greeting budget + FOCUS), not dispatched. Dev work is unparked, usage GREEN.
+Planner session 159 at its roll point. Next: (1) #376 (T-203, QA 266 ACCEPT at 09f82a12) is being re-merged with master by sia-infra; range-diff the new head against 09f82a12, then ask Aaron via clark 'Merge #376 at <new head>?'. (2) Book QA 267 for #387 + #388 (test-only, frozen) plus the T-236 slices when they land. (3) Rule the T-236 slice PRs. Seats: sia-infra (desktop CC) and sia-forge (QA PC CC) are on T-236; sia-builder (QA PC CC) is blocked on cursor-agent (T-235 P2-2).
 
 ### Watch out
 
@@ -21,28 +21,31 @@ Planner session 159. Next: rule T-235 Phase 1 round 2 when sia-builder (Cursor, 
 - DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.
 - VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.
 - JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.
-- CURSOR SEATS (session 159): talk only via the hub; launch as `cursor-agent`, never bare `agent` (desktop resolves Grok's CLI); every work reply starts with a TASK: line (#362); a Cursor seat that ran /start may still not have read its room (check /a2a/session/<room>/reads before assuming it saw a turn). The QA PC sia-builder checkout is the Cursor seat's; the old Claude Code builder there is closed.
+- DEV SEATS ARE CLAUDE CODE (Aaron via clark, 2026-10-03 ~04:0x CDT): until the A2A hub and waker are proven with Loop 8b, SIA devs run as CC Sonnet seats reached by native SendMessage (sia-infra-1d on the desktop; sia-forge and sia-builder [67472b] on the QA PC over Remote Control, where delivery is unconfirmed until they ack); Cursor seats are parked (handoffs #368-#370). Builds are Sonnet, so QA is Opus on Plumb (builder != judge), launched by clark from a dispatch the planner merges. Run `setup.mjs` live checks yourself under a scratch HOME (QA's permission layer refuses them; see docs/loops/qa-264-row7c-planner.md).
 
 ### Open questions
 
-- Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand on the QA PC, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.
+- Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.
 - Retire the dormant hub name `forge` (QA PC key valid, 39 unread)? The planner reads its 39 turns first; any retirement goes to Relay with Aaron's word (D-115).
 
 ### Loop state
 
 **Open PRs:** 
-- #358 — QA: not_required — T-235 Phase 1 audit (docs-only), round 2 owed by sia-builder; the planner rules it.
+- #376 — QA: accepted — T-203, QA 266 ACCEPT at 09f82a12; DIRTY after the 5 merges, sia-infra re-merging master; range-diff before asking Aaron
+- #387 — QA: not_started — T-232 follow-up (test-only), frozen 9d1ed0c5, CI green
+- #388 — QA: not_started — T-229 follow-up (test-only), frozen 913a5a43
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- Merge #376 at its new head (after the range-diff)?
 - Recover killed session 5b3338ac / catch-up task?
-- Retire hub name forge after reading its 39 turns?
 
 **Rulings made mid-loop:** 
-- D-115 hub names
-- T-235 Phase 1 not accepted (round 2)
-- T-236 opened
+- Merged on Aaron's word: #373, #372, #371, #374, #377, #378, #379, #382
+- Closed: T-152, T-234, T-229, T-230, T-231, T-232
+- T-236 dispatched in two slices
+- D-116 T-202 approved
 
 ## developer [sia-builder] _(written session 156)_
 
