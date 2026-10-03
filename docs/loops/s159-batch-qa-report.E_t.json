@@ -1,0 +1,65 @@
+{
+  "loop": "qa-264-s159-batch",
+  "candidate_git": {
+    "sha": "f77be477b7bea6dc71ad4d1a126d47a2914d63c9",
+    "branch": "qa/s159-batch-merge",
+    "frozen_at": "2026-10-03T09:43:16Z"
+  },
+  "candidates": [
+    { "task": "T-234 A", "sha": "1115ee190059ef6cb7e35ac34bc8d5de5d7b3e96", "branch": "origin/loop/t234-a-serving-greeting", "pr": 373, "verdict": "ACCEPT" },
+    { "task": "T-234 B", "sha": "7e0509e17f0d1915dd4c82040cf273862b1ccfba", "branch": "origin/loop/t234-b-qa263-probes", "pr": 374, "verdict": "REJECT" },
+    { "task": "T-235 P2-1", "sha": "4240a8beeddde0ef9865a411c571932eb2d9d75d", "branch": "origin/loop/t235-p2-1-cursor-abs-node", "pr": 372, "verdict": "INCOMPLETE" },
+    { "task": "T-152", "sha": "ef3fbd2394bf57f519fa488f8f735b1f272904f7", "branch": "origin/loop/t152-typecheck-ci", "pr": 371, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit on each head and on the merge; npm run typecheck:tests on #371 head, master and the merge",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "tsc clean on 1115ee19, 7e0509e1, 4240a8be, ef3fbd23 and merge f77be477; typecheck:tests 4 errors on master 93f2a1be, exit 0 on ef3fbd23 and on the merge"
+    },
+    "unit": {
+      "command": "npx vitest run <one touched file> per invocation, per head and on the merge",
+      "exit_code": 1,
+      "passed": false,
+      "duration_ms": 120000,
+      "detail": "All touched files green on #373, #372, #371 heads. #374 head: start-parity.test.ts 1 failed / 11 (CI run 37112930898 test=failure, same row). Merge: 9 files green, start-parity 1 failed / 11."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q264-373-1", "status": "met", "order": "shown", "evidence": "diff origin/master...1115ee19: briefing.ts, serving-build.ts and their two tests only." },
+    { "id": "Q264-373-2", "status": "met", "order": "red-first", "evidence": "base: serving-build 10 failed/16, briefing 5 failed/43; head: 16/16, 43/43." },
+    { "id": "Q264-373-3", "status": "met", "order": "shown", "evidence": "own mutant behindServed>1: 3 failed/16; dev mutant WEEKLY_STOP=99: 4 failed/43." },
+    { "id": "Q264-373-4", "status": "met", "order": "shown", "evidence": "gh pr checks 373: test pass, run 37112663778, headSha 1115ee19." },
+    { "id": "Q264-373-5", "status": "met", "order": "shown", "evidence": "Three shapes pinned with toBe; no path or ISO in LEVEL case; weekly>=98 puts weekly first, no 5-hour reset; 5h STOP with weekly 40 keeps old text. SERVED_PATHS misses project-template/ (served by /bootstrap and setup.mjs Cursor command copy): follow-up." },
+    { "id": "Q264-374-1", "status": "met", "order": "shown", "evidence": "diff 1115ee19..7e0509e1: three start.md copies and three test files." },
+    { "id": "Q264-374-2", "status": "met", "order": "red-first", "evidence": "base 1115ee19: briefing 1 failed/47 (F7); head 47/47; latest-brief 25, state-views 18 both sides (pins, mutants are the red)." },
+    { "id": "Q264-374-3", "status": "met", "order": "shown", "evidence": "own mutant (old *brief*.md line in Cursor copy only): briefing 1 failed/47 and cursor-start-parity issue." },
+    { "id": "Q264-374-4", "status": "unmet", "order": "shown", "evidence": "gh pr checks 374: test FAIL, run 37112930898, headSha 7e0509e1: start-parity.test.ts T-226 template sentences 'expected 2 to be >= 3'; reproduced locally 1 failed/11; base 11/11." },
+    { "id": "Q264-374-6", "status": "met", "order": "shown", "evidence": "is-ancestor holds; QA 263 six mutants red: 1/47, 1/18, 1/25, 1/25, 4/16 (adapted), 2/47 (adapted), intent preserved; three copies carry same lines; checkCursorStartParity pass." },
+    { "id": "Q264-372-1", "status": "met", "order": "shown", "evidence": "setup-hooks.mjs, setup.mjs, setup-hooks.test.ts only." },
+    { "id": "Q264-372-2", "status": "met", "order": "red-first", "evidence": "base 7 failed/11 (not a function); head 11/11." },
+    { "id": "Q264-372-3", "status": "met", "order": "shown", "evidence": "own mutant old untagged-only stale rule: 1 failed/11; dev mutant bare node: 3 failed/11." },
+    { "id": "Q264-372-4", "status": "met", "order": "shown", "evidence": "gh pr checks 372: test pass, run 37112521369, headSha 4240a8be." },
+    { "id": "Q264-372-7ab", "status": "met", "order": "shown", "evidence": "helpers pure (probe: inputs unmutated); setup.mjs passes process.execPath; upgrade, idempotence, stale replace, unrelated survive pinned and probed." },
+    { "id": "Q264-372-7c", "status": "not_run", "order": "shown", "evidence": "setup.mjs under scratch HOME refused by this seat's permission layer (headless, no approver); not circumvented." },
+    { "id": "Q264-371-1", "status": "met", "order": "shown", "evidence": "ci.yml, CHANGELOG, retirements.json line refs, four test files." },
+    { "id": "Q264-371-2", "status": "met", "order": "red-first", "evidence": "typecheck:tests master 4 errors (TS7053, TS2305, TS2353 x2); head exit 0; touched tests green." },
+    { "id": "Q264-371-3", "status": "met", "order": "shown", "evidence": "own mutant drop Record annotation: TS7053; dev RED PROBE 6f237511: TS2322; master allowance after:10: S4-9.2 1 failed/14." },
+    { "id": "Q264-371-4", "status": "met", "order": "shown", "evidence": "gh pr checks 371: test pass, run 37112675080, headSha ef3fbd23; Typecheck tests step success." },
+    { "id": "Q264-371-8", "status": "met", "order": "shown", "evidence": "red 37112456733 headSha 6f237511 failed only at Typecheck tests with the planted TS2322; step in test and test-windows; SQL-absence case covers deleted row; allowance names T-152/R-011." },
+    { "id": "Q264-9", "status": "unmet", "order": "shown", "evidence": "merge #373,#374,#372,#371 no conflicts (f77be477); typecheck:tests exit 0; tsc clean; 9 touched files green; start-parity 1 failed/11 from #374." }
+  ],
+  "regressions": [
+    "#374: open-brain/tests/pipelines/sync/start-parity.test.ts T-226 'the Claude and Cursor template copies carry the same sentences about the brief' fails (2 < 3) because the *brief*.md line was reworded."
+  ],
+  "gaps": [
+    "#373: SERVED_PATHS omits project-template/ (served via /bootstrap and setup.mjs Cursor command copy).",
+    "#373: level GREEN with sevenDayPct>=98 renders 'Usage: GREEN (weekly 98%) · park, push WIP'.",
+    "#373: ahead plus records-only behind drops the records count; serving-build.ts header comment stale.",
+    "#372: live setup.mjs scratch-HOME run (row 7c) not run from this seat."
+  ],
+  "notes": "QA 264, dispatch tree 1a54588cba116b204d3bab42381fd630c5fb4213. No live Jev call, no real config read or written, setup.mjs never executed. Batch verdict REJECT (#374)."
+}
