@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 309,
+  "revision": 310,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4112,6 +4112,12 @@
       "title": "Hub names: keep grok, cursor-builder, cursor-infra; every NEW hub enrollment uses the seat's name (sia-forge, sia-builder, ...)",
       "date": "2026-10-03",
       "note": "Aaron's ruling, relayed by clark from clark's window (D-103 route), session 159. cursor-builder keeps its name (key moved desktop->QA PC by Relay on Aaron's approval; the seat runs --rotate-key). Any new enrollment from now on is named after the seat checkout, not the vendor or model. Dormant `forge` (owned, QA PC key valid, 39 unread, unused since 2026-09-30) is NOT retired: the planner reads its 39 turns first, then any 'retire forge' goes to Relay with Aaron's word. Next edit of .agents/SYSTEM/hub-partner-seats.json should carry this rule in its description."
+    },
+    {
+      "id": "D-116",
+      "title": "T-202 approved: each seat's SessionStart posts one SEAT-ONLINE line to its planner hub room under its own key, 3 s bound, never blocking",
+      "date": "2026-10-03",
+      "note": "Aaron's word in AskUserQuestion in clark's window ~03:1x CDT 2026-10-03, recorded first-hand by clark (D-103 route), approving the planner's wording verbatim: 'Approve T-202: each seat's SessionStart posts one SEAT-ONLINE line (seat, host, runtime, checkout SHA, record rev) to its planner hub room under its own key, 3 s bound, never blocking'. This satisfies the 'Authority' section of docs/loops/t202-plan.md (loop/t202-seat-online @ 965a7c53). Code still waits on T-203 (checkout map with host) and on T-235 round 2 row 2 (whether cursor-agent fires sessionStart), per the planner's session-159 ruling in T-202's note."
     }
   ],
   "handoffs": [
