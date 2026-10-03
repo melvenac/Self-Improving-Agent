@@ -330,6 +330,15 @@ describe("T-233 B item 4: the Usage line", () => {
     expect(line).not.toContain("5-hour reset");
   });
 
+  it("QA 264: at weekly >= 98 the band word is STOP whatever the file's level says; GREEN is never printed", () => {
+    for (const level of ["GREEN", "AMBER", "RED", "STOP"]) {
+      expect(usageFor(realShape({ level, fiveHourPct: 10, sevenDayPct: 98 }))).toBe("Usage: STOP (weekly 98%) · park, push WIP · 5h 10%");
+    }
+    expect(usageFor(realShape({ level: "GREEN (5h 4%); weekly 99%", fiveHourPct: 4, sevenDayPct: 99 }))).toBe("Usage: STOP (weekly 99%) · park, push WIP · 5h 4%");
+    // below the line the file's own band stands
+    expect(usageFor(realShape({ level: "GREEN", fiveHourPct: 4, sevenDayPct: 97 }))).toMatch(/^Usage: GREEN \(5h 4%, resets /);
+  });
+
   it("a weeklyOverride does not lift the weekly stop (it names a lifted hold at 95-97 only)", () => {
     expect(usageFor(realShape({ level: "STOP", fiveHourPct: 14, sevenDayPct: 98, weeklyOverride: "T-233" }))).toBe("Usage: STOP (weekly 98%) · park, push WIP · 5h 14%");
   });

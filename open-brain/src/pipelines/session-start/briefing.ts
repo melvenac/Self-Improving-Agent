@@ -243,7 +243,8 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
   // T-234 A: at weekly >= 98 the WEEKLY window caused the stop, and the 5-hour reset does not lift it, so the weekly window
   // comes first and the line never names the 5-hour reset. Aaron's one-time reset is his act, not a consequence the line can state.
   if (weekly !== null && weekly >= WEEKLY_STOP) {
-    return `Usage: ${five} (weekly ${weekly}%) · ${WEEKLY_STOP_CONSEQUENCE}${fivePct !== null ? ` · 5h ${fivePct}%` : ""}`;
+    // The band word is STOP whatever the file's leading word says: a GREEN file with weekly 98 must never print GREEN.
+    return `Usage: STOP (weekly ${weekly}%) · ${WEEKLY_STOP_CONSEQUENCE}${fivePct !== null ? ` · 5h ${fivePct}%` : ""}`;
   }
   let weeklyConsequence: string | null = null;
   if (weekly !== null && weekly >= 95) {
