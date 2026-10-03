@@ -90,6 +90,10 @@ Only the fixes the planner rules in, one small PR each (or a ruled batch). Compo
 - Branch from a fresh `origin/master`; push your branch and open the PR; **never merge, never push to master.**
 - `/sync` before any commit.
 - Talk to the planner only through the hub (room below). After every post, `--wait` and act on the exit code.
+- **Start every work reply** (hub and chat) with one line `TASK: <id> <phase>, <what> (<branch>)`. The
+  dashboard reads a Cursor seat's dispatch only from that line, because it does not parse hub-talk output
+  (clark, 2026-10-03). This belongs in `.cursor/rules/hub-room.mdc` for every Cursor seat; that is a
+  Phase 2 candidate.
 
 ## Hub
 
