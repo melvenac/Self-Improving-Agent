@@ -7,6 +7,12 @@
 - **`setup.mjs` refused to run from a path with a space (T-235 Phase 0).** It took the repo root from a URL pathname,
   which keeps a space as `%20`, so on the QA PC (`C:\Users\Aaron Melven\…`) it reported "Cannot find open-brain/"
   and wrote nothing. The root now comes from `fileURLToPath` (`repoRootFrom` in `scripts/setup-hooks.mjs`).
+- **A seat is resolved by its checkout, not by `AGENT.local.md` (T-203, closes G-049).** sia-builder, sia-infra and
+  sia-forge all declared "Forge / developer", so `/start`'s presence block read Forge's key and readers row in all
+  three. `.agents/SYSTEM/hub-partner-seats.json` is now the single map from a worktree basename to seat, role, agent
+  and hub name (`resolveCheckoutSeat`). An unlisted checkout prints `seat unknown for checkout <c>` instead of
+  falling back to the identity. The main checkout prints `presence: none`. A new `/sync` check, `seat-identity`,
+  flags an `AGENT.local.md` that disagrees with the map.
 
 ## [0.45.0] - 2026-10-02 — Loop 15 slices three and four, `/bootstrap`, the per-session record, and CI on tcm
 
