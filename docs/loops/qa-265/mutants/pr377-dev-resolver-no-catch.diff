@@ -1,0 +1,18 @@
+diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts
+index 54d0300d..364e7321 100644
+--- a/open-brain/src/pipelines/session-end/recalled-ids.ts
++++ b/open-brain/src/pipelines/session-end/recalled-ids.ts
+@@ -110,12 +110,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
+ 
+   for (const path of filePaths) {
+     // An unreadable file rates nothing, exactly as an absent one: only the foreign-writer line distinguishes them (T-229).
+-    let raw: string | null;
+-    try {
+-      raw = readFile(path);
+-    } catch {
+-      continue;
+-    }
++    const raw: string | null = readFile(path);
+     if (raw === null) continue;
+ 
+     let parsed: RecalledFile;

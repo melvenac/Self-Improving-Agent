@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 344434f9..d44a884a 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -932,7 +932,7 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {},
+     notChecked.push(`${settings.cause}: settings unreadable, plugins not examined`);
+   }
+   // Absent settings enable nothing: a pass, but the skip is NAMED like a url server (QA 260).
+-  const settingsAbsent = !settings.ok && settings.cause.endsWith("does not exist");
++  const settingsAbsent = !settings.ok;
+   if (enabled.length > 0) {
+     const installed = readJsonFile(join(home, ".claude", "plugins", "installed_plugins.json"));
+     for (const key of enabled) {

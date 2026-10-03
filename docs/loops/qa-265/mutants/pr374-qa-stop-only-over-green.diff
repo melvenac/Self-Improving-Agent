@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+index 105dc7a4..e78eb5d9 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -244,7 +244,7 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
+   // comes first and the line never names the 5-hour reset. Aaron's one-time reset is his act, not a consequence the line can state.
+   if (weekly !== null && weekly >= WEEKLY_STOP) {
+     // The band word is STOP whatever the file's leading word says: a GREEN file with weekly 98 must never print GREEN.
+-    return `Usage: STOP (weekly ${weekly}%) · ${WEEKLY_STOP_CONSEQUENCE}${fivePct !== null ? ` · 5h ${fivePct}%` : ""}`;
++    return `Usage: ${five.startsWith("GREEN") ? "STOP" : five} (weekly ${weekly}%) · ${WEEKLY_STOP_CONSEQUENCE}${fivePct !== null ? ` · 5h ${fivePct}%` : ""}`;
+   }
+   let weeklyConsequence: string | null = null;
+   if (weekly !== null && weekly >= 95) {

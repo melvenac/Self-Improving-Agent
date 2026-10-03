@@ -1,0 +1,48 @@
+{
+  "loop": "qa-265-s159b-batch",
+  "candidate_git": {
+    "sha": "f7b11fdb",
+    "branch": "scratch merge of origin/master 0c1f8432 + #374 #377 #378 #379 #382 (not pushed)",
+    "frozen_at": "2026-10-03T10:32:56Z"
+  },
+  "candidates": [
+    { "task": "T-234 PR B r2", "sha": "40105c1fa2ed6d40f85cbd18660e178d7ff787b7", "branch": "origin/loop/t234-b-qa263-probes", "pr": 374, "verdict": "ACCEPT" },
+    { "task": "T-229", "sha": "da6cdd97101318da51f995dfec0e1bff6430ae79", "branch": "origin/loop/t229-recalled-readfile", "pr": 377, "verdict": "ACCEPT" },
+    { "task": "T-230", "sha": "b24ea6a0a43b9b92188e130ec814f502e457ae4b", "branch": "origin/loop/t230-scan-counts-row", "pr": 378, "verdict": "ACCEPT" },
+    { "task": "T-231", "sha": "89ab68b25c4a642f275e5dd7dcf575b373e328f4", "branch": "origin/loop/t231-mcp-container", "pr": 379, "verdict": "ACCEPT" },
+    { "task": "T-232", "sha": "688001ec55974314f1c846a709bba4cc476fded1", "branch": "origin/loop/t232-retention-summary", "pr": 382, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit and npm run typecheck:tests on the batch merge f7b11fdb",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "tsc 0 at every head; typecheck:tests 0 at #374, #382 and the merge; 2 at the pre-#371 heads #377/#378/#379 (master's 4 pre-#371 errors only, none in PR lines)"
+    },
+    "unit": {
+      "command": "npx vitest run, one touched test file per invocation, on each head and on the merge",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 120000,
+      "detail": "merge: server 33, recalled-ids 29, mcp-command-paths 45, briefing 48, serving-build 17, latest-brief 25, state-views 18, start-parity 11. CI test success: 37115232157 (#374), 37113710230 (#377), 37113792954 (#378), 37113923809 (#379), 37115305682 (#382)"
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q265-1", "status": "met", "order": "shown", "evidence": "diff origin/master...head per PR: each confined to its task; #378 test-only; #374 r2 adds only 3e80fb15." },
+    { "id": "Q265-5", "status": "met", "order": "red-first", "evidence": "#374: range-diff 7e0509e1 unchanged + 3e80fb15; remerge-diff empty. r1 start-parity at head 1 failed (2 >= 3); dispatch mutant on Cursor copy 2 failed/11. SERVED_PATHS row red on master 1/17, dev mutant 1/17. STOP row red on master; QA mutants 1/48 and 2/48." },
+    { "id": "Q265-6", "status": "met", "order": "red-first", "evidence": "#377: 3 sites pass readRecalledFile into resolveRecalledIdsObserved; resolver and detector catch. Master 6/29 and 1/31 red; head 29/29, 31/31. Dev resolver-no-catch red in both. QA mutant only-EISDIR-rethrown SURVIVES (G1)." },
+    { "id": "Q265-7", "status": "met", "order": "shown", "evidence": "#378: Q1 mutant 1 failed/31; QA first-line-only mutant 1 failed/31; test green on master (pin)." },
+    { "id": "Q265-8", "status": "met", "order": "red-first", "evidence": "#379: 12 fragments asserted; ABSENT pass; SKIP row; master 13 failed/45; mutant B 2 failed; QA null-as-absent 1 failed; probe 3/3." },
+    { "id": "Q265-9", "status": "met", "order": "red-first", "evidence": "#382: every write asserts applied; crossing 2 NOTEs + summary; no-op summary only. Master 1 failed/31; dev M1 1 failed; QA first-crossed-only 1 failed. Summary count-once not asserted (G2)." },
+    { "id": "Q265-10", "status": "met", "order": "shown", "evidence": "Merge #374,#377,#378,#379,#382 on 0c1f8432: no conflicts; tsc 0; typecheck:tests 0; 8 touched files green." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "G1 #377: readRecalledFile's ENOENT-only rule is pinned for EISDIR only; QA mutant rethrow-only-EISDIR survives. Non-blocking.",
+    "G2 #382: no assertion that the summary line appears exactly once. Non-blocking.",
+    "Deviation: TMPDIR could not be set (permission layer refused inline env); tests used /tmp with setup-env.ts isolation. The .claude template copy could not be edited; the #374 mutant ran on the .cursor copy."
+  ],
+  "notes": "QA 265, dispatch tree 0c1f84327bd4da670ff45bfa5370830e5ccee2c6. No live Jev call. gh read-only. Batch verdict ACCEPT; merge authority with Aaron per PR."
+}

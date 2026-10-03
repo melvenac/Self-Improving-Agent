@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/shared/state-writer.ts b/open-brain/src/shared/state-writer.ts
+index 88411f52..eff53b70 100644
+--- a/open-brain/src/shared/state-writer.ts
++++ b/open-brain/src/shared/state-writer.ts
+@@ -364,7 +364,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions):
+     const t = tasksBefore.get(id);
+     return t === undefined || !isDroppedByRetention(t, revsBefore);
+   });
+-  for (const id of crossed) {
++  for (const id of crossed.slice(0, 1)) {
+     const where = cited.get(id) ?? [];
+     const shown = where.slice(0, 3).join(", ");
+     const more = where.length > 3 ? ` +${where.length - 3} more` : "";

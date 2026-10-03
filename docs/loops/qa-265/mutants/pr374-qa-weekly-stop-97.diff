@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+index 105dc7a4..d78dc953 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -168,7 +168,7 @@ export const USAGE_CONSEQUENCES: Readonly<Record<string, string>> = {
+ };
+ 
+ /** The weekly percentage at which every seat winds down; below it, from 95, the weekly window only holds new work. */
+-const WEEKLY_STOP = 98;
++const WEEKLY_STOP = 97;
+ const WEEKLY_STOP_CONSEQUENCE = "park, push WIP";
+ 
+ function frontmatterValue(file: string, key: string): string | null {

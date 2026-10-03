@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts
+index 344434f9..9bd73da3 100644
+--- a/open-brain/src/pipelines/sync/checks.ts
++++ b/open-brain/src/pipelines/sync/checks.ts
+@@ -842,7 +842,7 @@ const isPlainObject = (v: unknown): v is Record<string, unknown> => v !== null &
+  * not an object is recorded in `notChecked` (which caps the result at WARN, D-104/D-106), naming the subject and the type.
+  */
+ function containerOf(v: unknown, subject: string, notChecked: string[]): Record<string, unknown> {
+-  if (v === undefined) return {};
++  if (v === undefined || v === null) return {};
+   if (isPlainObject(v)) return v;
+   notChecked.push(`${subject} is ${typeName(v)}, not an object`);
+   return {};

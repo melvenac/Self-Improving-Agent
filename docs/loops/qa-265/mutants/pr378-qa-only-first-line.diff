@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts
+index f1610879..5b770643 100644
+--- a/open-brain/src/server.ts
++++ b/open-brain/src/server.ts
+@@ -295,7 +295,7 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
+       }
+     }
+     // T-048 round 2: what the two scans could not read, at zero too.
+-    lines.push(...formatScanCounts(result.session, result.health));
++    lines.push(formatScanCounts(result.session, result.health)[0]);
+ 
+     // Seat identity and the role knowledge that goes with it (C1 / G-032).
+     //
