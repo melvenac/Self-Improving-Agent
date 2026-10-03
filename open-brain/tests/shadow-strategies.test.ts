@@ -30,7 +30,6 @@ describe('shadow strategies', () => {
       tags: opts.tags ?? '',
       source: 'test',
       maturity: opts.maturity ?? 'progenitor',
-      successRate: null,
     });
     if (opts.ageDays) {
       db.prepare(
