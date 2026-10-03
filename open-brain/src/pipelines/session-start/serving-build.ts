@@ -2,7 +2,6 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readLastFetchAt } from "./tree-currency.js";
 
 /**
  * T-233 A / T-172's guard: ob_start's FIRST line names the SERVING build, not the checkout the session is in.
@@ -18,6 +17,17 @@ import { readLastFetchAt } from "./tree-currency.js";
  * `Serving build: not checked (<why>)`, not an absent line.
  */
 export const SERVING_UPSTREAM = "origin/master";
+
+/**
+ * T-234 A: the paths whose change alters what this machine SERVES, so only a commit touching one is a stale build. Counting
+ * every commit called a build stale over commits that touched only `.agents/` records and `docs/` (clark, 2026-10-03).
+ *  - `open-brain/`: the MCP server's source and build scripts. Its `tests/` are not served and are excluded.
+ *  - `scripts/`: the session hooks and setup the main checkout runs.
+ *  - `.claude/`: the slash commands (/start, /end, /sync) and hook settings.
+ *  - `package.json`: the version `ob_start` reports.
+ * Everything else (`.agents/`, `docs/`, `project-template/`, the README) is records or documentation, not served code.
+ */
+export const SERVED_PATHS: readonly string[] = ["open-brain", ":(exclude)open-brain/tests", "scripts", ".claude", "package.json"];
 
 /** The `build/` directory of the code that is running: this module sits at build/pipelines/session-start/. */
 export function runningBuildDir(): string {
@@ -52,29 +62,38 @@ export function describeServingBuild(buildDir: string = runningBuildDir()): stri
 
   // The tree is the build's grandparent: <tree>/open-brain/build.
   const tree = join(buildDir, "..", "..");
-  let head: string;
   try {
-    head = gitIn(tree, ["rev-parse", "HEAD"]);
+    gitIn(tree, ["rev-parse", "HEAD"]);
   } catch (err) {
     return notChecked(`${short} built ${builtAt}, but git cannot read ${tree}: ${why(err)}`);
   }
 
+  // Three distances, each a count git computed, none of them a guess: every commit the build lacks, the ones among them that
+  // change what is SERVED, and the build's own commits origin/master lacks. A count that fails or is not a number is
+  // `not checked`: an unknown distance is never zero.
+  const count = (range: string, paths: readonly string[] = []): number => {
+    const n = Number.parseInt(gitIn(tree, ["rev-list", "--count", range, ...(paths.length > 0 ? ["--", ...paths] : [])]), 10);
+    if (!Number.isFinite(n)) throw new Error(`git returned an uncountable distance for ${range}`);
+    return n;
+  };
   let behind: number;
+  let behindServed: number;
+  let ahead: number;
   try {
-    behind = Number.parseInt(gitIn(tree, ["rev-list", "--count", `${commit}..${SERVING_UPSTREAM}`]), 10);
+    behind = count(`${commit}..${SERVING_UPSTREAM}`);
+    behindServed = count(`${commit}..${SERVING_UPSTREAM}`, SERVED_PATHS);
+    ahead = count(`${SERVING_UPSTREAM}..${commit}`);
   } catch (err) {
     return notChecked(`${short} built ${builtAt}: its distance from ${SERVING_UPSTREAM} is unknown (${why(err)})`);
   }
-  if (!Number.isFinite(behind)) return notChecked(`${short} built ${builtAt}: git returned an uncountable distance from ${SERVING_UPSTREAM}`);
 
-  const fetchedAt = readLastFetchAt(tree) ?? "an unknown time";
-  const treeNote = head === commit ? "" : `; the tree's HEAD is ${head.slice(0, 7)}, not the build's commit`;
-  const subject = `${tree} at build ${short} (built ${builtAt})${treeNote}`;
-  if (behind > 0) {
-    return (
-      `SERVING BUILD IS STALE: ${subject} is ${behind} commit${behind === 1 ? "" : "s"} behind ${SERVING_UPSTREAM} ` +
-      `as of the tree's last fetch (${fetchedAt}). Every session on this machine runs this build, so merged fixes are not served.`
-    );
+  const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`;
+  const label = `Build ${short}`;
+  const aheadNote = ahead > 0 ? `ahead by ${ahead}` : null;
+  if (behindServed > 0) {
+    return `${label} · STALE: ${[`${plural(behindServed, "code commit")} behind`, aheadNote].filter((p) => p !== null).join(", ")} → ask Aaron to update`;
   }
-  return `Serving build: ${subject} is level with ${SERVING_UPSTREAM} as of the tree's last fetch (${fetchedAt}), not the network.`;
+  if (aheadNote !== null) return `${label} · ${aheadNote} (unmerged local commits)`;
+  const recordsOnly = behind - behindServed;
+  return recordsOnly > 0 ? `${label} · current (${plural(recordsOnly, "records-only commit")} behind)` : `${label} · current`;
 }

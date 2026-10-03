@@ -60,7 +60,7 @@ const countTests = (text: string): number => (text.match(/^\s*(?:it|test)(?:\.ea
 export interface TestLossAllowance { file: string; before: number; after: number; reason: string }
 export const ALLOWED_TEST_LOSSES: readonly TestLossAllowance[] = [
   { file: "open-brain/tests/cli-flags.test.ts", before: 19, after: 18, reason: "T-215 / R-011: backfill-success-rate.mjs deleted; maturity-ordering test proved nothing" },
-  { file: "open-brain/tests/ranking.test.ts", before: 11, after: 10, reason: "T-215 / R-011: backfill-success-rate.mjs deleted; maturity-ordering test proved nothing" },
+  { file: "open-brain/tests/ranking.test.ts", before: 11, after: 9, reason: "T-215 / R-011: backfill-success-rate.mjs deleted; maturity-ordering test proved nothing. T-152 / R-011 (atlas-sia ruling, session 160): success-rate tie row deleted, its successRate was never stored" },
 ];
 
 /** Findings for modified test files (before/after counts) against an allowance table; [] means the guard holds. */

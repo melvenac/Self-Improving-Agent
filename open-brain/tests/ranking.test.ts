@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Database from 'better-sqlite3';
 import { initSchemaV2, indexKnowledge } from '../src/db-v2.js';
-import { recallRankExpr, maturityBoost, LIFECYCLE_CONFIG, type Maturity } from '../src/lifecycle.js';
+import { recallRankExpr, LIFECYCLE_CONFIG, type Maturity } from '../src/lifecycle.js';
 
 /**
  * Guards the ob_recall ranking contract. bm25() is negative and the query sorts
@@ -20,7 +20,7 @@ describe('recall ranking', () => {
   /** Insert an entry with identical text (so BM25 is equal) but controlled age/maturity. */
   function add(
     vaultPath: string,
-    opts: { ageDays?: number; maturity?: Maturity; successRate?: number | null; tags?: string } = {}
+    opts: { ageDays?: number; maturity?: Maturity; tags?: string } = {}
   ) {
     indexKnowledge(db, {
       vaultPath,
@@ -29,7 +29,6 @@ describe('recall ranking', () => {
       tags: opts.tags ?? '',
       source: 'test',
       maturity: opts.maturity ?? 'progenitor',
-      successRate: opts.successRate ?? null,
     });
     if (opts.ageDays) {
       db.prepare(
@@ -117,19 +116,6 @@ describe('recall ranking', () => {
     // Same age, same tags, same text — so identical scores regardless of maturity.
     expect(rows[0].weighted_rank).toBeCloseTo(rows[1].weighted_rank, 10);
     expect(rows[1].weighted_rank).toBeCloseTo(rows[2].weighted_rank, 10);
-  });
-
-  // T-215: this used to assert that success rate 0.1 is demoted below 0.9. success_rate is
-  // cut and not stored, so the assertion passed only on insertion (tie) order: swapped, it
-  // failed with "expected 'failing.md' to be 'healthy.md'". Inverted to the contract that
-  // holds: it is not an input, so the two entries tie exactly.
-  it('does not rank by success rate: it is not a ranking input', () => {
-    add('healthy.md', { ageDays: 30, successRate: 0.9 });
-    add('failing.md', { ageDays: 30, successRate: 0.1 });
-
-    const rows = rankRows();
-    expect(rows).toHaveLength(2);
-    expect(rows[0].weighted_rank).toBeCloseTo(rows[1].weighted_rank, 10);
   });
 
   it('boosts entries tagged failure above equally-relevant peers', () => {

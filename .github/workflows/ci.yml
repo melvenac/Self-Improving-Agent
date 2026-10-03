@@ -132,6 +132,11 @@ jobs:
         working-directory: open-brain
         run: npx tsc --noEmit
 
+      # tsc --noEmit reads src/ only; tests/ are checked by their own config (T-152).
+      - name: Typecheck tests
+        working-directory: open-brain
+        run: npm run typecheck:tests
+
       - name: Test
         working-directory: open-brain
         run: npm test -- --reporter=verbose
@@ -180,6 +185,10 @@ jobs:
       - name: Typecheck
         working-directory: open-brain
         run: npx tsc --noEmit
+
+      - name: Typecheck tests
+        working-directory: open-brain
+        run: npm run typecheck:tests
 
       # Step 0 counts only on a quiet laptop (R89 item 4). This records the baseline and MARKS a run that is not quiet;
       # it does not fail it, because whether a row counts is the handoff's call, made from this log.

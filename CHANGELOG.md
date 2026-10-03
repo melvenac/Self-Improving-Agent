@@ -13,6 +13,10 @@
   and hub name (`resolveCheckoutSeat`). An unlisted checkout prints `seat unknown for checkout <c>` instead of
   falling back to the identity. The main checkout prints `presence: none`. A new `/sync` check, `seat-identity`,
   flags an `AGENT.local.md` that disagrees with the map.
+- **CI now type-checks the test suite (T-152).** `npx tsc --noEmit` reads `src/` only, so `tests/` were never
+  type-checked. The `test` and `test-windows` jobs now also run `npm run typecheck:tests`. The last 4 errors are
+  fixed in test files only: 3 were leftovers of the Loop 10 maturity cut (R-011; the `maturityBoost` import and the
+  `successRate` fixture fields), and 1 was an untyped lookup in `recalled-ids.test.ts`.
 
 ## [0.45.0] - 2026-10-02 — Loop 15 slices three and four, `/bootstrap`, the per-session record, and CI on tcm
 
