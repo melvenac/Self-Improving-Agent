@@ -167,6 +167,10 @@ export const USAGE_CONSEQUENCES: Readonly<Record<string, string>> = {
   STOP: "everyone parks until the 5-hour reset",
 };
 
+/** The weekly percentage at which every seat winds down; below it, from 95, the weekly window only holds new work. */
+const WEEKLY_STOP = 98;
+const WEEKLY_STOP_CONSEQUENCE = "park, push WIP";
+
 function frontmatterValue(file: string, key: string): string | null {
   if (!existsSync(file)) return null;
   const match = readFileSync(file, "utf8").match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -236,9 +240,13 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
   // number is `weekly not checked`. `weeklyOverride` (string, optional) names the loop Aaron lifted the hold for.
   const weekly: number | null = obj ? num(obj.sevenDayPct) : null;
   const override = obj && typeof obj.weeklyOverride === "string" && obj.weeklyOverride.trim() !== "" ? obj.weeklyOverride.trim() : null;
+  // T-234 A: at weekly >= 98 the WEEKLY window caused the stop, and the 5-hour reset does not lift it, so the weekly window
+  // comes first and the line never names the 5-hour reset. Aaron's one-time reset is his act, not a consequence the line can state.
+  if (weekly !== null && weekly >= WEEKLY_STOP) {
+    return `Usage: ${five} (weekly ${weekly}%) · ${WEEKLY_STOP_CONSEQUENCE}${fivePct !== null ? ` · 5h ${fivePct}%` : ""}`;
+  }
   let weeklyConsequence: string | null = null;
-  if (weekly !== null && weekly >= 98) weeklyConsequence = "wind down: every seat pushes WIP and a handoff and parks";
-  else if (weekly !== null && weekly >= 95) {
+  if (weekly !== null && weekly >= 95) {
     weeklyConsequence = override !== null ? `no new QA, tasks or dispatches except ${override} (Aaron's lift)` : "no new QA, tasks or dispatches";
   }
   // Below 95 adds nothing: no weekly segment. Not checked is named, never dropped.

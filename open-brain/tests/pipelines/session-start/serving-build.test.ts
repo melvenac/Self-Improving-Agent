@@ -2,14 +2,15 @@ import { describe, it, expect, afterAll } from "vitest";
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { describeServingBuild } from "../../../src/pipelines/session-start/serving-build.js";
 import { handleStart } from "../../../src/server.js";
 
 /**
- * T-233 A. The serving tree is a real clone whose origin is a local bare repository; the build's commit comes from
- * `open-brain/build/build-info.json`, exactly as write-build-info.mjs stamps it. Three fixtures: behind, level, and
- * no build-info; plus the unreadable shapes, each of which must say "not checked" and never print nothing.
+ * T-233 A, T-234 A. The serving tree is a real clone whose origin is a local bare repository; the build's commit comes from
+ * `open-brain/build/build-info.json`, exactly as write-build-info.mjs stamps it. Fixtures: behind (by served code), behind by
+ * records only, level, ahead, diverged, and no build-info; plus the unreadable shapes, each of which must say "not checked"
+ * and never print nothing. The strings are pinned exactly: the shape is the contract.
  */
 const made: string[] = [];
 afterAll(() => {
@@ -21,12 +22,18 @@ const git = (cwd: string, ...args: string[]): string =>
 
 interface Fixture {
   tree: string;
+  seed: string;
   buildDir: string;
   commits: string[]; // oldest first, all on origin/master
 }
 
-/** A serving tree with `n` commits on origin/master, all fetched. */
-function servingTree(n: number): Fixture {
+/** A serving tree with `n` commits on origin/master, all fetched. Each commit touches `files` (default: a served path). */
+function servingTree(n: number, files: string[] = ["open-brain/src/f.txt"]): Fixture {
+  return servingTreeOf(Array.from({ length: n }, () => files));
+}
+
+/** A serving tree whose origin/master commits touch exactly `perCommit[i]`, oldest first, all fetched. */
+function servingTreeOf(perCommit: string[][]): Fixture {
   const root = mkdtempSync(join(tmpdir(), "t233a-"));
   made.push(root);
   const origin = join(root, "origin.git");
@@ -40,8 +47,11 @@ function servingTree(n: number): Fixture {
   git(seed, "config", "user.name", "t");
   git(seed, "remote", "add", "origin", origin);
   const commits: string[] = [];
-  for (let i = 0; i < n; i++) {
-    writeFileSync(join(seed, "f.txt"), `v${i}\n`);
+  for (const [i, files] of perCommit.entries()) {
+    for (const f of files) {
+      mkdirSync(dirname(join(seed, f)), { recursive: true });
+      writeFileSync(join(seed, f), `v${i}\n`);
+    }
     git(seed, "add", "-A");
     git(seed, "commit", "-q", "-m", `c${i}`);
     commits.push(git(seed, "rev-parse", "HEAD"));
@@ -50,53 +60,119 @@ function servingTree(n: number): Fixture {
   execFileSync("git", ["clone", "-q", origin, tree], { stdio: "ignore" });
   const buildDir = join(tree, "open-brain", "build");
   mkdirSync(buildDir, { recursive: true });
-  return { tree, buildDir, commits };
+  return { tree, seed, buildDir, commits };
 }
 
 const stamp = (f: Fixture, commit: string | null, extra: Record<string, unknown> = {}): void => {
   writeFileSync(join(f.buildDir, "build-info.json"), JSON.stringify({ commit, builtAt: "2026-10-01T10:00:00.000Z", reason: null, ...extra }, null, 2));
 };
 
+/** `n` local commits in the serving tree that origin/master lacks; returns the tip. */
+function localCommits(f: Fixture, n: number): string {
+  git(f.tree, "config", "user.email", "t@example.invalid");
+  git(f.tree, "config", "user.name", "t");
+  for (let i = 1; i <= n; i++) {
+    writeFileSync(join(f.tree, `local${i}.txt`), "x");
+    git(f.tree, "add", "-A");
+    git(f.tree, "commit", "-q", "-m", `local${i}`);
+  }
+  return git(f.tree, "rev-parse", "HEAD");
+}
+
+const short = (sha: string): string => sha.slice(0, 7);
+
 describe("T-233 A the serving build is named, and a stale one is loud", { timeout: 60_000 }, () => {
-  it("BEHIND: a build 3 commits behind origin/master says so, with the distance", () => {
+  it("BEHIND: a build 3 served-code commits behind origin/master says so, with the distance", () => {
     const f = servingTree(5);
     stamp(f, f.commits[1]!); // commits 2, 3, 4 are newer
-    const line = describeServingBuild(f.buildDir);
-    expect(line).toContain("SERVING BUILD IS STALE");
-    expect(line).toContain("is 3 commits behind origin/master");
-    expect(line).toContain(f.commits[1]!.slice(0, 7));
-    expect(line).toContain("(built 2026-10-01T10:00:00.000Z)");
-    expect(line).not.toContain("level with");
+    expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(f.commits[1]!)} · STALE: 3 code commits behind → ask Aaron to update`);
   });
 
   it("BEHIND by one is singular", () => {
     const f = servingTree(3);
     stamp(f, f.commits[1]!);
-    expect(describeServingBuild(f.buildDir)).toContain("is 1 commit behind origin/master");
+    expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(f.commits[1]!)} · STALE: 1 code commit behind → ask Aaron to update`);
   });
 
-  it("LEVEL: a build at origin/master names the tree and says level, qualified by the last fetch", () => {
+  it("LEVEL: a build at origin/master says current, with no path and no timestamp", () => {
     const f = servingTree(3);
     stamp(f, f.commits[2]!);
     const line = describeServingBuild(f.buildDir);
-    expect(line.startsWith("Serving build: ")).toBe(true);
-    expect(line).toContain("is level with origin/master");
-    expect(line).toContain("not the network");
-    expect(line).not.toContain("STALE");
+    expect(line).toBe(`Build ${short(f.commits[2]!)} · current`);
+    expect(line).not.toContain(f.tree);
+    expect(line).not.toContain("2026-10-01");
   });
 
-  it("a build older than its own tree's HEAD names both commits (the build is what is served)", () => {
+  it("the line is about the BUILD's commit, not the tree's HEAD (the build is what is served)", () => {
     const f = servingTree(3);
     stamp(f, f.commits[2]!);
-    // The tree's HEAD moves on while the build stays: HEAD is not the build's commit.
+    // The tree's HEAD moves on while the build stays: HEAD is not the build's commit. That commit is local, so origin/master
+    // is not ahead of the build and the build is not ahead of origin/master. No HEAD note: the shape carries no extras.
     git(f.tree, "config", "user.email", "t@example.invalid");
     git(f.tree, "config", "user.name", "t");
     writeFileSync(join(f.tree, "local.txt"), "x");
     git(f.tree, "add", "-A");
     git(f.tree, "commit", "-q", "-m", "local");
+    expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(f.commits[2]!)} · current`);
+  });
+
+  // The path set that counts as SERVED: open-brain/ (except its tests), scripts/, .claude/ and package.json.
+  it("RECORDS ONLY: commits touching only .agents/ and docs/ are not a stale build (false stale, clark 2026-10-03)", () => {
+    const f = servingTreeOf([["open-brain/src/a.ts"], [".agents/state.json"], ["docs/loops/x.md", ".agents/TASKS/INBOX.md"]]);
+    stamp(f, f.commits[0]!);
     const line = describeServingBuild(f.buildDir);
-    expect(line).toContain("the tree's HEAD is");
-    expect(line).toContain("not the build's commit");
+    expect(line).toBe(`Build ${short(f.commits[0]!)} · current (2 records-only commits behind)`);
+    expect(line).not.toContain("STALE");
+  });
+
+  it("RECORDS ONLY by one is singular, and open-brain/tests changes are not served either", () => {
+    const f = servingTreeOf([["open-brain/src/a.ts"], ["open-brain/tests/a.test.ts"]]);
+    stamp(f, f.commits[0]!);
+    expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(f.commits[0]!)} · current (1 records-only commit behind)`);
+  });
+
+  it("only SERVED commits are counted: 4 code commits among records say 4, not 5 or 7", () => {
+    const f = servingTreeOf([
+      ["open-brain/src/a.ts"],
+      ["open-brain/src/b.ts"],
+      [".agents/state.json"],
+      [".claude/commands/start.md"],
+      ["docs/x.md"],
+      ["scripts/setup.mjs"],
+      ["package.json"],
+      [".agents/SESSIONS/next-session.md"],
+    ]);
+    stamp(f, f.commits[0]!);
+    expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(f.commits[0]!)} · STALE: 4 code commits behind → ask Aaron to update`);
+  });
+
+  it("a commit touching served code AND records counts as code", () => {
+    const f = servingTreeOf([["open-brain/src/a.ts"], [".agents/state.json", "open-brain/package.json"]]);
+    stamp(f, f.commits[0]!);
+    expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(f.commits[0]!)} · STALE: 1 code commit behind → ask Aaron to update`);
+  });
+
+  it("AHEAD (F6): a build at a local commit origin/master lacks is 'ahead by N', never 'current'", () => {
+    const f = servingTree(2);
+    const built = localCommits(f, 2);
+    stamp(f, built);
+    const line = describeServingBuild(f.buildDir);
+    expect(line).toBe(`Build ${short(built)} · ahead by 2 (unmerged local commits)`);
+    expect(line).not.toContain("current");
+  });
+
+  it("DIVERGED: ahead of origin/master AND behind its served code says both", () => {
+    const f = servingTree(2);
+    const built = localCommits(f, 1);
+    // origin/master moves on with a served change this build lacks.
+    mkdirSync(join(f.seed, "open-brain", "src"), { recursive: true });
+    writeFileSync(join(f.seed, "open-brain", "src", "new.ts"), "n");
+    git(f.seed, "add", "-A");
+    git(f.seed, "commit", "-q", "-m", "served change");
+    git(f.seed, "push", "-q", "origin", "master");
+    git(f.tree, "fetch", "-q", "origin");
+    stamp(f, built);
+    expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(built)} · STALE: 1 code commit behind, ahead by 1 → ask Aaron to update`);
   });
 
   it("NO BUILD-INFO: not checked, with the reason, never nothing", () => {
@@ -124,7 +200,7 @@ describe("T-233 A the serving build is named, and a stale one is loud", { timeou
     const line = describeServingBuild(f.buildDir);
     expect(line).toMatch(/^Serving build: not checked \(/);
     expect(line).toContain("is unknown");
-    expect(line).not.toContain("level with");
+    expect(line).not.toContain("current");
   });
 
   it("a build directory that is not inside a git tree is not checked", () => {

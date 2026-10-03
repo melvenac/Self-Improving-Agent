@@ -305,8 +305,36 @@ describe("T-233 B item 4: the Usage line", () => {
     expect(usageFor(realShape({ sevenDayPct: 95 }))).toContain("+ WEEKLY 95% →");
     expect(usageFor(realShape({ sevenDayPct: 96 }))).toContain("no new QA, tasks or dispatches");
     const wind = usageFor(realShape({ sevenDayPct: 98 }));
-    expect(wind).toContain("wind down: every seat pushes WIP and a handoff and parks");
+    expect(wind).toContain("park, push WIP");
     expect(wind).not.toContain("no new QA");
+  });
+
+  // T-234 A: the window that CAUSED the band comes first, and a weekly STOP is not blamed on (or lifted by) the 5-hour reset.
+  it("a WEEKLY stop names the weekly window first and the 5-hour window last, in the pinned shape", () => {
+    expect(usageFor(realShape({ level: "STOP", fiveHourPct: 14, sevenDayPct: 98, fiveHourResetsAt: "2026-10-03T02:50:00Z" }))).toBe(
+      "Usage: STOP (weekly 98%) · park, push WIP · 5h 14%",
+    );
+    expect(usageFor(realShape({ level: "STOP (5h 14%, resets 02:50Z) + WEEKLY 98%", fiveHourPct: 14, sevenDayPct: 99 }))).toBe(
+      "Usage: STOP (weekly 99%) · park, push WIP · 5h 14%",
+    );
+  });
+
+  it("a weekly stop without a 5-hour number omits that segment; the 5-hour reset is never named", () => {
+    const { usageLevel } = JSON.parse(realShape({ level: "STOP", sevenDayPct: 98 })) as { usageLevel: Record<string, unknown> };
+    delete usageLevel.fiveHourPct;
+    const line = usageFor(JSON.stringify({ usageLevel }));
+    expect(line).toBe("Usage: STOP (weekly 98%) · park, push WIP");
+    expect(line).not.toContain("5-hour reset");
+  });
+
+  it("a weeklyOverride does not lift the weekly stop (it names a lifted hold at 95-97 only)", () => {
+    expect(usageFor(realShape({ level: "STOP", fiveHourPct: 14, sevenDayPct: 98, weeklyOverride: "T-233" }))).toBe("Usage: STOP (weekly 98%) · park, push WIP · 5h 14%");
+  });
+
+  it("a STOP from the 5-hour window keeps the 5-hour reset text and the 5-hour window first", () => {
+    expect(usageFor(realShape({ level: "STOP", fiveHourPct: 100, sevenDayPct: 40, fiveHourResetsAt: "2026-10-03T02:50:00Z" }))).toBe(
+      "Usage: STOP (5h 100%, resets 02:50Z) → everyone parks until the 5-hour reset",
+    );
   });
 
   it("weeklyOverride names the lifted loop at >= 95 only; absent or null changes nothing", () => {
@@ -430,7 +458,8 @@ describe("ob_start carries the same block, and every /start copy prints it verba
     g(seed, "remote", "add", "origin", origin);
     const shas: string[] = [];
     for (let i = 0; i < behind + 1; i++) {
-      writeFileSync(join(seed, "f.txt"), `v${i}\n`);
+      mkdirSync(join(seed, "open-brain", "src"), { recursive: true });
+      writeFileSync(join(seed, "open-brain", "src", "f.txt"), `v${i}\n`); // a SERVED path: records-only commits are not stale (T-234 A)
       g(seed, "add", "-A");
       g(seed, "commit", "-q", "-m", `c${i}`);
       shas.push(g(seed, "rev-parse", "HEAD"));
@@ -458,8 +487,7 @@ describe("ob_start carries the same block, and every /start copy prints it verba
   it("T-233 A+B: a STALE serving build is inside the block, above Usage, and the same line opens the greeting", async () => {
     const text = (await handleStart({ project_root: project(), serving_build_dir: servingBuildDir(2) })).content[0]!.text;
     const block = blockOf(text);
-    expect(block[1]!.startsWith("SERVING BUILD IS STALE:")).toBe(true);
-    expect(block[1]).toContain("is 2 commits behind origin/master");
+    expect(block[1]).toMatch(/^Build [0-9a-f]{7} · STALE: 2 code commits behind → ask Aaron to update$/);
     expect(block[2]!.startsWith("Usage: ")).toBe(true);
     expect(block[1]).toBe(text.split("\n")[0]);
   });
