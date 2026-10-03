@@ -1,10 +1,27 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import Database from "better-sqlite3";
 import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from "../../../src/db-v2.js";
 import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved, readRecalledFile } from "../../../src/pipelines/session-end/recalled-ids.js";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+
+/**
+ * QA 265 G1 (#377): a fake read seam for `readRecalledFile` itself. A real directory only produces EISDIR, and a real EACCES, EBUSY or
+ * ENOTDIR cannot be made portably (Windows reports ENOENT for a path through a file, and a chmod does not stop the owner), so the
+ * rows below make `readFileSync` throw the named code while `fsFault.code` is set, and read the real file system otherwise.
+ */
+const fsFault = vi.hoisted(() => ({ code: null as string | null }));
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  return {
+    ...actual,
+    readFileSync: ((...args: Parameters<typeof actual.readFileSync>) => {
+      if (fsFault.code !== null) throw Object.assign(new Error(`${fsFault.code}: simulated`), { code: fsFault.code });
+      return actual.readFileSync(...args);
+    }) as typeof actual.readFileSync,
+  };
+});
 
 const THIS_SESSION = "efcaeb75-f5d5-421f-a1e5-645f155c59e4";
 const OTHER_SESSION = "2fb67133-f85a-4c1d-9e30-000000000000";
@@ -324,5 +341,33 @@ describe("T-229: an unreadable .recalled-entries.json is not an absent one", () 
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+});
+
+describe("readRecalledFile: ONLY ENOENT is absent (QA 265 G1)", () => {
+  afterEach(() => {
+    fsFault.code = null;
+  });
+
+  it.each(["EACCES", "EPERM", "EBUSY", "ENOTDIR", "EMFILE"])("%s is rethrown with its code, never read as an absent file", (code) => {
+    fsFault.code = code;
+    expect(() => readRecalledFile("/p/.recalled-entries.json")).toThrow(expect.objectContaining({ code }));
+  });
+
+  it("ENOENT through the same seam is the one absent case: null", () => {
+    fsFault.code = "ENOENT";
+    expect(readRecalledFile("/p/.recalled-entries.json")).toBeNull();
+  });
+
+  it.each(["EACCES", "EPERM"])("%s end to end: the foreign-writer line is 'not checked (<path>: <code>)', never 'none present', and nothing is rated", (code) => {
+    const path = "/p/.recalled-entries.json";
+    fsFault.code = code;
+    const report = detectForeignWriter({ sessionId: THIS_SESSION, filePaths: [path], readFile: readRecalledFile });
+    expect(report.unreadable).toEqual([{ path, code }]);
+    expect(formatForeignWriter(report)).toEqual([`  Foreign writer: not checked (${path}: ${code})`]);
+    expect(formatForeignWriter(report).join("\n")).not.toContain("none present");
+    const resolved = resolveRecalledIds({ db: makeDb(), sessionId: THIS_SESSION, filePaths: [path], readFile: readRecalledFile });
+    expect(resolved.ids).toEqual([]);
+    expect(resolved.origin).toBe("none");
   });
 });
