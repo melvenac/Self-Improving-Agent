@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 305,
+  "revision": 307,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1436,7 +1436,21 @@
       "opened_session": 159,
       "closed_session": null,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03). — Session 159 PHASE 0 PROGRESS: the seat is on the QA PC, not the desktop (brief corrected #353). Split agreed by clark with Relay: T-235 owns QA PC Cursor setup; Relay owns hub-talk, codes and rooms; the planner owns hub-partner-seats.json. setup.mjs failed on the QA PC ('Cannot find open-brain/': URL pathname kept the space in 'Aaron Melven' as %20); fixed by #354 (merge 842e4692, red-first test, Aaron's 'Merge #354' via clark). Clark moved the QA PC serving tree to 842e4692, rebuilt and reran setup; the planner read back by SSH: hooks.json sessionStart --ide cursor, mcp.json server path, 4 commands. Still to do: Aaron relaunches agent from PowerShell (Relay: Git Bash start triggers T-046); cursor-builder key move desktop->QA PC then --rotate-key (option A, chosen by the planner; the name already exists on the hub, so a code cannot be used), on Aaron's word to Relay. Aaron skipped renaming the QA PC profile, so further space bugs are fixed as found. — Session 159 RULING on Phase 1 (PR #358, 126ac04b + 082ddf01 rows A-D): NOT ACCEPTED, round 2 owed (hub turn 80). Rows 1 and 8 are live-measured. Rows 3, 4, 5, 6 and 9, and part of 2, were read from config (registered, not FIRED). Round 2 = one scratch-project experiment outside every checkout: a .cursor/hooks.json logger on every CLI event (event, pid/ppid, SHELL/ComSpec, payload keys only), then one shell command, one file read and one MCP call, with a normal exit (-p and interactive); the ::claude/::cursor slot before and after; the parent chains of the hook and of the MCP server (T-003); a scratch-project command resolving; setup.mjs twice under a scratch HOME (skip unless the real ~ is provably untouched). Same branch; post the new head. Builder's two untracked hub-copy files (hub-phase1-done.txt, hub-turn72-greeting.txt): delete. Phase 2 waits only on the planner's ruling (usage is GREEN; dev unparked by Aaron ~01:10 CDT). Standing: TASK: line on every work reply (turn 81). The seat's session was cleared and it asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9), so this note is the durable copy. Also seen: sia-forge (grok) had read nothing in its room since 2026-09-29, so its /start never ran the hub inbox step; that is an audit row candidate.",
+      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03). — Session 159 PHASE 0 PROGRESS: the seat is on the QA PC, not the desktop (brief corrected #353). Split agreed by clark with Relay: T-235 owns QA PC Cursor setup; Relay owns hub-talk, codes and rooms; the planner owns hub-partner-seats.json. setup.mjs failed on the QA PC ('Cannot find open-brain/': URL pathname kept the space in 'Aaron Melven' as %20); fixed by #354 (merge 842e4692, red-first test, Aaron's 'Merge #354' via clark). Clark moved the QA PC serving tree to 842e4692, rebuilt and reran setup; the planner read back by SSH: hooks.json sessionStart --ide cursor, mcp.json server path, 4 commands. Still to do: Aaron relaunches agent from PowerShell (Relay: Git Bash start triggers T-046); cursor-builder key move desktop->QA PC then --rotate-key (option A, chosen by the planner; the name already exists on the hub, so a code cannot be used), on Aaron's word to Relay. Aaron skipped renaming the QA PC profile, so further space bugs are fixed as found. — Session 159 RULING on Phase 1 (PR #358, 126ac04b + 082ddf01 rows A-D): NOT ACCEPTED, round 2 owed (hub turn 80). Rows 1 and 8 are live-measured. Rows 3, 4, 5, 6 and 9, and part of 2, were read from config (registered, not FIRED). Round 2 = one scratch-project experiment outside every checkout: a .cursor/hooks.json logger on every CLI event (event, pid/ppid, SHELL/ComSpec, payload keys only), then one shell command, one file read and one MCP call, with a normal exit (-p and interactive); the ::claude/::cursor slot before and after; the parent chains of the hook and of the MCP server (T-003); a scratch-project command resolving; setup.mjs twice under a scratch HOME (skip unless the real ~ is provably untouched). Same branch; post the new head. Builder's two untracked hub-copy files (hub-phase1-done.txt, hub-turn72-greeting.txt): delete. Phase 2 waits only on the planner's ruling (usage is GREEN; dev unparked by Aaron ~01:10 CDT). Standing: TASK: line on every work reply (turn 81). The seat's session was cleared and it asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9), so this note is the durable copy. Also seen: sia-forge (grok) had read nothing in its room since 2026-09-29, so its /start never ran the hub inbox step; that is an audit row candidate. — CORRECTION (session 159): the 'seat asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9)' line above is WRONG. That bridge was the OLD Claude Code sia-builder on the QA PC, being closed (clark). It is not the T-235 seat; the only T-235 seat is the Cursor one (hub cursor-builder). The planner sent the old seat a cancel; it changed nothing (tree read back by SSH), and Aaron's permission let the planner kill it over SSH (PID 7372, without SessionEnd). Its #270/#272 are merged.",
+      "note_by": [
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-236",
+      "title": "Greeting budget + FOCUS: cap and compute the /start Briefing (size test over both repos), handoff caps, role docs by changed-sha",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 159,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: Aaron, 'Open T-236', in clark's window ~02:5x CDT 2026-10-03 (D-103 route), on the planner's feedback to clark's review docs/loops/greeting-review-2026-10-03.md (copied from ~/Worktrees). Measured: Briefing 9.5 KB / 1,517 words, WATCH OUT 70% of it; ob_start 51.6 KB (T-183). SCOPE (agreed by clark): (a) set_handoff caps: at most 3 watch-outs, one line each, optional `expires` (session or date) after which the renderer drops them; pick_up about 400 chars, next action only. (b) Role docs printed in full only when their sha changed since THIS seat's last read (per-seat last-read sha), else sha + pointer; this closes T-183. A bare pointer is rejected (the PRD-unread failure). (c) FOCUS + SEATS computed from the RECORD only (never the dashboard API), after T-203/T-191 give a per-seat task field; hub presence from ob_start's existing fetch. (d) NEXT dropped unless the objective links task ids. (e) WAITING ON AARON from open_questions with a new owner field. (f) renderBriefing budget about 4 KB / 30 lines with per-section caps and '+N more: <pointer>' overflow, enforced by a test over BOTH SIA and A2A fixture states. A2A CAUTION: Relay's /start shares the renderer and ob_state schema; every new field OPTIONAL with a default, A2A's state renders unchanged, guard a missing hub-partner-seats.json. Already done outside T-236: /START AUDIT GAPS and the CARRY-VERBATIM lines retired in the planner's session-159 handoff; the shorter build/usage wording went into T-234 PR A (hub turn 241). Standing rules in WATCH OUT move to role docs via the D-110 shared.md split, not here.",
       "note_by": [
         "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
@@ -4477,6 +4491,51 @@
       "session_uuid": "ae490afb-211a-42c7-b82e-292e88d0a9f4",
       "checkout": "sia-planner",
       "first_rev": 294
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Planner session 159. Next: rule T-235 Phase 1 round 2 when sia-builder (Cursor, QA PC) posts it (hub room k57098ep, turns 80-81 unread as of 07:0xZ), then dispatch the ruled Phase 2 fixes; review T-234 PR A then B from sia-forge (Cursor, desktop, hub grok, turns 239-241 UNREAD: it needs Aaron's nudge prompt) and book a non-Composer QA for both. T-236 is open (greeting budget + FOCUS), not dispatched. Dev work is unparked, usage GREEN.",
+      "watch_out": [
+        "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
+        "BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.",
+        "A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`. '=' commits plus a trivial conflict line may go on as reviewed (#294, #302 did); anything else gets a narrow re-QA. A moved head needs a fresh approval if Aaron's word pinned the old SHA (#295 now).",
+        "CI (T-227, #310): GitHub-hosted ubuntu-latest, fetch-depth 0, a few minutes per run; push runs ONLY on master; a branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is an opt-in (tcm=true).",
+        "STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).",
+        "QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).",
+        "RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.",
+        "REPORTING TO CLARK (D-113, Aaron 2026-10-02 ~21:45Z, AMENDS D-077): the hourly status cadence is DROPPED; create NO status cron at /start. Message `clark` on EVENTS only: verdicts, merges (the one-line D-063 notice), blocks, READY TO ROLL, plus one line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner). Clark reads the dashboard's planner rows for status. If `clark` is not in ListAgents, skip the send.",
+        "DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.",
+        "VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.",
+        "JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.",
+        "CURSOR SEATS (session 159): talk only via the hub; launch as `cursor-agent`, never bare `agent` (desktop resolves Grok's CLI); every work reply starts with a TASK: line (#362); a Cursor seat that ran /start may still not have read its room (check /a2a/session/<room>/reads before assuming it saw a turn). The QA PC sia-builder checkout is the Cursor seat's; the old Claude Code builder there is closed."
+      ],
+      "open_questions": [
+        "Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand on the QA PC, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.",
+        "Retire the dormant hub name `forge` (QA PC key valid, 39 unread)? The planner reads its 39 turns first; any retirement goes to Relay with Aaron's word (D-115)."
+      ],
+      "session": 159,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#358",
+            "qa_status": "not_required",
+            "note": "T-235 Phase 1 audit (docs-only), round 2 owed by sia-builder; the planner rules it."
+          }
+        ],
+        "frozen_sha": null,
+        "questions_for_aaron": [
+          "Recover killed session 5b3338ac / catch-up task?",
+          "Retire hub name forge after reading its 39 turns?"
+        ],
+        "rulings": [
+          "D-115 hub names",
+          "T-235 Phase 1 not accepted (round 2)",
+          "T-236 opened"
+        ]
+      },
+      "session_uuid": "e05907a8-86cf-436b-bee3-ce6f2214e02e",
+      "checkout": "sia-planner",
+      "first_rev": 300
     }
   ],
   "sessions": [
