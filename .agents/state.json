@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 313,
+  "revision": 314,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1349,57 +1349,61 @@
       "id": "T-229",
       "title": "The callers' readFile wrapper for .recalled-entries.json turns ANY error (EISDIR, EACCES, EBUSY) into 'no file', so the foreign-writer detector reports 'none present' for a path it could not read; report non-ENOENT errors as 'not checked (<code>)'",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "QA 258 #299 follow-up (docs/loops/b4-misc-qa-report.md, #299 row 8). The wrapper predates T-050 and does not affect which entries are rated.",
+      "note": "QA 258 #299 follow-up (docs/loops/b4-misc-qa-report.md, #299 row 8). The wrapper predates T-050 and does not affect which entries are rated. — CLOSED session 159: #377 (sia-forge, da6cdd97) merged 0600a99f after QA 265 ACCEPT on Aaron's word. Only ENOENT is absent; any other read error renders 'Foreign writer: not checked (<path>: <code>)'. QA's non-blocking gap (no EACCES row) went to sia-forge as a test-only follow-up.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-230",
       "title": "Pin that ob_start PRINTS the T-048 zero lines: a server.test.ts row asserting 'Session logs unreadable: 0' and 'Transcript directories unreadable: 0' in handleStart output (QA 261's surviving mutant Q1)",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "QA 261 (docs/loops/t048r2-qa-report.md row 4): deleting lines.push(...formatScanCounts(...)) from handleStart in server.ts leaves every committed test green; QA's own demo row kills it. Lands after #302 merges.",
+      "note": "QA 261 (docs/loops/t048r2-qa-report.md row 4): deleting lines.push(...formatScanCounts(...)) from handleStart in server.ts leaves every committed test green; QA's own demo row kills it. Lands after #302 merges. — CLOSED session 159: #378 (sia-infra, b24ea6a0, test-only) merged c954336e after QA 265 ACCEPT on Aaron's word. QA 261's mutant is red.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-231",
       "title": "mcp-command-paths: a malformed CONTAINER (project mcpServers not an object, a .mcp.json that is an array or scalar) beside a good server passes silently; make it not-checked, which caps the result at WARN, like a malformed entry (D-106)",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "QA 262 gap 4 (docs/loops/t008r3-qa-report.md), carried from QA 260 gap 1. Lands after #295 and #298 merge. Also pin the unreadable-settings 'no absent note' row (QA mutant B survives).",
+      "note": "QA 262 gap 4 (docs/loops/t008r3-qa-report.md), carried from QA 260 gap 1. Lands after #295 and #298 merge. Also pin the unreadable-settings 'no absent note' row (QA mutant B survives). — CLOSED session 159: #379 (sia-forge, 89ab68b2) merged 2c725171 after QA 265 ACCEPT on Aaron's word. 12 malformed-container rows (scope widened to the class and ruled), absent stays normal, nothing checkable gives SKIP; QA mutant B is red.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-232",
       "title": "ob_state write output prints ~22 'KEPT despite retention' NOTE lines (~4k chars) on EVERY write even when retention changed nothing; print one summary line (count kept, how to list them) unless a task's retention status changed in this write",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "Observed on every ob_state call in planner session 157. The per-id NOTE lines repeat unchanged; their information is only new when a task crosses the retention boundary.",
+      "note": "Observed on every ob_state call in planner session 157. The per-id NOTE lines repeat unchanged; their information is only new when a task crosses the retention boundary. — CLOSED session 159: #382 (sia-infra, 688001ec) merged 60abf014 after QA 265 ACCEPT on Aaron's word. One retention summary line per write; per-id NOTE only when a task crosses the boundary. QA's non-blocking gap (summary exactly once) went to sia-infra as a test-only follow-up.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-233",
@@ -1419,16 +1423,16 @@
       "id": "T-234",
       "title": "T-233 follow-ups from QA 263 (F1-F7): adopt QA's probes into the suite and close the surviving-mutant gaps; 'ahead of origin/master' must not read as 'level'",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 158,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "Session 158, from QA 263's report (docs/loops/t233-qa-report.md on qa/t233-report fe33a55a; probes docs/loops/qa-263/qa263-probes.test.ts and six mutants under docs/loops/qa-263/mutants/). Behaviour is correct in all; the gaps are tests a mutant survives. F1: the serving tree's IDENTITY (qa-a-names-wrong-tree survives; nothing catches it). F2: weeklyOverride vs >=98% wind-down (QA probe catches it; the suite does not). F3: resolved_by mark dropped from next-session.md (probe catches it). F4: serving_build_dir added to the MCP zod schema (probe catches it). F5: the brief regex's $ anchor (qa-c-no-end-anchor survives; nothing catches it). F6: a serving tree AHEAD of origin/master is reported as 'level'; it should say 'ahead by N (unmerged local commits)'. F7: a start.md wording nit (see report). Done when: QA's probe rows are in the suite, all six QA mutants go red, and F6 has a fixture row. — Session 159 (2026-10-03, clark's acceptance read of the served /start greeting, session e05907a8): core PASS (Briefing verbatim, serving line first, real Usage line, Session 159 = 158+1, Drift none). Three follow-ups: (1) FALSE STALE — 'SERVING BUILD IS STALE ... 2 commits behind' counted a9785b75 + d36798df, which touch only .agents records (verified by planner: git diff --name-only e833816 origin/master = next-session.md, SUMMARY.md, INBOX.md, task.md, state.json). Count only commits touching served code (open-brain/, .claude/commands) or label them '(records only)'. (2) WRONG USAGE TEXT — 'STOP (5h 14%, resets 02:50Z) + WEEKLY 98% -> everyone parks until the 5-hour reset': the STOP came from the weekly window, which the 5h reset does not lift; when sevenDayPct >= 98 say 'until the weekly reset (or Aaron's one-time reset)' and do not attribute STOP to the 5h window. (3) The /START AUDIT GAPS watch-out item (2) (count the session number by hand) is now done in code and made the planner hedge in FLAGS; retire that item (the whole watch-out retires once T-233 is served on every machine, which rev 299 records). Also: ob_start returned 51.6 KB and spilled to a file (T-183 still open). — Session 159 DISPATCH: Aaron via clark (~01:10 CDT 2026-10-03) lifted the SIA park for dev work. T-234 goes to sia-forge (Cursor Composer 2.5, desktop, hub grok). Brief: docs/loops/t234-brief.md. PR A = false-stale count, usage-window text, F6; PR B = QA 263 probes adopted, all six QA mutants red, F7. Item (3) (retire the hand-count watch-out) is the planner's handoff work, not the seat's. — Session 159: PR A #373 (1115ee19) MERGED as 5cf4359c after QA 264 ACCEPT on Aaron's word. PR B #374 was REJECTED by QA 264: its start.md rewording broke start-parity's T-226 grab. Round 2 at 3e80fb15 fixes the grab (threshold kept at 3; a one-sentence deletion mutant still goes red) and folds in QA's two #373 follow-ups: project-template in SERVED_PATHS, and STOP as the band word at weekly >= 98. Being retargeted to master for a narrow re-QA.",
+      "note": "Session 158, from QA 263's report (docs/loops/t233-qa-report.md on qa/t233-report fe33a55a; probes docs/loops/qa-263/qa263-probes.test.ts and six mutants under docs/loops/qa-263/mutants/). Behaviour is correct in all; the gaps are tests a mutant survives. F1: the serving tree's IDENTITY (qa-a-names-wrong-tree survives; nothing catches it). F2: weeklyOverride vs >=98% wind-down (QA probe catches it; the suite does not). F3: resolved_by mark dropped from next-session.md (probe catches it). F4: serving_build_dir added to the MCP zod schema (probe catches it). F5: the brief regex's $ anchor (qa-c-no-end-anchor survives; nothing catches it). F6: a serving tree AHEAD of origin/master is reported as 'level'; it should say 'ahead by N (unmerged local commits)'. F7: a start.md wording nit (see report). Done when: QA's probe rows are in the suite, all six QA mutants go red, and F6 has a fixture row. — Session 159 (2026-10-03, clark's acceptance read of the served /start greeting, session e05907a8): core PASS (Briefing verbatim, serving line first, real Usage line, Session 159 = 158+1, Drift none). Three follow-ups: (1) FALSE STALE — 'SERVING BUILD IS STALE ... 2 commits behind' counted a9785b75 + d36798df, which touch only .agents records (verified by planner: git diff --name-only e833816 origin/master = next-session.md, SUMMARY.md, INBOX.md, task.md, state.json). Count only commits touching served code (open-brain/, .claude/commands) or label them '(records only)'. (2) WRONG USAGE TEXT — 'STOP (5h 14%, resets 02:50Z) + WEEKLY 98% -> everyone parks until the 5-hour reset': the STOP came from the weekly window, which the 5h reset does not lift; when sevenDayPct >= 98 say 'until the weekly reset (or Aaron's one-time reset)' and do not attribute STOP to the 5h window. (3) The /START AUDIT GAPS watch-out item (2) (count the session number by hand) is now done in code and made the planner hedge in FLAGS; retire that item (the whole watch-out retires once T-233 is served on every machine, which rev 299 records). Also: ob_start returned 51.6 KB and spilled to a file (T-183 still open). — Session 159 DISPATCH: Aaron via clark (~01:10 CDT 2026-10-03) lifted the SIA park for dev work. T-234 goes to sia-forge (Cursor Composer 2.5, desktop, hub grok). Brief: docs/loops/t234-brief.md. PR A = false-stale count, usage-window text, F6; PR B = QA 263 probes adopted, all six QA mutants red, F7. Item (3) (retire the hand-count watch-out) is the planner's handoff work, not the seat's. — Session 159: PR A #373 (1115ee19) MERGED as 5cf4359c after QA 264 ACCEPT on Aaron's word. PR B #374 was REJECTED by QA 264: its start.md rewording broke start-parity's T-226 grab. Round 2 at 3e80fb15 fixes the grab (threshold kept at 3; a one-sentence deletion mutant still goes red) and folds in QA's two #373 follow-ups: project-template in SERVED_PATHS, and STOP as the band word at weekly >= 98. Being retargeted to master for a narrow re-QA. — CLOSED session 159: PR A #373 (merged 5cf4359c) and PR B #374 r2 (40105c1f, merged a947b8b4) by sia-forge (CC Sonnet), both on Aaron's word after Opus QA (QA 264 ACCEPT on A; QA 264 REJECT then QA 265 ACCEPT on B r2). All six QA 263 mutants are red; start-parity's grab was fixed with the threshold kept; SERVED_PATHS includes project-template; at weekly >= 98 the band word is STOP. clark's item (3) (retire the hand-count watch-out) was done in the planner's session-159 handoff.",
       "note_by": [
         "ae490afb-211a-42c7-b82e-292e88d0a9f4",
         "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-235",
