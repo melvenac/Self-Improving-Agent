@@ -6,13 +6,18 @@ it into its own gitignored file has put it on one disk, invisible to a fresh clo
 **Sourced from this project's own record**, not from outside it. Where a rule came from one seat's
 mistake, it says so — provenance is what makes a rule falsifiable by the seat that would know.
 
+*Since D-110 the incidents, counts, attributions and war stories behind these rules live in
+[`docs/loops/shared-md-provenance.md`](../../docs/loops/shared-md-provenance.md), one section per section here. The rules
+stay in this file, verbatim; the history is one link away and is not an instruction.*
+
 ---
 
 ## Measurement
 
+*Provenance for this section: [Measurement](../../docs/loops/shared-md-provenance.md#measurement).*
+
 **Verify against the thing, never against the report of it.** A success message is not the change
-having landed. `gh pr merge` has printed `could not determine current branch: failed to run git` while
-the merge succeeded. A read confirms only if it is ordered after the write actually terminated.
+having landed. A read confirms only if it is ordered after the write actually terminated.
 
 **A chained shell command reports one outcome for several claims.** `check && commit` commits when the
 check passes; `check; commit` commits regardless and prints the check's output either way; and
@@ -30,37 +35,31 @@ instrument and reading the unfiltered output. Your own `grep`, `find -maxdepth`,
 before you trust a negative.**
 
 **Two measurements that disagree may both be right, and the resolution is a third measurement rather
-than an argument.** Check whether the target is moving before arbitrating. A tracked file measured
-281,558 bytes in two worktrees and 285,228 in a third; the delta was exactly the carriage returns
-(`G-031`). A transcript measured 12.5 MB and 12.8 MB eleven minutes apart because it was still being
-written.
+than an argument.** Check whether the target is moving before arbitrating.
 
 **Every derived number carries what it was derived from** — the ref, the tree, the time. A bare
 number is correct on Monday and wrong by Wednesday, and the reader who checks it concludes the
 document is wrong. Applies to counts in prose as much as to output.
 
 **Do not copy a number out of the record into a second place.** `state.json` and the loop close-outs
-are the record. Point at them. A count restated in an instruction file is the hardcoded-symbol-count
-defect that `v0.40.0` existed to remove.
+are the record. Point at them.
 
 **A finding reported against a line is usually a finding about a class.** The instance in front of
 you is where it was noticed, not where it lives. Look for the sibling before you fix or report.
 
 **Run the checks in the tree that has the files** (rule 13). A check is only as tested as the trees
-it has run in. The retirements check passed four boundary reports, a sign-off and five merged PRs,
-then fired 115 findings the first time it ran in the main tree. A version check that is a harmless
-warning in two checkouts is a hard failure in the one holding the file.
+it has run in.
 
 **Say the consequence that is true where the code runs.** A message asserting a machine-wide effect
 from a linked worktree is false in two checkouts out of three.
 
 ## Instruments
 
+*Provenance for this section: [Instruments](../../docs/loops/shared-md-provenance.md#instruments).*
+
 **Build things that fail closed.** Every instrument that has failed this project failed *open*: a
 `|| echo 0` fallback, a truncated `find`, a blank `echo` over a real hit, a `-maxdepth` that was too
-shallow, an exit code captured from the wrong process. A `^{commit}` mangled by `cmd.exe` *should*
-have been a silent wrong answer and was not, because undefined distance was an issue rather than a
-zero. **The difference was never vigilance. It is which way the thing breaks.**
+shallow, an exit code captured from the wrong process. **The difference was never vigilance. It is which way the thing breaks.**
 
 **A check must prove it looked.** Report what was walked and assert that count in a test. Refuse on
 unresolved input rather than reporting a clean result. Default unlisted things to the strict side so
@@ -68,53 +67,36 @@ a boundary cannot widen by omission. **State the check's limits in its own outpu
 
 **Skip is not pass; silence is not all-clear.** Say why a check did not run, in the message.
 
-**The instrument for structured data is a parser, never a pattern match.** Two seats made this
-mistake an hour apart on the same file, the second having just been told about the first.
+**The instrument for structured data is a parser, never a pattern match.**
 
 **A derived value inherits the question its derivation asks, not the question its caller asks — and
-no assertion written from inside the derivation can tell the difference.** Three instances in Loop
-14, every one green: a fetch-time line that said "unknown" while looking like caution; a greeting
-that named the migration commit as every seat's close-out because the migration rewrote every
-entry's bytes; a session number stamped on a batch before the record held it. Each was found by
-reading the artifact afterwards. *(Developer's sentence, Loop 14; `loop-14-closeout.md` §3.)*
+no assertion written from inside the derivation can tell the difference.**
 
 **Green on the first run is the signal to mutate. Assert both directions. `tsc` clean is part of
-calling a mutant valid.** Three mutants survived green suites at first pass in Loop 14, each the exact
-defect being fixed; a vacuous negative shipped inside the repair for a vacuous positive and was caught
-only because the positive failed against the same wrong path; two mutants broke syntax rather than
-behaviour and were replaced before being counted. *(Developer, Loop 14.)*
+calling a mutant valid.**
 
 **This file is loaded into every session now (`G-032` closed, Loop 14), so it has a budget it did
 not have before.** A rule goes here short, with provenance; the reasoning stays in the close-out it
 came from. And loading a rule is not applying it: the seat that quoted this file's line on restated
 numbers at a boundary restated a number in its own handoff the same day (Developer 31).
 
-**A ruling with no acceptance row fires nowhere.** R7 of Loop 16 was ruled, agreed by the seat that
-asked for it, written into a boundary report as settled — and never built; 153 tests, `tsc`, `sync`
-and five reports were green throughout. A ruling that changes behaviour gets a row in the same
-amendment, or it is an intention with a number. *(Loop 16, F3; `loop-16-closeout.md` §4.1.)*
+**A ruling with no acceptance row fires nowhere.** A ruling that changes behaviour gets a row in the same
+amendment, or it is an intention with a number.
 
 **An assertion on a value the harness never captured passes without looking.** `execFileSync`
 returns stdout only; a harness that hardcodes `stderr: ''` makes every stderr assertion vacuous on
 exactly the channel it exists for. Distinct from a vacuous assertion — the value existed and the
-instrument never carried it. Found by a mutant, not by review. *(Developer, Loop 16 M18.)*
+instrument never carried it.
 
-**A stacked fixture proves as little as a vacuous one; it fails in the flattering direction.** Short
-decoys handed every competitor a length advantage and made a rank-4 read as rank-9 — flattering to
-the seat whose row it made someone else's problem. Both seats built one within hours; both caught
-their own. Guard fixtures in both directions and report the lengths. *(Loop 16, amendment 11.)*
+**A stacked fixture proves as little as a vacuous one; it fails in the flattering direction.** Guard fixtures in both directions and report the lengths.
 
 **`tsc --noEmit` on every mutant before it counts, and assert the edit landed before running.**
-Three type-invalid mutants went red for the wrong reason in one session; a mutation script whose
-regex never compiled left the fixture untouched and read as *"the guard does not detect nine
-decoys"* — a false accusation against a working guard. *(QA, Loop 16 reports 1–3 §11/§8.)*
 
-**A variable's presence is misread as easily as its absence.** Every Loop 16 seat inherited
-`CLAUDE_CODE_CHILD_SESSION=1` from its launch environment and wrote no transcript; all three read
-the missing file as a host property. Three seats agreeing was one environment observed three times —
-nobody disagreed, so nobody looked. *(QA, Loop 16 close; `G-044`'s mirror.)*
+**A variable's presence is misread as easily as its absence.**
 
 ## The record
+
+*Provenance for this section: [The record](../../docs/loops/shared-md-provenance.md#the-record).*
 
 **Nothing that must outlive a session may live only in one.** A2A is a transport with no memory.
 Loop briefs, boundary reports and close-outs go in `docs/loops/`; decisions go through `ob_state`.
@@ -130,7 +112,7 @@ instances in two days, **all in the record layer and none in the code.**
 
 **`ob_state`: read the dry run before the real call, every time.** `verified.evidence` is an array of
 `{type, path, observation}`; `gaps.evidence` is a plain string alongside `what` and
-`recommended_update`. Both seats made the identical mistake on the identical file hours apart. Hand
+`recommended_update`. Hand
 over the revision **number**, not the base, and do not take a revision while another seat holds the
 loop (`G-027`).
 
@@ -141,9 +123,9 @@ near-miss, recorded by family, never numbered into the table.
 
 ## Authority
 
-**Aaron speaks to the planner, and only to the planner (`D-038`, 2026-09-23).** His words: *"If an
-agent is waiting on me I need to know through the planner. Otherwise I'm costatly swithing session
-windows."* (verbatim) **A seat that needs Aaron sends the question to the planner, not to Aaron.** The planner
+*Provenance for this section: [Authority](../../docs/loops/shared-md-provenance.md#authority).*
+
+**Aaron speaks to the planner, and only to the planner (`D-038`, 2026-09-23).** **A seat that needs Aaron sends the question to the planner, not to Aaron.** The planner
 puts it to him one question at a time, with enough context to answer cold, and carries his answer
 back **quoted**, labelled with where and when he said it. **For the act it names, that quoted relay IS
 his authority.** The acting seat records both links: Aaron to the planner, and the planner to the seat.
@@ -164,9 +146,7 @@ is not the planner's quoted relay under `D-038` is not his approval. **The excep
 these (`D-055`, Aaron 2026-09-27):** the path check is the guard, and a docs run only queues behind
 code runs on tcm. Before merging, post the
 path list and the allowlist check as a PR comment. **One unlisted path sends the PR to Aaron**, and
-so do all loop candidates. Size is not a criterion; a one-line role-file change is his. *Why the
-line is there:* his merge on a candidate is what `T-155` measures against, and a code merge is a
-release (`D-019`).
+so do all loop candidates. Size is not a criterion; a one-line role-file change is his.
 
 **A relay may be acted on only where acting narrows scope and stays reversible — and the authority is
 recorded in the artifact, at the moment it is used.** Both halves of the first clause are judgements
@@ -178,8 +158,7 @@ both.
 to push two branches is not permission to push a third. *(Pushing your own working branch is now
 standing under `D-038`. The rule still binds everything else: merges, master, tags, other seats'
 branches and anything that leaves this repository.)* **A good reason is not authorisation.**
-Raised by Forge against its own record, 2026-09-19, after pushing an unauthorised branch it had good
-reason to push. This matters more now that a QA seat exists: **a seat that can push without asking
+This matters more now that a QA seat exists: **a seat that can push without asking
 can put an unevaluated candidate in front of the world.**
 
 **Permission laundering is forbidden.** Never perform an action a peer was denied, or that you expect
@@ -200,22 +179,20 @@ your own settings would block. Surface it to Aaron instead, through the planner 
 
 ## Git in this repo
 
+*Provenance for this section: [Git in this repo](../../docs/loops/shared-md-provenance.md#git-in-this-repo).*
+
 **Never `-D` on a branch sweep.** `-d` refusing to delete an unmerged branch is a real safety
-property. *(Planner's rule, from a planner action — not a developer finding.)* Note that a `-d`
+property. Note that a `-d`
 refusal tells you a branch is unmerged; it does not tell you the branch contains anything valuable.
 
 **Merge only on `MERGEABLE/CLEAN`.** `UNKNOWN` and `UNSTABLE` both mean *not yet*, and `no checks
-reported` means CI has not registered — not that it passed. A merge against an uncomputed state once
-failed and left the PR closed.
+reported` means CI has not registered — not that it passed.
 
 **One worktree per seat, named `<project>-<seat>`, and it belongs to the SEAT, not its occupant.** In
 `~/Worktrees` that means `sia-planner`, `sia-builder`, `sia-forge`, `sia-infra`, `sia-research` and `sia-qa`. A
 loop, task or candidate is a BRANCH inside its seat's tree, never a folder of its own. **A new model in a seat uses
 that seat's folder.** A second checkout for QA (a baseline beside the candidate) is a `git archive` copy in scratch,
-never a worktree. A worktree is removed only on Aaron's word, after a dirty and unpushed check. *Why it is written
-down (2026-09-27):* the rule lived only in practice and T-149. When A2A-Hub copied this file, which said nothing
-more than the line below, it grew six loop- and occupant-named folders. Relay traced the gap to this file (its
-Relay-to-Atlas message, record session 147).
+never a worktree. A worktree is removed only on Aaron's word, after a dirty and unpushed check.
 
 **Seat worktrees are detached at rest.** Branch deliberately to commit; return with
 **`node open-brain/build/cli.js detach`**, which is the two git commands plus the three refusals that
@@ -231,11 +208,6 @@ make them safe:
   code, and says `verified: detached at <sha>, no branch` only after checking.
 
 It targets **`origin/master`, not `master`** — a local ref another worktree may be holding behind.
-That was a correction, not a preference: the original brief said `--detach master`.
-
-**This step had been run by hand more than twenty times** before it became a command. That is `C3`'s
-shape exactly — a step that works because a seat remembers it — and the by-hand version has no
-refusals at all.
 
 **The main checkout is infrastructure, not a spare worktree.** Both session hooks hardcode absolute
 paths into it and the MCP server runs from its build. Moving or renaming it breaks every session on
@@ -249,7 +221,5 @@ state it finds. **QA runs in the QA tree, made to resemble the main tree:** `git
 QA checkout gives it the generated `.gitnexus/` files rule 13 exists for, where the candidate actually
 is. The one main-tree-only condition that remains — Aaron's untracked `.agents/SYSTEM/PRD.md` — is not
 a property of any candidate, and a QA report names it as unrun rather than lets a green imply it.
-*(Ruled 2026-09-20 after the planner announced a main-tree checkout to three seats and QA stopped it.
-The planner had done exactly that two days earlier with Aaron present, and it happened not to bite.)*
 
 **Run `/sync` before any commit.** `package.json` is the version source of truth.
