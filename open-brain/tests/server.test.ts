@@ -87,6 +87,34 @@ describe("server handlers", () => {
     });
 
     /**
+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in
+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made
+     * to run here (a proven session id with .agents/SESSIONS, and a home that has
+     * .claude/projects), so each line must say 0 rather than "not searched/scanned".
+     */
+    it("prints both T-048 scan counts at zero when both scans ran and found nothing unreadable", async () => {
+      proseProject(tmp);
+      const home = mkdtempSync(join(tmpdir(), "t230-home-"));
+      mkdirSync(join(home, ".claude", "projects", "some-project"), { recursive: true });
+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+      process.env.HOME = home;
+      process.env.USERPROFILE = home;
+      try {
+        proveOwn("t230-uuid");
+        await handleSetSession({ session_id: "t230-uuid", project_dir: tmp });
+        const text = getText(await handleStart({ project_root: tmp }));
+        expect(text).toContain("\nSession logs unreadable: 0\n");
+        expect(text).toContain("\nTranscript directories unreadable: 0\n");
+      } finally {
+        for (const [k, v] of Object.entries(saved)) {
+          if (v === undefined) delete process.env[k];
+          else process.env[k] = v;
+        }
+        rmSync(home, { recursive: true, force: true });
+      }
+    });
+
+    /**
      * Loop 1 (ADR-023): ob_start used to compute the state and then report
      * "SUMMARY loaded" — the content never left the pipeline. This pins the
      * shape that replaced it: full file text under per-file headers, drift as
