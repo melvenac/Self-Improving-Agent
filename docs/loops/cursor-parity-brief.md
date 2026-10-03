@@ -29,15 +29,23 @@ seats that use it. What we know already (planner reads, 2026-10-03):
   in context-mode's preToolUse hook (`~/.claude/plugins`, context-mode 1.0.169) with
   "syntax error near unexpected token `&'" when `agent` was started from Git Bash (`SHELL=bash`); starting
   it from **PowerShell** is the workaround. That is T-046, live. Record which shell each measurement used.
-- The hub is strict for new names: a name needs a one-time enrollment code, then
-  `hub-talk --as <name> --init-key --invite <code>`. **The QA PC holds no `cursor-builder` key**; Aaron
-  issues the code. Never copy a key file between machines.
+- **Launch Cursor as `cursor-agent`, never bare `agent`** (clark, 2026-10-03). On the desktop a bare
+  `agent` in PowerShell runs **Grok's** CLI (`~/.grok/bin/agent.exe` is ahead of Cursor on PATH). On the QA PC
+  `agent` happens to resolve to Cursor today; use `cursor-agent` there too, so there is one rule.
+- The hub is strict for new names: a NEW name needs a one-time enrollment code, then
+  `hub-talk --as <name> --init-key --invite <code>`. **`cursor-builder` is not new** (it exists on the hub,
+  owned by aaron), so a code cannot register it. Instead (option A, chosen by the planner, approved by Aaron
+  via clark): Relay moves the desktop `cursor-builder.key` to the QA PC, and the seat's first hub call is
+  `hub-talk --as cursor-builder --rotate-key`, which kills the desktop copy. No other key moves between machines.
 
 ## Phase 0: the QA PC (before the audit)
 
-Aaron's acts, not the seat's: start `agent` from PowerShell; run `node scripts/setup.mjs` in the QA PC serving
-tree (it writes `~/.cursor` and rebuilds open-brain at the same commit); enroll `cursor-builder` on the hub.
-The seat then records the before/after of `~/.cursor` (names only) as the audit's first rows.
+1. Aaron starts `cursor-agent` **from PowerShell** in the QA PC `sia-builder` checkout.
+2. setup.mjs in the QA PC serving tree. **Done 2026-10-03** by clark at 842e4692 (after #354 fixed the
+   `%20` repo-root bug); read back by the planner by SSH.
+3. The `cursor-builder` key is moved by Relay; the seat runs `--rotate-key` once.
+
+The seat then records the state of `~/.cursor` (names only) as the audit's first rows.
 
 ## Phase 1: measure (deliverable: one docs-only PR)
 
