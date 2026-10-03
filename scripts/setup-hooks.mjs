@@ -13,6 +13,7 @@
  * event is now checked on its own.
  */
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export const SESSION_HOOKS = [
   ['SessionStart', 'cli-bootstrap.js'],
@@ -70,4 +71,14 @@ export function withSessionHooks(settings, openBrainDir) {
   drop('SessionEnd', 'knowledge-mcp', 'knowledge-mcp SessionEnd');
 
   return { settings: s, changed: JSON.stringify(s) !== before, notes };
+}
+
+/**
+ * The repo root for a script at `<root>/scripts/<file>`, from its import.meta.url.
+ * T-235 Phase 0: a URL's pathname keeps percent-encoding, so a home directory with a
+ * space (the QA PC's "Aaron Melven") became "Aaron%20Melven", open-brain/ was "not
+ * found", and setup.mjs refused to run.
+ */
+export function repoRootFrom(metaUrl) {
+  return path.resolve(path.dirname(fileURLToPath(metaUrl)), '..');
 }
