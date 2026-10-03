@@ -8,7 +8,7 @@
  * outside it is the project's own prose and is preserved byte for byte.
  */
 import type { State, Task, Handoff } from "../../shared/state-schema.js";
-import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, compareFirstRev, questionText, questionResolvedBy } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, compareFirstRev, questionText, questionResolvedBy, watchText } from "../../shared/state-schema.js";
 
 export interface ViewOptions {
   version: string;
@@ -159,7 +159,7 @@ export function renderNextSession(state: State, o: ViewOptions): string {
       lines.push("### Pick up here", "", h.pick_up || "_Nothing recorded._", "");
       lines.push("### Watch out", "");
       if (h.watch_out.length === 0) lines.push("_Nothing flagged._");
-      for (const w of h.watch_out) lines.push(`- ${w}`);
+      for (const w of h.watch_out) lines.push(`- ${watchText(w)}`);
       lines.push("", "### Open questions", "");
       if (h.open_questions.length === 0) lines.push("_None._");
       // The view is the record: a resolved question stays listed here, marked. Only the greeting omits it.
