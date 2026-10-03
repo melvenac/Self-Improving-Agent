@@ -1,12 +1,12 @@
-<!-- generated from .agents/state.json rev 305 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 307 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 158)_
+## planner [sia-planner] _(written session 159)_
 
 ### Pick up here
 
-Planner session 158, ~23:0xZ 2026-10-02. T-233 CODE IS MERGED (D-114: #343-#346 on Aaron's word after QA 263 ACCEPT; master 8df2abcf; master push CI was in progress at writing, so check it). T-233 stays OPEN until DEPLOYED and SERVED: (1) update the desktop and QA PC serving trees to master and read back HEAD + build SHA (Aaron's act, or clark's on his word; the planner reads by SSH only); (2) set usage_file: per seat; (3) a fresh-session /start on each machine shows the serving line first and a real Usage line. Then retire the /START AUDIT GAPS watch-out. T-234 (P2) carries QA 263's F1-F7 test gaps. D-110's queue (T-191 is now largely done by T-233; re-read before dispatching) stays HELD under the weekly hold (97% at 22:2xZ; Aaron's lift covered T-233 only). Seats: sia-forge parked after T-233 (its handoff docs/loops/t233-developer-handoff.md is merged); sia-builder free. Hourly status to clark is dropped (D-113), but a status prompt still fired at 22:22Z from an unknown source; that question is open with Aaron.
+Planner session 159. Next: rule T-235 Phase 1 round 2 when sia-builder (Cursor, QA PC) posts it (hub room k57098ep, turns 80-81 unread as of 07:0xZ), then dispatch the ruled Phase 2 fixes; review T-234 PR A then B from sia-forge (Cursor, desktop, hub grok, turns 239-241 UNREAD: it needs Aaron's nudge prompt) and book a non-Composer QA for both. T-236 is open (greeting budget + FOCUS), not dispatched. Dev work is unparked, usage GREEN.
 
 ### Watch out
 
@@ -17,30 +17,32 @@ Planner session 158, ~23:0xZ 2026-10-02. T-233 CODE IS MERGED (D-114: #343-#346 
 - STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).
 - QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).
 - RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.
-- REPORTING TO CLARK (D-113, Aaron 2026-10-02 ~21:45Z, AMENDS D-077): the hourly status cadence is DROPPED; create NO status cron at /start. Message `clark` on EVENTS only: verdicts, merges (the one-line D-063 notice), blocks, READY TO ROLL, plus one line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner). Clark reads the dashboard's planner rows for status. If `clark` is not in ListAgents, skip the send. CARRY THIS ITEM FORWARD VERBATIM at every roll until T-233 removes status_cron from seat data.
+- REPORTING TO CLARK (D-113, Aaron 2026-10-02 ~21:45Z, AMENDS D-077): the hourly status cadence is DROPPED; create NO status cron at /start. Message `clark` on EVENTS only: verdicts, merges (the one-line D-063 notice), blocks, READY TO ROLL, plus one line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner). Clark reads the dashboard's planner rows for status. If `clark` is not in ListAgents, skip the send.
 - DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.
 - VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.
 - JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.
-- /START AUDIT GAPS (clark's HoH audits of sessions 156 and 158's starts, ~/Worktrees/hoh-startup-audit.md; do NOT repeat; CARRY VERBATIM AT EVERY ROLL until T-233 ships AND is served on every machine, then retire it): (0) CHECK THE SERVING TREE FIRST: ~/Projects/Self-Improving-Agent's HEAD vs origin/master on THIS machine (it was 599 behind on the desktop and 429 on the QA PC on 2026-10-02, which is why most items below regressed). If it is behind, say so on the first line and ask Aaron to update it. (1) NO status cron (D-113 dropped D-077's cadence; amended at rev 297). (2) The session number is the RECORD's next session (last n + 1), not ob_start's per-checkout 'Session #N' (T-164; state it yourself if the serving build is stale, T-172). (3) 'Latest brief' is the newest *brief* by DATE (ls -t docs/loops/*brief*), not by loop number or sort -V; a developer handoff is not a brief (T-210). (4) Read C:\Users\melve\slots.json usageLevel at /start (home root, NOT ~/Worktrees; also the dashboard slots panel; live numbers are quota.claude in http://100.124.212.87:4100/api/sessions) and state the level in the OBJECTIVE line — e.g. RED + weekly 95% means the dispatch is held. (5) git fetch BEFORE the greeting when the tree is behind origin/master. (6) Do not print answered open questions. (7) Do every residual read, including .agents/SYSTEM/domains.json. (8) Count gaps from state.json gaps[], not a truncated render. (9) ob_start returns ~50 KB here (T-183): extract the State block to the scratchpad and read it in parts.
+- CURSOR SEATS (session 159): talk only via the hub; launch as `cursor-agent`, never bare `agent` (desktop resolves Grok's CLI); every work reply starts with a TASK: line (#362); a Cursor seat that ran /start may still not have read its room (check /a2a/session/<room>/reads before assuming it saw a turn). The QA PC sia-builder checkout is the Cursor seat's; the old Claude Code builder there is closed.
 
 ### Open questions
 
-_None._
+- Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand on the QA PC, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.
+- Retire the dormant hub name `forge` (QA PC key valid, 39 unread)? The planner reads its 39 turns first; any retirement goes to Relay with Aaron's word (D-115).
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #358 — QA: not_required — T-235 Phase 1 audit (docs-only), round 2 owed by sia-builder; the planner rules it.
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Deploy T-233: update the desktop and QA PC serving trees to master 8df2abcf, and set usage_file: per seat?
-- A status prompt fired at 22:22Z after D-113 dropped the cadence; where is it from, and should it be removed or should D-113 be amended?
+- Recover killed session 5b3338ac / catch-up task?
+- Retire hub name forge after reading its 39 turns?
 
 **Rulings made mid-loop:** 
-- D-112 T-233 first loop
-- D-113 status cron dropped
-- D-114 T-233 batch merged
+- D-115 hub names
+- T-235 Phase 1 not accepted (round 2)
+- T-236 opened
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -112,7 +114,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_7 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_8 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
