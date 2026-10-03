@@ -13,12 +13,12 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { withSessionHooks } from './setup-hooks.mjs';
+import { withSessionHooks, repoRootFrom } from './setup-hooks.mjs';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
 const CURSOR_DIR = path.join(HOME, '.cursor');
-const REPO_ROOT = path.resolve(path.join(path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Z]:)/, '$1'), '..'));
+const REPO_ROOT = repoRootFrom(import.meta.url);
 const OPEN_BRAIN_DIR = path.join(REPO_ROOT, 'open-brain');
 const OPEN_BRAIN_SERVER = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
 const OPEN_BRAIN_BOOTSTRAP = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');

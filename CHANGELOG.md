@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- **`setup.mjs` refused to run from a path with a space (T-235 Phase 0).** It took the repo root from a URL pathname,
+  which keeps a space as `%20`, so on the QA PC (`C:\Users\Aaron Melven\…`) it reported "Cannot find open-brain/"
+  and wrote nothing. The root now comes from `fileURLToPath` (`repoRootFrom` in `scripts/setup-hooks.mjs`).
+
 ## [0.45.0] - 2026-10-02 — Loop 15 slices three and four, `/bootstrap`, the per-session record, and CI on tcm
 
 One release for everything since v0.44.2 (D-073, Aaron’s ruling on 2026-10-02). It folds in the three sections that were
