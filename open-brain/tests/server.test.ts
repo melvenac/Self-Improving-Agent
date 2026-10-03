@@ -394,6 +394,8 @@ describe("server handlers", () => {
         return out;
       };
       const perId = /retention KEPT done task/g;
+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.
+      const summaryLines = (out: string) => out.split("\n").filter((l) => l.startsWith("KEPT despite retention")).length;
       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.
       expect((await write("t232-a", 61)).match(perId)).toBeNull();
       expect((await write("t232-b", 62)).match(perId)).toBeNull();
@@ -401,9 +403,11 @@ describe("server handlers", () => {
       expect(crossing.match(perId)).toHaveLength(2);
       expect(crossing).toContain("NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md");
       expect(crossing).toContain("KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002");
+      expect(summaryLines(crossing)).toBe(1);
       // Retention changes nothing here: the summary line only, no per-id detail.
       const noop = await write("t232-d", 64);
       expect(noop).toContain("KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002");
+      expect(summaryLines(noop)).toBe(1);
       expect(noop.match(perId)).toBeNull();
     });
 

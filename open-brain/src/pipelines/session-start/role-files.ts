@@ -1,6 +1,7 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import type { AgentIdentity } from "./agent-identity.js";
 
 /**
@@ -264,6 +265,117 @@ function isBehindUpstream(projectRoot: string, rel: string): boolean {
   const there = git(projectRoot, ["rev-parse", `origin/master:${rel}`]);
   if (here === null || there === null) return false;
   return here !== there;
+}
+
+/**
+ * T-236 slice 1 (closes T-183): the role docs, printed in full only when their content changed since
+ * THIS seat last read them in THIS checkout; otherwise one line. Opt-in per repo (`role_docs_by_sha`
+ * in greeting.json); off, the output is exactly what it was before.
+ *
+ * ## Where the last read lives, and why
+ *
+ * `.agents/role-reads.local.json`, untracked (the `.agents` allowlist ignores it), keyed by seat. Per
+ * CHECKOUT by construction: every worktree has its own `.agents/`, so no two checkouts share it. Per
+ * SEAT by key: a checkout whose declared seat changes reads its rules again. It is never a file two
+ * seats share without keys.
+ *
+ * ## Fail toward reading
+ *
+ * A first read, an unknown seat, or a store that cannot be read prints in FULL: a seat that skipped
+ * its rules because an instrument said it had read them is the PRD-unread failure. The read is
+ * recorded only for text that was actually printed, by the caller, after it is in the output
+ * (`recordRoleReads`); describing or measuring the greeting never records.
+ */
+export const ROLE_READS_REL = ".agents/role-reads.local.json";
+
+/** git's blob id of the content: equal to `git rev-parse HEAD:<path>` when the working copy is clean. */
+export function blobSha(content: string): string {
+  const body = Buffer.from(content, "utf8");
+  return createHash("sha1").update(Buffer.concat([Buffer.from(`blob ${body.length}\0`), body])).digest("hex");
+}
+
+/** The store key for a seat, or null when there is no seat to remember a read for. */
+export function roleReadsKey(seat: AgentIdentity | null): string | null {
+  if (!seat || seat.role === NOT_A_SEAT) return null;
+  return `${seat.name}/${seat.role}`;
+}
+
+type RoleReads = Record<string, Record<string, { sha: string; read_at: string }>>;
+
+function readRoleReads(projectRoot: string): { ok: true; seats: RoleReads } | { ok: false; reason: string } {
+  const abs = join(projectRoot, ROLE_READS_REL);
+  if (!existsSync(abs)) return { ok: true, seats: {} };
+  let data: unknown;
+  try {
+    data = JSON.parse(readFileSync(abs, "utf8"));
+  } catch (err) {
+    return { ok: false, reason: `${ROLE_READS_REL} unreadable (${(err as Error).message})` };
+  }
+  const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+  if (!isObj(data) || !isObj(data.seats)) return { ok: false, reason: `${ROLE_READS_REL} has no seats object` };
+  for (const reads of Object.values(data.seats)) {
+    if (!isObj(reads)) return { ok: false, reason: `${ROLE_READS_REL} has a malformed seat entry` };
+    for (const r of Object.values(reads)) {
+      if (!isObj(r) || typeof r.sha !== "string" || typeof r.read_at !== "string") {
+        return { ok: false, reason: `${ROLE_READS_REL} has a malformed read entry` };
+      }
+    }
+  }
+  return { ok: true, seats: data.seats as RoleReads };
+}
+
+export interface RoleDocsRender {
+  lines: string[];
+  /** What this render printed in full, with the sha it printed: the only reads the caller may record. */
+  printedFull: Array<{ rel: string; sha: string }>;
+}
+
+export function renderRoleDocs(projectRoot: string, files: RoleFileReport[], seat: AgentIdentity | null, bySha: boolean): RoleDocsRender {
+  const lines: string[] = [];
+  const printedFull: RoleDocsRender["printedFull"] = [];
+  const key = bySha ? roleReadsKey(seat) : null;
+  const store = bySha && key !== null ? readRoleReads(projectRoot) : null;
+  if (bySha && key === null) lines.push(`\n(Role docs in full: no seat resolved, so there is no last read to compare with.)`);
+  if (store && !store.ok) lines.push(`\n(Role docs in full: ${store.reason}.)`);
+  const mine = store?.ok && key !== null ? store.seats[key] ?? {} : null;
+  for (const f of files) {
+    if (f.content === null) continue;
+    const sha = blobSha(f.content);
+    const last = mine?.[f.rel];
+    if (last && last.sha === sha) {
+      lines.push(`\n${f.rel} @ ${sha.slice(0, 12)} (unchanged since your last read: ${last.read_at})`);
+      continue;
+    }
+    lines.push(`\n## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}`);
+    lines.push(f.content.replace(/\s+$/, ""));
+    // Off, nothing is recordable: the repo did not opt in, so this render must leave no trace.
+    if (bySha) printedFull.push({ rel: f.rel, sha });
+  }
+  return { lines, printedFull };
+}
+
+/**
+ * Records `printed` as this seat's last read. Call it only with a render's `printedFull`, after those
+ * lines are in the output. Returns a line to print when the record could not be written (the next
+ * /start then prints in full again, which is the safe direction), else null. An unreadable store is
+ * replaced: keeping it would print every doc in full forever, and its other seats read again once.
+ */
+export function recordRoleReads(projectRoot: string, seat: AgentIdentity | null, printed: RoleDocsRender["printedFull"], now: Date): string | null {
+  const key = roleReadsKey(seat);
+  if (key === null || printed.length === 0) return null;
+  const existing = readRoleReads(projectRoot);
+  const seats: RoleReads = existing.ok ? existing.seats : {};
+  const reads = { ...(seats[key] ?? {}) };
+  for (const p of printed) reads[p.rel] = { sha: p.sha, read_at: now.toISOString().slice(0, 16).replace("T", " ") + "Z" };
+  seats[key] = reads;
+  const abs = join(projectRoot, ROLE_READS_REL);
+  try {
+    writeFileSync(`${abs}.tmp`, `${JSON.stringify({ seats }, null, 2)}\n`);
+    renameSync(`${abs}.tmp`, abs);
+    return null;
+  } catch (err) {
+    return `(Role docs: the last read could not be recorded, so they print in full next time: ${(err as Error).message})`;
+  }
 }
 
 /** execFileSync with an args array: no shell, so `HEAD:path` reaches git verbatim. */

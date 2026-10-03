@@ -1,12 +1,12 @@
-<!-- generated from .agents/state.json rev 314 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 318 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 159)_
+## planner [sia-planner] _(written session 160)_
 
 ### Pick up here
 
-Planner session 159. Next: rule T-235 Phase 1 round 2 when sia-builder (Cursor, QA PC) posts it (hub room k57098ep, turns 80-81 unread as of 07:0xZ), then dispatch the ruled Phase 2 fixes; review T-234 PR A then B from sia-forge (Cursor, desktop, hub grok, turns 239-241 UNREAD: it needs Aaron's nudge prompt) and book a non-Composer QA for both. T-236 is open (greeting budget + FOCUS), not dispatched. Dev work is unparked, usage GREEN.
+Planner session 160. QA 267 dispatch is on PR #395 (docs-only; the classifier refused the planner's self-merge, so Aaron merges it). Once merged, send clark the prompt path docs/loops/qa-267-headless-prompt.md and DISPATCH_SHA = the merge commit. On the verdict, ask Aaron once for the batch #387 9d1ed0c5, #388 913a5a43, #391 b2096051, #393 4020a42b; greeting.json conflicts by one line at #393 (sorted keys). Then dispatch T-236 item (c) FOCUS/SEATS.
 
 ### Watch out
 
@@ -14,35 +14,39 @@ Planner session 159. Next: rule T-235 Phase 1 round 2 when sia-builder (Cursor, 
 - BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.
 - A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`. '=' commits plus a trivial conflict line may go on as reviewed (#294, #302 did); anything else gets a narrow re-QA. A moved head needs a fresh approval if Aaron's word pinned the old SHA (#295 now).
 - CI (T-227, #310): GitHub-hosted ubuntu-latest, fetch-depth 0, a few minutes per run; push runs ONLY on master; a branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is an opt-in (tcm=true).
-- STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).
-- QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).
+- STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule). SESSION 160: the auto-mode classifier refused the planner's self-merge of #395 as [Self-Approval]; do not route around it, ask Aaron.
+- QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2). Session 160: a sed edit of the helper missed the regex line and passed every message check; test the refusal of the OLD prefix, and never test the success path against origin.
 - RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.
 - REPORTING TO CLARK (D-113, Aaron 2026-10-02 ~21:45Z, AMENDS D-077): the hourly status cadence is DROPPED; create NO status cron at /start. Message `clark` on EVENTS only: verdicts, merges (the one-line D-063 notice), blocks, READY TO ROLL, plus one line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\Users\melve\Worktrees\hoh-checklist.md, read-only for the planner). Clark reads the dashboard's planner rows for status. If `clark` is not in ListAgents, skip the send.
 - DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.
 - VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.
 - JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.
-- CURSOR SEATS (session 159): talk only via the hub; launch as `cursor-agent`, never bare `agent` (desktop resolves Grok's CLI); every work reply starts with a TASK: line (#362); a Cursor seat that ran /start may still not have read its room (check /a2a/session/<room>/reads before assuming it saw a turn). The QA PC sia-builder checkout is the Cursor seat's; the old Claude Code builder there is closed.
+- DEV SEATS ARE CLAUDE CODE (Aaron via clark, 2026-10-03 ~04:0x CDT): until the A2A hub and waker are proven with Loop 8b, SIA devs run as CC Sonnet seats reached by native SendMessage (sia-infra-1d on the desktop; sia-forge and sia-builder [67472b] on the QA PC over Remote Control, where delivery is unconfirmed until they ack); Cursor seats are parked (handoffs #368-#370). Builds are Sonnet, so QA is Opus on Plumb (builder != judge), launched by clark from a dispatch the planner merges. Run `setup.mjs` live checks yourself under a scratch HOME (QA's permission layer refuses them; see docs/loops/qa-264-row7c-planner.md).
 
 ### Open questions
 
-- Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand on the QA PC, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.
+- Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.
 - Retire the dormant hub name `forge` (QA PC key valid, 39 unread)? The planner reads its 39 turns first; any retirement goes to Relay with Aaron's word (D-115).
 
 ### Loop state
 
 **Open PRs:** 
-- #358 — QA: not_required — T-235 Phase 1 audit (docs-only), round 2 owed by sia-builder; the planner rules it.
+- #395 — QA: not_started — QA 267 dispatch, docs-only, CLEAN; awaiting Aaron's merge (classifier refused self-merge)
+- #387 — QA: not_started — T-232 follow-up, test-only, 9d1ed0c5, QA 267
+- #388 — QA: not_started — T-229 follow-up, test-only, 913a5a43, QA 267
+- #391 — QA: not_started — T-236 slice 1, b2096051, QA 267
+- #393 — QA: not_started — T-236 slice 2, 4020a42b (handoff_caps false per ruling), QA 267
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- Merge #395 (QA 267 dispatch, docs-only)?
 - Recover killed session 5b3338ac / catch-up task?
-- Retire hub name forge after reading its 39 turns?
 
 **Rulings made mid-loop:** 
-- D-115 hub names
-- T-235 Phase 1 not accepted (round 2)
-- T-236 opened
+- #376 merged, T-203 closed (rev 316)
+- T-236 slice 2 ruled: handoff_caps OFF, briefing_budget ON (rev 317); #393 head 4020a42b verified to carry it
+- QA 267 booked for #387, #388, #391, #393
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -118,4 +122,4 @@ _8 older handoff(s), superseded within their seat and checkout, are in state.jso
 
 ## Last session
 
-Session 159 — 2026-10-03 — planner [sia-planner] — `e05907a8-86cf-436b-bee3-ce6f2214e02e` (12 writing session(s) in the record)
+Session 160 — 2026-10-03 — planner [sia-planner] — `766a2128-4c5f-4b3f-93b7-3f9a88c1e594` (12 writing session(s) in the record)
