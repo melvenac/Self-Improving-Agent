@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 299 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 300 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
 Legend: `[ ]` open · `[~]` in_progress · `[!]` blocked
 
-Titles only. Full rationale for a task is its `note` in `.agents/state.json` under `tasks[]` — read it when you work the task, not when you pick one.
+Titles only. Full rationale for a task is its `note` in `.agents/state.json` under `tasks[]` — read it before you rule on, work or retire a task, not when you merely pick one.
 
 ## P0
 
