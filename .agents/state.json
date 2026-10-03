@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 301,
+  "revision": 302,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1436,7 +1436,7 @@
       "opened_session": 159,
       "closed_session": null,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03).",
+      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03). — Session 159 PHASE 0 PROGRESS: the seat is on the QA PC, not the desktop (brief corrected #353). Split agreed by clark with Relay: T-235 owns QA PC Cursor setup; Relay owns hub-talk, codes and rooms; the planner owns hub-partner-seats.json. setup.mjs failed on the QA PC ('Cannot find open-brain/': URL pathname kept the space in 'Aaron Melven' as %20); fixed by #354 (merge 842e4692, red-first test, Aaron's 'Merge #354' via clark). Clark moved the QA PC serving tree to 842e4692, rebuilt and reran setup; the planner read back by SSH: hooks.json sessionStart --ide cursor, mcp.json server path, 4 commands. Still to do: Aaron relaunches agent from PowerShell (Relay: Git Bash start triggers T-046); cursor-builder key move desktop->QA PC then --rotate-key (option A, chosen by the planner; the name already exists on the hub, so a code cannot be used), on Aaron's word to Relay. Aaron skipped renaming the QA PC profile, so further space bugs are fixed as found.",
       "note_by": [
         "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
@@ -4564,7 +4564,7 @@
     },
     {
       "n": 159,
-      "date": "2026-10-02",
+      "date": "2026-10-03",
       "uuid": "e05907a8-86cf-436b-bee3-ce6f2214e02e",
       "seat": "planner",
       "checkout": "sia-planner",
