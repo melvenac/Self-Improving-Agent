@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import Database from "better-sqlite3";
 import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from "../../../src/db-v2.js";
-import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from "../../../src/pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved, readRecalledFile } from "../../../src/pipelines/session-end/recalled-ids.js";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const THIS_SESSION = "efcaeb75-f5d5-421f-a1e5-645f155c59e4";
 const OTHER_SESSION = "2fb67133-f85a-4c1d-9e30-000000000000";
@@ -262,5 +265,64 @@ describe("detectForeignWriter — T-050", () => {
   it("FW-6: the report carries no ids at all, so it cannot be mistaken for evidence of what was recalled", () => {
     const r = run(OURS, { "/p/.recalled-entries.json": fileFor(OTHER_SESSION, [1, 2]) });
     expect(JSON.stringify(r)).not.toMatch(/"ids"|"entries"/);
+  });
+});
+
+/**
+ * T-229 (QA 258, #299 row 8): the callers' readFile turned ANY error into "no file", so a path that could not be read
+ * (a directory, EACCES, EBUSY) printed "none present". Only ENOENT means absent; anything else is unreadable and the
+ * foreign-writer line says "not checked (<code>)". The resolver's own behaviour is unchanged: an unreadable file rates nothing.
+ */
+describe("T-229: an unreadable .recalled-entries.json is not an absent one", () => {
+  const throwing = (code: string) => (): string | null => {
+    throw Object.assign(new Error(`${code}: cannot read`), { code });
+  };
+
+  it.each(["EISDIR", "EACCES", "EBUSY"])("FW-7: %s is reported as not checked, with the path and the code, never 'none present'", (code) => {
+    const r = detectForeignWriter({ sessionId: THIS_SESSION, filePaths: ["/p/.recalled-entries.json"], readFile: throwing(code) });
+    expect(r.checked).toBe(true);
+    expect(r.unreadable).toEqual([{ path: "/p/.recalled-entries.json", code }]);
+    expect(formatForeignWriter(r)).toEqual([`  Foreign writer: not checked (/p/.recalled-entries.json: ${code})`]);
+  });
+
+  it("FW-8: an unreadable path beside a readable one reports both; neither hides the other", () => {
+    const own = "/b/.recalled-entries.json";
+    const r = detectForeignWriter({
+      sessionId: THIS_SESSION,
+      filePaths: ["/a/.recalled-entries.json", own],
+      readFile: (p) => (p === own ? fileFor(THIS_SESSION, [1]) : throwing("EBUSY")()),
+    });
+    expect(formatForeignWriter(r)).toEqual([
+      "  Foreign writer: not checked (/a/.recalled-entries.json: EBUSY)",
+      "  Foreign writer: none (1 file read, all name this session)",
+    ]);
+  });
+
+  it("FW-9: the resolver treats an unreadable file as nothing to rate and falls through to the next path, as before", () => {
+    const next = "/n/.recalled-entries.json";
+    const r = resolveRecalledIds({
+      db: makeDb(),
+      sessionId: THIS_SESSION,
+      filePaths: ["/a/.recalled-entries.json", next],
+      readFile: (p) => (p === next ? fileFor(THIS_SESSION, [42]) : throwing("EISDIR")()),
+    });
+    expect(r.ids).toEqual([42]);
+    expect(r.origin).toBe("file");
+    const none = resolveRecalledIds({ db: makeDb(), sessionId: THIS_SESSION, filePaths: ["/a/.recalled-entries.json"], readFile: throwing("EACCES") });
+    expect(none.ids).toEqual([]);
+    expect(none.origin).toBe("none");
+  });
+
+  it("readRecalledFile: ENOENT is absent (null); a directory throws EISDIR; a file is its text", () => {
+    const dir = mkdtempSync(join(tmpdir(), "t229-"));
+    try {
+      expect(readRecalledFile(join(dir, "missing.json"))).toBeNull();
+      mkdirSync(join(dir, "adir.json"));
+      expect(() => readRecalledFile(join(dir, "adir.json"))).toThrow(expect.objectContaining({ code: "EISDIR" }));
+      writeFileSync(join(dir, "real.json"), "{\"x\":1}");
+      expect(readRecalledFile(join(dir, "real.json"))).toBe("{\"x\":1}");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

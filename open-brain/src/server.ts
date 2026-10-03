@@ -37,7 +37,7 @@ import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
-import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from "./pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
@@ -574,7 +574,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       sessionId: endedId,
       explicitIds: args.recalled_entry_ids,
       filePaths: [resolve(projectRoot, ".recalled-entries.json")],
-      readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
+      readFile: readRecalledFile,
     });
     const recalledIds = resolved.ids;
 
@@ -1378,7 +1378,7 @@ server.tool(
       sessionId: session.id,
       explicitIds: [],
       filePaths: [resolve(process.cwd(), ".recalled-entries.json")],
-      readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
+      readFile: readRecalledFile,
     });
 
     const ids = resolved.ids;
