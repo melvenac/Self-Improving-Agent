@@ -1,6 +1,9 @@
 # T-235 brief: Cursor parity with Claude Code
 
-**Planner:** Atlas, session 159, 2026-10-03. **Seat:** sia-builder (Cursor Composer 2.5, hub name `cursor-builder`).
+**Planner:** Atlas, session 159, 2026-10-03. **Seat:** sia-builder (Cursor Composer 2.5, hub name `cursor-builder`)
+**on the QA PC** (DESKTOP-O4EGB1E): checkout `C:\Users\Aaron Melven\Worktrees\sia-builder`, A2A-Hub at
+`C:\Users\Aaron Melven\Projects\A2A-Hub`, serving tree `C:\Users\Aaron Melven\Projects\Self-Improving-Agent`.
+*(Corrected same session: the first version assumed the desktop. The user name has a space, so quote every path.)*
 **Authority:** Aaron in the planner's window, 2026-10-03: "We haven't focused on getting sia in cursor parity
 with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5."
 
@@ -19,7 +22,22 @@ seats that use it. What we know already (planner reads, 2026-10-03):
   (`open-brain/docs/cursor-windows-git-bash-hooks.md`, T-046). So some Claude-side hooks may already fire
   under Cursor, untagged, and some may fire twice. **Nobody has measured which, in the CLI.**
 - The QA PC had none of the Cursor wiring (no `~/.cursor/mcp.json`, `hooks.json` or commands) although its
-  serving tree is current. The desktop has it.
+  serving tree is current. The desktop has it. **T-235 owns the QA PC's Cursor setup** (split agreed by
+  clark with Relay, 2026-10-03; Relay owns hub-talk, hub codes and rooms).
+- From Relay (relayed by clark, not read by the planner): Git Bash cannot find `agent` on the QA PC because
+  the installer ships only `agent.cmd` (QA PC 2026.10.01-e373342, laptop 2026.09.28). Every tool call failed
+  in context-mode's preToolUse hook (`~/.claude/plugins`, context-mode 1.0.169) with
+  "syntax error near unexpected token `&'" when `agent` was started from Git Bash (`SHELL=bash`); starting
+  it from **PowerShell** is the workaround. That is T-046, live. Record which shell each measurement used.
+- The hub is strict for new names: a name needs a one-time enrollment code, then
+  `hub-talk --as <name> --init-key --invite <code>`. **The QA PC holds no `cursor-builder` key**; Aaron
+  issues the code. Never copy a key file between machines.
+
+## Phase 0: the QA PC (before the audit)
+
+Aaron's acts, not the seat's: start `agent` from PowerShell; run `node scripts/setup.mjs` in the QA PC serving
+tree (it writes `~/.cursor` and rebuilds open-brain at the same commit); enroll `cursor-builder` on the hub.
+The seat then records the before/after of `~/.cursor` (names only) as the audit's first rows.
 
 ## Phase 1: measure (deliverable: one docs-only PR)
 
@@ -59,12 +77,13 @@ Only the fixes the planner rules in, one small PR each (or a ruled batch). Compo
   measure hooks, use a project-level `.cursor/hooks.json` in a scratch directory, or a scratch `HOME`/
   `USERPROFILE`. If a measurement truly needs the real file, ask on the hub first.
 - **Never copy secret values** (keys, tokens, env values) into docs or PRs (G-051). Names and shapes only.
-- **Do not touch `C:\Users\melve\Projects\Self-Improving-Agent`** (the serving checkout every session runs).
+- **Do not touch the serving checkout** (`~/Projects/Self-Improving-Agent`, which every session on the
+  machine runs), except Phase 0 above, which is Aaron's.
 - Branch from a fresh `origin/master`; push your branch and open the PR; **never merge, never push to master.**
 - `/sync` before any commit.
 - Talk to the planner only through the hub (room below). After every post, `--wait` and act on the exit code.
 
 ## Hub
 
-`HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as cursor-builder --session k57098epn7qz32vt0cazfjpbes8f6kdq`
+`HUB_URL=http://100.124.212.87:4000 node "C:/Users/Aaron Melven/Projects/A2A-Hub/scripts/hub-talk.mjs" --as cursor-builder --session k57098epn7qz32vt0cazfjpbes8f6kdq`
 plus `--inbox`, `--say "$(cat <file>)"`, or `--wait --wait-timeout 3500`. Exit codes: see `.cursor/rules/hub-room.mdc`.
