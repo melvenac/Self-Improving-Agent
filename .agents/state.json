@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 302,
+  "revision": 303,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4091,6 +4091,12 @@
       "title": "T-233 batch merged on Aaron's word: #343, #344, #345, #346 at the QA 263 heads",
       "date": "2026-10-02",
       "note": "QA 263 (Plumb, DISPATCH 3fe3a245, report qa/t233-report fe33a55a, read back by the planner) ACCEPTed all four and the batch, with 7 non-blocking findings. Aaron in AskUserQuestion in clark's window ~22:5xZ, recorded first-hand by clark (D-103 route): 'Merge all 4', in the order C, D, A, B. Merged by the planner, each pinned with --match-head-commit after re-checking head == pin, test SUCCESS and not DIRTY; A and B were retargeted to master first. #343 d010692c -> 8b7973cf; #344 8a827092 -> 8b4ed95b; #345 d20d4925 -> ef59dbd1; #346 724e31fe -> 8df2abcf. origin/master contains all four pins (merge-base checked)."
+    },
+    {
+      "id": "D-115",
+      "title": "Hub names: keep grok, cursor-builder, cursor-infra; every NEW hub enrollment uses the seat's name (sia-forge, sia-builder, ...)",
+      "date": "2026-10-03",
+      "note": "Aaron's ruling, relayed by clark from clark's window (D-103 route), session 159. cursor-builder keeps its name (key moved desktop->QA PC by Relay on Aaron's approval; the seat runs --rotate-key). Any new enrollment from now on is named after the seat checkout, not the vendor or model. Dormant `forge` (owned, QA PC key valid, 39 unread, unused since 2026-09-30) is NOT retired: the planner reads its 39 turns first, then any 'retire forge' goes to Relay with Aaron's word. Next edit of .agents/SYSTEM/hub-partner-seats.json should carry this rule in its description."
     }
   ],
   "handoffs": [
