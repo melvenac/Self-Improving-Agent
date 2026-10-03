@@ -23,7 +23,8 @@ import {
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
-import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
+import { describeRoleFiles, renderRoleDocs, recordRoleReads } from "./pipelines/session-start/role-files.js";
+import { greetingFlag } from "./pipelines/session-start/greeting-flags.js";
 import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
@@ -417,12 +418,12 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
 
     // The role knowledge itself, last: it is reference material the seat reads
     // once and refers back to, not a briefing it reads top to bottom.
-    for (const f of roles.files) {
-      if (f.content === null) continue;
-      lines.push(`
-## ${f.rel}${f.commit ? ` @ ${f.commit.slice(0, 7)}` : ""}`);
-      lines.push(f.content.replace(/\s+$/, ""));
-    }
+    // T-236: with role_docs_by_sha on, a doc this seat already read at this sha is one line. The
+    // read is recorded only after its full text is in `lines`, and only here.
+    const roleDocs = renderRoleDocs(projectRoot, roles.files, roles.seat, greetingFlag(projectRoot, "role_docs_by_sha"));
+    lines.push(...roleDocs.lines);
+    const unrecorded = recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
+    if (unrecorded) lines.push(`\n${unrecorded}`);
 
     // Total is of everything above it — the measurement Part 1 of the
     // evaluation asks for. Computed last so it counts the real return.
