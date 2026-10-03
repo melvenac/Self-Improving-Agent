@@ -3,10 +3,6 @@ import Database from 'better-sqlite3';
 import { initSchemaV2, indexKnowledge } from '../src/db-v2.js';
 import { recallRankExpr, LIFECYCLE_CONFIG, type Maturity } from '../src/lifecycle.js';
 
-// T-152 RED PROBE, reverted in the next commit: a deliberate type error the new CI step must catch.
-const t152RedProbe: number = 'not a number';
-void t152RedProbe;
-
 /**
  * Guards the ob_recall ranking contract. bm25() is negative and the query sorts
  * ASCENDING, so "ranks higher" means "sorts earlier".
