@@ -279,6 +279,17 @@ describe("checkMcpCommandPaths: .mcp.json and plugins (T-008b)", () => {
     const r = run();
     expect(r.severity, r.message).toBe("warn");
     expect(r.message).toContain("settings unreadable, plugins not examined");
+    // QA 262 R4-a (mutant B, `settingsAbsent = !settings.ok`): unreadable is not absent, so no absence note beside the warning.
+    expect(r.message).not.toContain("settings.json absent");
+  });
+
+  it("G': a settings.json that is a DIRECTORY is WARN, plugins not examined, and carries no absence note either", () => {
+    writeFileSync(join(home, ".claude.json"), JSON.stringify({ mcpServers: { good: { command: onPath("goodserver") } } }));
+    mkdirSync(join(home, ".claude", "settings.json"), { recursive: true });
+    const r = run();
+    expect(r.severity, r.message).toBe("warn");
+    expect(r.message).toContain("settings unreadable, plugins not examined");
+    expect(r.message).not.toContain("settings.json absent");
   });
 
   it("an ABSENT ~/.claude/settings.json enables nothing and stays a pass, with the skip NAMED", () => {
@@ -318,5 +329,53 @@ describe("checkMcpCommandPaths: .mcp.json and plugins (T-008b)", () => {
     plugin("thing@market", { ".mcp.json": JSON.stringify({ mcpServers: { ok: { command: onPath("goodserver") } } }) });
     const r = run();
     expect(r.severity, r.message).toBe("pass");
+  });
+
+  // T-231 (QA 262 gap 4, from QA 260 gap 1): a CONTAINER of the wrong type beside a good server was dropped silently and the
+  // result passed. D-104 and D-106: an input that was not examined is never a pass. Each row has one good server that DOES
+  // resolve, so the only thing that can turn the result into a warn is the malformed container, and the message names it.
+  describe("a malformed container beside a good server is WARN, named (T-231)", () => {
+    const goodServers = () => ({ mcpServers: { good: { command: onPath("goodserver") } } });
+    const globalPath = () => join(home, ".claude.json");
+    const goodInCheckout = () => writeFileSync(join(repo, ".mcp.json"), JSON.stringify(goodServers()));
+
+    const cases: Array<[string, () => void, () => string]> = [
+      ["a project's mcpServers is a string", () => writeFileSync(globalPath(), JSON.stringify({ ...goodServers(), projects: { "/p": { mcpServers: "oops" } } })), () => "project /p: mcpServers is a string, not an object"],
+      ["a project entry is null", () => writeFileSync(globalPath(), JSON.stringify({ ...goodServers(), projects: { "/p": null } })), () => "project /p: entry is null, not an object"],
+      ["the global projects container is a string", () => writeFileSync(globalPath(), JSON.stringify({ ...goodServers(), projects: "oops" })), () => "global: projects is a string, not an object"],
+      ["the global mcpServers is an array", () => { goodInCheckout(); writeFileSync(globalPath(), JSON.stringify({ mcpServers: ["x"] })); }, () => "global: mcpServers is an array, not an object"],
+      ["the global mcpServers is null", () => { goodInCheckout(); writeFileSync(globalPath(), JSON.stringify({ mcpServers: null })); }, () => "global: mcpServers is null, not an object"],
+      ["~/.claude.json is an array", () => { goodInCheckout(); writeFileSync(globalPath(), "[1]"); }, () => `${globalPath()}: top level is an array, not an object`],
+      ["the checkout's .mcp.json is an array", () => writeFileSync(join(repo, ".mcp.json"), "[1,2]"), () => ".mcp.json: top level is an array, not an object"],
+      ["the checkout's .mcp.json is a scalar", () => writeFileSync(join(repo, ".mcp.json"), "5"), () => ".mcp.json: top level is a number, not an object"],
+      ["the checkout's .mcp.json mcpServers is a string", () => writeFileSync(join(repo, ".mcp.json"), JSON.stringify({ mcpServers: "oops" })), () => ".mcp.json: mcpServers is a string, not an object"],
+      ["a plugin manifest's mcpServers is a number", () => { plugin("thing@market", { ".claude-plugin/plugin.json": JSON.stringify({ name: "thing", mcpServers: 7 }) }); }, () => "plugin thing: mcpServers is a number, not an object"],
+      ["a plugin's root .mcp.json is an array", () => { plugin("thing@market", { ".mcp.json": "[1]" }); }, () => "plugin thing: .mcp.json top level is an array, not an object"],
+      ["settings.json enabledPlugins is an array", () => { mkdirSync(join(home, ".claude"), { recursive: true }); writeFileSync(join(home, ".claude", "settings.json"), JSON.stringify({ enabledPlugins: ["a@b"] })); }, () => "settings.json: enabledPlugins is an array, not an object"],
+    ];
+
+    it.each(cases)("%s", (_name, arrange, expected) => {
+      writeFileSync(globalPath(), JSON.stringify(goodServers()));
+      arrange();
+      const r = run();
+      expect(r.severity, r.message).toBe("warn");
+      expect(r.message).toContain(`not checked: `);
+      expect(r.message).toContain(expected());
+      expect(r.message).toContain("This is not a full pass.");
+    });
+
+    it("with a malformed container and NOTHING else checkable the result is SKIP, never a pass", () => {
+      writeFileSync(globalPath(), JSON.stringify({ projects: { "/p": { mcpServers: "oops" } } }));
+      const r = run();
+      expect(r.severity, r.message).toBe("skip");
+      expect(r.message).toContain("project /p: mcpServers is a string, not an object");
+    });
+
+    it("an ABSENT container is normal: no mcpServers key, no projects, no enabledPlugins says nothing and still passes", () => {
+      writeFileSync(globalPath(), JSON.stringify({ ...goodServers(), numStartups: 3 }));
+      const r = run();
+      expect(r.severity, r.message).toBe("pass");
+      expect(r.message).not.toContain("not checked");
+    });
   });
 });

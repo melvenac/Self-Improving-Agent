@@ -831,8 +831,33 @@ export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): str
 type McpServerDef = { command?: unknown; url?: unknown; type?: unknown };
 type McpSource = { scope: string; servers: Record<string, McpServerDef>; pluginRoot?: string };
 
-const asMcpServers = (v: unknown): Record<string, McpServerDef> =>
-  v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, McpServerDef>) : {};
+/** "an array", "null", "a string", "a number": how a malformed container is named in the not-checked note. */
+const typeName = (v: unknown): string => (v === null ? "null" : Array.isArray(v) ? "an array" : `a ${typeof v}`);
+const isPlainObject = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
+
+/**
+ * T-231 (QA 262 gap 4, QA 260 gap 1): a CONTAINER (an `mcpServers` value, `projects`, `enabledPlugins`, or the top level of a file)
+ * that is present but not an object is malformed input, not an empty one. Reading it with a plain object-or-{} fallback turned it into `{}`, so a
+ * wrong-typed container beside a good server passed silently. ABSENT (undefined) is normal and says nothing. Anything else that is
+ * not an object is recorded in `notChecked` (which caps the result at WARN, D-104/D-106), naming the subject and the type.
+ */
+function containerOf(v: unknown, subject: string, notChecked: string[]): Record<string, unknown> {
+  if (v === undefined) return {};
+  if (isPlainObject(v)) return v;
+  notChecked.push(`${subject} is ${typeName(v)}, not an object`);
+  return {};
+}
+
+/** The servers a `.mcp.json`-shaped file declares: under `mcpServers`, or (when that key is absent or null) the top-level map itself. */
+function serversOfMcpJson(value: unknown, subject: string, notChecked: string[]): Record<string, McpServerDef> {
+  if (!isPlainObject(value)) {
+    notChecked.push(`${subject} top level is ${typeName(value)}, not an object`);
+    return {};
+  }
+  const inner = value.mcpServers;
+  if (inner === undefined || inner === null) return value as Record<string, McpServerDef>;
+  return containerOf(inner, `${subject} mcpServers`, notChecked) as Record<string, McpServerDef>;
+}
 
 function readJsonFile(path: string): { ok: true; value: unknown } | { ok: false; cause: string } {
   try {
@@ -867,10 +892,18 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, 
   const globalPath = join(home, ".claude.json");
   const global = readJsonFile(globalPath);
   if (global.ok) {
-    const cfg = (global.value ?? {}) as { mcpServers?: unknown; projects?: unknown };
-    sources.push({ scope: "global", servers: asMcpServers(cfg.mcpServers) });
-    for (const [proj, v] of Object.entries(asMcpServers(cfg.projects))) {
-      sources.push({ scope: `project ${proj}`, servers: asMcpServers((v as { mcpServers?: unknown } | null)?.mcpServers) });
+    if (!isPlainObject(global.value)) {
+      notChecked.push(`${globalPath}: top level is ${typeName(global.value)}, not an object`);
+    } else {
+      const cfg = global.value;
+      sources.push({ scope: "global", servers: containerOf(cfg.mcpServers, "global: mcpServers", notChecked) as Record<string, McpServerDef> });
+      for (const [proj, v] of Object.entries(containerOf(cfg.projects, "global: projects", notChecked))) {
+        if (!isPlainObject(v)) {
+          notChecked.push(`project ${proj}: entry is ${typeName(v)}, not an object`);
+          continue;
+        }
+        sources.push({ scope: `project ${proj}`, servers: containerOf(v.mcpServers, `project ${proj}: mcpServers`, notChecked) as Record<string, McpServerDef> });
+      }
     }
   } else {
     notChecked.push(global.cause);
@@ -881,16 +914,18 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, 
     const mcpJson = join(projectRoot, ".mcp.json");
     if (existsSync(mcpJson)) {
       const r = readJsonFile(mcpJson);
-      if (r.ok) sources.push({ scope: ".mcp.json", servers: asMcpServers((r.value as { mcpServers?: unknown } | null)?.mcpServers ?? r.value) });
+      if (r.ok) sources.push({ scope: ".mcp.json", servers: serversOfMcpJson(r.value, ".mcp.json:", notChecked) });
       else notChecked.push(r.cause);
     }
   }
 
   // Enabled plugins.
   const settings = readJsonFile(join(home, ".claude", "settings.json"));
-  const enabled = settings.ok
-    ? Object.entries(asMcpServers((settings.value as { enabledPlugins?: unknown } | null)?.enabledPlugins)).filter(([, on]) => (on as unknown) === true).map(([k]) => k)
-    : [];
+  let enabled: string[] = [];
+  if (settings.ok) {
+    if (!isPlainObject(settings.value)) notChecked.push(`settings.json: top level is ${typeName(settings.value)}, not an object`);
+    else enabled = Object.entries(containerOf(settings.value.enabledPlugins, "settings.json: enabledPlugins", notChecked)).filter(([, on]) => on === true).map(([k]) => k);
+  }
   // Absent settings enable nothing, which is a normal state. Present but unreadable means no plugin
   // was examined: that is a gap, not an empty list (QA 256 G).
   if (!settings.ok && !settings.cause.endsWith("does not exist")) {
@@ -928,13 +963,12 @@ export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, 
             decl = undefined;
           }
         }
-        if (decl !== undefined && Object.keys(asMcpServers(decl)).length > 0) {
-          sources.push({ scope: label, servers: asMcpServers(decl), pluginRoot: installPath });
-        }
+        const declared = containerOf(decl, `${label}: mcpServers`, notChecked) as Record<string, McpServerDef>;
+        if (Object.keys(declared).length > 0) sources.push({ scope: label, servers: declared, pluginRoot: installPath });
       }
       if (dotMcp) {
         if (dotMcp.ok) {
-          sources.push({ scope: label, servers: asMcpServers((dotMcp.value as { mcpServers?: unknown } | null)?.mcpServers ?? dotMcp.value), pluginRoot: installPath });
+          sources.push({ scope: label, servers: serversOfMcpJson(dotMcp.value, `${label}: .mcp.json`, notChecked), pluginRoot: installPath });
         } else notChecked.push(`${label}: ${dotMcp.cause}`);
       }
     }
