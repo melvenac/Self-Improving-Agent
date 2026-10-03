@@ -10,12 +10,12 @@
  * Replaces open-brain/scripts/session-end-v2.mjs with compiled TypeScript.
  */
 
-import { existsSync, readFileSync } from "fs";
+import { existsSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
 import { openV2Database } from "./db-v2.js";
 import { formatSessionEndLines, sessionEndV2 } from "./pipelines/session-end/index-v2.js";
-import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from "./pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
 import { resolveSessionId } from "./shared/active-session.js";
@@ -124,7 +124,7 @@ try {
         join(projectDir, ".recalled-entries.json"),
         join(homedir(), ".claude", "context-mode", ".recalled-entries.json"),
       ],
-      readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
+      readFile: readRecalledFile,
     });
     const recalledIds = resolved.ids;
     // Loop 5 R3: this hook runs unattended, so it was the worst place for a

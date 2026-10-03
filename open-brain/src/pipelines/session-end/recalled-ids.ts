@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import type Database from "better-sqlite3";
 import { getSessionRecalledIds } from "../../db-v2.js";
 
@@ -72,13 +73,27 @@ export interface ResolveRecalledIdsInput {
   explicitIds?: number[];
   /** Candidate `.recalled-entries.json` paths, in priority order. */
   filePaths: string[];
-  /** Injected so tests never touch the real filesystem. */
+  /** Injected so tests never touch the real filesystem. Null means ABSENT; an unreadable path throws (see `readRecalledFile`). */
   readFile: (path: string) => string | null;
 }
 
 interface RecalledFile {
   session_id?: string | null;
   entries?: Array<{ id?: number }>;
+}
+
+/**
+ * T-229: the one reader every caller passes as `readFile`. Only ENOENT means absent (null). Any other error (EISDIR, EACCES,
+ * EBUSY, ENOTDIR) is rethrown, because the callers' own wrapper turned all of them into "no file" and the foreign-writer line
+ * then said "none present" for a path nobody could read.
+ */
+export function readRecalledFile(path: string): string | null {
+  try {
+    return readFileSync(path, "utf-8");
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw err;
+  }
 }
 
 export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsSource {
@@ -94,7 +109,13 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS
   }
 
   for (const path of filePaths) {
-    const raw = readFile(path);
+    // An unreadable file rates nothing, exactly as an absent one: only the foreign-writer line distinguishes them (T-229).
+    let raw: string | null;
+    try {
+      raw = readFile(path);
+    } catch {
+      continue;
+    }
     if (raw === null) continue;
 
     let parsed: RecalledFile;
@@ -203,6 +224,8 @@ export interface ForeignWriterReport {
   looked: number;
   /** Of those, files that existed and were read. */
   present: number;
+  /** T-229: paths that could not be read for a reason other than ENOENT. They are neither present nor absent. */
+  unreadable: { path: string; code: string }[];
   findings: ForeignWriterFinding[];
 }
 
@@ -213,12 +236,20 @@ export function detectForeignWriter(input: {
 }): ForeignWriterReport {
   const { sessionId, filePaths, readFile } = input;
   if (!sessionId) {
-    return { sessionId, checked: false, notChecked: "no session id, so no file can be called foreign", looked: filePaths.length, present: 0, findings: [] };
+    return { sessionId, checked: false, notChecked: "no session id, so no file can be called foreign", looked: filePaths.length, present: 0, unreadable: [], findings: [] };
   }
   const findings: ForeignWriterFinding[] = [];
+  const unreadable: { path: string; code: string }[] = [];
   let present = 0;
   for (const path of filePaths) {
-    const raw = readFile(path);
+    let raw: string | null;
+    try {
+      raw = readFile(path);
+    } catch (err) {
+      const e = err as { code?: unknown; message?: unknown };
+      unreadable.push({ path, code: typeof e.code === "string" ? e.code : String(e.message ?? err).split("\n")[0]! });
+      continue;
+    }
     if (raw === null) continue;
     present += 1;
     let parsed: { session_id?: unknown };
@@ -232,22 +263,23 @@ export function detectForeignWriter(input: {
     if (named === null) findings.push({ path, kind: "unattributed", fileSessionId: null });
     else if (named !== sessionId) findings.push({ path, kind: "foreign", fileSessionId: named });
   }
-  return { sessionId, checked: true, looked: filePaths.length, present, findings };
+  return { sessionId, checked: true, looked: filePaths.length, present, unreadable, findings };
 }
 
 /** One line per finding, or one line saying what was (or was not) looked at. Never empty: absent and zero differ. */
 export function formatForeignWriter(report: ForeignWriterReport, indent = "  "): string[] {
   if (!report.checked) return [`${indent}Foreign writer: not checked (${report.notChecked})`];
+  // T-229: a path that could not be read is NOT absent. It is named with its code, and "none present" is never printed beside it.
+  const unreadable = report.unreadable.map((u) => `${indent}Foreign writer: not checked (${u.path}: ${u.code})`);
   if (report.findings.length === 0) {
-    return report.present === 0
-      ? [`${indent}Foreign writer: none present (no .recalled-entries.json in ${report.looked} location(s))`]
-      : [`${indent}Foreign writer: none (${report.present} file${report.present === 1 ? "" : "s"} read, all name this session)`];
+    if (report.present === 0) return unreadable.length > 0 ? unreadable : [`${indent}Foreign writer: none present (no .recalled-entries.json in ${report.looked} location(s))`];
+    return [...unreadable, `${indent}Foreign writer: none (${report.present} file${report.present === 1 ? "" : "s"} read, all name this session)`];
   }
-  return report.findings.map((f) => {
+  return [...unreadable, ...report.findings.map((f) => {
     const what =
       f.kind === "foreign" ? `names session ${f.fileSessionId}, not ${report.sessionId}` : f.kind === "unattributed" ? "names no session" : "is not parseable JSON";
     return `${indent}Foreign writer: FOUND ${f.path} ${what} (reported, not refused; it played no part in which entries were rated)`;
-  });
+  })];
 }
 
 /**

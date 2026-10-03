@@ -470,6 +470,20 @@ describe("server handlers", () => {
       expect(text).toContain("Feedback: 0 entries rated");
     });
 
+    it("T-229: a directory at .recalled-entries.json is 'not checked (EISDIR)', never 'none present'", async () => {
+      writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "1.0.0" }));
+      mkdirSync(join(tmp, ".recalled-entries.json"));
+
+      proveOwn("t229-current");
+      const res = await handleEnd({ project_root: tmp, dry_run: true, session_id: "t229-current", session_summary: "unreadable recalled file" });
+
+      const text = getText(res);
+      expect(text).toContain("Foreign writer: not checked (");
+      expect(text).toContain(".recalled-entries.json: EISDIR)");
+      expect(text).not.toContain("Foreign writer: none present");
+      expect(text).toContain("Feedback: 0 entries rated");
+    });
+
     it("reports errors gracefully", async () => {
       // With recalled IDs but no DB, it should error gracefully
       const res = await handleEnd({
