@@ -73,6 +73,64 @@ export function withSessionHooks(settings, openBrainDir) {
   return { settings: s, changed: JSON.stringify(s) !== before, notes };
 }
 
+const fwd = (s) => String(s).replace(/\\/g, '/');
+
+/**
+ * T-235 P2-1: Cursor's open-brain MCP entry, with the ABSOLUTE path of the Node that
+ * ran setup as `command`. A bare `node` is resolved by whatever launches the server,
+ * and under cursor-agent that was a different Node (better-sqlite3 NODE_MODULE_VERSION
+ * 127 vs 137), so ob_* failed. An existing bare-`node` entry is upgraded.
+ *
+ * @returns {{ config: object, changed: boolean, notes: string[] }}
+ */
+export function withCursorMcp(config, serverPath, nodePath) {
+  const before = JSON.stringify(config ?? {});
+  const c = JSON.parse(before);
+  if (!c.mcpServers) c.mcpServers = {};
+  const existing = c.mcpServers['open-brain'];
+  // OPEN_BRAIN_IDE scopes this session's slot in active-session.json (see setup.mjs).
+  c.mcpServers['open-brain'] = {
+    ...(existing || {}),
+    command: nodePath,
+    args: [serverPath],
+    env: { ...(existing?.env || {}), OPEN_BRAIN_IDE: 'cursor' },
+  };
+  const changed = JSON.stringify(c) !== before;
+  const notes = [changed
+    ? (existing?.command === nodePath ? 'open-brain registered in ~/.cursor/mcp.json' : `open-brain registered in ~/.cursor/mcp.json (command ${nodePath})`)
+    : 'Cursor open-brain MCP already registered'];
+  return { config: c, changed, notes };
+}
+
+/**
+ * T-235 P2-1: the Cursor sessionStart hook command, with the absolute Node path.
+ * An earlier entry running the same bootstrap (untagged, or still on a bare `node`)
+ * is REPLACED, not left alongside: two entries would fire the hook twice.
+ *
+ * @returns {{ config: object, changed: boolean, notes: string[] }}
+ */
+export function withCursorSessionHook(config, bootstrapPath, nodePath) {
+  const before = JSON.stringify(config ?? { version: 1, hooks: {} });
+  const c = JSON.parse(before);
+  if (!c.hooks) c.hooks = {};
+  if (!Array.isArray(c.hooks.sessionStart)) c.hooks.sessionStart = [];
+  const command = `"${fwd(nodePath)}" "${fwd(bootstrapPath)}" --ide cursor`;
+  const notes = [];
+
+  const stale = c.hooks.sessionStart.filter((e) => e.command?.includes('cli-bootstrap.js') && e.command !== command);
+  if (stale.length > 0) {
+    c.hooks.sessionStart = c.hooks.sessionStart.filter((e) => !stale.includes(e));
+    notes.push(`Upgraded ${stale.length} stale Cursor sessionStart hook entry(ies)`);
+  }
+  if (!c.hooks.sessionStart.some((e) => e.command === command)) {
+    c.hooks.sessionStart.push({ command });
+    notes.push('Cursor sessionStart hook registered in ~/.cursor/hooks.json');
+  } else {
+    notes.push('Cursor sessionStart hook already configured');
+  }
+  return { config: c, changed: JSON.stringify(c) !== before, notes };
+}
+
 /**
  * The repo root for a script at `<root>/scripts/<file>`, from its import.meta.url.
  * T-235 Phase 0: a URL's pathname keeps percent-encoding, so a home directory with a
