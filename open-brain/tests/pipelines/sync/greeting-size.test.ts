@@ -223,7 +223,7 @@ describe("greeting-size — T-198 presence bound", () => {
     const withBlock = composeGreeting(seatFixture("with", "sia-planner", true), "0.0.0")!;
     const without = composeGreeting(seatFixture("none", "sia-planner", false), "0.0.0")!;
     expect(without.parts.presence).toBe(0);
-    for (const label of ["forge", "cursor-infra", "cursor-builder"]) {
+    for (const label of ["grok", "cursor-infra", "cursor-builder"]) {
       expect(withBlock.text).toContain(`  ${label}: listener not polling, 999 unread since 99d`);
     }
     expect(withBlock.parts.presence).toBeGreaterThan(150);

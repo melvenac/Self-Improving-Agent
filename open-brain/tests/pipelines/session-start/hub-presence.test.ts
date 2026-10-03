@@ -49,13 +49,13 @@ function fixtureFetch(body: unknown, status = 200): { fetchFn: typeof fetch; cal
   return { fetchFn, calls };
 }
 
-function roster(over: Partial<Record<"forge" | "cursor-infra" | "cursor-builder", unknown>> = {}) {
+function roster(over: Partial<Record<"grok" | "cursor-infra" | "cursor-builder", unknown>> = {}) {
   const room = (sessionId: string, extra: Record<string, unknown> = {}) => ({
     sessionId, unread: 0, pollingNow: false, pollAgeMs: 0, ...extra,
   });
   return {
     agents: [
-      { name: "forge", rooms: [over.forge ?? room(ATLAS_ROOM)] },
+      { name: "grok", rooms: [over.grok ?? room(ATLAS_ROOM)] },
       { name: "cursor-infra", rooms: [over["cursor-infra"] ?? room(INFRA_ROOM)] },
       { name: "cursor-builder", rooms: [over["cursor-builder"] ?? room(BUILDER_ROOM)] },
     ],
@@ -87,7 +87,7 @@ describe("T-198 hub presence at /start (r2)", () => {
     keyDir = mkdtempSync(join(tmpdir(), "t198-keys-"));
     useCheckout("sia-planner");
     writeKey("atlas", KEY);
-    writeKey("forge", KEY);
+    writeKey("grok", KEY);
   });
 
   afterEach(() => {
@@ -119,9 +119,9 @@ describe("T-198 hub presence at /start (r2)", () => {
   });
 
   it("PR-1 a seat with pollingNow true prints as LISTENER polling", async () => {
-    const { fetchFn } = fixtureFetch(roster({ forge: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 } }));
+    const { fetchFn } = fixtureFetch(roster({ grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 } }));
     const block = await describe_(fetchFn);
-    expect(block.lines.join("\n")).toContain("forge: listener polling");
+    expect(block.lines.join("\n")).toContain("grok: listener polling");
   });
 
   it("PR-2 a seat not polling prints the unread count and age, as a listener", async () => {
@@ -132,7 +132,7 @@ describe("T-198 hub presence at /start (r2)", () => {
 
   it("R1 wording: every partner line says listener or absent, none claims the seat read a turn, and the header says so", async () => {
     const { fetchFn } = fixtureFetch(roster({
-      forge: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1 },
+      grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1 },
       "cursor-infra": { sessionId: INFRA_ROOM, unread: 3, pollingNow: false, pollAgeMs: 270_000 },
     }));
     const block = await describe_(fetchFn);
@@ -207,7 +207,7 @@ describe("T-198 hub presence at /start (r2)", () => {
   it("PR-4 a partner absent from the roster prints as absent, not skipped", async () => {
     const { fetchFn } = fixtureFetch({ agents: [] });
     const block = await describe_(fetchFn);
-    expect(block.lines.join("\n")).toContain("forge: absent");
+    expect(block.lines.join("\n")).toContain("grok: absent");
     expect(formatPartnerLine({ label: "grok", hub_as: "grok", session_id: ATLAS_ROOM }, [] as PresenceAgent[])).toBe("grok: absent");
   });
 
@@ -245,16 +245,17 @@ describe("T-198 hub presence at /start (r2)", () => {
       expect(calls[0].headers["X-Agent-Key"]).not.toBe("dev-key");
     });
 
-    it("the key name is the MAPPED hub name of the checkout: sia-forge reads forge.key", async () => {
+    it("the key name is the MAPPED hub name of the checkout: sia-forge reads grok.key, not the identity's forge.key", async () => {
       useCheckout("sia-forge");
       writeKey("atlas", `atlas-${"a".repeat(40)}`);
+      writeKey("grok", `grok-${"g".repeat(40)}`);
       writeKey("forge", `forge-${"f".repeat(40)}`);
       const { fetchFn, calls } = fixtureFetch({ agents: [] });
       const block = await describeHubPresence({
         projectRoot: root, identity: forgeIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
       } as Parameters<typeof describeHubPresence>[0]);
       expect(calls).toHaveLength(1);
-      expect(calls[0].headers["X-Agent-Key"]).toBe(`forge-${"f".repeat(40)}`);
+      expect(calls[0].headers["X-Agent-Key"]).toBe(`grok-${"g".repeat(40)}`);
       expect(block.lines.join("\n")).toContain("Atlas: absent");
     });
 
@@ -287,16 +288,16 @@ describe("T-198 hub presence at /start (r2)", () => {
       expect(block.lines[0]).not.toContain("short-secret");
     });
 
-    it("an identity whose key file exists under another name does not fall back to it: forge has no key, grok.key is not borrowed", async () => {
+    it("a mapped seat whose key is missing does not fall back to the identity's key: no grok.key, forge.key is not borrowed", async () => {
       useCheckout("sia-forge");
-      rmSync(join(keyDir, HUB_ID, "forge.key"));
-      writeKey("grok", `grok-${"g".repeat(40)}`);
+      rmSync(join(keyDir, HUB_ID, "grok.key"));
+      writeKey("forge", `forge-${"f".repeat(40)}`);
       const { fetchFn, calls } = fixtureFetch({ agents: [] });
       const block = await describeHubPresence({
         projectRoot: root, identity: forgeIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
       } as Parameters<typeof describeHubPresence>[0]);
       expect(calls).toHaveLength(0);
-      expect(block.lines[0]).toMatch(/^presence: UNKNOWN \(no hub key for forge at /);
+      expect(block.lines[0]).toMatch(/^presence: UNKNOWN \(no hub key for grok at /);
     });
   });
 
@@ -317,13 +318,13 @@ partner: Atlas
     it.each([
       ["sia-builder", "cursor-builder", BUILDER_ROOM],
       ["sia-infra", "cursor-infra", INFRA_ROOM],
-      ["sia-forge", "forge", ATLAS_ROOM],
+      ["sia-forge", "grok", ATLAS_ROOM],
     ])("S-2 %s reads %s.key and that seat's readers row, though its AGENT.local.md says Forge / developer", async (checkout, hubName, room) => {
       useCheckout(checkout);
       writeAgent("Forge", "developer");
       const key = `${hubName}-${"k".repeat(40)}`;
       writeKey(hubName, key);
-      writeKey("grok", `grok-${"g".repeat(40)}`);
+      writeKey("forge", `forge-${"f".repeat(40)}`); // the identity-derived name: a decoy that must never be read
       const { fetchFn, calls } = fixtureFetch(atlasRow(room));
       const block = await describeHubPresence({
         projectRoot: root, identity: forgeIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,

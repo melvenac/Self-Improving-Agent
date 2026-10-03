@@ -35,7 +35,7 @@ describe("T-203 S-1: the map resolves a checkout to seat, role, agent and hub na
     ["sia-planner", "planner", "planner", "Atlas", "atlas"],
     ["sia-builder", "builder", "developer", "Builder", "cursor-builder"],
     ["sia-infra", "infra", "developer", "Infra", "cursor-infra"],
-    ["sia-forge", "forge", "developer", "Forge", "forge"],
+    ["sia-forge", "forge", "developer", "Forge", "grok"],
   ])("%s is seat %s / %s / %s with hub name %s", (name, seat, role, agent, hubName) => {
     const r = resolveCheckoutSeat(checkout(name));
     expect(r).toEqual({ kind: "seat", checkout: name, seat, role, agent, hubName });
