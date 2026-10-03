@@ -120,6 +120,7 @@ describe("describeLatestBrief — T-210", () => {
     "loop-9-brief-amendment-x.md",
     "followups-briefs.md",
     "notabrief.md",
+    "loop-9-brief.md.orig", // QA 263 F5: the name must END at .md; an unanchored end would take a backup copy
   ])("T233-C excluded: %s is not a brief, even when newer than one", (name) => {
     const root = repo();
     commit(root, "loop-1-brief.md", "2026-09-01T12:00:00+00:00");
