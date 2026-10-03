@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Role docs print in full only when they changed since this seat last read them (T-236 slice 1, closes T-183).**
+  Opt-in per repo: `"role_docs_by_sha": true` in the new tracked `.agents/SYSTEM/greeting.json` (absent file or key = off,
+  so a repo that does not opt in, A2A included, renders exactly as before). On, `ob_start` prints an unchanged doc as one
+  line, `<path> @ <sha> (unchanged since your last read: <when>)`. The last read is recorded per seat in the untracked
+  `.agents/role-reads.local.json`, only for text actually printed. A first read, an unknown seat or an unreadable record
+  prints in full.
+
 ### Fixed
 
 - **`setup.mjs` refused to run from a path with a space (T-235 Phase 0).** It took the repo root from a URL pathname,
