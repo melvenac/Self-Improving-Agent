@@ -69,7 +69,7 @@ do not assume.**
 spelled out for a missing file. An invalid `state.json` says so before falling back.
 
 **The briefing is rendered by `ob_start`, in code (T-233).** In the normal case the output ends its State content with a block that opens at the
-`## Briefing` line and closes at `## End Briefing`: usage, session line, drift, objective, next, pick-up, watch-outs, open questions, broken, working tree,
+`## Briefing` line and closes at `## End Briefing`: the serving-build line first, then usage, session line, drift, objective, next, pick-up, watch-outs, open questions, broken, working tree,
 latest brief and skills, all built from the record by one function that every runtime shares. Do not rebuild, reorder, summarise or trim it, and do not open
 `task.md`, `INBOX.md`, `SUMMARY.md` or `next-session.md` to fill a gap that is not there. Do not create a session log or reconcile drift yourself.
 
@@ -94,7 +94,7 @@ between seats is A2A (direct cross-session messages), which arrives on its own a
 
 **What a session start DOES need to read is the durable half, and it is in the repo:** the newest
 brief, which `ob_start` names for you on its `Latest brief: <path> (<date>)` line (the newest
-`*brief*.md` in `docs/loops/` by git commit date; do not pick one by loop number or by file name).
+brief in `docs/loops/`, a file named `*brief.md`, `*rebrief.md` or an `-amendment-N` of either, by git commit date; do not pick one by loop number or by file name).
 If that line is absent there is no brief to read. Read any boundary report the brief or the handoff
 names. Decisions live in `.agents/state.json` `decisions[]` and already reached you through `ob_start`.
 

@@ -5,6 +5,9 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { parseState, type State } from "../../../src/shared/state-schema.js";
 import { applyStateOps } from "../../../src/shared/state-writer.js";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { describeServingBuild } from "../../../src/pipelines/session-start/serving-build.js";
 import { handleStart } from "../../../src/server.js";
 import {
   BRIEFING_END,
@@ -337,6 +340,25 @@ describe("T-233 B item 4: the Usage line", () => {
     );
   });
 
+  it("QA 263 F2: at >= 98 the wind-down holds even WITH an override, which is neither named nor allowed to hold instead", () => {
+    for (const pct of [98, 99, 100]) {
+      const line = usageFor(realShape({ level: "STOP", fiveHourPct: 10, sevenDayPct: pct, weeklyOverride: "T-233" }));
+      expect(line).toBe(`Usage: STOP (weekly ${pct}%) · park, push WIP · 5h 10%`);
+      expect(line).not.toContain("T-233");
+      expect(line).not.toContain("no new QA");
+    }
+    expect(usageFor(realShape({ sevenDayPct: 97.9, weeklyOverride: "T-233" }))).toContain("except T-233 (Aaron's lift)");
+  });
+
+  it("QA 263: usage_file is read from the tracked AGENT.md when AGENT.local.md has no such key", () => {
+    const root = tmp("t234b-usage-tracked-");
+    const p = slots(root, JSON.stringify({ usageLevel: "AMBER" }));
+    mkdirSync(join(root, ".agents"), { recursive: true });
+    writeFileSync(join(root, ".agents", "AGENT.md"), ["---", "name: X", `usage_file: ${p}`, "---", ""].join("\n"));
+    seatFile(root, []);
+    expect(describeUsage(root, {})).toBe("Usage: AMBER + weekly not checked → small LIGHT tasks only, QA cap 2");
+  });
+
   it("weeklyOverride names the lifted loop at >= 95 only; absent or null changes nothing", () => {
     expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: "T-233" }))).toContain("no new QA, tasks or dispatches except T-233 (Aaron's lift)");
     expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: null }))).toMatch(/no new QA, tasks or dispatches$/);
@@ -492,10 +514,76 @@ describe("ob_start carries the same block, and every /start copy prints it verba
     expect(block[1]).toBe(text.split("\n")[0]);
   });
 
+  it("QA 263 row 1: a LEVEL serving build is the block's first line too, and the greeting's", async () => {
+    const text = (await handleStart({ project_root: project(), serving_build_dir: servingBuildDir(0) })).content[0]!.text;
+    const block = blockOf(text);
+    expect(block[1]).toMatch(/^Build [0-9a-f]{7} · current$/);
+    expect(block[1]).toBe(text.split("\n")[0]);
+  });
+
+  // QA 263 F4 (A+B): serving_build_dir is a test seam, "deliberately NOT in the tool schema". Only a call through the real MCP
+  // server (stdio, the path every runtime's /start takes) can show that; the key must be absent from tools/list and stripped on call.
+  it("QA 263 F4: serving_build_dir is not in ob_start's MCP schema, is stripped from a call, and the MCP block is renderBriefing's", async () => {
+    const ob = resolve(__dirname, "../../..");
+    const transport = new StdioClientTransport({
+      command: join(ob, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx"),
+      args: [join(ob, "src", "server.ts")],
+      cwd: ob,
+      env: { ...(process.env as Record<string, string>) },
+      stderr: "ignore",
+    });
+    const client = new Client({ name: "t234b-probe", version: "0.0.0" });
+    await client.connect(transport);
+    try {
+      const start = (await client.listTools()).tools.find((t) => t.name === "ob_start")!;
+      const props = Object.keys((start.inputSchema as { properties?: Record<string, unknown> }).properties ?? {});
+      expect(props).toContain("project_root");
+      expect(props).not.toContain("serving_build_dir");
+
+      const stale = servingBuildDir(4);
+      // Control: called directly this fixture IS stale, so a key that got through would print STALE.
+      expect(describeServingBuild(stale)).toMatch(/ · STALE: 4 code commits behind/);
+
+      const root = project();
+      const res = (await client.callTool({ name: "ob_start", arguments: { project_root: root, serving_build_dir: stale } })) as {
+        content: { type: string; text: string }[];
+        isError?: boolean;
+      };
+      expect(res.isError ?? false).toBe(false);
+      const text = res.content[0]!.text;
+      const first = text.split("\n")[0]!;
+      expect(first.startsWith("Serving build: not checked (")).toBe(true);
+      expect(text).not.toContain("STALE");
+
+      const block = blockOf(text);
+      const parsed = parseState(readFileSync(join(root, ".agents", "state.json"), "utf8"));
+      if (!parsed.ok) throw new Error(parsed.error);
+      expect(block).toEqual(
+        renderBriefing(
+          input(parsed.data, {
+            version: "1.0.0",
+            sessionNumber: Number(block[3]!.match(/^Session (\d+) /)![1]),
+            serving: first,
+            date: new Date().toISOString().slice(0, 10),
+            usage: describeUsage(root),
+            latestBrief: null,
+            workingTree: describeWorkingTree(root),
+            skills: describeSkills(root),
+          }),
+        ),
+      );
+    } finally {
+      await client.close();
+    }
+  }, 120_000);
+
   it("every start.md copy says to print the block verbatim and no longer carries the assembly template", () => {
     const repo = resolve(__dirname, "../../../..");
     for (const f of [".claude/commands/start.md", "project-template/.claude/commands/start.md", "project-template/.cursor/commands/start.md"]) {
       const body = readFileSync(join(repo, f), "utf8");
+      // QA 263 F7: the block's first line is the serving-build line, and the brief is the narrowed name, not `*brief*.md`.
+      expect(body, f).toContain("the serving-build line first, then usage");
+      expect(body, f).not.toContain("`*brief*.md`");
       expect(body, f).toContain("## End Briefing");
       expect(body, f).toContain("verbatim");
       expect(body, f).not.toContain("{objective text}");
