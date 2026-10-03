@@ -44,6 +44,7 @@ Phase 0 on this machine (per brief #353): `setup.mjs` run at serving tree 842e46
 | 7 | Document `cursor-agent` vs bare `agent` PATH rule in setup output (brief already states) | — | S |
 | 8 | Hub post UTF-8: document Node `readFileSync` or `Get-Content -Encoding UTF8` for `--say` (row A) | A | S |
 | 9 | Seat profile `usage_file` for Cursor usage line (row C) | C | S |
+| 10 | Windows hook audit: read Cursor temp payload or async stdin so event names and recall payloads are measurable | 4, 5 | S |
 
 ## Rows added from turn-72 /start greeting (Atlas turn 78)
 
@@ -54,4 +55,39 @@ Phase 0 on this machine (per brief #353): `setup.mjs` run at serving tree 842e46
 | C | Usage line | Briefing: `Usage: not checked (no usage_file in seat data and no SIA_USAGE_FILE)` | Builder seat profile in `ob_start` has no `usage_file` (planner has cron paths). | **Gap:** what path/env should a Cursor seat use — do not set without ruling. |
 | D | Session proof chain | `Session ID: none — no session proof for parent process 11548` | MCP server parent is `cursor-agent` bundled `node.exe` (PID 11548); no `~/.claude/open-brain/by-pid/11548.json`. Cursor `::cursor` slot exists in `active-session.json` but T-003 proof is not wired to the MCP parent. | Same as rows 1–2; explicit parent-chain note for QA. |
 
-**Not measured in this pass:** terminating a `cursor-agent` session to observe `stop`/`sessionEnd` events; full inventory of which Claude plugin hooks fire on each tool type (would need scripted tool calls + log).
+---
+
+## Phase 1 round 2 (Atlas turns 80–81, live `cursor-agent`)
+
+**Scratch:** `C:\Users\Aaron Melven\scratch\t235-hooks`. **Shell:** PowerShell. **CLI:** `cursor-agent -p -f` (2026.10.01-e373342).
+
+**Setup:** project `.cursor/hooks.json` + `t235-logger.mjs` on 18 agent hook events; `probe.txt`; `.cursor/commands/task.md` for row 6.
+
+**Run A:**
+
+```powershell
+Set-Location "C:\Users\Aaron Melven\scratch\t235-hooks"
+cursor-agent -p -f --output-format text -- "Parity test only. In order: run one shell command echo T235_HOOK_TEST; read probe.txt; call MCP open-brain ob_stats with empty arguments. Do not create or edit files. Say DONE when finished."
+```
+
+Agent: echo OK, read OK, `ob_stats` failed (better-sqlite3 NODE_MODULE_VERSION 127 vs Node 137 on serving build). Exit 0.
+
+**Hook log:** 19 lines, all `payloadKeys: []`, `hook_event_name: "unknown"`, `CLAUDE_PID: null`, `SHELL=cmd.exe`. Cursor hook wrapper did not deliver stdin to Node sync read (Windows limit). **Firing confirmed** by process count.
+
+**`active-session.json`:** before — no scratch slot; after — `…/scratch/t235-hooks::cursor` with new `session_id` and `payload_keys` listing `hook_event_name`, `session_id`, `transcript_path`, … → **global `cli-bootstrap --ide cursor` ran**.
+
+**Row 1 chain (MCP parent 11548):** `node.exe` → `powershell.exe` → `cmd.exe` → … ; **`by-pid/11548.json` absent**.
+
+**Row 3:** no labeled sessionEnd/stop; two late hook spawns after work; no `sessionEnd` in `~/.cursor/hooks.json`. Interactive quit not repeated.
+
+**Row 4:** recall trigger needs PostToolUse fields `tool_name`, `tool_input.command`, `session_id`; payload not captured.
+
+**Row 5:** many hook spawns → Claude/plugin hooks likely fire; not attributable without payload.
+
+**Row 6 (Run B):** `/task` resolved project `.cursor/commands/task.md` (agent followed it; no `.agents` in scratch).
+
+**Row 9:** `USERPROFILE=scratch\t235-home-setup` + `mkdir .claude`; two `setup.mjs` runs from serving tree — run1 registers, run2 all SKIP; writes only under scratch HOME.
+
+**Rows A–D:** encoding = PowerShell argv cp1252 vs Node UTF-8; SHELL = cmd in hooks; usage_file = missing from `.agents/AGENT.md` frontmatter (`briefing.ts`); provenance = chain above.
+
+**Still not measured:** interactive exit-only session; per-event hook labels on Windows without reading Cursor temp `payload.json`.
