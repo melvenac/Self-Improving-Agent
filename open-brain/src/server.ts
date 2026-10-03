@@ -37,7 +37,7 @@ import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
-import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from "./pipelines/session-end/recalled-ids.js";
+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
@@ -526,7 +526,8 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     // T-157: printed unconditionally, not folded into the line above. The
     // evictions that cost this project two tasks were reported as one clause
     // among several and read as routine.
-    if (r.kept_cited_task_ids.length) lines.push(`KEPT despite retention (id cited in the tracked tree): ${r.kept_cited_task_ids.join(", ")}`);
+    // T-232: one line however many; the per-id NOTE comes only in the write a task crosses the boundary.
+    if (r.kept_cited_task_ids.length) lines.push(`KEPT despite retention (id cited in the tracked tree): ${r.kept_cited_task_ids.length} — ${r.kept_cited_task_ids.join(", ")}`);
     if (r.removed_gap_ids.length) lines.push(`Closed gaps removed: ${r.removed_gap_ids.join(", ")}`);
     // T-163: an entry leaves the per-session arrays only by retention, and says so.
     if (r.superseded.length) lines.push(`Superseded (a newer entry of the same seat and checkout, with >${RECORD_RETENTION_SESSIONS} sessions written since; or a legacy handoff whose seat has written a keyed one): ${r.superseded.join("; ")}`);
@@ -574,7 +575,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       sessionId: endedId,
       explicitIds: args.recalled_entry_ids,
       filePaths: [resolve(projectRoot, ".recalled-entries.json")],
-      readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
+      readFile: readRecalledFile,
     });
     const recalledIds = resolved.ids;
 
@@ -1378,7 +1379,7 @@ server.tool(
       sessionId: session.id,
       explicitIds: [],
       filePaths: [resolve(process.cwd(), ".recalled-entries.json")],
-      readFile: (p) => { try { return readFileSync(p, "utf-8"); } catch { return null; } },
+      readFile: readRecalledFile,
     });
 
     const ids = resolved.ids;

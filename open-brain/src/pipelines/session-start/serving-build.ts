@@ -25,9 +25,10 @@ export const SERVING_UPSTREAM = "origin/master";
  *  - `scripts/`: the session hooks and setup the main checkout runs.
  *  - `.claude/`: the slash commands (/start, /end, /sync) and hook settings.
  *  - `package.json`: the version `ob_start` reports.
- * Everything else (`.agents/`, `docs/`, `project-template/`, the README) is records or documentation, not served code.
+ *  - `project-template/`: served through /bootstrap and setup.mjs's copy of the Cursor commands (QA 264).
+ * Everything else (`.agents/`, `docs/`, the README) is records or documentation, not served code.
  */
-export const SERVED_PATHS: readonly string[] = ["open-brain", ":(exclude)open-brain/tests", "scripts", ".claude", "package.json"];
+export const SERVED_PATHS: readonly string[] = ["open-brain", ":(exclude)open-brain/tests", "scripts", ".claude", "package.json", "project-template"];
 
 /** The `build/` directory of the code that is running: this module sits at build/pipelines/session-start/. */
 export function runningBuildDir(): string {

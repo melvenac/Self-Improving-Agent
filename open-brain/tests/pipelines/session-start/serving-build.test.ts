@@ -146,6 +146,12 @@ describe("T-233 A the serving build is named, and a stale one is loud", { timeou
     expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(f.commits[0]!)} · STALE: 4 code commits behind → ask Aaron to update`);
   });
 
+  it("project-template/ is served (via /bootstrap and setup.mjs's Cursor copy), so a commit touching only it is a stale build (QA 264)", () => {
+    const f = servingTreeOf([["open-brain/src/a.ts"], ["project-template/.cursor/commands/start.md"]]);
+    stamp(f, f.commits[0]!);
+    expect(describeServingBuild(f.buildDir)).toBe(`Build ${short(f.commits[0]!)} · STALE: 1 code commit behind → ask Aaron to update`);
+  });
+
   it("a commit touching served code AND records counts as code", () => {
     const f = servingTreeOf([["open-brain/src/a.ts"], [".agents/state.json", "open-brain/package.json"]]);
     stamp(f, f.commits[0]!);

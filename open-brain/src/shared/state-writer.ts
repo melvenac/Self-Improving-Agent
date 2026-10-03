@@ -355,7 +355,16 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
     ? { dropped: [] as string[], kept: [] as string[] }
     : applyRetention(next, cited);
   const dropped = retention.dropped;
-  for (const id of retention.kept) {
+  // T-232: the per-id detail is news only in the write where a task CROSSES the boundary: inside the
+  // window by the record as read, past it now. A task already past it was kept, and said so, before;
+  // repeating ~22 lines on every write buried the rest of the output. The caller prints one summary line.
+  const revsBefore = parsed.data.sessions.map((x) => x.first_rev);
+  const tasksBefore = new Map(parsed.data.tasks.map((t) => [t.id, t]));
+  const crossed = retention.kept.filter((id) => {
+    const t = tasksBefore.get(id);
+    return t === undefined || !isDroppedByRetention(t, revsBefore);
+  });
+  for (const id of crossed) {
     const where = cited.get(id) ?? [];
     const shown = where.slice(0, 3).join(", ");
     const more = where.length > 3 ? ` +${where.length - 3} more` : "";

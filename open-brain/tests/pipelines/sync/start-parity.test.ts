@@ -92,7 +92,7 @@ describe("T-226 the briefing takes the brief from ob_start's Latest brief line",
 
   it("the Claude and Cursor template copies carry the same sentences about the brief (the parity table is not stretched to cover it)", () => {
     const grab = (rel: string): string[] =>
-      text(rel).split("\n").filter((l) => /Latest brief|brief, which|\*brief\*|no brief to read|boundary report/.test(l));
+      text(rel).split("\n").filter((l) => /Latest brief|brief, which|\*brief\.md|no brief to read|boundary report/.test(l));
     expect(grab("project-template/.claude/commands/start.md").length).toBeGreaterThanOrEqual(3);
     expect(grab("project-template/.cursor/commands/start.md")).toEqual(grab("project-template/.claude/commands/start.md"));
   });

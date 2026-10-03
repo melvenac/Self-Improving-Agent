@@ -13,6 +13,9 @@
   and hub name (`resolveCheckoutSeat`). An unlisted checkout prints `seat unknown for checkout <c>` instead of
   falling back to the identity. The main checkout prints `presence: none`. A new `/sync` check, `seat-identity`,
   flags an `AGENT.local.md` that disagrees with the map.
+- **`ob_state` repeated ~22 "retention KEPT" NOTE lines on every write (T-232).** A done task kept because the
+  tracked tree cites it now gets its per-id NOTE only in the write where it crosses the retention boundary. Every write
+  still prints one summary line: `KEPT despite retention (id cited in the tracked tree): <count> — <ids>`.
 - **CI now type-checks the test suite (T-152).** `npx tsc --noEmit` reads `src/` only, so `tests/` were never
   type-checked. The `test` and `test-windows` jobs now also run `npm run typecheck:tests`. The last 4 errors are
   fixed in test files only: 3 were leftovers of the Loop 10 maturity cut (R-011; the `maturityBoost` import and the

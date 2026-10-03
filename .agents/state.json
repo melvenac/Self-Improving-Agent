@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 312,
+  "revision": 314,
   "project": {
     "name": "self-improving-agent"
   },
@@ -974,9 +974,10 @@
       "opened_session": 150,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner session 150, 2026-09-30, from G-049 (Forge's T-198 r2 finding): sia-builder, sia-infra and sia-forge all carry AGENT.local.md identity 'Forge / developer', so T-198's presence block resolves builder and infra to Forge's reader row and to forge.key; cursor-builder.key and cursor-infra.key are never looked up. T-199 already attributes sessions by checkout for the same reason. SCOPE: (1) one tracked source maps each seat worktree (by basename, as sessions[].checkout records it) to seat name, role and hub name; extend .agents/SYSTEM/worktree-seats.json or the T-196 seat file, whichever the developer shows is the single source, and never both; (2) T-198's key lookup and readers lookup resolve through it; (3) a checkout absent from the map prints a visible 'seat unknown for checkout <c>', never a fallback to the identity name; (4) /sync flags an AGENT.local.md whose identity disagrees with the map for its checkout. Rows: builder resolves to cursor-builder (or whatever the map names) and infra likewise; an unmapped checkout gives the visible line; the /sync check fires on the current builder/infra AGENT.local.md; a mutant that falls back to the identity name goes red. SEQUENCED AFTER T-198 r2 merges (it changes T-198's lookup); build on origin/loop/t198-presence until then and name the dependency. Seat: Forge. Closes G-049 when merged.",
+      "note": "Opened planner session 150, 2026-09-30, from G-049 (Forge's T-198 r2 finding): sia-builder, sia-infra and sia-forge all carry AGENT.local.md identity 'Forge / developer', so T-198's presence block resolves builder and infra to Forge's reader row and to forge.key; cursor-builder.key and cursor-infra.key are never looked up. T-199 already attributes sessions by checkout for the same reason. SCOPE: (1) one tracked source maps each seat worktree (by basename, as sessions[].checkout records it) to seat name, role and hub name; extend .agents/SYSTEM/worktree-seats.json or the T-196 seat file, whichever the developer shows is the single source, and never both; (2) T-198's key lookup and readers lookup resolve through it; (3) a checkout absent from the map prints a visible 'seat unknown for checkout <c>', never a fallback to the identity name; (4) /sync flags an AGENT.local.md whose identity disagrees with the map for its checkout. Rows: builder resolves to cursor-builder (or whatever the map names) and infra likewise; an unmapped checkout gives the visible line; the /sync check fires on the current builder/infra AGENT.local.md; a mutant that falls back to the identity name goes red. SEQUENCED AFTER T-198 r2 merges (it changes T-198's lookup); build on origin/loop/t198-presence until then and name the dependency. Seat: Forge. Closes G-049 when merged. — Session 159: ported by sia-infra (CC Sonnet) from Forge's unmerged 09-30 build (ded9557d, 5b1dc52e) as #376. hub-partner-seats.json is the single source; forge stays `grok` and cursor stays true (unruled data changes dropped). Six mutants were rebuilt. The CHANGELOG-only conflict after #371 was resolved. FROZEN at 09f82a12, CI 37115492972 green. Waiting for the next QA batch. sia-infra's local AGENT.local.md identity is now Infra; seat-identity passes.",
       "note_by": [
-        "e50107b1-ac67-452c-9da1-3fc4c3beda97"
+        "e50107b1-ac67-452c-9da1-3fc4c3beda97",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
       "closed_rev": null
     },
@@ -1348,57 +1349,61 @@
       "id": "T-229",
       "title": "The callers' readFile wrapper for .recalled-entries.json turns ANY error (EISDIR, EACCES, EBUSY) into 'no file', so the foreign-writer detector reports 'none present' for a path it could not read; report non-ENOENT errors as 'not checked (<code>)'",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "QA 258 #299 follow-up (docs/loops/b4-misc-qa-report.md, #299 row 8). The wrapper predates T-050 and does not affect which entries are rated.",
+      "note": "QA 258 #299 follow-up (docs/loops/b4-misc-qa-report.md, #299 row 8). The wrapper predates T-050 and does not affect which entries are rated. — CLOSED session 159: #377 (sia-forge, da6cdd97) merged 0600a99f after QA 265 ACCEPT on Aaron's word. Only ENOENT is absent; any other read error renders 'Foreign writer: not checked (<path>: <code>)'. QA's non-blocking gap (no EACCES row) went to sia-forge as a test-only follow-up.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-230",
       "title": "Pin that ob_start PRINTS the T-048 zero lines: a server.test.ts row asserting 'Session logs unreadable: 0' and 'Transcript directories unreadable: 0' in handleStart output (QA 261's surviving mutant Q1)",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "QA 261 (docs/loops/t048r2-qa-report.md row 4): deleting lines.push(...formatScanCounts(...)) from handleStart in server.ts leaves every committed test green; QA's own demo row kills it. Lands after #302 merges.",
+      "note": "QA 261 (docs/loops/t048r2-qa-report.md row 4): deleting lines.push(...formatScanCounts(...)) from handleStart in server.ts leaves every committed test green; QA's own demo row kills it. Lands after #302 merges. — CLOSED session 159: #378 (sia-infra, b24ea6a0, test-only) merged c954336e after QA 265 ACCEPT on Aaron's word. QA 261's mutant is red.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-231",
       "title": "mcp-command-paths: a malformed CONTAINER (project mcpServers not an object, a .mcp.json that is an array or scalar) beside a good server passes silently; make it not-checked, which caps the result at WARN, like a malformed entry (D-106)",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "QA 262 gap 4 (docs/loops/t008r3-qa-report.md), carried from QA 260 gap 1. Lands after #295 and #298 merge. Also pin the unreadable-settings 'no absent note' row (QA mutant B survives).",
+      "note": "QA 262 gap 4 (docs/loops/t008r3-qa-report.md), carried from QA 260 gap 1. Lands after #295 and #298 merge. Also pin the unreadable-settings 'no absent note' row (QA mutant B survives). — CLOSED session 159: #379 (sia-forge, 89ab68b2) merged 2c725171 after QA 265 ACCEPT on Aaron's word. 12 malformed-container rows (scope widened to the class and ruled), absent stays normal, nothing checkable gives SKIP; QA mutant B is red.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-232",
       "title": "ob_state write output prints ~22 'KEPT despite retention' NOTE lines (~4k chars) on EVERY write even when retention changed nothing; print one summary line (count kept, how to list them) unless a task's retention status changed in this write",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 157,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "Observed on every ob_state call in planner session 157. The per-id NOTE lines repeat unchanged; their information is only new when a task crosses the retention boundary.",
+      "note": "Observed on every ob_state call in planner session 157. The per-id NOTE lines repeat unchanged; their information is only new when a task crosses the retention boundary. — CLOSED session 159: #382 (sia-infra, 688001ec) merged 60abf014 after QA 265 ACCEPT on Aaron's word. One retention summary line per write; per-id NOTE only when a task crosses the boundary. QA's non-blocking gap (summary exactly once) went to sia-infra as a test-only follow-up.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-233",
@@ -1418,16 +1423,16 @@
       "id": "T-234",
       "title": "T-233 follow-ups from QA 263 (F1-F7): adopt QA's probes into the suite and close the surviving-mutant gaps; 'ahead of origin/master' must not read as 'level'",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 158,
-      "closed_session": null,
+      "closed_session": 159,
       "supersedes": null,
-      "note": "Session 158, from QA 263's report (docs/loops/t233-qa-report.md on qa/t233-report fe33a55a; probes docs/loops/qa-263/qa263-probes.test.ts and six mutants under docs/loops/qa-263/mutants/). Behaviour is correct in all; the gaps are tests a mutant survives. F1: the serving tree's IDENTITY (qa-a-names-wrong-tree survives; nothing catches it). F2: weeklyOverride vs >=98% wind-down (QA probe catches it; the suite does not). F3: resolved_by mark dropped from next-session.md (probe catches it). F4: serving_build_dir added to the MCP zod schema (probe catches it). F5: the brief regex's $ anchor (qa-c-no-end-anchor survives; nothing catches it). F6: a serving tree AHEAD of origin/master is reported as 'level'; it should say 'ahead by N (unmerged local commits)'. F7: a start.md wording nit (see report). Done when: QA's probe rows are in the suite, all six QA mutants go red, and F6 has a fixture row. — Session 159 (2026-10-03, clark's acceptance read of the served /start greeting, session e05907a8): core PASS (Briefing verbatim, serving line first, real Usage line, Session 159 = 158+1, Drift none). Three follow-ups: (1) FALSE STALE — 'SERVING BUILD IS STALE ... 2 commits behind' counted a9785b75 + d36798df, which touch only .agents records (verified by planner: git diff --name-only e833816 origin/master = next-session.md, SUMMARY.md, INBOX.md, task.md, state.json). Count only commits touching served code (open-brain/, .claude/commands) or label them '(records only)'. (2) WRONG USAGE TEXT — 'STOP (5h 14%, resets 02:50Z) + WEEKLY 98% -> everyone parks until the 5-hour reset': the STOP came from the weekly window, which the 5h reset does not lift; when sevenDayPct >= 98 say 'until the weekly reset (or Aaron's one-time reset)' and do not attribute STOP to the 5h window. (3) The /START AUDIT GAPS watch-out item (2) (count the session number by hand) is now done in code and made the planner hedge in FLAGS; retire that item (the whole watch-out retires once T-233 is served on every machine, which rev 299 records). Also: ob_start returned 51.6 KB and spilled to a file (T-183 still open). — Session 159 DISPATCH: Aaron via clark (~01:10 CDT 2026-10-03) lifted the SIA park for dev work. T-234 goes to sia-forge (Cursor Composer 2.5, desktop, hub grok). Brief: docs/loops/t234-brief.md. PR A = false-stale count, usage-window text, F6; PR B = QA 263 probes adopted, all six QA mutants red, F7. Item (3) (retire the hand-count watch-out) is the planner's handoff work, not the seat's. — Session 159: PR A #373 (1115ee19) MERGED as 5cf4359c after QA 264 ACCEPT on Aaron's word. PR B #374 was REJECTED by QA 264: its start.md rewording broke start-parity's T-226 grab. Round 2 at 3e80fb15 fixes the grab (threshold kept at 3; a one-sentence deletion mutant still goes red) and folds in QA's two #373 follow-ups: project-template in SERVED_PATHS, and STOP as the band word at weekly >= 98. Being retargeted to master for a narrow re-QA.",
+      "note": "Session 158, from QA 263's report (docs/loops/t233-qa-report.md on qa/t233-report fe33a55a; probes docs/loops/qa-263/qa263-probes.test.ts and six mutants under docs/loops/qa-263/mutants/). Behaviour is correct in all; the gaps are tests a mutant survives. F1: the serving tree's IDENTITY (qa-a-names-wrong-tree survives; nothing catches it). F2: weeklyOverride vs >=98% wind-down (QA probe catches it; the suite does not). F3: resolved_by mark dropped from next-session.md (probe catches it). F4: serving_build_dir added to the MCP zod schema (probe catches it). F5: the brief regex's $ anchor (qa-c-no-end-anchor survives; nothing catches it). F6: a serving tree AHEAD of origin/master is reported as 'level'; it should say 'ahead by N (unmerged local commits)'. F7: a start.md wording nit (see report). Done when: QA's probe rows are in the suite, all six QA mutants go red, and F6 has a fixture row. — Session 159 (2026-10-03, clark's acceptance read of the served /start greeting, session e05907a8): core PASS (Briefing verbatim, serving line first, real Usage line, Session 159 = 158+1, Drift none). Three follow-ups: (1) FALSE STALE — 'SERVING BUILD IS STALE ... 2 commits behind' counted a9785b75 + d36798df, which touch only .agents records (verified by planner: git diff --name-only e833816 origin/master = next-session.md, SUMMARY.md, INBOX.md, task.md, state.json). Count only commits touching served code (open-brain/, .claude/commands) or label them '(records only)'. (2) WRONG USAGE TEXT — 'STOP (5h 14%, resets 02:50Z) + WEEKLY 98% -> everyone parks until the 5-hour reset': the STOP came from the weekly window, which the 5h reset does not lift; when sevenDayPct >= 98 say 'until the weekly reset (or Aaron's one-time reset)' and do not attribute STOP to the 5h window. (3) The /START AUDIT GAPS watch-out item (2) (count the session number by hand) is now done in code and made the planner hedge in FLAGS; retire that item (the whole watch-out retires once T-233 is served on every machine, which rev 299 records). Also: ob_start returned 51.6 KB and spilled to a file (T-183 still open). — Session 159 DISPATCH: Aaron via clark (~01:10 CDT 2026-10-03) lifted the SIA park for dev work. T-234 goes to sia-forge (Cursor Composer 2.5, desktop, hub grok). Brief: docs/loops/t234-brief.md. PR A = false-stale count, usage-window text, F6; PR B = QA 263 probes adopted, all six QA mutants red, F7. Item (3) (retire the hand-count watch-out) is the planner's handoff work, not the seat's. — Session 159: PR A #373 (1115ee19) MERGED as 5cf4359c after QA 264 ACCEPT on Aaron's word. PR B #374 was REJECTED by QA 264: its start.md rewording broke start-parity's T-226 grab. Round 2 at 3e80fb15 fixes the grab (threshold kept at 3; a one-sentence deletion mutant still goes red) and folds in QA's two #373 follow-ups: project-template in SERVED_PATHS, and STOP as the band word at weekly >= 98. Being retargeted to master for a narrow re-QA. — CLOSED session 159: PR A #373 (merged 5cf4359c) and PR B #374 r2 (40105c1f, merged a947b8b4) by sia-forge (CC Sonnet), both on Aaron's word after Opus QA (QA 264 ACCEPT on A; QA 264 REJECT then QA 265 ACCEPT on B r2). All six QA 263 mutants are red; start-parity's grab was fixed with the threshold kept; SERVED_PATHS includes project-template; at weekly >= 98 the band word is STOP. clark's item (3) (retire the hand-count watch-out) was done in the planner's session-159 handoff.",
       "note_by": [
         "ae490afb-211a-42c7-b82e-292e88d0a9f4",
         "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
-      "closed_rev": null
+      "closed_rev": 314
     },
     {
       "id": "T-235",
@@ -1437,7 +1442,7 @@
       "opened_session": 159,
       "closed_session": null,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03). — Session 159 PHASE 0 PROGRESS: the seat is on the QA PC, not the desktop (brief corrected #353). Split agreed by clark with Relay: T-235 owns QA PC Cursor setup; Relay owns hub-talk, codes and rooms; the planner owns hub-partner-seats.json. setup.mjs failed on the QA PC ('Cannot find open-brain/': URL pathname kept the space in 'Aaron Melven' as %20); fixed by #354 (merge 842e4692, red-first test, Aaron's 'Merge #354' via clark). Clark moved the QA PC serving tree to 842e4692, rebuilt and reran setup; the planner read back by SSH: hooks.json sessionStart --ide cursor, mcp.json server path, 4 commands. Still to do: Aaron relaunches agent from PowerShell (Relay: Git Bash start triggers T-046); cursor-builder key move desktop->QA PC then --rotate-key (option A, chosen by the planner; the name already exists on the hub, so a code cannot be used), on Aaron's word to Relay. Aaron skipped renaming the QA PC profile, so further space bugs are fixed as found. — Session 159 RULING on Phase 1 (PR #358, 126ac04b + 082ddf01 rows A-D): NOT ACCEPTED, round 2 owed (hub turn 80). Rows 1 and 8 are live-measured. Rows 3, 4, 5, 6 and 9, and part of 2, were read from config (registered, not FIRED). Round 2 = one scratch-project experiment outside every checkout: a .cursor/hooks.json logger on every CLI event (event, pid/ppid, SHELL/ComSpec, payload keys only), then one shell command, one file read and one MCP call, with a normal exit (-p and interactive); the ::claude/::cursor slot before and after; the parent chains of the hook and of the MCP server (T-003); a scratch-project command resolving; setup.mjs twice under a scratch HOME (skip unless the real ~ is provably untouched). Same branch; post the new head. Builder's two untracked hub-copy files (hub-phase1-done.txt, hub-turn72-greeting.txt): delete. Phase 2 waits only on the planner's ruling (usage is GREEN; dev unparked by Aaron ~01:10 CDT). Standing: TASK: line on every work reply (turn 81). The seat's session was cleared and it asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9), so this note is the durable copy. Also seen: sia-forge (grok) had read nothing in its room since 2026-09-29, so its /start never ran the hub inbox step; that is an audit row candidate. — CORRECTION (session 159): the 'seat asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9)' line above is WRONG. That bridge was the OLD Claude Code sia-builder on the QA PC, being closed (clark). It is not the T-235 seat; the only T-235 seat is the Cursor one (hub cursor-builder). The planner sent the old seat a cancel; it changed nothing (tree read back by SSH), and Aaron's permission let the planner kill it over SSH (PID 7372, without SessionEnd). Its #270/#272 are merged. — Session 159: P2-1 #372 (sia-builder CC Sonnet on the QA PC, 4240a8be) MERGED as d26570bd on Aaron's word after QA 264: rows ACCEPT except 7c, which QA's permission layer refused. The planner ran row 7c on the desktop under a scratch HOME: PASS (docs/loops/qa-264-row7c-planner.md, #380). ACCEPTANCE STILL OPEN: the QA PC serving tree moves to master, setup.mjs is re-run there, and `cursor-agent -p` calling ob_stats must succeed. That is blocked today by the QA PC's cursor-agent stream failure (2026.10.01-e373342: 'Connection lost ... WritableIterable is closed'; the desktop's 2026.09.28 works; clark suspects a regression in that build). P2-2 (the hook-label re-measure) is blocked by the same failure.",
+      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03). — Session 159 PHASE 0 PROGRESS: the seat is on the QA PC, not the desktop (brief corrected #353). Split agreed by clark with Relay: T-235 owns QA PC Cursor setup; Relay owns hub-talk, codes and rooms; the planner owns hub-partner-seats.json. setup.mjs failed on the QA PC ('Cannot find open-brain/': URL pathname kept the space in 'Aaron Melven' as %20); fixed by #354 (merge 842e4692, red-first test, Aaron's 'Merge #354' via clark). Clark moved the QA PC serving tree to 842e4692, rebuilt and reran setup; the planner read back by SSH: hooks.json sessionStart --ide cursor, mcp.json server path, 4 commands. Still to do: Aaron relaunches agent from PowerShell (Relay: Git Bash start triggers T-046); cursor-builder key move desktop->QA PC then --rotate-key (option A, chosen by the planner; the name already exists on the hub, so a code cannot be used), on Aaron's word to Relay. Aaron skipped renaming the QA PC profile, so further space bugs are fixed as found. — Session 159 RULING on Phase 1 (PR #358, 126ac04b + 082ddf01 rows A-D): NOT ACCEPTED, round 2 owed (hub turn 80). Rows 1 and 8 are live-measured. Rows 3, 4, 5, 6 and 9, and part of 2, were read from config (registered, not FIRED). Round 2 = one scratch-project experiment outside every checkout: a .cursor/hooks.json logger on every CLI event (event, pid/ppid, SHELL/ComSpec, payload keys only), then one shell command, one file read and one MCP call, with a normal exit (-p and interactive); the ::claude/::cursor slot before and after; the parent chains of the hook and of the MCP server (T-003); a scratch-project command resolving; setup.mjs twice under a scratch HOME (skip unless the real ~ is provably untouched). Same branch; post the new head. Builder's two untracked hub-copy files (hub-phase1-done.txt, hub-turn72-greeting.txt): delete. Phase 2 waits only on the planner's ruling (usage is GREEN; dev unparked by Aaron ~01:10 CDT). Standing: TASK: line on every work reply (turn 81). The seat's session was cleared and it asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9), so this note is the durable copy. Also seen: sia-forge (grok) had read nothing in its room since 2026-09-29, so its /start never ran the hub inbox step; that is an audit row candidate. — CORRECTION (session 159): the 'seat asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9)' line above is WRONG. That bridge was the OLD Claude Code sia-builder on the QA PC, being closed (clark). It is not the T-235 seat; the only T-235 seat is the Cursor one (hub cursor-builder). The planner sent the old seat a cancel; it changed nothing (tree read back by SSH), and Aaron's permission let the planner kill it over SSH (PID 7372, without SessionEnd). Its #270/#272 are merged. — Session 159: P2-1 #372 (sia-builder CC Sonnet on the QA PC, 4240a8be) MERGED as d26570bd on Aaron's word after QA 264: rows ACCEPT except 7c, which QA's permission layer refused. The planner ran row 7c on the desktop under a scratch HOME: PASS (docs/loops/qa-264-row7c-planner.md, #380). ACCEPTANCE STILL OPEN: the QA PC serving tree moves to master, setup.mjs is re-run there, and `cursor-agent -p` calling ob_stats must succeed. That is blocked today by the QA PC's cursor-agent stream failure (2026.10.01-e373342: 'Connection lost ... WritableIterable is closed'; the desktop's 2026.09.28 works; clark suspects a regression in that build). P2-2 (the hook-label re-measure) is blocked by the same failure. — Session 159 DEPLOY (clark, on Aaron's 'Clark runs it', ~05:1x CDT): the desktop and QA PC serving trees moved to 5a7bf167, rebuilt (build-info 5a7bf167) and re-ran setup.mjs. Cursor mcp.json now points at C:\\Program Files\\nodejs\\node.exe on both machines, and 1 stale sessionStart entry was upgraded on each. #372 NON-CURSOR ACCEPTANCE (QA PC, clark's read-back): the configured command is absolute, Node v22.23.3, and it loads open-brain's better-sqlite3 ('better-sqlite3 OK'). The planner accepts this for P2-1. The cursor-agent ob_stats check is deferred until a Cursor CLI connects on the QA PC (Aaron: no cursor agents available; the QA PC stream failure is machine-specific per clark). P2-2 is still blocked on the same.",
       "note_by": [
         "e05907a8-86cf-436b-bee3-ce6f2214e02e"
       ],
