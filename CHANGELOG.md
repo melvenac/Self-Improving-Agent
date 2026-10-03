@@ -7,6 +7,12 @@
 - **`setup.mjs` refused to run from a path with a space (T-235 Phase 0).** It took the repo root from a URL pathname,
   which keeps a space as `%20`, so on the QA PC (`C:\Users\Aaron Melven\…`) it reported "Cannot find open-brain/"
   and wrote nothing. The root now comes from `fileURLToPath` (`repoRootFrom` in `scripts/setup-hooks.mjs`).
+- **A seat is resolved by its checkout, not by `AGENT.local.md` (T-203, closes G-049).** sia-builder, sia-infra and
+  sia-forge all declared "Forge / developer", so `/start`'s presence block read Forge's key and readers row in all
+  three. `.agents/SYSTEM/hub-partner-seats.json` is now the single map from a worktree basename to seat, role, agent
+  and hub name (`resolveCheckoutSeat`). An unlisted checkout prints `seat unknown for checkout <c>` instead of
+  falling back to the identity. The main checkout prints `presence: none`. A new `/sync` check, `seat-identity`,
+  flags an `AGENT.local.md` that disagrees with the map.
 - **`ob_state` repeated ~22 "retention KEPT" NOTE lines on every write (T-232).** A done task kept because the
   tracked tree cites it now gets its per-id NOTE only in the write where it crosses the retention boundary. Every write
   still prints one summary line: `KEPT despite retention (id cited in the tracked tree): <count> — <ids>`.
