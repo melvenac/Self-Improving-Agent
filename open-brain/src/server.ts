@@ -526,7 +526,8 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     // T-157: printed unconditionally, not folded into the line above. The
     // evictions that cost this project two tasks were reported as one clause
     // among several and read as routine.
-    if (r.kept_cited_task_ids.length) lines.push(`KEPT despite retention (id cited in the tracked tree): ${r.kept_cited_task_ids.join(", ")}`);
+    // T-232: one line however many; the per-id NOTE comes only in the write a task crosses the boundary.
+    if (r.kept_cited_task_ids.length) lines.push(`KEPT despite retention (id cited in the tracked tree): ${r.kept_cited_task_ids.length} — ${r.kept_cited_task_ids.join(", ")}`);
     if (r.removed_gap_ids.length) lines.push(`Closed gaps removed: ${r.removed_gap_ids.join(", ")}`);
     // T-163: an entry leaves the per-session arrays only by retention, and says so.
     if (r.superseded.length) lines.push(`Superseded (a newer entry of the same seat and checkout, with >${RECORD_RETENTION_SESSIONS} sessions written since; or a legacy handoff whose seat has written a keyed one): ${r.superseded.join("; ")}`);

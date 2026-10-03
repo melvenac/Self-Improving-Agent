@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { handleStart, handleEnd, handleSync, handleScore, computeScore, handleSetSession, handleState } from "../src/server.js";
 import { applyStateOps } from "../src/shared/state-writer.js";
 import { readFileSync, cpSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 
 const stateFixture = join(import.meta.dirname, "fixtures-state/state.json");
 
@@ -370,6 +371,40 @@ describe("server handlers", () => {
       expect(dry).toContain(`NOTE CHANGE: T-005 note APPENDED: +${" — and more".length} chars`);
       const real = getText(await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops }));
       expect(real).toContain(`NOTE CHANGE: T-005 note APPENDED: +${" — and more".length} chars`);
+    });
+
+    /**
+     * T-232: the per-id "retention KEPT done task" NOTE used to print on EVERY write (about 22 lines,
+     * ~4k chars in this project) though retention had changed nothing. It is news only in the write
+     * where a cited task crosses the boundary; every write still prints one summary line.
+     */
+    it("ob_state prints per-id retention-KEPT detail only in the write a task crosses the boundary", async () => {
+      proseProject(tmp);
+      cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+      // citedTaskIds reads the TRACKED tree (git grep), so the citing doc must be in a git index.
+      writeFileSync(join(tmp, "closeout.md"), "Cites T-001 and T-002.\n");
+      execFileSync("git", ["init", "-q"], { cwd: tmp });
+      execFileSync("git", ["add", "closeout.md"], { cwd: tmp });
+      const write = async (uuid: string, n: number) => {
+        proveOwn(uuid);
+        await handleSetSession({ session_id: uuid, project_dir: tmp });
+        const rev = JSON.parse(readFileSync(join(tmp, ".agents", "state.json"), "utf-8")).revision as number;
+        const out = getText(await handleState({ project_root: tmp, session: n, expected_revision: rev, ops: [{ op: "set_objective", text: uuid }] }));
+        expect(out).toContain("ob_state applied"); // a refused write prints nothing about retention, which reads as a pass
+        return out;
+      };
+      const perId = /retention KEPT done task/g;
+      // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.
+      expect((await write("t232-a", 61)).match(perId)).toBeNull();
+      expect((await write("t232-b", 62)).match(perId)).toBeNull();
+      const crossing = await write("t232-c", 63);
+      expect(crossing.match(perId)).toHaveLength(2);
+      expect(crossing).toContain("NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md");
+      expect(crossing).toContain("KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002");
+      // Retention changes nothing here: the summary line only, no per-id detail.
+      const noop = await write("t232-d", 64);
+      expect(noop).toContain("KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002");
+      expect(noop.match(perId)).toBeNull();
     });
 
     /** T171-D3: the dry run of a replace is the door the agent reads. QA 144's dry-run-hides-replace drops this line. */
