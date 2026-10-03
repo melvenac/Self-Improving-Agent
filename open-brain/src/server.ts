@@ -32,7 +32,6 @@ import { countWords, estimateTokens } from "./pipelines/session-start/state-read
 import { renderState } from "./pipelines/session-start/state-render.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
-import { greetingFlag } from "./pipelines/session-start/greeting-flags.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
 import { formatScanCounts } from "./pipelines/session-start/scan-counts.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
