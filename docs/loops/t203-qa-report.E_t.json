@@ -1,0 +1,47 @@
+{
+  "loop": "qa-266-t203",
+  "candidate_git": {
+    "sha": "09f82a12193788df0b50113aae20e2cd3cccf49c",
+    "branch": "origin/loop/t203-port",
+    "frozen_at": "2026-10-03T10:53:02Z"
+  },
+  "candidates": [
+    { "task": "T-203", "sha": "09f82a12193788df0b50113aae20e2cd3cccf49c", "branch": "origin/loop/t203-port", "pr": 376, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit; npm run typecheck:tests (open-brain, head 09f82a12)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "Both exit 0 locally. CI run 37115492972 (pull_request, headSha 09f82a12): changed success, test success, test-windows skipped."
+    },
+    "unit": {
+      "command": "npx vitest run, one file per run: seat-map, hub-presence, greeting-size, hub-seats",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 15000,
+      "detail": "LIGHT job, no local full suite. Head: 14/14, 33/33, 11/11, 5/5. Merge with master a947b8b4: 14/14, 33/33, 11/11. Red on base f9a3af2e source: seat-map module missing, hub-presence 9 failed/33, greeting-size 1 failed/11. CI full suite green on 37115492972."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q266-1", "status": "met", "order": "shown", "evidence": "diff origin/master...09f82a12: exactly the 10 listed files; merge-tree with master a947b8b4 clean." },
+    { "id": "Q266-2", "status": "met", "order": "shown", "evidence": "resolveCheckoutSeat reads hub-partner-seats.json only; key name, readers row, upper bound and seat-identity go through it; keyNameForIdentity/hubAsForIdentity deleted; worktree-seats.json byte-identical; git grep of hub names in src/scripts/SYSTEM json finds comments only. Path constant declared 3 times (same file)." },
+    { "id": "Q266-3", "status": "met", "order": "shown", "evidence": "forge.hub_name grok->grok, cursor true->true; readers keys and content deep-equal to base; no existing seat field changed." },
+    { "id": "Q266-4", "status": "met", "order": "red-first", "evidence": "base source: seat-map Cannot find module, hub-presence 9 failed|24 passed (33), greeting-size 1 failed|10 passed (11); head: 14/14, 33/33, 11/11." },
+    { "id": "Q266-5", "status": "met", "order": "shown", "evidence": "dev a killed (hub-presence 1/33 red, S-3); dev b killed (5/33 red); QA q1 role-ignored killed (seat-map 1/14); QA q2 derived hub name killed (seat-map 2/14); QA q4 bound pinned to atlas SURVIVED greeting-size 11/11 (gap); q3 not counted (tsc 2)." },
+    { "id": "Q266-6", "status": "met", "order": "shown", "evidence": "sia-scratch with identity Forge and forge.key+grok.key: 'presence: UNKNOWN (seat unknown for checkout sia-scratch)', 0 fetches." },
+    { "id": "Q266-7", "status": "met", "order": "shown", "evidence": "sia-forge with only forge.key: 'presence: UNKNOWN (no hub key for grok at .../grok.key)', 0 fetches; sia-builder with forge/grok/cursor-infra keys: no hub key for cursor-builder; control sends the cursor-builder key." },
+    { "id": "Q266-8", "status": "met", "order": "shown", "evidence": "runSync on scratch worktree sia-builder: Forge/developer issue, Builder/developer pass; role-only mismatch issue; unlisted and no-identity skip with reason. Message says AGENT.local.md when tracked AGENT.md answered (cosmetic)." },
+    { "id": "Q266-9", "status": "met", "order": "shown", "evidence": "gh pr checks 376: test pass, run 37115492972 headSha 09f82a12 success; npm run typecheck:tests exit 0." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "QA mutant q4 (presenceBlockUpperBound reads readers['atlas'] regardless of checkout) survives greeting-size 11/11: no row sizes the bound for a non-planner checkout.",
+    "seat-identity message says 'AGENT.local.md says' when the identity came from tracked AGENT.md.",
+    "hub-partner-seats.json path declared as three constants (hub-presence.ts, sync/hub-seats.ts, seat-map.ts); one file, not a second map.",
+    "TMPDIR could not be set (harness refused the assignment); vitest tmpdir() fixtures used /tmp."
+  ],
+  "notes": "QA 266, dispatch tree 7427ee5587f0343bc663cf2e6e8ba49357cab8bf. No live Jev call, no hub call (recording fetchFn, hub URL 127.0.0.1:9, fake keys under ~/qa-tmp; no ~/.a2a-hub on this machine). Verdict ACCEPT; merge waits for Aaron."
+}
