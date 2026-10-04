@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 336 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 337 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — QA 273 (Plumb: #421 r2, #424, #425, #427) and QA 274 (laptop, Windows rows of #425/#427) dispatched at 0565c51f, launched by Aaron by hand (clark's classifier blocks remote launches). QA 275 (#434 T-240, #436 P2-5, #437 P2-7) dispatched; launches on Plumb after 273 reports. #425 merges only after #437. All three dev seats frozen and idle.
 
 ## What's working
@@ -158,6 +158,7 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - Gap G-051: A QA dispatch that lets a seat read REAL config files (~/.claude.json, settings.json, .mcp.json, env) said 'read-only' but did not forbid copying VALUES into a report committed to a PUBLIC repo.
 - Gap G-052: Two accepted B3 PRs leave a default-path behaviour untested: #313 (T-065) has no row that pins knowledgeV2Db's default location (QA 257's repoint mutant survived), and #314 (T-042) never exercises the default obsidianVaultDir() resolution (every row passes vaultDir).
 - Gap G-053: The config-channel harness test CA-3c/3d R21 failed once on master push CI (8f14ca91, run 37172590273 attempt 1): the boundary check saw `<common>/info/refs created` during the developer stage, refused the developer, and the test expected a pass. It passed on re-run (attempt 2), on the PR run of the same code, and in the master runs immediately before. info/refs is written by `git update-server-info`, which a background `git gc --auto` can trigger, so a git-internal write is being read as a role changing what git executes.
+- Gap G-055: A cursor-agent --model flag on one launch PERSISTS as the machine's global Cursor default (~/.cursor/cli-config.json), and the seat wakers pass no --model. So one trial launch silently moved every SIA Cursor seat on the QA PC from composer-2.5 to grok-4.7-high at ~05:40 CDT 2026-10-04, and nothing in a seat's reply or a PR names the model. Built in that window, per clark: #427 r3 (a6d75b52), #441 (48bf4795), #442 (08fa9002), #444 r2 (a5f11819), #445 (d292747f), #446 (685b9fe9), #448 (merged, docs), plus the T-187 and T-166 work in progress. Builder != judge still holds (QA is Opus).
 
 ## What's next
 
