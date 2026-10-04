@@ -130,6 +130,43 @@ describe("T-198 hub presence at /start (r2)", () => {
     expect(block.lines.join("\n")).toContain("cursor-infra: listener not polling, 3 unread since 5m");
   });
 
+  describe("T-237 pollAgeMs null is A2A's 'no wait-poll in the window', not a malformed body", () => {
+    it("T237-1 a room with pollAgeMs null is accepted, and the other rooms render normally", async () => {
+      const { fetchFn } = fixtureFetch(roster({
+        grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: false, pollAgeMs: null },
+        "cursor-infra": { sessionId: INFRA_ROOM, unread: 3, pollingNow: false, pollAgeMs: 270_000 },
+      }));
+      const text = (await describe_(fetchFn)).lines.join("\n");
+      expect(text).not.toContain("presence: UNKNOWN");
+      expect(text).toContain("grok: listener not polling");
+      expect(text).toContain("cursor-infra: listener not polling, 3 unread since 5m");
+    });
+
+    it.each([
+      ["null", null],
+      ["absent", undefined],
+    ])("T237-2 unread > 0 with pollAgeMs %s says no poll is recorded and never prints an age", async (_label, pollAgeMs) => {
+      const { fetchFn } = fixtureFetch(roster({ "cursor-infra": { sessionId: INFRA_ROOM, unread: 2, pollingNow: false, pollAgeMs } }));
+      const line = (await describe_(fetchFn)).lines.find((l) => l.includes("cursor-infra:"));
+      expect(line).toBe("  cursor-infra: listener not polling, 2 unread, no listener poll recorded");
+      expect(line).not.toMatch(/since/);
+    });
+
+    const room = `"sessionId":"${INFRA_ROOM}","unread":2,"pollingNow":false`;
+    it.each([
+      ["a string", `{"agents":[{"name":"cursor-infra","rooms":[{${room},"pollAgeMs":"5"}]}]}`, /agents\[0\]\.rooms\[0\]\.pollAgeMs is not a finite number or null/],
+      ["a boolean", `{"agents":[{"name":"cursor-infra","rooms":[{${room},"pollAgeMs":true}]}]}`, /agents\[0\]\.rooms\[0\]\.pollAgeMs is not a finite number or null/],
+      ["Infinity (1e999 parses to it)", `{"agents":[{"name":"cursor-infra","rooms":[{${room},"pollAgeMs":1e999}]}]}`, /agents\[0\]\.rooms\[0\]\.pollAgeMs is not a finite number or null/],
+      ["NaN (not JSON at all)", `{"agents":[{"name":"cursor-infra","rooms":[{${room},"pollAgeMs":NaN}]}]}`, /malformed body: /],
+    ])("T237-3 pollAgeMs as %s is still malformed: ONE UNKNOWN line", async (_label, body, why) => {
+      const { fetchFn } = fixtureFetch(body);
+      const block = await describe_(fetchFn);
+      expect(block.lines).toHaveLength(1);
+      expect(block.lines[0]).toMatch(/^presence: UNKNOWN \(malformed body: /);
+      expect(block.lines[0]).toMatch(why);
+    });
+  });
+
   it("R1 wording: every partner line says listener or absent, none claims the seat read a turn, and the header says so", async () => {
     const { fetchFn } = fixtureFetch(roster({
       grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1 },
