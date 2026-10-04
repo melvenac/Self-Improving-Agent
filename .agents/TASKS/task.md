@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 326 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 327 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-QA 269 running (#397 T-237, #401 T-236c, #402 T-199, #404 T-204); then one batch ask to Aaron, with #403 (planner.md). Next: T-238 after #401; the wrong-seat PICK UP fallback (infra is investigating). _(since session 160)_
+Dev seats switch to Cursor for new work (Aaron, 2026-10-03 ~22:1x CDT); dispatch waits on each seat's hub room + waker from clark. Open: #415 (T-239 follow-up) for the next QA batch; D-118's role-doc sentence (Aaron's merge). _(since session 160)_
 
 ## Top tasks
 
