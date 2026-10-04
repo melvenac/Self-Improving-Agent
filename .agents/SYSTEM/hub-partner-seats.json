@@ -1,14 +1,14 @@
 {
-  "description": "One seat file. It is the single tracked map from a worktree (its basename, as sessions[].checkout records it) to seat, role, agent name and hub name (T-203, closing G-049): ob_start resolves the reader by CHECKOUT, never by AGENT.local.md, and /sync flags an AGENT.local.md that disagrees. ob_start also reads readers for partner presence (T-198), and the hub-seats check reads talk, seats and readers (T-196). worktree-seats.json stays the layout rule (which <project>-<seat> names may exist) and holds no seat attribute. Room ids were read from hub-talk --as atlas --list --json on 2026-09-28. hub_name is a plain field, never derived from the seat name (D-115); the forge seat still speaks as grok until T-213 repoints it.",
+  "description": "One seat file. It is the single tracked map from a worktree (its basename, as sessions[].checkout records it) to seat, role, agent name and hub name (T-203, closing G-049): ob_start resolves the reader by CHECKOUT, never by AGENT.local.md, and /sync flags an AGENT.local.md that disagrees. ob_start also reads readers for partner presence (T-198), and the hub-seats check reads talk, seats and readers (T-196). worktree-seats.json stays the layout rule (which <project>-<seat> names may exist) and holds no seat attribute. Room ids are as clark created them on 2026-10-04 (session 160), one room per Cursor seat with participants [atlas, <hub_name>, <hub_name>-waker]. hub_name is a plain field, never derived from the seat name (D-115); the forge seat speaks as forge since T-213.",
   "hub_url": "http://100.124.212.87:4000",
   "talk": "HUB_URL={hub_url} node <A2A-Hub>/scripts/hub-talk.mjs --as {hub_name} --session {room}",
   "talk_tokens": "Substitute {hub_url}, {hub_name}, and {room} only. Replace <A2A-Hub> with the absolute path of the local checkout of https://github.com/melvenac/A2A-Hub that contains scripts/hub-talk.mjs. The angle-bracket token is not filled from this file.",
   "wait": "--wait --wait-timeout 3500",
   "seats": {
     "planner": { "checkout": "sia-planner", "role": "planner", "agent": "Atlas", "hub_name": "atlas", "cursor": false },
-    "builder": { "checkout": "sia-builder", "role": "developer", "agent": "Builder", "hub_name": "cursor-builder", "cursor": true, "room": "k57098epn7qz32vt0cazfjpbes8f6kdq" },
-    "forge": { "checkout": "sia-forge", "role": "developer", "agent": "Forge", "hub_name": "grok", "cursor": true, "room": "k57frxw0ptb8tadmqdwy0khhks8ey006" },
-    "infra": { "checkout": "sia-infra", "role": "developer", "agent": "Infra", "hub_name": "cursor-infra", "cursor": true, "room": "k5702788wctxj75begyt4x2k5x8f6mav" },
+    "builder": { "checkout": "sia-builder", "role": "developer", "agent": "Builder", "hub_name": "cursor-builder", "cursor": true, "room": "k575sfwr9wcx3r8fw83g3bc00x8fmar3" },
+    "forge": { "checkout": "sia-forge", "role": "developer", "agent": "Forge", "hub_name": "forge", "cursor": true, "room": "k571z4ghp7nbp34djhecwnsk3n8fmhsf" },
+    "infra": { "checkout": "sia-infra", "role": "developer", "agent": "Infra", "hub_name": "cursor-infra", "cursor": true, "room": "k57d92gqtjm9wpfs74ekbx9rns8fmy2f" },
     "qa": { "checkout": "sia-qa", "role": "qa", "agent": "Probe", "cursor": false },
     "research": { "checkout": "sia-research", "role": "none", "agent": "Scout", "cursor": false }
   },
@@ -18,24 +18,24 @@
   "readers": {
     "atlas": {
       "partners": [
-        { "label": "grok", "hub_as": "grok", "session_id": "k57frxw0ptb8tadmqdwy0khhks8ey006" },
-        { "label": "cursor-infra", "hub_as": "cursor-infra", "session_id": "k5702788wctxj75begyt4x2k5x8f6mav" },
-        { "label": "cursor-builder", "hub_as": "cursor-builder", "session_id": "k57098epn7qz32vt0cazfjpbes8f6kdq" }
+        { "label": "forge", "hub_as": "forge", "session_id": "k571z4ghp7nbp34djhecwnsk3n8fmhsf" },
+        { "label": "cursor-infra", "hub_as": "cursor-infra", "session_id": "k57d92gqtjm9wpfs74ekbx9rns8fmy2f" },
+        { "label": "cursor-builder", "hub_as": "cursor-builder", "session_id": "k575sfwr9wcx3r8fw83g3bc00x8fmar3" }
       ]
     },
-    "grok": {
+    "forge": {
       "partners": [
-        { "label": "Atlas", "hub_as": "atlas", "session_id": "k57frxw0ptb8tadmqdwy0khhks8ey006" }
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k571z4ghp7nbp34djhecwnsk3n8fmhsf" }
       ]
     },
     "cursor-infra": {
       "partners": [
-        { "label": "Atlas", "hub_as": "atlas", "session_id": "k5702788wctxj75begyt4x2k5x8f6mav" }
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k57d92gqtjm9wpfs74ekbx9rns8fmy2f" }
       ]
     },
     "cursor-builder": {
       "partners": [
-        { "label": "Atlas", "hub_as": "atlas", "session_id": "k57098epn7qz32vt0cazfjpbes8f6kdq" }
+        { "label": "Atlas", "hub_as": "atlas", "session_id": "k575sfwr9wcx3r8fw83g3bc00x8fmar3" }
       ]
     }
   }

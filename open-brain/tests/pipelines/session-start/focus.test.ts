@@ -143,7 +143,7 @@ describe("T-236 (c) SEATS", () => {
       const root = checkout("sia-planner");
       const block = await describeHubPresence({ projectRoot: root, identity: null, callerLabel: "vitest" });
       expect(calls).toHaveLength(1);
-      expect(block.statusByHubName).toEqual({ "cursor-builder": "polling", "cursor-infra": "not polling", grok: "absent" });
+      expect(block.statusByHubName).toEqual({ "cursor-builder": "polling", "cursor-infra": "not polling", forge: "absent" });
       const state = stateWith({ [OPEN[0]]: { assignee: "builder" } });
       expect(seatsLine(state, seatOrder(root)!, block.statusByHubName ?? null)).toBe(
         `SEATS: planner — · builder ${OPEN[0]} polling · forge — absent · infra — not polling · qa — · research —`,
@@ -186,7 +186,7 @@ describe("T-236 (c) B1 the worst case still fits the budget with FOCUS and SEATS
     if (!parsed.ok) throw new Error(parsed.error);
     const state = parsed.data;
     const root = checkout("sia-infra");
-    const presence = { atlas: "absent", "cursor-builder": "not polling", grok: "absent", "cursor-infra": "polling" } as const;
+    const presence = { atlas: "absent", "cursor-builder": "not polling", forge: "absent", "cursor-infra": "polling" } as const;
     const input: BriefingInput = {
       state, version: "9.9.9", seat: "developer", sessionNumber: 160, sessionNote: null, date: "2026-10-03",
       drift: Array.from({ length: 6 }, (_, i) => ({ field: `field${i}`, expected: "e".repeat(80), actual: "a".repeat(80), fixed: false })) as BriefingInput["drift"],
