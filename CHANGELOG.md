@@ -4,6 +4,11 @@
 
 ### Added
 
+- **FOCUS and SEATS in the budgeted briefing (T-236 (c)).** Opt-in: `briefing_focus` in `.agents/SYSTEM/greeting.json`,
+  effective only with `briefing_budget` (absent = off; A2A renders unchanged). A task gains an optional `assignee`, a seat
+  of `hub-partner-seats.json`, set by the planner with `update_task`. FOCUS names this checkout's seat's assigned task (or
+  `none assigned in the record`), on the PICK UP header line. SEATS lists every seat's, with presence words only from the
+  roster ob_start already fetched. Still 30 lines in the worst case. New `/sync` check `task-assignees`.
 - **Role docs print in full only when they changed since this seat last read them (T-236 slice 1, closes T-183).**
   Opt-in per repo: `"role_docs_by_sha": true` in the new tracked `.agents/SYSTEM/greeting.json` (absent file or key = off,
   so a repo that does not opt in, A2A included, renders exactly as before). On, `ob_start` prints an unchanged doc as one

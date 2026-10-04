@@ -58,6 +58,11 @@ export interface HubPresenceBlock {
   lines: string[];
   sourceRel: string | null;
   charCount: number;
+  /**
+   * T-236 (c): each of this reader's partners by hub name, from THIS block's one roster fetch, for the SEATS line.
+   * Present only when the roster was fetched and valid: no roster, no words, never a guess.
+   */
+  statusByHubName?: Readonly<Record<string, "polling" | "not polling" | "absent">>;
 }
 
 /** A key shorter than this is refused, as hub-key.mjs does (KEY_FLOOR). */
@@ -244,9 +249,16 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
     return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
   }
 
-  const lines = [presenceHeader(opts.callerLabel, seatsFile.rel), ...partners.map((p) => `  ${formatPartnerLine(p, roster.agents)}`)];
+  const partnerLines = partners.map((p) => formatPartnerLine(p, roster.agents));
+  const lines = [presenceHeader(opts.callerLabel, seatsFile.rel), ...partnerLines.map((l) => `  ${l}`)];
   const text = lines.join("\n");
-  return { lines, sourceRel: seatsFile.rel, charCount: text.length };
+  // T-236 (c): the same lines, as one word per hub name, so SEATS never fetches or guesses on its own.
+  const statusByHubName: Record<string, "polling" | "not polling" | "absent"> = {};
+  partners.forEach((p, n) => {
+    const l = partnerLines[n]!;
+    statusByHubName[p.hub_as] = l.endsWith(": absent") ? "absent" : l.endsWith(": listener polling") ? "polling" : "not polling";
+  });
+  return { lines, sourceRel: seatsFile.rel, charCount: text.length, statusByHubName };
 }
 
 function presenceHeader(callerLabel: string, sourceRel: string): string {

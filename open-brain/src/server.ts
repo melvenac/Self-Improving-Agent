@@ -25,6 +25,8 @@ import { sessionStart, type StateFileSize } from "./pipelines/session-start/inde
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import { describeRoleFiles, renderRoleDocs, recordRoleReads } from "./pipelines/session-start/role-files.js";
 import { greetingFlag } from "./pipelines/session-start/greeting-flags.js";
+import { focusLine, seatsLine, seatOrder } from "./pipelines/session-start/focus.js";
+import { resolveCheckoutSeat } from "./pipelines/session-start/seat-map.js";
 import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
@@ -375,6 +377,15 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         skills: describeSkills(projectRoot),
         // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
         budget: greetingFlag(projectRoot, "briefing_budget"),
+        // T-236 (c): OPT-IN, and only with the budget. The seat is the CHECKOUT's; presence is the roster fetched above.
+        ...(greetingFlag(projectRoot, "briefing_budget") && greetingFlag(projectRoot, "briefing_focus")
+          ? {
+              focus: {
+                focus: focusLine(sj.data, resolveCheckoutSeat(projectRoot)),
+                seats: ((order) => (order ? seatsLine(sj.data, order, presence.statusByHubName ?? null) : null))(seatOrder(projectRoot)),
+              },
+            }
+          : {}),
       }));
     } else {
       // F3: an unknown schema_version REFUSES, with no prose fallback.

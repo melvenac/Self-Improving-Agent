@@ -40,6 +40,11 @@ export interface BriefingInput {
    * Off or absent: the original layout below, untouched, which is what A2A's /start prints byte for byte.
    */
   budget?: boolean;
+  /**
+   * T-236 (c), OPT-IN (greeting.json `briefing_focus`), and only inside the budgeted layout. Precomputed by the caller
+   * (focus.ts) from the record and the roster ob_start already fetched. Absent: the budgeted layout of slice 2, unchanged.
+   */
+  focus?: { focus: string | null; seats: string | null };
 }
 
 const NEXT_SHOWN = 3;
@@ -164,8 +169,12 @@ function renderBudgeted(i: BriefingInput): string[] {
     if (ids.length > CAPS.next) out.push(`+${ids.length - CAPS.next} more: ${MORE_TASKS}`);
   }
 
+  // T-236 (c): SEATS, then FOCUS on the PICK UP header line. The budget had no line to spare (30/30 at 6f145faf), so
+  // SEATS is paid for by brief and skills sharing one line below, and FOCUS by sharing the header: net 0 lines.
+  const seats = i.focus?.seats ?? null;
+  if (seats !== null) out.push(seats);
   const own = i.seat ? newestHandoffForSeat(s.handoffs, i.seat) : null;
-  out.push("PICK UP HERE");
+  out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
   if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars));
   else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
   else out.push(`none recorded for this seat (${i.seat})`);
@@ -222,8 +231,11 @@ function renderBudgeted(i: BriefingInput): string[] {
   }
 
   out.push(i.workingTree);
-  if (i.latestBrief) out.push(i.latestBrief);
-  out.push(i.skills);
+  if (seats !== null && i.latestBrief) out.push(`${i.latestBrief} · ${i.skills}`);
+  else {
+    if (i.latestBrief) out.push(i.latestBrief);
+    out.push(i.skills);
+  }
   out.push(BRIEFING_END);
   return out;
 }
