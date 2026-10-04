@@ -136,6 +136,7 @@ describe("gate policies", { timeout: 60_000 }, () => {
       ["plan", "policy-plan.schema.json"],
       ["done", "policy-developer-done.schema.json"],
       ["merge", "policy-merge.schema.json"],
+      ["effort", "policy-effort.schema.json"],
     ] as const)("%s policy schema matches what zod derives", (kind, file) => {
       const onDisk = readFileSync(join(schemaDir(), file), "utf-8");
       const derived = serialiseSchema(policyJsonSchemas()[kind]);

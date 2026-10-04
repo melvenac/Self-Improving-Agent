@@ -119,6 +119,8 @@ export {
 
 export {
   loadPolicies,
+  loadEffortPolicy,
+  chooseEffort,
   policiesDir,
   policyJsonSchemas,
   decidePlanGate,
