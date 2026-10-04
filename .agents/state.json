@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 333,
+  "revision": 334,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1523,6 +1523,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:3x CDT: 'Is there any way for atlas to know what runtime its devs are using? Once cursor usage is gone we will be switching back to cc so atlas needs to know both runtimes.' -> 'give it to Atlas as a task.' Relayed by clark (TOLD, one link: Aaron -> clark -> Atlas). PROBLEM (read by the planner at cff008ca): .agents/SYSTEM/hub-partner-seats.json carries only a boolean `cursor` and a hub room per seat; it has no Claude Code dispatch route, host or model, so a switch back to CC has nothing in the record to dispatch from. The briefing's SEATS line prints 'not polling' for waker seats, which is normal for them and reads as a fault. SCOPE: (1) map: replace `cursor` with `runtime: \"cursor\" | \"claude-code\"`; add per seat `host`, `model` (cursor: composer-2.5; CC: sonnet) and `dispatch.cursor = {via:'hub-room', hub_name, room, waker:'<hub_name>-waker'}` and `dispatch.claude_code = {via:'session', name, host}`; `runtime` selects the active one; hub_name stays a plain field (D-115); recommend whether the runtime-baked names cursor-builder/cursor-infra are kept or renamed at the next switch (the planner rules). (2) ob_start SEATS line per seat: runtime/model, host and live state, using hub seatState (idle/working/owes_reply/alarm) for waker seats and session presence for CC seats; never 'not polling' for a waker seat. (3) A short 'switch runtime' procedure in a role doc, both directions, with the D-119 lease OwnerPid rule for each runtime (CC: the claude.exe session; Cursor: the nearest cursor-agent ancestor). (4) Tests: ob_start renders both runtimes from fixture maps; a map missing `runtime` fails loudly. OVERLAP: this is the record half of T-202 (which also wants SHA/rev at seat start); T-202 stays open for the online signal. Role-doc and code changes merge on Aaron's word.",
+      "note_by": [
+        "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-241",
+      "title": "Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 161,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:2x CDT: 'We need to try the frogger migration again at some point. The plan was to reset frogger repo before the migration and test again.' Then: 'Frogger is a real project but non production, it was a fun test for cc several weeks ago. No plan to publish it.' Relayed by clark (TOLD, one link). SCOPE: frogger is a DISPOSABLE TEST BED, so the reset and the /bootstrap re-run do not need the live-project caution reserved for Makerspace (T-181). The planner schedules it; it is not urgent. STEPS: (1) Before using ~/Projects/frogger-residue as the reset source, establish what it holds and whether it is the saved pre-pilot copy (both directories exist, read at s161). (2) Reset ~/Projects/frogger to its pre-migration state. (3) Re-run /bootstrap from current SIA master, including the bootstrap-fix work (docs/loops/bootstrap-fix-brief.md and its r2-r4 handoffs). (4) Grade the run against F1-F15 in docs/loops/t181-frogger-pilot-report.md and write the result to a tracked file in docs/loops/. RELATION: this is the frogger slice of T-181 run again; T-181 stays open for the other projects.",
       "note_by": [
         "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1"
       ],
