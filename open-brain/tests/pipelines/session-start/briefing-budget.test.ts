@@ -5,6 +5,7 @@ import { parseState, type State } from "../../../src/shared/state-schema.js";
 import { BRIEFING_BUDGET, BRIEFING_END, BRIEFING_START, renderBriefing, type BriefingInput } from "../../../src/pipelines/session-start/briefing.js";
 import { HANDOFF_CAPS } from "../../../src/shared/handoff-caps.js";
 import { focusLine, seatsLine, seatOrder } from "../../../src/pipelines/session-start/focus.js";
+import type { SeatRuntime } from "../../../src/pipelines/session-start/hub-seat-state.js";
 import { MISSING_HANDOFF_MAX_CHARS } from "../../../src/pipelines/session-start/state-render.js";
 
 /**
@@ -282,6 +283,8 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     if (!parsed.ok) throw new Error(parsed.error);
     const state = parsed.data;
     const presence = Object.fromEntries(slots.filter((s) => s.hubName !== null).map((s) => [s.hubName!, "hub listener:not polling"]));
+    const infra = slots.find((s) => s.seat === "infra");
+    if (!infra) throw new Error("seat map has no infra row");
     // At the longest the product allows: larger session and revision numbers than the T-199 row's 155-char notice.
     const notice = `Handoff MISSING: last builder session #123456 (00000000-0000-4000-8000-000000000000, rev 123456789) wrote the record, left no handoff; fix: ob_state set_handoff`;
     expect(notice.length, "the notice is at MISSING_HANDOFF_MAX_CHARS").toBe(MISSING_HANDOFF_MAX_CHARS);
@@ -291,7 +294,17 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
       usage: "Usage: STOP (weekly 98%) · park, push WIP · 5h 14%",
       workingTree: `Working tree: 9 uncommitted: ${"a/b/c.ts, ".repeat(8)}+1 more`,
       focus: {
-        focus: focusLine(state, { kind: "seat", checkout: "sia-infra", seat: "infra", role: "developer", agent: "Infra", hubName: slots.find((s) => s.seat === "infra")?.hubName ?? null }),
+        focus: focusLine(state, {
+          kind: "seat",
+          checkout: "sia-infra",
+          seat: "infra",
+          role: "developer",
+          agent: "Infra",
+          hubName: infra.hubName,
+          runtime: infra.runtime as SeatRuntime,
+          host: infra.host,
+          model: infra.model,
+        }),
         seats: seatsLine(state, slots, presence),
       },
       missingHandoff: notice,
