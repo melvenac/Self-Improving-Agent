@@ -165,7 +165,7 @@ describe("T-003 round 2", { timeout: 60_000 }, () => {
     });
     rmSync(home, { recursive: true, force: true });
     rmSync(cwd, { recursive: true, force: true });
-    expect(r.stdout ?? "").toContain("Session proof NOT written: this host is not Claude Code");
+    expect(r.stdout ?? "").toContain("Session proof NOT written: cursor payload has no cursor_version (D5)");
     expect(r.stdout ?? "").not.toContain("Session proof written:");
   });
 
