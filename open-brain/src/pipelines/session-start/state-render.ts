@@ -1,6 +1,5 @@
 import type { State, Task, Handoff, Seat, OpenQuestion } from "../../shared/state-schema.js";
-import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, ownHandoff, compareFirstRev, questionText, questionResolvedBy, watchText } from "../../shared/state-schema.js";
-import { basename, resolve } from "node:path";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, ownHandoff, checkoutOf, compareFirstRev, questionText, questionResolvedBy, watchText } from "../../shared/state-schema.js";
 import { findHandoffCommit } from "./handoff-provenance.js";
 import { resolveCheckoutSeat } from "./seat-map.js";
 
@@ -264,7 +263,8 @@ export const MISSING_HANDOFF_MAX_CHARS = 160;
  */
 export function checkMissingHandoff(state: State, options: MissingHandoffOptions): MissingHandoffCheck {
   if (!options.projectRoot) return { kind: "not-checked", reason: "no project root, so the checkout is unknown" };
-  const checkout = basename(resolve(options.projectRoot));
+  // checkoutOf: the writer's own derivation, so the session it stamped is the one found here (T-239 follow-up, QA 270 row 10).
+  const checkout = checkoutOf(options.projectRoot);
   // Only a PROVEN current session is excluded. With none proven (null or absent) a session whose own uuid is null is not "the
   // current one": it is an unattributable session, and it must stay visible to the not-checked branch below.
   const current = options.sessionUuid ?? null;

@@ -41,7 +41,7 @@ title: Short description of the lesson
 project: Project Name
 domain: comma, separated, tags
 date: YYYY-MM-DD
-type: gotcha | pattern | decision | fix | optimization
+type: optional free label, one token (T-025). Not an enum. fact_kind is the update rule.
 last-used: YYYY-MM-DD
 retrieval-count: N
 ---
@@ -74,7 +74,7 @@ the .md, then index it in SQLite).
 
 ### `fact_kind`: state vs event
 
-Which **update rule** a fact obeys, which is a different axis from the `type` field above:
+`type` in the frontmatter above is an optional free label, one token. It is not retired and it is not enumerated (T-025). `fact_kind` (state, event, or NULL) is the update rule:
 
 | Kind | Meaning | Correct update |
 |---|---|---|

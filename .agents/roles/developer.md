@@ -81,6 +81,27 @@ The `module-boundary` check is the reference implementation of the rest: refuses
 specifier rather than reporting a clean graph; defaults unlisted files to the strict side; asserts
 the count of what it walked; states its own limits in its output. See *Instruments* in `shared.md`.
 
+## Machine lease on shared QA machines (T-204, D-119, G-054)
+
+On the QA PC and laptop, **HEAVY** runs (full vitest suite, build, or expected over ~2 minutes / ~1.5 GB) take the
+profile copy of `machine-lease.ps1` before the run and `release` after. **LIGHT** runs (one vitest file, `tsc`,
+`typecheck:tests`) need no lease but stay one file at a time.
+
+Always invoke with **`-File`**, never `powershell -Command "& ..."`, when exit codes matter — `-Command` does not
+preserve script codes (non-owner `release` is **12** under `-File`, **1** under `-Command`; see
+`docs/loops/g054-finding.md`). Example:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" take -OwnerPid $owner -Seat <seat> -TtlMinutes 90
+```
+
+**`-OwnerPid`** (same pid for `take`, `status`, and `release`):
+
+- **Cursor (D-118a, code #427 r2):** the nearest **ancestor** of the calling shell — start from the parent, never the calling shell itself — that is cursor-agent's own host process: `node.exe` running `cursor-agent`'s `versions/<ver>/index.js`. Shape: `docs/loops/t235-p2-3-r2-measure.md`.
+- **Claude Code:** the `claude.exe` session's pid.
+
+Exit **10** = held (wait and report owner); **11** = malformed lease; **12** = not yours on `release`/`renew` (report, do not retry with another pid); **2** = usage (including `take` with a dead pid). Read `$LASTEXITCODE` in the same PowerShell session.
+
 ## Scope and outputs
 
 Implementation, hooks, scripts, DB migrations, builds, tests.
