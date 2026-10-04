@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
- * Stand-in cursor-agent host: the script path contains "cursor-agent" so
- * findCursorAgentHostPid matches this process. Spawns cli-bootstrap as a child
- * with the same stdin payload and extra argv after "--".
+ * Stand-in cursor-agent host for e2e tests. The command line matches the live
+ * Windows host shape: …\cursor-agent\versions\<ver>\index.js (see process-session.ts).
+ * Spawns cli-bootstrap as a child with the same stdin payload and extra argv after "--".
  */
-const { spawnSync } = require("child_process");
+import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 
 const sep = process.argv.indexOf("--");
 const childArgs = sep >= 0 ? process.argv.slice(sep + 1) : [];
-const input = require("fs").readFileSync(0, "utf-8");
+const input = readFileSync(0, "utf-8");
 process.stdout.write(`CURSOR_AGENT_HOST_PID=${process.pid}\n`);
 const r = spawnSync(process.execPath, childArgs, {
   input,

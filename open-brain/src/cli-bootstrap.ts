@@ -123,7 +123,7 @@ const proofLine: string = (() => {
     if (payload.cursor_version === undefined || payload.cursor_version === null) {
       return "Session proof NOT written: cursor payload has no cursor_version (D5), so this session's server will refuse attributed writes.";
     }
-    const hostPid = findCursorAgentHostPid(process.pid);
+    const hostPid = findCursorAgentHostPid(process.ppid);
     if (hostPid === null) {
       return "Session proof NOT written: no cursor-agent host process found in the hook's ancestor chain, so this session's server will refuse attributed writes.";
     }

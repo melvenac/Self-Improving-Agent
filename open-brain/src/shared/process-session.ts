@@ -30,9 +30,10 @@
 // - The ordering "SessionStart completes before the new session's first tool
 //   call" was measured headless (3 of 3), not interactively.
 // - Cursor (T-235 P2-3): SessionStart writes `by-pid/<cursorAgentHostPid>.json`
-//   after walking ancestors until CommandLine matches `cursor-agent`. The MCP
-//   server walks the same way when OPEN_BRAIN_IDE=cursor (direct ppid first,
-//   then ancestors). Claude Code behaviour below is unchanged.
+//   after walking ancestors from the hook's `process.ppid` (never the hook pid)
+//   until CommandLine matches the cursor-agent executable entry (see
+//   isCursorAgentHostCommandLine). The MCP server walks from its parent when
+//   OPEN_BRAIN_IDE=cursor. Claude Code behaviour below is unchanged.
 // - The server must be the claude process's DIRECT child. A wrapper (cmd /c,
 //   npx) between them makes ppid name the wrapper: no file, so refuse — unless
 //   cursor walk-up is enabled.
@@ -128,6 +129,51 @@ export type ProvenSession =
 
 export type ProcessParentInfo = { pid: number; ppid: number; commandLine: string };
 
+/**
+ * True when `commandLine` is the cursor-agent host process, not merely a path
+ * that contains the substring `cursor-agent` (T-235 P2-3 r2).
+ *
+ * Live match on QA PC 2026-10-04 (cursor-agent 2026.10.01-e373342):
+ * `…\AppData\Local\cursor-agent\versions\2026.10.01-e373342\node.exe
+ * …\cursor-agent\versions\2026.10.01-e373342\index.js` (args follow).
+ */
+export function isCursorAgentHostCommandLine(commandLine: string): boolean {
+  if (!commandLine.trim()) return false;
+  const win = commandLine.replace(/\//g, "\\");
+  if (/\\cursor-agent\\versions\\[^\\]+\\index\.js/i.test(win)) return true;
+  if (/\/cursor-agent\/versions\/[^/]+\/index\.js/i.test(commandLine)) return true;
+  if (/\\cursor-agent\.ps1/i.test(win) && /powershell/i.test(win)) return true;
+  if (/\\cursor-agent\.cmd(?:\s|$|")/i.test(win)) return true;
+  return false;
+}
+
+function loadWin32ProcessTable(): Map<number, ProcessParentInfo> {
+  const raw = execFileSync(
+    "powershell.exe",
+    [
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress",
+    ],
+    { encoding: "utf-8", timeout: 60_000, stdio: ["ignore", "pipe", "ignore"], windowsHide: true },
+  ).trim();
+  const parsed = JSON.parse(raw) as
+    | Array<{ ProcessId: number; ParentProcessId: number; CommandLine: string | null }>
+    | { ProcessId: number; ParentProcessId: number; CommandLine: string | null };
+  const rows = Array.isArray(parsed) ? parsed : [parsed];
+  const map = new Map<number, ProcessParentInfo>();
+  for (const row of rows) {
+    if (!Number.isInteger(row.ProcessId)) continue;
+    map.set(row.ProcessId, {
+      pid: row.ProcessId,
+      ppid: row.ParentProcessId,
+      commandLine: row.CommandLine ?? "",
+    });
+  }
+  return map;
+}
+
 /** Read one process row for ancestor walks (injectable in tests). */
 export function readProcessParent(pid: number): ProcessParentInfo | null {
   if (!Number.isInteger(pid) || pid <= 0) return null;
@@ -175,21 +221,25 @@ export function readProcessParent(pid: number): ProcessParentInfo | null {
   }
 }
 
-const CURSOR_AGENT_RE = /cursor-agent/i;
-
 /**
- * Nearest ancestor of `fromPid` whose command line identifies the cursor-agent
- * host (the long-lived node process for one CLI run).
+ * Nearest ancestor of `fromPid` (inclusive) whose command line is the
+ * cursor-agent host. The SessionStart hook passes `process.ppid`, never its own
+ * pid (T-235 P2-3 r2).
  */
 export function findCursorAgentHostPid(
   fromPid: number,
   readParent: (pid: number) => ProcessParentInfo | null = readProcessParent,
 ): number | null {
+  let resolveParent = readParent;
+  if (process.platform === "win32" && readParent === readProcessParent) {
+    const table = loadWin32ProcessTable();
+    resolveParent = (pid) => table.get(pid) ?? null;
+  }
   let p = fromPid;
   for (let i = 0; i < 64 && p > 0; i++) {
-    const row = readParent(p);
+    const row = resolveParent(p);
     if (!row) break;
-    if (CURSOR_AGENT_RE.test(row.commandLine)) return row.pid;
+    if (isCursorAgentHostCommandLine(row.commandLine)) return row.pid;
     p = row.ppid;
   }
   return null;

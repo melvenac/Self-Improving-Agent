@@ -1,10 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
 import {
   byPidDir,
   findCursorAgentHostPid,
+  isCursorAgentHostCommandLine,
   processStartTime,
   proveSession,
   writeProcessSession,
@@ -12,8 +15,13 @@ import {
 } from "../src/shared/process-session.js";
 import { handleSetSession } from "../src/server.js";
 
+const TSX_CLI = createRequire(import.meta.url).resolve("tsx/cli");
+const HOST_ENTRY = resolve(import.meta.dirname, "fixtures-t003/cursor-agent/versions/e2e-fixture/index.js");
+const BOOT = resolve(import.meta.dirname, "../src/cli-bootstrap.ts");
+
 const SELF = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
 const OTHER = "11111111-2222-3333-4444-555555555555";
+const HOST_CMD = String.raw`C:\AppData\Local\cursor-agent\versions\2026.10.01-e373342\node.exe C:\AppData\Local\cursor-agent\versions\2026.10.01-e373342\index.js`;
 
 describe("T-235 P2-3 cursor session proof", () => {
   let dir: string;
@@ -22,6 +30,108 @@ describe("T-235 P2-3 cursor session proof", () => {
   });
   afterEach(() => rmSync(dir, { recursive: true, force: true }));
 
+  it("isCursorAgentHostCommandLine matches live cursor-agent index.js entry, not repo paths", () => {
+    expect(isCursorAgentHostCommandLine(HOST_CMD)).toBe(true);
+    expect(
+      isCursorAgentHostCommandLine(
+        String.raw`node.exe C:\Users\Aaron Melven\Worktrees\sia-builder\open-brain\build\cli-bootstrap.js`,
+      ),
+    ).toBe(false);
+    expect(isCursorAgentHostCommandLine(String.raw`node.exe fixtures-t003\cursor-agent-host.cjs`)).toBe(false);
+  });
+
+  it("e2e: cursor-agent fixture host spawns bootstrap and writes by-pid/<hostPid>.json", () => {
+    const home = mkdtempSync(join(tmpdir(), "t235-p23-home-"));
+    const cwd = mkdtempSync(join(tmpdir(), "t235-p23-cwd-"));
+    const slot = join(home, "active-session.json");
+    try {
+      const r = spawnSync(
+        process.execPath,
+        [HOST_ENTRY, "--", TSX_CLI, BOOT, "--ide", "cursor"],
+        {
+          input: JSON.stringify({
+            cwd,
+            session_id: SELF,
+            cursor_version: "2026.10.01-e373342",
+            workspace_roots: [cwd],
+          }),
+          encoding: "utf-8",
+          env: {
+            ...process.env,
+            HOME: home,
+            USERPROFILE: home,
+            OPEN_BRAIN_ACTIVE_SESSION: slot,
+          },
+        },
+      );
+      expect(r.status).toBe(0);
+      const m = (r.stdout ?? "").match(/CURSOR_AGENT_HOST_PID=(\d+)/);
+      expect(m).not.toBeNull();
+      const hostPid = Number(m![1]);
+      expect(r.stdout).toContain(`Session proof written: session ${SELF} for cursor-agent host process ${hostPid}.`);
+      const proofPath = join(byPidDir(slot), `${hostPid}.json`);
+      expect(existsSync(proofPath)).toBe(true);
+      const proof = JSON.parse(readFileSync(proofPath, "utf-8"));
+      expect(proof.claude_pid).toBe(hostPid);
+      const hookOut = (r.stdout ?? "").split("\n").find((l) => l.includes("Session proof written"));
+      expect(hookOut).toBeDefined();
+    } finally {
+      rmSync(home, { recursive: true, force: true });
+      rmSync(cwd, { recursive: true, force: true });
+    }
+  });
+
+  it("ancestor cmdlines may mention cursor-agent paths but only versioned index.js is a host", () => {
+    const hook = 10;
+    const chain: Record<number, ProcessParentInfo> = {
+      [hook]: {
+        pid: hook,
+        ppid: 1,
+        commandLine: String.raw`node.exe C:\repos\cursor-agent\workspace\open-brain\build\cli-bootstrap.js`,
+      },
+    };
+    expect(findCursorAgentHostPid(hook, (p) => chain[p] ?? null)).toBeNull();
+  });
+
+  it("mutant: proof keyed to hook pid (not host) is rejected on cursor walk", () => {
+    const host = process.ppid;
+    const hook = process.pid;
+    const wrapper = hook + 1000;
+    const hostStart = processStartTime(host);
+    expect(hostStart).not.toBeNull();
+    const chain: Record<number, ProcessParentInfo> = {
+      [wrapper]: { pid: wrapper, ppid: hook, commandLine: "powershell wrapper" },
+      [hook]: { pid: hook, ppid: host, commandLine: "node.exe cli-bootstrap.js" },
+      [host]: { pid: host, ppid: 1, commandLine: HOST_CMD },
+    };
+    writeProcessSession(dir, {
+      session_id: SELF,
+      claude_pid: hook,
+      proc_start: hostStart!,
+      ide: "cursor",
+      written_at: "",
+    });
+    expect(
+      proveSession(dir, wrapper, processStartTime(hook), {
+        cursorWalk: true,
+        readParent: (p) => chain[p] ?? null,
+      }),
+    ).toMatchObject({ id: null });
+    writeProcessSession(dir, {
+      session_id: SELF,
+      claude_pid: host,
+      proc_start: hostStart!,
+      ide: "cursor",
+      written_at: "",
+    });
+    expect(
+      proveSession(dir, wrapper, processStartTime(hook), {
+        cursorWalk: true,
+        readParent: (p) => chain[p] ?? null,
+      }),
+    ).toEqual({ id: SELF, pid: host });
+  });
+
   it("cursorWalk finds proof on the cursor-agent host when the MCP parent is a wrapper", () => {
     const host = process.ppid;
     const wrapper = process.pid;
@@ -29,7 +139,7 @@ describe("T-235 P2-3 cursor session proof", () => {
     expect(hostStart).not.toBeNull();
     const chain: Record<number, ProcessParentInfo> = {
       [wrapper]: { pid: wrapper, ppid: host, commandLine: "powershell.exe wrapper" },
-      [host]: { pid: host, ppid: 1, commandLine: "node.exe C:\\cursor-agent\\node.exe run" },
+      [host]: { pid: host, ppid: 1, commandLine: HOST_CMD },
     };
     writeProcessSession(dir, {
       session_id: SELF,
@@ -64,7 +174,7 @@ describe("T-235 P2-3 cursor session proof", () => {
           p === wrapper
             ? { pid: wrapper, ppid: host, commandLine: "pwsh" }
             : p === host
-              ? { pid: host, ppid: 1, commandLine: "cursor-agent host" }
+              ? { pid: host, ppid: 1, commandLine: HOST_CMD }
               : null,
       }),
     ).toEqual({ id: SELF, pid: host });
@@ -97,13 +207,14 @@ describe("T-235 P2-3 cursor session proof", () => {
     }
   });
 
-  it("findCursorAgentHostPid walks ancestors until command line matches cursor-agent", () => {
+  it("findCursorAgentHostPid walks from hook ppid to versioned index.js host", () => {
     const host = 20;
     const hook = 10;
     const chain: Record<number, ProcessParentInfo> = {
       [hook]: { pid: hook, ppid: host, commandLine: "node.exe cli-bootstrap.js" },
-      [host]: { pid: host, ppid: 1, commandLine: "node.exe fixtures-t003/cursor-agent-host.cjs" },
+      [host]: { pid: host, ppid: 1, commandLine: HOST_CMD },
     };
     expect(findCursorAgentHostPid(hook, (p) => chain[p] ?? null)).toBe(host);
+    expect(findCursorAgentHostPid(hook, (p) => chain[p] ?? null)).not.toBe(hook);
   });
 });
