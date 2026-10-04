@@ -13,7 +13,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { withSessionHooks, withCursorMcp, withCursorSessionHook, repoRootFrom } from './setup-hooks.mjs';
+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorRecallHook, repoRootFrom } from './setup-hooks.mjs';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
@@ -22,6 +22,7 @@ const REPO_ROOT = repoRootFrom(import.meta.url);
 const OPEN_BRAIN_DIR = path.join(REPO_ROOT, 'open-brain');
 const OPEN_BRAIN_SERVER = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
 const OPEN_BRAIN_BOOTSTRAP = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');
+const OPEN_BRAIN_RECALL_TRIGGER = path.join(OPEN_BRAIN_DIR, 'build', 'cli-recall-trigger.js');
 
 // Status indicators
 const OK = '\u2713';
@@ -218,6 +219,22 @@ function registerCursorHooks() {
   fs.writeFileSync(hooksPath, JSON.stringify(r.config, null, 2) + '\n');
 }
 
+function registerCursorRecallHook() {
+  const hooksPath = path.join(CURSOR_DIR, 'hooks.json');
+
+  let config = { version: 1, hooks: {} };
+  if (fs.existsSync(hooksPath)) {
+    config = JSON.parse(fs.readFileSync(hooksPath, 'utf-8'));
+  }
+
+  const r = withCursorRecallHook(config, OPEN_BRAIN_RECALL_TRIGGER, process.execPath);
+  for (const n of r.notes) log(n.includes('already') ? SKIP : OK, n);
+  if (!r.changed) return;
+
+  ensureDir(CURSOR_DIR);
+  fs.writeFileSync(hooksPath, JSON.stringify(r.config, null, 2) + '\n');
+}
+
 function copyCursorSlashCommands() {
   const destDir = path.join(CURSOR_DIR, 'commands');
   const repoCommandsDir = path.join(REPO_ROOT, 'project-template', '.cursor', 'commands');
@@ -300,6 +317,7 @@ function main() {
   copySlashCommands();
   registerCursorMcp();
   registerCursorHooks();
+  registerCursorRecallHook();
   copyCursorSlashCommands();
   setupObsidianVault();
 

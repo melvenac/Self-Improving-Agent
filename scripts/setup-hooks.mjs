@@ -132,6 +132,33 @@ export function withCursorSessionHook(config, bootstrapPath, nodePath) {
 }
 
 /**
+ * T-235 P2-5: register cli-recall-trigger on Cursor postToolUse (absolute Node path).
+ *
+ * @returns {{ config: object, changed: boolean, notes: string[] }}
+ */
+export function withCursorRecallHook(config, triggerPath, nodePath) {
+  const before = JSON.stringify(config ?? { version: 1, hooks: {} });
+  const c = JSON.parse(before);
+  if (!c.hooks) c.hooks = {};
+  if (!Array.isArray(c.hooks.postToolUse)) c.hooks.postToolUse = [];
+  const command = `"${fwd(nodePath)}" "${fwd(triggerPath)}"`;
+  const notes = [];
+
+  const stale = c.hooks.postToolUse.filter((e) => e.command?.includes("cli-recall-trigger") && e.command !== command);
+  if (stale.length > 0) {
+    c.hooks.postToolUse = c.hooks.postToolUse.filter((e) => !stale.includes(e));
+    notes.push(`Upgraded ${stale.length} stale Cursor postToolUse recall hook entry(ies)`);
+  }
+  if (!c.hooks.postToolUse.some((e) => e.command === command)) {
+    c.hooks.postToolUse.push({ command });
+    notes.push("Cursor postToolUse recall hook registered in ~/.cursor/hooks.json");
+  } else {
+    notes.push("Cursor postToolUse recall hook already configured");
+  }
+  return { config: c, changed: JSON.stringify(c) !== before, notes };
+}
+
+/**
  * The repo root for a script at `<root>/scripts/<file>`, from its import.meta.url.
  * T-235 Phase 0: a URL's pathname keeps percent-encoding, so a home directory with a
  * space (the QA PC's "Aaron Melven") became "Aaron%20Melven", open-brain/ was "not
