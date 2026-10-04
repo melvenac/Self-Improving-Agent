@@ -12,8 +12,10 @@
  * after that check would never have reached any machine set up before it — each
  * event is now checked on its own.
  */
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 export const SESSION_HOOKS = [
   ['SessionStart', 'cli-bootstrap.js'],
@@ -166,4 +168,45 @@ export function withCursorRecallHook(config, triggerPath, nodePath) {
  */
 export function repoRootFrom(metaUrl) {
   return path.resolve(path.dirname(fileURLToPath(metaUrl)), '..');
+}
+
+function fileHash(filePath) {
+  return createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+}
+
+function filesIdentical(a, b) {
+  if (!fs.existsSync(a) || !fs.existsSync(b)) return false;
+  return fileHash(a) === fileHash(b);
+}
+
+/**
+ * Copy every `.md` from `project-template/.cursor/commands/` into `~/.cursor/commands/`.
+ * A destination that already exists and differs from the template is moved aside first
+ * (`<name>.md.user-<UTC timestamp>`), never silently overwritten. Identical files are a no-op.
+ */
+export function copyCursorSlashCommands(repoRoot, cursorDir) {
+  const repoCommandsDir = path.join(repoRoot, 'project-template', '.cursor', 'commands');
+  const destDir = path.join(cursorDir, 'commands');
+  if (!fs.existsSync(repoCommandsDir)) {
+    return { copied: 0, missingTemplate: true, movedAside: [] };
+  }
+  fs.mkdirSync(destDir, { recursive: true });
+  let copied = 0;
+  const movedAside = [];
+  const utcStamp = () => new Date().toISOString().replace(/:/g, '');
+  for (const file of fs.readdirSync(repoCommandsDir)) {
+    if (!file.endsWith('.md')) continue;
+    const src = path.join(repoCommandsDir, file);
+    const dest = path.join(destDir, file);
+    if (filesIdentical(src, dest)) continue;
+    if (fs.existsSync(dest)) {
+      const aside = path.join(destDir, `${file}.user-${utcStamp()}`);
+      fs.renameSync(dest, aside);
+      movedAside.push({ from: dest, to: aside });
+    }
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(src, dest);
+    copied += 1;
+  }
+  return { copied, missingTemplate: false, movedAside };
 }

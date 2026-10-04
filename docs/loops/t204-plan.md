@@ -22,6 +22,11 @@ because A2A carries no memory.
 6. **Fail closed**: unreadable, empty, malformed or field-missing is HELD (exit 11, cause named), never ignored or
    deleted.
 7. Exit codes: 0 ok, 10 held by a live owner, 11 held but unreadable/malformed, 12 release/renew by a non-owner, 2 usage.
+8. **Caller (G-054):** every seat, launcher and wrapper must run the profile copy with
+   `powershell -NoProfile -ExecutionPolicy Bypass -File %USERPROFILE%\machine-lease.ps1 ...`, not
+   `powershell -Command "& ..."`. `-Command` does not preserve script exit codes (non-owner `release` is 12 under
+   `-File` but 1 under `-Command`). Read `$LASTEXITCODE` in the same session. `take` with a dead `-OwnerPid` exits **2**
+   (usage: not a running process).
 
 ## qa-queue.ps1
 

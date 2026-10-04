@@ -1448,6 +1448,20 @@ export const SAFE_LOCAL_KEYS: ReadonlyArray<{ key: RegExp; value?: RegExp; why: 
   { key: /^extensions\.worktreeconfig$/, why: "a flag enabling config.worktree, which is itself watched and held to this list" },
 ];
 
+/**
+ * G-053: `gc.auto` is admitted only when the stored value is exactly `0` (no trim). Every other `gc.*`
+ * key is refused so a widened allowlist cannot admit `gc.autoDetach` or similar.
+ */
+export function isAllowedLocalConfigEntry(key: string, value: string): boolean {
+  if (key.startsWith("gc.")) {
+    return key === "gc.auto" && value === "0";
+  }
+  const rule = SAFE_LOCAL_KEYS.find((s) => s.key.test(key));
+  if (rule === undefined) return false;
+  if (rule.value !== undefined && !rule.value.test(value)) return false;
+  return true;
+}
+
 /** Every key in the repository's own config files that {@link SAFE_LOCAL_KEYS} does not allow. */
 export function unsafeLocalKeys(repoRoot: string, dirs: GitDirs): { keys: string[]; error: string | null } {
   const files = [join(dirs.commonDir, "config"), join(dirs.gitDir, "config.worktree"), join(dirs.commonDir, "config.worktree")];
@@ -1463,8 +1477,7 @@ export function unsafeLocalKeys(repoRoot: string, dirs: GitDirs): { keys: string
       const nl = entry.indexOf("\n");
       const key = (nl < 0 ? entry : entry.slice(0, nl)).toLowerCase();
       const value = nl < 0 ? "" : entry.slice(nl + 1);
-      const rule = SAFE_LOCAL_KEYS.find((s) => s.key.test(key));
-      if (rule === undefined || (rule.value !== undefined && !rule.value.test(value.trim()))) {
+      if (!isAllowedLocalConfigEntry(key, value)) {
         keys.push(`${key} (in ${f})`);
       }
     }
