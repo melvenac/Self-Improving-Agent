@@ -18,6 +18,7 @@ import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { handleStart } from "../../../src/server.js";
 import { gitShow } from "../../../src/pipelines/session-start/git-read.js";
+import { BRIEFING_START } from "../../../src/pipelines/session-start/briefing.js";
 import { composeGreeting } from "../../../src/pipelines/sync/checks.js";
 
 const SPAWN_TIMEOUT_MS = 60_000;
@@ -140,6 +141,18 @@ describe("T-200 record source", { timeout: SPAWN_TIMEOUT_MS }, () => {
       new RegExp(`record read from origin/master ${sha} rev 163; this tree holds rev 140; last fetch \\d{4}-\\d{2}-\\d{2}T`),
     );
     expect(out).toContain("state.json rev 163");
+  });
+
+  it("RM-1b: behind master with briefing_budget ON still renders master's record in the budgeted Briefing block", async () => {
+    const f = makeFixture(root, LOCAL);
+    f.advanceOrigin(MASTER);
+    mkdirSync(join(f.clone, ".agents", "SYSTEM"), { recursive: true });
+    writeFileSync(join(f.clone, ".agents", "SYSTEM", "greeting.json"), JSON.stringify({ briefing_budget: true }));
+    const out = await start(f.clone);
+    expect(out).toContain(BRIEFING_START);
+    expect(out).toContain("MASTER-OBJECTIVE");
+    expect(out).not.toContain("LOCAL-OBJECTIVE");
+    expect(out).toContain("record read from origin/master");
   });
 
   it("RM-2a: a tree at master's revision renders its own record and says LOCAL", async () => {
