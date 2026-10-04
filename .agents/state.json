@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 328,
+  "revision": 329,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3303,6 +3303,13 @@
       "what": "The config-channel harness test CA-3c/3d R21 failed once on master push CI (8f14ca91, run 37172590273 attempt 1): the boundary check saw `<common>/info/refs created` during the developer stage, refused the developer, and the test expected a pass. It passed on re-run (attempt 2), on the PR run of the same code, and in the master runs immediately before. info/refs is written by `git update-server-info`, which a background `git gc --auto` can trigger, so a git-internal write is being read as a role changing what git executes.",
       "evidence": "Run 37172590273 attempt 1, failure text 'developer was refused, not warned. 1 repository config/hook file(s) changed during the developer stage: <common>/info/refs created'. The only failure in the last 30 CI runs (sia-infra, session 161). The planner re-ran it session 160: attempt 2 success.",
       "recommended_update": "Determine what wrote info/refs (gc.auto in the test's scratch repo; set gc.auto=0 there, or run the stage with GIT_CONFIG_PARAMETERS gc.auto=0) and decide whether info/refs belongs in the watched set at all. It is data git writes, not something git executes. If it recurs before a fix, record each run id here.",
+      "opened_session": 160
+    },
+    {
+      "id": "G-054",
+      "what": "machine-lease.ps1: rivet (A2A, T-094) saw a non-owner `release` print 'not yours' with exit 0, and the header documents exit 12. The SOURCE at master (docs/loops/machine-lease.ps1, Assert-Owner, around line 165) does `exit 12` on that path. So either rivet ran a different copy, or the exit code was lost between the script and the caller (for example `powershell -Command \"& ...\"` reports only success or failure, or a pipe or wrapper replaced it). Separately, rivet's two HEAVY runs took the lease with dead OwnerPids (7964, 4052) before D-119 (D-118a) reached it, so those leases protected nothing.",
+      "evidence": "clark, session 160 (about 00:4x CDT 2026-10-04), relaying rivet's T-094 run. The planner read the source: line 165 has `exit 12`. The installed copies match blob 45969354 on both QA machines (clark's install read-back).",
+      "recommended_update": "Reproduce on the QA PC or laptop: take with one pid, release with another, and capture the exit code with `powershell -NoProfile -ExecutionPolicy Bypass -File <copy> release -OwnerPid <other>; echo $LASTEXITCODE` (not -Command, not piped). If it's 12, the defect is in the caller: document the -File requirement in qa-launch.md and in the D-119 dispatch text. If it's 0, the script is wrong: fix it and add a harness row. Also make `take` refuse an -OwnerPid that is not alive (status would read stale at once).",
       "opened_session": 160
     }
   ],

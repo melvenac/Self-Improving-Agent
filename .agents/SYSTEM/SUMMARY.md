@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 328 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 329 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — Cursor dev seats live on the QA PC (wakers + new rooms). QA 272 running: #415, #420 T-200, #421 G-053, + #418 retro-check. In build: T-235 P2-3 (builder, plan first), P2-4 (forge), P2-6 (infra).
 
 ## What's working
@@ -158,6 +158,7 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - Gap G-051: A QA dispatch that lets a seat read REAL config files (~/.claude.json, settings.json, .mcp.json, env) said 'read-only' but did not forbid copying VALUES into a report committed to a PUBLIC repo.
 - Gap G-052: Two accepted B3 PRs leave a default-path behaviour untested: #313 (T-065) has no row that pins knowledgeV2Db's default location (QA 257's repoint mutant survived), and #314 (T-042) never exercises the default obsidianVaultDir() resolution (every row passes vaultDir).
 - Gap G-053: The config-channel harness test CA-3c/3d R21 failed once on master push CI (8f14ca91, run 37172590273 attempt 1): the boundary check saw `<common>/info/refs created` during the developer stage, refused the developer, and the test expected a pass. It passed on re-run (attempt 2), on the PR run of the same code, and in the master runs immediately before. info/refs is written by `git update-server-info`, which a background `git gc --auto` can trigger, so a git-internal write is being read as a role changing what git executes.
+- Gap G-054: machine-lease.ps1: rivet (A2A, T-094) saw a non-owner `release` print 'not yours' with exit 0, and the header documents exit 12. The SOURCE at master (docs/loops/machine-lease.ps1, Assert-Owner, around line 165) does `exit 12` on that path. So either rivet ran a different copy, or the exit code was lost between the script and the caller (for example `powershell -Command "& ..."` reports only success or failure, or a pipe or wrapper replaced it). Separately, rivet's two HEAVY runs took the lease with dead OwnerPids (7964, 4052) before D-119 (D-118a) reached it, so those leases protected nothing.
 
 ## What's next
 
