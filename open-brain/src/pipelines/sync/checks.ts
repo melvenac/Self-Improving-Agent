@@ -1754,7 +1754,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
     severity: "pass",
     message:
       `${retirements.length} retirements across ${events.size} event classes, ${verified} allowed referrers all present and still naming their retirement, ` +
-      `0 unexpected across ${surface.length} live files read (${listing.label}), with ${allowedPairsNotScanned} (file, retirement) pair(s) not scanned because the file is a declared referrer; ${excludedNote}; ${live.length === listing.files.length ? "historical: none" : `historical: ${listing.files.length - live.length} (by rule)`} — ` +
+      `0 unexpected across ${surface.length} live files read (${listing.label}), with ${allowedPairsNotScanned} allowed referrer(s) verified by line_hashes; ${excludedNote}; ${live.length === listing.files.length ? "historical: none" : `historical: ${listing.files.length - live.length} (by rule)`} — ` +
       `resolvable against a registry: ${RESOLVABLE.join(", ")}; guarded by this record alone: ${unresolvable.join(", ")} ` +
       `(green means every RECORDED retirement is finished, not that every retirement is recorded)`,
     report: true,
