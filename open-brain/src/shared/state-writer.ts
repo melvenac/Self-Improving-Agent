@@ -20,7 +20,7 @@
  */
 import { existsSync, readFileSync, writeFileSync, renameSync, unlinkSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { basename, join, resolve } from "node:path";
+import { join } from "node:path";
 import { z } from "zod";
 import {
   StateSchema,
@@ -29,8 +29,10 @@ import {
   SeatName,
   LoopStateSchema,
   OpenQuestionSchema,
+  WatchOutSchema,
   parseState,
   serializeState,
+  checkoutOf,
   compareFirstRev,
   nextSessionNumber,
   type Seat,
@@ -38,6 +40,7 @@ import {
   type Task,
 } from "./state-schema.js";
 import { readJson } from "./fs-utils.js";
+import { handoffCapViolations } from "./handoff-caps.js";
 import {
   renderInbox,
   renderTaskFile,
@@ -63,10 +66,10 @@ const NoteEdit = {
 const NOTE_JOIN = " — ";
 
 export const OpSchema = z.discriminatedUnion("op", [
-  z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional() }),
+  z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional(), assignee: z.string().min(1).optional() }),
   // T-171: adding to a note and replacing it are different fields, named at the
   // call. `note` is gone from both ops (refused by name below, not ignored).
-  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), ...NoteEdit }),
+  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), assignee: z.string().min(1).nullable().optional(), ...NoteEdit }),
   z.strictObject({ op: z.literal("close_task"), id: z.string(), ...NoteEdit }),
   z.strictObject({ op: z.literal("reopen_task"), id: z.string(), note: z.string().min(1) }),
   z.strictObject({ op: z.literal("add_verified"), id: z.string().optional(), claim: z.string().min(1), evidence: z.array(EvidenceSchema).min(1) }),
@@ -81,7 +84,7 @@ export const OpSchema = z.discriminatedUnion("op", [
   // an argument: it comes from ApplyStateOptions.session_uuid, so a batch cannot
   // write under another session's uuid (T-163). The op is strict, so a batch
   // that tries is refused rather than having the key ignored.
-  z.strictObject({ op: z.literal("set_handoff"), seat: SeatName, pick_up: z.string(), watch_out: z.array(z.string()), open_questions: z.array(OpenQuestionSchema), loop_state: LoopStateSchema.nullable().optional() }),
+  z.strictObject({ op: z.literal("set_handoff"), seat: SeatName, pick_up: z.string(), watch_out: z.array(WatchOutSchema), open_questions: z.array(OpenQuestionSchema), loop_state: LoopStateSchema.nullable().optional() }),
 ]);
 export type StateOp = z.infer<typeof OpSchema>;
 
@@ -138,6 +141,11 @@ export interface ApplyStateOptions {
   seat?: Seat | null;
   /** YYYY-MM-DD stamped on the session record; defaults to today (local). */
   today?: string;
+  /**
+   * T-236 slice 2, OPT-IN per repo (greeting.json `handoff_caps`), default OFF: a set_handoff that breaks the caps is refused with a
+   * named reason. Applies to the entry being written only; no existing handoff is rewritten or re-checked.
+   */
+  handoff_caps?: boolean;
 }
 
 export interface WriteResult {
@@ -257,7 +265,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   // the record internally inconsistent once (a handoff "in session 72" when 72
   // did not exist), so the whole batch takes the recorded number.
   const uuid = options.session_uuid ?? null;
-  const checkout = options.checkout ?? basename(resolve(projectRoot));
+  const checkout = options.checkout ?? checkoutOf(projectRoot);
   const today = options.today ?? localIsoDate();
   const mine = uuid === null ? undefined : next.sessions.find((s) => s.uuid === uuid);
   // T-164 SC-2: the greeting number is provisional until this write. A different
@@ -300,7 +308,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const gapScan: GapCitationScan = renderOnly
     ? { ok: true, cited: new Map() }
     : citedGapIds(projectRoot);
-  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges, gapScan };
+  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges, gapScan, handoffCaps: options.handoff_caps === true };
 
   for (let i = 0; i < options.ops.length; i++) {
     const opName = (options.ops[i] as { op?: unknown } | null)?.op;
@@ -455,6 +463,8 @@ interface OpContext {
   noteChanges: string[];
   /** Gap citations in the tracked tree. A failed scan refuses add_gap. */
   gapScan: GapCitationScan;
+  /** T-236 slice 2: enforce the handoff caps on a set_handoff. Default false. */
+  handoffCaps: boolean;
 }
 
 /** The authors of a note after `add` is appended by `uuid`: unknown stays unknown. */
@@ -529,7 +539,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       const id = op.id ?? nextId("T", s.tasks.map((t) => t.id));
       if (s.tasks.some((t) => t.id === id)) return { ok: false, error: `task ${id} already exists` };
       if (op.supersedes && !s.tasks.some((t) => t.id === op.supersedes)) return { ok: false, error: `supersedes unknown task ${op.supersedes}` };
-      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: !op.note ? [] : ctx.uuid === null ? null : [ctx.uuid], closed_rev: null });
+      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: !op.note ? [] : ctx.uuid === null ? null : [ctx.uuid], closed_rev: null, ...(op.assignee !== undefined ? { assignee: op.assignee } : {}) });
       if (op.note) ctx.noteChanges.push(`${id} note SET: 0 -> ${op.note.length} chars`);
       return { ok: true, id };
     }
@@ -540,6 +550,9 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       if (op.title !== undefined) t.title = op.title;
       if (op.priority !== undefined) t.priority = op.priority;
       if (op.status !== undefined) t.status = op.status;
+      // T-236 (c): null CLEARS, and clearing removes the key, so the record reads as if it was never assigned.
+      if (op.assignee === null) delete t.assignee;
+      else if (op.assignee !== undefined) t.assignee = op.assignee;
       const refused = editNote(t, op, ctx);
       if (refused) return { ok: false, error: refused };
       return { ok: true, id: t.id };
@@ -653,6 +666,10 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       // SeatName is a role: three developer checkouts shared one slot, so a
       // developer's close-out erased another developer's (Step 0, record 118).
       // A session adds its own entry or updates it; it cannot reach another's.
+      if (ctx.handoffCaps) {
+        const broken = handoffCapViolations(op.pick_up, op.watch_out);
+        if (broken.length > 0) return { ok: false, error: `set_handoff refused (handoff_caps is on for this repo): ${broken.join("; ")}` };
+      }
       if (ctx.uuid === null) {
         return { ok: false, error: "set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing" };
       }

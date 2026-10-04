@@ -33,6 +33,7 @@
  * indent, trailing newline — so that two writers agreeing on the data agree
  * on the bytes, and so tests can compare output with `toBe`.
  */
+import { basename, resolve } from "node:path";
 import { z } from "zod";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -101,6 +102,13 @@ export const TaskSchema = z.strictObject({
    * before every keyed session, like a legacy handoff).
    */
   closed_rev: nonNegInt.nullable(),
+  /**
+   * T-236 (c): the seat this task is assigned to, a key of hub-partner-seats.json `seats` (the seat, not a hub or
+   * agent name, so a hub rename does not orphan it). Set by the planner at dispatch. OPTIONAL WITH NO DEFAULT on
+   * purpose: absent stays absent on disk, so a write never stamps the key onto every task (A2A's record has none).
+   * The writer does not read the seat map; /sync `task-assignees` checks the value.
+   */
+  assignee: z.string().min(1).optional(),
 }).refine((t) => (t.status === "done") === (t.closed_session !== null), {
   message: 'closed_session must be set when status is "done" and null otherwise',
   path: ["closed_session"],
@@ -222,15 +230,35 @@ export const LoopStateSchema = z.strictObject({
  * omits a resolved question and counts it, so a question answered two sessions ago stops being re-asked at every start.
  * A union rather than a new field so every existing record stays valid and nothing needs migrating.
  */
-export const OpenQuestionSchema = z.union([z.string(), z.strictObject({ text: z.string().min(1), resolved_by: z.string().min(1).optional() })]);
+export const OpenQuestionSchema = z.union([
+  z.string(),
+  // T-236 slice 2: `owner` names who the question waits on (e.g. "aaron"). Optional, so every existing record stays valid; the
+  // greeting renders WAITING ON AARON from unresolved questions owned by aaron, and only where the repo opted in.
+  z.strictObject({ text: z.string().min(1), resolved_by: z.string().min(1).optional(), owner: z.string().min(1).optional() }),
+]);
 export type OpenQuestion = z.infer<typeof OpenQuestionSchema>;
 export const questionText = (q: OpenQuestion): string => (typeof q === "string" ? q : q.text);
 export const questionResolvedBy = (q: OpenQuestion): string | null => (typeof q === "string" ? null : q.resolved_by ?? null);
+export const questionOwner = (q: OpenQuestion): string | null => (typeof q === "string" ? null : q.owner ?? null);
+
+/**
+ * A watch-out on a handoff (T-236 slice 2). A bare string is a watch-out exactly as before and renders exactly as before; an
+ * object carries the same text plus an optional `expires`: a SESSION NUMBER (the last session the watch-out prints in) or an
+ * ISO date (YYYY-MM-DD, the last day it prints). After that the greeting drops it and says how many it dropped, where the repo
+ * opted in. A union rather than a new field, like OpenQuestionSchema, so no existing record needs migrating.
+ */
+export const WatchOutSchema = z.union([
+  z.string(),
+  z.strictObject({ text: z.string().min(1), expires: z.union([z.number().int().positive(), z.string().regex(ISO_DATE, "expected YYYY-MM-DD")]).optional() }),
+]);
+export type WatchOut = z.infer<typeof WatchOutSchema>;
+export const watchText = (w: WatchOut): string => (typeof w === "string" ? w : w.text);
+export const watchExpires = (w: WatchOut): number | string | null => (typeof w === "string" ? null : w.expires ?? null);
 
 export const HandoffSchema = z.strictObject({
   seat: SeatName,
   pick_up: z.string(),
-  watch_out: z.array(z.string()),
+  watch_out: z.array(WatchOutSchema),
   open_questions: z.array(OpenQuestionSchema),
   session: sessionNumber,
   loop_state: LoopStateSchema.nullable(),
@@ -406,6 +434,29 @@ export function newestHandoffForSeat(handoffs: readonly Handoff[], seat: Seat): 
 }
 
 /**
+ * A seat instance's checkout: the basename of the resolved project root. ONE derivation, shared by the writer that stamps
+ * `checkout` on a handoff and the reader that looks its own up (T-239), so the two cannot disagree.
+ */
+export function checkoutOf(projectRoot: string): string {
+  return basename(resolve(projectRoot));
+}
+
+/**
+ * The reader's OWN handoff, the one selector every greeting site calls (T-239).
+ *
+ * `ownCheckout` undefined (greeting.json `handoff_by_checkout` off, the default): the role's newest across every checkout,
+ * which is the output before T-239 and what A2A prints. Given: only an entry of this seat AND this checkout. A sibling
+ * checkout's handoff is not this seat's instructions, and a legacy entry (null checkout) is not provably this seat's, so
+ * neither is ever returned: briefing a seat from an entry it cannot attribute is the defect (sia-infra session 161 was
+ * briefed from sia-builder's session-156 handoff).
+ */
+export function ownHandoff(handoffs: readonly Handoff[], seat: Seat | null, ownCheckout?: string): Handoff | null {
+  if (seat === null) return null;
+  if (ownCheckout === undefined) return newestHandoffForSeat(handoffs, seat);
+  return newestHandoffForSeat(handoffs.filter((h) => h.checkout === ownCheckout), seat);
+}
+
+/**
  * `path` is the zod path of the FIRST issue, dot-joined, or `$` for the root —
  * the same value the `error` string leads with, exposed as data.
  *
@@ -444,14 +495,16 @@ export function parseState(text: string): ParseResult {
  * string, writes nothing.
  */
 export function serializeState(data: State): string {
+  // Checked on EVERY write, not once: the walk is a dozen objects, and a check that remembers its answer cannot see a later drift.
+  assertKeyOrder();
   return JSON.stringify(canonicalize(data), null, 2) + "\n";
 }
 
-const KEY_ORDER: Record<string, string[]> = {
+export const KEY_ORDER: Readonly<Record<string, readonly string[]>> = {
   $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "sessions"],
   project: ["name"],
   objective: ["text", "since_session"],
-  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "note_by", "closed_rev"],
+  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "note_by", "closed_rev", "assignee"],
   verified: ["id", "claim", "evidence", "since_session", "status"],
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session", "status", "closed_session", "closed_rev"],
@@ -461,6 +514,75 @@ const KEY_ORDER: Record<string, string[]> = {
   open_prs: ["ref", "qa_status", "note"],
   sessions: ["n", "date", "uuid", "seat", "checkout", "first_rev"],
 };
+
+/**
+ * T-238. `canonicalize` writes ONLY the keys KEY_ORDER lists for a slot, so a field added to a schema and not to KEY_ORDER
+ * validated, applied, printed "applied" and VANISHED from disk (tasks[].assignee did exactly that in #401 until it was added).
+ *
+ * The slots are DERIVED from StateSchema, not listed: a slot is the property name an object schema sits under, the same name
+ * `canonicalize` looks up (the root is `$`). Slots without an entry are the object variants of a string-or-object union
+ * (`watch_out`, `open_questions`); `canonicalize` sorts their keys and drops none, so they are the one deliberate exception.
+ */
+const UNORDERED_SLOTS: ReadonlySet<string> = new Set(["watch_out", "open_questions"]);
+const LEAF_TYPES: ReadonlySet<string> = new Set(["string", "number", "boolean", "enum", "literal", "null", "undefined", "bigint", "date"]);
+
+interface ZodDef {
+  type: string;
+  shape?: Record<string, unknown>;
+  element?: unknown;
+  innerType?: unknown;
+  options?: unknown[];
+}
+const defOf = (schema: unknown): ZodDef => (schema as { def: ZodDef }).def;
+
+/** Every object schema reachable from `schema`, keyed by slot, with each distinct key set. Throws on a schema type it cannot see through. */
+export function schemaObjectSlots(schema: unknown = StateSchema, slot = "$", out = new Map<string, string[][]>()): Map<string, string[][]> {
+  const d = defOf(schema);
+  if (d.type === "object") {
+    const keys = Object.keys(d.shape ?? {}).sort();
+    const seen = out.get(slot) ?? [];
+    if (!seen.some((k) => k.join("\u0000") === keys.join("\u0000"))) seen.push(keys);
+    out.set(slot, seen);
+    for (const [k, v] of Object.entries(d.shape ?? {})) schemaObjectSlots(v, k, out);
+  } else if (d.type === "array") schemaObjectSlots(d.element, slot, out);
+  else if (d.type === "optional" || d.type === "nullable" || d.type === "default") schemaObjectSlots(d.innerType, slot, out);
+  else if (d.type === "union") for (const o of d.options ?? []) schemaObjectSlots(o, slot, out);
+  else if (!LEAF_TYPES.has(d.type)) {
+    // A fail-closed walker: a type that could hold objects and is not handled here would hide fields from the guard.
+    throw new Error(`schemaObjectSlots: cannot see through zod type "${d.type}" at slot "${slot}"; handle it before this guard can be trusted`);
+  }
+  return out;
+}
+
+/**
+ * Where `order` (default KEY_ORDER) and the schemas disagree, one sentence each; empty means they agree. Checked per slot:
+ * every schema field is listed, every listed key is a schema field, no key is listed twice, and no object slot is missing
+ * an entry unless it is one of UNORDERED_SLOTS. A slot reached by two different object shapes cannot be told apart by name.
+ */
+export function keyOrderGaps(order: Readonly<Record<string, readonly string[]>> = KEY_ORDER): string[] {
+  const gaps: string[] = [];
+  const slots = schemaObjectSlots();
+  for (const [slot, shapes] of slots) {
+    const listed = order[slot];
+    if (listed === undefined) {
+      if (!UNORDERED_SLOTS.has(slot)) gaps.push(`slot "${slot}" has no KEY_ORDER entry, so serializeState would order its keys by chance`);
+      continue;
+    }
+    if (shapes.length > 1) gaps.push(`slot "${slot}" is reached by ${shapes.length} different object shapes, but KEY_ORDER is keyed by slot name`);
+    const fields = new Set(shapes.flat());
+    for (const k of fields) if (!listed.includes(k)) gaps.push(`slot "${slot}": schema field "${k}" is not in KEY_ORDER, so serializeState would drop it from disk`);
+    for (const k of listed) if (!fields.has(k)) gaps.push(`slot "${slot}": KEY_ORDER lists "${k}", which no schema object in that slot has`);
+    if (new Set(listed).size !== listed.length) gaps.push(`slot "${slot}": KEY_ORDER lists a key twice`);
+  }
+  for (const slot of Object.keys(order)) if (!slots.has(slot)) gaps.push(`KEY_ORDER has an entry for "${slot}", which is not a slot of StateSchema`);
+  return gaps;
+}
+
+/** Throws, loudly, when `order` has drifted from the schemas: a write that went ahead would lose data. */
+export function assertKeyOrder(order: Readonly<Record<string, readonly string[]>> = KEY_ORDER): void {
+  const gaps = keyOrderGaps(order);
+  if (gaps.length > 0) throw new Error(`serializeState refused: KEY_ORDER and StateSchema disagree, and writing would lose data. ${gaps.join("; ")}`);
+}
 
 function canonicalize(value: unknown, slot = "$"): unknown {
   if (Array.isArray(value)) return value.map((v) => canonicalize(v, slot));

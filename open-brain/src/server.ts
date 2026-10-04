@@ -24,12 +24,14 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import { describeRoleFiles, renderRoleDocs, recordRoleReads } from "./pipelines/session-start/role-files.js";
-import { greetingFlag } from "./pipelines/session-start/greeting-flags.js";
+import { greetingFlag, handoffCheckout } from "./pipelines/session-start/greeting-flags.js";
+import { focusLine, seatsLine, seatOrder } from "./pipelines/session-start/focus.js";
+import { resolveCheckoutSeat } from "./pipelines/session-start/seat-map.js";
 import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
-import { renderState } from "./pipelines/session-start/state-render.js";
+import { renderState, missingHandoffLine } from "./pipelines/session-start/state-render.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
@@ -355,9 +357,12 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       // The reader's OWN seat, so the greeting renders this seat's handoff and
       // names the others by their close-out commit. A greeting that shows the
       // developer's handoff to the planner is C4 failing on the row C2 exists for.
+      // T-239: with handoff_by_checkout on, only THIS checkout's handoff is "yours", in both renders.
+      const ownCheckout = handoffCheckout(projectRoot);
       lines.push(...renderState(sj.data, result.state.version, {
         seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
         projectRoot,
+        ownCheckout,
       }));
       // T-233 B: the whole briefing, rendered here, so /start prints it instead of assembling it.
       lines.push("", ...renderBriefing({
@@ -365,6 +370,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         state: sj.data,
         version: result.state.version,
         seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+        ownCheckout,
         sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
         sessionNote: result.session.skippedReason,
         date: new Date().toISOString().slice(0, 10),
@@ -373,6 +379,21 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         latestBrief,
         workingTree: describeWorkingTree(projectRoot),
         skills: describeSkills(projectRoot),
+        // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
+        budget: greetingFlag(projectRoot, "briefing_budget"),
+        // T-236 (c): OPT-IN, and only with the budget. The seat is the CHECKOUT's; presence is the roster fetched above.
+        ...(greetingFlag(projectRoot, "briefing_budget") && greetingFlag(projectRoot, "briefing_focus")
+          ? {
+              focus: {
+                focus: focusLine(sj.data, resolveCheckoutSeat(projectRoot)),
+                seats: ((order) => (order ? seatsLine(sj.data, order, presence.statusByHubName ?? null) : null))(seatOrder(projectRoot)),
+              },
+            }
+          : {}),
+        // T-199, opt-in: a repo without `missing_handoff` renders exactly as before.
+        missingHandoff: greetingFlag(projectRoot, "missing_handoff")
+          ? missingHandoffLine(sj.data, { projectRoot, sessionUuid: proven.id, seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null })
+          : null,
       }));
     } else {
       // F3: an unknown schema_version REFUSES, with no prose fallback.
@@ -401,6 +422,10 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       }
       if (sj.present && !sj.valid) {
         lines.push(`\nstate.json invalid at ${sj.error} — falling back to files`);
+      }
+      // T-199, opt-in: the detector reads the record, so with no readable record it says it did not check.
+      if (greetingFlag(projectRoot, "missing_handoff")) {
+        lines.push(`\nHandoff check: not checked (${sj.present ? "state.json invalid" : "no .agents/state.json"}, so there is no record to read)`);
       }
       const content: Record<string, string | null> = {
         summary: result.state.summary,
@@ -486,6 +511,8 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
       // reason is added to the refusal below.
       session_uuid: stateSession.id,
       seat: identity && isSeat(identity.role) ? identity.role : null,
+      // T-236 slice 2: OPT-IN per repo; the caps apply to the handoff being written, never to existing ones.
+      handoff_caps: greetingFlag(projectRoot, "handoff_caps"),
     });
     const lines: string[] = [];
     if (!r.ok) {
