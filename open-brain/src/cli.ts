@@ -78,6 +78,11 @@ if (command === "sync") {
     process.exit(1);
   }
 
+  if (opts.has("--retirements-rehash")) {
+    const { runRetirementsRehashCli } = await import("./pipelines/sync/retirements-line-hash.js");
+    process.exit(runRetirementsRehashCli(projectRoot, opts.has("--write")));
+  }
+
   if (history) {
     const paths = resolvePaths(projectRoot);
     const entries = readHistory(paths.scoreHistory);
