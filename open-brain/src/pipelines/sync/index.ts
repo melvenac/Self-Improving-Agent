@@ -40,6 +40,7 @@ import { checkCursorStartParity } from "./start-parity.js";
 import { checkProbeMarkers } from "./probe-markers.js";
 import { checkVaultPollution } from "./vault-pollution.js";
 import { checkSeatIdentity } from "./seat-identity.js";
+import { checkTaskAssignees } from "./task-assignees.js";
 import { checkCursorHookCompat } from "./cursor-hook-compat.js";
 import { checkShadowMergeLedger } from "../../harness/shadow-merge.js";
 
@@ -113,6 +114,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkHubSeats(options.projectRoot));
   // T-203: the checkout's AGENT.local.md against the seat map.
   checks.push(checkSeatIdentity(options.projectRoot));
+  // T-236 (c): tasks[].assignee names a seat in the map.
+  checks.push(checkTaskAssignees(options.projectRoot));
   checks.push(checkCursorStartParity(options.projectRoot));
   // Record 198: a file under open-brain/tests that says "not for merge" is an issue.
   checks.push(checkProbeMarkers(options.projectRoot));

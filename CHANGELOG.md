@@ -4,6 +4,11 @@
 
 ### Added
 
+- **FOCUS and SEATS in the budgeted briefing (T-236 (c)).** Opt-in: `briefing_focus` in `.agents/SYSTEM/greeting.json`,
+  effective only with `briefing_budget` (absent = off; A2A renders unchanged). A task gains an optional `assignee`, a seat
+  of `hub-partner-seats.json`, set by the planner with `update_task`. FOCUS names this checkout's seat's assigned task (or
+  `none assigned in the record`), on the PICK UP header line. SEATS lists every seat's, with presence words only from the
+  roster ob_start already fetched. Still 30 lines in the worst case. New `/sync` check `task-assignees`.
 - **`/start` names a checkout whose last session wrote the record and left no handoff (T-199, ported from Forge's loop/t199-missing-handoff).**
   Opt-in per repo: `"missing_handoff": true` in `.agents/SYSTEM/greeting.json` (absent = off, so A2A renders exactly as before).
   On, the Briefing prints `Handoff MISSING: last <seat> session #N (<uuid>, rev R) wrote the record, left no handoff; fix: ob_state

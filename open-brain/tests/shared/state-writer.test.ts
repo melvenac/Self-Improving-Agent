@@ -655,6 +655,30 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expect(DONE_RETENTION_SESSIONS).toBe(3);
   });
 
+  // ---- T-236 (c) W1: tasks[].assignee, optional, set at dispatch ----
+
+  it("W1 update_task sets assignee and null clears it; open_task takes one; the key never appears on an untouched task", () => {
+    const set = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "update_task", id: "T-005", assignee: "infra" }] });
+    expect(set.ok).toBe(true);
+    expect(readState(root).tasks.find((t) => t.id === "T-005")?.assignee).toBe("infra");
+    const opened = applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "open_task", title: "dispatched", priority: "P1", assignee: "builder" }] });
+    expect(opened.ok).toBe(true);
+    expect(readState(root).tasks.find((t) => t.title === "dispatched")?.assignee).toBe("builder");
+    const cleared = applyStateOps(root, { session: SESSION, expected_revision: 9, ops: [{ op: "update_task", id: "T-005", assignee: null }] });
+    expect(cleared.ok).toBe(true);
+    // Cleared means ABSENT on disk, and no other task grew the key: A2A-shaped records stay byte-stable.
+    const raw = JSON.parse(readFileSync(join(root, STATE), "utf-8")) as { tasks: Array<Record<string, unknown>> };
+    expect(raw.tasks.filter((t) => "assignee" in t).map((t) => t.title)).toEqual(["dispatched"]);
+  });
+
+  it("W1 an empty assignee is refused; A2A's record (no assignee anywhere) still parses", () => {
+    const r = applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "update_task", id: "T-005", assignee: "" }] });
+    expect(r.ok).toBe(false);
+    expect(readFileSync(join(root, STATE), "utf-8")).toBe(before);
+    const a2a = parseState(readFileSync(join(import.meta.dirname, "../fixtures-state/a2a-state-1c200b41.json"), "utf8"));
+    expect(a2a.ok).toBe(true);
+  });
+
   it("retention never touches verified, gaps or decisions", () => {
     for (let i = 0; i < 3; i++) applyStateOps(root, { session: 99 + i, expected_revision: 7 + i, session_uuid: `s-${i}`, ops: [{ op: "set_objective", text: `x${i}` }] });
     const s = readState(root);

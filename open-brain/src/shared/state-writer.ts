@@ -65,10 +65,10 @@ const NoteEdit = {
 const NOTE_JOIN = " — ";
 
 export const OpSchema = z.discriminatedUnion("op", [
-  z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional() }),
+  z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional(), assignee: z.string().min(1).optional() }),
   // T-171: adding to a note and replacing it are different fields, named at the
   // call. `note` is gone from both ops (refused by name below, not ignored).
-  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), ...NoteEdit }),
+  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), assignee: z.string().min(1).nullable().optional(), ...NoteEdit }),
   z.strictObject({ op: z.literal("close_task"), id: z.string(), ...NoteEdit }),
   z.strictObject({ op: z.literal("reopen_task"), id: z.string(), note: z.string().min(1) }),
   z.strictObject({ op: z.literal("add_verified"), id: z.string().optional(), claim: z.string().min(1), evidence: z.array(EvidenceSchema).min(1) }),
@@ -538,7 +538,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       const id = op.id ?? nextId("T", s.tasks.map((t) => t.id));
       if (s.tasks.some((t) => t.id === id)) return { ok: false, error: `task ${id} already exists` };
       if (op.supersedes && !s.tasks.some((t) => t.id === op.supersedes)) return { ok: false, error: `supersedes unknown task ${op.supersedes}` };
-      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: !op.note ? [] : ctx.uuid === null ? null : [ctx.uuid], closed_rev: null });
+      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: !op.note ? [] : ctx.uuid === null ? null : [ctx.uuid], closed_rev: null, ...(op.assignee !== undefined ? { assignee: op.assignee } : {}) });
       if (op.note) ctx.noteChanges.push(`${id} note SET: 0 -> ${op.note.length} chars`);
       return { ok: true, id };
     }
@@ -549,6 +549,9 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       if (op.title !== undefined) t.title = op.title;
       if (op.priority !== undefined) t.priority = op.priority;
       if (op.status !== undefined) t.status = op.status;
+      // T-236 (c): null CLEARS, and clearing removes the key, so the record reads as if it was never assigned.
+      if (op.assignee === null) delete t.assignee;
+      else if (op.assignee !== undefined) t.assignee = op.assignee;
       const refused = editNote(t, op, ctx);
       if (refused) return { ok: false, error: refused };
       return { ok: true, id: t.id };
