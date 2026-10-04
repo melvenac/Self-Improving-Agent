@@ -57,6 +57,31 @@ describe("resolvePaths", () => {
     expect(paths.scoreHistory).toContain("score-history.jsonl");
     expect(paths.settingsJson).toContain("settings.json");
   });
+
+  // G-052 / QA 257: pins the default when KNOWLEDGE_V2_DB is unset so a repoint mutant goes red.
+  it("defaults knowledgeV2Db under home when KNOWLEDGE_V2_DB is unset", () => {
+    const home = mkdtempSync(join(tmpdir(), "ob-g052-home-"));
+    const saved = {
+      HOME: process.env.HOME,
+      USERPROFILE: process.env.USERPROFILE,
+      KNOWLEDGE_V2_DB: process.env.KNOWLEDGE_V2_DB,
+    };
+    process.env.HOME = home;
+    process.env.USERPROFILE = home;
+    delete process.env.KNOWLEDGE_V2_DB;
+    try {
+      const paths = resolvePaths(process.cwd());
+      expect(paths.knowledgeV2Db).toBe(join(home, ".claude", "open-brain", "knowledge-v2.db"));
+    } finally {
+      if (saved.HOME === undefined) delete process.env.HOME;
+      else process.env.HOME = saved.HOME;
+      if (saved.USERPROFILE === undefined) delete process.env.USERPROFILE;
+      else process.env.USERPROFILE = saved.USERPROFILE;
+      if (saved.KNOWLEDGE_V2_DB === undefined) delete process.env.KNOWLEDGE_V2_DB;
+      else process.env.KNOWLEDGE_V2_DB = saved.KNOWLEDGE_V2_DB;
+      rmSync(home, { recursive: true, force: true });
+    }
+  });
 });
 
 describe("obsidianVaultDir", () => {

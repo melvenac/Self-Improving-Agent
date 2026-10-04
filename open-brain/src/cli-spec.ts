@@ -10,7 +10,7 @@ import type { CommandSpec } from "./shared/cli-args.js";
 export const COMMAND_SPECS = {
   sync: {
     name: "sync",
-    booleans: ["--check", "--score", "--json", "--history"],
+    booleans: ["--check", "--score", "--json", "--history", "--retirements-rehash", "--write"],
     values: {},
     positionals: "directory",
   },
