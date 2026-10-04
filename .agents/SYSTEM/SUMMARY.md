@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 325 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 326 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — QA 269 running (#397 T-237, #401 T-236c, #402 T-199, #404 T-204); then one batch ask to Aaron, with #403 (planner.md). Next: T-238 after #401; the wrong-seat PICK UP fallback (infra is investigating).
 
 ## What's working
@@ -157,6 +157,7 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - Gap G-050: The retirements check allows a referrer per FILE, so a new live mention of a cut thing inside a file that is still an allowed referrer passes silently. Had dashboard.mjs kept the word 'progenitor', it would have stayed allowed and the re-added success_rate mutant would have passed. A per-file allowance cannot tell an obituary line from a live read added beside it.
 - Gap G-051: A QA dispatch that lets a seat read REAL config files (~/.claude.json, settings.json, .mcp.json, env) said 'read-only' but did not forbid copying VALUES into a report committed to a PUBLIC repo.
 - Gap G-052: Two accepted B3 PRs leave a default-path behaviour untested: #313 (T-065) has no row that pins knowledgeV2Db's default location (QA 257's repoint mutant survived), and #314 (T-042) never exercises the default obsidianVaultDir() resolution (every row passes vaultDir).
+- Gap G-053: The config-channel harness test CA-3c/3d R21 failed once on master push CI (8f14ca91, run 37172590273 attempt 1): the boundary check saw `<common>/info/refs created` during the developer stage, refused the developer, and the test expected a pass. It passed on re-run (attempt 2), on the PR run of the same code, and in the master runs immediately before. info/refs is written by `git update-server-info`, which a background `git gc --auto` can trigger, so a git-internal write is being read as a role changing what git executes.
 
 ## What's next
 
