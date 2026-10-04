@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 324 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 325 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -46,6 +46,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-236** Greeting budget + FOCUS: cap and compute the /start Briefing (size test over both repos), handoff caps, role docs by changed-sha
 - [ ] **T-237** Hub presence: accept pollAgeMs null ('no poll seen', an A2A contract value since Loop 8a) instead of failing the whole read as malformed
 - [ ] **T-238** serializeState silently drops any schema field missing from KEY_ORDER: add a guard asserting KEY_ORDER covers every field of every slot's schema
+- [ ] **T-239** A seat with no handoff of its own is briefed from ANOTHER checkout's handoff: select 'your handoff' by seat AND checkout (flag handoff_by_checkout, default OFF)
 
 ## P2
 

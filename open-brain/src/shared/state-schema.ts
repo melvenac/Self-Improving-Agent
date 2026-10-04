@@ -102,6 +102,13 @@ export const TaskSchema = z.strictObject({
    * before every keyed session, like a legacy handoff).
    */
   closed_rev: nonNegInt.nullable(),
+  /**
+   * T-236 (c): the seat this task is assigned to, a key of hub-partner-seats.json `seats` (the seat, not a hub or
+   * agent name, so a hub rename does not orphan it). Set by the planner at dispatch. OPTIONAL WITH NO DEFAULT on
+   * purpose: absent stays absent on disk, so a write never stamps the key onto every task (A2A's record has none).
+   * The writer does not read the seat map; /sync `task-assignees` checks the value.
+   */
+  assignee: z.string().min(1).optional(),
 }).refine((t) => (t.status === "done") === (t.closed_session !== null), {
   message: 'closed_session must be set when status is "done" and null otherwise',
   path: ["closed_session"],
@@ -495,7 +502,7 @@ const KEY_ORDER: Record<string, string[]> = {
   $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "sessions"],
   project: ["name"],
   objective: ["text", "since_session"],
-  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "note_by", "closed_rev"],
+  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "note_by", "closed_rev", "assignee"],
   verified: ["id", "claim", "evidence", "since_session", "status"],
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session", "status", "closed_session", "closed_rev"],

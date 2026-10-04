@@ -93,7 +93,9 @@ observation, not agreement.
 
 - **The record:** `.agents/state.json` via `ob_state` only. `INBOX.md`, `task.md`,
   `next-session.md` and `SUMMARY.md`'s marked region are rendered views — never hand-edited.
-- **`next-session.md` is the developer's handoff, not this seat's.** There is one `handoff` slot and
-  `/end` writes it; this seat does not run `/end`. Read it anyway. **That mismatch is Loop 14's C2
-  and it is unfixed.**
+- **`next-session.md` is a rendered view, not this seat's handoff.** Since schema v3 the record keeps
+  one handoff per session, per seat and checkout, and `ob_start` prints the reader's own as
+  "Your handoff". This seat writes its own with `ob_state` `set_handoff` before it stops; it does not
+  run `/end`. Where `.agents/SYSTEM/greeting.json` sets `missing_handoff`, `ob_start` names a checkout
+  whose last session wrote the record and left none.
 - **This seat's own history:** `docs/loops/planner-handoff.md`, `docs/loops/loop-13-closeout.md`.

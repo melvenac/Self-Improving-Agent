@@ -41,6 +41,18 @@ export interface BriefingInput {
    */
   budget?: boolean;
   /**
+   * T-236 (c), OPT-IN (greeting.json `briefing_focus`), and only inside the budgeted layout. Precomputed by the caller
+   * (focus.ts) from the record and the roster ob_start already fetched. Absent: the budgeted layout of slice 2, unchanged.
+   */
+  focus?: { focus: string | null; seats: string | null };
+  /**
+   * T-199, OPT-IN per repo (greeting.json `missing_handoff`), default OFF. The one-line notice that this checkout's last session
+   * wrote the record and left no handoff, or that the check could not run. Null or absent prints nothing, so every other render is
+   * byte-identical. The legacy layout prints it as its own line after the pick-up; the budgeted layout has no spare line (it is
+   * exactly at its cap), so it is APPENDED to the pick-up line, which is never cut after the append.
+   */
+  missingHandoff?: string | null;
+  /**
    * T-239, OPT-IN per repo (greeting.json `handoff_by_checkout`, via `handoffCheckout`), default OFF. Set: the reader's
    * checkout, and only that checkout's handoff is the pick-up. Absent: the role's newest handoff, as before.
    */
@@ -88,6 +100,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : own.pick_up.trim());
   else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
   else out.push(noneRecorded(i.seat, i.ownCheckout));
+  if (i.missingHandoff) out.push(i.missingHandoff);
 
   if (own && own.watch_out.length > 0) {
     out.push("", "WATCH OUT");
@@ -174,11 +187,16 @@ function renderBudgeted(i: BriefingInput): string[] {
     if (ids.length > CAPS.next) out.push(`+${ids.length - CAPS.next} more: ${MORE_TASKS}`);
   }
 
+  // T-236 (c): SEATS, then FOCUS on the PICK UP header line. The budget had no line to spare (30/30 at 6f145faf), so
+  // SEATS is paid for by brief and skills sharing one line below, and FOCUS by sharing the header: net 0 lines.
+  const seats = i.focus?.seats ?? null;
+  if (seats !== null) out.push(seats);
   const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
-  out.push("PICK UP HERE");
-  if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars));
-  else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
-  else out.push(noneRecorded(i.seat, i.ownCheckout));
+  out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
+  const pickUp = own
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars)
+    : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : noneRecorded(i.seat, i.ownCheckout);
+  out.push(i.missingHandoff ? `${pickUp} · ${i.missingHandoff}` : pickUp);
 
   if (own) {
     const live = own.watch_out.filter((w) => !isExpired(w, i.sessionNumber, i.date));
@@ -232,8 +250,11 @@ function renderBudgeted(i: BriefingInput): string[] {
   }
 
   out.push(i.workingTree);
-  if (i.latestBrief) out.push(i.latestBrief);
-  out.push(i.skills);
+  if (seats !== null && i.latestBrief) out.push(`${i.latestBrief} · ${i.skills}`);
+  else {
+    if (i.latestBrief) out.push(i.latestBrief);
+    out.push(i.skills);
+  }
   out.push(BRIEFING_END);
   return out;
 }
