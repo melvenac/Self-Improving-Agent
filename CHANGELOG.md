@@ -24,6 +24,13 @@
 
 ### Fixed
 
+- **A seat with no handoff of its own was briefed from a sibling checkout's (T-239).** The greeting picked "your
+  handoff" by ROLE only, so sia-infra, which had none, printed sia-builder's session-156 pick-up, watch-outs and open
+  questions as its own. Opt-in per repo: `"handoff_by_checkout": true` in `.agents/SYSTEM/greeting.json` (SIA sets it;
+  absent = off, so A2A renders exactly as before). On, all three sites (`renderState` and both briefing layouts) share
+  one selector, `ownHandoff`, that matches seat AND checkout (`checkoutOf`, the basename the writer stamps). With none,
+  PICK UP says `none recorded for this checkout (<seat>, <checkout>)`. A legacy entry with no checkout is never anyone's
+  own and is listed as `[legacy, unattributed]`.
 - **One hub room with `pollAgeMs: null` turned ALL partner presence into UNKNOWN (T-237).** A2A sends null for
   "no wait-poll seen in the window", by design. It is now accepted, and a room with unread turns and no recorded poll
   says `no listener poll recorded` instead of the false `since 0s`. A string, boolean or non-finite value is still malformed.

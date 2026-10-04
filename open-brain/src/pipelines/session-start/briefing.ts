@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, isAbsolute } from "node:path";
-import { TaskPriority, isOpenGap, newestHandoffForSeat, newestHandoffPerInstance, questionOwner, questionResolvedBy, questionText, watchExpires, watchText } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, newestHandoffPerInstance, ownHandoff, questionOwner, questionResolvedBy, questionText, watchExpires, watchText } from "../../shared/state-schema.js";
 import type { State, Seat, WatchOut } from "../../shared/state-schema.js";
 import { HANDOFF_CAPS } from "../../shared/handoff-caps.js";
 import type { DriftResult } from "./types.js";
@@ -52,6 +52,16 @@ export interface BriefingInput {
    * exactly at its cap), so it is APPENDED to the pick-up line, which is never cut after the append.
    */
   missingHandoff?: string | null;
+  /**
+   * T-239, OPT-IN per repo (greeting.json `handoff_by_checkout`, via `handoffCheckout`), default OFF. Set: the reader's
+   * checkout, and only that checkout's handoff is the pick-up. Absent: the role's newest handoff, as before.
+   */
+  ownCheckout?: string;
+}
+
+/** PICK UP HERE when the reader's seat resolved and no handoff is its own. */
+function noneRecorded(seat: Seat, ownCheckout: string | undefined): string {
+  return ownCheckout === undefined ? `none recorded for this seat (${seat})` : `none recorded for this checkout (${seat}, ${ownCheckout})`;
 }
 
 const NEXT_SHOWN = 3;
@@ -85,11 +95,11 @@ export function renderBriefing(i: BriefingInput): string[] {
   if (ranked.length === 0) out.push("- (no active P0 or P1 task)");
   out.push(`${active.length} active (${byPriority.map(([p, g]) => `${g.length} ${p}`).join(", ")}); ${done} done. Backlog order, not a decision: the pick-up below rules what starts.`);
 
-  const own = i.seat ? newestHandoffForSeat(s.handoffs, i.seat) : null;
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
   out.push("", "PICK UP HERE");
   if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : own.pick_up.trim());
   else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
-  else out.push(`none recorded for this seat (${i.seat})`);
+  else out.push(noneRecorded(i.seat, i.ownCheckout));
   if (i.missingHandoff) out.push(i.missingHandoff);
 
   if (own && own.watch_out.length > 0) {
@@ -181,11 +191,11 @@ function renderBudgeted(i: BriefingInput): string[] {
   // SEATS is paid for by brief and skills sharing one line below, and FOCUS by sharing the header: net 0 lines.
   const seats = i.focus?.seats ?? null;
   if (seats !== null) out.push(seats);
-  const own = i.seat ? newestHandoffForSeat(s.handoffs, i.seat) : null;
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
   out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
   const pickUp = own
     ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars)
-    : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : `none recorded for this seat (${i.seat})`;
+    : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : noneRecorded(i.seat, i.ownCheckout);
   out.push(i.missingHandoff ? `${pickUp} · ${i.missingHandoff}` : pickUp);
 
   if (own) {

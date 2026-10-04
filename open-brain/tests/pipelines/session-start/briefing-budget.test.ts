@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { parseState, type State } from "../../../src/shared/state-schema.js";
 import { BRIEFING_BUDGET, BRIEFING_END, BRIEFING_START, renderBriefing, type BriefingInput } from "../../../src/pipelines/session-start/briefing.js";
 import { HANDOFF_CAPS } from "../../../src/shared/handoff-caps.js";
+import { focusLine, seatsLine, seatOrder } from "../../../src/pipelines/session-start/focus.js";
+import { MISSING_HANDOFF_MAX_CHARS } from "../../../src/pipelines/session-start/state-render.js";
 
 /**
  * T-236 slice 2 (a) expiry, (d) NEXT, (e) WAITING ON AARON, (f) the budget. Everything here runs the budgeted layout (`budget: true`)
@@ -254,6 +256,55 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     const { lines: n, chars } = size(lines);
     expect(lines.join("\n")).toContain(notice);
     expect(n, `${n} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
+    expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+  });
+
+  it("WORST CASE with EVERY flag on (FOCUS + SEATS + a MISSING_HANDOFF_MAX_CHARS T-199 notice + handoff_by_checkout): still 30 lines and 4096 chars", () => {
+    // T-239 merged with T-236 (c) and T-199: one PICK UP block carries all three. FOCUS on the header, this checkout's own
+    // handoff (picked over a NEWER sibling's) on the body line, the notice appended to it. Built with the real producers.
+    const raw = structuredClone(SIA);
+    raw.objective = { text: `${"Objective ".repeat(200)} T-1 T-2 T-3 T-4 T-5 T-6 T-7 T-8`, since_session: 5 };
+    const REPO = join(import.meta.dirname, "../../../..");
+    const slots = seatOrder(REPO);
+    if (slots === null) throw new Error("the tracked seat map is unreadable");
+    let n = 0;
+    raw.tasks = raw.tasks.map((t: { status: string }) =>
+      t.status !== "done" ? { ...t, title: long("Title", 400), assignee: slots[n++ % slots.length]!.seat, status: n <= 6 ? "blocked" : t.status, priority: n <= 4 ? "P0" : "P2" } : t,
+    );
+    const handoff = (checkout: string, first_rev: number, tag: string) => ({
+      ...raw.handoffs[0], seat: "developer", checkout, session_uuid: `u-${checkout}`, first_rev,
+      pick_up: `${tag} ${"Pick up ".repeat(300)}`,
+      watch_out: Array.from({ length: 17 }, (_, i) => long(`${tag} watch ${i}:`, 700)),
+      open_questions: [...Array.from({ length: 8 }, (_, i) => ({ text: long(`${tag} wait ${i}`, 500), owner: "aaron" })), ...Array.from({ length: 8 }, (_, i) => long(`${tag} open ${i}`, 500))],
+    });
+    raw.handoffs = [handoff("sia-infra", 50, "OWN"), handoff("sia-builder", 90, "SIBLING")];
+    const parsed = parseState(JSON.stringify(raw));
+    if (!parsed.ok) throw new Error(parsed.error);
+    const state = parsed.data;
+    const presence = Object.fromEntries(slots.filter((s) => s.hubName !== null).map((s) => [s.hubName!, "not polling" as const]));
+    // At the longest the product allows: larger session and revision numbers than the T-199 row's 155-char notice.
+    const notice = `Handoff MISSING: last builder session #123456 (00000000-0000-4000-8000-000000000000, rev 123456789) wrote the record, left no handoff; fix: ob_state set_handoff`;
+    expect(notice.length, "the notice is at MISSING_HANDOFF_MAX_CHARS").toBe(MISSING_HANDOFF_MAX_CHARS);
+    const lines = render(state, {
+      drift,
+      serving: "Build abc1234 · STALE: 123 code commits behind, ahead by 45 → ask Aaron to update",
+      usage: "Usage: STOP (weekly 98%) · park, push WIP · 5h 14%",
+      workingTree: `Working tree: 9 uncommitted: ${"a/b/c.ts, ".repeat(8)}+1 more`,
+      focus: {
+        focus: focusLine(state, { kind: "seat", checkout: "sia-infra", seat: "infra", role: "developer", agent: "Infra", hubName: slots.find((s) => s.seat === "infra")?.hubName ?? null }),
+        seats: seatsLine(state, slots, presence),
+      },
+      missingHandoff: notice,
+      ownCheckout: "sia-infra",
+    });
+    const { lines: count, chars } = size(lines);
+    const at = lines.findIndex((l) => l.startsWith("PICK UP HERE"));
+    expect(lines[at]).toMatch(/^PICK UP HERE · FOCUS: T-\d+ Title x+… \(P\d, \w+\)/);
+    expect(lines[at + 1]!.startsWith("OWN Pick up"), "this checkout's handoff, not the newer sibling's").toBe(true);
+    expect(lines[at + 1]!.endsWith(` · ${notice}`)).toBe(true);
+    expect(lines.join("\n")).not.toContain("SIBLING");
+    expect(lines.some((l) => l.startsWith("SEATS: "))).toBe(true);
+    expect(count, `${count} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
     expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
   });
 

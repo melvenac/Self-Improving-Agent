@@ -33,6 +33,7 @@
  * indent, trailing newline — so that two writers agreeing on the data agree
  * on the bytes, and so tests can compare output with `toBe`.
  */
+import { basename, resolve } from "node:path";
 import { z } from "zod";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -430,6 +431,29 @@ export function newestHandoffForSeat(handoffs: readonly Handoff[], seat: Seat): 
   let best: Handoff | null = null;
   for (const h of handoffs) if (h.seat === seat && (best === null || compareFirstRev(h.first_rev, best.first_rev) >= 0)) best = h;
   return best;
+}
+
+/**
+ * A seat instance's checkout: the basename of the resolved project root. ONE derivation, shared by the writer that stamps
+ * `checkout` on a handoff and the reader that looks its own up (T-239), so the two cannot disagree.
+ */
+export function checkoutOf(projectRoot: string): string {
+  return basename(resolve(projectRoot));
+}
+
+/**
+ * The reader's OWN handoff, the one selector every greeting site calls (T-239).
+ *
+ * `ownCheckout` undefined (greeting.json `handoff_by_checkout` off, the default): the role's newest across every checkout,
+ * which is the output before T-239 and what A2A prints. Given: only an entry of this seat AND this checkout. A sibling
+ * checkout's handoff is not this seat's instructions, and a legacy entry (null checkout) is not provably this seat's, so
+ * neither is ever returned: briefing a seat from an entry it cannot attribute is the defect (sia-infra session 161 was
+ * briefed from sia-builder's session-156 handoff).
+ */
+export function ownHandoff(handoffs: readonly Handoff[], seat: Seat | null, ownCheckout?: string): Handoff | null {
+  if (seat === null) return null;
+  if (ownCheckout === undefined) return newestHandoffForSeat(handoffs, seat);
+  return newestHandoffForSeat(handoffs.filter((h) => h.checkout === ownCheckout), seat);
 }
 
 /**
