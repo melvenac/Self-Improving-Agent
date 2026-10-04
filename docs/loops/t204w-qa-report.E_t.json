@@ -1,0 +1,44 @@
+{
+  "loop": "qa-271-t204w-r2",
+  "supersedes": { "branch": "qa/t204w-report", "sha": "f73f6b92ffe18841806fd4ff4f57d764a05afd24", "verdict": "INCOMPLETE" },
+  "candidate_git": {
+    "sha": "5add91379641ef211f98b2f79d1551c0090821eb",
+    "branch": "pull/404/head",
+    "frozen_at": "2026-10-04T03:36:00Z"
+  },
+  "candidates": [
+    { "task": "T-204", "sha": "5add91379641ef211f98b2f79d1551c0090821eb", "branch": "pull/404/head", "pr": 404, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "harness_candidate": {
+      "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File docs/loops/machine-lease-harness.ps1 -Lease docs/loops/machine-lease.ps1 -Queue docs/loops/qa-queue.ps1",
+      "exit_code": 0,
+      "passed": true,
+      "detail": "summary passed=24 failed=0"
+    },
+    "harness_with_master_queue": {
+      "command": "... -OldQueue C:/qa-scratch/qa271b-mut/master-qa-queue.ps1 (origin/master dc8ae462)",
+      "exit_code": 1,
+      "passed": true,
+      "detail": "summary passed=24 failed=7; the 7 failures are exactly old.R8, R8b, R8c, R9, R9b, R9c, R9d (expected RED)"
+    },
+    "mutant_nonatomic": { "exit_code": 1, "passed": true, "detail": "Rounds 30: passed=23 failed=1; R5 only, 30 of 30 rounds had != 1 winner" },
+    "mutant_nostart": { "exit_code": 1, "passed": true, "detail": "passed=23 failed=1; R3 only" },
+    "mutant_queue_skiplease": { "exit_code": 1, "passed": true, "detail": "passed=22 failed=2; new.R8 and new.R8c only" },
+    "crash_release_probe": { "exit_code": 0, "passed": true, "detail": "held (exit 10) while child alive; after taskkill: status 'free (stale: pid_gone)', next take exit 0 with 'takeover=stale lease reason=pid_gone'" }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q271-14", "status": "met", "order": "shown", "evidence": "Candidate harness exit 0, 24/0. With master's qa-queue.ps1 as -OldQueue: 24 pass, all 7 old rows FAIL." },
+    { "id": "Q271-15", "status": "met", "order": "shown", "evidence": "Edits confirmed by diff. nonatomic kills R5 only (30/30 rounds), nostart kills R3 only, QA queue-skiplease kills new.R8 and new.R8c only." },
+    { "id": "Q271-16", "status": "met", "order": "shown", "evidence": "Child powershell took the lease as itself, was killed; status read stale: pid_gone and the next taker reclaimed it (exit 0)." },
+    { "id": "Q271-safety", "status": "met", "order": "shown", "evidence": "C:/Users/melve/machine-lease absent at start and end; all runs with USERPROFILE/HOME under C:/qa-tmp; 0 leftover sleeper processes; PR head 5add9137 unmoved start and end." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "G2: t204-developer-handoff.md says the mutant branches are not pushed; ls-remote shows all three on origin.",
+    "O1: git CRLF warning from the harness stub-tree commit surfaces as NativeCommandError text under *> capture; cosmetic.",
+    "O2: second-Windows-user limit not exercised (by design, named by status)."
+  ],
+  "notes": "QA 271 attempt 2, dispatch tree db8ef4e6a131408b84c779b7dd1cbdf375906100. PowerShell started only via the PowerShell tool, never via node. No live Jev call; gh not used; no issue or PR touched."
+}
