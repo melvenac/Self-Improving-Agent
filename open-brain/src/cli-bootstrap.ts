@@ -29,6 +29,7 @@ import {
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, writeProcessSession } from "./shared/process-session.js";
 import { takeMissingHandoffNotices } from "./shared/handoff-guard.js";
+import { appendHookMetric, dedupeCursorHookRuns, tryClaimHookRun } from "./shared/session-hook-claim.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
 // Claude Code includes `agent_id` when the hook fires inside a subagent.
@@ -100,6 +101,25 @@ const registeredAs =
     : currentIde();
 const ide = detectIde(payload, registeredAs);
 const lines: string[] = [];
+
+// T-235 P2-7: Cursor sessionStart is registered twice (Cursor hooks + Claude
+// settings). Claim before any side effect so concurrent invocations serialize
+// on wx, and Claude Code payloads without cursor_version are never suppressed.
+const sessionForClaim = resolveSessionId(hookInput as Record<string, unknown>)?.uuid;
+if (sessionForClaim && dedupeCursorHookRuns(payload, registeredAs)) {
+  const claim = tryClaimHookRun(home, "sessionStart", sessionForClaim);
+  appendHookMetric(home, {
+    t: new Date().toISOString(),
+    event: "sessionStart",
+    session_id: sessionForClaim,
+    outcome: claim,
+    script: "bootstrap",
+  });
+  if (claim === "duplicate") {
+    console.log(`SESSION_START_SKIPPED: duplicate hook for session ${sessionForClaim}`);
+    process.exit(0);
+  }
+}
 
 // T-003: the SESSION PROOF, written FIRST — before anything slow — because the
 // host runs no tool call of this session until this hook has finished (measured
