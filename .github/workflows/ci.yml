@@ -141,6 +141,24 @@ jobs:
         working-directory: open-brain
         run: npm test -- --reporter=verbose
 
+      # T-168: CI has no hub census. The writer records runner name, labels and
+      # timestamp; concurrent_jobs stays "unknown" unless a token is present.
+      # This file merges on Aaron's word (CI workflow).
+      - name: Write CI suite meta
+        if: always()
+        working-directory: open-brain
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/write-ci-suite-meta.mjs suite-run-meta.json
+
+      - name: Upload suite run meta
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: suite-meta-${{ github.run_id }}-${{ github.run_attempt }}
+          path: open-brain/suite-run-meta.json
+          if-no-files-found: warn
+
   # Windows, on the laptop runner (laptop-win). Opt-in: only a dispatch with windows=true runs it, so a new
   # platform cannot block D-032's merge gate while it proves itself. Its jobs are firewalled from every private
   # network by a rule scoped to the runner service (planner session 109). The first step proves it, like tcm's.
