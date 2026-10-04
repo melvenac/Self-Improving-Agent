@@ -564,6 +564,65 @@ describe("server handlers", () => {
     });
   });
 
+  /**
+   * T-236 slice 2: the opt-in lives in `.agents/SYSTEM/greeting.json`, one boolean per behaviour; absent, unreadable or non-boolean
+   * means OFF. These rows go through the real handlers, because the flag has to reach the writer and the renderer to mean anything.
+   */
+  describe("T-236 slice 2: greeting.json reaches ob_state and ob_start", () => {
+    const flags = (body: string): void => {
+      mkdirSync(join(tmp, ".agents", "SYSTEM"), { recursive: true });
+      writeFileSync(join(tmp, ".agents", "SYSTEM", "greeting.json"), body);
+    };
+    const project = (): void => {
+      proseProject(tmp);
+      cpSync(stateFixture, join(tmp, ".agents", "state.json"));
+      writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "0.30.0" }));
+    };
+    const blockOf = (text: string): string[] => {
+      const lines = text.split("\n");
+      return lines.slice(lines.findIndex((l) => l.startsWith("## Briefing")), lines.indexOf("## End Briefing") + 1);
+    };
+    const handoff = (watch_out: string[]) => ({ op: "set_handoff", seat: "developer", pick_up: "Next", watch_out, open_questions: [] });
+
+    it("handoff_caps ON refuses a fourth watch-out through ob_state and writes nothing; absent applies it", async () => {
+      project();
+      proveOwn("t236-caps-uuid");
+      await handleSetSession({ session_id: "t236-caps-uuid", project_dir: tmp });
+      const four = ["a", "b", "c", "d"];
+
+      flags(JSON.stringify({ handoff_caps: true }));
+      const refused = await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops: [handoff(four)] });
+      expect(refused.isError).toBe(true);
+      expect(getText(refused)).toContain("handoff_caps is on for this repo");
+      expect(getText(refused)).toContain("4 watch-outs, the cap is 3");
+      expect(getText(refused)).toContain("Nothing written.");
+
+      rmSync(join(tmp, ".agents", "SYSTEM", "greeting.json"));
+      const applied = await handleState({ project_root: tmp, session: 55, expected_revision: 7, ops: [handoff(four)] });
+      expect(applied.isError).toBeUndefined();
+      expect(getText(applied)).toContain("ob_state applied");
+    });
+
+    it("briefing_budget ON prints the budgeted block through ob_start; absent, unreadable or non-boolean prints the original layout", async () => {
+      project();
+      const original = blockOf(getText(await handleStart({ project_root: tmp })));
+      expect(original.join("\n")).toContain("Backlog order, not a decision");
+
+      flags(JSON.stringify({ briefing_budget: true }));
+      const budgeted = blockOf(getText(await handleStart({ project_root: tmp })));
+      expect(budgeted.join("\n")).not.toContain("Backlog order, not a decision");
+      expect(budgeted).not.toContain("NEXT");
+      expect(budgeted.length).toBeLessThanOrEqual(30);
+      expect(budgeted.length).toBeLessThan(original.length);
+
+      for (const body of ["{ not json", JSON.stringify({ briefing_budget: "yes" }), JSON.stringify([true]), JSON.stringify({ handoff_caps: true })]) {
+        flags(body);
+        const off = blockOf(getText(await handleStart({ project_root: tmp })));
+        expect(off.slice(4), body).toEqual(original.slice(4)); // past the serving, usage and session lines, which vary per run
+      }
+    });
+  });
+
   describe("handleSync", () => {
     it("runs sync on project root", async () => {
       writeFileSync(join(tmp, "package.json"), JSON.stringify({ version: "1.0.0" }));
