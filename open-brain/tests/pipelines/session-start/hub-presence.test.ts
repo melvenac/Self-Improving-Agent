@@ -119,16 +119,53 @@ describe("T-198 hub presence at /start (r2)", () => {
     expect(() => new net.Socket().connect(1, "127.0.0.1")).toThrow(/no network in presence tests/);
   });
 
-  it("PR-1 a seat with pollingNow true prints as LISTENER polling", async () => {
-    const { fetchFn } = fixtureFetch(roster({ forge: { sessionId: FORGE_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 } }));
+  it("PR-1 a cursor-runtime partner prints hub seatState, not listener polling", async () => {
+    const body = {
+      agents: [
+        {
+          name: "forge",
+          rooms: [{ sessionId: FORGE_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 }],
+          seat: { seatState: "working" },
+        },
+        { name: "cursor-infra", rooms: [{ sessionId: INFRA_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }] },
+        { name: "cursor-builder", rooms: [{ sessionId: BUILDER_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }] },
+      ],
+    };
+    const { fetchFn } = fixtureFetch(body);
     const block = await describe_(fetchFn);
-    expect(block.lines.join("\n")).toContain("forge: listener polling");
+    expect(block.lines.join("\n")).toContain("forge: working");
+    expect(block.lines.join("\n")).not.toContain("forge: listener");
   });
 
-  it("PR-2 a seat not polling prints the unread count and age, as a listener", async () => {
-    const { fetchFn } = fixtureFetch(roster({ "cursor-infra": { sessionId: INFRA_ROOM, unread: 3, pollingNow: false, pollAgeMs: 270_000 } }));
+  it("PR-2 a cursor-runtime partner with seatState owes_reply never says not polling", async () => {
+    const body = {
+      agents: [
+        { name: "forge", rooms: [{ sessionId: FORGE_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }], seat: { seatState: "idle" } },
+        {
+          name: "cursor-infra",
+          rooms: [{ sessionId: INFRA_ROOM, unread: 3, pollingNow: false, pollAgeMs: 270_000 }],
+          seat: { seatState: "owes_reply" },
+        },
+        { name: "cursor-builder", rooms: [{ sessionId: BUILDER_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }] },
+      ],
+    };
+    const { fetchFn } = fixtureFetch(body);
     const block = await describe_(fetchFn);
-    expect(block.lines.join("\n")).toContain("cursor-infra: listener not polling, 3 unread since 5m");
+    expect(block.lines.join("\n")).toContain("cursor-infra: owes_reply");
+    expect(block.lines.join("\n")).not.toMatch(/cursor-infra:.*not polling/);
+  });
+
+  it("T-240 unknown seatState prints state:unknown(<raw>)", async () => {
+    const body = {
+      agents: [
+        { name: "forge", rooms: [{ sessionId: FORGE_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }], seat: { seatState: "bogus" } },
+        { name: "cursor-infra", rooms: [{ sessionId: INFRA_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }] },
+        { name: "cursor-builder", rooms: [{ sessionId: BUILDER_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }] },
+      ],
+    };
+    const { fetchFn } = fixtureFetch(body);
+    const block = await describe_(fetchFn);
+    expect(block.lines.join("\n")).toContain("forge: state:unknown(bogus)");
   });
 
   describe("T-237 pollAgeMs null is A2A's 'no wait-poll in the window', not a malformed body", () => {
@@ -139,8 +176,8 @@ describe("T-198 hub presence at /start (r2)", () => {
       }));
       const text = (await describe_(fetchFn)).lines.join("\n");
       expect(text).not.toContain("presence: UNKNOWN");
-      expect(text).toContain("forge: listener not polling");
-      expect(text).toContain("cursor-infra: listener not polling, 3 unread since 5m");
+      expect(text).toContain("forge: state:unknown(missing)");
+      expect(text).toContain("cursor-infra: state:unknown(missing)");
     });
 
     it.each([
@@ -149,8 +186,8 @@ describe("T-198 hub presence at /start (r2)", () => {
     ])("T237-2 unread > 0 with pollAgeMs %s says no poll is recorded and never prints an age", async (_label, pollAgeMs) => {
       const { fetchFn } = fixtureFetch(roster({ "cursor-infra": { sessionId: INFRA_ROOM, unread: 2, pollingNow: false, pollAgeMs } }));
       const line = (await describe_(fetchFn)).lines.find((l) => l.includes("cursor-infra:"));
-      expect(line).toBe("  cursor-infra: listener not polling, 2 unread, no listener poll recorded");
-      expect(line).not.toMatch(/since/);
+      expect(line).toBe("  cursor-infra: state:unknown(missing)");
+      expect(line).not.toMatch(/since|not polling/);
     });
 
     const room = `"sessionId":"${INFRA_ROOM}","unread":2,"pollingNow":false`;
@@ -177,7 +214,7 @@ describe("T-198 hub presence at /start (r2)", () => {
     const partnerLines = block.lines.slice(1);
     expect(partnerLines.length).toBe(3);
     for (const line of partnerLines) {
-      expect(line).toMatch(/^ {2}\S.*: (listener polling|listener not polling|absent)/);
+      expect(line).toMatch(/^ {2}\S.*: (hub listener:|working|idle|owes_reply|state:unknown|absent)/);
       expect(line).not.toMatch(/seen|\bread\b|acknowledg/i);
     }
     expect(block.lines[0]).toContain("listener");
@@ -246,7 +283,7 @@ describe("T-198 hub presence at /start (r2)", () => {
     const { fetchFn } = fixtureFetch({ agents: [] });
     const block = await describe_(fetchFn);
     expect(block.lines.join("\n")).toContain("forge: absent");
-    expect(formatPartnerLine({ label: "grok", hub_as: "grok", session_id: FORGE_ROOM }, [] as PresenceAgent[])).toBe("grok: absent");
+    expect(formatPartnerLine({ label: "grok", hub_as: "grok", session_id: FORGE_ROOM }, [] as PresenceAgent[], "cursor")).toBe("grok: absent");
   });
 
   it("PR-5 mutant swallowFetchErrors produces no UNKNOWN line", async () => {
@@ -371,7 +408,7 @@ partner: Atlas
       } as Parameters<typeof describeHubPresence>[0]);
       expect(calls).toHaveLength(1);
       expect(calls[0].headers["X-Agent-Key"]).toBe(key);
-      expect(block.lines.join(String.fromCharCode(10))).toContain("Atlas: listener not polling, 2 unread since 1m");
+      expect(block.lines.join(String.fromCharCode(10))).toContain("Atlas: hub listener: not polling, 2 unread since 1m");
     });
 
     it("S-2 the reader is found even when the identity is unresolved (null): the checkout is enough", async () => {

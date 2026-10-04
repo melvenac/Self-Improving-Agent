@@ -15,6 +15,7 @@
     "typecheck:tests": "tsc -p tsconfig.tests.json",
     "dev": "npx tsx src/cli.ts",
     "test": "vitest run",
+    "test:heavy": "tsx src/cli-suite-run.ts",
     "test:watch": "vitest",
     "postbuild": "node scripts/copy-build-assets.mjs && node scripts/write-build-info.mjs"
   },
