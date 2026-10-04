@@ -733,7 +733,7 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
     it("G-053: gc.auto admits only the raw value 0 (no trim)", () => {
       const dirs = resolveGitDirs(repo.root);
       expect(unsafeLocalKeys(repo.root, dirs).keys).toEqual([]);
-      for (const bad of [" 0", "0 ", "\t0", "00", "0x"]) {
+      for (const bad of [" 0", "0 ", "\t0", "00", "0x", "-0", "+0"]) {
         rawGit(repo.root, ["config", "gc.auto", bad]);
         expect(unsafeLocalKeys(repo.root, dirs).keys.some((k) => k.startsWith("gc.auto")), `gc.auto=${JSON.stringify(bad)}`).toBe(true);
         expectRefusedCleanly(refusal(config()), "unsafe-config-at-base", "gc.auto");
@@ -752,6 +752,12 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
       rawGit(repo.root, ["config", "gc.autodetach", "1"]);
       expectRefusedCleanly(refusal(config()), "unsafe-config-at-base", "gc.autodetach");
       rawGit(repo.root, ["config", "--unset", "gc.autodetach"]);
+    });
+
+    it("G-053: gc.autoPackLimit=0 is refused — a zero under another gc.* key is not gc.auto=0", () => {
+      rawGit(repo.root, ["config", "gc.autoPackLimit", "0"]);
+      expectRefusedCleanly(refusal(config()), "unsafe-config-at-base", "gc.autopacklimit");
+      rawGit(repo.root, ["config", "--unset", "gc.autoPackLimit"]);
     });
 
     it("G-053 mutant: /^0/ without end-anchor would admit 00 — product uses exact match", () => {
