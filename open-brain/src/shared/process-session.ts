@@ -187,25 +187,16 @@ export function loadWin32ProcessTable(run: () => string = readWin32ProcessTableS
   try {
     return parseWin32ProcessTable(run());
   } catch (err) {
-    const status = (err as { status?: number }).status;
+    const status = (err as { status?: number | null }).status;
     const detail = err instanceof Error ? err.message : String(err);
-    const why = status !== undefined && status !== 0 ? `exit ${status}: ${detail}` : detail;
+    // status is null when the process never started (spawn ENOENT/timeout).
+    // !== undefined treats that null as an exit code and reports "exit null".
+    const why = status != null && status !== 0 ? `exit ${status}: ${detail}` : detail;
     return { ok: false, reason: `Win32 process table: ${why}` };
   }
 }
 
 function readWin32ProcessTableStdout(): string {
-  const forced = process.env.OPEN_BRAIN_PROCESS_TABLE;
-  if (forced === "throw:spawn") throw new Error("spawn powershell.exe ENOENT");
-  if (forced === "throw:timeout") throw new Error("spawn powershell.exe ETIMEDOUT");
-  if (forced === "throw:status") {
-    const err = new Error("Command failed: powershell.exe");
-    (err as { status?: number }).status = 1;
-    throw err;
-  }
-  if (forced === "empty") return " ";
-  if (forced === "bad-json") return "{";
-  if (forced !== undefined && forced.startsWith("json:")) return forced.slice("json:".length);
   return execFileSync(
     "powershell.exe",
     [
@@ -279,10 +270,9 @@ export function resolveCursorAgentHost(
   loadTable?: () => Win32TableResult,
 ): HostWalk {
   let resolveParent = readParent;
-  // On Windows the default walk uses one CIM table. Tests pass loadTable, or set
-  // OPEN_BRAIN_PROCESS_TABLE so the hook process hits the same loader.
+  // On Windows the default walk uses one CIM table. Tests pass loadTable.
+  // There is no environment override: a forged table must not name a host (T-235 P2-3 r4).
   const shouldLoad = loadTable !== undefined
-    || process.env.OPEN_BRAIN_PROCESS_TABLE !== undefined
     || (process.platform === "win32" && readParent === readProcessParent);
   if (shouldLoad) {
     const loaded = (loadTable ?? loadWin32ProcessTable)();
@@ -310,6 +300,8 @@ export type ProveSessionOptions = {
   /** When true, walk from parentPid to the cursor-agent host before reading proof. */
   cursorWalk?: boolean;
   readParent?: (pid: number) => ProcessParentInfo | null;
+  /** Test injection for the Win32 table. Production never reads this from the environment. */
+  loadTable?: () => Win32TableResult;
 };
 
 function proveSessionAtKey(
@@ -408,7 +400,7 @@ export function proveSession(
   if (direct.id !== null) return direct;
   let host: HostWalk;
   try {
-    host = resolveCursorAgentHost(parentPid, readParent);
+    host = resolveCursorAgentHost(parentPid, readParent, options.loadTable);
   } catch (err) {
     return { id: null, reason: err instanceof Error ? err.message : String(err) };
   }

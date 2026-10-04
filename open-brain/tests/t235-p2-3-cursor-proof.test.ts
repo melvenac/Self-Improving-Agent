@@ -242,22 +242,38 @@ describe("T-235 P2-3 cursor session proof", () => {
     if (one.ok) expect(one.table.get(9)?.ppid).toBe(1);
   });
 
-  it("r3 proveSession returns id null when the process table cannot be loaded", () => {
-    const prev = process.env.OPEN_BRAIN_PROCESS_TABLE;
-    process.env.OPEN_BRAIN_PROCESS_TABLE = "throw:spawn";
-    try {
-      const r = proveSession(dir, process.pid, "win:1", { cursorWalk: true });
-      expect(r.id).toBeNull();
-      if (r.id === null) expect(r.reason).toMatch(/Win32 process table/);
-    } finally {
-      if (prev === undefined) delete process.env.OPEN_BRAIN_PROCESS_TABLE;
-      else process.env.OPEN_BRAIN_PROCESS_TABLE = prev;
+  it("r4 a spawn failure with status null names the spawn error", () => {
+    const loaded = loadWin32ProcessTable(() => {
+      const err = new Error("spawn powershell.exe ENOENT");
+      (err as { status?: number | null }).status = null;
+      throw err;
+    });
+    expect(loaded.ok).toBe(false);
+    if (!loaded.ok) {
+      expect(loaded.reason).toContain("spawn powershell.exe ENOENT");
+      expect(loaded.reason).not.toContain("exit null");
     }
   });
 
-  it("r3 the hook prints Session proof NOT written when powershell cannot spawn", () => {
-    const home = mkdtempSync(join(tmpdir(), "t235-r3-home-"));
-    const cwd = mkdtempSync(join(tmpdir(), "t235-r3-cwd-"));
+  it("r3 proveSession returns id null when the process table cannot be loaded", () => {
+    const r = proveSession(dir, process.pid, "win:1", {
+      cursorWalk: true,
+      loadTable: () => loadWin32ProcessTable(() => {
+        throw new Error("spawn powershell.exe ENOENT");
+      }),
+    });
+    expect(r.id).toBeNull();
+    if (r.id === null) expect(r.reason).toMatch(/Win32 process table/);
+  });
+
+  it("r4 OPEN_BRAIN_PROCESS_TABLE json naming a foreign pid writes no proof for it", () => {
+    const foreign = 2147483001;
+    const forged = JSON.stringify([
+      { ProcessId: process.pid, ParentProcessId: foreign, CommandLine: "node.exe vitest" },
+      { ProcessId: foreign, ParentProcessId: 1, CommandLine: HOST_CMD },
+    ]);
+    const home = mkdtempSync(join(tmpdir(), "t235-r4-home-"));
+    const cwd = mkdtempSync(join(tmpdir(), "t235-r4-cwd-"));
     const slot = join(home, "active-session.json");
     const r = spawnSync(process.execPath, [TSX_CLI, BOOT, "--ide", "cursor"], {
       input: JSON.stringify({ cwd, session_id: SELF, cursor_version: "1", workspace_roots: [cwd] }),
@@ -267,14 +283,15 @@ describe("T-235 P2-3 cursor session proof", () => {
         HOME: home,
         USERPROFILE: home,
         OPEN_BRAIN_ACTIVE_SESSION: slot,
-        OPEN_BRAIN_PROCESS_TABLE: "throw:spawn",
+        OPEN_BRAIN_PROCESS_TABLE: `json:${forged}`,
       },
     });
+    const foreignProof = join(byPidDir(slot), `${foreign}.json`);
+    const wroteForeign = existsSync(foreignProof);
     rmSync(home, { recursive: true, force: true });
     rmSync(cwd, { recursive: true, force: true });
     expect(r.status).toBe(0);
-    expect(r.stdout).toContain("Session proof NOT written:");
-    expect(r.stdout).toContain("Win32 process table");
-    expect(r.stdout).not.toContain("Session proof written:");
+    expect(wroteForeign).toBe(false);
+    expect(r.stdout ?? "").not.toContain(`cursor-agent host process ${foreign}`);
   });
 });
