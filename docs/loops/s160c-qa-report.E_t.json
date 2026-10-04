@@ -1,0 +1,51 @@
+{
+  "loop": "qa-268-s160c",
+  "candidate_git": {
+    "sha": "0c66cb9aabd4130cf59cbc51b241f94dbe55f26c",
+    "branch": "local qa268-merge (f8345f1b + 6f145faf + 3e95016c), not pushed",
+    "frozen_at": "2026-10-04T00:10:52Z"
+  },
+  "candidates": [
+    { "task": "T-236", "sha": "6f145faf9d1bba962d281e16285fcb59b14b68c7", "branch": "origin/loop/t236-slice2-briefing", "pr": 393, "verdict": "ACCEPT" },
+    { "task": "T-237", "sha": "3e95016c92844b67113ae44f9d9c7ed362335587", "branch": "pull/397/head", "pr": 397, "verdict": "REJECT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit and npm run typecheck:tests in qa268-merge (after #393, after #393+#397) and qa268-pr397; node --check on tsc-emitted server.js",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 60000,
+      "detail": "All 0. node --check build server.js 0; control copy with duplicated greetingFlag import exits 1 (SyntaxError: Identifier 'greetingFlag' has already been declared)."
+    },
+    "unit": {
+      "command": "npx vitest run <one file> per run (LIGHT job; no full suite)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 90000,
+      "detail": "#393 merged with f8345f1b: server 35/35, role-docs-by-sha 11/11, a2a-byte-identical 3/3, briefing-budget 31/31. #397: hub-presence master 6 failed|34 passed (40), head 40/40; greeting-size 11/11 at head. Batch 0c66cb9a: hub-presence 40/40, server 35/35. QA bound probe: head FAIL (364 > 313), master pass (310 <= 313)."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q268-1", "status": "met", "order": "shown", "evidence": "range-diff f5512b6a~1..4020a42b vs origin/master..6f145faf: 3x '='. remerge-diff of 6f145faf: only greeting.json conflict resolution and removal of the second greetingFlag import." },
+    { "id": "Q268-2", "status": "met", "order": "shown", "evidence": "grep -c 'import { greetingFlag }' server.ts = 1 (line 27); greeting.json {briefing_budget:true, handoff_caps:false, role_docs_by_sha:true}, sorted." },
+    { "id": "Q268-3", "status": "met", "order": "shown", "evidence": "f8345f1b + 6f145faf (4f247ec0, tree = 6f145faf): tsc 0, typecheck:tests 0, node --check server.js 0 (control 1); server 35, role-docs-by-sha 11, a2a-byte-identical 3, briefing-budget 31." },
+    { "id": "Q268-4", "status": "met", "order": "shown", "evidence": "gh pr checks 393: test pass, run 37161339592, headSha 6f145faf, pull_request, tested refs/pull/393/merge 3d151d3c." },
+    { "id": "Q268-5", "status": "met", "order": "shown", "evidence": "TS-parser scan: merged src 102 files / 1124 bindings / 0 duplicates; batch 0; tests 0; control 6e55119b flags server.ts greetingFlag 27,35. tsc --noEmit and typecheck:tests (includes src/**, 102 files) both in CI and both catch TS2300, but only on a tree with both PRs; ruleset strict=false and PR CI on opened/synchronize only, so a stale green passes the gate (G1)." },
+    { "id": "Q268-6", "status": "met", "order": "shown", "evidence": "3 files: CHANGELOG.md, hub-presence.ts, hub-presence.test.ts. A2A field names unchanged; pollAgeMs type widened to number|null; reason text now 'is not a finite number or null', asserted nowhere else." },
+    { "id": "Q268-7", "status": "met", "order": "red-first", "evidence": "Head test file on master src: 6 failed | 34 passed (40) (T237-1, T237-2 null+absent ['since 0s'], T237-3 string/bool/Infinity on new reason text only; NaN passes both). Head 40/40." },
+    { "id": "Q268-8", "status": "met", "order": "shown", "evidence": "DEV-M1 null->0: 1 failed (T237-2 null). QA-M1 absent still since 0s: 1 failed (T237-2 absent). QA-M2 null room dropped: 2 failed (T237-1, T237-2 null). Each tsc 0, src restored clean. Probe QA-P3 falsy check survives (G2)." },
+    { "id": "Q268-9", "status": "unmet", "order": "shown", "evidence": "New line passes R1 regexes and hub-presence 40/40, greeting-size 11/11; but F1: presenceBlockUpperBound (worst-case 'longest live form' for /sync greeting-size) still uses the 'since 99d' form; the new no-poll form is 17 chars longer per partner. Probe: head bound 313 < real 364; master bound 313 >= 310. greeting-size.test.ts:227 pins the old worst form. Demo fix (longer of both forms) makes probe pass; needs greeting-size.test.ts:227 updated." },
+    { "id": "Q268-10", "status": "met", "order": "shown", "evidence": "gh pr checks 397: test pass, run 37161480519, headSha 3e95016c, pull_request." },
+    { "id": "Q268-11", "status": "met", "order": "shown", "evidence": "f8345f1b + 6f145faf + 3e95016c = 0c66cb9a, no conflict (CHANGELOG.md clean): tsc 0, typecheck:tests 0, hub-presence 40/40, server 35/35, dup-import scan 0. F1 carried in from #397." }
+  ],
+  "regressions": [
+    "#397: presenceBlockUpperBound is no longer an upper bound: a live block whose rooms have unread and no recorded poll is 51 chars (3 partners x 17) longer than the 'worst-case upper bound' /sync prints."
+  ],
+  "gaps": [
+    "G1 process: strict_required_status_checks_policy false + PR CI only on opened/synchronize: two individually green PRs can be red together; only the batch merge row or master push CI sees it.",
+    "G2 #397: no row pins unread>0 with numeric pollAgeMs 0; a falsy-check mutant survives.",
+    "G3 #397: R1 wording row's fixture never renders the new no-poll line, so its word ban does not guard it."
+  ],
+  "notes": "QA 268, dispatch tree 7779e6fee1fc1ee013ad6523dcb5a2e115e9dbda. Heads unmoved at start. Master moved f8345f1b -> 7779e6fe in docs/state only (no open-brain/ or CHANGELOG change). TMPDIR could not be set (permission layer). No live Jev call; gh read-only. Per-PR: #393 ACCEPT, #397 REJECT (F1); batch REJECT."
+}

@@ -1,0 +1,12 @@
+diff --git a/open-brain/src/pipelines/session-start/hub-presence.ts b/open-brain/src/pipelines/session-start/hub-presence.ts
+index 36afeec2..93c9a93a 100644
+--- a/open-brain/src/pipelines/session-start/hub-presence.ts
++++ b/open-brain/src/pipelines/session-start/hub-presence.ts
+@@ -150,6 +150,7 @@ function validateRoster(body: unknown): { ok: true; agents: PresenceAgent[] } |
+       if (typeof room.sessionId !== "string") return bad(`${rat}.sessionId`, "is not a string");
+       if (!Number.isInteger(room.unread) || (room.unread as number) < 0) return bad(`${rat}.unread`, "is not a non-negative integer");
+       if (typeof room.pollingNow !== "boolean") return bad(`${rat}.pollingNow`, "is not a boolean");
++      if (room.pollAgeMs === null) { agent.rooms.splice(j, 1); continue; }
+       // T-237: null is A2A's "no wait-poll in the window" by design, so one such room must not make ALL presence UNKNOWN.
+       if (room.pollAgeMs !== undefined && room.pollAgeMs !== null && (typeof room.pollAgeMs !== "number" || !Number.isFinite(room.pollAgeMs))) {
+         return bad(`${rat}.pollAgeMs`, "is not a finite number or null");

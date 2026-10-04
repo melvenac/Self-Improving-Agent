@@ -1,0 +1,15 @@
+diff --git a/open-brain/src/pipelines/session-start/hub-presence.ts b/open-brain/src/pipelines/session-start/hub-presence.ts
+index 36afeec2..01daf3b3 100644
+--- a/open-brain/src/pipelines/session-start/hub-presence.ts
++++ b/open-brain/src/pipelines/session-start/hub-presence.ts
+@@ -126,8 +126,8 @@ export function formatPartnerLine(partner: HubPartnerSeat, agents: PresenceAgent
+   const unread = room.unread ?? 0;
+   if (unread > 0) {
+     // T-237: no recorded poll has no age. "since 0s" for a null or absent age was a false freshness claim.
+-    if (typeof room.pollAgeMs !== "number") return `${partner.label}: listener not polling, ${unread} unread, no listener poll recorded`;
+-    return `${partner.label}: listener not polling, ${unread} unread since ${formatPollAge(room.pollAgeMs)}`;
++    if (room.pollAgeMs === null) return `${partner.label}: listener not polling, ${unread} unread, no listener poll recorded`;
++    return `${partner.label}: listener not polling, ${unread} unread since ${formatPollAge(room.pollAgeMs ?? 0)}`;
+   }
+   return `${partner.label}: listener not polling`;
+ }

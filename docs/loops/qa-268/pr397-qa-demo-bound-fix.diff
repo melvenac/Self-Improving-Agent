@@ -1,0 +1,20 @@
+diff --git a/open-brain/src/pipelines/session-start/hub-presence.ts b/open-brain/src/pipelines/session-start/hub-presence.ts
+index 36afeec2..571c6cfa 100644
+--- a/open-brain/src/pipelines/session-start/hub-presence.ts
++++ b/open-brain/src/pipelines/session-start/hub-presence.ts
+@@ -272,10 +272,12 @@ export function presenceBlockUpperBound(
+   if (seat.kind !== "seat" || !seat.hubName) return { chars: 0, lines: [] };
+   const partners = seatsFile.data.readers[seat.hubName]?.partners;
+   if (!partners?.length) return { chars: 0, lines: [] };
+-  const worst: PresenceAgent[] = partners.map((p) => ({
++  const worstOf = (pollAgeMs: number | null): PresenceAgent[] => partners.map((p) => ({
+     name: p.hub_as,
+-    rooms: [{ sessionId: p.session_id, unread: 999, pollingNow: false, pollAgeMs: 99 * 86_400_000 }],
++    rooms: [{ sessionId: p.session_id, unread: 999, pollingNow: false, pollAgeMs }],
+   }));
+-  const lines = [presenceHeader(callerLabel, seatsFile.rel), ...partners.map((p) => `  ${formatPartnerLine(p, worst)}`)];
++  const longest = (p: HubPartnerSeat) =>
++    [formatPartnerLine(p, worstOf(99 * 86_400_000)), formatPartnerLine(p, worstOf(null))].reduce((a, b) => (b.length > a.length ? b : a));
++  const lines = [presenceHeader(callerLabel, seatsFile.rel), ...partners.map((p) => `  ${longest(p)}`)];
+   return { chars: lines.join("\n").length, lines };
+ }
