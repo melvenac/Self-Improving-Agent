@@ -8,6 +8,8 @@ import {
   byPidDir,
   findCursorAgentHostPid,
   isCursorAgentHostCommandLine,
+  loadWin32ProcessTable,
+  parseWin32ProcessTable,
   processStartTime,
   proveSession,
   writeProcessSession,
@@ -216,5 +218,63 @@ describe("T-235 P2-3 cursor session proof", () => {
     };
     expect(findCursorAgentHostPid(hook, (p) => chain[p] ?? null)).toBe(host);
     expect(findCursorAgentHostPid(hook, (p) => chain[p] ?? null)).not.toBe(hook);
+  });
+
+  it("r3 Win32 table loader returns a reason and does not throw", () => {
+    const failures: Array<() => string> = [
+      () => { throw new Error("spawn powershell.exe ENOENT"); },
+      () => { throw new Error("spawn powershell.exe ETIMEDOUT"); },
+      () => {
+        const err = new Error("Command failed: powershell.exe");
+        (err as { status?: number }).status = 1;
+        throw err;
+      },
+      () => " ",
+      () => "{",
+    ];
+    for (const run of failures) {
+      const loaded = loadWin32ProcessTable(run);
+      expect(loaded.ok).toBe(false);
+      if (!loaded.ok) expect(loaded.reason).toMatch(/Win32 process table/);
+    }
+    const one = parseWin32ProcessTable(JSON.stringify({ ProcessId: 9, ParentProcessId: 1, CommandLine: "node.exe index.js" }));
+    expect(one.ok).toBe(true);
+    if (one.ok) expect(one.table.get(9)?.ppid).toBe(1);
+  });
+
+  it("r3 proveSession returns id null when the process table cannot be loaded", () => {
+    const prev = process.env.OPEN_BRAIN_PROCESS_TABLE;
+    process.env.OPEN_BRAIN_PROCESS_TABLE = "throw:spawn";
+    try {
+      const r = proveSession(dir, process.pid, "win:1", { cursorWalk: true });
+      expect(r.id).toBeNull();
+      if (r.id === null) expect(r.reason).toMatch(/Win32 process table/);
+    } finally {
+      if (prev === undefined) delete process.env.OPEN_BRAIN_PROCESS_TABLE;
+      else process.env.OPEN_BRAIN_PROCESS_TABLE = prev;
+    }
+  });
+
+  it("r3 the hook prints Session proof NOT written when powershell cannot spawn", () => {
+    const home = mkdtempSync(join(tmpdir(), "t235-r3-home-"));
+    const cwd = mkdtempSync(join(tmpdir(), "t235-r3-cwd-"));
+    const slot = join(home, "active-session.json");
+    const r = spawnSync(process.execPath, [TSX_CLI, BOOT, "--ide", "cursor"], {
+      input: JSON.stringify({ cwd, session_id: SELF, cursor_version: "1", workspace_roots: [cwd] }),
+      encoding: "utf-8",
+      env: {
+        ...process.env,
+        HOME: home,
+        USERPROFILE: home,
+        OPEN_BRAIN_ACTIVE_SESSION: slot,
+        OPEN_BRAIN_PROCESS_TABLE: "throw:spawn",
+      },
+    });
+    rmSync(home, { recursive: true, force: true });
+    rmSync(cwd, { recursive: true, force: true });
+    expect(r.status).toBe(0);
+    expect(r.stdout).toContain("Session proof NOT written:");
+    expect(r.stdout).toContain("Win32 process table");
+    expect(r.stdout).not.toContain("Session proof written:");
   });
 });

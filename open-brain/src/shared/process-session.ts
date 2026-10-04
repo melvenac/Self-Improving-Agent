@@ -147,8 +147,66 @@ export function isCursorAgentHostCommandLine(commandLine: string): boolean {
   return false;
 }
 
-function loadWin32ProcessTable(): Map<number, ProcessParentInfo> {
-  const raw = execFileSync(
+export type Win32TableResult =
+  | { ok: true; table: Map<number, ProcessParentInfo> }
+  | { ok: false; reason: string };
+
+/** Parse one ConvertTo-Json payload. A single process is an object, not an array. */
+export function parseWin32ProcessTable(raw: string): Win32TableResult {
+  const trimmed = raw.trim();
+  if (!trimmed) return { ok: false, reason: "Win32 process table: empty stdout" };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch (err) {
+    return { ok: false, reason: `Win32 process table: unparseable JSON (${err instanceof Error ? err.message : String(err)})` };
+  }
+  if (parsed === null || typeof parsed !== "object") {
+    return { ok: false, reason: "Win32 process table: JSON is not an object or array" };
+  }
+  const rows = Array.isArray(parsed) ? parsed : [parsed];
+  const map = new Map<number, ProcessParentInfo>();
+  for (const row of rows) {
+    if (row === null || typeof row !== "object") continue;
+    const rec = row as { ProcessId?: unknown; ParentProcessId?: unknown; CommandLine?: unknown };
+    if (!Number.isInteger(rec.ProcessId)) continue;
+    map.set(rec.ProcessId as number, {
+      pid: rec.ProcessId as number,
+      ppid: typeof rec.ParentProcessId === "number" ? rec.ParentProcessId : 0,
+      commandLine: typeof rec.CommandLine === "string" ? rec.CommandLine : "",
+    });
+  }
+  return { ok: true, table: map };
+}
+
+/**
+ * One CIM query for the whole table. Spawn failure, timeout, nonzero exit,
+ * empty stdout and bad JSON return ok:false. Never throws (T-235 P2-3 r3).
+ */
+export function loadWin32ProcessTable(run: () => string = readWin32ProcessTableStdout): Win32TableResult {
+  try {
+    return parseWin32ProcessTable(run());
+  } catch (err) {
+    const status = (err as { status?: number }).status;
+    const detail = err instanceof Error ? err.message : String(err);
+    const why = status !== undefined && status !== 0 ? `exit ${status}: ${detail}` : detail;
+    return { ok: false, reason: `Win32 process table: ${why}` };
+  }
+}
+
+function readWin32ProcessTableStdout(): string {
+  const forced = process.env.OPEN_BRAIN_PROCESS_TABLE;
+  if (forced === "throw:spawn") throw new Error("spawn powershell.exe ENOENT");
+  if (forced === "throw:timeout") throw new Error("spawn powershell.exe ETIMEDOUT");
+  if (forced === "throw:status") {
+    const err = new Error("Command failed: powershell.exe");
+    (err as { status?: number }).status = 1;
+    throw err;
+  }
+  if (forced === "empty") return " ";
+  if (forced === "bad-json") return "{";
+  if (forced !== undefined && forced.startsWith("json:")) return forced.slice("json:".length);
+  return execFileSync(
     "powershell.exe",
     [
       "-NoProfile",
@@ -157,21 +215,7 @@ function loadWin32ProcessTable(): Map<number, ProcessParentInfo> {
       "Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress",
     ],
     { encoding: "utf-8", timeout: 60_000, stdio: ["ignore", "pipe", "ignore"], windowsHide: true },
-  ).trim();
-  const parsed = JSON.parse(raw) as
-    | Array<{ ProcessId: number; ParentProcessId: number; CommandLine: string | null }>
-    | { ProcessId: number; ParentProcessId: number; CommandLine: string | null };
-  const rows = Array.isArray(parsed) ? parsed : [parsed];
-  const map = new Map<number, ProcessParentInfo>();
-  for (const row of rows) {
-    if (!Number.isInteger(row.ProcessId)) continue;
-    map.set(row.ProcessId, {
-      pid: row.ProcessId,
-      ppid: row.ParentProcessId,
-      commandLine: row.CommandLine ?? "",
-    });
-  }
-  return map;
+  );
 }
 
 /** Read one process row for ancestor walks (injectable in tests). */
@@ -221,28 +265,45 @@ export function readProcessParent(pid: number): ProcessParentInfo | null {
   }
 }
 
+export type HostWalk = { pid: number | null; reason: string | null };
+
 /**
  * Nearest ancestor of `fromPid` (inclusive) whose command line is the
  * cursor-agent host. The SessionStart hook passes `process.ppid`, never its own
- * pid (T-235 P2-3 r2).
+ * pid (T-235 P2-3 r2). A failed Win32 table load returns pid null and a reason
+ * and does not throw (T-235 P2-3 r3).
  */
-export function findCursorAgentHostPid(
+export function resolveCursorAgentHost(
   fromPid: number,
   readParent: (pid: number) => ProcessParentInfo | null = readProcessParent,
-): number | null {
+  loadTable?: () => Win32TableResult,
+): HostWalk {
   let resolveParent = readParent;
-  if (process.platform === "win32" && readParent === readProcessParent) {
-    const table = loadWin32ProcessTable();
-    resolveParent = (pid) => table.get(pid) ?? null;
+  // On Windows the default walk uses one CIM table. Tests pass loadTable, or set
+  // OPEN_BRAIN_PROCESS_TABLE so the hook process hits the same loader.
+  const shouldLoad = loadTable !== undefined
+    || process.env.OPEN_BRAIN_PROCESS_TABLE !== undefined
+    || (process.platform === "win32" && readParent === readProcessParent);
+  if (shouldLoad) {
+    const loaded = (loadTable ?? loadWin32ProcessTable)();
+    if (!loaded.ok) return { pid: null, reason: loaded.reason };
+    resolveParent = (pid) => loaded.table.get(pid) ?? null;
   }
   let p = fromPid;
   for (let i = 0; i < 64 && p > 0; i++) {
     const row = resolveParent(p);
     if (!row) break;
-    if (isCursorAgentHostCommandLine(row.commandLine)) return row.pid;
+    if (isCursorAgentHostCommandLine(row.commandLine)) return { pid: row.pid, reason: null };
     p = row.ppid;
   }
-  return null;
+  return { pid: null, reason: "no cursor-agent host process found in the hook's ancestor chain" };
+}
+
+export function findCursorAgentHostPid(
+  fromPid: number,
+  readParent: (pid: number) => ProcessParentInfo | null = readProcessParent,
+): number | null {
+  return resolveCursorAgentHost(fromPid, readParent).pid;
 }
 
 export type ProveSessionOptions = {
@@ -345,13 +406,18 @@ export function proveSession(
   const readParent = options.readParent ?? readProcessParent;
   const direct = proveSessionClaude(dir, parentPid, parentStart);
   if (direct.id !== null) return direct;
-  const host = findCursorAgentHostPid(parentPid, readParent);
-  if (host === null) {
+  let host: HostWalk;
+  try {
+    host = resolveCursorAgentHost(parentPid, readParent);
+  } catch (err) {
+    return { id: null, reason: err instanceof Error ? err.message : String(err) };
+  }
+  if (host.pid === null) {
     return {
       id: null,
-      reason: `no cursor-agent host ancestor of parent process ${parentPid} (cursor walk found no matching process)`,
+      reason: host.reason ?? `no cursor-agent host ancestor of parent process ${parentPid} (cursor walk found no matching process)`,
     };
   }
-  const hostStart = processStartTime(host);
-  return proveSessionAtKey(dir, host, hostStart, String(parentPid));
+  const hostStart = processStartTime(host.pid);
+  return proveSessionAtKey(dir, host.pid, hostStart, String(parentPid));
 }

@@ -27,7 +27,7 @@ import {
   resolveAgentIdentity,
 } from "./shared/active-session.js";
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
-import { byPidDir, findCursorAgentHostPid, processStartTime, writeProcessSession } from "./shared/process-session.js";
+import { byPidDir, processStartTime, resolveCursorAgentHost, writeProcessSession } from "./shared/process-session.js";
 import { takeMissingHandoffNotices } from "./shared/handoff-guard.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
@@ -123,24 +123,24 @@ const proofLine: string = (() => {
     if (payload.cursor_version === undefined || payload.cursor_version === null) {
       return "Session proof NOT written: cursor payload has no cursor_version (D5), so this session's server will refuse attributed writes.";
     }
-    const hostPid = findCursorAgentHostPid(process.ppid);
-    if (hostPid === null) {
-      return "Session proof NOT written: no cursor-agent host process found in the hook's ancestor chain, so this session's server will refuse attributed writes.";
-    }
-    const procStart = processStartTime(hostPid);
-    if (procStart === null) {
-      return `Session proof NOT written: the start time of cursor-agent host process ${hostPid} could not be read, so this session's server will refuse attributed writes.`;
-    }
     try {
+      const host = resolveCursorAgentHost(process.ppid);
+      if (host.pid === null) {
+        return `Session proof NOT written: ${host.reason ?? "no cursor-agent host process found in the hook's ancestor chain"}, so this session's server will refuse attributed writes.`;
+      }
+      const procStart = processStartTime(host.pid);
+      if (procStart === null) {
+        return `Session proof NOT written: the start time of cursor-agent host process ${host.pid} could not be read, so this session's server will refuse attributed writes.`;
+      }
       writeProcessSession(byPidDir(resolvePaths(cwd).activeSession), {
         session_id: payloadId.uuid,
-        claude_pid: hostPid,
+        claude_pid: host.pid,
         proc_start: procStart,
         ide: "cursor",
         written_at: new Date().toISOString(),
         ...(typeof payload.transcript_path === "string" ? { transcript_path: payload.transcript_path } : {}),
       });
-      return `Session proof written: session ${payloadId.uuid} for cursor-agent host process ${hostPid}.`;
+      return `Session proof written: session ${payloadId.uuid} for cursor-agent host process ${host.pid}.`;
     } catch (err) {
       return `Session proof NOT written: ${err instanceof Error ? err.message : String(err)} — this session's server will refuse attributed writes.`;
     }
