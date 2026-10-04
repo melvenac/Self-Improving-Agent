@@ -1,11 +1,14 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseState, checkoutOf, ownHandoff, type State } from "../../../src/shared/state-schema.js";
 import { renderBriefing, type BriefingInput } from "../../../src/pipelines/session-start/briefing.js";
 import { renderState } from "../../../src/pipelines/session-start/state-render.js";
 import { handoffCheckout } from "../../../src/pipelines/session-start/greeting-flags.js";
+import { checkMissingHandoff } from "../../../src/pipelines/session-start/state-render.js";
+import { applyStateOps } from "../../../src/shared/state-writer.js";
+import { handleStart } from "../../../src/server.js";
 import { readFileSync } from "node:fs";
 
 /**
@@ -182,5 +185,89 @@ describe("R7: checkoutOf is one derivation for the writer and the reader", () =>
   it("the basename of the resolved project root, trailing separator or not", () => {
     expect(checkoutOf(join(tmpdir(), "Worktrees", "sia-infra"))).toBe("sia-infra");
     expect(checkoutOf(join(tmpdir(), "Worktrees", "sia-infra") + "/")).toBe("sia-infra");
+  });
+});
+
+describe("R8 (QA 270 row 3): ob_start itself hands the checkout to BOTH renderers when the flag is on", () => {
+  // The selector and the renderers are pinned above; this pins the one production path that reads the flag and passes
+  // `ownCheckout` on. QA 270's mutant (server.ts stops passing it to renderBriefing) survived every other row.
+  const parents: string[] = [];
+  const saved = { HUB_URL: process.env.HUB_URL, A2A_KEY_DIR: process.env.A2A_KEY_DIR };
+  beforeEach(() => {
+    // No network: the presence block's fetch fails and says so; nothing here depends on it.
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("no network in this test"));
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    for (const [k, v] of Object.entries(saved)) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true });
+  });
+
+  async function start(greeting: Record<string, boolean>): Promise<string> {
+    const parent = mkdtempSync(join(tmpdir(), "t239-r8-"));
+    parents.push(parent);
+    const root = join(parent, "sia-infra");
+    for (const d of ["SYSTEM", "TASKS", "SESSIONS"]) mkdirSync(join(root, ".agents", d), { recursive: true });
+    writeFileSync(join(root, "package.json"), JSON.stringify({ version: "1.0.0" }));
+    writeFileSync(join(root, ".agents", "SESSIONS", "SESSION_TEMPLATE.md"), "# Session N\n");
+    writeFileSync(join(root, ".agents", "AGENT.local.md"), "---\nname: Infra\nrole: developer\npartner: Atlas\n---\n");
+    writeFileSync(join(root, ".agents", "SYSTEM", "greeting.json"), JSON.stringify(greeting));
+    const raw = structuredClone(SIA);
+    raw.handoffs = [{ ...raw.handoffs[0], seat: "developer", checkout: "sia-builder", session_uuid: "u-builder", first_rev: 5, pick_up: "builder's pick-up", watch_out: ["builder's watch"] }];
+    writeFileSync(join(root, ".agents", "state.json"), JSON.stringify(raw, null, 2));
+    return (await handleStart({ project_root: root })).content[0].text;
+  }
+
+  for (const budget of [true, false]) {
+    it(`flag on (briefing_budget ${budget}): the Briefing and the State block both say none recorded for THIS checkout`, async () => {
+      const text = await start({ briefing_budget: budget, handoff_by_checkout: true });
+      const briefing = text.slice(text.indexOf("## Briefing"));
+      expect(briefing, "renderBriefing got ownCheckout").toMatch(/\nPICK UP HERE\nnone recorded for this checkout \(developer, sia-infra\)\n/);
+      expect(briefing).not.toContain("builder's pick-up");
+      const state = text.slice(0, text.indexOf("## Briefing"));
+      expect(state, "renderState got ownCheckout").toContain("no handoff recorded for this checkout (developer, sia-infra)");
+      expect(state).not.toContain("Your handoff");
+    });
+  }
+
+  it("flag off: the role-wide pick-up, as before (the row reads the flag, not a constant)", async () => {
+    const text = await start({ briefing_budget: true });
+    expect(text.slice(text.indexOf("## Briefing"))).toMatch(/\nPICK UP HERE\nbuilder's pick-up\n/);
+  });
+});
+
+describe("R9: checkMissingHandoff and the writer use ONE derivation of the checkout", () => {
+  // The writer stamps `sessions[].checkout` with checkoutOf(root); checkMissingHandoff must find that session from the same
+  // checkout however its root is spelled. An inline derivation that drifts (no resolve, a raw path, a case fold on one side
+  // only) stops matching on some spelling, and this row names which.
+  const parents: string[] = [];
+  afterEach(() => {
+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+  });
+
+  it("a session the real writer stamped (no handoff) is found as missing from every spelling of its root", () => {
+    const parent = mkdtempSync(join(tmpdir(), "t239-r9-"));
+    parents.push(parent);
+    const root = join(parent, "sia-infra");
+    mkdirSync(root);
+    cpSync(join(import.meta.dirname, "../../fixtures"), root, { recursive: true });
+    cpSync(join(FIXTURES, "state.json"), join(root, ".agents", "state.json"));
+    const uuid = "cccccccc-3333-4333-8333-000000000239";
+    const before = JSON.parse(readFileSync(join(root, ".agents", "state.json"), "utf8")).revision as number;
+    const w = applyStateOps(root, { session: 999, expected_revision: before, session_uuid: uuid, ops: [{ op: "set_objective", text: "R9" }] } as Parameters<typeof applyStateOps>[1]);
+    if (!w.ok) throw new Error(w.error);
+    const parsed = parseState(readFileSync(join(root, ".agents", "state.json"), "utf8"));
+    if (!parsed.ok) throw new Error(parsed.error);
+    const stamped = parsed.data.sessions.find((x) => x.uuid === uuid);
+    expect(stamped?.checkout, "the writer stamps checkoutOf(root)").toBe(checkoutOf(root));
+    const spellings = [root, `${root}/`, `${root}//`, join(root, "."), `${root}/sub/..`];
+    for (const spelling of spellings) {
+      expect(checkoutOf(spelling), spelling).toBe("sia-infra");
+      const c = checkMissingHandoff(parsed.data, { projectRoot: spelling, sessionUuid: "someone-else", seat: "developer" });
+      expect(c.kind, `checkMissingHandoff from ${JSON.stringify(spelling)}`).toBe("missing");
+    }
   });
 });

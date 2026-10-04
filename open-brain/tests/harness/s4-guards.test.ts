@@ -241,11 +241,15 @@ describe("slice four guards", { timeout: 120_000 }, () => {
     expect(testCountFindings(rows, ALLOWED_TEST_LOSSES)).toEqual([]);
   });
 
-  it("S4-5c.1 the three policy files are unchanged, and qa-score.json is the one added policy", () => {
+  it("S4-5c.1 the three policy files are unchanged, and later policies are the named additions", () => {
     const three = ["developer-done.json", "plan-gate.json", "merge.json"].map((f) => `open-brain/src/harness/policies/${f}`);
     expect(git(["diff", "--name-only", BASE, "--", ...three]).trim()).toBe("");
-    const added = git(["diff", "--diff-filter=A", "--name-only", BASE, "--", ...SCOPES.policies]).trim();
-    expect(added).toBe("open-brain/src/harness/policies/qa-score.json");
+    const added = git(["diff", "--diff-filter=A", "--name-only", BASE, "--", ...SCOPES.policies]).trim().split("\n").filter(Boolean).sort();
+    // qa-score.json is slice four's addition. effort.json is T-173, after that base.
+    expect(added).toEqual([
+      "open-brain/src/harness/policies/effort.json",
+      "open-brain/src/harness/policies/qa-score.json",
+    ]);
   });
 
   it("S4-5c.3 merge.json keeps both required-gate switches false", () => {

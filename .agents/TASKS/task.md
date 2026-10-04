@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 328 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 338 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Cursor dev seats live on the QA PC (wakers + new rooms). QA 272 running: #415, #420 T-200, #421 G-053, + #418 retro-check. In build: T-235 P2-3 (builder, plan first), P2-4 (forge), P2-6 (infra). _(since session 160)_
+Close out T-235 phase 2 and the s161 backlog batch. 7 PRs ACCEPTED and waiting on Aaron's merge word via clark (#421, #424, #436, #441, #442, #446, #451). QA 279 (Plumb, narrow re-runs of #427 r4, #434 r2, #437 r2, #444 r3, #445 r2) running; then #425 after #437. _(since session 161)_
 
 ## Top tasks
 

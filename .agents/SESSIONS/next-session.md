@@ -1,48 +1,66 @@
-<!-- generated from .agents/state.json rev 328 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 338 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 160)_
+## planner [sia-planner] _(written session 161)_
 
 ### Pick up here
 
-On QA 272's verdict: one ask to Aaron for #415, #420 and #421 (use mergeone: update-branch, first parent = QA'd SHA, patch-id equal). Rule builder's P2-3 plan; collect forge's P2-4 and infra's P2-6 PRs for QA 273. Re-arm one hub --wait per room after every reply.
+Rule QA 279 (origin/qa/s161g-report; Plumb unit plumb-20261004T153750Z, attempt 2; dispatch docs/loops/qa-279-s161g-dispatch.md at 972c6026). Then send clark ONE merge request with every accepted PR and SHA: the seven already asked (#421 8173cef6, #424 b9026d71, #436 144623d2, #441 48bf4795, #442 08fa9002, #446 685b9fe9, #451 1e8cba7c) plus QA 279's accepts, and #425 9fcb97ca only after #437. Merge with update-branch, first parent = the QA'd SHA, equal patch-id, pinned. #424, #442 and #451 all edit sync/checks.ts and were never batch-merged together: a conflict goes back to its seat. After the merges: #444 rebases onto #427's findCursorAgentHostPid; T-025's /sync frontmatter check (rows in docs/loops/t025-ruling.md) becomes buildable; T-235 can close once P2-3 to P2-7 are merged.
 
 ### Watch out
 
-- CURSOR SEATS (Aaron 2026-10-03/04): all SIA dev runs as Cursor seats on the QA PC, each woken by its own waker. Rooms: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. Send: HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as atlas --session <room> --say "..."; listen: same with --wait --wait-timeout 3500 in the background; it exits on each reply, so re-arm. The Claude Code seats take no new work. sia-infra-1d (desktop) retires on Aaron's word; its desktop checkout shares the basename sia-infra with the QA PC's (one record instance), so it writes nothing to ob_state.
-- USAGE: Claude levels (AMBER/RED/STOP in slots.json) gate Claude sessions only; Cursor dev is NOT gated (Aaron). QA routing: SIA QA on Plumb first, then the desktop (launch-qa.ps1); the QA PC takes no headless QA while dev runs there except through qa-queue.ps1 + the lease.
-- MACHINE LEASE (T-204, D-118, D-119 alias D-118a): on the QA PC and laptop, every HEAVY dev run takes machine-lease.ps1 with -OwnerPid = the nearest cursor-agent ancestor (fail closed if none); release with the same pid. Put it in every dispatch.
-- BATCH QA + ONE APPROVAL PER BATCH (Aaron, standing): one AskUserQuestion per accepted batch naming every PR and SHA; D-117 requires up-to-date branches, so merge each with update-branch, then check first parent = QA'd SHA and an equal PR-diff patch-id ($TEMP/mergeone.sh did this in s160), pinned --match-head-commit. A conflict resolution gets read with `git show --remerge-diff`.
-- STANDING MERGE RULE: docs/** and .agents record files merge without asking once CLEAN; check scope with a FRESH `git fetch origin` (s160: a stale origin/master made a docs PR look like it carried record files). Config, code, tests and role files are Aaron's. D-063 one-line notice to clark per merge.
-- QA DISPATCHES: DISPATCH_SHA must contain every file (cat-file); write the prompt with Write and edit the push helper with Edit (sed missed lines twice in s160); test every refusal including the old prefix; never test the success path against origin; set npm_config_cache under tmp; a batch merge row names the real conflict.
-- REPORTING TO CLARK (D-113): events only (verdicts, merges, blocks, READY TO ROLL). A serving-tree deploy needs Aaron's word per occasion; setup.mjs is MANUAL (the classifier blocks it for clark); then /mcp reconnect open-brain.
-- VERIFY BEFORE RULING: read the load-bearing rows yourself; READ A TASK'S NOTE BEFORE DISPATCHING IT (s160 dispatched T-204 as new when a built candidate existed); derive machine facts from the doc, not memory (s160 swapped the laptop and QA PC IPs). Never route a classifier-denied act through another seat.
-- JEV: calibration 1 COMPLETE (D-100): G_done stays shadow; calibration 2 needs T-225.
+- QUESTIONS GO TO CLARK (Aaron's 'ask clark', s161): routing, sequencing and record calls go to clark by SendMessage. Acts needing Aaron's own word (code/CI/role-file merges, deploys, classifier-blocked acts) also go to clark, who asks Aaron once and relays his words; proceed only on his quoted words. D-121, which records this, is NOT committed: the classifier blocked it as instruction poisoning, pending Aaron's own word in the planner's window (its diff is in the s161 scratchpad, rev336-d121.diff).
+- CURSOR SEATS: all SIA dev runs as Cursor seats on the QA PC, each woken by its own waker. Rooms: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. Send: HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as atlas --session <room> --say "..."; listen: same with --wait --wait-timeout 3500 in the background; it exits on each reply AND first replays unread backlog, so check the TASK line before acting. A --say with backticks, dollar signs, pipes or double quotes can arrive TRUNCATED: ask for a resend in plain lines.
+- G-055 (s161): the QA PC's Cursor default model has been grok-4.7-high since ~05:40 CDT (clark's trial persisted); the wakers pass no --model. Restoring composer-2.5 is with Aaron. Every freeze names its model from store.db; QA dispatches state it. Builder != judge still holds (QA is Opus).
+- QA LAUNCH: Plumb first (launch-job.sh --dispatch-sha, --add-dir ~/qa-scratch ~/qa-tmp); real-Windows rows on the laptop (launch-qa.ps1 + machine-lease with -File); NEVER the desktop (D-065 stands; s161's QA 274 on the desktop was clark's call against it). clark launches; when its classifier blocks a remote launch, Aaron launches by hand. A claude -p job writes its log only at exit, so an empty log is normal; a job can die on the session limit, and clark relaunches it after the reset.
+- MACHINE LEASE (T-204, D-118, D-119): HEAVY dev runs on the QA PC and laptop take machine-lease.ps1 with -File (G-054, #443 merged) and OwnerPid = the nearest cursor-agent host ancestor (CC: the claude.exe session); release with the same pid right after. A seat that holds the lease idle blocks other projects (s161: forge held it while chisel waited).
+- BATCH QA + ONE APPROVAL PER BATCH; D-117 up-to-date branches: update-branch, then first parent = QA'd SHA and an equal PR-diff patch-id, pinned --match-head-commit. A post-freeze doc commit (#437 s161) is acceptable only after confirming the diff is docs-only; seats must push nothing to a frozen PR.
+- STANDING MERGE RULE: docs/** and .agents record files merge without asking once CLEAN (fresh fetch). A docs-only PR's test job SKIPS and the merge may print a ruleset error yet merge: read the PR state after any merge error. Config, code, tests and role files are Aaron's.
+- FROZEN MEANS CI GREEN (D-120): read gh pr checks yourself before accepting a freeze (s161: T-240 was reported frozen with CI red).
+- QA DISPATCHES: DISPATCH_SHA must contain every file (cat-file); Write the prompt, Edit the helper; test every refusal with the exit code read UNPIPED; derived prompts from sed need their wording checked (s161 caught wrong rows and a false TMP claim).
+- VERIFY BEFORE RULING: read the load-bearing rows yourself; read a task's note before dispatching it; seats repeat stale note text (s161: effectiveKind, cut in Loop 10). Never route a classifier-denied act through another seat.
+- T-235 FINDINGS: under cursor-agent, Claude settings SessionStart and SessionEnd also run (#437 dedupes them); the Claude PostToolUse/Bash recall hook does not fire under Cursor (tool_name Shell); whether Cursor shows a hook's additionalContext to the model is unproven. Production code must not carry test seams that feed attribution (s161 #427 r3's OPEN_BRAIN_PROCESS_TABLE).
+- GITNEXUS (T-166, #452): impact() still misses cross-file calls through nullable or optional receivers on 1.6.12 and can say 'exact'. Grep the method name too. A CLAUDE.md paragraph saying so is proposed and waits on Aaron. T-055 closed; the Windows FTS hazard (no Git mingw64 bin on PATH) is in T-187 (#451).
+- T-146 BLOCKED (the corpus is the desktop DB; Aaron asked: still wanted, and where it runs). T-241 frogger: no remote; reset = 05ec972 plus the residue's reflection-queue.json; runs on the desktop or needs Aaron's word for a bundle copy.
 
 ### Open questions
 
-- Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.
-- Retire the desktop sia-infra worktree and clark's desktop cursor-infra keys now that #418 merged? Needs Aaron's word (worktree removal), after its dirty/unpushed check.
+- D-121 (questions go to clark): Aaron's own word in the planner's window, so it can be committed.
+- CLAUDE.md GitNexus paragraph (T-166): yes or no.
+- T-146: still wanted, and where does it run?
+- Restore composer-2.5 as the QA PC's Cursor default (G-055).
 
 ### Loop state
 
 **Open PRs:** 
-- #415 — QA: in_progress — T-239 follow-up dc092840, QA 272
-- #420 — QA: in_progress — T-200 port 0d2bc66e (forge), QA 272
-- #421 — QA: in_progress — G-053 82aeb3da (cursor-infra), QA 272; security-boundary row
+- #421 — QA: accepted — G-053 r3 8173cef6 (QA 275); awaiting Aaron's merge
+- #424 — QA: accepted — T-235 P2-6 r2 b9026d71 (QA 275); awaiting merge; checks.ts
+- #436 — QA: accepted — T-235 P2-5 144623d2 (QA 275); awaiting merge
+- #441 — QA: accepted — G-052 48bf4795 (QA 277); awaiting merge
+- #442 — QA: accepted — G-050 08fa9002 (QA 277); awaiting merge; checks.ts
+- #446 — QA: accepted — T-173 685b9fe9 (QA 277); awaiting merge; --effort always passed
+- #451 — QA: accepted — T-187 1e8cba7c (QA 277); awaiting merge; checks.ts
+- #425 — QA: accepted — T-235 P2-4 9fcb97ca (QA 273/274); merges only after #437
+- #427 — QA: in_progress — T-235 P2-3 r4 9daf38d8, QA 279 (env seam removed)
+- #434 — QA: in_progress — T-240 r2 b9f8a5df, QA 279; role file shared.md
+- #437 — QA: in_progress — T-235 P2-7 r2 3dfa2424, QA 279
+- #444 — QA: in_progress — T-168 r3 9bfb2e1e, QA 279; ci.yml; rebase onto #427 after merge
+- #445 — QA: in_progress — T-156 r2 43ed65a9, QA 279
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `972c60264a336f20ece99b7eb9c55f13e83f2ec5`
 
 **Questions pending for Aaron:** 
-- QA 272 batch merge after the verdict
-- Retire the desktop sia-infra worktree
+- Merge #421, #424, #436, #441, #442, #446, #451
+- D-121 own word
+- CLAUDE.md GitNexus paragraph
+- T-146 still wanted / where
+- Restore composer-2.5 (G-055)
 
 **Rulings made mid-loop:** 
-- s160 merged: #387-#413 batches, #415 pending, #416-#419, #422
-- D-117 up-to-date rule; D-118 lease use; D-119 (D-118a) waker lease owner
-- Closed: T-199 T-201(superseded) T-204 T-207 T-213 T-236 T-237 T-238 T-239
-- T-191 deferred P2; G-053 opened
+- s161 QA 272-278 ruled; merges: #415 #420 (QA 272), #443 G-054 (Aaron), docs #429 #435 #438-#440 #447 #448 #452-#454 and records #430-#433 #449 #450
+- s161 rulings: P2-5 measured names only; P2-7 SessionEnd in scope + atomic claim; T-240 hub seatState, keep hub_names; T-173 max-over-targets; T-168 hub presence census (not ListAgents) + D-119 owner; G-050 per-line hash, never auto-rehash; T-025 B2 (fact_kind is the taxonomy); #427 env seam is a must-fix
+- Closed s161: G-054, T-055. Opened: T-240, T-241, G-055. Blocked: T-146
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -114,8 +132,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_8 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 160 — 2026-10-04 — planner [sia-planner] — `766a2128-4c5f-4b3f-93b7-3f9a88c1e594` (12 writing session(s) in the record)
+Session 161 — 2026-10-04 — planner [sia-planner] — `9a3bc5a9-fd23-444f-a45e-3bc75c455cd1` (13 writing session(s) in the record)

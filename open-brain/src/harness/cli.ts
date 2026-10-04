@@ -187,12 +187,14 @@ export const schemaFileName = (kind: DeliverableKind): string =>
  * too — becoming exactly the stale authoritative-looking artifact this file
  * already refuses to create.
  */
-export const policySchemaFileName = (kind: "plan" | "done" | "merge"): string =>
+export const policySchemaFileName = (kind: "plan" | "done" | "merge" | "effort"): string =>
   kind === "plan"
     ? "policy-plan.schema.json"
     : kind === "done"
       ? "policy-developer-done.schema.json"
-      : "policy-merge.schema.json";
+      : kind === "merge"
+        ? "policy-merge.schema.json"
+        : "policy-effort.schema.json";
 
 /**
  * Validate an `E_t` file with the runtime's own validator.
@@ -628,7 +630,7 @@ function cmdSchemas(argv: readonly string[]): number {
   }
   const schemas = jsonSchemas();
   const policySchemas = policyJsonSchemas();
-  for (const kind of ["plan", "done", "merge"] as const) {
+  for (const kind of ["plan", "done", "merge", "effort"] as const) {
     const text = serialiseSchema(policySchemas[kind]);
     if (write) {
       const target = join(schemaDir(), policySchemaFileName(kind));
