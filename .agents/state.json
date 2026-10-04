@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 331,
+  "revision": 332,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4656,7 +4656,7 @@
       "seat": "planner",
       "pick_up": "QA 272 is RULED, so do not ask Aaron about #415/#420/#421 again. Dispatch QA 273 for #421 r2 9915a59b (narrow, row 10), #424 12c28926, #425 9fcb97ca and #427 270b550b on Plumb, and send the Windows rows to the desktop once it is free of Gauge. Re-read the head SHAs before freezing them. Rule builder's P2-5 plan; collect forge P2-7 and infra's G-054 repro. Arm one hub --wait per room (none armed at s161 start; forge 2 unread, builder 3).",
       "watch_out": [
-        "CURSOR SEATS (Aaron 2026-10-03/04): all SIA dev runs as Cursor seats on the QA PC, each woken by its own waker. Rooms: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. Send: HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as atlas --session <room> --say \"...\"; listen: same with --wait --wait-timeout 3500 in the background; it exits on each reply, so re-arm. The Claude Code seats take no new work. sia-infra-1d (desktop) retires on Aaron's word; its desktop checkout shares the basename sia-infra with the QA PC's (one record instance), so it writes nothing to ob_state.",
+        "CURSOR SEATS (Aaron 2026-10-03/04): all SIA dev runs as Cursor seats on the QA PC, each woken by its own waker. Rooms: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. Send: HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as atlas --session <room> --say \"...\"; listen: same with --wait --wait-timeout 3500 in the background; it exits on each reply, so re-arm. The Claude Code seats take no new work. INFRA'S ONLY HOME is C:\\Users\\Aaron Melven\\Worktrees\\sia-infra on the QA PC. s161: on Aaron's 'go', clark closed sia-infra-1d, removed the desktop sia-infra worktree (local files archived to Worktrees\\_archive\\sia-infra-desktop-2026-10-04.zip) and renamed the desktop cursor-infra / cursor-infra-waker / cursor-builder keys to *.retired-moved-to-qapc-20261004T070613Z.",
         "USAGE: Claude levels (AMBER/RED/STOP in slots.json) gate Claude sessions only; Cursor dev is NOT gated (Aaron). QA routing: SIA QA on Plumb first, then the desktop (launch-qa.ps1); the QA PC takes no headless QA while dev runs there except through qa-queue.ps1 + the lease.",
         "MACHINE LEASE (T-204, D-118, D-119 alias D-118a): on the QA PC and laptop, every HEAVY dev run takes machine-lease.ps1 with -OwnerPid = the nearest cursor-agent ancestor (fail closed if none); release with the same pid. Put it in every dispatch.",
         "BATCH QA + ONE APPROVAL PER BATCH (Aaron, standing): one AskUserQuestion per accepted batch naming every PR and SHA; D-117 requires up-to-date branches, so merge each with update-branch, then check first parent = QA'd SHA and an equal PR-diff patch-id ($TEMP/mergeone.sh did this in s160), pinned --match-head-commit. A conflict resolution gets read with `git show --remerge-diff`.",
@@ -4665,12 +4665,11 @@
         "REPORTING TO CLARK (D-113): events only (verdicts, merges, blocks, READY TO ROLL). A serving-tree deploy needs Aaron's word per occasion; setup.mjs is MANUAL (the classifier blocks it for clark); then /mcp reconnect open-brain. s161: the serving build is 3 code commits behind (#415/#420); the redeploy waits on Aaron's word.",
         "VERIFY BEFORE RULING: read the load-bearing rows yourself; READ A TASK'S NOTE BEFORE DISPATCHING IT (s160 dispatched T-204 as new when a built candidate existed); derive machine facts from the doc, not memory (s160 swapped the laptop and QA PC IPs). Never route a classifier-denied act through another seat.",
         "JEV: calibration 1 COMPLETE (D-100): G_done stays shadow; calibration 2 needs T-225.",
-        "PROVENANCE (s161 catch-up): the merges of #415/#420 and the open PRs #421 r2/#424/#425/#427/#429 were READ on GitHub. #418 retro PASS, the seat freezes and the next-task assignments (builder P2-5 t17, forge P2-7 t12, infra G-054 t13) were TOLD by clark and not re-read. QA 272 has no verdict file in docs/loops.",
+        "PROVENANCE (s161): READ on GitHub/disk: the merges of #415/#420; the open PRs #421 r2/#424/#425/#427/#429; the desktop sia-infra worktree absent from `git worktree list` and the archive zip present. TOLD by clark, not re-read: #418 retro PASS, the seat freezes, the next tasks (builder P2-5 t17, forge P2-7 t12, infra G-054 t13), Aaron's 'go' and the key renames. QA 272 has no verdict file in docs/loops.",
         "SEATS line: 'not polling' is normal for a waker seat and is not a fault. Printing hub seatState (idle/working) there instead is clark's suggestion; there is no task for it yet."
       ],
       "open_questions": [
-        "Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.",
-        "Retire the desktop sia-infra worktree, close sia-infra-1d and retire clark's desktop cursor-infra keys now that #418 merged? Needs Aaron's word (worktree removal), after its dirty/unpushed check."
+        "Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered."
       ],
       "session": 161,
       "loop_state": {
@@ -4704,13 +4703,13 @@
         "frozen_sha": null,
         "questions_for_aaron": [
           "Serving-tree redeploy (3 code commits behind)",
-          "Retire desktop sia-infra worktree / sia-infra-1d / desktop keys",
           "Recover killed CC builder session 5b3338ac"
         ],
         "rulings": [
           "QA 272: #415 merged 7285c62e, #420 merged 2eebaa6f (Aaron 'Merge both'); #421 rejected to r2; #418 retro PASS (told by clark)",
           "D-117 up-to-date rule; D-118 lease use; D-119 (D-118a) waker lease owner; D-120 waker continue rule",
-          "T-191 deferred P2; G-053 and G-054 open"
+          "T-191 deferred P2; G-053 and G-054 open",
+          "s161: desktop sia-infra retired on Aaron's 'go' (clark executed)"
         ]
       },
       "session_uuid": "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1",
