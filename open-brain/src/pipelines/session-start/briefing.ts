@@ -1,8 +1,9 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, isAbsolute } from "node:path";
-import { TaskPriority, isOpenGap, newestHandoffForSeat } from "../../shared/state-schema.js";
-import type { State, Seat } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, newestHandoffForSeat, newestHandoffPerInstance, questionOwner, questionResolvedBy, questionText, watchExpires, watchText } from "../../shared/state-schema.js";
+import type { State, Seat, WatchOut } from "../../shared/state-schema.js";
+import { HANDOFF_CAPS } from "../../shared/handoff-caps.js";
 import type { DriftResult } from "./types.js";
 import { COUNT_ONLY_PRIORITIES, GAP_CLIP, TITLE_CLIP, clip, newestGapFirst, splitQuestions } from "./state-render.js";
 
@@ -34,12 +35,25 @@ export interface BriefingInput {
   latestBrief: string | null;
   workingTree: string;
   skills: string;
+  /**
+   * T-236 slice 2, OPT-IN per repo (greeting.json `briefing_budget`), default OFF. On: the budgeted layout (`renderBudgeted`).
+   * Off or absent: the original layout below, untouched, which is what A2A's /start prints byte for byte.
+   */
+  budget?: boolean;
+  /**
+   * T-199, OPT-IN per repo (greeting.json `missing_handoff`), default OFF. The one-line notice that this checkout's last session
+   * wrote the record and left no handoff, or that the check could not run. Null or absent prints nothing, so every other render is
+   * byte-identical. The legacy layout prints it as its own line after the pick-up; the budgeted layout has no spare line (it is
+   * exactly at its cap), so it is APPENDED to the pick-up line, which is never cut after the append.
+   */
+  missingHandoff?: string | null;
 }
 
 const NEXT_SHOWN = 3;
 const GAPS_BRIEFED = 5;
 
 export function renderBriefing(i: BriefingInput): string[] {
+  if (i.budget === true) return renderBudgeted(i);
   const s = i.state;
   const out: string[] = [BRIEFING_START];
 
@@ -71,10 +85,11 @@ export function renderBriefing(i: BriefingInput): string[] {
   if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : own.pick_up.trim());
   else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
   else out.push(`none recorded for this seat (${i.seat})`);
+  if (i.missingHandoff) out.push(i.missingHandoff);
 
   if (own && own.watch_out.length > 0) {
     out.push("", "WATCH OUT");
-    for (const w of own.watch_out) out.push(`- ${w}`);
+    for (const w of own.watch_out) out.push(`- ${watchText(w)}`);
   }
 
   if (own) {
@@ -98,6 +113,124 @@ export function renderBriefing(i: BriefingInput): string[] {
   }
 
   out.push("", i.workingTree);
+  if (i.latestBrief) out.push(i.latestBrief);
+  out.push(i.skills);
+  out.push(BRIEFING_END);
+  return out;
+}
+
+/* ------------------------------------------------------------------------- *
+ * T-236 slice 2: the budgeted layout. OPT-IN; `renderBriefing` above is the default and does not call any of this.
+ * ------------------------------------------------------------------------- */
+
+/** What the budgeted briefing must fit in: ~4 KB and ~30 lines (T-236 (f)). A test renders the worst case against both. */
+export const BRIEFING_BUDGET = { lines: 30, chars: 4096 } as const;
+
+/** Per-section caps. Each section ends with `+N more: <pointer>` when it cuts, never silently. */
+const CAPS = { objective: 400, next: 2, watch: HANDOFF_CAPS.watchOuts, watchChars: HANDOFF_CAPS.watchOutChars, waiting: 2, open: 2, question: 160, drift: 160, blocked: 3 } as const;
+const MORE_WATCH = "state.json handoffs[].watch_out";
+const MORE_QUESTIONS = "state.json handoffs[].open_questions";
+const MORE_TASKS = "state.json tasks[]";
+
+/** One line: whitespace flattened, cut at `limit` with the full length named. A clip is never silent. */
+function cut(text: string, limit: number): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  return flat.length <= limit ? flat : `${flat.slice(0, limit).trimEnd()}… (${flat.length} chars)`;
+}
+
+/**
+ * Has this watch-out expired? A number is the LAST SESSION it prints in; an ISO date is the last DAY. With no session number
+ * (no log was created) a numeric expiry cannot be judged, so the item is kept: fail toward showing, never toward dropping.
+ */
+function isExpired(w: WatchOut, sessionNumber: number | null, date: string): boolean {
+  const e = watchExpires(w);
+  if (e === null) return false;
+  if (typeof e === "number") return sessionNumber !== null && sessionNumber > e;
+  return date > e;
+}
+
+function renderBudgeted(i: BriefingInput): string[] {
+  const s = i.state;
+  const out: string[] = [BRIEFING_START, i.serving, i.usage];
+  const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
+  const drift =
+    i.drift.length === 0
+      ? "Drift: none"
+      : cut(`Drift detected (${i.drift.length}): ${i.drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`).join("; ")}`, CAPS.drift);
+  out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision} · ${drift}`);
+
+  out.push("OBJECTIVE", s.objective ? `${cut(s.objective.text, CAPS.objective)} (since session ${s.objective.since_session})` : "none");
+
+  // (d) NEXT only when the objective NAMES task ids, and then exactly those. The backlog's order is not a plan.
+  const ids = [...new Set(s.objective?.text.match(/\bT-\d+\b/g) ?? [])];
+  if (ids.length > 0) {
+    out.push("NEXT");
+    for (const id of ids.slice(0, CAPS.next)) {
+      const t = s.tasks.find((x) => x.id === id);
+      out.push(t ? `- [${t.status === "done" ? "done" : t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+    }
+    if (ids.length > CAPS.next) out.push(`+${ids.length - CAPS.next} more: ${MORE_TASKS}`);
+  }
+
+  const own = i.seat ? newestHandoffForSeat(s.handoffs, i.seat) : null;
+  out.push("PICK UP HERE");
+  const pickUp = own
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars)
+    : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : `none recorded for this seat (${i.seat})`;
+  out.push(i.missingHandoff ? `${pickUp} · ${i.missingHandoff}` : pickUp);
+
+  if (own) {
+    const live = own.watch_out.filter((w) => !isExpired(w, i.sessionNumber, i.date));
+    const expired = own.watch_out.length - live.length;
+    if (live.length > 0 || expired > 0) {
+      out.push("WATCH OUT");
+      for (const w of live.slice(0, CAPS.watch)) out.push(`- ${cut(watchText(w), CAPS.watchChars)}`);
+      const notes = [live.length > CAPS.watch ? `+${live.length - CAPS.watch} more: ${MORE_WATCH}` : null, expired > 0 ? `${expired} expired, not shown` : null].filter((n): n is string => n !== null);
+      if (notes.length > 0) out.push(notes.join(" · "));
+    }
+  }
+
+  // (e) WAITING ON AARON: every seat's CURRENT handoff (the newest per seat and checkout), unresolved questions owned by aaron.
+  const waiting = newestHandoffPerInstance(s.handoffs).flatMap((h) =>
+    h.open_questions.filter((q) => questionResolvedBy(q) === null && questionOwner(q)?.toLowerCase() === "aaron").map((q) => `${cut(questionText(q), CAPS.question)} (${h.seat})`),
+  );
+  if (waiting.length > 0) {
+    out.push("WAITING ON AARON:");
+    for (const w of waiting.slice(0, CAPS.waiting)) out.push(`- ${w}`);
+    if (waiting.length > CAPS.waiting) out.push(`+${waiting.length - CAPS.waiting} more: ${MORE_QUESTIONS}`);
+  }
+
+  if (own) {
+    let resolved = 0;
+    const open: string[] = [];
+    for (const q of own.open_questions) {
+      if (questionResolvedBy(q) !== null) resolved++;
+      else if (questionOwner(q)?.toLowerCase() !== "aaron") open.push(cut(questionText(q), CAPS.question)); // aaron's are WAITING ON AARON, once
+    }
+    if (open.length > 0 || resolved > 0) {
+      out.push("OPEN QUESTIONS");
+      for (const q of open.slice(0, CAPS.open)) out.push(`- ${q}`);
+      const notes = [open.length > CAPS.open ? `+${open.length - CAPS.open} more: ${MORE_QUESTIONS}` : null, resolved > 0 ? `(${resolved} resolved, not shown)` : null].filter((n): n is string => n !== null);
+      if (notes.length > 0) out.push(notes.join(" · "));
+    }
+  }
+
+  // Gaps are a count, with the newest id; a blocked P0/P1 task is named (capped), a blocked P2/P3 is counted.
+  const gaps = s.gaps.filter(isOpenGap).sort(newestGapFirst);
+  const blocked = s.tasks.filter((t) => t.status === "blocked");
+  const blockedNamed = blocked.filter((t) => !COUNT_ONLY_PRIORITIES.has(t.priority));
+  const blockedHidden = blocked.length - blockedNamed.length;
+  if (gaps.length > 0 || blocked.length > 0) {
+    const parts = [`Gaps: ${gaps.length} open${gaps[0] ? ` (newest ${gaps[0].id})` : ""}`];
+    if (blockedNamed.length > 0) {
+      const more = blockedNamed.length > CAPS.blocked ? `, +${blockedNamed.length - CAPS.blocked} more: ${MORE_TASKS}` : "";
+      parts.push(`blocked: ${blockedNamed.slice(0, CAPS.blocked).map((t) => t.id).join(", ")}${more}`);
+    }
+    if (blockedHidden > 0) parts.push(`+${blockedHidden} blocked P2/P3`);
+    out.push(parts.join(" · "));
+  }
+
+  out.push(i.workingTree);
   if (i.latestBrief) out.push(i.latestBrief);
   out.push(i.skills);
   out.push(BRIEFING_END);

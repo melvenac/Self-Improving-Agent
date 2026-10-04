@@ -27,7 +27,8 @@ export interface PresenceRoom {
   sessionId: string;
   unread: number;
   pollingNow: boolean;
-  pollAgeMs?: number;
+  /** A2A sends null for "no wait-poll seen in the window" (src/presence.ts, T-237). Absent is treated the same. */
+  pollAgeMs?: number | null;
 }
 
 export interface PresenceAgent {
@@ -124,8 +125,9 @@ export function formatPartnerLine(partner: HubPartnerSeat, agents: PresenceAgent
   if (room.pollingNow) return `${partner.label}: listener polling`;
   const unread = room.unread ?? 0;
   if (unread > 0) {
-    const age = formatPollAge(room.pollAgeMs ?? 0);
-    return `${partner.label}: listener not polling, ${unread} unread since ${age}`;
+    // T-237: no recorded poll has no age. "since 0s" for a null or absent age was a false freshness claim.
+    if (typeof room.pollAgeMs !== "number") return `${partner.label}: listener not polling, ${unread} unread, no listener poll recorded`;
+    return `${partner.label}: listener not polling, ${unread} unread since ${formatPollAge(room.pollAgeMs)}`;
   }
   return `${partner.label}: listener not polling`;
 }
@@ -148,8 +150,9 @@ function validateRoster(body: unknown): { ok: true; agents: PresenceAgent[] } | 
       if (typeof room.sessionId !== "string") return bad(`${rat}.sessionId`, "is not a string");
       if (!Number.isInteger(room.unread) || (room.unread as number) < 0) return bad(`${rat}.unread`, "is not a non-negative integer");
       if (typeof room.pollingNow !== "boolean") return bad(`${rat}.pollingNow`, "is not a boolean");
-      if (room.pollAgeMs !== undefined && (typeof room.pollAgeMs !== "number" || !Number.isFinite(room.pollAgeMs))) {
-        return bad(`${rat}.pollAgeMs`, "is not a finite number");
+      // T-237: null is A2A's "no wait-poll in the window" by design, so one such room must not make ALL presence UNKNOWN.
+      if (room.pollAgeMs !== undefined && room.pollAgeMs !== null && (typeof room.pollAgeMs !== "number" || !Number.isFinite(room.pollAgeMs))) {
+        return bad(`${rat}.pollAgeMs`, "is not a finite number or null");
       }
     }
   }
@@ -269,10 +272,21 @@ export function presenceBlockUpperBound(
   if (seat.kind !== "seat" || !seat.hubName) return { chars: 0, lines: [] };
   const partners = seatsFile.data.readers[seat.hubName]?.partners;
   if (!partners?.length) return { chars: 0, lines: [] };
-  const worst: PresenceAgent[] = partners.map((p) => ({
-    name: p.hub_as,
-    rooms: [{ sessionId: p.session_id, unread: 999, pollingNow: false, pollAgeMs: 99 * 86_400_000 }],
-  }));
-  const lines = [presenceHeader(callerLabel, seatsFile.rel), ...partners.map((p) => `  ${formatPartnerLine(p, worst)}`)];
+  // QA 268 F1 (T-237): one fixed room stopped being the worst case when "no listener poll recorded" arrived, and a
+  // bound that is not the longest form is not a bound. Each partner's line is the LONGEST over every room shape the
+  // line renders: aged, unknown age (a negative age is valid input), no recorded poll (null or absent), polling, absent.
+  const shapes: Array<PresenceAgent["rooms"]> = [
+    [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: 99 * 86_400_000 }],
+    [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: -1 }],
+    [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: null }],
+    [{ sessionId: "", unread: 999, pollingNow: false }],
+    [{ sessionId: "", unread: 0, pollingNow: true, pollAgeMs: 0 }],
+    [],
+  ];
+  const longest = (p: HubPartnerSeat): string =>
+    shapes
+      .map((rooms) => formatPartnerLine(p, [{ name: p.hub_as, rooms: (rooms ?? []).map((r) => ({ ...r, sessionId: p.session_id })) }]))
+      .reduce((a, b) => (b.length > a.length ? b : a));
+  const lines = [presenceHeader(callerLabel, seatsFile.rel), ...partners.map((p) => `  ${longest(p)}`)];
   return { chars: lines.join("\n").length, lines };
 }

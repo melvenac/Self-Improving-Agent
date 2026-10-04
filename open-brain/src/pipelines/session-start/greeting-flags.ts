@@ -9,7 +9,7 @@ import { join } from "node:path";
  * file, an unreadable or malformed file, a non-boolean value and an absent key all mean false,
  * which is today's output.
  *
- * Keys: briefing_budget, handoff_caps, role_docs_by_sha. Keep them sorted in the tracked file.
+ * Keys: briefing_budget, handoff_caps, missing_handoff, role_docs_by_sha. Keep them sorted in the tracked file.
  */
 export const GREETING_FLAGS_REL = ".agents/SYSTEM/greeting.json";
 

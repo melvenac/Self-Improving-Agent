@@ -29,7 +29,7 @@ import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
 import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
-import { renderState } from "./pipelines/session-start/state-render.js";
+import { renderState, missingHandoffLine } from "./pipelines/session-start/state-render.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
@@ -373,6 +373,12 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         latestBrief,
         workingTree: describeWorkingTree(projectRoot),
         skills: describeSkills(projectRoot),
+        // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
+        budget: greetingFlag(projectRoot, "briefing_budget"),
+        // T-199, opt-in: a repo without `missing_handoff` renders exactly as before.
+        missingHandoff: greetingFlag(projectRoot, "missing_handoff")
+          ? missingHandoffLine(sj.data, { projectRoot, sessionUuid: proven.id, seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null })
+          : null,
       }));
     } else {
       // F3: an unknown schema_version REFUSES, with no prose fallback.
@@ -401,6 +407,10 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       }
       if (sj.present && !sj.valid) {
         lines.push(`\nstate.json invalid at ${sj.error} — falling back to files`);
+      }
+      // T-199, opt-in: the detector reads the record, so with no readable record it says it did not check.
+      if (greetingFlag(projectRoot, "missing_handoff")) {
+        lines.push(`\nHandoff check: not checked (${sj.present ? "state.json invalid" : "no .agents/state.json"}, so there is no record to read)`);
       }
       const content: Record<string, string | null> = {
         summary: result.state.summary,
@@ -486,6 +496,8 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
       // reason is added to the refusal below.
       session_uuid: stateSession.id,
       seat: identity && isSeat(identity.role) ? identity.role : null,
+      // T-236 slice 2: OPT-IN per repo; the caps apply to the handoff being written, never to existing ones.
+      handoff_caps: greetingFlag(projectRoot, "handoff_caps"),
     });
     const lines: string[] = [];
     if (!r.ok) {

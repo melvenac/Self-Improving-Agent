@@ -1,6 +1,8 @@
 import type { State, Task, Handoff, Seat, OpenQuestion } from "../../shared/state-schema.js";
-import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat, questionText, questionResolvedBy } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat, compareFirstRev, questionText, questionResolvedBy, watchText } from "../../shared/state-schema.js";
+import { basename, resolve } from "node:path";
 import { findHandoffCommit } from "./handoff-provenance.js";
+import { resolveCheckoutSeat } from "./seat-map.js";
 
 /**
  * Renders a validated `.agents/state.json` as the text ob_start returns in
@@ -225,6 +227,60 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
   return lines;
 }
 
+export interface MissingHandoffOptions {
+  /** The checkout is its basename, as the writer stamps `sessions[].checkout`. Absent: nothing can be attributed. */
+  projectRoot?: string;
+  /** The proven current session: its handoff is not due yet, so it is never named. */
+  sessionUuid?: string | null;
+  seat?: Seat | null;
+}
+
+export type MissingHandoffCheck = { kind: "clear" } | { kind: "missing"; line: string } | { kind: "not-checked"; reason: string };
+
+/** The longest the notice is allowed to be for a realistic seat label (the budgeted briefing appends it to a line and has no spare one). */
+export const MISSING_HANDOFF_MAX_CHARS = 160;
+
+/**
+ * T-199 HO-1. The last session of THIS checkout wrote the record and left no handoff.
+ *
+ * Sessions are attributed by CHECKOUT, the project-root basename the writer stamps, not by seat: a session that never
+ * called set_handoff has `seat` null, and that null is the case detected. Only the newest session (by `first_rev`) of the
+ * checkout counts, so the line clears once a later session there records a handoff, and the current session is excluded.
+ * A checkout with NO session in the record is clear, not missing: a developer seat that never wrote through ob_state is
+ * normal (its handoff travels as a doc at roll). The label is the T-203 map's seat for this checkout, never the
+ * AGENT.local.md identity.
+ *
+ * Fail closed: what cannot be checked is `not-checked` with its reason, never silence.
+ */
+export function checkMissingHandoff(state: State, options: MissingHandoffOptions): MissingHandoffCheck {
+  if (!options.projectRoot) return { kind: "not-checked", reason: "no project root, so the checkout is unknown" };
+  const checkout = basename(resolve(options.projectRoot));
+  // Only a PROVEN current session is excluded. With none proven (null or absent) a session whose own uuid is null is not "the
+  // current one": it is an unattributable session, and it must stay visible to the not-checked branch below.
+  const current = options.sessionUuid ?? null;
+  const mine = state.sessions.filter((s) => s.checkout === checkout && (current === null || s.uuid !== current));
+  if (mine.length === 0) return { kind: "clear" };
+  const attributable = mine.filter((s) => s.uuid !== null);
+  if (attributable.length === 0) {
+    return { kind: "not-checked", reason: `${mine.length} session(s) of checkout ${checkout} carry no uuid, so none can be matched to a handoff` };
+  }
+  let last = attributable[0]!;
+  for (const s of attributable) if (compareFirstRev(s.first_rev, last.first_rev) >= 0) last = s;
+  if (state.handoffs.some((h) => h.session_uuid === last.uuid)) return { kind: "clear" };
+  const mapped = resolveCheckoutSeat(options.projectRoot);
+  const who = (mapped.kind === "seat" ? mapped.seat : null) ?? last.seat ?? options.seat ?? checkout;
+  return {
+    kind: "missing",
+    line: `Handoff MISSING: last ${who} session #${last.n} (${last.uuid}, rev ${last.first_rev ?? "unknown"}) wrote the record, left no handoff; fix: ob_state set_handoff`,
+  };
+}
+
+/** The one line the briefing prints, or null when the check ran and nothing is missing. */
+export function missingHandoffLine(state: State, options: MissingHandoffOptions): string | null {
+  const c = checkMissingHandoff(state, options);
+  return c.kind === "missing" ? c.line : c.kind === "not-checked" ? `Handoff check: not checked (${c.reason})` : null;
+}
+
 /** ` [sia-builder]`, or ` [legacy]` for an entry migrated from v2, which recorded no checkout. */
 function instanceLabel(h: Handoff): string {
   return ` [${h.checkout ?? "legacy"}]`;
@@ -246,7 +302,7 @@ function renderOneHandoff(h: Handoff): string[] {
   lines.push(`  pick up: ${h.pick_up}`);
   if (h.watch_out.length > 0) {
     lines.push(`  watch out:`);
-    for (const w of h.watch_out) lines.push(`    - ${w}`);
+    for (const w of h.watch_out) lines.push(`    - ${watchText(w)}`);
   }
   // T-233 B: a resolved question is omitted and COUNTED, so "none" and "N answered" stay different facts.
   const { open, resolved } = splitQuestions(h.open_questions);
