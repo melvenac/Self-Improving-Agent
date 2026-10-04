@@ -301,7 +301,7 @@ describe("greeting-size — T-198 presence bound", () => {
     const without = composeGreeting(seatFixture("none", "sia-planner", false), "0.0.0")!;
     expect(without.parts.presence).toBe(0);
     // QA 268 F1 (T-237): the longest form is the no-recorded-poll one, not "since 99d".
-    for (const label of ["grok", "cursor-infra", "cursor-builder"]) {
+    for (const label of ["forge", "cursor-infra", "cursor-builder"]) {
       expect(withBlock.text).toContain(`  ${label}: listener not polling, 999 unread, no listener poll recorded`);
     }
     expect(withBlock.parts.presence).toBeGreaterThan(150);
