@@ -208,7 +208,10 @@ export function decideSuiteStart(input: {
   census: CensusResult;
   controlledRerun: boolean;
 }): SuiteDecision {
-  if (input.leaseExit === 10) return { refuse: true, why: "lease held (exit 10)" };
+  if (input.leaseExit !== null && input.leaseExit !== 0) {
+    if (input.leaseExit === 10) return { refuse: true, why: "lease held (exit 10)" };
+    return { refuse: true, why: `lease take refused (exit ${input.leaseExit})` };
+  }
   if (input.controlledRerun && !input.census.available) {
     return { refuse: true, why: input.census.reason ?? "census unavailable: unknown" };
   }

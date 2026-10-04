@@ -4,6 +4,7 @@
  */
 
 import type { CensusResult } from "./suite-census.js";
+import type { OwnerSource } from "./suite-owner.js";
 
 export interface VitestCounts {
   passed: number;
@@ -15,6 +16,11 @@ export interface SuiteMeta {
   git_sha: string;
   seat: string;
   lease_status: string;
+  owner_pid: number | null;
+  owner_source: OwnerSource;
+  owner_reason: string | null;
+  lease_take_exit: number | null;
+  lease_release_exit: number | null;
   census: {
     source: CensusResult["source"] | "ci";
     timestamp: string;
@@ -72,11 +78,22 @@ export function buildSuiteMeta(input: {
   leaseExit: number | null;
   census: CensusResult;
   vitest: { counts: VitestCounts | null; exitCode: number | null };
+  ownerPid?: number | null;
+  ownerSource?: OwnerSource;
+  ownerReason?: string | null;
+  leaseStatus?: string;
+  leaseTakeExit?: number | null;
+  leaseReleaseExit?: number | null;
 }): SuiteMeta {
   return {
     git_sha: input.gitSha,
     seat: input.seat,
-    lease_status: leaseStatusFromExit(input.leaseExit),
+    lease_status: input.leaseStatus ?? leaseStatusFromExit(input.leaseExit),
+    owner_pid: input.ownerPid ?? null,
+    owner_source: input.ownerSource ?? "none",
+    owner_reason: input.ownerReason ?? null,
+    lease_take_exit: input.leaseTakeExit === undefined ? input.leaseExit : input.leaseTakeExit,
+    lease_release_exit: input.leaseReleaseExit ?? null,
     census: {
       source: input.census.source,
       timestamp: input.census.timestamp,
@@ -106,6 +123,11 @@ export function buildCiSuiteMeta(input: {
     git_sha: input.gitSha,
     seat: "ci",
     lease_status: "skipped",
+    owner_pid: null,
+    owner_source: "none",
+    owner_reason: null,
+    lease_take_exit: null,
+    lease_release_exit: null,
     census: {
       source: "ci",
       timestamp: input.timestamp,

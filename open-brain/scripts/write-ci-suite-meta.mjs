@@ -26,6 +26,11 @@ const meta = {
   git_sha: sha,
   seat: "ci",
   lease_status: "skipped",
+  owner_pid: null,
+  owner_source: "none",
+  owner_reason: null,
+  lease_take_exit: null,
+  lease_release_exit: null,
   census: {
     source: "ci",
     timestamp,
