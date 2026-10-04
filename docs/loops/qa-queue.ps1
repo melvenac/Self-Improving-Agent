@@ -15,7 +15,11 @@
 # Two queues on one machine cannot overlap. A lock file (%USERPROFILE%\sia-qa-queue\queue.lock) is created
 # exclusively, holds this process's pid and start time, and is removed on exit. A second queue refuses, naming the
 # holder, before any fetch or checkout. A stale lock (that pid is gone, or the pid's start time differs) is taken
-# over and the takeover is logged. This does not consult WMI CommandLine: a null CommandLine is what let a second
+# over and the takeover is logged.
+#
+# The MACHINE LEASE (T-204) is a second, separate thing: queue.lock keeps two queues apart, the lease keeps this
+# queue and a developer's suite apart. It is taken through %USERPROFILE%\machine-lease.ps1 (a copy of
+# docs/loops/machine-lease.ps1; the queue refuses to start without it) for the whole run and released on exit. This does not consult WMI CommandLine: a null CommandLine is what let a second
 # queue move the tree under a running driver on 2026-09-27.
 param(
   [Parameter(Mandatory = $true)] [string] $Queue,  # e.g. "130,132" or "130 132": TEXT, split below. As int[] under
@@ -25,6 +29,7 @@ param(
   [int] $QuietWaitMinutes = 120,    # ... for at most this long; then run anyway, and record that it was busy
   [string] $Checkout = '',          # optional: the commit to move the tree to, after any running driver finishes
   [int] $StartWaitMinutes = 480,    # how long -Checkout waits for a hand-launched driver to finish
+  [int] $LeaseWaitMinutes = 120,    # how long to wait for the machine lease (machine-lease.ps1); then abort, never run anyway
   [switch] $SelfTest                # classify CommandLine shapes and exit; no lock, no git, no driver
 )
 
@@ -192,6 +197,55 @@ function Release-QueueLock {
   }
 }
 
+# The machine lease. Fail closed: no helper copy, or any answer other than "taken", means the queue does not run.
+$script:LeaseHeld = $false
+function Get-LeaseScript { Join-Path $env:USERPROFILE 'machine-lease.ps1' }
+
+function Acquire-MachineLease {
+  $helper = Get-LeaseScript
+  if (-not (Test-Path -LiteralPath $helper)) {
+    L 'refuse' "machine lease helper missing: $helper (copy docs/loops/machine-lease.ps1 there; see qa-launch.md)"
+    exit 1
+  }
+  $ttl = ($TimeoutMinutes * [math]::Max(1, $items.Count)) + 30
+  $out = @(& powershell -NoProfile -ExecutionPolicy Bypass -File $helper take -OwnerPid $PID -Seat 'qa-queue' -Session "queue=$Queue" -TtlMinutes $ttl -WaitMinutes $LeaseWaitMinutes 2>&1)
+  $code = $LASTEXITCODE
+  foreach ($line in $out) { L 'lease' ([string]$line) }
+  if ($code -eq 0) { $script:LeaseHeld = $true; return }
+  $busy = (@($out | Where-Object { "$_" -match '^(busy|wait)=' }) | Select-Object -Last 1)
+  if ($code -eq 10) { L 'abort' "QA PC busy: $busy" } else { L 'abort' "machine lease not taken (exit $code): $($out -join ' | ')" }
+  exit 1
+}
+
+function Release-MachineLease {
+  if (-not $script:LeaseHeld) { return }
+  $script:LeaseHeld = $false
+  $out = @(& powershell -NoProfile -ExecutionPolicy Bypass -File (Get-LeaseScript) release -OwnerPid $PID 2>&1)
+  L 'lease' "release exit=$LASTEXITCODE $($out -join ' | ')"
+}
+
+# What the driver itself said about its run. complete= is the driver's verdict; done is only a file it wrote last.
+function Get-DriverVerdict([string] $metaPath) {
+  if (-not (Test-Path -LiteralPath $metaPath)) { return 'complete=missing (no drive.meta)' }
+  $lines = @(Get-Content -LiteralPath $metaPath)
+  $c = @($lines | Where-Object { $_ -match '^complete=' }) | Select-Object -Last 1
+  if (-not $c) { return 'complete=missing (drive.meta has no complete= line)' }
+  $val = ($c -replace '^complete=', '').Trim()
+  if ($val -eq 'True') { return 'complete=True' }
+  $why = @($lines | Where-Object { $_ -match '^(refusal|denial|stopped|incomplete_after_\d+)=' }) | Select-Object -Last 2
+  if (-not $why) { $why = @('no reason recorded') }
+  return "complete=$val ($($why -join '; '))"
+}
+
+# A model refusal or usage limit in the driver's stderr, named. Returns '' when there is none.
+function Get-ErrRefusal([string] $outDir) {
+  foreach ($f in @(Get-ChildItem -LiteralPath $outDir -Filter 'run-*.err' -ErrorAction SilentlyContinue)) {
+    $m = Select-String -LiteralPath $f.FullName -Pattern 'usage limit|rate limit|refus|quota|limit reached|overloaded' -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($m) { return "$($f.Name): $($m.Line.Trim())" }
+  }
+  return ''
+}
+
 function Wait-OtherDrivers([string] $where, [datetime] $deadline) {
   while ($true) {
     # @() so a single hit stays a collection. A bare one-item return is one object, and a
@@ -217,6 +271,9 @@ try {
   if ($bad.Count -gt 0 -or $items.Count -eq 0) { L 'abort' "queue '$Queue' is not a list of record numbers"; exit 1 }
   $Queue = $items -join ','
   L 'start' "queue=$Queue checkout=$Checkout machine=$env:COMPUTERNAME timeout_min=$TimeoutMinutes"
+
+  # Before -Checkout: nothing is fetched or moved while a developer's suite holds the machine.
+  Acquire-MachineLease
 
   Set-Location $tree
 
@@ -302,11 +359,17 @@ try {
 
     # 5. What the driver itself recorded.
     $out = Join-Path $env:USERPROFILE "sia-qa$n"
-    L "done_marker.$n" (Test-Path (Join-Path $out 'done'))
     $meta = Join-Path $out 'drive.meta'
+    $verdict = Get-DriverVerdict $meta
+    L "complete.$n" ($verdict -replace '^complete=', '')
+    # done_marker only says the driver wrote its last file. It never stands alone: it carries the verdict (QA 231).
+    L "done_marker.$n" "$(Test-Path (Join-Path $out 'done')) $verdict"
+    $errHit = Get-ErrRefusal $out
+    if ($errHit) { L "refusal_err.$n" $errHit }
     if (Test-Path $meta) { $c = Get-Content $meta | Where-Object { $_ -match '^(completion|refusal|result)' } | Select-Object -Last 3; L "driver.$n" ($c -join ' | ') }
   }
   L 'end' 'queue finished'
 } finally {
+  Release-MachineLease
   Release-QueueLock
 }

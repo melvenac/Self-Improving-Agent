@@ -28,12 +28,14 @@ prompt copied out with `git show <sha>:<prompt> > C:\qa-tmp\<prompt>`.
   agent-dashboard's developer, under the same `Aaron Melven` profile). Use it for SIA QA **only when no developer
   suite is running there**, and ask the planner before any launch.
 - **The desktop** runs planners and Clark, never QA while Aaron or agents are working (see below).
-- **Approved by Aaron, not built yet: T-204, the compute lease.** A developer's suite and `qa-queue.ps1` each take one
-  lease file before a run, so neither starts over the other. **Until T-204 ships, don't use the QA PC for SIA QA.**
-  After it ships, the QA PC takes QA whenever the lease is free.
+- **The machine lease (T-204) is built.** A developer's suite, `qa-queue.ps1` and the headless launcher each take one
+  lease before a run (`machine-lease.ps1 take`), so neither starts over the other. The queue holds it for its whole
+  run and REFUSES to start without the helper copy. **The QA PC takes QA whenever `machine-lease.ps1 status` says
+  free.** The lease is per user; `status` prints that limit. Design and rows: `docs/loops/t204-plan.md`.
 
 ## What is already on each machine
 
+- `machine-lease.ps1` and `qa-queue.ps1` sit in each QA machine's user folder (both are copied, the queue refuses without the first).
 - `qa-queue.ps1` sits in each QA machine's user folder. It is 6,330 bytes and identical to
   `docs/loops/qa-queue.ps1`, which has been unchanged since `2667c6b`. Checked 2026-09-27.
   - **The queue runs from that copy, never from inside the QA checkout, because `-Checkout` moves the checkout.**
