@@ -16,5 +16,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-le
 powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" release -OwnerPid $owner
 ```
 
-Cursor seats (D-118a): `$owner` = nearest `cursor-agent` ancestor; same pid for take and release. `take` with a dead pid
-exits **2**.
+`$owner` (same pid for take and release): **Cursor** (#427 r2) = nearest ancestor (parent first, never this shell) that is `node.exe` running `cursor-agent` `versions/<ver>/index.js` (`docs/loops/t235-p2-3-r2-measure.md`). **Claude Code** = that `claude.exe` session's pid. `take` with a dead pid exits **2**.

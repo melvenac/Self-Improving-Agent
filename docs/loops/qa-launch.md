@@ -45,12 +45,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-le
 powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" release -OwnerPid $owner
 ```
 
-**`-OwnerPid` must be a live process** the helper can read (D-119: the nearest `cursor-agent` ancestor on Cursor seats).
-`take` with a dead or unreadable pid **refuses with exit 2** and does not create a lease.
+**`-OwnerPid` must be a live process** the helper can read. `take` with a dead or unreadable pid **refuses with exit 2** and does not create a lease.
 
-After merge, **re-copy by hand** on the QA PC and laptop (this doc does not run the copy for you):
-
-`git show <merge-sha>:docs/loops/machine-lease.ps1 > %USERPROFILE%\machine-lease.ps1`
+- **Cursor (D-119, code #427 r2):** the nearest **ancestor** of the calling shell — start from the parent, never the calling shell itself — that is cursor-agent's own host process: `node.exe` running `cursor-agent`'s `versions/<ver>/index.js`. Shape: `docs/loops/t235-p2-3-r2-measure.md`.
+- **Claude Code:** the `claude.exe` session's pid.
 
 ## What is already on each machine
 

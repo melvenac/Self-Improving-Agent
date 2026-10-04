@@ -95,10 +95,12 @@ preserve script codes (non-owner `release` is **12** under `-File`, **1** under 
 powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" take -OwnerPid $owner -Seat <seat> -TtlMinutes 90
 ```
 
-**`-OwnerPid`** on Cursor seats is the nearest ancestor whose command line contains `cursor-agent` (D-118a); the same
-pid for `take`, `status`, and `release`. Exit **10** = held (wait and report owner); **11** = malformed lease; **12** =
-not yours on `release`/`renew` (report, do not retry with another pid); **2** = usage (including `take` with a dead pid).
-Read `$LASTEXITCODE` in the same PowerShell session.
+**`-OwnerPid`** (same pid for `take`, `status`, and `release`):
+
+- **Cursor (D-118a, code #427 r2):** the nearest **ancestor** of the calling shell — start from the parent, never the calling shell itself — that is cursor-agent's own host process: `node.exe` running `cursor-agent`'s `versions/<ver>/index.js`. Shape: `docs/loops/t235-p2-3-r2-measure.md`.
+- **Claude Code:** the `claude.exe` session's pid.
+
+Exit **10** = held (wait and report owner); **11** = malformed lease; **12** = not yours on `release`/`renew` (report, do not retry with another pid); **2** = usage (including `take` with a dead pid). Read `$LASTEXITCODE` in the same PowerShell session.
 
 ## Scope and outputs
 
