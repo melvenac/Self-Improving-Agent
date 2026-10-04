@@ -29,10 +29,13 @@
 //   across one /clear. Either alone is caught.
 // - The ordering "SessionStart completes before the new session's first tool
 //   call" was measured headless (3 of 3), not interactively.
-// - Hosts other than Claude Code write no proof, so their servers refuse
-//   attributed writes (Atlas's Q2 ruling: Cursor).
+// - Cursor (T-235 P2-3): SessionStart writes `by-pid/<cursorAgentHostPid>.json`
+//   after walking ancestors until CommandLine matches `cursor-agent`. The MCP
+//   server walks the same way when OPEN_BRAIN_IDE=cursor (direct ppid first,
+//   then ancestors). Claude Code behaviour below is unchanged.
 // - The server must be the claude process's DIRECT child. A wrapper (cmd /c,
-//   npx) between them makes ppid name the wrapper: no file, so refuse.
+//   npx) between them makes ppid name the wrapper: no file, so refuse — unless
+//   cursor walk-up is enabled.
 
 import { execFileSync } from "child_process";
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "fs";
@@ -123,12 +126,129 @@ export type ProvenSession =
   | { id: string; pid: number }
   | { id: null; reason: string };
 
+export type ProcessParentInfo = { pid: number; ppid: number; commandLine: string };
+
+/** Read one process row for ancestor walks (injectable in tests). */
+export function readProcessParent(pid: number): ProcessParentInfo | null {
+  if (!Number.isInteger(pid) || pid <= 0) return null;
+  try {
+    if (process.platform === "win32") {
+      const out = execFileSync(
+        "powershell.exe",
+        [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          `$p=Get-CimInstance Win32_Process -Filter "ProcessId=${pid}" -ErrorAction SilentlyContinue; if(-not $p){exit 1}; Write-Output ($p.ProcessId); Write-Output ($p.ParentProcessId); Write-Output ($p.CommandLine)`,
+        ],
+        { encoding: "utf-8", timeout: 15_000, stdio: ["ignore", "pipe", "ignore"], windowsHide: true },
+      ).trim();
+      const lines = out.split(/\r?\n/);
+      if (lines.length < 3) return null;
+      const procPid = Number(lines[0]);
+      const ppid = Number(lines[1]);
+      if (!Number.isInteger(procPid) || !Number.isInteger(ppid)) return null;
+      return { pid: procPid, ppid, commandLine: lines.slice(2).join("\n") };
+    }
+    if (process.platform === "linux") {
+      const stat = readFileSync(`/proc/${pid}/stat`, "utf-8");
+      const rest = stat.slice(stat.lastIndexOf(")") + 2).split(" ");
+      const ppid = Number(rest[1]);
+      let commandLine = "";
+      try {
+        commandLine = readFileSync(`/proc/${pid}/cmdline`, "utf-8").replace(/\0/g, " ");
+      } catch {
+        commandLine = "";
+      }
+      return { pid, ppid, commandLine };
+    }
+    const ps = execFileSync("ps", ["-p", String(pid), "-o", "pid=,ppid=,command="], {
+      encoding: "utf-8",
+      timeout: 15_000,
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    const m = ps.match(/^(\d+)\s+(\d+)\s+(.*)$/);
+    if (!m) return null;
+    return { pid: Number(m[1]), ppid: Number(m[2]), commandLine: m[3] };
+  } catch {
+    return null;
+  }
+}
+
+const CURSOR_AGENT_RE = /cursor-agent/i;
+
 /**
- * The session this server can PROVE is its own, or why it cannot.
- * `parentStart` is the parent process's start time (the server computes it
- * once: its parent is fixed for its life). Never falls back to anything.
+ * Nearest ancestor of `fromPid` whose command line identifies the cursor-agent
+ * host (the long-lived node process for one CLI run).
  */
-export function proveSession(dir: string, parentPid: number, parentStart: string | null): ProvenSession {
+export function findCursorAgentHostPid(
+  fromPid: number,
+  readParent: (pid: number) => ProcessParentInfo | null = readProcessParent,
+): number | null {
+  let p = fromPid;
+  for (let i = 0; i < 64 && p > 0; i++) {
+    const row = readParent(p);
+    if (!row) break;
+    if (CURSOR_AGENT_RE.test(row.commandLine)) return row.pid;
+    p = row.ppid;
+  }
+  return null;
+}
+
+export type ProveSessionOptions = {
+  /** When true, walk from parentPid to the cursor-agent host before reading proof. */
+  cursorWalk?: boolean;
+  readParent?: (pid: number) => ProcessParentInfo | null;
+};
+
+function proveSessionAtKey(
+  dir: string,
+  keyPid: number,
+  keyStart: string | null,
+  parentLabel: string,
+): ProvenSession {
+  const path = proofPath(dir, keyPid);
+  if (!existsSync(path)) {
+    return {
+      id: null,
+      reason: `no session proof for this server's parent process ${parentLabel} (${path} absent: the SessionStart hook did not write one, or SessionEnd removed it)`,
+    };
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(path, "utf-8"));
+  } catch (err) {
+    return { id: null, reason: `the session proof ${path} is unreadable: ${err instanceof Error ? err.message : String(err)}` };
+  }
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return { id: null, reason: `the session proof ${path} is not a session record` };
+  }
+  const proof = parsed as Partial<ProcessSessionProof>;
+  if (typeof proof.session_id !== "string" || !proof.session_id.trim()) {
+    return { id: null, reason: `the session proof ${path} carries no session_id` };
+  }
+  if (proof.claude_pid !== keyPid) {
+    return {
+      id: null,
+      reason: `the session proof ${path} names pid ${String(proof.claude_pid)}, not the cursor-agent host ${keyPid}`,
+    };
+  }
+  if (keyStart === null) {
+    return {
+      id: null,
+      reason: `the start time of the cursor-agent host process ${keyPid} could not be read, so the proof cannot be checked against a reused pid`,
+    };
+  }
+  if (proof.proc_start !== keyStart) {
+    return {
+      id: null,
+      reason: `the session proof ${path} was written for a process that started at ${String(proof.proc_start)}, and the cursor-agent host ${keyPid} started at ${keyStart}: a reused pid`,
+    };
+  }
+  return { id: proof.session_id, pid: keyPid };
+}
+
+function proveSessionClaude(dir: string, parentPid: number, parentStart: string | null): ProvenSession {
   const path = proofPath(dir, parentPid);
   if (!existsSync(path)) {
     return { id: null, reason: `no session proof for this server's parent process ${parentPid} (${path} absent: the SessionStart hook did not write one, or SessionEnd removed it)` };
@@ -139,8 +259,6 @@ export function proveSession(dir: string, parentPid: number, parentStart: string
   } catch (err) {
     return { id: null, reason: `the session proof ${path} is unreadable: ${err instanceof Error ? err.message : String(err)}` };
   }
-  // JSON null is a value, and reading `.session_id` on it throws. A named
-  // refusal, the same as any other body that is not a session record (D2).
   if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
     return { id: null, reason: `the session proof ${path} is not a session record` };
   }
@@ -158,4 +276,32 @@ export function proveSession(dir: string, parentPid: number, parentStart: string
     return { id: null, reason: `the session proof ${path} was written for a process that started at ${String(proof.proc_start)}, and this server's parent ${parentPid} started at ${parentStart}: a reused pid` };
   }
   return { id: proof.session_id, pid: parentPid };
+}
+
+/**
+ * The session this server can PROVE is its own, or why it cannot.
+ * `parentStart` is the parent process's start time (the server computes it
+ * once: its parent is fixed for its life). Never falls back to anything.
+ */
+export function proveSession(
+  dir: string,
+  parentPid: number,
+  parentStart: string | null,
+  options?: ProveSessionOptions,
+): ProvenSession {
+  if (!options?.cursorWalk) {
+    return proveSessionClaude(dir, parentPid, parentStart);
+  }
+  const readParent = options.readParent ?? readProcessParent;
+  const direct = proveSessionClaude(dir, parentPid, parentStart);
+  if (direct.id !== null) return direct;
+  const host = findCursorAgentHostPid(parentPid, readParent);
+  if (host === null) {
+    return {
+      id: null,
+      reason: `no cursor-agent host ancestor of parent process ${parentPid} (cursor walk found no matching process)`,
+    };
+  }
+  const hostStart = processStartTime(host);
+  return proveSessionAtKey(dir, host, hostStart, String(parentPid));
 }

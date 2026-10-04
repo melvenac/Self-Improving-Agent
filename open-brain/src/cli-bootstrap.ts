@@ -27,7 +27,7 @@ import {
   resolveAgentIdentity,
 } from "./shared/active-session.js";
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
-import { byPidDir, processStartTime, writeProcessSession } from "./shared/process-session.js";
+import { byPidDir, findCursorAgentHostPid, processStartTime, writeProcessSession } from "./shared/process-session.js";
 import { takeMissingHandoffNotices } from "./shared/handoff-guard.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
@@ -119,6 +119,32 @@ const proofLine: string = (() => {
   const payloadId = resolveSessionId(hookInput as Record<string, unknown>);
   const claudePid = Number(process.env.CLAUDE_PID);
   if (!payloadId) return "Session proof NOT written: the payload carried no session id.";
+  if (ide === "cursor") {
+    if (payload.cursor_version === undefined || payload.cursor_version === null) {
+      return "Session proof NOT written: cursor payload has no cursor_version (D5), so this session's server will refuse attributed writes.";
+    }
+    const hostPid = findCursorAgentHostPid(process.pid);
+    if (hostPid === null) {
+      return "Session proof NOT written: no cursor-agent host process found in the hook's ancestor chain, so this session's server will refuse attributed writes.";
+    }
+    const procStart = processStartTime(hostPid);
+    if (procStart === null) {
+      return `Session proof NOT written: the start time of cursor-agent host process ${hostPid} could not be read, so this session's server will refuse attributed writes.`;
+    }
+    try {
+      writeProcessSession(byPidDir(resolvePaths(cwd).activeSession), {
+        session_id: payloadId.uuid,
+        claude_pid: hostPid,
+        proc_start: procStart,
+        ide: "cursor",
+        written_at: new Date().toISOString(),
+        ...(typeof payload.transcript_path === "string" ? { transcript_path: payload.transcript_path } : {}),
+      });
+      return `Session proof written: session ${payloadId.uuid} for cursor-agent host process ${hostPid}.`;
+    } catch (err) {
+      return `Session proof NOT written: ${err instanceof Error ? err.message : String(err)} — this session's server will refuse attributed writes.`;
+    }
+  }
   if (ide !== "claude") return "Session proof NOT written: this host is not Claude Code, so its server cannot attribute writes (T-003, ruling Q2).";
   if (!Number.isInteger(claudePid) || claudePid <= 0) return `Session proof NOT written: CLAUDE_PID is ${process.env.CLAUDE_PID === undefined ? "unset" : `"${process.env.CLAUDE_PID}"`}, so the claude process is unknown and this session's server will refuse attributed writes.`;
   const procStart = processStartTime(claudePid);
