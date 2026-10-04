@@ -18,9 +18,10 @@ import {
  */
 const HUB = "http://hub.test:4000";
 const HUB_ID = "hub.test-4000";
-const ATLAS_ROOM = "k57frxw0ptb8tadmqdwy0khhks8ey006";
-const INFRA_ROOM = "k5702788wctxj75begyt4x2k5x8f6mav";
-const BUILDER_ROOM = "k57098epn7qz32vt0cazfjpbes8f6kdq";
+// T-213: the rooms clark created, one per seat (participants atlas, <hub_name>, <hub_name>-waker), as the tracked map records them.
+const FORGE_ROOM = "k571z4ghp7nbp34djhecwnsk3n8fmhsf";
+const INFRA_ROOM = "k57d92gqtjm9wpfs74ekbx9rns8fmy2f";
+const BUILDER_ROOM = "k575sfwr9wcx3r8fw83g3bc00x8fmar3";
 const KEY = `test-key-${"x".repeat(40)}`;
 
 const atlasIdentity = { name: "Atlas", role: "planner", partner: "Forge" };
@@ -49,13 +50,13 @@ function fixtureFetch(body: unknown, status = 200): { fetchFn: typeof fetch; cal
   return { fetchFn, calls };
 }
 
-function roster(over: Partial<Record<"grok" | "cursor-infra" | "cursor-builder", unknown>> = {}) {
+function roster(over: Partial<Record<"forge" | "cursor-infra" | "cursor-builder", unknown>> = {}) {
   const room = (sessionId: string, extra: Record<string, unknown> = {}) => ({
     sessionId, unread: 0, pollingNow: false, pollAgeMs: 0, ...extra,
   });
   return {
     agents: [
-      { name: "grok", rooms: [over.grok ?? room(ATLAS_ROOM)] },
+      { name: "forge", rooms: [over.forge ?? room(FORGE_ROOM)] },
       { name: "cursor-infra", rooms: [over["cursor-infra"] ?? room(INFRA_ROOM)] },
       { name: "cursor-builder", rooms: [over["cursor-builder"] ?? room(BUILDER_ROOM)] },
     ],
@@ -87,7 +88,7 @@ describe("T-198 hub presence at /start (r2)", () => {
     keyDir = mkdtempSync(join(tmpdir(), "t198-keys-"));
     useCheckout("sia-planner");
     writeKey("atlas", KEY);
-    writeKey("grok", KEY);
+    writeKey("forge", KEY);
   });
 
   afterEach(() => {
@@ -119,9 +120,9 @@ describe("T-198 hub presence at /start (r2)", () => {
   });
 
   it("PR-1 a seat with pollingNow true prints as LISTENER polling", async () => {
-    const { fetchFn } = fixtureFetch(roster({ grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 } }));
+    const { fetchFn } = fixtureFetch(roster({ forge: { sessionId: FORGE_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 } }));
     const block = await describe_(fetchFn);
-    expect(block.lines.join("\n")).toContain("grok: listener polling");
+    expect(block.lines.join("\n")).toContain("forge: listener polling");
   });
 
   it("PR-2 a seat not polling prints the unread count and age, as a listener", async () => {
@@ -133,12 +134,12 @@ describe("T-198 hub presence at /start (r2)", () => {
   describe("T-237 pollAgeMs null is A2A's 'no wait-poll in the window', not a malformed body", () => {
     it("T237-1 a room with pollAgeMs null is accepted, and the other rooms render normally", async () => {
       const { fetchFn } = fixtureFetch(roster({
-        grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: false, pollAgeMs: null },
+        forge: { sessionId: FORGE_ROOM, unread: 0, pollingNow: false, pollAgeMs: null },
         "cursor-infra": { sessionId: INFRA_ROOM, unread: 3, pollingNow: false, pollAgeMs: 270_000 },
       }));
       const text = (await describe_(fetchFn)).lines.join("\n");
       expect(text).not.toContain("presence: UNKNOWN");
-      expect(text).toContain("grok: listener not polling");
+      expect(text).toContain("forge: listener not polling");
       expect(text).toContain("cursor-infra: listener not polling, 3 unread since 5m");
     });
 
@@ -169,7 +170,7 @@ describe("T-198 hub presence at /start (r2)", () => {
 
   it("R1 wording: every partner line says listener or absent, none claims the seat read a turn, and the header says so", async () => {
     const { fetchFn } = fixtureFetch(roster({
-      grok: { sessionId: ATLAS_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1 },
+      forge: { sessionId: FORGE_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1 },
       "cursor-infra": { sessionId: INFRA_ROOM, unread: 3, pollingNow: false, pollAgeMs: 270_000 },
     }));
     const block = await describe_(fetchFn);
@@ -222,7 +223,7 @@ describe("T-198 hub presence at /start (r2)", () => {
   });
 
   describe("R2 structurally malformed 200 bodies never escape the UNKNOWN contract", () => {
-    const ok = { sessionId: ATLAS_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 };
+    const ok = { sessionId: FORGE_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 };
     const cases: Array<[string, unknown, RegExp]> = [
       ["QA 225's probe: rooms is an object", { agents: [{ name: "grok", rooms: {} }] }, /agents\[0\]\.rooms/],
       ["an agent that is null", { agents: [null] }, /agents\[0\]/],
@@ -244,8 +245,8 @@ describe("T-198 hub presence at /start (r2)", () => {
   it("PR-4 a partner absent from the roster prints as absent, not skipped", async () => {
     const { fetchFn } = fixtureFetch({ agents: [] });
     const block = await describe_(fetchFn);
-    expect(block.lines.join("\n")).toContain("grok: absent");
-    expect(formatPartnerLine({ label: "grok", hub_as: "grok", session_id: ATLAS_ROOM }, [] as PresenceAgent[])).toBe("grok: absent");
+    expect(block.lines.join("\n")).toContain("forge: absent");
+    expect(formatPartnerLine({ label: "grok", hub_as: "grok", session_id: FORGE_ROOM }, [] as PresenceAgent[])).toBe("grok: absent");
   });
 
   it("PR-5 mutant swallowFetchErrors produces no UNKNOWN line", async () => {
@@ -282,17 +283,19 @@ describe("T-198 hub presence at /start (r2)", () => {
       expect(calls[0].headers["X-Agent-Key"]).not.toBe("dev-key");
     });
 
-    it("the key name is the MAPPED hub name of the checkout: sia-forge reads grok.key, not the identity's forge.key", async () => {
-      useCheckout("sia-forge");
+    // T-213: forge's hub name became "forge", the identity's own name, so sia-forge can no longer tell the two apart.
+    // sia-builder (mapped cursor-builder, identity Forge) carries the same proof.
+    it("the key name is the MAPPED hub name of the checkout: sia-builder reads cursor-builder.key, not the identity's forge.key", async () => {
+      useCheckout("sia-builder");
       writeKey("atlas", `atlas-${"a".repeat(40)}`);
-      writeKey("grok", `grok-${"g".repeat(40)}`);
+      writeKey("cursor-builder", `cursor-builder-${"g".repeat(40)}`);
       writeKey("forge", `forge-${"f".repeat(40)}`);
       const { fetchFn, calls } = fixtureFetch({ agents: [] });
       const block = await describeHubPresence({
         projectRoot: root, identity: forgeIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
       } as Parameters<typeof describeHubPresence>[0]);
       expect(calls).toHaveLength(1);
-      expect(calls[0].headers["X-Agent-Key"]).toBe(`grok-${"g".repeat(40)}`);
+      expect(calls[0].headers["X-Agent-Key"]).toBe(`cursor-builder-${"g".repeat(40)}`);
       expect(block.lines.join("\n")).toContain("Atlas: absent");
     });
 
@@ -325,16 +328,15 @@ describe("T-198 hub presence at /start (r2)", () => {
       expect(block.lines[0]).not.toContain("short-secret");
     });
 
-    it("a mapped seat whose key is missing does not fall back to the identity's key: no grok.key, forge.key is not borrowed", async () => {
-      useCheckout("sia-forge");
-      rmSync(join(keyDir, HUB_ID, "grok.key"));
+    it("a mapped seat whose key is missing does not fall back to the identity's key: no cursor-builder.key, forge.key is not borrowed", async () => {
+      useCheckout("sia-builder");
       writeKey("forge", `forge-${"f".repeat(40)}`);
       const { fetchFn, calls } = fixtureFetch({ agents: [] });
       const block = await describeHubPresence({
         projectRoot: root, identity: forgeIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,
       } as Parameters<typeof describeHubPresence>[0]);
       expect(calls).toHaveLength(0);
-      expect(block.lines[0]).toMatch(/^presence: UNKNOWN \(no hub key for grok at /);
+      expect(block.lines[0]).toMatch(/^presence: UNKNOWN \(no hub key for cursor-builder at /);
     });
   });
 
@@ -355,13 +357,14 @@ partner: Atlas
     it.each([
       ["sia-builder", "cursor-builder", BUILDER_ROOM],
       ["sia-infra", "cursor-infra", INFRA_ROOM],
-      ["sia-forge", "grok", ATLAS_ROOM],
+      ["sia-forge", "forge", FORGE_ROOM],
     ])("S-2 %s reads %s.key and that seat's readers row, though its AGENT.local.md says Forge / developer", async (checkout, hubName, room) => {
       useCheckout(checkout);
       writeAgent("Forge", "developer");
       const key = `${hubName}-${"k".repeat(40)}`;
       writeKey(hubName, key);
-      writeKey("forge", `forge-${"f".repeat(40)}`); // the identity-derived name: a decoy that must never be read
+      // the identity-derived name: a decoy that must never be read. For sia-forge (T-213) the mapped name IS forge, so no decoy.
+      if (hubName !== "forge") writeKey("forge", `forge-${"f".repeat(40)}`);
       const { fetchFn, calls } = fixtureFetch(atlasRow(room));
       const block = await describeHubPresence({
         projectRoot: root, identity: forgeIdentity, callerLabel: "vitest", hubUrl: HUB, keyDir, fetchFn,

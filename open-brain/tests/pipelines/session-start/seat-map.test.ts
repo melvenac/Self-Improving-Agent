@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { mkdtempSync, mkdirSync, writeFileSync, cpSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, cpSync, rmSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { resolveCheckoutSeat } from "../../../src/pipelines/session-start/seat-map.js";
@@ -35,7 +35,7 @@ describe("T-203 S-1: the map resolves a checkout to seat, role, agent and hub na
     ["sia-planner", "planner", "planner", "Atlas", "atlas"],
     ["sia-builder", "builder", "developer", "Builder", "cursor-builder"],
     ["sia-infra", "infra", "developer", "Infra", "cursor-infra"],
-    ["sia-forge", "forge", "developer", "Forge", "grok"],
+    ["sia-forge", "forge", "developer", "Forge", "forge"],
   ])("%s is seat %s / %s / %s with hub name %s", (name, seat, role, agent, hubName) => {
     const r = resolveCheckoutSeat(checkout(name));
     expect(r).toEqual({ kind: "seat", checkout: name, seat, role, agent, hubName });
@@ -112,5 +112,34 @@ describe("T-203 S-4: /sync flags an AGENT.local.md that disagrees with the map f
     const noMap = checkSeatIdentity(checkout("sia-builder", { name: "Forge", role: "developer" }, false));
     expect(noMap.severity).toBe("skip");
     expect(noMap.message).toMatch(/no seat map|hub-partner-seats\.json/);
+  });
+});
+
+describe("T-213: the tracked map carries the rooms clark created (atlas, <hub_name>, <hub_name>-waker) and forge speaks as forge", () => {
+  // Read straight from the tracked file: these are the values every seat's presence and hub-talk read.
+  const map = JSON.parse(readFileSync(SEAT_FILE, "utf8")) as {
+    seats: Record<string, { checkout: string; hub_name?: string; room?: string }>;
+    readers: Record<string, { partners: { label: string; hub_as: string; session_id: string }[] }>;
+  };
+  const ROOMS = {
+    infra: { checkout: "sia-infra", hub_name: "cursor-infra", room: "k57d92gqtjm9wpfs74ekbx9rns8fmy2f" },
+    builder: { checkout: "sia-builder", hub_name: "cursor-builder", room: "k575sfwr9wcx3r8fw83g3bc00x8fmar3" },
+    forge: { checkout: "sia-forge", hub_name: "forge", room: "k571z4ghp7nbp34djhecwnsk3n8fmhsf" },
+  } as const;
+
+  it.each(Object.entries(ROOMS))("seat %s: checkout, hub_name and room", (seat, want) => {
+    expect(map.seats[seat]).toMatchObject(want);
+  });
+
+  it.each(Object.entries(ROOMS))("seat %s: the atlas↔seat reader pair, both directions, on the seat's room", (_seat, want) => {
+    const fromAtlas = map.readers.atlas!.partners.filter((p) => p.hub_as === want.hub_name);
+    expect(fromAtlas).toEqual([{ label: want.hub_name, hub_as: want.hub_name, session_id: want.room }]);
+    expect(map.readers[want.hub_name]?.partners).toEqual([{ label: "Atlas", hub_as: "atlas", session_id: want.room }]);
+  });
+
+  it("atlas reads exactly these three partners, and no reader or seat still speaks as grok", () => {
+    expect(map.readers.atlas!.partners.map((p) => p.hub_as).sort()).toEqual(["cursor-builder", "cursor-infra", "forge"]);
+    expect(Object.keys(map.readers).sort()).toEqual(["atlas", "cursor-builder", "cursor-infra", "forge"]);
+    expect(Object.values(map.seats).map((s) => s.hub_name)).not.toContain("grok");
   });
 });

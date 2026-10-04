@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **The seat map carries the new per-seat hub rooms, and forge speaks as `forge` (T-213).** In
+  `.agents/SYSTEM/hub-partner-seats.json`, builder, forge and infra each have a room whose participants are atlas, the seat
+  and `<hub_name>-waker`. Forge's `hub_name` is `forge` (was `grok`), so a greeting in the sia-forge checkout reads
+  `forge.key`. The three atlas-to-seat reader pairs moved with them. Nothing else in the file changed.
+
 ### Added
 
 - **FOCUS and SEATS in the budgeted briefing (T-236 (c)).** Opt-in: `briefing_focus` in `.agents/SYSTEM/greeting.json`,
@@ -24,6 +31,10 @@
 
 ### Fixed
 
+- **T-239 follow-up (QA 270 rows 3 and 10).** `checkMissingHandoff` derives the checkout with the shared `checkoutOf`,
+  the same function the writer stamps `sessions[].checkout` with, instead of its own inline `basename(resolve())`. New rows
+  pin `ob_start` passing `ownCheckout` to both renderers (QA 270's surviving mutant), and a session the real writer
+  stamped being found from every spelling of its root.
 - **A seat with no handoff of its own was briefed from a sibling checkout's (T-239).** The greeting picked "your
   handoff" by ROLE only, so sia-infra, which had none, printed sia-builder's session-156 pick-up, watch-outs and open
   questions as its own. Opt-in per repo: `"handoff_by_checkout": true` in `.agents/SYSTEM/greeting.json` (SIA sets it;
