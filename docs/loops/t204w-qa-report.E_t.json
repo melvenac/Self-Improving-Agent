@@ -1,0 +1,34 @@
+{
+  "loop": "qa-271-t204w",
+  "candidate_git": {
+    "sha": "5add91379641ef211f98b2f79d1551c0090821eb",
+    "branch": "pull/404/head",
+    "frozen_at": "2026-10-04T02:15:08Z"
+  },
+  "candidates": [
+    { "task": "T-204", "sha": "5add91379641ef211f98b2f79d1551c0090821eb", "branch": "pull/404/head", "pr": 404, "verdict": "INCOMPLETE" }
+  ],
+  "runtime_checks": {
+    "harness": {
+      "command": "powershell -File docs/loops/machine-lease-harness.ps1 -Lease ... -Queue ... -OldQueue master-qa-queue.ps1 -Rounds 20 (via C:/qa-scratch/qa271-mut/run.ps1)",
+      "exit_code": null,
+      "passed": false,
+      "duration_ms": 0,
+      "detail": "NOT RUN: the headless permission layer refused every PowerShell execution route (PowerShell tool '&', PowerShell tool powershell.exe -File, Bash powershell.exe -File). A node child_process route was deliberately not used."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q271-14", "status": "unverified", "order": "not-run", "evidence": "Harness not executed: PowerShell refused by the headless permission layer. Inputs prepared: master qa-queue.ps1 at 0bc93353 in C:/qa-scratch/qa271-mut." },
+    { "id": "Q271-15", "status": "unverified", "order": "not-run", "evidence": "Mutants built and confirmed landed (nonatomic +2/-1, nostart +1/-1, QA queue-skiplease 1 line) but none executed." },
+    { "id": "Q271-16", "status": "unverified", "order": "not-run", "evidence": "Crash-release probe not written or run (needs PowerShell)." },
+    { "id": "Q271-safety", "status": "met", "order": "shown", "evidence": "C:/Users/melve/machine-lease absent at start and end (node existsSync with positive and negative controls); PR head 5add9137 unmoved start and end." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "G1: rows 14-16 unexecuted on any QA host (QA 269 Linux, QA 271 permission layer).",
+    "G2: t204-developer-handoff.md says the mutant branches are not pushed; ls-remote shows all three on origin.",
+    "G3: the headless desktop launch does not admit powershell.exe; the next dispatch needs an allow rule or a ruling on the node route."
+  ],
+  "notes": "QA 271, dispatch tree db8ef4e6a131408b84c779b7dd1cbdf375906100. No live Jev call; gh not used; no issue or PR touched."
+}
