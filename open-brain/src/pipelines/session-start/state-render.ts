@@ -1,5 +1,5 @@
 import type { State, Task, Handoff, Seat, OpenQuestion } from "../../shared/state-schema.js";
-import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, newestHandoffForSeat, questionText, questionResolvedBy, watchText } from "../../shared/state-schema.js";
+import { TaskPriority, isOpenGap, lastSession, newestHandoffPerInstance, ownHandoff, questionText, questionResolvedBy, watchText } from "../../shared/state-schema.js";
 import { findHandoffCommit } from "./handoff-provenance.js";
 
 /**
@@ -22,6 +22,11 @@ export interface RenderStateOptions {
   seat?: Seat | null;
   /** Needed to derive other seats' close-out commits. Omitted: they are named without one. */
   projectRoot?: string;
+  /**
+   * T-239, OPT-IN per repo (greeting.json `handoff_by_checkout`), default OFF. Set: only this checkout's handoff is "yours",
+   * and a legacy entry (null checkout) is listed as `[legacy, unattributed]`. Absent: the role's newest, as before.
+   */
+  ownCheckout?: string;
 }
 
 export function renderState(state: State, version?: string, options: RenderStateOptions = {}): string[] {
@@ -198,18 +203,23 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
   const visible = newestHandoffPerInstance(state.handoffs);
   const hidden = state.handoffs.length - visible.length;
   const seat = options.seat ?? null;
-  const own = seat ? newestHandoffForSeat(state.handoffs, seat) : null;
+  const byCheckout = options.ownCheckout !== undefined;
+  const own = ownHandoff(state.handoffs, seat, options.ownCheckout);
 
   if (seat === null) {
     lines.push(
       `\nHandoffs (${visible.length}) — READER'S SEAT UNRESOLVED, so none is rendered as "yours":`
     );
   } else if (own === null) {
-    lines.push(`\nHandoffs (${visible.length}) — no handoff recorded for this seat (${seat}):`);
+    lines.push(
+      byCheckout
+        ? `\nHandoffs (${visible.length}) — no handoff recorded for this checkout (${seat}, ${options.ownCheckout}):`
+        : `\nHandoffs (${visible.length}) — no handoff recorded for this seat (${seat}):`
+    );
   }
 
   if (own) {
-    lines.push(`\nYour handoff — ${own.seat}${instanceLabel(own)}, session ${own.session}:`);
+    lines.push(`\nYour handoff — ${own.seat}${instanceLabel(own, byCheckout)}, session ${own.session}:`);
     lines.push(...renderOneHandoff(own));
   }
 
@@ -217,7 +227,7 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
   if (others.length > 0) {
     lines.push(`\nOther handoffs (newest per seat and checkout; named, not rendered — read one by its commit):`);
     for (const h of others) {
-      lines.push(`  ${h.seat}${instanceLabel(h)} (session ${h.session}): ${describeProvenance(h, options)}`);
+      lines.push(`  ${h.seat}${instanceLabel(h, byCheckout)} (session ${h.session}): ${describeProvenance(h, options)}`);
       lines.push(`    ${firstLine(h.pick_up)}`);
     }
   }
@@ -225,9 +235,12 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
   return lines;
 }
 
-/** ` [sia-builder]`, or ` [legacy]` for an entry migrated from v2, which recorded no checkout. */
-function instanceLabel(h: Handoff): string {
-  return ` [${h.checkout ?? "legacy"}]`;
+/**
+ * ` [sia-builder]`, or ` [legacy]` for an entry migrated from v2, which recorded no checkout. With `handoff_by_checkout` on
+ * (T-239) that entry is never anyone's own and reads ` [legacy, unattributed]`.
+ */
+function instanceLabel(h: Handoff, byCheckout: boolean): string {
+  return ` [${h.checkout ?? (byCheckout ? "legacy, unattributed" : "legacy")}]`;
 }
 
 /** The unresolved question texts, and how many were resolved (T-233 B). */

@@ -1,5 +1,6 @@
 {
   "briefing_budget": true,
+  "handoff_by_checkout": true,
   "handoff_caps": false,
   "role_docs_by_sha": true
 }

@@ -20,7 +20,7 @@
  */
 import { existsSync, readFileSync, writeFileSync, renameSync, unlinkSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { basename, join, resolve } from "node:path";
+import { join } from "node:path";
 import { z } from "zod";
 import {
   StateSchema,
@@ -32,6 +32,7 @@ import {
   WatchOutSchema,
   parseState,
   serializeState,
+  checkoutOf,
   compareFirstRev,
   nextSessionNumber,
   type Seat,
@@ -264,7 +265,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   // the record internally inconsistent once (a handoff "in session 72" when 72
   // did not exist), so the whole batch takes the recorded number.
   const uuid = options.session_uuid ?? null;
-  const checkout = options.checkout ?? basename(resolve(projectRoot));
+  const checkout = options.checkout ?? checkoutOf(projectRoot);
   const today = options.today ?? localIsoDate();
   const mine = uuid === null ? undefined : next.sessions.find((s) => s.uuid === uuid);
   // T-164 SC-2: the greeting number is provisional until this write. A different

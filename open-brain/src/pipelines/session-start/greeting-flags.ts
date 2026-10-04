@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { checkoutOf } from "../../shared/state-schema.js";
 
 /**
  * T-236: the per-repo greeting opt-ins, ONE reader for ONE file (planner ruling, session 160).
@@ -9,7 +10,7 @@ import { join } from "node:path";
  * file, an unreadable or malformed file, a non-boolean value and an absent key all mean false,
  * which is today's output.
  *
- * Keys: briefing_budget, handoff_caps, role_docs_by_sha. Keep them sorted in the tracked file.
+ * Keys: briefing_budget, handoff_by_checkout, handoff_caps, role_docs_by_sha. Keep them sorted in the tracked file.
  */
 export const GREETING_FLAGS_REL = ".agents/SYSTEM/greeting.json";
 
@@ -30,4 +31,12 @@ export function readGreetingFlags(projectRoot: string): Readonly<Record<string, 
 
 export function greetingFlag(projectRoot: string, key: string): boolean {
   return readGreetingFlags(projectRoot)[key] === true;
+}
+
+/**
+ * T-239: the checkout whose handoff is this reader's own, or undefined when `handoff_by_checkout` is off (the default), which
+ * keeps the role-wide pick-up A2A prints. The value is `checkoutOf`, the derivation the writer stamps handoffs with.
+ */
+export function handoffCheckout(projectRoot: string): string | undefined {
+  return greetingFlag(projectRoot, "handoff_by_checkout") ? checkoutOf(projectRoot) : undefined;
 }

@@ -24,7 +24,7 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
 import { describeRoleFiles, renderRoleDocs, recordRoleReads } from "./pipelines/session-start/role-files.js";
-import { greetingFlag } from "./pipelines/session-start/greeting-flags.js";
+import { greetingFlag, handoffCheckout } from "./pipelines/session-start/greeting-flags.js";
 import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
@@ -355,9 +355,12 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       // The reader's OWN seat, so the greeting renders this seat's handoff and
       // names the others by their close-out commit. A greeting that shows the
       // developer's handoff to the planner is C4 failing on the row C2 exists for.
+      // T-239: with handoff_by_checkout on, only THIS checkout's handoff is "yours", in both renders.
+      const ownCheckout = handoffCheckout(projectRoot);
       lines.push(...renderState(sj.data, result.state.version, {
         seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
         projectRoot,
+        ownCheckout,
       }));
       // T-233 B: the whole briefing, rendered here, so /start prints it instead of assembling it.
       lines.push("", ...renderBriefing({
@@ -365,6 +368,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         state: sj.data,
         version: result.state.version,
         seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+        ownCheckout,
         sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
         sessionNote: result.session.skippedReason,
         date: new Date().toISOString().slice(0, 10),
