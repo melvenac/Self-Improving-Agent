@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 324 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 325 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — QA 269 running (#397 T-237, #401 T-236c, #402 T-199, #404 T-204); then one batch ask to Aaron, with #403 (planner.md). Next: T-238 after #401; the wrong-seat PICK UP fallback (infra is investigating).
 
 ## What's working
