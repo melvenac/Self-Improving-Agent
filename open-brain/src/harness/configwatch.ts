@@ -1445,6 +1445,7 @@ export const SAFE_LOCAL_KEYS: ReadonlyArray<{ key: RegExp; value?: RegExp; why: 
   { key: /^user\.(name|email)$/, why: "identity: a name and an address, never a program" },
   { key: /^commit\.gpgsign$/, why: "every runtime commit passes --no-gpg-sign, so no signing program runs" },
   { key: /^core\.(autocrlf|eol)$/, why: "line-ending handling only" },
+  { key: /^gc\.auto$/, value: /^0$/, why: "disables background gc that can write info/refs via update-server-info (G-053)" },
   { key: /^extensions\.worktreeconfig$/, why: "a flag enabling config.worktree, which is itself watched and held to this list" },
 ];
 
