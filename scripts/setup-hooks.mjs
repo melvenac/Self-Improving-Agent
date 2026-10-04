@@ -132,6 +132,34 @@ export function withCursorSessionHook(config, bootstrapPath, nodePath) {
 }
 
 /**
+ * T-235 P2-4: the Cursor sessionEnd hook, with the absolute Node path (same shape as sessionStart).
+ * A bare-node or path-spelling duplicate of cli-session-end.js is REPLACED, not left beside the new one.
+ *
+ * @returns {{ config: object, changed: boolean, notes: string[] }}
+ */
+export function withCursorSessionEndHook(config, sessionEndPath, nodePath) {
+  const before = JSON.stringify(config ?? { version: 1, hooks: {} });
+  const c = JSON.parse(before);
+  if (!c.hooks) c.hooks = {};
+  if (!Array.isArray(c.hooks.sessionEnd)) c.hooks.sessionEnd = [];
+  const command = `"${fwd(nodePath)}" "${fwd(sessionEndPath)}"`;
+  const notes = [];
+
+  const stale = c.hooks.sessionEnd.filter((e) => e.command?.includes('cli-session-end.js') && e.command !== command);
+  if (stale.length > 0) {
+    c.hooks.sessionEnd = c.hooks.sessionEnd.filter((e) => !stale.includes(e));
+    notes.push(`Upgraded ${stale.length} stale Cursor sessionEnd hook entry(ies)`);
+  }
+  if (!c.hooks.sessionEnd.some((e) => e.command === command)) {
+    c.hooks.sessionEnd.push({ command });
+    notes.push('Cursor sessionEnd hook registered in ~/.cursor/hooks.json');
+  } else {
+    notes.push('Cursor sessionEnd hook already configured');
+  }
+  return { config: c, changed: JSON.stringify(c) !== before, notes };
+}
+
+/**
  * The repo root for a script at `<root>/scripts/<file>`, from its import.meta.url.
  * T-235 Phase 0: a URL's pathname keeps percent-encoding, so a home directory with a
  * space (the QA PC's "Aaron Melven") became "Aaron%20Melven", open-brain/ was "not

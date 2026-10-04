@@ -7,7 +7,7 @@
 import { describe, it, expect } from "vitest";
 import { join } from "node:path";
 // @ts-expect-error — a plain .mjs module outside the TypeScript project
-import { withSessionHooks, withCursorMcp, withCursorSessionHook } from "../../scripts/setup-hooks.mjs";
+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook } from "../../scripts/setup-hooks.mjs";
 
 type Entry = { matcher: string; hooks: Array<{ type: string; command: string }> };
 type Settings = { hooks?: Record<string, Entry[]>; [k: string]: unknown };
@@ -113,5 +113,61 @@ describe("setup.mjs Cursor registration pins the running Node (T-235 P2-1)", () 
     const once = hook({ version: 1, hooks: { stop: [{ command: "s" }] } }).config;
     expect(hook(once).changed).toBe(false);
     expect((once.hooks as Record<string, unknown>).stop).toEqual([{ command: "s" }]);
+  });
+});
+
+// T-235 P2-4: Cursor sessionEnd → cli-session-end.js (absolute node, idempotent, user hooks preserved).
+describe("setup.mjs Cursor sessionEnd (T-235 P2-4)", () => {
+  const NODE = String.raw`C:\Program Files\nodejs\node.exe`;
+  const BOOT = String.raw`C:\repo\open-brain\build\cli-bootstrap.js`;
+  const END = String.raw`C:\repo\open-brain\build\cli-session-end.js`;
+  const hookStartCmd = `"C:/Program Files/nodejs/node.exe" "C:/repo/open-brain/build/cli-bootstrap.js" --ide cursor`;
+  const hookEndCmd = `"C:/Program Files/nodejs/node.exe" "C:/repo/open-brain/build/cli-session-end.js"`;
+  type Hooks = { version?: number; hooks: { sessionStart?: Array<{ command: string }>; sessionEnd?: Array<{ command: string }>; stop?: Array<{ command: string }> } };
+  const endHook = (c: unknown, node = NODE): { config: Hooks; changed: boolean } => withCursorSessionEndHook(c, END, node);
+
+  it("adds one sessionEnd entry with the absolute node path", () => {
+    const r = endHook({ version: 1, hooks: {} });
+    expect(r.config.hooks.sessionEnd).toEqual([{ command: hookEndCmd }]);
+    expect(r.changed).toBe(true);
+  });
+
+  it("is idempotent: a second run changes nothing and does not duplicate", () => {
+    const once = endHook({ version: 1, hooks: {} }).config;
+    const twice = endHook(once);
+    expect(twice.changed).toBe(false);
+    expect(twice.config.hooks.sessionEnd).toHaveLength(1);
+  });
+
+  it("preserves an existing user sessionEnd hook and upgrades a stale bare-node cli-session-end entry", () => {
+    const bare = `node "C:/repo/open-brain/build/cli-session-end.js"`;
+    const r = endHook({
+      version: 1,
+      hooks: { sessionEnd: [{ command: "echo unrelated" }, { command: bare }] },
+    });
+    expect(r.changed).toBe(true);
+    expect(r.config.hooks.sessionEnd).toEqual([{ command: "echo unrelated" }, { command: hookEndCmd }]);
+  });
+
+  it("keeps sessionStart and other events when sessionEnd is added", () => {
+    const start = withCursorSessionHook({ version: 1, hooks: { stop: [{ command: "s" }] } }, BOOT, NODE).config as Hooks;
+    const r = endHook(start);
+    expect(r.config.hooks.sessionStart).toEqual([{ command: hookStartCmd }]);
+    expect((r.config.hooks as { stop: unknown }).stop).toEqual([{ command: "s" }]);
+    expect(r.config.hooks.sessionEnd).toEqual([{ command: hookEndCmd }]);
+  });
+
+  it("Claude Code withSessionHooks output is independent (byte-identical across Cursor sessionEnd registration)", () => {
+    const claude: Settings = { hooks: { SessionStart: [{ matcher: "", hooks: [{ type: "command", command: cmd("cli-bootstrap.js") }] }] } };
+    const before = JSON.stringify(run(claude).settings);
+    endHook({ version: 1, hooks: { sessionStart: [{ command: hookStartCmd }] } });
+    expect(JSON.stringify(run(claude).settings)).toBe(before);
+  });
+
+  it("mutant: treating every tree as already configured would skip registration (red on empty hooks)", () => {
+    const alwaysConfigured = (c: unknown) => ({ config: c as Hooks, changed: false, notes: [] as string[] });
+    const r = alwaysConfigured({ version: 1, hooks: {} });
+    expect((r.config.hooks.sessionEnd ?? []).length).toBe(0);
+    expect(endHook({ version: 1, hooks: {} }).config.hooks.sessionEnd).toHaveLength(1);
   });
 });
