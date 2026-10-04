@@ -3,9 +3,9 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, cpSync } f
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { parseState, type State } from "../../../src/shared/state-schema.js";
-import { resolveCheckoutSeat } from "../../../src/pipelines/session-start/seat-map.js";
+import { resolveCheckoutSeat, runtimeByHubName } from "../../../src/pipelines/session-start/seat-map.js";
 import { focusLine, seatsLine, seatOrder } from "../../../src/pipelines/session-start/focus.js";
-import { describeHubPresence } from "../../../src/pipelines/session-start/hub-presence.js";
+import { describeHubPresence, formatPartnerLine, liveStateForHubAgent } from "../../../src/pipelines/session-start/hub-presence.js";
 import { BRIEFING_BUDGET, renderBriefing, type BriefingInput } from "../../../src/pipelines/session-start/briefing.js";
 import { handleStart } from "../../../src/server.js";
 
@@ -95,7 +95,11 @@ describe("T-236 (c) SEATS", () => {
     });
     const order = seatOrder(checkout("sia-infra"));
     expect(order?.map((s) => s.seat)).toEqual(["planner", "builder", "forge", "infra", "qa", "research"]);
-    expect(seatsLine(state, order!, null)).toBe(`SEATS: planner — · builder ${OPEN[0]} · forge — · infra ${OPEN[1]} (+1) · qa — · research —`);
+    expect(seatsLine(state, order!, null)).toMatch(
+      new RegExp(
+        `^SEATS: planner — claude-code sonnet desktop · builder ${OPEN[0]} cursor composer-2\\.5 qa-pc · forge — cursor composer-2\\.5 qa-pc · infra ${OPEN[1]} \\(\\+1\\) cursor composer-2\\.5 qa-pc · qa — claude-code sonnet qa-pc · research — claude-code sonnet desktop$`,
+      ),
+    );
   });
 
   it("S3 with no roster there are no presence words at all", () => {
@@ -112,8 +116,16 @@ describe("T-236 (c) SEATS", () => {
     const room = (hubAs: string) => map.readers.atlas.partners.find((p: { hub_as: string }) => p.hub_as === hubAs).session_id;
     const roster = {
       agents: [
-        { name: "cursor-builder", rooms: [{ sessionId: room("cursor-builder"), unread: 0, pollingNow: true, pollAgeMs: 1000 }] },
-        { name: "cursor-infra", rooms: [{ sessionId: room("cursor-infra"), unread: 2, pollingNow: false, pollAgeMs: 60_000 }] },
+        {
+          name: "cursor-builder",
+          rooms: [{ sessionId: room("cursor-builder"), unread: 0, pollingNow: true, pollAgeMs: 1000 }],
+          seat: { seatState: "working" },
+        },
+        {
+          name: "cursor-infra",
+          rooms: [{ sessionId: room("cursor-infra"), unread: 2, pollingNow: false, pollAgeMs: 60_000 }],
+          seat: { seatState: "owes_reply" },
+        },
       ],
     };
     let calls: string[];
@@ -143,10 +155,10 @@ describe("T-236 (c) SEATS", () => {
       const root = checkout("sia-planner");
       const block = await describeHubPresence({ projectRoot: root, identity: null, callerLabel: "vitest" });
       expect(calls).toHaveLength(1);
-      expect(block.statusByHubName).toEqual({ "cursor-builder": "polling", "cursor-infra": "not polling", forge: "absent" });
+      expect(block.liveByHubName).toMatchObject({ "cursor-builder": "working", "cursor-infra": "owes_reply", forge: "absent" });
       const state = stateWith({ [OPEN[0]]: { assignee: "builder" } });
-      expect(seatsLine(state, seatOrder(root)!, block.statusByHubName ?? null)).toBe(
-        `SEATS: planner — · builder ${OPEN[0]} polling · forge — absent · infra — not polling · qa — · research —`,
+      expect(seatsLine(state, seatOrder(root)!, block.liveByHubName ?? null)).toBe(
+        `SEATS: planner — claude-code sonnet desktop absent · builder ${OPEN[0]} cursor composer-2.5 qa-pc working · forge — cursor composer-2.5 qa-pc absent · infra — cursor composer-2.5 qa-pc owes_reply · qa — claude-code sonnet qa-pc · research — claude-code sonnet desktop`,
       );
     });
 
@@ -163,7 +175,9 @@ describe("T-236 (c) SEATS", () => {
       const text = (await handleStart({ project_root: root })).content[0].text;
       expect(calls.filter((u) => u.startsWith(HUB))).toHaveLength(1);
       expect(text).toMatch(new RegExp(`\\nPICK UP HERE · FOCUS: ${OPEN[0]} Plan it \\(P\\d, \\w+\\)\\n`));
-      expect(text).toContain(`SEATS: planner ${OPEN[0]} · builder ${OPEN[1]} polling · forge — absent · infra — not polling · qa — · research —`);
+      expect(text).toContain(
+        `SEATS: planner ${OPEN[0]} claude-code sonnet desktop absent · builder ${OPEN[1]} cursor composer-2.5 qa-pc working · forge — cursor composer-2.5 qa-pc absent · infra — cursor composer-2.5 qa-pc owes_reply · qa — claude-code sonnet qa-pc · research — claude-code sonnet desktop`,
+      );
     });
   });
 });
@@ -186,7 +200,7 @@ describe("T-236 (c) B1 the worst case still fits the budget with FOCUS and SEATS
     if (!parsed.ok) throw new Error(parsed.error);
     const state = parsed.data;
     const root = checkout("sia-infra");
-    const presence = { atlas: "absent", "cursor-builder": "not polling", forge: "absent", "cursor-infra": "polling" } as const;
+    const presence = { atlas: "hub listener:absent", "cursor-builder": "working", forge: "absent", "cursor-infra": "idle" } as const;
     const input: BriefingInput = {
       state, version: "9.9.9", seat: "developer", sessionNumber: 160, sessionNote: null, date: "2026-10-03",
       drift: Array.from({ length: 6 }, (_, i) => ({ field: `field${i}`, expected: "e".repeat(80), actual: "a".repeat(80), fixed: false })) as BriefingInput["drift"],
@@ -206,5 +220,31 @@ describe("T-236 (c) B1 the worst case still fits the budget with FOCUS and SEATS
     expect(text).toMatch(/\nSEATS: planner T-\d+ \(\+\d+\)/);
     expect(text).toContain("Latest brief: docs/loops/t236-brief.md (2026-10-03) · Skills: self-improving-agent-gotchas");
     console.log(`B1-MEASURE ${lines.length} lines ${text.length} chars`);
+  });
+});
+
+describe("T-240 r2 another seat missing runtime", () => {
+  it("stays on the SEATS line and a waker seat never falls back to not polling", () => {
+    const root = checkout("sia-infra");
+    const path = join(root, ".agents", "SYSTEM", "hub-partner-seats.json");
+    const map = JSON.parse(readFileSync(path, "utf8")) as { seats: Record<string, { runtime?: string }> };
+    delete map.seats.builder!.runtime;
+    writeFileSync(path, JSON.stringify(map));
+
+    const order = seatOrder(root);
+    expect(order).not.toBeNull();
+    const line = seatsLine(stateWith({}), order!, { "cursor-builder": "hub listener:not polling" })!;
+    expect(line).toContain("runtime missing in seat map");
+    expect(line).toContain("builder");
+    expect(line).toContain("infra");
+    expect(line).not.toContain("not polling");
+
+    expect(runtimeByHubName(root)?.["cursor-builder"]).toBe("missing");
+    const agent = { name: "cursor-builder", rooms: [{ sessionId: "x", unread: 2, pollingNow: false, pollAgeMs: 1000 }] };
+    expect(liveStateForHubAgent("missing", agent)).toBe("runtime missing in seat map");
+    expect(formatPartnerLine({ label: "Builder", hub_as: "cursor-builder", session_id: "x" }, [agent], "missing")).toBe(
+      "Builder: runtime missing in seat map",
+    );
+    expect(formatPartnerLine({ label: "Builder", hub_as: "cursor-builder", session_id: "x" }, [agent], "missing")).not.toContain("not polling");
   });
 });

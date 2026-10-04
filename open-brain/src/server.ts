@@ -107,7 +107,8 @@ function writeSessionId(): ProvenSession {
   // The parent is fixed for this process's life, so its start time is read
   // once (it costs a process spawn on Windows). The pid is re-checked anyway.
   if (!_parentStart || _parentStart.pid !== parent) _parentStart = { pid: parent, start: processStartTime(parent) };
-  return proveSession(byPidDir(resolvePaths(process.cwd()).activeSession), parent, _parentStart.start);
+  const cursorWalk = process.env.OPEN_BRAIN_IDE?.toLowerCase() === "cursor";
+  return proveSession(byPidDir(resolvePaths(process.cwd()).activeSession), parent, _parentStart.start, cursorWalk ? { cursorWalk: true } : undefined);
 }
 
 /**
@@ -420,7 +421,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
           ? {
               focus: {
                 focus: focusLine(sj.data, resolveCheckoutSeat(projectRoot)),
-                seats: ((order) => (order ? seatsLine(sj.data, order, presence.statusByHubName ?? null) : null))(seatOrder(projectRoot)),
+                seats: ((order) => (order ? seatsLine(sj.data, order, presence.liveByHubName ?? null) : null))(seatOrder(projectRoot)),
               },
             }
           : {}),

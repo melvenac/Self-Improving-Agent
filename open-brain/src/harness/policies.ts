@@ -178,6 +178,101 @@ export const QaScorePolicySchema = z
 
 export const QA_SCORE_POLICY_FILE = "qa-score.json";
 
+/**
+ * T-173. The ladder order is the file's `levels` array, which is the order
+ * `claude --effort` lists. A retry walks one step toward the end.
+ *
+ * Lowering below the stage base is allowed only when every repair target
+ * matches a path rule. Each target contributes its matched rule's level, or
+ * the stage base when nothing matches it, and the effort is the max.
+ */
+export const EFFORT_LEVELS = ["low", "medium", "high", "xhigh", "max"] as const;
+export const EffortLevelSchema = z.enum(EFFORT_LEVELS);
+export type EffortLevel = z.infer<typeof EffortLevelSchema>;
+
+export const EFFORT_STAGES = ["planner", "developer", "qa"] as const;
+export type EffortStage = (typeof EFFORT_STAGES)[number];
+
+export const EFFORT_POLICY_FILE = "effort.json";
+
+/** The sentence the policy file must carry, so a reader sees when lowering is legal. */
+export const EFFORT_LOWERING_MARK = "every repair target";
+
+export const EffortPathRuleSchema = z
+  .object({
+    id: z.string().min(1),
+    prefixes: z.array(z.string().min(1)).min(1),
+    level: EffortLevelSchema,
+  })
+  .strict();
+
+export const EffortPolicySchema = z
+  .object({
+    policy: z.literal("effort"),
+    description: z.string().min(1),
+    levels: z.array(EffortLevelSchema).min(1),
+    stages: z
+      .object({
+        planner: EffortLevelSchema,
+        developer: EffortLevelSchema,
+        qa: EffortLevelSchema,
+      })
+      .strict(),
+    paths: z.array(EffortPathRuleSchema),
+    retry: z.literal("one-up"),
+  })
+  .strict()
+  .superRefine((policy, ctx) => {
+    if (!policy.description.includes(EFFORT_LOWERING_MARK)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["description"],
+        message: `description must state the lowering rule (include "${EFFORT_LOWERING_MARK}")`,
+      });
+    }
+    const seen = new Set<string>();
+    for (const level of policy.levels) {
+      if (seen.has(level)) {
+        ctx.addIssue({ code: "custom", path: ["levels"], message: `duplicate ladder level ${level}` });
+      }
+      seen.add(level);
+    }
+    const ids = new Set<string>();
+    for (const rule of policy.paths) {
+      if (ids.has(rule.id)) {
+        ctx.addIssue({ code: "custom", path: ["paths"], message: `duplicate path rule id ${rule.id}` });
+      }
+      ids.add(rule.id);
+      if (!seen.has(rule.level)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["paths"],
+          message: `path rule ${rule.id} level ${rule.level} is not on the levels ladder`,
+        });
+      }
+    }
+    for (const stage of EFFORT_STAGES) {
+      if (!seen.has(policy.stages[stage])) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["stages", stage],
+          message: `stage ${stage} level ${policy.stages[stage]} is not on the levels ladder`,
+        });
+      }
+    }
+  });
+
+export type EffortPolicy = z.infer<typeof EffortPolicySchema>;
+
+export interface EffortChoice {
+  level: EffortLevel;
+  stage: EffortStage;
+  /** The path rule that supplied the winning contribution, or null when the stage base won. */
+  path_rule: string | null;
+  /** True when a retry moved the level one step up. A level already at the top stays put. */
+  retry_bumped: boolean;
+}
+
 export type PlanGatePolicy = z.infer<typeof PlanGatePolicySchema>;
 export type QaScorePolicy = z.infer<typeof QaScorePolicySchema>;
 export type DoneGatePolicy = z.infer<typeof DoneGatePolicySchema>;
@@ -279,8 +374,26 @@ export function loadQaScorePolicy(dir: string = policiesDir()): QaScorePolicy {
   return r.data;
 }
 
+/** The effort policy is loaded on its own, like the QA-score policy. A missing file refuses; there is no built-in table. */
+export function loadEffortPolicy(dir: string = policiesDir()): EffortPolicy {
+  const path = join(dir, EFFORT_POLICY_FILE);
+  if (!existsSync(path)) throw new PolicyUnreadable(`policy file missing: ${path}`);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(path, "utf-8"));
+  } catch (err) {
+    throw new PolicyUnreadable(`policy file ${path} is not valid JSON: ${(err as Error).message}`);
+  }
+  const r = EffortPolicySchema.safeParse(parsed);
+  if (!r.success) {
+    const problems = r.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`);
+    throw new PolicyUnreadable(`policy file ${path} does not match the policy schema: ${problems.join("; ")}`);
+  }
+  return r.data;
+}
+
 /** The derived JSON Schema files, one per policy. `D-021`'s shape. */
-export function policyJsonSchemas(): Record<"plan" | "done" | "merge" | "qa", Record<string, unknown>> {
+export function policyJsonSchemas(): Record<"plan" | "done" | "merge" | "qa" | "effort", Record<string, unknown>> {
   return {
     qa: {
       ...(z.toJSONSchema(QaScorePolicySchema, { io: "input" }) as Record<string, unknown>),
@@ -329,12 +442,92 @@ export function policyJsonSchemas(): Record<"plan" | "done" | "merge" | "qa", Re
         "A required gate with no record is undefined, never would-merge. " +
         "PROVENANCE: the fail-closed flags are the candidate C criteria, not a calibration.",
     },
+    effort: {
+      ...(z.toJSONSchema(EffortPolicySchema, { io: "input" }) as Record<string, unknown>),
+      title: "Effort policy",
+      description:
+        "Maps what the runtime already knows (stage, plan repair_targets, retry) to a claude --effort level. " +
+        "Values are data and may be edited; the SHAPE is derived from open-brain/src/harness/policies.ts " +
+        "and this file must not be edited by hand. " +
+        "LOWERING: a path rule may set a level below the stage base only when every repair target matches a path rule. " +
+        "Each repair target contributes its matched rule's level, or the stage base when nothing matches it. " +
+        "Effort is the maximum of those contributions. An empty target list keeps the stage base. " +
+        "A retry steps one level up the levels list and stops at the top. " +
+        "LIMIT: this chooses a launch flag. It does not judge the work. No Jev. " +
+        "PROVENANCE: the shipped levels are a starting position (T-173), not a calibration.",
+    },
   };
 }
 
 /* ------------------------------------------------------------------------- *
  * Applying a policy
  * ------------------------------------------------------------------------- */
+
+/** A repair target matches a prefix on a path boundary, after slash normalisation. */
+export function effortPathMatches(target: string, prefix: string): boolean {
+  const t = target.replace(/\\/g, "/");
+  const p = prefix.replace(/\\/g, "/");
+  if (t === p) return true;
+  const boundary = p.endsWith("/") ? p : `${p}/`;
+  return t.startsWith(boundary);
+}
+
+function ladderIndex(levels: readonly string[], level: string): number {
+  const i = levels.indexOf(level);
+  if (i < 0) throw new Error(`effort level ${level} is not on the policy ladder (${levels.join(", ")})`);
+  return i;
+}
+
+/**
+ * One launch's effort.
+ *
+ * Each repair target contributes the highest matching path rule, or the stage
+ * base when no rule matches that target. The result is the max of those
+ * contributions. An empty list is the stage base alone, so a doc beside an
+ * unmatched source file stays at the base (ruling 1). A retry then steps one
+ * level up and stops at the top of the ladder.
+ */
+export function chooseEffort(input: {
+  policy: EffortPolicy;
+  stage: EffortStage;
+  repairTargets: readonly string[];
+  attempt: number;
+}): EffortChoice {
+  if (!Number.isInteger(input.attempt) || input.attempt < 1) {
+    throw new Error(`effort attempt must be a positive integer, got ${input.attempt}`);
+  }
+  const { policy, stage } = input;
+  const stageBase = policy.stages[stage];
+  const contributions: { level: EffortLevel; rule: string | null }[] =
+    input.repairTargets.length === 0
+      ? [{ level: stageBase, rule: null }]
+      : input.repairTargets.map((target) => {
+          let best: { level: EffortLevel; rule: string } | null = null;
+          for (const rule of policy.paths) {
+            if (!rule.prefixes.some((prefix) => effortPathMatches(target, prefix))) continue;
+            if (best === null || ladderIndex(policy.levels, rule.level) > ladderIndex(policy.levels, best.level)) {
+              best = { level: rule.level, rule: rule.id };
+            }
+          }
+          return best ?? { level: stageBase, rule: null };
+        });
+  let winning = contributions[0]!;
+  for (const contribution of contributions) {
+    if (ladderIndex(policy.levels, contribution.level) > ladderIndex(policy.levels, winning.level)) {
+      winning = contribution;
+    }
+  }
+  let level = winning.level;
+  let retryBumped = false;
+  if (input.attempt > 1) {
+    const at = ladderIndex(policy.levels, level);
+    if (at < policy.levels.length - 1) {
+      level = policy.levels[at + 1]!;
+      retryBumped = true;
+    }
+  }
+  return { level, stage, path_rule: winning.rule, retry_bumped: retryBumped };
+}
 
 export type GateVerdict = "proceed" | "reject" | "halt";
 

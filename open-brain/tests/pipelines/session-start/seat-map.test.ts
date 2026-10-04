@@ -38,7 +38,12 @@ describe("T-203 S-1: the map resolves a checkout to seat, role, agent and hub na
     ["sia-forge", "forge", "developer", "Forge", "forge"],
   ])("%s is seat %s / %s / %s with hub name %s", (name, seat, role, agent, hubName) => {
     const r = resolveCheckoutSeat(checkout(name));
-    expect(r).toEqual({ kind: "seat", checkout: name, seat, role, agent, hubName });
+    expect(r).toMatchObject({ kind: "seat", checkout: name, seat, role, agent, hubName });
+    if (r.kind === "seat") {
+      expect(r.runtime).toBeTruthy();
+      expect(r.host).toBeTruthy();
+      expect(r.model).toBeTruthy();
+    }
   });
 
   it.each([
@@ -59,6 +64,17 @@ describe("T-203 S-1: the map resolves a checkout to seat, role, agent and hub na
   it("a basename that is not listed is unknown, whatever its AGENT.local.md says", () => {
     const r = resolveCheckoutSeat(checkout("sia-scratch", { name: "Atlas", role: "planner" }));
     expect(r).toEqual({ kind: "unknown", checkout: "sia-scratch" });
+  });
+
+  it("T-240 a seat row with no runtime is unreadable", () => {
+    const root = checkout("sia-infra", null);
+    const path = join(root, ".agents", "SYSTEM", "hub-partner-seats.json");
+    const map = JSON.parse(readFileSync(path, "utf8"));
+    delete map.seats.infra.runtime;
+    writeFileSync(path, JSON.stringify(map));
+    const r = resolveCheckoutSeat(root);
+    expect(r.kind).toBe("unreadable");
+    expect(r).toMatchObject({ reason: /runtime must be cursor or claude-code/ });
   });
 
   it("no seat file at all is reported as no map, not as unknown", () => {
@@ -118,7 +134,7 @@ describe("T-203 S-4: /sync flags an AGENT.local.md that disagrees with the map f
 describe("T-213: the tracked map carries the rooms clark created (atlas, <hub_name>, <hub_name>-waker) and forge speaks as forge", () => {
   // Read straight from the tracked file: these are the values every seat's presence and hub-talk read.
   const map = JSON.parse(readFileSync(SEAT_FILE, "utf8")) as {
-    seats: Record<string, { checkout: string; hub_name?: string; room?: string }>;
+    seats: Record<string, { checkout: string; hub_name?: string; room?: string; dispatch?: { cursor?: { room?: string } } }>;
     readers: Record<string, { partners: { label: string; hub_as: string; session_id: string }[] }>;
   };
   const ROOMS = {
@@ -127,8 +143,12 @@ describe("T-213: the tracked map carries the rooms clark created (atlas, <hub_na
     forge: { checkout: "sia-forge", hub_name: "forge", room: "k571z4ghp7nbp34djhecwnsk3n8fmhsf" },
   } as const;
 
-  it.each(Object.entries(ROOMS))("seat %s: checkout, hub_name and room", (seat, want) => {
-    expect(map.seats[seat]).toMatchObject(want);
+  it.each(Object.entries(ROOMS))("seat %s: checkout, hub_name and dispatch.cursor.room, with no top-level room", (seat, want) => {
+    const row = map.seats[seat]!;
+    expect(row.checkout).toBe(want.checkout);
+    expect(row.hub_name).toBe(want.hub_name);
+    expect(row.dispatch?.cursor?.room).toBe(want.room);
+    expect(row.room).toBeUndefined();
   });
 
   it.each(Object.entries(ROOMS))("seat %s: the atlas↔seat reader pair, both directions, on the seat's room", (_seat, want) => {
