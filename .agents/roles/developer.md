@@ -81,6 +81,25 @@ The `module-boundary` check is the reference implementation of the rest: refuses
 specifier rather than reporting a clean graph; defaults unlisted files to the strict side; asserts
 the count of what it walked; states its own limits in its output. See *Instruments* in `shared.md`.
 
+## Machine lease on shared QA machines (T-204, D-119, G-054)
+
+On the QA PC and laptop, **HEAVY** runs (full vitest suite, build, or expected over ~2 minutes / ~1.5 GB) take the
+profile copy of `machine-lease.ps1` before the run and `release` after. **LIGHT** runs (one vitest file, `tsc`,
+`typecheck:tests`) need no lease but stay one file at a time.
+
+Always invoke with **`-File`**, never `powershell -Command "& ..."`, when exit codes matter — `-Command` does not
+preserve script codes (non-owner `release` is **12** under `-File`, **1** under `-Command`; see
+`docs/loops/g054-finding.md`). Example:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" take -OwnerPid $owner -Seat <seat> -TtlMinutes 90
+```
+
+**`-OwnerPid`** on Cursor seats is the nearest ancestor whose command line contains `cursor-agent` (D-118a); the same
+pid for `take`, `status`, and `release`. Exit **10** = held (wait and report owner); **11** = malformed lease; **12** =
+not yours on `release`/`renew` (report, do not retry with another pid); **2** = usage (including `take` with a dead pid).
+Read `$LASTEXITCODE` in the same PowerShell session.
+
 ## Scope and outputs
 
 Implementation, hooks, scripts, DB migrations, builds, tests.

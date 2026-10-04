@@ -33,6 +33,25 @@ prompt copied out with `git show <sha>:<prompt> > C:\qa-tmp\<prompt>`.
   run and REFUSES to start without the helper copy. **The QA PC takes QA whenever `machine-lease.ps1 status` says
   free.** The lease is per user; `status` prints that limit. Design and rows: `docs/loops/t204-plan.md`.
 
+### Calling `machine-lease.ps1` (G-054, D-119)
+
+Seats and launchers must invoke the **profile copy** with **`-File`**, never `powershell -Command "& ..."`**, when
+the exit code matters (`take`, `release`, `renew`, `status`). `-Command` collapses script exit codes (for example
+non-owner `release` is **12** under `-File` but reports **1** under `-Command`; see `docs/loops/g054-finding.md`).
+Read **`$LASTEXITCODE` in the same PowerShell session** after each call.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" take -OwnerPid $owner -Seat <seat> -TtlMinutes 90
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" release -OwnerPid $owner
+```
+
+**`-OwnerPid` must be a live process** the helper can read (D-119: the nearest `cursor-agent` ancestor on Cursor seats).
+`take` with a dead or unreadable pid **refuses with exit 2** and does not create a lease.
+
+After merge, **re-copy by hand** on the QA PC and laptop (this doc does not run the copy for you):
+
+`git show <merge-sha>:docs/loops/machine-lease.ps1 > %USERPROFILE%\machine-lease.ps1`
+
 ## What is already on each machine
 
 - `machine-lease.ps1` and `qa-queue.ps1` sit in each QA machine's user folder (both are copied, the queue refuses without the first).

@@ -42,4 +42,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-le
 
 After each call, read **`$LASTEXITCODE`** in the **same** PowerShell session (exit **12** = not yours; do not retry with a different pid per D-118a).
 
-Update **qa-launch.md** and planner **D-119 dispatch** text to state this explicitly when those files are next edited for lease work; this finding does not change `machine-lease.ps1`.
+**Tracked updates (G-054, `loop/g054-lease-callers`):** `docs/loops/qa-launch.md` (this section), `docs/loops/t204-plan.md`
+item 8, `.agents/roles/developer.md`, `.cursor/rules/machine-lease.mdc`. Planner D-119 dispatch text in
+`.agents/state.json` already uses `-File`. This finding does not change `machine-lease.ps1`; `take` already refuses a
+non-live `-OwnerPid` with exit **2** (no harness row added — behaviour present at T-204).
