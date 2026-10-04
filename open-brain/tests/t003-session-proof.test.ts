@@ -345,8 +345,19 @@ describe("T-003 hooks: SessionStart writes the proof, SessionEnd removes its own
   it("no CLAUDE_PID, a Cursor payload, a subagent, or no payload id: NO proof is written, and the first two say why", () => {
     const noPid = hook(BOOT, { session_id: SELF, cwd }, undefined);
     expect(noPid.stdout).toContain("Session proof NOT written: CLAUDE_PID is unset");
-    const cursor = hook(BOOT, { session_id: SELF, cwd, cursor_version: "1.2.3" }, String(CLAUDE));
-    expect(cursor.stdout).toContain("Session proof NOT written: this host is not Claude Code");
+    const cursorInClaudeShell = hook(
+      BOOT,
+      { session_id: SELF, cwd, cursor_version: "2026.10.01-e373342", workspace_roots: [cwd] },
+      String(CLAUDE),
+    );
+    expect(cursorInClaudeShell.stdout).not.toContain(`for claude process ${CLAUDE}`);
+    if (cursorInClaudeShell.stdout.includes("Session proof written:")) {
+      expect(cursorInClaudeShell.stdout).toContain("cursor-agent host process");
+      expect(existsSync(proofFile(CLAUDE))).toBe(false);
+    } else {
+      expect(cursorInClaudeShell.stdout).toContain("no cursor-agent host process found");
+      expect(existsSync(proofFile())).toBe(false);
+    }
     const sub = hook(BOOT, { session_id: SELF, cwd, agent_id: "a1" }, String(CLAUDE));
     expect(sub.status).toBe(0);
     const none = hook(BOOT, { cwd }, String(CLAUDE));

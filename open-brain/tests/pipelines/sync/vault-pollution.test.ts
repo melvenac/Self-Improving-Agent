@@ -80,4 +80,44 @@ describe("checkVaultPollution — T-042", () => {
     put(v, "ob-server-folder/readme.md");
     expect(checkVaultPollution("/unused", v).severity).toBe("pass");
   });
+
+  // G-052 / QA 257: no vaultDir arg — default obsidianVaultDir() under an injected home.
+  it("VP-6: resolves the default vault under home when vaultDir is omitted", () => {
+    const home = mkdtempSync(join(tmpdir(), "t042-g052-home-"));
+    made.push(home);
+    const defaultVault = join(home, "Obsidian Vault v2");
+    mkdirSync(defaultVault, { recursive: true });
+    put(defaultVault, "Summaries/2026-08-31-ob-server-default.md");
+    const saved = {
+      HOME: process.env.HOME,
+      USERPROFILE: process.env.USERPROFILE,
+      OPEN_BRAIN_VAULT_DIR: process.env.OPEN_BRAIN_VAULT_DIR,
+      VITEST: process.env.VITEST,
+      VITEST_WORKER_ID: process.env.VITEST_WORKER_ID,
+    };
+    process.env.HOME = home;
+    process.env.USERPROFILE = home;
+    delete process.env.OPEN_BRAIN_VAULT_DIR;
+    // obsidianVaultDir()'s real-vault guard compares default resolution to homedir(); with an
+    // injected home those paths match and the guard fires. Lift it for this row only.
+    delete process.env.VITEST;
+    delete process.env.VITEST_WORKER_ID;
+    try {
+      const r = checkVaultPollution("/unused");
+      expect(r.severity).toBe("warn");
+      expect(r.message).toContain("1 ob-server-* file(s) in the vault");
+      expect(r.message).toContain("Summaries/2026-08-31-ob-server-default.md");
+    } finally {
+      if (saved.HOME === undefined) delete process.env.HOME;
+      else process.env.HOME = saved.HOME;
+      if (saved.USERPROFILE === undefined) delete process.env.USERPROFILE;
+      else process.env.USERPROFILE = saved.USERPROFILE;
+      if (saved.OPEN_BRAIN_VAULT_DIR === undefined) delete process.env.OPEN_BRAIN_VAULT_DIR;
+      else process.env.OPEN_BRAIN_VAULT_DIR = saved.OPEN_BRAIN_VAULT_DIR;
+      if (saved.VITEST === undefined) delete process.env.VITEST;
+      else process.env.VITEST = saved.VITEST;
+      if (saved.VITEST_WORKER_ID === undefined) delete process.env.VITEST_WORKER_ID;
+      else process.env.VITEST_WORKER_ID = saved.VITEST_WORKER_ID;
+    }
+  });
 });

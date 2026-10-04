@@ -1,0 +1,19 @@
+---
+description: How to call machine-lease.ps1 on shared QA machines (T-204, G-054).
+alwaysApply: true
+---
+
+# Machine lease
+
+On the QA PC and laptop, **HEAVY** runs take `%USERPROFILE%\machine-lease.ps1` before the run and `release` after.
+**LIGHT** (one vitest file, `tsc`, `typecheck:tests`) needs no lease.
+
+Always use **`-File`**, never `powershell -Command "& ..."`, when interpreting exit codes — `-Command` loses script exit
+codes (non-owner `release` is **12** under `-File`, **1** under `-Command`). Read `$LASTEXITCODE` in the same session.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" take -OwnerPid $owner -Seat <seat> -TtlMinutes 90
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-lease.ps1" release -OwnerPid $owner
+```
+
+`$owner` (same pid for take and release): **Cursor** (#427 r2) = nearest ancestor (parent first, never this shell) that is `node.exe` running `cursor-agent` `versions/<ver>/index.js` (`docs/loops/t235-p2-3-r2-measure.md`). **Claude Code** = that `claude.exe` session's pid. `take` with a dead pid exits **2**.

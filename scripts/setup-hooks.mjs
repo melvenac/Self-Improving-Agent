@@ -12,8 +12,10 @@
  * after that check would never have reached any machine set up before it — each
  * event is now checked on its own.
  */
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 export const SESSION_HOOKS = [
   ['SessionStart', 'cli-bootstrap.js'],
@@ -132,6 +134,33 @@ export function withCursorSessionHook(config, bootstrapPath, nodePath) {
 }
 
 /**
+ * T-235 P2-5: register cli-recall-trigger on Cursor postToolUse (absolute Node path).
+ *
+ * @returns {{ config: object, changed: boolean, notes: string[] }}
+ */
+export function withCursorRecallHook(config, triggerPath, nodePath) {
+  const before = JSON.stringify(config ?? { version: 1, hooks: {} });
+  const c = JSON.parse(before);
+  if (!c.hooks) c.hooks = {};
+  if (!Array.isArray(c.hooks.postToolUse)) c.hooks.postToolUse = [];
+  const command = `"${fwd(nodePath)}" "${fwd(triggerPath)}"`;
+  const notes = [];
+
+  const stale = c.hooks.postToolUse.filter((e) => e.command?.includes("cli-recall-trigger") && e.command !== command);
+  if (stale.length > 0) {
+    c.hooks.postToolUse = c.hooks.postToolUse.filter((e) => !stale.includes(e));
+    notes.push(`Upgraded ${stale.length} stale Cursor postToolUse recall hook entry(ies)`);
+  }
+  if (!c.hooks.postToolUse.some((e) => e.command === command)) {
+    c.hooks.postToolUse.push({ command });
+    notes.push("Cursor postToolUse recall hook registered in ~/.cursor/hooks.json");
+  } else {
+    notes.push("Cursor postToolUse recall hook already configured");
+  }
+  return { config: c, changed: JSON.stringify(c) !== before, notes };
+}
+
+/**
  * The repo root for a script at `<root>/scripts/<file>`, from its import.meta.url.
  * T-235 Phase 0: a URL's pathname keeps percent-encoding, so a home directory with a
  * space (the QA PC's "Aaron Melven") became "Aaron%20Melven", open-brain/ was "not
@@ -139,4 +168,45 @@ export function withCursorSessionHook(config, bootstrapPath, nodePath) {
  */
 export function repoRootFrom(metaUrl) {
   return path.resolve(path.dirname(fileURLToPath(metaUrl)), '..');
+}
+
+function fileHash(filePath) {
+  return createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+}
+
+function filesIdentical(a, b) {
+  if (!fs.existsSync(a) || !fs.existsSync(b)) return false;
+  return fileHash(a) === fileHash(b);
+}
+
+/**
+ * Copy every `.md` from `project-template/.cursor/commands/` into `~/.cursor/commands/`.
+ * A destination that already exists and differs from the template is moved aside first
+ * (`<name>.md.user-<UTC timestamp>`), never silently overwritten. Identical files are a no-op.
+ */
+export function copyCursorSlashCommands(repoRoot, cursorDir) {
+  const repoCommandsDir = path.join(repoRoot, 'project-template', '.cursor', 'commands');
+  const destDir = path.join(cursorDir, 'commands');
+  if (!fs.existsSync(repoCommandsDir)) {
+    return { copied: 0, missingTemplate: true, movedAside: [] };
+  }
+  fs.mkdirSync(destDir, { recursive: true });
+  let copied = 0;
+  const movedAside = [];
+  const utcStamp = () => new Date().toISOString().replace(/:/g, '');
+  for (const file of fs.readdirSync(repoCommandsDir)) {
+    if (!file.endsWith('.md')) continue;
+    const src = path.join(repoCommandsDir, file);
+    const dest = path.join(destDir, file);
+    if (filesIdentical(src, dest)) continue;
+    if (fs.existsSync(dest)) {
+      const aside = path.join(destDir, `${file}.user-${utcStamp()}`);
+      fs.renameSync(dest, aside);
+      movedAside.push({ from: dest, to: aside });
+    }
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(src, dest);
+    copied += 1;
+  }
+  return { copied, missingTemplate: false, movedAside };
 }
