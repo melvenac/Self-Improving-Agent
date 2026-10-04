@@ -7,6 +7,7 @@ import { checkGreetingSize, composeGreeting, GREETING_LIMIT } from "../../../src
 import { runSync } from "../../../src/pipelines/sync/index.js";
 import { readRepoRecord } from "../../helpers/repo-record.js";
 import type { State } from "../../../src/shared/state-schema.js";
+import { formatPartnerLine, presenceBlockUpperBound, type HubPartnerSeat } from "../../../src/pipelines/session-start/hub-presence.js";
 
 /**
  * T-183, row T183-4: the `greeting-size` detector, validated against a known
@@ -223,11 +224,38 @@ describe("greeting-size — T-198 presence bound", () => {
     const withBlock = composeGreeting(seatFixture("with", "sia-planner", true), "0.0.0")!;
     const without = composeGreeting(seatFixture("none", "sia-planner", false), "0.0.0")!;
     expect(without.parts.presence).toBe(0);
+    // QA 268 F1 (T-237): the longest form is the no-recorded-poll one, not "since 99d".
     for (const label of ["grok", "cursor-infra", "cursor-builder"]) {
-      expect(withBlock.text).toContain(`  ${label}: listener not polling, 999 unread since 99d`);
+      expect(withBlock.text).toContain(`  ${label}: listener not polling, 999 unread, no listener poll recorded`);
     }
     expect(withBlock.parts.presence).toBeGreaterThan(150);
     expect(withBlock.text.length - without.text.length).toBeGreaterThanOrEqual(withBlock.parts.presence);
+  });
+
+  /**
+   * QA 268 F1, the CLASS: a bound is only a bound if no form the line can take is longer. Every room shape that
+   * formatPartnerLine renders is built HERE, independently of the bound, at the bound's own unread count; adding a
+   * longer form to the formatter without the bound following it fails this row.
+   */
+  it("no presence line form is longer than the bound's line for that partner", () => {
+    const root = seatFixture("forms", "sia-planner", true);
+    const bound = presenceBlockUpperBound(root).lines.slice(1);
+    const map = JSON.parse(readFileSync(join(REPO_ROOT, ".agents", "SYSTEM", "hub-partner-seats.json"), "utf8"));
+    const partners: HubPartnerSeat[] = map.readers.atlas.partners;
+    expect(bound).toHaveLength(partners.length);
+    const ages = [undefined, null, -1, 0, 59_000, 3_599_000, 86_399_000, 99 * 86_400_000];
+    partners.forEach((p, n) => {
+      const forms: string[] = [formatPartnerLine(p, null), formatPartnerLine(p, []), formatPartnerLine(p, [{ name: p.hub_as, rooms: [] }])];
+      for (const pollingNow of [true, false]) {
+        for (const unread of [0, 999]) {
+          for (const pollAgeMs of ages) {
+            forms.push(formatPartnerLine(p, [{ name: p.hub_as, rooms: [{ sessionId: p.session_id, unread, pollingNow, pollAgeMs }] }]));
+          }
+        }
+      }
+      const longest = forms.reduce((a, b) => (b.length > a.length ? b : a));
+      expect(bound[n]!.length, `bound "${bound[n]}" vs longest form "  ${longest}"`).toBeGreaterThanOrEqual(`  ${longest}`.length);
+    });
   });
 
   it("counts 0 for a seat checkout with no readers row (sia-qa), and for an unlisted checkout", () => {

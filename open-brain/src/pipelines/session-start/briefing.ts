@@ -45,6 +45,13 @@ export interface BriefingInput {
    * (focus.ts) from the record and the roster ob_start already fetched. Absent: the budgeted layout of slice 2, unchanged.
    */
   focus?: { focus: string | null; seats: string | null };
+  /**
+   * T-199, OPT-IN per repo (greeting.json `missing_handoff`), default OFF. The one-line notice that this checkout's last session
+   * wrote the record and left no handoff, or that the check could not run. Null or absent prints nothing, so every other render is
+   * byte-identical. The legacy layout prints it as its own line after the pick-up; the budgeted layout has no spare line (it is
+   * exactly at its cap), so it is APPENDED to the pick-up line, which is never cut after the append.
+   */
+  missingHandoff?: string | null;
 }
 
 const NEXT_SHOWN = 3;
@@ -83,6 +90,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : own.pick_up.trim());
   else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
   else out.push(`none recorded for this seat (${i.seat})`);
+  if (i.missingHandoff) out.push(i.missingHandoff);
 
   if (own && own.watch_out.length > 0) {
     out.push("", "WATCH OUT");
@@ -175,9 +183,10 @@ function renderBudgeted(i: BriefingInput): string[] {
   if (seats !== null) out.push(seats);
   const own = i.seat ? newestHandoffForSeat(s.handoffs, i.seat) : null;
   out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
-  if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars));
-  else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
-  else out.push(`none recorded for this seat (${i.seat})`);
+  const pickUp = own
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars)
+    : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : `none recorded for this seat (${i.seat})`;
+  out.push(i.missingHandoff ? `${pickUp} · ${i.missingHandoff}` : pickUp);
 
   if (own) {
     const live = own.watch_out.filter((w) => !isExpired(w, i.sessionNumber, i.date));
