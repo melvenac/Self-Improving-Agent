@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 332 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 333 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -39,6 +39,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-187** /sync rebuilds the GitNexus index when it is behind (D-049): plain /sync runs analyze where a .gitnexus exists and the indexed SHA is not HEAD, then verifies the new SHA; sync --check stays read-only; a tree with no index stays SKIP (never PASS)
 - [ ] **T-202** The planner learns when a seat comes online: each seat worktree's SessionStart reports seat, checkout SHA, record rev and runtime (Claude Code or Cursor CLI) to the planner seat, deterministically
 - [ ] **T-235** Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps
+- [ ] **T-240** Seat runtime in the record: the seat map names each seat's runtime (cursor | claude-code), host, model and dispatch for BOTH runtimes; ob_start's SEATS line prints runtime/model, host and live state; switching runtime is one map edit plus a waker stop/start
 
 ## P2
 
