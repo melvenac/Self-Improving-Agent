@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 329,
+  "revision": 330,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4207,6 +4207,12 @@
       "title": "D-118a: a waker-run (Cursor) seat's machine-lease owner is its current cursor-agent run, not its shell",
       "date": "2026-10-04",
       "note": "Planner ruling, session 160, on clark's report that rivet's lease went stale at once (each Cursor tool call gets a fresh shell, so -OwnerPid = shell pid read 'stale: pid_gone' and release from the next shell returned not-yours). RULE: -OwnerPid = the nearest ancestor of the shell whose CommandLine contains 'cursor-agent', found by walking Win32_Process ParentProcessId. If none is found, fail closed: no lease and no HEAVY run, and report it. take, status, renew and release all pass the SAME -OwnerPid; exit 12 on release means report it and never retry with another pid. PR bodies for HEAVY runs list the owner pid and the take/status/release exit codes. Posted to all three SIA Cursor rooms; each seat acknowledged with a non-zero owner (builder 13852, forge 9976, infra 12248 on their first wakes). Relay applies the same rule to rivet."
+    },
+    {
+      "id": "D-120",
+      "title": "Waker seats work only while answering a turn: every dispatch says 'keep working until FROZEN or BLOCKED', and a message without a TASK: line is information",
+      "date": "2026-10-04",
+      "note": "Planner rule, session 160, from clark's report (01:22 CDT) that all three SIA Cursor seats sat idle mid-task: a waker run ends when the seat replies or Composer stops, and an info-only turn can end it ('noted, no work now'; chisel stopped mid-t013 with 24 uncommitted files). RULE for every brief: keep working until the task is FROZEN (PR open, CI green, reported) or BLOCKED (reported with the blocker); a planner message without a 'TASK:' line is information to note while continuing; every work reply ends with 'TASK: <id> <state>'. When a seat goes idle with its task unfinished, the planner posts 'TASK: CONTINUE <id>'. Posted session 160 as turns 15 (cursor-builder, P2-3), 10 (forge, P2-4) and 11 (cursor-infra, the #421 fix and then P2-6). Also session 160: QA 272 merged #415 (7285c62e) and #420 (2eebaa6f) on Aaron's 'Merge both'; it REJECTED #421 (the gc.auto value is trimmed before matching) and passed #418's retro-check."
     }
   ],
   "handoffs": [
