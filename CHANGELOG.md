@@ -19,6 +19,9 @@
 
 ### Fixed
 
+- **One hub room with `pollAgeMs: null` turned ALL partner presence into UNKNOWN (T-237).** A2A sends null for
+  "no wait-poll seen in the window", by design. It is now accepted, and a room with unread turns and no recorded poll
+  says `no listener poll recorded` instead of the false `since 0s`. A string, boolean or non-finite value is still malformed.
 - **`setup.mjs` refused to run from a path with a space (T-235 Phase 0).** It took the repo root from a URL pathname,
   which keeps a space as `%20`, so on the QA PC (`C:\Users\Aaron Melven\…`) it reported "Cannot find open-brain/"
   and wrote nothing. The root now comes from `fileURLToPath` (`repoRootFrom` in `scripts/setup-hooks.mjs`).
