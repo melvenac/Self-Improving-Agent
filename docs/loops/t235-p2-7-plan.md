@@ -10,7 +10,7 @@
 - **TTL:** `HOOK_CLAIM_TTL_MS = 120_000` (2 min). Dual hooks fire within seconds; resume/compact with the same `session_id` after two minutes must run in full (R4).
 - **Instrument (no hook stdin):** each claim appends one JSON line to `~/.claude/open-brain/hook-run-metrics.jsonl` and prints `[ob-hook-metric] …` on stderr.
 
-**Stale reclaim window:** when a claim file is older than TTL, the loser path `stat` → `unlink` → `wx` retry is not atomic across processes. Two concurrent hooks can both decide the file is stale, both unlink, and both succeed at `wx` on retry — so both run full. That window is narrow (only after TTL, only when two ends fire together) and is separate from the dual-registration race (milliseconds, no TTL) that wx fixes on the hot path.
+**Stale reclaim:** when a claim file is older than TTL, reclaim is `renameSync(claim, claim + ".stale." + pid)` then `wx`. One process wins the rename. A loser that gets `ENOENT` returns duplicate and does not throw. Claims and `.stale.*` sidecars older than the TTL are deleted on a later claim, at most 32 files per call, skipping the path being claimed so cleanup cannot reopen the race.
 
 ## Live counts (QA PC)
 

@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
@@ -51,30 +51,102 @@ describe("session-hook-claim (T-235 P2-7)", () => {
     expect(tryClaimHookRun(home, "sessionStart", id, HOOK_CLAIM_TTL_MS)).toBe("claimed");
   });
 
-  it("race: two concurrent sessionStart claims — exactly one wins", async () => {
-    const id = "race-session-1";
-    const claimMod = pathToFileURL(join(__dirname, "../../src/shared/session-hook-claim.ts")).href;
-    const scriptPath = join(home, "race.mjs");
-    writeFileSync(
-      scriptPath,
-      `import { tryClaimHookRun } from "${claimMod}";
-const r = tryClaimHookRun(process.env.HOME, "sessionStart", ${JSON.stringify(id)});
-console.log(r);`,
-    );
-    const env = { ...process.env, HOME: home, USERPROFILE: home };
-    const { createRequire } = await import("node:module");
-    const tsxCli = createRequire(import.meta.url).resolve("tsx/cli");
-    const runOne = () => spawnAsync(process.execPath, [tsxCli, scriptPath], { env });
-    const [r1, r2] = await Promise.all([runOne(), runOne()]);
-    if (r1.status !== 0) throw new Error(r1.stderr || "race child 1 failed");
-    if (r2.status !== 0) throw new Error(r2.stderr || "race child 2 failed");
-    const outcomes = [r1.stdout.trim(), r2.stdout.trim()].sort();
-    expect(outcomes).toEqual(["claimed", "duplicate"]);
+  it("expired claims other than the one being claimed are removed, at most 32 per call", () => {
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 5_000) / 1000;
+    const old = join(dir, "sessionStart-old-other.claim");
+    const aside = join(dir, "sessionEnd-old-other.claim.stale.1");
+    const fresh = join(dir, "sessionStart-fresh-other.claim");
+    writeFileSync(old, "old\n");
+    writeFileSync(aside, "aside\n");
+    writeFileSync(fresh, "fresh\n");
+    utimesSync(old, stale, stale);
+    utimesSync(aside, stale, stale);
+    expect(tryClaimHookRun(home, "sessionStart", "keeper")).toBe("claimed");
+    const names = readdirSync(dir);
+    expect(names).not.toContain("sessionStart-old-other.claim");
+    expect(names).not.toContain("sessionEnd-old-other.claim.stale.1");
+    expect(names).toContain("sessionStart-fresh-other.claim");
+    expect(names).toContain("sessionStart-keeper.claim");
   });
 
   it("sessionEnd: duplicate claim is rejected like sessionStart", () => {
     const id = "end-1";
     expect(tryClaimHookRun(home, "sessionEnd", id)).toBe("claimed");
     expect(tryClaimHookRun(home, "sessionEnd", id)).toBe("duplicate");
+  });
+});
+
+describe("session-hook-claim barrier on the built module", { timeout: 180_000 }, () => {
+  const built = join(__dirname, "../../build/shared/session-hook-claim.js");
+  const obRoot = join(__dirname, "../..");
+
+  beforeAll(async () => {
+    const tsc = join(obRoot, "node_modules/typescript/lib/tsc.js");
+    const r = await spawnAsync(process.execPath, [tsc, "-p", join(obRoot, "tsconfig.json")], { cwd: obRoot });
+    if (r.status !== 0) throw new Error(r.stderr || r.stdout || "tsc failed");
+    if (!existsSync(built)) throw new Error(`built module missing: ${built}`);
+  }, 120_000);
+
+  async function trials(stale: boolean, n: number): Promise<{ exact: number; doubles: number; throws: number; sample: string }> {
+    let exact = 0;
+    let doubles = 0;
+    let throws = 0;
+    let sample = "";
+    for (let i = 0; i < n; i++) {
+      const trialHome = mkdtempSync(join(tmpdir(), "ob-claim-race-"));
+      try {
+        const id = `race-${i}`;
+        if (stale) {
+          const dir = join(trialHome, ".claude", "open-brain", "hook-claims");
+          mkdirSync(dir, { recursive: true });
+          const claim = join(dir, `sessionStart-${id}.claim`);
+          writeFileSync(claim, "old\n");
+          const old = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
+          utimesSync(claim, old, old);
+        }
+        const start = Date.now() + 400;
+        const scriptPath = join(trialHome, "race.mjs");
+        const mod = pathToFileURL(built).href;
+        writeFileSync(
+          scriptPath,
+          `const start = ${start};
+while (Date.now() < start) {}
+const { tryClaimHookRun } = await import(${JSON.stringify(mod)});
+process.stdout.write(String(tryClaimHookRun(process.env.HOME, "sessionStart", ${JSON.stringify(id)})));
+`,
+        );
+        const env = { ...process.env, HOME: trialHome, USERPROFILE: trialHome };
+        const runs = await Promise.all([0, 1].map(() => spawnAsync(process.execPath, [scriptPath], { env })));
+        const failed = runs.some((r) => r.status !== 0);
+        if (failed) {
+          throws++;
+          if (!sample) {
+            sample = runs.map((r) => `status=${r.status} out=${JSON.stringify(r.stdout)} err=${JSON.stringify(r.stderr)}`).join("\n");
+          }
+        }
+        const claimed = runs.filter((r) => (r.stdout ?? "").trim() === "claimed").length;
+        if (!failed && claimed === 1) exact++;
+        else if (claimed > 1) doubles++;
+      } finally {
+        rmSync(trialHome, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+      }
+    }
+    return { exact, doubles, throws, sample };
+  }
+
+  it("fresh claims: 2 children spin to one instant, 20 trials, exactly one wins", async () => {
+    const r = await trials(false, 20);
+    expect(r.throws).toBe(0);
+    expect(r.doubles).toBe(0);
+    expect(r.exact).toBe(20);
+  });
+
+  it("stale claims: 2 children, 100 trials, zero double claims and zero throws", async () => {
+    const r = await trials(true, 100);
+    expect(r.throws, r.sample).toBe(0);
+    expect(r.doubles, r.sample).toBe(0);
+    expect(r.exact).toBe(100);
   });
 });

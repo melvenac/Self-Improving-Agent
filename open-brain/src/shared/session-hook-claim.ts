@@ -1,4 +1,4 @@
-import { appendFileSync, existsSync, mkdirSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { detectIde } from "./active-session.js";
 
@@ -36,8 +36,100 @@ function tryCreateClaim(path: string): boolean {
   }
 }
 
+function errno(err: unknown): string | undefined {
+  return (err as NodeJS.ErrnoException).code;
+}
+
 /**
- * Atomic exclusive claim (wx). Stale claims past ttlMs are removed and creation retried once.
+ * Rename. ENOENT means the other process already moved the file.
+ * Windows also returns EPERM while that rename is in progress; retry, then treat it as a loss.
+ * Either way the caller returns duplicate and does not throw.
+ */
+function renameExclusive(from: string, to: string): "ok" | "lost" {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      renameSync(from, to);
+      return "ok";
+    } catch (err) {
+      const code = errno(err);
+      if (code === "ENOENT" || code === "EEXIST") return "lost";
+      if (code === "EPERM" || code === "EBUSY") continue;
+      throw err;
+    }
+  }
+  return "lost";
+}
+
+/**
+ * One process wins rename of a stale claim to claim.stale.<pid>.
+ * A loser that sees ENOENT (or Windows EPERM) returns duplicate and does not throw.
+ */
+function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
+  try {
+    const mtime = statSync(path).mtimeMs;
+    if (Date.now() - mtime <= ttlMs) return "duplicate";
+  } catch (err) {
+    if (errno(err) === "ENOENT") return "duplicate";
+    throw err;
+  }
+  const aside = `${path}.stale.${process.pid}`;
+  if (renameExclusive(path, aside) === "lost") return "duplicate";
+  let ageMs: number;
+  try {
+    ageMs = Date.now() - statSync(aside).mtimeMs;
+  } catch (err) {
+    if (errno(err) === "ENOENT") return "duplicate";
+    throw err;
+  }
+  if (ageMs <= ttlMs) {
+    if (renameExclusive(aside, path) === "lost") {
+      try {
+        unlinkSync(aside);
+      } catch (cleanupErr) {
+        if (errno(cleanupErr) !== "ENOENT" && errno(cleanupErr) !== "EPERM") throw cleanupErr;
+      }
+    }
+    return "duplicate";
+  }
+  try {
+    unlinkSync(aside);
+  } catch (err) {
+    if (errno(err) !== "ENOENT" && errno(err) !== "EPERM") throw err;
+  }
+  return "reclaimed";
+}
+
+/** Drop at most this many expired claim files per call, so a hook never walks an unbounded directory. */
+const SWEEP_CAP = 32;
+
+function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
+  const dir = join(home, ".claude", "open-brain", "hook-claims");
+  let names: string[];
+  try {
+    names = readdirSync(dir);
+  } catch (err) {
+    if (errno(err) === "ENOENT") return;
+    throw err;
+  }
+  const now = Date.now();
+  let removed = 0;
+  for (const name of names) {
+    if (removed >= SWEEP_CAP) break;
+    const p = join(dir, name);
+    if (p === keep) continue;
+    try {
+      if (now - statSync(p).mtimeMs <= ttlMs) continue;
+      unlinkSync(p);
+      removed++;
+    } catch (err) {
+      if (errno(err) !== "ENOENT") throw err;
+    }
+  }
+}
+
+/**
+ * Atomic exclusive claim (wx). A stale claim is reclaimed by rename, then wx.
+ * ENOENT on that rename is a lost race: duplicate, never a throw.
  */
 export function tryClaimHookRun(
   home: string,
@@ -46,14 +138,10 @@ export function tryClaimHookRun(
   ttlMs: number = HOOK_CLAIM_TTL_MS,
 ): HookClaimResult {
   const path = claimPath(home, event, sessionId);
+  sweepExpiredClaims(home, ttlMs, path);
   if (tryCreateClaim(path)) return "claimed";
-  if (!existsSync(path)) return tryCreateClaim(path) ? "claimed" : "duplicate";
-  const mtime = statSync(path).mtimeMs;
-  if (Date.now() - mtime > ttlMs) {
-    unlinkSync(path);
-    return tryCreateClaim(path) ? "claimed" : "duplicate";
-  }
-  return "duplicate";
+  if (reclaimStale(path, ttlMs) === "duplicate") return "duplicate";
+  return tryCreateClaim(path) ? "claimed" : "duplicate";
 }
 
 export type HookMetricLine = {

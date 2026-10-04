@@ -28,6 +28,20 @@ describe("cli-session-end T-235 P2-7 cursor dedupe", { timeout: 30_000 }, () => 
     return r.stdout ?? "";
   }
 
+  it("Claude-shaped SessionEnd without cursor_version is never skipped", async () => {
+    const id = "end-cc-no-gate";
+    const payload = JSON.stringify({ session_id: id });
+    const env: NodeJS.ProcessEnv = { ...process.env, HOME: home, USERPROFILE: home };
+    delete env.OPEN_BRAIN_IDE;
+    const run = () => spawnAsync(process.execPath, [TSX_CLI, script], { input: payload, env });
+    const first = await run();
+    const second = await run();
+    expect(first.stdout ?? "").not.toMatch(/SESSION_END_SKIPPED/);
+    expect(second.stdout ?? "").not.toMatch(/SESSION_END_SKIPPED/);
+    expect(first.status).toBe(0);
+    expect(second.status).toBe(0);
+  });
+
   it("second cursor SessionEnd with the same session_id is skipped before the pipeline", async () => {
     const id = "end-dup-cursor-1";
     const first = await runEnd(id);
