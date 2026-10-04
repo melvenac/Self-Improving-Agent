@@ -29,6 +29,7 @@ import {
   SeatName,
   LoopStateSchema,
   OpenQuestionSchema,
+  WatchOutSchema,
   parseState,
   serializeState,
   compareFirstRev,
@@ -38,6 +39,7 @@ import {
   type Task,
 } from "./state-schema.js";
 import { readJson } from "./fs-utils.js";
+import { handoffCapViolations } from "./handoff-caps.js";
 import {
   renderInbox,
   renderTaskFile,
@@ -81,7 +83,7 @@ export const OpSchema = z.discriminatedUnion("op", [
   // an argument: it comes from ApplyStateOptions.session_uuid, so a batch cannot
   // write under another session's uuid (T-163). The op is strict, so a batch
   // that tries is refused rather than having the key ignored.
-  z.strictObject({ op: z.literal("set_handoff"), seat: SeatName, pick_up: z.string(), watch_out: z.array(z.string()), open_questions: z.array(OpenQuestionSchema), loop_state: LoopStateSchema.nullable().optional() }),
+  z.strictObject({ op: z.literal("set_handoff"), seat: SeatName, pick_up: z.string(), watch_out: z.array(WatchOutSchema), open_questions: z.array(OpenQuestionSchema), loop_state: LoopStateSchema.nullable().optional() }),
 ]);
 export type StateOp = z.infer<typeof OpSchema>;
 
@@ -138,6 +140,11 @@ export interface ApplyStateOptions {
   seat?: Seat | null;
   /** YYYY-MM-DD stamped on the session record; defaults to today (local). */
   today?: string;
+  /**
+   * T-236 slice 2, OPT-IN per repo (greeting.json `handoff_caps`), default OFF: a set_handoff that breaks the caps is refused with a
+   * named reason. Applies to the entry being written only; no existing handoff is rewritten or re-checked.
+   */
+  handoff_caps?: boolean;
 }
 
 export interface WriteResult {
@@ -300,7 +307,7 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const gapScan: GapCitationScan = renderOnly
     ? { ok: true, cited: new Map() }
     : citedGapIds(projectRoot);
-  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges, gapScan };
+  const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges, gapScan, handoffCaps: options.handoff_caps === true };
 
   for (let i = 0; i < options.ops.length; i++) {
     const opName = (options.ops[i] as { op?: unknown } | null)?.op;
@@ -455,6 +462,8 @@ interface OpContext {
   noteChanges: string[];
   /** Gap citations in the tracked tree. A failed scan refuses add_gap. */
   gapScan: GapCitationScan;
+  /** T-236 slice 2: enforce the handoff caps on a set_handoff. Default false. */
+  handoffCaps: boolean;
 }
 
 /** The authors of a note after `add` is appended by `uuid`: unknown stays unknown. */
@@ -653,6 +662,10 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       // SeatName is a role: three developer checkouts shared one slot, so a
       // developer's close-out erased another developer's (Step 0, record 118).
       // A session adds its own entry or updates it; it cannot reach another's.
+      if (ctx.handoffCaps) {
+        const broken = handoffCapViolations(op.pick_up, op.watch_out);
+        if (broken.length > 0) return { ok: false, error: `set_handoff refused (handoff_caps is on for this repo): ${broken.join("; ")}` };
+      }
       if (ctx.uuid === null) {
         return { ok: false, error: "set_handoff needs the writing session, and there is no registered session (call ob_set_session) — a handoff nobody can attribute is one the next close-out could not be kept from erasing" };
       }

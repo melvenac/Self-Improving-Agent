@@ -1,0 +1,373 @@
+=== renderBriefing seat=planner ===
+## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
+Drift: none
+
+OBJECTIVE
+Prove a truly remote agent can join the hub over the public internet with its own key: Aaron's Grok Bot on a cloud VM registers over HTTPS and talks to relay (D-011), as the first step to a multi-tenant hub where humans own accounts, agents join by invitation, and rooms can cross accounts by invitation (D-010). Done: per-agent keys (V-006), chat UI on tcm (V-005), read-only tcm access (V-007), Loop 5 identity + membership (V-008, V-010), T-064's log read (V-009), Loop 6 enrollment codes + terse errors + rate limits on tcm (V-012, 2026-09-27), Loop 8a presence on tcm (V-013, 2026-09-28), AUTH_MODE=strict on tcm (2026-09-30, G-001 closed). Next, in order (D-029, amending D-024): Loop 8b, an idle seat is woken or cannot go idle while it owes a reply (T-076); Loop 7, the hub explains itself to an arriving agent (T-075); T-057's exposure items (Convex binding, public Convex functions, the hub on 0.0.0.0:4000) before Funnel; Funnel, with T-005's F5 source test; the test (T-068). NEVER a public address while any of T-057's exposure items is open. (since session 21)
+
+NEXT
+- [P1] T-002 Onboard a truly remote agent
+- [P1] T-005 Rate limiting and abuse protection
+- [P1] T-006 On-demand spawn
+65 active (0 P0, 13 P1, 35 P2, 17 P3); 18 done. Backlog order, not a decision: the pick-up below rules what starts.
+
+PICK UP HERE
+Session 25, PARKED at RED + weekly 95% (~21:50Z 2026-10-02). Aaron asleep since ~12:10Z. DONE: EVERY loop in the merge chain has PASSED QA and is ruled: L9 cce0940 (with C1), L10 d99fff2, L11 429a3d7, L12 019cf31, L13 755c01c, L14 8ff1d3d, L15 9e92711. New tasks this session: T-087 (closes at L14 merge), T-088 (restart/rotation cost), T-089 (plain-text 4xx in --wait gives rc 3), T-090 (refused keyed requests cost reads). D-041: NO hourly status cron; message clark on EVENTS only (verdicts, merges, blocks, READY TO ROLL). FOR AARON WHEN AWAKE (AskUserQuestion, one at a time): (1) the merge chain: Loop 7 (family B pending, Cursor back 2026-10-03) -> 2b7b850 (CONDITION C-F1 FIRST: Rivet makes guide-refusals' self-test reword every 'too many requests' (replaceAll); otherwise the suite goes red at the Loop 11 merge; T-083) -> L9 -> L10 -> L11 -> L12 -> L13 -> L14 -> L15, each code merge on his word; Rivet rebases at merge time (rebase items: peek() comment in rateLimit.ts; Loop 15's guide line vs 2b7b850 plus O-2's added clause; CHANGELOG/package.json; src/index.ts vs 2b7b850). (2) Rivet's host lacks ~/.claude/commands (start.md etc.): his call. After the merges: Funnel gates are T-057's items, T-005's F5 reading, T-088 and T-090; next hub-talk work is T-089. AT RESUME: ob_set_session, git fetch, ob_start; ListAgents; ~/slots.json usageLevel. NO cron (D-041).
+
+WATCH OUT
+- USAGE RULES (~/Worktrees/usage-winddown-rules.md; level in ~/slots.json usageLevel, clark announces): AMBER = no new loop briefs, devs LIGHT only, QA cap 2; RED = devs park, planners rulings and merges only; STOP (>= 90% 5-hour) = everyone parks, running QA continues. WEEKLY: >=95% no new QA/tasks/dispatches (reached ~21:00Z 2026-10-02); >=98% wind down. Aaron's one-time weekly reset expires Oct 22.
+- D-041 (Aaron, ~21:45Z 2026-10-02): no hourly status to clark; message clark on events only (verdicts, merges, blocks, READY TO ROLL). Do not recreate the :12 cron.
+- OVERNIGHT (Aaron asleep ~12:10Z 2026-10-02): no rolls; work to 25% context left, then push WIP + merged handoff and park until his /clear. A2A merges need his word.
+- DESKTOP runs headless QA (SIA, Caliper): while clark says DESKTOP QA RUNNING, stay LIGHT here. Aaron's stack (3210/4000, Projects/A2A-Hub) is off limits to QA.
+- QA ports: L13 3995-3998/5010-5029; L14 3930-3933/5030-5049 (5040 held by Windows CDPSvc on the laptop); L15 3934-3937/5050-5069 (5060-5061 are fetch-blocked ports: use 5062+); all + 6790/6791.
+- keep every agent OPEN. Never tell a seat to exit.
+- STANDING RULE (D-040): docs-only PRs merge without a per-PR ask, pinned with --match-head-commit, merge GATED in the same command on nondocs=0. Code/tests/CI/config need his word naming the PR.
+- DISPATCH_SHA first line of every dispatch, a commit that CONTAINS everything the job reads (git cat-file -e). Paste SHAs, never retype.
+- Rivet is a Remote Control bridge session on the QA PC (offline ~20:41Z, reconnected); sends not confirmed read; check origin for its pushes.
+- On ANY classifier denial: send clark ONE line 'MANUAL MODE -> relay: <exact action> (<why>)' AND say it in your own session. Never retry or reroute.
+- Aaron is often REMOTE: never hand him commands to type. Ask decisions with AskUserQuestion in Relay's own session.
+- DERIVE, DON'T ASSERT: four of Relay's own errors in sessions 24-25 (latest: Loop 14 brief objective 1 would have refused valid keys). MEASURE what a rule rests on: session 25 measured that a ~40 KB Bash output leaves the context with a 2 KB preview, which changed Loop 15's design. Validate a grep with a known positive before trusting its zero.
+- Claude Code Bash tool: outputs over ~30,000 chars are saved to a file and only a 2 KB head preview is shown (measured 39,900 bytes). Keep commands' output small.
+- Rivet's machine: GIT_ASKPASS = VS Code askpass, credential helper GCM; real-git tests can write Aaron's global ~/.gitconfig.
+- tcm .env may set REPO_URL from the old .env.example; after Loop 12 deploys, read the startup line.
+- Gate EVERY kill on (PID, CreationDate) plus the expected command line.
+- git fetch can hang past 120 s; use timeout. Capture a status before piping to tail or head.
+- The SessionStart 'HANDOFF MISSING' warning can be a false positive (T-080).
+
+Working tree: clean
+Latest brief: docs/loops/x-brief.md (2026-10-02)
+Skills: none
+## End Briefing
+=== renderState seat=planner ===
+
+## State (state.json rev 179)
+Project: a2a-intelligent-hub v9.9.9
+Objective: Prove a truly remote agent can join the hub over the public internet with its own key: Aaron's Grok Bot on a cloud VM registers over HTTPS and talks to relay (D-011), as the first step to a multi-tenant hub where humans own accounts, agents join by invitation, and rooms can cross accounts by invitation (D-010). Done: per-agent keys (V-006), chat UI on tcm (V-005), read-only tcm access (V-007), Loop 5 identity + membership (V-008, V-010), T-064's log read (V-009), Loop 6 enrollment codes + terse errors + rate limits on tcm (V-012, 2026-09-27), Loop 8a presence on tcm (V-013, 2026-09-28), AUTH_MODE=strict on tcm (2026-09-30, G-001 closed). Next, in order (D-029, amending D-024): Loop 8b, an idle seat is woken or cannot go idle while it owes a reply (T-076); Loop 7, the hub explains itself to an arriving agent (T-075); T-057's exposure items (Convex binding, public Convex functions, the hub on 0.0.0.0:4000) before Funnel; Funnel, with T-005's F5 source test; the test (T-068). NEVER a public address while any of T-057's exposure items is open. (since session 21)
+
+Tasks (65 active; done: 18):
+  P1:
+    [open] T-002 Onboard a truly remote agent
+    [open] T-005 Rate limiting and abuse protection
+    [open] T-006 On-demand spawn
+    [open] T-007 Two cheap repo-peer measurements
+    [open] T-008 `hub-talk` exit code 1 means two opposite things
+    [open] T-017 `--inbox` then `--wait` re-delivers turns already read (two cursors disagree)
+    [open] T-050 Wake an idle IDE seat that has an unread turn in its room
+    [open] T-057 Convex is callable without the hub: tracked compose publishes 3210 on all interfaces; on tcm, any lo…
+    [open] T-061 Chat UI served by tcm's hub (Loop 4, v1.10.0)
+    [open] T-068 First outside-agent test: Grok Bot (cloud VM) registers over HTTPS via Funnel and talks to relay
+    [open] T-075 Loop 7: an agent with the hub's URL and an enrollment code, and nothing else, can join and hold a co…
+    [open] T-076 Loop 8b: an idle seat is woken by a hub turn, or cannot go idle while it owes a reply
+    [open] T-087 A refused keyless caller still costs Convex reads: refuse before the key lookup (gates a public addr…
+  [P2] 35 active: INBOX.md
+  [P3] 17 active: INBOX.md
+
+Verified (15):
+  V-006 — On tcm every agent row owns its own key and the shared dev-key resolves to no name; tcm runs v1.10.0… (165 chars; full text: state.json verified[V-006]) (1 evidence)
+  V-007 — A read-only ssh key reads tcm's hub, auth log, agents summary, image and runners and can do nothing… (161 chars; full text: state.json verified[V-007]) (1 evidence)
+  V-008 — Loop 5 (T-066, v1.11.0) passes acceptance on loop/5-identity ebe7747: every request acts as its key'… (204 chars; full text: state.json verified[V-008]) (1 evidence)
+  V-009 — No agent on tcm's hub used a legacy, shared or unknown key after the T-003 cutover finished: 20.6 h… (234 chars; full text: state.json verified[V-009]) (1 evidence)
+  V-010 — tcm runs A2A-Hub v1.11.0 (Loop 5) in AUTH_MODE=warn: container on image 645a6f248d82 since 2026-09-2… (215 chars; full text: state.json verified[V-010]) (1 evidence)
+  V-011 — aaron's tcm row is human-kind (G-002 fixed): the Loop 5 owner's view is available to him, with his k… (139 chars; full text: state.json verified[V-011]) (1 evidence)
+  V-012 — tcm runs A2A-Hub v1.12.0 (Loop 6) in AUTH_MODE=warn: container on image 11b61b0ae035 since 2026-09-2… (260 chars; full text: state.json verified[V-012]) (1 evidence)
+  V-013 — tcm runs A2A-Hub v1.13.0 (Loop 8a, presence) in AUTH_MODE=warn: container on image 5703b442c3ad sinc… (283 chars; full text: state.json verified[V-013]) (1 evidence)
+  V-014 — tcm runs A2A-Hub v1.13.0 in AUTH_MODE=strict since 2026-09-30T12:32:42Z, on the same image 5703b442c… (174 chars; full text: state.json verified[V-014]) (1 evidence)
+  V-015 — Loop 8b r4 (T-076) at loop/8b-build-r4 435aafb passes every acceptance row runnable before the Curso… (222 chars; full text: state.json verified[V-015]) (1 evidence)
+  … 5 older verified claim(s) not shown (15 total); all of them: node open-brain/build/cli.js state show --json
+
+Gaps (0):
+  (none)
+
+Decisions: 55 recorded; latest D-042 (2026-10-03) New hub names match the seat name; existing names stay
+
+Your handoff — planner [a2a-planner], session 25:
+  pick up: Session 25, PARKED at RED + weekly 95% (~21:50Z 2026-10-02). Aaron asleep since ~12:10Z. DONE: EVERY loop in the merge chain has PASSED QA and is ruled: L9 cce0940 (with C1), L10 d99fff2, L11 429a3d7, L12 019cf31, L13 755c01c, L14 8ff1d3d, L15 9e92711. New tasks this session: T-087 (closes at L14 merge), T-088 (restart/rotation cost), T-089 (plain-text 4xx in --wait gives rc 3), T-090 (refused keyed requests cost reads). D-041: NO hourly status cron; message clark on EVENTS only (verdicts, merges, blocks, READY TO ROLL). FOR AARON WHEN AWAKE (AskUserQuestion, one at a time): (1) the merge chain: Loop 7 (family B pending, Cursor back 2026-10-03) -> 2b7b850 (CONDITION C-F1 FIRST: Rivet makes guide-refusals' self-test reword every 'too many requests' (replaceAll); otherwise the suite goes red at the Loop 11 merge; T-083) -> L9 -> L10 -> L11 -> L12 -> L13 -> L14 -> L15, each code merge on his word; Rivet rebases at merge time (rebase items: peek() comment in rateLimit.ts; Loop 15's guide line vs 2b7b850 plus O-2's added clause; CHANGELOG/package.json; src/index.ts vs 2b7b850). (2) Rivet's host lacks ~/.claude/commands (start.md etc.): his call. After the merges: Funnel gates are T-057's items, T-005's F5 reading, T-088 and T-090; next hub-talk work is T-089. AT RESUME: ob_set_session, git fetch, ob_start; ListAgents; ~/slots.json usageLevel. NO cron (D-041).
+  watch out:
+    - USAGE RULES (~/Worktrees/usage-winddown-rules.md; level in ~/slots.json usageLevel, clark announces): AMBER = no new loop briefs, devs LIGHT only, QA cap 2; RED = devs park, planners rulings and merges only; STOP (>= 90% 5-hour) = everyone parks, running QA continues. WEEKLY: >=95% no new QA/tasks/dispatches (reached ~21:00Z 2026-10-02); >=98% wind down. Aaron's one-time weekly reset expires Oct 22.
+    - D-041 (Aaron, ~21:45Z 2026-10-02): no hourly status to clark; message clark on events only (verdicts, merges, blocks, READY TO ROLL). Do not recreate the :12 cron.
+    - OVERNIGHT (Aaron asleep ~12:10Z 2026-10-02): no rolls; work to 25% context left, then push WIP + merged handoff and park until his /clear. A2A merges need his word.
+    - DESKTOP runs headless QA (SIA, Caliper): while clark says DESKTOP QA RUNNING, stay LIGHT here. Aaron's stack (3210/4000, Projects/A2A-Hub) is off limits to QA.
+    - QA ports: L13 3995-3998/5010-5029; L14 3930-3933/5030-5049 (5040 held by Windows CDPSvc on the laptop); L15 3934-3937/5050-5069 (5060-5061 are fetch-blocked ports: use 5062+); all + 6790/6791.
+    - keep every agent OPEN. Never tell a seat to exit.
+    - STANDING RULE (D-040): docs-only PRs merge without a per-PR ask, pinned with --match-head-commit, merge GATED in the same command on nondocs=0. Code/tests/CI/config need his word naming the PR.
+    - DISPATCH_SHA first line of every dispatch, a commit that CONTAINS everything the job reads (git cat-file -e). Paste SHAs, never retype.
+    - Rivet is a Remote Control bridge session on the QA PC (offline ~20:41Z, reconnected); sends not confirmed read; check origin for its pushes.
+    - On ANY classifier denial: send clark ONE line 'MANUAL MODE -> relay: <exact action> (<why>)' AND say it in your own session. Never retry or reroute.
+    - Aaron is often REMOTE: never hand him commands to type. Ask decisions with AskUserQuestion in Relay's own session.
+    - DERIVE, DON'T ASSERT: four of Relay's own errors in sessions 24-25 (latest: Loop 14 brief objective 1 would have refused valid keys). MEASURE what a rule rests on: session 25 measured that a ~40 KB Bash output leaves the context with a 2 KB preview, which changed Loop 15's design. Validate a grep with a known positive before trusting its zero.
+    - Claude Code Bash tool: outputs over ~30,000 chars are saved to a file and only a 2 KB head preview is shown (measured 39,900 bytes). Keep commands' output small.
+    - Rivet's machine: GIT_ASKPASS = VS Code askpass, credential helper GCM; real-git tests can write Aaron's global ~/.gitconfig.
+    - tcm .env may set REPO_URL from the old .env.example; after Loop 12 deploys, read the startup line.
+    - Gate EVERY kill on (PID, CreationDate) plus the expected command line.
+    - git fetch can hang past 120 s; use timeout. Capture a status before piping to tail or head.
+    - The SessionStart 'HANDOFF MISSING' warning can be a false positive (T-080).
+  loop state:
+    open PRs: none
+    SHA frozen for QA: Loop 7: 5520b313e5f05c054c7352b5ef4a710acb75963d (family B pending, Cursor 2026-10-03); follow-up 2b7b850 (C-F1 before merge). QA-PASSED merge candidates: L9 cce0940903d604519a72bff170f2e169ee243616; L10 d99fff22cfc128f81db864ee760c86308bf0b4c5; L11 429a3d71646d3455d08c480509c40fb06ec4bdb9; L12 019cf31b67345853e85ef2787f138de9cea48dd6; L13 755c01cdf36ad9dfd012ba9f3849d55aaa8fdc23; L14 8ff1d3db400ab3e394538595eb676e447088a6be; L15 9e9271194198b7aa7b4e99c1933fcb18a4b84bc0.
+    questions pending for Aaron: none
+    rulings made mid-loop: 
+      - L15 QA: PASS stands; C-F1 on 2b7b850 before L11 merges; O-2 guide clause at the L15 rebase; docs/loops/loop-15-qa-ruling.md
+      - L14 QA: PASS stands; O-1 -> T-090, O-2 -> T-088; docs/loops/loop-14-qa-ruling.md
+      - L13 QA: PASS stands; O-1 -> T-089; docs/loops/loop-13-qa-ruling.md
+      - L12 QA: PASS stands; docs/loops/loop-12-qa-ruling.md
+      - L11 QA: PASS stands; O-1 -> T-087; docs/loops/loop-11-qa-ruling.md
+      - L15 build: accepted at 9e92711 (C2 met); design + C1 amendment (measured cap); T-017
+      - L14 build/design: accepted at 8ff1d3d; T-087
+      - L13 build/design: accepted at 755c01c; Atlas ACK, SIA T-228 merged a6059ff
+      - L9 r2 + C1: merge candidate cce0940; T-057
+
+Other handoffs (newest per seat and checkout; named, not rendered — read one by its commit):
+  qa [a2a-planner] (session 19): commit not derived (no project root given)
+    WRITTEN BY RELAY from Gauge's own handoff, docs/loops/gauge-handoff-session-20.md (master 0358353; READ IT FIRST). QA does not write ob_state (qa.md:69), so ...
+  (5 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writing session(s) in the record
+=== renderBriefing seat=developer ===
+## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
+Drift: none
+
+OBJECTIVE
+Prove a truly remote agent can join the hub over the public internet with its own key: Aaron's Grok Bot on a cloud VM registers over HTTPS and talks to relay (D-011), as the first step to a multi-tenant hub where humans own accounts, agents join by invitation, and rooms can cross accounts by invitation (D-010). Done: per-agent keys (V-006), chat UI on tcm (V-005), read-only tcm access (V-007), Loop 5 identity + membership (V-008, V-010), T-064's log read (V-009), Loop 6 enrollment codes + terse errors + rate limits on tcm (V-012, 2026-09-27), Loop 8a presence on tcm (V-013, 2026-09-28), AUTH_MODE=strict on tcm (2026-09-30, G-001 closed). Next, in order (D-029, amending D-024): Loop 8b, an idle seat is woken or cannot go idle while it owes a reply (T-076); Loop 7, the hub explains itself to an arriving agent (T-075); T-057's exposure items (Convex binding, public Convex functions, the hub on 0.0.0.0:4000) before Funnel; Funnel, with T-005's F5 source test; the test (T-068). NEVER a public address while any of T-057's exposure items is open. (since session 21)
+
+NEXT
+- [P1] T-002 Onboard a truly remote agent
+- [P1] T-005 Rate limiting and abuse protection
+- [P1] T-006 On-demand spawn
+65 active (0 P0, 13 P1, 35 P2, 17 P3); 18 done. Backlog order, not a decision: the pick-up below rules what starts.
+
+PICK UP HERE
+none recorded for this seat (developer)
+
+Working tree: clean
+Latest brief: docs/loops/x-brief.md (2026-10-02)
+Skills: none
+## End Briefing
+=== renderState seat=developer ===
+
+## State (state.json rev 179)
+Project: a2a-intelligent-hub v9.9.9
+Objective: Prove a truly remote agent can join the hub over the public internet with its own key: Aaron's Grok Bot on a cloud VM registers over HTTPS and talks to relay (D-011), as the first step to a multi-tenant hub where humans own accounts, agents join by invitation, and rooms can cross accounts by invitation (D-010). Done: per-agent keys (V-006), chat UI on tcm (V-005), read-only tcm access (V-007), Loop 5 identity + membership (V-008, V-010), T-064's log read (V-009), Loop 6 enrollment codes + terse errors + rate limits on tcm (V-012, 2026-09-27), Loop 8a presence on tcm (V-013, 2026-09-28), AUTH_MODE=strict on tcm (2026-09-30, G-001 closed). Next, in order (D-029, amending D-024): Loop 8b, an idle seat is woken or cannot go idle while it owes a reply (T-076); Loop 7, the hub explains itself to an arriving agent (T-075); T-057's exposure items (Convex binding, public Convex functions, the hub on 0.0.0.0:4000) before Funnel; Funnel, with T-005's F5 source test; the test (T-068). NEVER a public address while any of T-057's exposure items is open. (since session 21)
+
+Tasks (65 active; done: 18):
+  P1:
+    [open] T-002 Onboard a truly remote agent
+    [open] T-005 Rate limiting and abuse protection
+    [open] T-006 On-demand spawn
+    [open] T-007 Two cheap repo-peer measurements
+    [open] T-008 `hub-talk` exit code 1 means two opposite things
+    [open] T-017 `--inbox` then `--wait` re-delivers turns already read (two cursors disagree)
+    [open] T-050 Wake an idle IDE seat that has an unread turn in its room
+    [open] T-057 Convex is callable without the hub: tracked compose publishes 3210 on all interfaces; on tcm, any lo…
+    [open] T-061 Chat UI served by tcm's hub (Loop 4, v1.10.0)
+    [open] T-068 First outside-agent test: Grok Bot (cloud VM) registers over HTTPS via Funnel and talks to relay
+    [open] T-075 Loop 7: an agent with the hub's URL and an enrollment code, and nothing else, can join and hold a co…
+    [open] T-076 Loop 8b: an idle seat is woken by a hub turn, or cannot go idle while it owes a reply
+    [open] T-087 A refused keyless caller still costs Convex reads: refuse before the key lookup (gates a public addr…
+  [P2] 35 active: INBOX.md
+  [P3] 17 active: INBOX.md
+
+Verified (15):
+  V-006 — On tcm every agent row owns its own key and the shared dev-key resolves to no name; tcm runs v1.10.0… (165 chars; full text: state.json verified[V-006]) (1 evidence)
+  V-007 — A read-only ssh key reads tcm's hub, auth log, agents summary, image and runners and can do nothing… (161 chars; full text: state.json verified[V-007]) (1 evidence)
+  V-008 — Loop 5 (T-066, v1.11.0) passes acceptance on loop/5-identity ebe7747: every request acts as its key'… (204 chars; full text: state.json verified[V-008]) (1 evidence)
+  V-009 — No agent on tcm's hub used a legacy, shared or unknown key after the T-003 cutover finished: 20.6 h… (234 chars; full text: state.json verified[V-009]) (1 evidence)
+  V-010 — tcm runs A2A-Hub v1.11.0 (Loop 5) in AUTH_MODE=warn: container on image 645a6f248d82 since 2026-09-2… (215 chars; full text: state.json verified[V-010]) (1 evidence)
+  V-011 — aaron's tcm row is human-kind (G-002 fixed): the Loop 5 owner's view is available to him, with his k… (139 chars; full text: state.json verified[V-011]) (1 evidence)
+  V-012 — tcm runs A2A-Hub v1.12.0 (Loop 6) in AUTH_MODE=warn: container on image 11b61b0ae035 since 2026-09-2… (260 chars; full text: state.json verified[V-012]) (1 evidence)
+  V-013 — tcm runs A2A-Hub v1.13.0 (Loop 8a, presence) in AUTH_MODE=warn: container on image 5703b442c3ad sinc… (283 chars; full text: state.json verified[V-013]) (1 evidence)
+  V-014 — tcm runs A2A-Hub v1.13.0 in AUTH_MODE=strict since 2026-09-30T12:32:42Z, on the same image 5703b442c… (174 chars; full text: state.json verified[V-014]) (1 evidence)
+  V-015 — Loop 8b r4 (T-076) at loop/8b-build-r4 435aafb passes every acceptance row runnable before the Curso… (222 chars; full text: state.json verified[V-015]) (1 evidence)
+  … 5 older verified claim(s) not shown (15 total); all of them: node open-brain/build/cli.js state show --json
+
+Gaps (0):
+  (none)
+
+Decisions: 55 recorded; latest D-042 (2026-10-03) New hub names match the seat name; existing names stay
+
+Handoffs (2) — no handoff recorded for this seat (developer):
+
+Other handoffs (newest per seat and checkout; named, not rendered — read one by its commit):
+  qa [a2a-planner] (session 19): commit not derived (no project root given)
+    WRITTEN BY RELAY from Gauge's own handoff, docs/loops/gauge-handoff-session-20.md (master 0358353; READ IT FIRST). QA does not write ob_state (qa.md:69), so ...
+  planner [a2a-planner] (session 25): commit not derived (no project root given)
+    Session 25, PARKED at RED + weekly 95% (~21:50Z 2026-10-02). Aaron asleep since ~12:10Z. DONE: EVERY loop in the merge chain has PASSED QA and is ruled: L9 c...
+  (5 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writing session(s) in the record
+=== renderBriefing seat=qa ===
+## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
+Drift: none
+
+OBJECTIVE
+Prove a truly remote agent can join the hub over the public internet with its own key: Aaron's Grok Bot on a cloud VM registers over HTTPS and talks to relay (D-011), as the first step to a multi-tenant hub where humans own accounts, agents join by invitation, and rooms can cross accounts by invitation (D-010). Done: per-agent keys (V-006), chat UI on tcm (V-005), read-only tcm access (V-007), Loop 5 identity + membership (V-008, V-010), T-064's log read (V-009), Loop 6 enrollment codes + terse errors + rate limits on tcm (V-012, 2026-09-27), Loop 8a presence on tcm (V-013, 2026-09-28), AUTH_MODE=strict on tcm (2026-09-30, G-001 closed). Next, in order (D-029, amending D-024): Loop 8b, an idle seat is woken or cannot go idle while it owes a reply (T-076); Loop 7, the hub explains itself to an arriving agent (T-075); T-057's exposure items (Convex binding, public Convex functions, the hub on 0.0.0.0:4000) before Funnel; Funnel, with T-005's F5 source test; the test (T-068). NEVER a public address while any of T-057's exposure items is open. (since session 21)
+
+NEXT
+- [P1] T-002 Onboard a truly remote agent
+- [P1] T-005 Rate limiting and abuse protection
+- [P1] T-006 On-demand spawn
+65 active (0 P0, 13 P1, 35 P2, 17 P3); 18 done. Backlog order, not a decision: the pick-up below rules what starts.
+
+PICK UP HERE
+WRITTEN BY RELAY from Gauge's own handoff, docs/loops/gauge-handoff-session-20.md (master 0358353; READ IT FIRST). QA does not write ob_state (qa.md:69), so the planner records it. Relay's roll message wrongly asked Gauge to write its own; Gauge refused correctly. STATE at the 2026-09-28 roll: nothing open for QA. Loop 8a (v1.13.0) accepted on fe6b8aa (three verdicts in loop-8a-qa-report.md: FAIL d7c3cd0, FAIL 4a88333, PASS fe6b8aa) and deployed (V-013); Loop 6 accepted on dadc8ef and deployed (V-012). NEXT: Loop 7 (T-075) when Relay dispatches it. Read docs/loops/loop-7-brief.md early and send testability points BEFORE the design ruling; criteria come after the ruling. a2a-qa detached at origin/master; all qa/* branches merged.
+
+WATCH OUT
+- Stop processes ONLY by recorded PID or your own pinned ports. A hub-talk/daemon command-line pattern kill took down Relay's and Atlas's listeners on 2026-09-28.
+- Aaron talks only to planners: a full-key tcm read is an ! line at Gauge's prompt, sent to Aaron THROUGH Relay. Test the exact line first; under MSYS_NO_PATHCONV=1 node needs C:/ paths (PB run 1 failed on /c/).
+- Criteria conventions: questions with defaults (Q1-Qn) for the planner's ruling; every 'within W' row declares a tolerance band; validate each instrument on a known positive and a known negative; a raw FAIL caused by your own wording is reported as such for the planner to rule. Never re-label it, and never settle your own row's ambiguity in the build's favour (ruling 5).
+- PD stays keyless (the PD.8 ruling); a behavioural swap check that needs a key is the planner's keyed probe.
+- Instruments and gotchas (see the handoff doc): iproxy truncates its log on restart; talk() is async on purpose; cvx8 uses nohup; checking out an older candidate deletes the instruments, so use a git archive copy, never a worktree (shared.md). Needle sets pb6/pb8 and the /enroll needle-registration rule are in the doc.
+- Open items for QA later: T-078 (O-5, measure at tcm's volume before a public address); G1 rows-n2 A15b hardcodes qa-b1/qa-b2 (accepted drift); N -tt in rl6.mjs is stricter than T-065's criterion; Q7/X1 busy-daemon state for Loop 8b. qa3-cand/qa3-old are ALREADY REMOVED (on Aaron's word, 2026-09-27); the doc's line about them is stale.
+- Hub transport (shared.md): check hub-talk --list or presence before assuming a seat sees a turn.
+
+Working tree: clean
+Latest brief: docs/loops/x-brief.md (2026-10-02)
+Skills: none
+## End Briefing
+=== renderState seat=qa ===
+
+## State (state.json rev 179)
+Project: a2a-intelligent-hub v9.9.9
+Objective: Prove a truly remote agent can join the hub over the public internet with its own key: Aaron's Grok Bot on a cloud VM registers over HTTPS and talks to relay (D-011), as the first step to a multi-tenant hub where humans own accounts, agents join by invitation, and rooms can cross accounts by invitation (D-010). Done: per-agent keys (V-006), chat UI on tcm (V-005), read-only tcm access (V-007), Loop 5 identity + membership (V-008, V-010), T-064's log read (V-009), Loop 6 enrollment codes + terse errors + rate limits on tcm (V-012, 2026-09-27), Loop 8a presence on tcm (V-013, 2026-09-28), AUTH_MODE=strict on tcm (2026-09-30, G-001 closed). Next, in order (D-029, amending D-024): Loop 8b, an idle seat is woken or cannot go idle while it owes a reply (T-076); Loop 7, the hub explains itself to an arriving agent (T-075); T-057's exposure items (Convex binding, public Convex functions, the hub on 0.0.0.0:4000) before Funnel; Funnel, with T-005's F5 source test; the test (T-068). NEVER a public address while any of T-057's exposure items is open. (since session 21)
+
+Tasks (65 active; done: 18):
+  P1:
+    [open] T-002 Onboard a truly remote agent
+    [open] T-005 Rate limiting and abuse protection
+    [open] T-006 On-demand spawn
+    [open] T-007 Two cheap repo-peer measurements
+    [open] T-008 `hub-talk` exit code 1 means two opposite things
+    [open] T-017 `--inbox` then `--wait` re-delivers turns already read (two cursors disagree)
+    [open] T-050 Wake an idle IDE seat that has an unread turn in its room
+    [open] T-057 Convex is callable without the hub: tracked compose publishes 3210 on all interfaces; on tcm, any lo…
+    [open] T-061 Chat UI served by tcm's hub (Loop 4, v1.10.0)
+    [open] T-068 First outside-agent test: Grok Bot (cloud VM) registers over HTTPS via Funnel and talks to relay
+    [open] T-075 Loop 7: an agent with the hub's URL and an enrollment code, and nothing else, can join and hold a co…
+    [open] T-076 Loop 8b: an idle seat is woken by a hub turn, or cannot go idle while it owes a reply
+    [open] T-087 A refused keyless caller still costs Convex reads: refuse before the key lookup (gates a public addr…
+  [P2] 35 active: INBOX.md
+  [P3] 17 active: INBOX.md
+
+Verified (15):
+  V-006 — On tcm every agent row owns its own key and the shared dev-key resolves to no name; tcm runs v1.10.0… (165 chars; full text: state.json verified[V-006]) (1 evidence)
+  V-007 — A read-only ssh key reads tcm's hub, auth log, agents summary, image and runners and can do nothing… (161 chars; full text: state.json verified[V-007]) (1 evidence)
+  V-008 — Loop 5 (T-066, v1.11.0) passes acceptance on loop/5-identity ebe7747: every request acts as its key'… (204 chars; full text: state.json verified[V-008]) (1 evidence)
+  V-009 — No agent on tcm's hub used a legacy, shared or unknown key after the T-003 cutover finished: 20.6 h… (234 chars; full text: state.json verified[V-009]) (1 evidence)
+  V-010 — tcm runs A2A-Hub v1.11.0 (Loop 5) in AUTH_MODE=warn: container on image 645a6f248d82 since 2026-09-2… (215 chars; full text: state.json verified[V-010]) (1 evidence)
+  V-011 — aaron's tcm row is human-kind (G-002 fixed): the Loop 5 owner's view is available to him, with his k… (139 chars; full text: state.json verified[V-011]) (1 evidence)
+  V-012 — tcm runs A2A-Hub v1.12.0 (Loop 6) in AUTH_MODE=warn: container on image 11b61b0ae035 since 2026-09-2… (260 chars; full text: state.json verified[V-012]) (1 evidence)
+  V-013 — tcm runs A2A-Hub v1.13.0 (Loop 8a, presence) in AUTH_MODE=warn: container on image 5703b442c3ad sinc… (283 chars; full text: state.json verified[V-013]) (1 evidence)
+  V-014 — tcm runs A2A-Hub v1.13.0 in AUTH_MODE=strict since 2026-09-30T12:32:42Z, on the same image 5703b442c… (174 chars; full text: state.json verified[V-014]) (1 evidence)
+  V-015 — Loop 8b r4 (T-076) at loop/8b-build-r4 435aafb passes every acceptance row runnable before the Curso… (222 chars; full text: state.json verified[V-015]) (1 evidence)
+  … 5 older verified claim(s) not shown (15 total); all of them: node open-brain/build/cli.js state show --json
+
+Gaps (0):
+  (none)
+
+Decisions: 55 recorded; latest D-042 (2026-10-03) New hub names match the seat name; existing names stay
+
+Your handoff — qa [a2a-planner], session 19:
+  pick up: WRITTEN BY RELAY from Gauge's own handoff, docs/loops/gauge-handoff-session-20.md (master 0358353; READ IT FIRST). QA does not write ob_state (qa.md:69), so the planner records it. Relay's roll message wrongly asked Gauge to write its own; Gauge refused correctly. STATE at the 2026-09-28 roll: nothing open for QA. Loop 8a (v1.13.0) accepted on fe6b8aa (three verdicts in loop-8a-qa-report.md: FAIL d7c3cd0, FAIL 4a88333, PASS fe6b8aa) and deployed (V-013); Loop 6 accepted on dadc8ef and deployed (V-012). NEXT: Loop 7 (T-075) when Relay dispatches it. Read docs/loops/loop-7-brief.md early and send testability points BEFORE the design ruling; criteria come after the ruling. a2a-qa detached at origin/master; all qa/* branches merged.
+  watch out:
+    - Stop processes ONLY by recorded PID or your own pinned ports. A hub-talk/daemon command-line pattern kill took down Relay's and Atlas's listeners on 2026-09-28.
+    - Aaron talks only to planners: a full-key tcm read is an ! line at Gauge's prompt, sent to Aaron THROUGH Relay. Test the exact line first; under MSYS_NO_PATHCONV=1 node needs C:/ paths (PB run 1 failed on /c/).
+    - Criteria conventions: questions with defaults (Q1-Qn) for the planner's ruling; every 'within W' row declares a tolerance band; validate each instrument on a known positive and a known negative; a raw FAIL caused by your own wording is reported as such for the planner to rule. Never re-label it, and never settle your own row's ambiguity in the build's favour (ruling 5).
+    - PD stays keyless (the PD.8 ruling); a behavioural swap check that needs a key is the planner's keyed probe.
+    - Instruments and gotchas (see the handoff doc): iproxy truncates its log on restart; talk() is async on purpose; cvx8 uses nohup; checking out an older candidate deletes the instruments, so use a git archive copy, never a worktree (shared.md). Needle sets pb6/pb8 and the /enroll needle-registration rule are in the doc.
+    - Open items for QA later: T-078 (O-5, measure at tcm's volume before a public address); G1 rows-n2 A15b hardcodes qa-b1/qa-b2 (accepted drift); N -tt in rl6.mjs is stricter than T-065's criterion; Q7/X1 busy-daemon state for Loop 8b. qa3-cand/qa3-old are ALREADY REMOVED (on Aaron's word, 2026-09-27); the doc's line about them is stale.
+    - Hub transport (shared.md): check hub-talk --list or presence before assuming a seat sees a turn.
+  loop state:
+    open PRs: none
+    SHA frozen for QA: 
+    questions pending for Aaron: none
+    rulings made mid-loop: none
+
+Other handoffs (newest per seat and checkout; named, not rendered — read one by its commit):
+  planner [a2a-planner] (session 25): commit not derived (no project root given)
+    Session 25, PARKED at RED + weekly 95% (~21:50Z 2026-10-02). Aaron asleep since ~12:10Z. DONE: EVERY loop in the merge chain has PASSED QA and is ruled: L9 c...
+  (5 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writing session(s) in the record
+=== renderBriefing seat=null ===
+## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
+Drift: none
+
+OBJECTIVE
+Prove a truly remote agent can join the hub over the public internet with its own key: Aaron's Grok Bot on a cloud VM registers over HTTPS and talks to relay (D-011), as the first step to a multi-tenant hub where humans own accounts, agents join by invitation, and rooms can cross accounts by invitation (D-010). Done: per-agent keys (V-006), chat UI on tcm (V-005), read-only tcm access (V-007), Loop 5 identity + membership (V-008, V-010), T-064's log read (V-009), Loop 6 enrollment codes + terse errors + rate limits on tcm (V-012, 2026-09-27), Loop 8a presence on tcm (V-013, 2026-09-28), AUTH_MODE=strict on tcm (2026-09-30, G-001 closed). Next, in order (D-029, amending D-024): Loop 8b, an idle seat is woken or cannot go idle while it owes a reply (T-076); Loop 7, the hub explains itself to an arriving agent (T-075); T-057's exposure items (Convex binding, public Convex functions, the hub on 0.0.0.0:4000) before Funnel; Funnel, with T-005's F5 source test; the test (T-068). NEVER a public address while any of T-057's exposure items is open. (since session 21)
+
+NEXT
+- [P1] T-002 Onboard a truly remote agent
+- [P1] T-005 Rate limiting and abuse protection
+- [P1] T-006 On-demand spawn
+65 active (0 P0, 13 P1, 35 P2, 17 P3); 18 done. Backlog order, not a decision: the pick-up below rules what starts.
+
+PICK UP HERE
+none: this reader's seat is unresolved, so no handoff is named as yours
+
+Working tree: clean
+Latest brief: docs/loops/x-brief.md (2026-10-02)
+Skills: none
+## End Briefing
+=== renderState seat=null ===
+
+## State (state.json rev 179)
+Project: a2a-intelligent-hub v9.9.9
+Objective: Prove a truly remote agent can join the hub over the public internet with its own key: Aaron's Grok Bot on a cloud VM registers over HTTPS and talks to relay (D-011), as the first step to a multi-tenant hub where humans own accounts, agents join by invitation, and rooms can cross accounts by invitation (D-010). Done: per-agent keys (V-006), chat UI on tcm (V-005), read-only tcm access (V-007), Loop 5 identity + membership (V-008, V-010), T-064's log read (V-009), Loop 6 enrollment codes + terse errors + rate limits on tcm (V-012, 2026-09-27), Loop 8a presence on tcm (V-013, 2026-09-28), AUTH_MODE=strict on tcm (2026-09-30, G-001 closed). Next, in order (D-029, amending D-024): Loop 8b, an idle seat is woken or cannot go idle while it owes a reply (T-076); Loop 7, the hub explains itself to an arriving agent (T-075); T-057's exposure items (Convex binding, public Convex functions, the hub on 0.0.0.0:4000) before Funnel; Funnel, with T-005's F5 source test; the test (T-068). NEVER a public address while any of T-057's exposure items is open. (since session 21)
+
+Tasks (65 active; done: 18):
+  P1:
+    [open] T-002 Onboard a truly remote agent
+    [open] T-005 Rate limiting and abuse protection
+    [open] T-006 On-demand spawn
+    [open] T-007 Two cheap repo-peer measurements
+    [open] T-008 `hub-talk` exit code 1 means two opposite things
+    [open] T-017 `--inbox` then `--wait` re-delivers turns already read (two cursors disagree)
+    [open] T-050 Wake an idle IDE seat that has an unread turn in its room
+    [open] T-057 Convex is callable without the hub: tracked compose publishes 3210 on all interfaces; on tcm, any lo…
+    [open] T-061 Chat UI served by tcm's hub (Loop 4, v1.10.0)
+    [open] T-068 First outside-agent test: Grok Bot (cloud VM) registers over HTTPS via Funnel and talks to relay
+    [open] T-075 Loop 7: an agent with the hub's URL and an enrollment code, and nothing else, can join and hold a co…
+    [open] T-076 Loop 8b: an idle seat is woken by a hub turn, or cannot go idle while it owes a reply
+    [open] T-087 A refused keyless caller still costs Convex reads: refuse before the key lookup (gates a public addr…
+  [P2] 35 active: INBOX.md
+  [P3] 17 active: INBOX.md
+
+Verified (15):
+  V-006 — On tcm every agent row owns its own key and the shared dev-key resolves to no name; tcm runs v1.10.0… (165 chars; full text: state.json verified[V-006]) (1 evidence)
+  V-007 — A read-only ssh key reads tcm's hub, auth log, agents summary, image and runners and can do nothing… (161 chars; full text: state.json verified[V-007]) (1 evidence)
+  V-008 — Loop 5 (T-066, v1.11.0) passes acceptance on loop/5-identity ebe7747: every request acts as its key'… (204 chars; full text: state.json verified[V-008]) (1 evidence)
+  V-009 — No agent on tcm's hub used a legacy, shared or unknown key after the T-003 cutover finished: 20.6 h… (234 chars; full text: state.json verified[V-009]) (1 evidence)
+  V-010 — tcm runs A2A-Hub v1.11.0 (Loop 5) in AUTH_MODE=warn: container on image 645a6f248d82 since 2026-09-2… (215 chars; full text: state.json verified[V-010]) (1 evidence)
+  V-011 — aaron's tcm row is human-kind (G-002 fixed): the Loop 5 owner's view is available to him, with his k… (139 chars; full text: state.json verified[V-011]) (1 evidence)
+  V-012 — tcm runs A2A-Hub v1.12.0 (Loop 6) in AUTH_MODE=warn: container on image 11b61b0ae035 since 2026-09-2… (260 chars; full text: state.json verified[V-012]) (1 evidence)
+  V-013 — tcm runs A2A-Hub v1.13.0 (Loop 8a, presence) in AUTH_MODE=warn: container on image 5703b442c3ad sinc… (283 chars; full text: state.json verified[V-013]) (1 evidence)
+  V-014 — tcm runs A2A-Hub v1.13.0 in AUTH_MODE=strict since 2026-09-30T12:32:42Z, on the same image 5703b442c… (174 chars; full text: state.json verified[V-014]) (1 evidence)
+  V-015 — Loop 8b r4 (T-076) at loop/8b-build-r4 435aafb passes every acceptance row runnable before the Curso… (222 chars; full text: state.json verified[V-015]) (1 evidence)
+  … 5 older verified claim(s) not shown (15 total); all of them: node open-brain/build/cli.js state show --json
+
+Gaps (0):
+  (none)
+
+Decisions: 55 recorded; latest D-042 (2026-10-03) New hub names match the seat name; existing names stay
+
+Handoffs (2) — READER'S SEAT UNRESOLVED, so none is rendered as "yours":
+
+Other handoffs (newest per seat and checkout; named, not rendered — read one by its commit):
+  qa [a2a-planner] (session 19): commit not derived (no project root given)
+    WRITTEN BY RELAY from Gauge's own handoff, docs/loops/gauge-handoff-session-20.md (master 0358353; READ IT FIRST). QA does not write ob_state (qa.md:69), so ...
+  planner [a2a-planner] (session 25): commit not derived (no project root given)
+    Session 25, PARKED at RED + weekly 95% (~21:50Z 2026-10-02). Aaron asleep since ~12:10Z. DONE: EVERY loop in the merge chain has PASSED QA and is ruled: L9 c...
+  (5 older handoff(s) superseded within their seat and checkout are in the record, not shown)
+
+Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writing session(s) in the record
