@@ -1,0 +1,51 @@
+{
+  "loop": "qa-270-s160e",
+  "candidate_git": {
+    "sha": "add445db191d7d1946609c62e7c56e0c608d5c56",
+    "branch": "local qa270-merge (be913275 + #412 + #413), not pushed",
+    "frozen_at": "2026-10-04T02:19:38Z"
+  },
+  "candidates": [
+    { "task": "T-238", "sha": "f918de5844a89d38f03d4d4e23173e4540c9f814", "branch": "origin/loop/t238-keyorder-guard", "pr": 412, "verdict": "ACCEPT" },
+    { "task": "T-239", "sha": "e00c0d5aae7ad902a589d09b60a672d0700ae78c", "branch": "origin/loop/t239-handoff-by-checkout", "pr": 413, "verdict": "ACCEPT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit; npm run typecheck:tests; npm run build; node --check build/server.js (each head and the merge)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 120000,
+      "detail": "tsc 0 and typecheck:tests 0 at f918de58, e00c0d5a and merge add445db; node --check build/server.js OK at the merge. CI test pass: run 37169473529 (#412), 37169676054 (#413)."
+    },
+    "unit": {
+      "command": "npx vitest run <one file> per invocation, at the merge add445db",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 64000,
+      "detail": "state-keyorder 23/23, state-writer 48/48, state-schema 20/20, handoff-by-checkout 13/13, briefing 48/48, briefing-budget 33/33, missing-handoff 29/29, focus 10/10, server 35/35, a2a-byte-identical 3/3. LIGHT job: no full suite."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q270-1", "status": "met", "order": "shown", "evidence": "#412: 3 files (handoff doc, state-schema.ts, state-keyorder.test.ts). #413: 10 files (greeting.json flag, CHANGELOG, 6 src, 2 tests). Nothing outside either task." },
+    { "id": "Q270-2", "status": "met", "order": "red-first", "evidence": "#412 base: file fails to collect (schemaObjectSlots is not a function), not counted red; head 23/23. #413 base: handoff-by-checkout 13 failed (13), briefing-budget 1 failed | 32 passed; head 13/13 and 33/33." },
+    { "id": "Q270-3", "status": "partial", "order": "shown", "evidence": "#412: dev a1 (6 failed), dev c2 (1 failed), QA union-first-only (3 failed), QA missing-entry-off (1 failed): all killed, tsc 0. #413: dev M2 (3 failed), dev M3a (4 failed), QA noneRecorded (5 failed) killed; QA server drops ownCheckout from renderBriefing SURVIVES (handoff-by-checkout 13/13, server 35/35)." },
+    { "id": "Q270-4", "status": "met", "order": "shown", "evidence": "gh pr checks: #412 test pass run 37169473529 (headSha f918de58 success); #413 test pass run 37169676054 (headSha e00c0d5a success)." },
+    { "id": "Q270-5", "status": "met", "order": "shown", "evidence": "Independent zod-class walker = schemaObjectSlots: same 14 slots and key sets; nested project.meta.inner found via safeExtend; throws on record, tuple, lazy, intersection, map." },
+    { "id": "Q270-6", "status": "met", "order": "shown", "evidence": "Scratch copy of master state.json rev 325, KEY_ORDER.gaps minus recommended_update, applyStateOps add_gap threw 'KEY_ORDER and StateSchema disagree'; sha256 c331e59e9cadaee8 before = after; control write ok 325->326; dev c2 killed." },
+    { "id": "Q270-7", "status": "met", "order": "shown", "evidence": "Master state.json (645692 B) serialized at head == master serializer (sha dec92962441a35dd). 100 writes: head 843.7 ms vs base 834.9 ms; assertKeyOrder ~87 us/write." },
+    { "id": "Q270-8", "status": "met", "order": "shown", "evidence": "Flag off: 36 renders (4 seats x briefing orig/budget + renderState, on SIA fixture, A2A fixture, master record) identical head vs master; A2A qa own = qa@a2a-planner#19; a2a-byte-identical 3/3." },
+    { "id": "Q270-9", "status": "met", "order": "shown", "evidence": "On master's real record, every seat x checkout: none recorded for this checkout (<seat>, <checkout>) when none; developer@sia-forge keeps own #151 over newer sia-builder #156; qa@null#75 never own, listed [legacy, unattributed]." },
+    { "id": "Q270-10", "status": "met", "order": "shown", "evidence": "checkoutOf and checkMissingHandoff's inline basename(resolve()) agree on plain, trailing /, //, /., sub/.., case variant, symlink. Finding: both spelling-sensitive (symlink, case) for writer and reader alike; inline copy is drift risk." },
+    { "id": "Q270-11", "status": "met", "order": "shown", "evidence": "All flags on: FOCUS on header, OWN pick-up body, notice appended (160 = MISSING_HANDOFF_MAX_CHARS from product), SEATS line 10 above PICK UP line 11; 30 lines / 3834 chars (limits 30/4096)." },
+    { "id": "Q270-12", "status": "met", "order": "shown", "evidence": "be913275 + #412 (a3c95733) + #413 (add445db): no conflict, disjoint hunks in state-schema.ts; tsc 0, typecheck:tests 0, ten files green one per run, node --check build/server.js OK; 2 duplicate imports both pre-existing on master, none introduced." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "#413: server.ts ownCheckout wiring is unpinned; QA mutant dropping it from renderBriefing survives every row; non-blocking.",
+    "#413: all-flags worst case is exactly 30/30 lines; zero headroom.",
+    "#413/T-199: checkMissingHandoff still derives the checkout inline; agrees today; all derivations are symlink- and case-spelling-sensitive.",
+    "#412: dry_run and render-only batches never reach the refusal."
+  ],
+  "notes": "QA 270 (s160e), dispatch tree 0bc93353a7eae700b59835e09e573549948ce13c. No live Jev call; no live state.json written. TMPDIR could not be exported in this harness (runner children set it). First four npm ci used the default npm cache. Batch verdict ACCEPT, pending Aaron's batch merge approval."
+}
