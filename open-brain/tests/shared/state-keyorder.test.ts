@@ -58,7 +58,7 @@ describe("T-238: the guard is shown a known positive before a negative is truste
   it("a KEY_ORDER entry that lost a key is reported, naming the slot and the field, and says the field would be dropped", () => {
     const gaps = keyOrderGaps(without("tasks", "assignee"));
     expect(gaps).toEqual([`slot "tasks": schema field "assignee" is not in KEY_ORDER, so serializeState would drop it from disk`]);
-    expect(() => assertKeyOrder(without("tasks", "assignee"))).toThrow(/serializeState refused.*"assignee".*lose data/);
+    expect(() => assertKeyOrder(without("tasks", "assignee"))).toThrow(/serializeState refused.*lose data.*"assignee"/);
   });
 
   it("a KEY_ORDER entry with an extra key, a duplicate, a missing slot and an unknown slot are each reported", () => {
@@ -93,6 +93,20 @@ describe("T-238 row 3: serializeState loses no field, and refuses rather than lo
     const after = parseState(serializeState(before));
     expect(after.ok).toBe(true);
     if (after.ok) expect(after.data).toEqual(before);
+  });
+
+  it("a drifted KEY_ORDER REFUSES the write, naming the field, and the next write is fine once it is restored", () => {
+    const order = KEY_ORDER as unknown as Record<string, string[]>;
+    const original = order.tasks!;
+    const s = valid();
+    s.tasks[0] = { ...s.tasks[0]!, assignee: "builder" };
+    try {
+      order.tasks = original.filter((k) => k !== "assignee");
+      expect(() => serializeState(s)).toThrow(/serializeState refused.*"assignee" is not in KEY_ORDER/);
+    } finally {
+      order.tasks = original;
+    }
+    expect(JSON.parse(serializeState(s)).tasks[0].assignee).toBe("builder");
   });
 
   it("a task's assignee, the field that vanished in #401, survives the write", () => {

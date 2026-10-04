@@ -471,10 +471,12 @@ export function parseState(text: string): ParseResult {
  * string, writes nothing.
  */
 export function serializeState(data: State): string {
+  // Checked on EVERY write, not once: the walk is a dozen objects, and a check that remembers its answer cannot see a later drift.
+  assertKeyOrder();
   return JSON.stringify(canonicalize(data), null, 2) + "\n";
 }
 
-const KEY_ORDER: Record<string, string[]> = {
+export const KEY_ORDER: Readonly<Record<string, readonly string[]>> = {
   $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "sessions"],
   project: ["name"],
   objective: ["text", "since_session"],
@@ -488,6 +490,75 @@ const KEY_ORDER: Record<string, string[]> = {
   open_prs: ["ref", "qa_status", "note"],
   sessions: ["n", "date", "uuid", "seat", "checkout", "first_rev"],
 };
+
+/**
+ * T-238. `canonicalize` writes ONLY the keys KEY_ORDER lists for a slot, so a field added to a schema and not to KEY_ORDER
+ * validated, applied, printed "applied" and VANISHED from disk (tasks[].assignee did exactly that in #401 until it was added).
+ *
+ * The slots are DERIVED from StateSchema, not listed: a slot is the property name an object schema sits under, the same name
+ * `canonicalize` looks up (the root is `$`). Slots without an entry are the object variants of a string-or-object union
+ * (`watch_out`, `open_questions`); `canonicalize` sorts their keys and drops none, so they are the one deliberate exception.
+ */
+const UNORDERED_SLOTS: ReadonlySet<string> = new Set(["watch_out", "open_questions"]);
+const LEAF_TYPES: ReadonlySet<string> = new Set(["string", "number", "boolean", "enum", "literal", "null", "undefined", "bigint", "date"]);
+
+interface ZodDef {
+  type: string;
+  shape?: Record<string, unknown>;
+  element?: unknown;
+  innerType?: unknown;
+  options?: unknown[];
+}
+const defOf = (schema: unknown): ZodDef => (schema as { def: ZodDef }).def;
+
+/** Every object schema reachable from `schema`, keyed by slot, with each distinct key set. Throws on a schema type it cannot see through. */
+export function schemaObjectSlots(schema: unknown = StateSchema, slot = "$", out = new Map<string, string[][]>()): Map<string, string[][]> {
+  const d = defOf(schema);
+  if (d.type === "object") {
+    const keys = Object.keys(d.shape ?? {}).sort();
+    const seen = out.get(slot) ?? [];
+    if (!seen.some((k) => k.join("\u0000") === keys.join("\u0000"))) seen.push(keys);
+    out.set(slot, seen);
+    for (const [k, v] of Object.entries(d.shape ?? {})) schemaObjectSlots(v, k, out);
+  } else if (d.type === "array") schemaObjectSlots(d.element, slot, out);
+  else if (d.type === "optional" || d.type === "nullable" || d.type === "default") schemaObjectSlots(d.innerType, slot, out);
+  else if (d.type === "union") for (const o of d.options ?? []) schemaObjectSlots(o, slot, out);
+  else if (!LEAF_TYPES.has(d.type)) {
+    // A fail-closed walker: a type that could hold objects and is not handled here would hide fields from the guard.
+    throw new Error(`schemaObjectSlots: cannot see through zod type "${d.type}" at slot "${slot}"; handle it before this guard can be trusted`);
+  }
+  return out;
+}
+
+/**
+ * Where `order` (default KEY_ORDER) and the schemas disagree, one sentence each; empty means they agree. Checked per slot:
+ * every schema field is listed, every listed key is a schema field, no key is listed twice, and no object slot is missing
+ * an entry unless it is one of UNORDERED_SLOTS. A slot reached by two different object shapes cannot be told apart by name.
+ */
+export function keyOrderGaps(order: Readonly<Record<string, readonly string[]>> = KEY_ORDER): string[] {
+  const gaps: string[] = [];
+  const slots = schemaObjectSlots();
+  for (const [slot, shapes] of slots) {
+    const listed = order[slot];
+    if (listed === undefined) {
+      if (!UNORDERED_SLOTS.has(slot)) gaps.push(`slot "${slot}" has no KEY_ORDER entry, so serializeState would order its keys by chance`);
+      continue;
+    }
+    if (shapes.length > 1) gaps.push(`slot "${slot}" is reached by ${shapes.length} different object shapes, but KEY_ORDER is keyed by slot name`);
+    const fields = new Set(shapes.flat());
+    for (const k of fields) if (!listed.includes(k)) gaps.push(`slot "${slot}": schema field "${k}" is not in KEY_ORDER, so serializeState would drop it from disk`);
+    for (const k of listed) if (!fields.has(k)) gaps.push(`slot "${slot}": KEY_ORDER lists "${k}", which no schema object in that slot has`);
+    if (new Set(listed).size !== listed.length) gaps.push(`slot "${slot}": KEY_ORDER lists a key twice`);
+  }
+  for (const slot of Object.keys(order)) if (!slots.has(slot)) gaps.push(`KEY_ORDER has an entry for "${slot}", which is not a slot of StateSchema`);
+  return gaps;
+}
+
+/** Throws, loudly, when `order` has drifted from the schemas: a write that went ahead would lose data. */
+export function assertKeyOrder(order: Readonly<Record<string, readonly string[]>> = KEY_ORDER): void {
+  const gaps = keyOrderGaps(order);
+  if (gaps.length > 0) throw new Error(`serializeState refused: KEY_ORDER and StateSchema disagree, and writing would lose data. ${gaps.join("; ")}`);
+}
 
 function canonicalize(value: unknown, slot = "$"): unknown {
   if (Array.isArray(value)) return value.map((v) => canonicalize(v, slot));
