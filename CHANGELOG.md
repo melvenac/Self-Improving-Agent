@@ -9,6 +9,12 @@
   of `hub-partner-seats.json`, set by the planner with `update_task`. FOCUS names this checkout's seat's assigned task (or
   `none assigned in the record`), on the PICK UP header line. SEATS lists every seat's, with presence words only from the
   roster ob_start already fetched. Still 30 lines in the worst case. New `/sync` check `task-assignees`.
+- **`/start` names a checkout whose last session wrote the record and left no handoff (T-199, ported from Forge's loop/t199-missing-handoff).**
+  Opt-in per repo: `"missing_handoff": true` in `.agents/SYSTEM/greeting.json` (absent = off, so A2A renders exactly as before).
+  On, the Briefing prints `Handoff MISSING: last <seat> session #N (<uuid>, rev R) wrote the record, left no handoff; fix: ob_state
+  set_handoff` (the seat is the T-203 map's, by checkout), or `Handoff check: not checked (<why>)` when it cannot tell. In the budgeted
+  layout the notice is appended to the pick-up line, so it costs no line. A checkout with no session in the record is clear.
+
 - **Role docs print in full only when they changed since this seat last read them (T-236 slice 1, closes T-183).**
   Opt-in per repo: `"role_docs_by_sha": true` in the new tracked `.agents/SYSTEM/greeting.json` (absent file or key = off,
   so a repo that does not opt in, A2A included, renders exactly as before). On, `ob_start` prints an unchanged doc as one
@@ -18,6 +24,9 @@
 
 ### Fixed
 
+- **One hub room with `pollAgeMs: null` turned ALL partner presence into UNKNOWN (T-237).** A2A sends null for
+  "no wait-poll seen in the window", by design. It is now accepted, and a room with unread turns and no recorded poll
+  says `no listener poll recorded` instead of the false `since 0s`. A string, boolean or non-finite value is still malformed.
 - **`setup.mjs` refused to run from a path with a space (T-235 Phase 0).** It took the repo root from a URL pathname,
   which keeps a space as `%20`, so on the QA PC (`C:\Users\Aaron Melven\…`) it reported "Cannot find open-brain/"
   and wrote nothing. The root now comes from `fileURLToPath` (`repoRootFrom` in `scripts/setup-hooks.mjs`).
