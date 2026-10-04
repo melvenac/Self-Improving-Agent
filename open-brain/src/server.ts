@@ -421,7 +421,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
           ? {
               focus: {
                 focus: focusLine(sj.data, resolveCheckoutSeat(projectRoot)),
-                seats: ((order) => (order ? seatsLine(sj.data, order, presence.statusByHubName ?? null) : null))(seatOrder(projectRoot)),
+                seats: ((order) => (order ? seatsLine(sj.data, order, presence.liveByHubName ?? null) : null))(seatOrder(projectRoot)),
               },
             }
           : {}),

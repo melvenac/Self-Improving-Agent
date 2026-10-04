@@ -1,8 +1,18 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { isSeatRuntime } from "../session-start/hub-seat-state.js";
 import type { CheckResult } from "./types.js";
 
-type HubSeat = { hub_name?: unknown; cursor?: unknown; room?: unknown };
+type DispatchCursor = { via?: unknown; hub_name?: unknown; room?: unknown; waker?: unknown };
+type DispatchCc = { via?: unknown; name?: unknown; host?: unknown };
+type HubSeat = {
+  hub_name?: unknown;
+  runtime?: unknown;
+  host?: unknown;
+  model?: unknown;
+  dispatch?: { cursor?: DispatchCursor; claude_code?: DispatchCc };
+  room?: unknown;
+};
 type Partner = { label?: unknown; hub_as?: unknown; session_id?: unknown };
 type HubFile = {
   talk?: unknown;
@@ -20,6 +30,44 @@ function issue(message: string): CheckResult {
 
 function filled(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function validateDispatch(seat: string, row: HubSeat, problems: string[]): void {
+  if (!isSeatRuntime(row.runtime)) {
+    problems.push(`${seat} has no runtime (cursor or claude-code)`);
+    return;
+  }
+  if (!filled(row.host)) problems.push(`${seat} has no host`);
+  if (!filled(row.model)) problems.push(`${seat} has no model`);
+  const d = row.dispatch;
+  if (!d || typeof d !== "object") {
+    problems.push(`${seat} has no dispatch block`);
+    return;
+  }
+  const cur = d.cursor;
+  if (!cur || typeof cur !== "object") {
+    problems.push(`${seat} dispatch.cursor is missing`);
+  } else {
+    if (cur.via !== "hub-room") problems.push(`${seat} dispatch.cursor.via must be hub-room`);
+    if (!filled(cur.hub_name)) problems.push(`${seat} dispatch.cursor has no hub_name`);
+    if (!filled(cur.waker)) problems.push(`${seat} dispatch.cursor has no waker`);
+    if (row.runtime === "cursor") {
+      const dispatchRoom = typeof cur.room === "string" ? cur.room.trim() : "";
+      const topRoom = typeof row.room === "string" ? row.room.trim() : "";
+      if (!dispatchRoom) problems.push(`${seat} is a cursor runtime seat with no room (dispatch.cursor.room; a top-level room is not a fallback)`);
+      if (dispatchRoom && topRoom && dispatchRoom !== topRoom) {
+        problems.push(`${seat} top-level room differs from dispatch.cursor.room`);
+      }
+    }
+  }
+  const cc = d.claude_code;
+  if (!cc || typeof cc !== "object") {
+    problems.push(`${seat} dispatch.claude_code is missing`);
+  } else {
+    if (cc.via !== "session") problems.push(`${seat} dispatch.claude_code.via must be session`);
+    if (!filled(cc.name)) problems.push(`${seat} dispatch.claude_code has no name`);
+    if (!filled(cc.host)) problems.push(`${seat} dispatch.claude_code has no host`);
+  }
 }
 
 export function checkHubSeats(projectRoot: string): CheckResult {
@@ -85,22 +133,18 @@ export function checkHubSeats(projectRoot: string): CheckResult {
       problems.push(`${seat} is not a seat in worktree-seats.json`);
       continue;
     }
-    if (row?.cursor === true) {
-      const room = typeof row.room === "string" ? row.room.trim() : "";
-      const name = typeof row.hub_name === "string" ? row.hub_name.trim() : "";
-      if (!name) problems.push(`${seat} is a Cursor seat with no hub_name`);
-      if (!room) problems.push(`${seat} is a Cursor seat with no room`);
-    }
+    validateDispatch(seat, row ?? {}, problems);
   }
 
   if (problems.length > 0) {
     return issue(`hub seats: ${problems.join("; ")}`);
   }
-  const cursorSeats = Object.entries(entries).filter(([, row]) => row?.cursor === true).map(([seat]) => seat);
+  const cursorSeats = Object.entries(entries).filter(([, row]) => row?.runtime === "cursor").map(([seat]) => seat);
+  const ccSeats = Object.entries(entries).filter(([, row]) => row?.runtime === "claude-code").map(([seat]) => seat);
   return {
     name: "hub-seats",
     severity: "pass",
     report: true,
-    message: `hub-partner-seats.json matches worktree-seats.json and the readers map ob_start reads (${cursorSeats.length} Cursor room(s): ${cursorSeats.join(", ")}); ${ignoredSeatNames} seat names ignored`,
+    message: `hub-partner-seats.json matches worktree-seats.json and the readers map ob_start reads (${cursorSeats.length} cursor runtime(s): ${cursorSeats.join(", ")}; ${ccSeats.length} claude-code: ${ccSeats.join(", ")}); ${ignoredSeatNames} seat names ignored`,
   };
 }
