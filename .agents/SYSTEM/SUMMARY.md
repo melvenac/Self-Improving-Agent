@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 323 by open-brain v0.45.0 — do not edit; change state via ob_state -->
-> **Status:** v0.45.0 — Dev seats are Claude Code Sonnet (sia-infra on the desktop; sia-forge and sia-builder on the QA PC), reached by native SendMessage until the Loop 8b waker is proven (Aaron via clark, 2026-10-03). T-234 A+B and T-203 are merged. In flight: QA 267 (dispatch docs/loops/qa-267-s160-dispatch.md, PR #395) over #387, #388, #391 and #393 (T-236 slices 1 and 2), then one batch approval from Aaron. T-236 item (c) FOCUS/SEATS is next now that T-203 is in. sia-builder is blocked on cursor-agent (T-235 P2-2). Next dispatch candidates: the D-110 queue (T-191, T-152).
+<!-- generated from .agents/state.json rev 324 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+> **Status:** v0.45.0 — QA 269 running (#397 T-237, #401 T-236c, #402 T-199, #404 T-204); then one batch ask to Aaron, with #403 (planner.md). Next: T-238 after #401; the wrong-seat PICK UP fallback (infra is investigating).
 
 ## What's working
 
