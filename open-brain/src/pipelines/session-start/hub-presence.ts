@@ -272,10 +272,21 @@ export function presenceBlockUpperBound(
   if (seat.kind !== "seat" || !seat.hubName) return { chars: 0, lines: [] };
   const partners = seatsFile.data.readers[seat.hubName]?.partners;
   if (!partners?.length) return { chars: 0, lines: [] };
-  const worst: PresenceAgent[] = partners.map((p) => ({
-    name: p.hub_as,
-    rooms: [{ sessionId: p.session_id, unread: 999, pollingNow: false, pollAgeMs: 99 * 86_400_000 }],
-  }));
-  const lines = [presenceHeader(callerLabel, seatsFile.rel), ...partners.map((p) => `  ${formatPartnerLine(p, worst)}`)];
+  // QA 268 F1 (T-237): one fixed room stopped being the worst case when "no listener poll recorded" arrived, and a
+  // bound that is not the longest form is not a bound. Each partner's line is the LONGEST over every room shape the
+  // line renders: aged, unknown age (a negative age is valid input), no recorded poll (null or absent), polling, absent.
+  const shapes: Array<PresenceAgent["rooms"]> = [
+    [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: 99 * 86_400_000 }],
+    [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: -1 }],
+    [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: null }],
+    [{ sessionId: "", unread: 999, pollingNow: false }],
+    [{ sessionId: "", unread: 0, pollingNow: true, pollAgeMs: 0 }],
+    [],
+  ];
+  const longest = (p: HubPartnerSeat): string =>
+    shapes
+      .map((rooms) => formatPartnerLine(p, [{ name: p.hub_as, rooms: (rooms ?? []).map((r) => ({ ...r, sessionId: p.session_id })) }]))
+      .reduce((a, b) => (b.length > a.length ? b : a));
+  const lines = [presenceHeader(callerLabel, seatsFile.rel), ...partners.map((p) => `  ${longest(p)}`)];
   return { chars: lines.join("\n").length, lines };
 }
