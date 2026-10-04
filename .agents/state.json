@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 325,
+  "revision": 326,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3288,6 +3288,13 @@
       "evidence": "docs/loops/b3-misc-qa-report.md on 6533ba75, rows 3 and 9.",
       "recommended_update": "A LIGHT follow-up adds one row each: paths.test.ts pins the knowledgeV2Db default; vault-pollution.test.ts runs with no vaultDir and an injected home so obsidianVaultDir() is exercised.",
       "opened_session": 157
+    },
+    {
+      "id": "G-053",
+      "what": "The config-channel harness test CA-3c/3d R21 failed once on master push CI (8f14ca91, run 37172590273 attempt 1): the boundary check saw `<common>/info/refs created` during the developer stage, refused the developer, and the test expected a pass. It passed on re-run (attempt 2), on the PR run of the same code, and in the master runs immediately before. info/refs is written by `git update-server-info`, which a background `git gc --auto` can trigger, so a git-internal write is being read as a role changing what git executes.",
+      "evidence": "Run 37172590273 attempt 1, failure text 'developer was refused, not warned. 1 repository config/hook file(s) changed during the developer stage: <common>/info/refs created'. The only failure in the last 30 CI runs (sia-infra, session 161). The planner re-ran it session 160: attempt 2 success.",
+      "recommended_update": "Determine what wrote info/refs (gc.auto in the test's scratch repo; set gc.auto=0 there, or run the stage with GIT_CONFIG_PARAMETERS gc.auto=0) and decide whether info/refs belongs in the watched set at all. It is data git writes, not something git executes. If it recurs before a fix, record each run id here.",
+      "opened_session": 160
     }
   ],
   "decisions": [
