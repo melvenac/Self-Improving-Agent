@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 332,
+  "revision": 333,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1513,6 +1513,20 @@
         "766a2128-4c5f-4b3f-93b7-3f9a88c1e594"
       ],
       "closed_rev": 327
+    },
+    {
+      "id": "T-240",
+      "title": "Seat runtime in the record: the seat map names each seat's runtime (cursor | claude-code), host, model and dispatch for BOTH runtimes; ob_start's SEATS line prints runtime/model, host and live state; switching runtime is one map edit plus a waker stop/start",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 161,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:3x CDT: 'Is there any way for atlas to know what runtime its devs are using? Once cursor usage is gone we will be switching back to cc so atlas needs to know both runtimes.' -> 'give it to Atlas as a task.' Relayed by clark (TOLD, one link: Aaron -> clark -> Atlas). PROBLEM (read by the planner at cff008ca): .agents/SYSTEM/hub-partner-seats.json carries only a boolean `cursor` and a hub room per seat; it has no Claude Code dispatch route, host or model, so a switch back to CC has nothing in the record to dispatch from. The briefing's SEATS line prints 'not polling' for waker seats, which is normal for them and reads as a fault. SCOPE: (1) map: replace `cursor` with `runtime: \"cursor\" | \"claude-code\"`; add per seat `host`, `model` (cursor: composer-2.5; CC: sonnet) and `dispatch.cursor = {via:'hub-room', hub_name, room, waker:'<hub_name>-waker'}` and `dispatch.claude_code = {via:'session', name, host}`; `runtime` selects the active one; hub_name stays a plain field (D-115); recommend whether the runtime-baked names cursor-builder/cursor-infra are kept or renamed at the next switch (the planner rules). (2) ob_start SEATS line per seat: runtime/model, host and live state, using hub seatState (idle/working/owes_reply/alarm) for waker seats and session presence for CC seats; never 'not polling' for a waker seat. (3) A short 'switch runtime' procedure in a role doc, both directions, with the D-119 lease OwnerPid rule for each runtime (CC: the claude.exe session; Cursor: the nearest cursor-agent ancestor). (4) Tests: ob_start renders both runtimes from fixture maps; a map missing `runtime` fails loudly. OVERLAP: this is the record half of T-202 (which also wants SHA/rev at seat start); T-202 stays open for the online signal. Role-doc and code changes merge on Aaron's word.",
+      "note_by": [
+        "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
