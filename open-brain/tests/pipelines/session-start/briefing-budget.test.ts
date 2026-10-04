@@ -242,6 +242,21 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     expect(lines.at(-1)).toBe(BRIEFING_END);
   });
 
+  it("WORST CASE with the T-199 missing-handoff notice ON: still 30 lines and 4096 chars (the notice rides the pick-up line, so it costs no line)", () => {
+    const notice = `Handoff MISSING: last builder session #1234 (00000000-0000-4000-8000-000000000000, rev 123456) wrote the record, left no handoff; fix: ob_state set_handoff`;
+    const lines = render(worst(), {
+      drift,
+      serving: "Build abc1234 · STALE: 123 code commits behind, ahead by 45 → ask Aaron to update",
+      usage: "Usage: STOP (weekly 98%) · park, push WIP · 5h 14%",
+      workingTree: `Working tree: 9 uncommitted: ${"a/b/c.ts, ".repeat(8)}+1 more`,
+      missingHandoff: notice,
+    });
+    const { lines: n, chars } = size(lines);
+    expect(lines.join("\n")).toContain(notice);
+    expect(n, `${n} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
+    expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+  });
+
   it("WORST CASE keeps the facts that decide a session: every section header is present, each cut ends with its pointer", () => {
     const lines = render(worst(), { drift });
     for (const h of ["OBJECTIVE", "NEXT", "PICK UP HERE", "WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]) expect(lines, h).toContain(h);

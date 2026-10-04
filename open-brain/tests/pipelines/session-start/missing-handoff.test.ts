@@ -233,7 +233,7 @@ describe("T-199 end to end through handleStart (opt-in: greeting.json missing_ha
     });
   }
 
-  function project(stateText: string | null, flags: Record<string, boolean> | null): void {
+  function project(stateText: string | null, flags: Record<string, boolean | undefined> | null): void {
     tmp = mkdtempSync(join(tmpdir(), "ob-t199-"));
     mkdirSync(join(tmp, ".agents", "SESSIONS"), { recursive: true });
     mkdirSync(join(tmp, ".agents", "SYSTEM"), { recursive: true });
