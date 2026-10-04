@@ -1,0 +1,56 @@
+{
+  "loop": "qa-272-s160f",
+  "candidate_git": {
+    "sha": "7dd34fe2477894674cbd527a4f1b134793cc9b43",
+    "branch": "local qa272-merge (71b2b924 + #415 + #421 + #420), not pushed",
+    "frozen_at": "2026-10-04T06:05:03Z"
+  },
+  "candidates": [
+    { "task": "T-239 follow-up", "sha": "dc092840af38f86dfe18af060564fe181988f159", "branch": "origin/loop/t239-followup", "pr": 415, "verdict": "ACCEPT" },
+    { "task": "T-200", "sha": "0d2bc66e94ebed4ca7008395eede8426f43e055c", "branch": "origin/loop/t200-port", "pr": 420, "verdict": "ACCEPT" },
+    { "task": "G-053", "sha": "82aeb3da3e9036d5f6812738be541cb67ada1e07", "branch": "origin/loop/g053-inforefs", "pr": 421, "verdict": "REJECT" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit; npm run typecheck:tests (each head and the merge); npm run build; node --check build/server.js (merge)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 150000,
+      "detail": "tsc 0 and typecheck:tests 0 at dc092840, 0d2bc66e, 82aeb3da and merge 7dd34fe2; node --check build/server.js OK. CI test pass: run 37173052418 (#415), 37179283886 (#420), 37179333080 (#421), headSha = pinned head each."
+    },
+    "unit": {
+      "command": "npx vitest run <one file> per invocation, at the merge 7dd34fe2",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 136000,
+      "detail": "handoff-by-checkout 17/17, missing-handoff 29/29, record-source 13/13, briefing-budget 33/33, greeting-size 14/14, server 35/35, config-channel 38/38, a2a-byte-identical 3/3. Master (row 12): seat-map 21/21, hub-presence 40/40, hub-seats 5/5, focus 10/10. LIGHT job: no full suite."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q272-1", "status": "met", "order": "shown", "evidence": "#415: 3 files (CHANGELOG, state-render.ts, handoff-by-checkout.test.ts); no server.ts. #420: 10 files, all T-200. #421: 3 files (configwatch.ts +1 line, config-channel.test.ts, fixture.ts). Nothing outside the tasks." },
+    { "id": "Q272-2", "status": "met", "order": "red-first", "evidence": "#415: green at base by design (17/17; pins existing wiring), red via mutants. #420: collect failure at base not counted; with leaf git-read.ts copied, record-source 11 failed | 2 passed; head 13/13 and greeting-size 14/14. #421: base 32 failed | 6 passed (gc.auto refused at preflight); head 38/38." },
+    { "id": "Q272-3", "status": "partial", "order": "shown", "evidence": "#415: DEV Q1, Q2, D1 and QA A, B, C all killed, tsc 0. #420: DEV M1, M4, QA 1-4 killed; QA 5b (Sizes line) and QA 6 (no local record -> LOCAL) SURVIVE. #421: DEV rule-removed and QA a killed; QA b (/^0/) and QA c (gc.* key) SURVIVE." },
+    { "id": "Q272-4", "status": "met", "order": "shown", "evidence": "gh: #415 test pass run 37173052418; #420 test pass run 37179283886; #421 test pass run 37179333080; headSha equals each pinned SHA." },
+    { "id": "Q272-5", "status": "met", "order": "shown", "evidence": "Q1 and Q2 killed by R8 in both layouts. Real writer run from plain, /, //, /., sub/.. : stamped = checkoutOf = sia-infra and checkMissingHandoff missing each time. Windows path: both sides call checkoutOf (win32 gives sia-infra). Note: seat-map.ts:36 is the last inline derivation." },
+    { "id": "Q272-6", "status": "met", "order": "shown", "evidence": "range-diff abae5f92..424065c vs 651ac36b..0d2bc66e: docs commits identical; server.ts 46 changed lines identical (context only, sj rebinding ahead of renderBriefing); tree-currency readLastFetchAt export hunk absent (already exported on master); checks.ts blank-line move; +13 lines RM-1b row." },
+    { "id": "Q272-7", "status": "met", "order": "shown", "evidence": "Scratch real-git row 9/9: behind -> master record in both layouts, Briefing pick-up is master's, line 'record read from origin/master <sha> rev 163; this tree holds rev 140; last fetch ...'; current/ahead -> LOCAL line; invalid JSON / string revision / no ref -> LOCAL with cause. Git wrapper: only rev-parse, rev-list, show, log, status; 0 fetch; origin advanced or removed after fetch does not change the brief. Gap: line sits outside the verbatim Briefing block." },
+    { "id": "Q272-8", "status": "met", "order": "shown", "evidence": "a2a-byte-identical 3/3 at #420 head and at the merge." },
+    { "id": "Q272-9", "status": "met", "order": "shown", "evidence": "At base (base fixture, gc default): update-server-info creates <common>/info/refs; known-positive loop fails with 'info/refs created'. Forced git gc writes info/refs (git 2.53.0). Observation: the auto trigger could not be reproduced (gc --auto with gc.auto=1 and 360 loose objects did not run; 60 commits default never wrote info/refs)." },
+    { "id": "Q272-10", "status": "unmet", "order": "shown", "evidence": "unsafeLocalKeys tests value.trim() against /^0$/: gc.auto=' 0', '\\t0', '0 ', '0\\n' ADMITTED (dispatch requires ' 0' refused; '0 ' and '0\\n' are fatal to git). 1, 00, 0x, +0, -0, 0k, '' refused; gc.autoDetach, gc.autoPackLimit, gc.foo.auto, gc.writeServerInfo refused (unpinned: QA c survives). info/ still watched. Only one allowlist line changed. No program-execution path: gc.auto=0 runs nothing and suppresses pre-auto-gc." },
+    { "id": "Q272-11", "status": "met", "order": "shown", "evidence": "config-channel at head 5 consecutive runs: 38/38, 38/38, 38/38, 38/38, 38/38 (47-55 s each); 6th at merge 38/38." },
+    { "id": "Q272-12", "status": "met", "order": "shown", "evidence": "#418 retro: infra cursor-infra/k57d92..., builder cursor-builder/k575sf..., forge forge/k571z4...; atlas<->seat readers match both directions; grok 0, three old room ids 0. seat-map 21/21, hub-presence 40/40, hub-seats 5/5, focus 10/10. Fix-forward: hub-seats.test.ts uses retired id as synthetic data." },
+    { "id": "Q272-13", "status": "met", "order": "shown", "evidence": "71b2b924 + #415 (681129e7) + #421 (31fc5a12) + #420 (7dd34fe2): no conflict. tsc 0, typecheck:tests 0, eight files green one per run, build + node --check OK. Duplicate imports: one new, in a test file (handoff-by-checkout imports state-render.js twice); src unchanged." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "#421 (blocking): value trimmed before /^0$/; ' 0', '\\t0', '0 ', '0\\n' admitted. Fix: test the raw value; add refusal rows for 00, ' 0', '0 ', 0x, gc.autoDetach.",
+    "#421: actual CI trigger for info/refs unproven; commits spawn a detached maintenance run --auto.",
+    "#421 nit: disableAutoGc inserted between makeRepo's JSDoc and makeRepo.",
+    "#420: record-source line is outside the verbatim Briefing block; human-visible brief does not name the source.",
+    "#420: QA mutants 5b (Sizes line) and 6 (no local record -> LOCAL) survive.",
+    "#415 (out of scope): seat-map.ts:36 still derives the checkout inline.",
+    "#418 (cosmetic): hub-seats.test.ts uses retired room id k5702788... as synthetic data."
+  ],
+  "notes": "QA 272 (s160f), dispatch tree 71b2b924b1020a454e2eaa7035366c841de0f8f5. No live Jev call; no live state.json written; no issue/PR touched. npm cache under ~/qa-tmp for every npm ci. TMPDIR set by node runners for every vitest child. Verdicts: #415 ACCEPT, #420 ACCEPT, #421 REJECT; #418 retro PASS. Batch REJECT; #415 + #420 can merge without #421, pending Aaron's approval."
+}
