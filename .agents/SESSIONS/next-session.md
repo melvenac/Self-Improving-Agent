@@ -1,12 +1,12 @@
-<!-- generated from .agents/state.json rev 330 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 331 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 160)_
+## planner [sia-planner] _(written session 161)_
 
 ### Pick up here
 
-On QA 272's verdict: one ask to Aaron for #415, #420 and #421 (use mergeone: update-branch, first parent = QA'd SHA, patch-id equal). Rule builder's P2-3 plan; collect forge's P2-4 and infra's P2-6 PRs for QA 273. Re-arm one hub --wait per room after every reply.
+QA 272 is RULED, so do not ask Aaron about #415/#420/#421 again. Dispatch QA 273 for #421 r2 9915a59b (narrow, row 10), #424 12c28926, #425 9fcb97ca and #427 270b550b on Plumb, and send the Windows rows to the desktop once it is free of Gauge. Re-read the head SHAs before freezing them. Rule builder's P2-5 plan; collect forge P2-7 and infra's G-054 repro. Arm one hub --wait per room (none armed at s161 start; forge 2 unread, builder 3).
 
 ### Watch out
 
@@ -16,33 +16,37 @@ On QA 272's verdict: one ask to Aaron for #415, #420 and #421 (use mergeone: upd
 - BATCH QA + ONE APPROVAL PER BATCH (Aaron, standing): one AskUserQuestion per accepted batch naming every PR and SHA; D-117 requires up-to-date branches, so merge each with update-branch, then check first parent = QA'd SHA and an equal PR-diff patch-id ($TEMP/mergeone.sh did this in s160), pinned --match-head-commit. A conflict resolution gets read with `git show --remerge-diff`.
 - STANDING MERGE RULE: docs/** and .agents record files merge without asking once CLEAN; check scope with a FRESH `git fetch origin` (s160: a stale origin/master made a docs PR look like it carried record files). Config, code, tests and role files are Aaron's. D-063 one-line notice to clark per merge.
 - QA DISPATCHES: DISPATCH_SHA must contain every file (cat-file); write the prompt with Write and edit the push helper with Edit (sed missed lines twice in s160); test every refusal including the old prefix; never test the success path against origin; set npm_config_cache under tmp; a batch merge row names the real conflict.
-- REPORTING TO CLARK (D-113): events only (verdicts, merges, blocks, READY TO ROLL). A serving-tree deploy needs Aaron's word per occasion; setup.mjs is MANUAL (the classifier blocks it for clark); then /mcp reconnect open-brain.
+- REPORTING TO CLARK (D-113): events only (verdicts, merges, blocks, READY TO ROLL). A serving-tree deploy needs Aaron's word per occasion; setup.mjs is MANUAL (the classifier blocks it for clark); then /mcp reconnect open-brain. s161: the serving build is 3 code commits behind (#415/#420); the redeploy waits on Aaron's word.
 - VERIFY BEFORE RULING: read the load-bearing rows yourself; READ A TASK'S NOTE BEFORE DISPATCHING IT (s160 dispatched T-204 as new when a built candidate existed); derive machine facts from the doc, not memory (s160 swapped the laptop and QA PC IPs). Never route a classifier-denied act through another seat.
 - JEV: calibration 1 COMPLETE (D-100): G_done stays shadow; calibration 2 needs T-225.
+- PROVENANCE (s161 catch-up): the merges of #415/#420 and the open PRs #421 r2/#424/#425/#427/#429 were READ on GitHub. #418 retro PASS, the seat freezes and the next-task assignments (builder P2-5 t17, forge P2-7 t12, infra G-054 t13) were TOLD by clark and not re-read. QA 272 has no verdict file in docs/loops.
+- SEATS line: 'not polling' is normal for a waker seat and is not a fault. Printing hub seatState (idle/working) there instead is clark's suggestion; there is no task for it yet.
 
 ### Open questions
 
 - Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.
-- Retire the desktop sia-infra worktree and clark's desktop cursor-infra keys now that #418 merged? Needs Aaron's word (worktree removal), after its dirty/unpushed check.
+- Retire the desktop sia-infra worktree, close sia-infra-1d and retire clark's desktop cursor-infra keys now that #418 merged? Needs Aaron's word (worktree removal), after its dirty/unpushed check.
 
 ### Loop state
 
 **Open PRs:** 
-- #415 — QA: in_progress — T-239 follow-up dc092840, QA 272
-- #420 — QA: in_progress — T-200 port 0d2bc66e (forge), QA 272
-- #421 — QA: in_progress — G-053 82aeb3da (cursor-infra), QA 272; security-boundary row
+- #421 — QA: not_started — G-053 r2 9915a59b (cursor-infra), QA 273 narrow row 10; r1 rejected in QA 272
+- #424 — QA: not_started — T-235 P2-6 12c28926 (infra), QA 273
+- #425 — QA: not_started — T-235 P2-4 9fcb97ca (forge), QA 273
+- #427 — QA: not_started — T-235 P2-3 270b550b (builder), QA 273
+- #429 — QA: not_required — docs G-054 finding e44d9080: standing docs merge once CLEAN
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- QA 272 batch merge after the verdict
-- Retire the desktop sia-infra worktree
+- Serving-tree redeploy (3 code commits behind)
+- Retire desktop sia-infra worktree / sia-infra-1d / desktop keys
+- Recover killed CC builder session 5b3338ac
 
 **Rulings made mid-loop:** 
-- s160 merged: #387-#413 batches, #415 pending, #416-#419, #422
-- D-117 up-to-date rule; D-118 lease use; D-119 (D-118a) waker lease owner
-- Closed: T-199 T-201(superseded) T-204 T-207 T-213 T-236 T-237 T-238 T-239
-- T-191 deferred P2; G-053 opened
+- QA 272: #415 merged 7285c62e, #420 merged 2eebaa6f (Aaron 'Merge both'); #421 rejected to r2; #418 retro PASS (told by clark)
+- D-117 up-to-date rule; D-118 lease use; D-119 (D-118a) waker lease owner; D-120 waker continue rule
+- T-191 deferred P2; G-053 and G-054 open
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -114,8 +118,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_8 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 160 — 2026-10-04 — planner [sia-planner] — `766a2128-4c5f-4b3f-93b7-3f9a88c1e594` (12 writing session(s) in the record)
+Session 161 — 2026-10-04 — planner [sia-planner] — `9a3bc5a9-fd23-444f-a45e-3bc75c455cd1` (13 writing session(s) in the record)
