@@ -13,7 +13,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { withSessionHooks, withCursorMcp, withCursorSessionHook, repoRootFrom } from './setup-hooks.mjs';
+import { withSessionHooks, withCursorMcp, withCursorSessionHook, repoRootFrom, copyCursorSlashCommands } from './setup-hooks.mjs';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
@@ -218,26 +218,15 @@ function registerCursorHooks() {
   fs.writeFileSync(hooksPath, JSON.stringify(r.config, null, 2) + '\n');
 }
 
-function copyCursorSlashCommands() {
+function installCursorSlashCommands() {
+  const r = copyCursorSlashCommands(REPO_ROOT, CURSOR_DIR);
   const destDir = path.join(CURSOR_DIR, 'commands');
-  const repoCommandsDir = path.join(REPO_ROOT, 'project-template', '.cursor', 'commands');
-
-  if (!fs.existsSync(repoCommandsDir)) {
+  if (r.missingTemplate) {
     log(SKIP, 'No project-template/.cursor/commands/ in repo \u2014 skipped');
     return;
   }
-
-  ensureDir(destDir);
-  let copied = 0;
-  for (const file of fs.readdirSync(repoCommandsDir)) {
-    if (!file.endsWith('.md')) continue;
-    const src = path.join(repoCommandsDir, file);
-    const dest = path.join(destDir, file);
-    if (copyFileIfChanged(src, dest)) copied++;
-  }
-
-  if (copied > 0) {
-    log(OK, `${copied} Cursor slash command(s) copied \u2192 ${destDir}`);
+  if (r.copied > 0) {
+    log(OK, `${r.copied} Cursor slash command(s) copied \u2192 ${destDir}`);
   } else {
     log(SKIP, 'Cursor slash commands already up to date \u2014 skipped');
   }
@@ -300,7 +289,7 @@ function main() {
   copySlashCommands();
   registerCursorMcp();
   registerCursorHooks();
-  copyCursorSlashCommands();
+  installCursorSlashCommands();
   setupObsidianVault();
 
   console.log('');

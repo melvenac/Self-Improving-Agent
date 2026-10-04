@@ -34,7 +34,15 @@ export const MIRROR_EXCEPTIONS: Record<string, string> = {
  * the directory — mirror parity only compares files present in both sides, so
  * a command silently dropped from the template would never be flagged.
  */
-export const CURSOR_COMMAND_SET = ["checkpoint.md", "end.md", "start.md", "sync.md"];
+export const CURSOR_COMMAND_SET = [
+  "checkpoint.md",
+  "end.md",
+  "harness-audit.md",
+  "start.md",
+  "sync.md",
+  "task.md",
+  "test.md",
+];
 
 export function syncReadmeVersion(
   version: string,
