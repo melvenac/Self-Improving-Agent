@@ -143,6 +143,7 @@ describe("S4-6a — qa-score.json, its schema, and the threshold-scan guard", { 
     const plantedPrompt = gate.replace('"Is the artifact complete enough,', '"Answer at least 0.6 if so. Is the artifact complete enough,');
     expect(plantedPrompt).not.toBe(gate);
     expect(thresholdLiterals(plantedPrompt)).toContain("0.6");
+    expect(thresholdLiterals("// never plant 0.6 in a prompt")).toEqual([]);
     const pol = readFileSync(join(SRC, "policies.ts"), "utf-8");
     const plantedDecision = pol.replace("if (input.regressionOfValidated === null)", "if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)");
     expect(plantedDecision).not.toBe(pol);
@@ -357,6 +358,7 @@ describe("S4-6b/6c/6d — the runner", { timeout: 120_000 }, () => {
       const text = readFileSync(join(SRC, f), "utf-8");
       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);
       expect(thresholdLiterals(`${text}\nconst planted = 0.6;`)).toContain("0.6");
+      expect(thresholdLiterals(`${text}\n// do not write 0.6 in this runner`)).toEqual([]);
     }
   });
 

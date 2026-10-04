@@ -96,7 +96,13 @@ describe("T-048 round 2b", () => {
       details: { invocationLog: "ran" },
     })).not.toContain("invocation log:");
     const cli = readFileSync(join(import.meta.dirname, "../src/cli.ts"), "utf8");
-    expect(cli, "sync --score uses that printer").toContain("formatScoreCategoryLine");
+    const namesPrinter = (src: string) => src.split("\n").some((line) => {
+      const trimmed = line.trim();
+      return !trimmed.startsWith("//") && trimmed.includes("formatScoreCategoryLine");
+    });
+    expect(namesPrinter("formatScoreCategoryLine(row);")).toBe(true);
+    expect(namesPrinter("// formatScoreCategoryLine is not called")).toBe(false);
+    expect(namesPrinter(cli), "sync --score uses that printer").toBe(true);
   });
 
   it("D2: a readable db with no session_meta holds no session", () => {

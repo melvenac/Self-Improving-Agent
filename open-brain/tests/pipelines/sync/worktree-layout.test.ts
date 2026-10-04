@@ -180,7 +180,13 @@ describe("checkWorktreeLayout", () => {
   });
 
   it("runSync is wired to checkWorktreeLayout", () => {
+    const wired = (src: string) => src.split("\n").some((line) => {
+      const trimmed = line.trim();
+      return !trimmed.startsWith("//") && !trimmed.startsWith("*") && trimmed.includes("checks.push(checkWorktreeLayout(options.projectRoot))");
+    });
+    expect(wired("checks.push(checkWorktreeLayout(options.projectRoot));")).toBe(true);
+    expect(wired("// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment")).toBe(false);
     const src = readFileSync(join(import.meta.dirname, "../../../src/pipelines/sync/index.ts"), "utf8");
-    expect(src).toContain("checks.push(checkWorktreeLayout(options.projectRoot))");
+    expect(wired(src)).toBe(true);
   });
 });
