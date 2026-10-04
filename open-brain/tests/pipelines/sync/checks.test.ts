@@ -26,6 +26,7 @@ import {
   checkRetirements,
   resolveDocPath,
 } from "../../../src/pipelines/sync/checks.js";
+import { matchingLineHashes } from "../../../src/pipelines/sync/retirements-line-hash.js";
 // Loop 13 (the module boundary): these three read the knowledge database and
 // now live in the memory-side module. Core's checks.js no longer imports
 // better-sqlite3 at all.
@@ -923,12 +924,30 @@ describe("checkRetirements", () => {
     return root;
   }
 
+  const WIDGET_PATTERN = "\\bwidgetizer\\b";
   const WIDGETIZER = {
     historical: [".agents/retirements.json", "CHANGELOG.md"],
     retirements: [
-      { id: "R-1", name: "widgetizer", pattern: "\\bwidgetizer\\b", event: "cut", ruled: "2026-09-15", classes: ["cli-subcommand"], allowed_referrers: [] as Array<{ path: string; class: string; why: string }> },
+      {
+        id: "R-1",
+        name: "widgetizer",
+        pattern: WIDGET_PATTERN,
+        event: "cut",
+        ruled: "2026-09-15",
+        classes: ["cli-subcommand"],
+        allowed_referrers: [] as Array<{ path: string; class: string; why: string; line_hashes?: string[] }>,
+      },
     ],
   };
+
+  function obituaryReferrer(path: string, body: string) {
+    return {
+      path,
+      class: "prose",
+      why: "obituary",
+      line_hashes: matchingLineHashes(body, WIDGET_PATTERN, false),
+    };
+  }
 
   afterEach(() => { try { rmSync(root, { recursive: true, force: true }); } catch { /* best effort */ } });
 
@@ -939,13 +958,41 @@ describe("checkRetirements", () => {
     expect(r.message).toContain("widgetizer");
   });
 
-  it("passes when the only referrer is a declared obituary", () => {
+  it("passes when the only referrer is a declared obituary with matching line_hashes", () => {
+    const body = "`widgetizer` was cut in Loop 10";
     const record = structuredClone(WIDGETIZER);
-    record.retirements[0].allowed_referrers = [
-      { path: "README.md", class: "prose", why: "obituary" },
-    ];
-    const r = checkRetirements(setup(record, { "README.md": "`widgetizer` was cut in Loop 10" }));
+    record.retirements[0].allowed_referrers = [obituaryReferrer("README.md", body)];
+    const r = checkRetirements(setup(record, { "README.md": body }));
     expect(r.severity).toBe("pass");
+  });
+
+  it("G-050: a second matching line beside the allowed obituary is an issue", () => {
+    const body = "`widgetizer` was cut in Loop 10";
+    const record = structuredClone(WIDGETIZER);
+    record.retirements[0].allowed_referrers = [obituaryReferrer("README.md", body)];
+    const r = checkRetirements(setup(record, { "README.md": `${body}\nrun widgetizer again` }));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toMatch(/outside allowed line_hashes|duplicate matching line/);
+  });
+
+  it("G-050: T-215 dashboard mutant shape — new matching line in an allowed file is caught", () => {
+    const record = structuredClone(WIDGETIZER);
+    const pattern = "\\bzz_removed_metric\\b";
+    record.retirements[0].name = "zz_removed_metric";
+    record.retirements[0].pattern = pattern;
+    const body = "// zz_removed_metric dropped from dashboard view";
+    record.retirements[0].allowed_referrers = [
+      {
+        path: "dash.mjs",
+        class: "prose",
+        why: "obituary",
+        line_hashes: matchingLineHashes(body, pattern, false),
+      },
+    ];
+    const mutant = `${body}\nconst x = zz_removed_metric`;
+    const r = checkRetirements(setup(record, { "dash.mjs": mutant }));
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("dash.mjs");
   });
 
   // An empty record passing is the same defect as a check nobody has seen fail.
@@ -958,9 +1005,7 @@ describe("checkRetirements", () => {
   // Otherwise the allowlist silently grows into a list of paths nobody checks.
   it("fails when an allowed referrer no longer names its retirement", () => {
     const record = structuredClone(WIDGETIZER);
-    record.retirements[0].allowed_referrers = [
-      { path: "README.md", class: "prose", why: "obituary" },
-    ];
+    record.retirements[0].allowed_referrers = [obituaryReferrer("README.md", "`widgetizer` was cut")];
     const r = checkRetirements(setup(record, { "README.md": "nothing about it here" }));
     expect(r.severity).toBe("issue");
     expect(r.message).toContain("no longer names it");
@@ -969,7 +1014,7 @@ describe("checkRetirements", () => {
   it("fails when an allowed referrer has been deleted", () => {
     const record = structuredClone(WIDGETIZER);
     record.retirements[0].allowed_referrers = [
-      { path: "gone.md", class: "prose", why: "obituary" },
+      { path: "gone.md", class: "prose", why: "obituary", line_hashes: ["deadbeef"] },
     ];
     const r = checkRetirements(setup(record));
     expect(r.severity).toBe("issue");
@@ -1035,5 +1080,18 @@ describe("checkRetirements", () => {
     root = mkdtempSync(join(tmpdir(), "c3-"));
     const r = checkRetirements(root);
     expect(r.severity).toBe("skip");
+  });
+
+  it("G-050: checkRetirements never writes line_hashes (in-check rehash mutant fails)", () => {
+    const body = "`widgetizer` was cut in Loop 10";
+    const record = structuredClone(WIDGETIZER);
+    record.retirements[0].allowed_referrers = [{ path: "README.md", class: "prose", why: "obituary" }];
+    root = setup(record, { "README.md": body });
+    const recordPath = join(root, ".agents", "retirements.json");
+    const before = readFileSync(recordPath, "utf8");
+    checkRetirements(root);
+    checkRetirements(root);
+    expect(readFileSync(recordPath, "utf8")).toBe(before);
+    expect(checkRetirements(root).severity).toBe("issue");
   });
 });

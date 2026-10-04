@@ -78,6 +78,11 @@ if (command === "sync") {
     process.exit(1);
   }
 
+  if (opts.has("--retirements-rehash")) {
+    const { runRetirementsRehashCli } = await import("./pipelines/sync/retirements-line-hash.js");
+    process.exit(runRetirementsRehashCli(projectRoot, opts.has("--write")));
+  }
+
   if (history) {
     const paths = resolvePaths(projectRoot);
     const entries = readHistory(paths.scoreHistory);
@@ -634,7 +639,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("Usage: open-brain <command> [options]");
   console.log("");
   console.log("Commands:");
-  console.log("  sync [--check] [--score [--json]] [--history]");
+  console.log("  sync [--check] [--score [--json]] [--history] [--retirements-rehash [--write]]");
   console.log("  start                                     Start a session");
   console.log("  end [--dry-run]                            End a session");
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");

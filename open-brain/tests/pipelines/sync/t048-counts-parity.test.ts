@@ -10,6 +10,7 @@ import {
   checkModuleBoundary,
   checkRetirements,
 } from "../../../src/pipelines/sync/checks.js";
+import { matchingLineHashes } from "../../../src/pipelines/sync/retirements-line-hash.js";
 
 /**
  * T-048 (sync checks, part 2): the exception lists and the dropped imports. Every row names the
@@ -117,18 +118,33 @@ describe("T-048 sync counts: parity checks and the boundary graph", () => {
   });
 
   describe("retirements", () => {
-    it("states how many (file, retirement) pairs it did not scan because the file is a declared referrer", () => {
+    it("states how many allowed referrers were verified by line_hashes", () => {
+      const readme = "`widgetizer` was cut in Loop 10\n";
+      const pattern = "\\bwidgetizer\\b";
       write(join(root, ".agents"), "retirements.json", JSON.stringify({
         historical: [".agents/retirements.json"],
         retirements: [
-          { id: "R-1", name: "widgetizer", pattern: "\\bwidgetizer\\b", event: "cut", ruled: "2026-09-15", classes: ["cli-subcommand"], allowed_referrers: [{ path: "README.md", class: "prose", why: "obituary" }] },
+          {
+            id: "R-1",
+            name: "widgetizer",
+            pattern,
+            event: "cut",
+            ruled: "2026-09-15",
+            classes: ["cli-subcommand"],
+            allowed_referrers: [{
+              path: "README.md",
+              class: "prose",
+              why: "obituary",
+              line_hashes: matchingLineHashes(readme, pattern, false),
+            }],
+          },
         ],
       }));
-      write(root, "README.md", "`widgetizer` was cut in Loop 10\n");
+      write(root, "README.md", readme);
       write(root, "other.md", "nothing here\n");
       const r = checkRetirements(root);
       expect(r.severity, r.message).toBe("pass");
-      expect(r.message).toContain("with 1 (file, retirement) pair(s) not scanned because the file is a declared referrer");
+      expect(r.message).toContain("with 1 allowed referrer(s) verified by line_hashes");
     });
   });
 });
