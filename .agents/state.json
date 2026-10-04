@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 322,
+  "revision": 323,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4152,6 +4152,12 @@
       "title": "T-202 approved: each seat's SessionStart posts one SEAT-ONLINE line to its planner hub room under its own key, 3 s bound, never blocking",
       "date": "2026-10-03",
       "note": "Aaron's word in AskUserQuestion in clark's window ~03:1x CDT 2026-10-03, recorded first-hand by clark (D-103 route), approving the planner's wording verbatim: 'Approve T-202: each seat's SessionStart posts one SEAT-ONLINE line (seat, host, runtime, checkout SHA, record rev) to its planner hub room under its own key, 3 s bound, never blocking'. This satisfies the 'Authority' section of docs/loops/t202-plan.md (loop/t202-seat-online @ 965a7c53). Code still waits on T-203 (checkout map with host) and on T-235 round 2 row 2 (whether cursor-agent fires sessionStart), per the planner's session-159 ruling in T-202's note."
+    },
+    {
+      "id": "D-117",
+      "title": "master requires branches to be up to date before merging (Aaron, 'Turn it on', planner's window, session 160)",
+      "date": "2026-10-03",
+      "note": "Ruleset 24343321: strict_required_status_checks_policy false -> true, set by the planner via gh api PUT on Aaron's word. Read back: true, `test` still required, all other rules byte-equal to the pre-change copy. WHY: QA 268 found that QA 267's duplicate greetingFlag import escaped because each PR's CI ran against an older master and was never re-run; two individually green PRs broke when combined. CONSEQUENCE: after any merge to master, every open PR is BEHIND and must merge master and re-pass CI before merging. That is a moved head, so the planner range-diffs it against the QA'd SHA (a merge-of-master-only commit with '=' commits goes on as reviewed)."
     }
   ],
   "handoffs": [
