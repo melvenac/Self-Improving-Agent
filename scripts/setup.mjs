@@ -225,9 +225,12 @@ function installCursorSlashCommands() {
     log(SKIP, 'No project-template/.cursor/commands/ in repo \u2014 skipped');
     return;
   }
+  for (const m of r.movedAside ?? []) {
+    log(OK, `Preserved user Cursor command: moved ${m.from} \u2192 ${m.to}`);
+  }
   if (r.copied > 0) {
     log(OK, `${r.copied} Cursor slash command(s) copied \u2192 ${destDir}`);
-  } else {
+  } else if ((r.movedAside ?? []).length === 0) {
     log(SKIP, 'Cursor slash commands already up to date \u2014 skipped');
   }
 }
