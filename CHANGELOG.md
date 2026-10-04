@@ -4,6 +4,12 @@
 
 ### Added
 
+- **`/start` names a checkout whose last session wrote the record and left no handoff (T-199, ported from Forge's loop/t199-missing-handoff).**
+  Opt-in per repo: `"missing_handoff": true` in `.agents/SYSTEM/greeting.json` (absent = off, so A2A renders exactly as before).
+  On, the Briefing prints `Handoff MISSING: last <seat> session #N (<uuid>, rev R) wrote the record, left no handoff; fix: ob_state
+  set_handoff` (the seat is the T-203 map's, by checkout), or `Handoff check: not checked (<why>)` when it cannot tell. In the budgeted
+  layout the notice is appended to the pick-up line, so it costs no line. A checkout with no session in the record is clear.
+
 - **Role docs print in full only when they changed since this seat last read them (T-236 slice 1, closes T-183).**
   Opt-in per repo: `"role_docs_by_sha": true` in the new tracked `.agents/SYSTEM/greeting.json` (absent file or key = off,
   so a repo that does not opt in, A2A included, renders exactly as before). On, `ob_start` prints an unchanged doc as one
