@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **The seat map carries the new per-seat hub rooms, and forge speaks as `forge` (T-213).** In
+  `.agents/SYSTEM/hub-partner-seats.json`, builder, forge and infra each have a room whose participants are atlas, the seat
+  and `<hub_name>-waker`. Forge's `hub_name` is `forge` (was `grok`), so a greeting in the sia-forge checkout reads
+  `forge.key`. The three atlas-to-seat reader pairs moved with them. Nothing else in the file changed.
+
 ### Added
 
 - **FOCUS and SEATS in the budgeted briefing (T-236 (c)).** Opt-in: `briefing_focus` in `.agents/SYSTEM/greeting.json`,

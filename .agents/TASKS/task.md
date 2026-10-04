@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 325 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 329 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-QA 269 running (#397 T-237, #401 T-236c, #402 T-199, #404 T-204); then one batch ask to Aaron, with #403 (planner.md). Next: T-238 after #401; the wrong-seat PICK UP fallback (infra is investigating). _(since session 160)_
+Cursor dev seats live on the QA PC (wakers + new rooms). QA 272 running: #415, #420 T-200, #421 G-053, + #418 retro-check. In build: T-235 P2-3 (builder, plan first), P2-4 (forge), P2-6 (infra). _(since session 160)_
 
 ## Top tasks
 
