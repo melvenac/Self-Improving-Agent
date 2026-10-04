@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "revision": 337,
+  "revision": 338,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "QA 273 (Plumb: #421 r2, #424, #425, #427) and QA 274 (laptop, Windows rows of #425/#427) dispatched at 0565c51f, launched by Aaron by hand (clark's classifier blocks remote launches). QA 275 (#434 T-240, #436 P2-5, #437 P2-7) dispatched; launches on Plumb after 273 reports. #425 merges only after #437. All three dev seats frozen and idle.",
+    "text": "Close out T-235 phase 2 and the s161 backlog batch. 7 PRs ACCEPTED and waiting on Aaron's merge word via clark (#421, #424, #436, #441, #442, #446, #451). QA 279 (Plumb, narrow re-runs of #427 r4, #434 r2, #437 r2, #444 r3, #445 r2) running; then #425 after #437.",
     "since_session": 161
   },
   "tasks": [
@@ -4695,72 +4695,109 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Read QA 273's report (qa/s161a-report) and QA 274's (qa/s161b-report) and rule them. Then one AskUserQuestion for the accepted batch, holding #425 until #437 merges. After 273 is ruled, write qa-275-s161c-dispatch-amendment-1.md with the batch-merge row on the new master (#436, #424 and #425 all edit setup.mjs and setup-hooks.mjs), and ask clark or Aaron to launch QA 275 on Plumb. Seats are idle: pick the next T-235 slice or T-241 (frogger) for them from the record. Re-arm one hub --wait per room after every reply; a --wait first replays unread backlog, so check the turn number.",
+      "pick_up": "Rule QA 279 (origin/qa/s161g-report; Plumb unit plumb-20261004T153750Z, attempt 2; dispatch docs/loops/qa-279-s161g-dispatch.md at 972c6026). Then send clark ONE merge request with every accepted PR and SHA: the seven already asked (#421 8173cef6, #424 b9026d71, #436 144623d2, #441 48bf4795, #442 08fa9002, #446 685b9fe9, #451 1e8cba7c) plus QA 279's accepts, and #425 9fcb97ca only after #437. Merge with update-branch, first parent = the QA'd SHA, equal patch-id, pinned. #424, #442 and #451 all edit sync/checks.ts and were never batch-merged together: a conflict goes back to its seat. After the merges: #444 rebases onto #427's findCursorAgentHostPid; T-025's /sync frontmatter check (rows in docs/loops/t025-ruling.md) becomes buildable; T-235 can close once P2-3 to P2-7 are merged.",
       "watch_out": [
-        "CURSOR SEATS (Aaron 2026-10-03/04): all SIA dev runs as Cursor seats on the QA PC, each woken by its own waker. Rooms: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. Send: HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as atlas --session <room> --say \"...\"; listen: same with --wait --wait-timeout 3500 in the background; it exits on each reply, so re-arm. INFRA'S ONLY HOME is C:\\Users\\Aaron Melven\\Worktrees\\sia-infra on the QA PC (desktop copy retired s161). A seat's --say that contains backticks, dollar signs or double quotes can arrive TRUNCATED (forge's P2-7 plan, s161): if a turn ends mid-sentence, ask for a resend without them.",
-        "QA LAUNCH (s161): clark's classifier blocks every remote launch ([Remote Shell Writes]), so QA launches are MANUAL MODE: Aaron runs them by hand. Never route a blocked launch through another seat. QA routing: Plumb first (launch-job.sh --dispatch-sha, --add-dir ~/qa-scratch ~/qa-tmp); real-Windows rows on the laptop (launch-qa.ps1 + machine-lease); the desktop never while agents run.",
-        "MACHINE LEASE (T-204, D-118, D-119 alias D-118a): on the QA PC and laptop, every HEAVY dev run takes machine-lease.ps1 with -OwnerPid = the nearest cursor-agent ancestor (fail closed if none); release with the same pid. Put it in every dispatch.",
-        "BATCH QA + ONE APPROVAL PER BATCH (Aaron, standing): one AskUserQuestion per accepted batch naming every PR and SHA; D-117 requires up-to-date branches, so merge each with update-branch, then check first parent = QA'd SHA and an equal PR-diff patch-id, pinned --match-head-commit. A conflict resolution gets read with `git show --remerge-diff`.",
-        "STANDING MERGE RULE: docs/** and .agents record files merge without asking once CLEAN; check scope with a FRESH `git fetch origin`. Config, code, tests and role files are Aaron's. A docs-only PR's `test` job SKIPS; s161's #429 merge printed 'Required status check test is expected' and MERGED anyway, so read the PR state after any merge error before retrying.",
-        "FROZEN MEANS CI GREEN (D-120): s161 infra reported T-240 FROZEN with CI pending and it was red (typecheck:tests). Before accepting a freeze, read `gh pr checks` yourself.",
-        "QA DISPATCHES: DISPATCH_SHA must contain every file (cat-file); write the prompt with Write and edit the push helper with Edit; test every refusal including the old prefix and read the exit code UNPIPED (s161: a `| head` reported 0 for every refusal); never test the success path against origin; set npm_config_cache under tmp.",
-        "REPORTING TO CLARK (D-113): events only (verdicts, merges, blocks, READY TO ROLL). A serving-tree deploy needs Aaron's word per occasion; setup.mjs is MANUAL; then /mcp reconnect open-brain. s161: serving trees redeployed to 91e14451 on Aaron's word; this session reconnected and ob_start printed 'Build 91e1445 current'.",
-        "VERIFY BEFORE RULING: read the load-bearing rows yourself; READ A TASK'S NOTE BEFORE DISPATCHING IT; derive machine facts from the doc, not memory. Never route a classifier-denied act through another seat.",
-        "T-235 FINDINGS (s161): under cursor-agent, Claude settings SessionStart AND SessionEnd hooks also run (forge), so Cursor sessions double-ran bootstrap and would double session-end once #425 lands; #437 dedupes both. The Claude PostToolUse/Bash recall hook does NOT fire under Cursor (tool_name is Shell; trigger_fires 0, builder's t235-p2-5-measure.md). Whether Cursor shows a hook's additionalContext to the model is UNPROVEN.",
-        "JEV: calibration 1 COMPLETE (D-100): G_done stays shadow; calibration 2 needs T-225.",
-        "T-241 (frogger re-run, Aaron via clark s161): queued P2, disposable test bed; check ~/Projects/frogger-residue before using it as the reset source; schedule when the seats are free."
+        "QUESTIONS GO TO CLARK (Aaron's 'ask clark', s161): routing, sequencing and record calls go to clark by SendMessage. Acts needing Aaron's own word (code/CI/role-file merges, deploys, classifier-blocked acts) also go to clark, who asks Aaron once and relays his words; proceed only on his quoted words. D-121, which records this, is NOT committed: the classifier blocked it as instruction poisoning, pending Aaron's own word in the planner's window (its diff is in the s161 scratchpad, rev336-d121.diff).",
+        "CURSOR SEATS: all SIA dev runs as Cursor seats on the QA PC, each woken by its own waker. Rooms: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. Send: HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as atlas --session <room> --say \"...\"; listen: same with --wait --wait-timeout 3500 in the background; it exits on each reply AND first replays unread backlog, so check the TASK line before acting. A --say with backticks, dollar signs, pipes or double quotes can arrive TRUNCATED: ask for a resend in plain lines.",
+        "G-055 (s161): the QA PC's Cursor default model has been grok-4.7-high since ~05:40 CDT (clark's trial persisted); the wakers pass no --model. Restoring composer-2.5 is with Aaron. Every freeze names its model from store.db; QA dispatches state it. Builder != judge still holds (QA is Opus).",
+        "QA LAUNCH: Plumb first (launch-job.sh --dispatch-sha, --add-dir ~/qa-scratch ~/qa-tmp); real-Windows rows on the laptop (launch-qa.ps1 + machine-lease with -File); NEVER the desktop (D-065 stands; s161's QA 274 on the desktop was clark's call against it). clark launches; when its classifier blocks a remote launch, Aaron launches by hand. A claude -p job writes its log only at exit, so an empty log is normal; a job can die on the session limit, and clark relaunches it after the reset.",
+        "MACHINE LEASE (T-204, D-118, D-119): HEAVY dev runs on the QA PC and laptop take machine-lease.ps1 with -File (G-054, #443 merged) and OwnerPid = the nearest cursor-agent host ancestor (CC: the claude.exe session); release with the same pid right after. A seat that holds the lease idle blocks other projects (s161: forge held it while chisel waited).",
+        "BATCH QA + ONE APPROVAL PER BATCH; D-117 up-to-date branches: update-branch, then first parent = QA'd SHA and an equal PR-diff patch-id, pinned --match-head-commit. A post-freeze doc commit (#437 s161) is acceptable only after confirming the diff is docs-only; seats must push nothing to a frozen PR.",
+        "STANDING MERGE RULE: docs/** and .agents record files merge without asking once CLEAN (fresh fetch). A docs-only PR's test job SKIPS and the merge may print a ruleset error yet merge: read the PR state after any merge error. Config, code, tests and role files are Aaron's.",
+        "FROZEN MEANS CI GREEN (D-120): read gh pr checks yourself before accepting a freeze (s161: T-240 was reported frozen with CI red).",
+        "QA DISPATCHES: DISPATCH_SHA must contain every file (cat-file); Write the prompt, Edit the helper; test every refusal with the exit code read UNPIPED; derived prompts from sed need their wording checked (s161 caught wrong rows and a false TMP claim).",
+        "VERIFY BEFORE RULING: read the load-bearing rows yourself; read a task's note before dispatching it; seats repeat stale note text (s161: effectiveKind, cut in Loop 10). Never route a classifier-denied act through another seat.",
+        "T-235 FINDINGS: under cursor-agent, Claude settings SessionStart and SessionEnd also run (#437 dedupes them); the Claude PostToolUse/Bash recall hook does not fire under Cursor (tool_name Shell); whether Cursor shows a hook's additionalContext to the model is unproven. Production code must not carry test seams that feed attribution (s161 #427 r3's OPEN_BRAIN_PROCESS_TABLE).",
+        "GITNEXUS (T-166, #452): impact() still misses cross-file calls through nullable or optional receivers on 1.6.12 and can say 'exact'. Grep the method name too. A CLAUDE.md paragraph saying so is proposed and waits on Aaron. T-055 closed; the Windows FTS hazard (no Git mingw64 bin on PATH) is in T-187 (#451).",
+        "T-146 BLOCKED (the corpus is the desktop DB; Aaron asked: still wanted, and where it runs). T-241 frogger: no remote; reset = 05ec972 plus the residue's reflection-queue.json; runs on the desktop or needs Aaron's word for a bundle copy."
       ],
-      "open_questions": [],
+      "open_questions": [
+        "D-121 (questions go to clark): Aaron's own word in the planner's window, so it can be committed.",
+        "CLAUDE.md GitNexus paragraph (T-166): yes or no.",
+        "T-146: still wanted, and where does it run?",
+        "Restore composer-2.5 as the QA PC's Cursor default (G-055)."
+      ],
       "session": 161,
       "loop_state": {
         "open_prs": [
           {
             "ref": "#421",
-            "qa_status": "in_progress",
-            "note": "G-053 r2 9915a59b, QA 273 (narrow row 10)"
+            "qa_status": "accepted",
+            "note": "G-053 r3 8173cef6 (QA 275); awaiting Aaron's merge"
           },
           {
             "ref": "#424",
-            "qa_status": "in_progress",
-            "note": "T-235 P2-6 12c28926, QA 273"
+            "qa_status": "accepted",
+            "note": "T-235 P2-6 r2 b9026d71 (QA 275); awaiting merge; checks.ts"
+          },
+          {
+            "ref": "#436",
+            "qa_status": "accepted",
+            "note": "T-235 P2-5 144623d2 (QA 275); awaiting merge"
+          },
+          {
+            "ref": "#441",
+            "qa_status": "accepted",
+            "note": "G-052 48bf4795 (QA 277); awaiting merge"
+          },
+          {
+            "ref": "#442",
+            "qa_status": "accepted",
+            "note": "G-050 08fa9002 (QA 277); awaiting merge; checks.ts"
+          },
+          {
+            "ref": "#446",
+            "qa_status": "accepted",
+            "note": "T-173 685b9fe9 (QA 277); awaiting merge; --effort always passed"
+          },
+          {
+            "ref": "#451",
+            "qa_status": "accepted",
+            "note": "T-187 1e8cba7c (QA 277); awaiting merge; checks.ts"
           },
           {
             "ref": "#425",
-            "qa_status": "in_progress",
-            "note": "T-235 P2-4 9fcb97ca, QA 273 + QA 274 row 15; merge HELD until #437 merges"
+            "qa_status": "accepted",
+            "note": "T-235 P2-4 9fcb97ca (QA 273/274); merges only after #437"
           },
           {
             "ref": "#427",
             "qa_status": "in_progress",
-            "note": "T-235 P2-3 270b550b, QA 273 + QA 274 row 20"
+            "note": "T-235 P2-3 r4 9daf38d8, QA 279 (env seam removed)"
           },
           {
             "ref": "#434",
-            "qa_status": "not_started",
-            "note": "T-240 12f26320 (CI 37186403772), QA 275; carries role file shared.md"
-          },
-          {
-            "ref": "#436",
-            "qa_status": "not_started",
-            "note": "T-235 P2-5 144623d2 (CI 37186601074), QA 275"
+            "qa_status": "in_progress",
+            "note": "T-240 r2 b9f8a5df, QA 279; role file shared.md"
           },
           {
             "ref": "#437",
-            "qa_status": "not_started",
-            "note": "T-235 P2-7 23d46156 (CI 37186696789), QA 275"
+            "qa_status": "in_progress",
+            "note": "T-235 P2-7 r2 3dfa2424, QA 279"
+          },
+          {
+            "ref": "#444",
+            "qa_status": "in_progress",
+            "note": "T-168 r3 9bfb2e1e, QA 279; ci.yml; rebase onto #427 after merge"
+          },
+          {
+            "ref": "#445",
+            "qa_status": "in_progress",
+            "note": "T-156 r2 43ed65a9, QA 279"
           }
         ],
-        "frozen_sha": "0565c51ff97bac036cd4cac18bfa4ce4e1b2729d",
+        "frozen_sha": "972c60264a336f20ece99b7eb9c55f13e83f2ec5",
         "questions_for_aaron": [
-          "Launch QA 273 (Plumb) and QA 274 (laptop) by hand",
-          "Batch merge approval after QA 273/274 verdicts"
+          "Merge #421, #424, #436, #441, #442, #446, #451",
+          "D-121 own word",
+          "CLAUDE.md GitNexus paragraph",
+          "T-146 still wanted / where",
+          "Restore composer-2.5 (G-055)"
         ],
         "rulings": [
-          "QA 272: #415 merged 7285c62e, #420 merged 2eebaa6f; #421 rejected to r2; #418 retro PASS (told by clark)",
-          "s161: P2-5 ruled (measured names only, double-fire count, injection unproven); P2-7 ruled (SessionEnd in scope, wx claim, TTL row, live measure); T-240 ruled (keep hub_names, hub seatState enum, CC fallback labelled 'hub listener')",
-          "s161: 5b3338ac NOT recovered (Aaron 'ask clark'; clark agreed): its work is in git and the record, only its knowledge-DB capture is lost",
-          "s161: desktop sia-infra retired; serving trees redeployed to 91e14451; T-240 and T-241 opened",
-          "D-117 up-to-date; D-118/D-119 lease; D-120 waker continue rule"
+          "s161 QA 272-278 ruled; merges: #415 #420 (QA 272), #443 G-054 (Aaron), docs #429 #435 #438-#440 #447 #448 #452-#454 and records #430-#433 #449 #450",
+          "s161 rulings: P2-5 measured names only; P2-7 SessionEnd in scope + atomic claim; T-240 hub seatState, keep hub_names; T-173 max-over-targets; T-168 hub presence census (not ListAgents) + D-119 owner; G-050 per-line hash, never auto-rehash; T-025 B2 (fact_kind is the taxonomy); #427 env seam is a must-fix",
+          "Closed s161: G-054, T-055. Opened: T-240, T-241, G-055. Blocked: T-146"
         ]
       },
       "session_uuid": "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1",
