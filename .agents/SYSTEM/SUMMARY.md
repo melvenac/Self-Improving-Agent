@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 330 by open-brain v0.45.0 — do not edit; change state via ob_state -->
-> **Status:** v0.45.0 — Cursor dev seats live on the QA PC (wakers + new rooms). QA 272 running: #415, #420 T-200, #421 G-053, + #418 retro-check. In build: T-235 P2-3 (builder, plan first), P2-4 (forge), P2-6 (infra).
+<!-- generated from .agents/state.json rev 331 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+> **Status:** v0.45.0 — QA 272 RULED (#415, #420 merged on Aaron's word; #421 rejected, now r2 9915a59b; #418 retro PASS). QA 273 to dispatch: #421 r2 (narrow, row 10), #424 P2-6, #425 P2-4, #427 P2-3 on Plumb, with Windows rows on the desktop. In build: builder P2-5 plan, forge P2-7, infra G-054 lease repro.
 
 ## What's working
 
