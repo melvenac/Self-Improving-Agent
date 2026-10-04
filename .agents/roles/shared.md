@@ -223,3 +223,21 @@ is. The one main-tree-only condition that remains — Aaron's untracked `.agents
 a property of any candidate, and a QA report names it as unrun rather than lets a green imply it.
 
 **Run `/sync` before any commit.** `package.json` is the version source of truth.
+
+## Switch seat runtime (T-240)
+
+The authoritative map is `.agents/SYSTEM/hub-partner-seats.json`. Each seat carries `runtime` (`cursor` or
+`claude-code`), `host`, `model`, and both `dispatch.cursor` and `dispatch.claude_code`. Only `runtime` selects which
+dispatch is live. **`hub_name` stays as-is when switching back to Claude Code** (D-115): names such as `cursor-builder`
+and `cursor-infra` are stable hub identities, keys and reader rows — do not rename them for a runtime switch.
+
+**Cursor → Claude Code:** set `runtime` to `claude-code`. Stop the seat's waker (`<hub_name>-waker`). Start or resume
+the Claude Code session named in `dispatch.claude_code.name` on `dispatch.claude_code.host`.
+
+**Claude Code → Cursor:** set `runtime` to `cursor`. End or park the CC session. Start the waker for
+`dispatch.cursor.waker` on the seat's host; confirm hub room `dispatch.cursor.room` in the record.
+
+**Machine lease (D-119):** take and release with `-File` and an **OwnerPid** that matches the runtime you are about to
+stress. **Claude Code:** the `claude.exe` process for that session. **Cursor:** the nearest ancestor whose command line
+contains `cursor-agent` (not the shell that launched it). Release with the same OwnerPid; see `docs/loops/g054-finding.md`
+for the PowerShell `-Command` pitfall.

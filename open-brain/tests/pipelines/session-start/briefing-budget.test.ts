@@ -281,7 +281,7 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     const parsed = parseState(JSON.stringify(raw));
     if (!parsed.ok) throw new Error(parsed.error);
     const state = parsed.data;
-    const presence = Object.fromEntries(slots.filter((s) => s.hubName !== null).map((s) => [s.hubName!, "not polling" as const]));
+    const presence = Object.fromEntries(slots.filter((s) => s.hubName !== null).map((s) => [s.hubName!, "hub listener:not polling"]));
     // At the longest the product allows: larger session and revision numbers than the T-199 row's 155-char notice.
     const notice = `Handoff MISSING: last builder session #123456 (00000000-0000-4000-8000-000000000000, rev 123456789) wrote the record, left no handoff; fix: ob_state set_handoff`;
     expect(notice.length, "the notice is at MISSING_HANDOFF_MAX_CHARS").toBe(MISSING_HANDOFF_MAX_CHARS);

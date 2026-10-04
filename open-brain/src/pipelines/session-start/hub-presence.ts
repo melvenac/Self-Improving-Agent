@@ -2,7 +2,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AgentIdentity } from "./agent-identity.js";
-import { resolveCheckoutSeat } from "./seat-map.js";
+import { formatHubSeatState, type SeatRuntime } from "./hub-seat-state.js";
+import { readSeatMapRows, resolveCheckoutSeat, runtimeByHubName } from "./seat-map.js";
 
 /** Interim until T-196; allowlisted at `.agents/SYSTEM/hub-partner-seats.json`. */
 export const HUB_PARTNER_SEATS_REL = ".agents/SYSTEM/hub-partner-seats.json";
@@ -31,10 +32,15 @@ export interface PresenceRoom {
   pollAgeMs?: number | null;
 }
 
+export interface PresenceSeatRow {
+  seatState?: string;
+}
+
 export interface PresenceAgent {
   name: string;
   state?: string;
   rooms?: PresenceRoom[];
+  seat?: PresenceSeatRow;
 }
 
 export interface PresenceBody {
@@ -60,10 +66,10 @@ export interface HubPresenceBlock {
   sourceRel: string | null;
   charCount: number;
   /**
-   * T-236 (c): each of this reader's partners by hub name, from THIS block's one roster fetch, for the SEATS line.
+   * T-236 (c) / T-240: live state per hub name from THIS block's one roster fetch, for the SEATS line.
    * Present only when the roster was fetched and valid: no roster, no words, never a guess.
    */
-  statusByHubName?: Readonly<Record<string, "polling" | "not polling" | "absent">>;
+  liveByHubName?: Readonly<Record<string, string>>;
 }
 
 /** A key shorter than this is refused, as hub-key.mjs does (KEY_FLOOR). */
@@ -119,22 +125,68 @@ export function formatPollAge(ms: number): string {
   return `${Math.round(ms / 86_400_000)}d`;
 }
 
-export function formatPartnerLine(partner: HubPartnerSeat, agents: PresenceAgent[] | null): string {
-  if (!agents) return `${partner.label}: absent`;
-  const agent = agents.find((a) => a.name === partner.hub_as);
-  if (!agent) return `${partner.label}: absent`;
+function formatHubListenerLine(partner: HubPartnerSeat, agent: PresenceAgent): string {
   const room = agent.rooms?.find((r) => r.sessionId === partner.session_id);
   if (!room) return `${partner.label}: absent`;
   // The hub's pollingNow says a LISTENER process is polling this room. It does not say
-  // the seat consumed the turn (QA 225), so every line says "listener".
-  if (room.pollingNow) return `${partner.label}: listener polling`;
+  // the seat consumed the turn (QA 225). T-240: label as hub listener, not session presence.
+  if (room.pollingNow) return `${partner.label}: hub listener: polling`;
   const unread = room.unread ?? 0;
   if (unread > 0) {
-    // T-237: no recorded poll has no age. "since 0s" for a null or absent age was a false freshness claim.
-    if (typeof room.pollAgeMs !== "number") return `${partner.label}: listener not polling, ${unread} unread, no listener poll recorded`;
-    return `${partner.label}: listener not polling, ${unread} unread since ${formatPollAge(room.pollAgeMs)}`;
+    if (typeof room.pollAgeMs !== "number") {
+      return `${partner.label}: hub listener: not polling, ${unread} unread, no listener poll recorded`;
+    }
+    return `${partner.label}: hub listener: not polling, ${unread} unread since ${formatPollAge(room.pollAgeMs)}`;
   }
-  return `${partner.label}: listener not polling`;
+  return `${partner.label}: hub listener: not polling`;
+}
+
+function formatWakerSeatLine(partner: HubPartnerSeat, agent: PresenceAgent | undefined): string {
+  if (!agent) return `${partner.label}: absent`;
+  return `${partner.label}: ${formatHubSeatState(agent.seat?.seatState)}`;
+}
+
+export function formatPartnerLine(
+  partner: HubPartnerSeat,
+  agents: PresenceAgent[] | null,
+  runtimeForHub: SeatRuntime | undefined,
+): string {
+  if (!agents) return `${partner.label}: absent`;
+  const agent = agents.find((a) => a.name === partner.hub_as);
+  if (!agent) return `${partner.label}: absent`;
+  if (runtimeForHub === "cursor") return formatWakerSeatLine(partner, agent);
+  return formatHubListenerLine(partner, agent);
+}
+
+/** Live state word(s) for SEATS from one agent row and the seat map runtime for that hub name. */
+export function liveStateForHubAgent(runtime: SeatRuntime | undefined, agent: PresenceAgent | undefined): string | null {
+  if (!agent) return "absent";
+  if (runtime === "cursor") return formatHubSeatState(agent.seat?.seatState);
+  const rooms = agent.rooms ?? [];
+  if (!rooms.length) return "hub listener:absent";
+  if (rooms.some((r) => r.pollingNow)) return "hub listener:polling";
+  const unread = rooms.reduce((n, r) => n + (r.unread ?? 0), 0);
+  if (unread > 0) return "hub listener:not polling";
+  return "hub listener:not polling";
+}
+
+export function buildLiveByHubName(
+  projectRoot: string,
+  agents: PresenceAgent[],
+): Record<string, string> {
+  const map = readSeatMapRows(projectRoot);
+  if (!map.ok) return {};
+  const runtimes = runtimeByHubName(projectRoot) ?? {};
+  const byName = new Map(agents.map((a) => [a.name, a]));
+  const out: Record<string, string> = {};
+  for (const row of Object.values(map.seats)) {
+    if (typeof row.hub_name !== "string" || !row.hub_name.trim()) continue;
+    const hub = row.hub_name.trim();
+    const runtime = runtimes[hub];
+    const live = liveStateForHubAgent(runtime, byName.get(hub));
+    if (live) out[hub] = live;
+  }
+  return out;
 }
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -147,6 +199,12 @@ function validateRoster(body: unknown): { ok: true; agents: PresenceAgent[] } | 
     const at = `agents[${i}]`;
     if (!isObject(agent)) return bad(at, "is not an object");
     if (typeof agent.name !== "string") return bad(`${at}.name`, "is not a string");
+    if (agent.seat !== undefined) {
+      if (!isObject(agent.seat)) return bad(`${at}.seat`, "is not an object");
+      if (agent.seat.seatState !== undefined && typeof agent.seat.seatState !== "string") {
+        return bad(`${at}.seat.seatState`, "is not a string");
+      }
+    }
     if (agent.rooms === undefined) continue;
     if (!Array.isArray(agent.rooms)) return bad(`${at}.rooms`, "is not an array");
     for (const [j, room] of agent.rooms.entries()) {
@@ -252,16 +310,12 @@ export async function describeHubPresence(opts: HubPresenceOptions): Promise<Hub
     return { lines: [line], sourceRel: seatsFile.rel, charCount: line.length };
   }
 
-  const partnerLines = partners.map((p) => formatPartnerLine(p, roster.agents));
+  const runtimes = runtimeByHubName(opts.projectRoot) ?? {};
+  const partnerLines = partners.map((p) => formatPartnerLine(p, roster.agents, runtimes[p.hub_as]));
   const lines = [presenceHeader(opts.callerLabel, seatsFile.rel), ...partnerLines.map((l) => `  ${l}`)];
   const text = lines.join("\n");
-  // T-236 (c): the same lines, as one word per hub name, so SEATS never fetches or guesses on its own.
-  const statusByHubName: Record<string, "polling" | "not polling" | "absent"> = {};
-  partners.forEach((p, n) => {
-    const l = partnerLines[n]!;
-    statusByHubName[p.hub_as] = l.endsWith(": absent") ? "absent" : l.endsWith(": listener polling") ? "polling" : "not polling";
-  });
-  return { lines, sourceRel: seatsFile.rel, charCount: text.length, statusByHubName };
+  const liveByHubName = buildLiveByHubName(opts.projectRoot, roster.agents);
+  return { lines, sourceRel: seatsFile.rel, charCount: text.length, liveByHubName };
 }
 
 function presenceHeader(callerLabel: string, sourceRel: string): string {
@@ -287,6 +341,7 @@ export function presenceBlockUpperBound(
   // QA 268 F1 (T-237): one fixed room stopped being the worst case when "no listener poll recorded" arrived, and a
   // bound that is not the longest form is not a bound. Each partner's line is the LONGEST over every room shape the
   // line renders: aged, unknown age (a negative age is valid input), no recorded poll (null or absent), polling, absent.
+  const runtimes = runtimeByHubName(projectRoot) ?? {};
   const shapes: Array<PresenceAgent["rooms"]> = [
     [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: 99 * 86_400_000 }],
     [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: -1 }],
@@ -295,10 +350,18 @@ export function presenceBlockUpperBound(
     [{ sessionId: "", unread: 0, pollingNow: true, pollAgeMs: 0 }],
     [],
   ];
-  const longest = (p: HubPartnerSeat): string =>
-    shapes
-      .map((rooms) => formatPartnerLine(p, [{ name: p.hub_as, rooms: (rooms ?? []).map((r) => ({ ...r, sessionId: p.session_id })) }]))
-      .reduce((a, b) => (b.length > a.length ? b : a));
+  const longest = (p: HubPartnerSeat): string => {
+    const runtime = runtimes[p.hub_as];
+    const wakerCandidates = [
+      formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "owes_reply" }, rooms: [] }], "cursor"),
+      formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "state:unknown(mystery)" }, rooms: [] }], "cursor"),
+      formatPartnerLine(p, [{ name: p.hub_as, rooms: [] }], "cursor"),
+    ];
+    const listenerCandidates = shapes.map((rooms) =>
+      formatPartnerLine(p, [{ name: p.hub_as, rooms: (rooms ?? []).map((r) => ({ ...r, sessionId: p.session_id })) }], runtime === "cursor" ? "claude-code" : runtime),
+    );
+    return [...wakerCandidates, ...listenerCandidates, formatPartnerLine(p, null, runtime)].reduce((a, b) => (b.length > a.length ? b : a));
+  };
   const lines = [presenceHeader(callerLabel, seatsFile.rel), ...partners.map((p) => `  ${longest(p)}`)];
   return { chars: lines.join("\n").length, lines };
 }

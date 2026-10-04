@@ -38,7 +38,12 @@ describe("T-203 S-1: the map resolves a checkout to seat, role, agent and hub na
     ["sia-forge", "forge", "developer", "Forge", "forge"],
   ])("%s is seat %s / %s / %s with hub name %s", (name, seat, role, agent, hubName) => {
     const r = resolveCheckoutSeat(checkout(name));
-    expect(r).toEqual({ kind: "seat", checkout: name, seat, role, agent, hubName });
+    expect(r).toMatchObject({ kind: "seat", checkout: name, seat, role, agent, hubName });
+    if (r.kind === "seat") {
+      expect(r.runtime).toBeTruthy();
+      expect(r.host).toBeTruthy();
+      expect(r.model).toBeTruthy();
+    }
   });
 
   it.each([
@@ -59,6 +64,17 @@ describe("T-203 S-1: the map resolves a checkout to seat, role, agent and hub na
   it("a basename that is not listed is unknown, whatever its AGENT.local.md says", () => {
     const r = resolveCheckoutSeat(checkout("sia-scratch", { name: "Atlas", role: "planner" }));
     expect(r).toEqual({ kind: "unknown", checkout: "sia-scratch" });
+  });
+
+  it("T-240 a seat row with no runtime is unreadable", () => {
+    const root = checkout("sia-infra", null);
+    const path = join(root, ".agents", "SYSTEM", "hub-partner-seats.json");
+    const map = JSON.parse(readFileSync(path, "utf8"));
+    delete map.seats.infra.runtime;
+    writeFileSync(path, JSON.stringify(map));
+    const r = resolveCheckoutSeat(root);
+    expect(r.kind).toBe("unreadable");
+    expect(r).toMatchObject({ reason: /runtime must be cursor or claude-code/ });
   });
 
   it("no seat file at all is reported as no map, not as unknown", () => {
