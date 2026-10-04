@@ -25,6 +25,7 @@ import type { Allowlist } from "./workspace.js";
 import { normaliseRepoPath, type FrozenCandidate } from "./workspace.js";
 import type { CheckRunResults } from "./checks.js";
 import type { DeveloperReport, Plan } from "./schema.js";
+import { chooseEffort, loadEffortPolicy, type EffortChoice } from "./policies.js";
 import {
   constructEnv,
   findOnPath,
@@ -271,8 +272,8 @@ export interface RoleAdapter {
   readonly name: string;
   /** Resolve what will actually be spawned, from the environment the role runs in. */
   resolve(env: NodeJS.ProcessEnv): LauncherResolution;
-  /** Arguments after the resolved executable and its pre-args. */
-  args(run: { sessionId: string }): string[];
+  /** Arguments after the resolved executable and its pre-args. `effort` is the policy's level for this launch. */
+  args(run: { sessionId: string; effort: string }): string[];
   /** Parent variables this harness needs beyond the base allowlist (never a denied one). */
   readonly envAllow: readonly string[];
   /** Where this harness left the run's transcript, if it can be found. */
@@ -293,7 +294,6 @@ export interface ClaudeAdapterOptions {
   /** A specific launcher path. Default: `claude` found on the role environment's PATH. */
   launcher?: string;
   model?: string;
-  effort?: string;
   maxBudgetUsd?: number;
 }
 
@@ -312,6 +312,7 @@ export const CLAUDE_ADAPTER_FLAGS: readonly string[] = [
   "--setting-sources",
   "--allowed-tools",
   "--disallowed-tools",
+  "--effort",
 ];
 
 /**
@@ -330,6 +331,10 @@ export const CLAUDE_ADAPTER_FLAGS: readonly string[] = [
  *   can be routed around. The runtime observes the effect regardless.
  * - `--session-id`: a runtime-chosen id, so the transcript can be found and
  *   its absence reported rather than guessed at.
+ * - `--effort`: the level from the effort policy for this launch (T-173). It is
+ *   always passed. A Claude Code that does not recognise the flag exits nonzero
+ *   and the stage fails; that is the intended failure on an older CLI (T-182).
+ *   There is no construction-time effort option.
  */
 export function claudeAdapter(opts: ClaudeAdapterOptions = {}): RoleAdapter {
   return {
@@ -341,7 +346,10 @@ export function claudeAdapter(opts: ClaudeAdapterOptions = {}): RoleAdapter {
       }
       return resolveLauncher(launcher);
     },
-    args: ({ sessionId }) => {
+    args: ({ sessionId, effort }) => {
+      if (effort === "") {
+        throw new Error("claudeAdapter requires the effort level from the effort policy (T-173); there is no default");
+      }
       const a = [
         "--print",
         "--output-format", "json",
@@ -353,9 +361,9 @@ export function claudeAdapter(opts: ClaudeAdapterOptions = {}): RoleAdapter {
         "--allowed-tools", "Read Edit Write Glob Grep Bash",
         "--disallowed-tools",
         "Bash(git push:*) Bash(git fetch:*) Bash(git pull:*) Bash(git remote:*) Bash(git clone:*) WebFetch WebSearch",
+        "--effort", effort,
       ];
       if (opts.model) a.push("--model", opts.model);
-      if (opts.effort) a.push("--effort", opts.effort);
       if (opts.maxBudgetUsd !== undefined) a.push("--max-budget-usd", String(opts.maxBudgetUsd));
       return a;
     },
@@ -391,6 +399,8 @@ export interface ProcessRunRecord {
   childEnvNames: string[];
   transcriptPath: string | null;
   outcome: SpawnOutcome;
+  /** The policy's choice for this launch, beside the process result (T-173). */
+  effort: EffortChoice;
 }
 
 export interface ProcessRoleOptions {
@@ -401,6 +411,8 @@ export interface ProcessRoleOptions {
   parentEnv?: NodeJS.ProcessEnv;
   /** Extra variables forced into the child (never a denied one). */
   envSet?: Readonly<Record<string, string>>;
+  /** Effort policy directory. Default: the harness policies directory. */
+  policiesDir?: string;
 }
 
 export type Preflight = { ok: true; resolution: Extract<LauncherResolution, { ok: true }> } | { ok: false; reason: string };
@@ -463,6 +475,13 @@ export class ProcessRole implements RoleSession {
       return p.resolution;
     })();
 
+    const effort = chooseEffort({
+      policy: loadEffortPolicy(this.opts.policiesDir),
+      stage: this.role,
+      repairTargets: ctx.plan?.repair_targets ?? [],
+      attempt: ctx.attempt,
+    });
+
     const sessionId = randomUUID();
     const dir = mkdtempSync(join(tmpdir(), "hoh-role-"));
     const deliverablePath = join(dir, "R_t.json");
@@ -496,7 +515,7 @@ export class ProcessRole implements RoleSession {
       HOH_ATTEMPT: String(ctx.attempt),
     });
 
-    const args = [...resolution.preArgs, ...this.opts.adapter.args({ sessionId })];
+    const args = [...resolution.preArgs, ...this.opts.adapter.args({ sessionId, effort: effort.level })];
     const outcome = await runBounded(resolution.executable, args, {
       cwd: ctx.repoRoot,
       env,
@@ -533,6 +552,7 @@ export class ProcessRole implements RoleSession {
       childEnvNames: Object.keys(env).sort(),
       transcriptPath: this.opts.adapter.transcriptFor?.(sessionId, env) ?? null,
       outcome,
+      effort,
     };
   }
 }

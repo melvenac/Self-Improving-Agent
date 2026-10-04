@@ -1,0 +1,27 @@
+{
+  "policy": "effort",
+  "description": "LOWERING: a path rule may set a level below the stage base only when every repair target matches a path rule. Each repair target contributes its matched rule's level, or the stage base when nothing matches it. Effort is the maximum of those contributions. An empty target list keeps the stage base. A retry steps one level up the levels list and stops at the top.",
+  "levels": ["low", "medium", "high", "xhigh", "max"],
+  "stages": {
+    "planner": "high",
+    "developer": "high",
+    "qa": "max"
+  },
+  "paths": [
+    {
+      "id": "harness-security",
+      "prefixes": [
+        "open-brain/src/harness/refwatch.ts",
+        "open-brain/src/harness/git.ts",
+        "open-brain/src/harness/runtime.ts"
+      ],
+      "level": "xhigh"
+    },
+    {
+      "id": "docs-version",
+      "prefixes": ["docs/", "CHANGELOG.md", "package.json", "open-brain/package.json"],
+      "level": "medium"
+    }
+  ],
+  "retry": "one-up"
+}
