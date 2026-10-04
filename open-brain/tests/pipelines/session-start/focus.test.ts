@@ -21,6 +21,8 @@ const parents: string[] = [];
 
 /** The fixture's open tasks, so rows assign real ids rather than invented ones. */
 const OPEN: string[] = SIA.tasks.filter((t: { status: string }) => t.status !== "done").map((t: { id: string }) => t.id);
+/** A fixture task's own status: rows assert it, never assume it (T-005 is in_progress in the fixture). */
+const statusOf = (id: string): string => SIA.tasks.find((t: { id: string }) => t.id === id).status;
 const DONE: string = SIA.tasks.find((t: { status: string }) => t.status === "done").id;
 
 function stateWith(assign: Record<string, { assignee?: string | null; priority?: string; title?: string; status?: string }>): State {
@@ -50,7 +52,7 @@ describe("T-236 (c) FOCUS", () => {
   it("F1 the checkout's seat (infra) gets its assigned task, though AGENT.local.md names another seat", () => {
     const state = stateWith({ [OPEN[0]]: { assignee: "infra", priority: "P1", title: "Short title" } });
     const line = focusLine(state, resolveCheckoutSeat(checkout("sia-infra", "Builder")));
-    expect(line).toBe(`FOCUS: ${OPEN[0]} Short title (P1, open)`);
+    expect(line).toBe(`FOCUS: ${OPEN[0]} Short title (P1, ${statusOf(OPEN[0])})`);
   });
 
   it("F2 no assigned task: 'none assigned in the record', and no task id from NEXT or the objective", () => {
@@ -73,7 +75,7 @@ describe("T-236 (c) FOCUS", () => {
       [OPEN[2]]: { assignee: "infra", priority: "P1", title: "mid" },
     });
     expect(focusLine(state, resolveCheckoutSeat(checkout("sia-infra")))).toBe(
-      `FOCUS: ${OPEN[1]} high (P0, open) · +2 more: state.json tasks[] (assignee)`,
+      `FOCUS: ${OPEN[1]} high (P0, ${statusOf(OPEN[1])}) · +2 more: state.json tasks[] (assignee)`,
     );
   });
 
@@ -111,7 +113,7 @@ describe("T-236 (c) SEATS", () => {
     const roster = {
       agents: [
         { name: "cursor-builder", rooms: [{ sessionId: room("cursor-builder"), unread: 0, pollingNow: true, pollAgeMs: 1000 }] },
-        { name: "cursor-infra", rooms: [{ sessionId: room("cursor-infra"), unread: 2, pollingNow: false, pollAgeMs: null }] },
+        { name: "cursor-infra", rooms: [{ sessionId: room("cursor-infra"), unread: 2, pollingNow: false, pollAgeMs: 60_000 }] },
       ],
     };
     let calls: string[];
@@ -159,7 +161,7 @@ describe("T-236 (c) SEATS", () => {
       writeFileSync(join(root, ".agents", "state.json"), JSON.stringify(raw, null, 2));
       const text = (await handleStart({ project_root: root })).content[0].text;
       expect(calls.filter((u) => u.startsWith(HUB))).toHaveLength(1);
-      expect(text).toMatch(new RegExp(`\\nPICK UP HERE · FOCUS: ${OPEN[0]} Plan it \\(P\\d, open\\)\\n`));
+      expect(text).toMatch(new RegExp(`\\nPICK UP HERE · FOCUS: ${OPEN[0]} Plan it \\(P\\d, \\w+\\)\\n`));
       expect(text).toContain(`SEATS: planner ${OPEN[0]} · builder ${OPEN[1]} polling · forge — absent · infra — not polling · qa — · research —`);
     });
   });
