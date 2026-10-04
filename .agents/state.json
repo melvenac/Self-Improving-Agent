@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 324,
+  "revision": 325,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1486,6 +1486,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Found by sia-infra while building T-236(c) (#401, session 160). It escaped into a red run and was caught before any push. open-brain/src/shared/state-schema.ts KEY_ORDER (around line 470, master bbc2acbf) lists the keys serializeState writes per slot, and it emits ONLY those keys. A field added to a schema but not to KEY_ORDER passes validation, applies, prints 'ob_state applied', and VANISHES from disk on write: the new tasks[].assignee did exactly that until infra added it. #401 pins assignee (W1, M8b); the CLASS is open, because nothing asserts that KEY_ORDER[slot] equals the key set of that slot's zod schema, for tasks or any other slot. ROWS: (1) for every slot, KEY_ORDER[slot] and the schema's shape keys are equal sets (a test derived from the schemas, not a hand list); (2) a mutant that deletes one key from any KEY_ORDER entry turns row 1 red; (3) a mutant that adds a schema field without a KEY_ORDER entry turns row 1 red. A runtime refusal on write ('field X has no KEY_ORDER entry') is the developer's call. Fails closed either way. Sequence after #401 merges (it edits KEY_ORDER).",
+      "note_by": [
+        "766a2128-4c5f-4b3f-93b7-3f9a88c1e594"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-239",
+      "title": "A seat with no handoff of its own is briefed from ANOTHER checkout's handoff: select 'your handoff' by seat AND checkout (flag handoff_by_checkout, default OFF)",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 160,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "OBSERVED session 160: sia-infra session 161's first budgeted greeting printed sia-BUILDER's session-156 handoff under PICK UP HERE (clark read it; infra confirmed). CAUSE (infra, derived): newestHandoffForSeat (state-schema.ts about line 422) matches h.seat only and ignores checkout; three call sites pass only the role: state-render.ts about 201, briefing.ts about 76 and about 167 (server.ts about 358 and 366). A2A HITS IT TOO: a2a-qa has no qa@a2a-qa entry and is briefed from qa@a2a-planner#19, so the fix is behind greeting.json `handoff_by_checkout` (default OFF; SIA sets it true; A2A stays byte-identical). RULINGS: shared checkoutOf(projectRoot) for writer and reader; one instance selector at all three call sites; with the flag on, a null-checkout legacy entry is never 'yours' and is listed under Other handoffs as 'legacy, unattributed'; PICK UP says none recorded for this checkout. Rows R1-R7 and mutants M1-M5 per infra's plan (session 161). Seat: sia-infra, branch loop/t239-handoff-by-checkout, PR after QA 269's verdict. RELAY'S RULING (A2A, session 160): qa@a2a-planner#19 is right content with the WRITER's checkout stamp, because in A2A the planner writes QA's handoff from Gauge's report. A2A keeps the flag OFF. The same shape applies here: a handoff written BY one checkout FOR another is stamped with the writer's checkout. If SIA ever writes a seat's handoff on its behalf, the writer needs a way to stamp the target checkout, or this selector will miss it.",
       "note_by": [
         "766a2128-4c5f-4b3f-93b7-3f9a88c1e594"
       ],
