@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 335,
+  "revision": 336,
   "project": {
     "name": "self-improving-agent"
   },
@@ -87,7 +87,8 @@
       "opened_session": 48,
       "closed_session": null,
       "supersedes": null,
-      "note": "`.agents/SYSTEM/ENTITIES.md` documents `type: gotcha | pattern | decision | fix | optimization`; `vault-writer.ts` emits no `type` at all except `writeFailure`'s hardcoded `type: failure`; live vault notes carry one. Deliberately left out of the v0.10.0 work so the inconsistency stayed visible rather than being buried inside a feature. Worth noting while fixing it: **all five documented types are events** — there is no state type, which is why state facts get written as experiences and never replaced. No `/sync` check validates experience frontmatter today, so whatever is decided should come with one. (Session 48)",
+      "note": "`.agents/SYSTEM/ENTITIES.md` documents `type: gotcha | pattern | decision | fix | optimization`; `vault-writer.ts` emits no `type` at all except `writeFailure`'s hardcoded `type: failure`; live vault notes carry one. Deliberately left out of the v0.10.0 work so the inconsistency stayed visible rather than being buried inside a feature. Worth noting while fixing it: **all five documented types are events** — there is no state type, which is why state facts get written as experiences and never replaced. No `/sync` check validates experience frontmatter today, so whatever is decided should come with one. (Session 48) — Session 161: RULED B2: fact_kind is the taxonomy; frontmatter type is an optional one-token free label, neither retired nor enumerated. ENTITIES.md updated (#448 merged, docs/loops/t025-ruling.md). effectiveKind was removed in e05ad9a7 (Loop 10), so T-022's gate is only the count of recorded fact_kind labels; the schema cannot tell an explicit ob_store kind from another writer. REMAINING: the /sync frontmatter check (rows R1-R5 in the ruling doc), queued until #424 and #442 merge (sync checks.ts).",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -187,12 +188,13 @@
       "id": "T-055",
       "title": "GitNexus's incremental analyze is unreliable on this repo",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 50,
-      "closed_session": null,
+      "closed_session": 161,
       "supersedes": null,
-      "note": "SLICE TWO COUNT (2026-09-20): six of six incremental analyzes in the QA tree failed with the FTS inconsistency and were recovered by `analyze --repair-fts`; the main tree hit it once on a merge and once not. The trigger on this repository is EVERY incremental run, not merges. `gitnexus clean` without --force exits 0 and deletes nothing (G-043, folded earlier).",
-      "closed_rev": null
+      "note": "SLICE TWO COUNT (2026-09-20): six of six incremental analyzes in the QA tree failed with the FTS inconsistency and were recovered by `analyze --repair-fts`; the main tree hit it once on a merge and once not. The trigger on this repository is EVERY incremental run, not merges. `gitnexus clean` without --force exits 0 and deletes nothing (G-043, folded earlier). — Session 161: CLOSED as not reproducible on gitnexus 1.6.12 with FTS loaded. Forge's scratch-clone measure (docs/loops/t055-measure.md, #447 merged): repair-fts then five incrementals all exit 0, the file_fts inconsistency did not recur, and lastCommit matched each probe. The real hazard is on Windows: without Git mingw64 bin on PATH, FTS is off and repair-fts exits 1. T-187 carries that as a reported issue.",
+      "note_by": null,
+      "closed_rev": 336
     },
     {
       "id": "T-056",
@@ -319,7 +321,8 @@
       "opened_session": 58,
       "closed_session": null,
       "supersedes": null,
-      "note": "Unblocked by Loop 7 C2: the sweep optimises session-start retrieval, and C2 keeps that path. ADR-028 refused 0.02 on one measured alternative beating one incumbent and recommended this sweep instead. Loop 6 established recency decay does real work (no_recency refuted, 11-22), so this is the one ranking input with evidence behind it. Run before any further ranking change.",
+      "note": "Unblocked by Loop 7 C2: the sweep optimises session-start retrieval, and C2 keeps that path. ADR-028 refused 0.02 on one measured alternative beating one incumbent and recommended this sweep instead. Loop 6 established recency decay does real work (no_recency refuted, 11-22), so this is the one ranking input with evidence behind it. Run before any further ranking change. — Session 161: BLOCKED. Infra found the instrument, open-brain/scripts/shadow-backfill.mjs (the Loop 6 replay ADR-028 cites; strategies live 0.005, recency_0_01, recency_0_02 and recency_0_04 already exist), and ran it read-only on a backup of the QA PC's knowledge DB: 5 rows, 0 recall_log, 0 feedback_log, so eligible=0. The corpus is the desktop's DB. Questions with Aaron via clark: is T-146 still wanted after Loop 10's ranking rework, and may a DB copy go to the QA PC, or does it run on the desktop?",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -1536,7 +1539,7 @@
       "opened_session": 161,
       "closed_session": null,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:2x CDT: 'We need to try the frogger migration again at some point. The plan was to reset frogger repo before the migration and test again.' Then: 'Frogger is a real project but non production, it was a fun test for cc several weeks ago. No plan to publish it.' Relayed by clark (TOLD, one link). SCOPE: frogger is a DISPOSABLE TEST BED, so the reset and the /bootstrap re-run do not need the live-project caution reserved for Makerspace (T-181). The planner schedules it; it is not urgent. STEPS: (1) Before using ~/Projects/frogger-residue as the reset source, establish what it holds and whether it is the saved pre-pilot copy (both directories exist, read at s161). (2) Reset ~/Projects/frogger to its pre-migration state. (3) Re-run /bootstrap from current SIA master, including the bootstrap-fix work (docs/loops/bootstrap-fix-brief.md and its r2-r4 handoffs). (4) Grade the run against F1-F15 in docs/loops/t181-frogger-pilot-report.md and write the result to a tracked file in docs/loops/. RELATION: this is the frogger slice of T-181 run again; T-181 stays open for the other projects.",
+      "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:2x CDT: 'We need to try the frogger migration again at some point. The plan was to reset frogger repo before the migration and test again.' Then: 'Frogger is a real project but non production, it was a fun test for cc several weeks ago. No plan to publish it.' Relayed by clark (TOLD, one link). SCOPE: frogger is a DISPOSABLE TEST BED, so the reset and the /bootstrap re-run do not need the live-project caution reserved for Makerspace (T-181). The planner schedules it; it is not urgent. STEPS: (1) Before using ~/Projects/frogger-residue as the reset source, establish what it holds and whether it is the saved pre-pilot copy (both directories exist, read at s161). (2) Reset ~/Projects/frogger to its pre-migration state. (3) Re-run /bootstrap from current SIA master, including the bootstrap-fix work (docs/loops/bootstrap-fix-brief.md and its r2-r4 handoffs). (4) Grade the run against F1-F15 in docs/loops/t181-frogger-pilot-report.md and write the result to a tracked file in docs/loops/. RELATION: this is the frogger slice of T-181 run again; T-181 stays open for the other projects. — Session 161, read by the planner on the desktop: frogger has NO git remote. Two local commits: 05ec972 'Initial commit: frogger arcade as it stood before SIA bootstrap' and 07640b8 'Bootstrap frogger onto SIA (T-181 pilot 1)'; tree clean. ~/Projects/frogger-residue is NOT a pre-pilot copy: it holds only .agents/reflection-queue.json, which the pilot moved out (report step 0). Reset point = 05ec972 plus .agents/reflection-queue.json restored. It runs on the desktop, or on the QA PC only after a bundle copy, which needs Aaron's word.",
       "note_by": [
         "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1"
       ],
@@ -3337,8 +3340,11 @@
       "id": "G-054",
       "what": "machine-lease.ps1: rivet (A2A, T-094) saw a non-owner `release` print 'not yours' with exit 0, and the header documents exit 12. The SOURCE at master (docs/loops/machine-lease.ps1, Assert-Owner, around line 165) does `exit 12` on that path. So either rivet ran a different copy, or the exit code was lost between the script and the caller (for example `powershell -Command \"& ...\"` reports only success or failure, or a pipe or wrapper replaced it). Separately, rivet's two HEAVY runs took the lease with dead OwnerPids (7964, 4052) before D-119 (D-118a) reached it, so those leases protected nothing.",
       "evidence": "clark, session 160 (about 00:4x CDT 2026-10-04), relaying rivet's T-094 run. The planner read the source: line 165 has `exit 12`. The installed copies match blob 45969354 on both QA machines (clark's install read-back).",
-      "recommended_update": "Reproduce on the QA PC or laptop: take with one pid, release with another, and capture the exit code with `powershell -NoProfile -ExecutionPolicy Bypass -File <copy> release -OwnerPid <other>; echo $LASTEXITCODE` (not -Command, not piped). If it's 12, the defect is in the caller: document the -File requirement in qa-launch.md and in the D-119 dispatch text. If it's 0, the script is wrong: fix it and add a harness row. Also make `take` refuse an -OwnerPid that is not alive (status would read stale at once).",
-      "opened_session": 160
+      "recommended_update": "CLOSED session 161 by #443 (merged 1d45222c on Aaron's 'Merge', relayed by clark and verified: first parent 80a59ae7, patch-id f4d483dd at both heads). The script was right: -Command loses exit 12 (docs/loops/g054-finding.md). Every tracked caller doc (qa-launch.md, t204-plan.md, developer.md, .cursor/rules/machine-lease.mdc) now requires -File and states the OwnerPid rule for both runtimes. take already refuses a dead OwnerPid with exit 2 (machine-lease.ps1:129, read by the planner).",
+      "opened_session": 160,
+      "status": "closed",
+      "closed_session": 161,
+      "closed_rev": 336
     }
   ],
   "decisions": [
