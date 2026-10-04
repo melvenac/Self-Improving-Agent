@@ -310,19 +310,47 @@ describe("harness shadow-verdict CLI", () => {
   });
 });
 
+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */
+function codeHas(src: string, needle: string): boolean {
+  return src.split("\n").some((line) => {
+    const trimmed = line.trim();
+    return trimmed.length > 0
+      && !trimmed.startsWith("//")
+      && !trimmed.startsWith("*")
+      && !trimmed.startsWith("/*")
+      && trimmed.includes(needle);
+  });
+}
+
 describe("CC-0 and CC-19 guards", () => {
   it("CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip", () => {
     const root = join(import.meta.dirname, "../../src/harness");
     const runtime = readFileSync(join(root, "runtime.ts"), "utf8");
     const schema = readFileSync(join(root, "schema.ts"), "utf8");
     const declared = readFileSync(join(root, "declared.ts"), "utf8");
-    expect(runtime).not.toContain("prepareShadowVerdict");
-    expect(runtime).not.toContain("shadow-verdict");
-    expect(schema).not.toContain("would-merge");
-    expect(declared).not.toContain("would-merge");
+    expect(codeHas("prepareShadowVerdict();", "prepareShadowVerdict")).toBe(true);
+    expect(codeHas("// prepareShadowVerdict is not called from the runtime", "prepareShadowVerdict")).toBe(false);
+    expect(codeHas("/* prepareShadowVerdict stays out of runtime.ts */", "prepareShadowVerdict")).toBe(false);
+    expect(codeHas(runtime, "prepareShadowVerdict")).toBe(false);
+    expect(codeHas(runtime, "shadow-verdict")).toBe(false);
+    expect(codeHas(schema, "would-merge")).toBe(false);
+    expect(codeHas(declared, "would-merge")).toBe(false);
     const tests = readFileSync(join(import.meta.dirname, "shadow-merge.test.ts"), "utf8");
-    expect(tests).not.toMatch(/\b(?:it|describe|test)\.skip\b/);
-    expect(tests).not.toMatch(/\bskipIf\b/);
+    const skipCall = (src: string) => src.split("\n").some((line) => {
+      const trimmed = line.trim();
+      return trimmed.length > 0
+        && !trimmed.startsWith("//")
+        && !trimmed.startsWith("*")
+        && !trimmed.startsWith("/*")
+        && (/\b(?:it|describe|test)\.skip\b/.test(trimmed) || /\bskipIf\b/.test(trimmed));
+    });
+    const plantedSkip = "it" + ".skip";
+    const plantedSkipIf = "skip" + "If";
+    expect(skipCall(plantedSkip + '("")')).toBe(true);
+    expect(skipCall(plantedSkipIf + "()")).toBe(true);
+    expect(skipCall("// " + plantedSkip + " is not how this file is written")).toBe(false);
+    expect(skipCall("/* " + plantedSkip + " stays out of this file */")).toBe(false);
+    expect(skipCall(tests)).toBe(false);
   });
 
   it("CC-19 the merge point is prepare, and the runtime still never merges", () => {

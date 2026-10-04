@@ -10,6 +10,8 @@ Method: tests under `open-brain/tests` that read source (or a copied source stri
 - `open-brain/tests/harness/s4-guards.test.ts:132-148` — `importsMerge` and `doneGate` / spread. String positive and string near-miss, then the real files.
 - `open-brain/tests/harness/spawn-sites.test.ts:110` — spawn-site scan, planted positives for each API form.
 - `open-brain/tests/trigger/no-network.test.ts` and `floor.test.ts` — named G-040; fixture strings beside the scan.
+- `open-brain/tests/harness/checks.test.ts:141-160` — shell scan over `src/harness`. The pair is at `:124-138`: `shell: true` in code matches, the same text in a comment does not.
+- `open-brain/tests/harness/s4-g2-key.test.ts:236-241` — `spreadsProcessEnv`. The pair is at `:231-233`: `{ ...process.env }` matches, `harnessEnv(env)` does not.
 
 ## Added in this branch
 
@@ -19,12 +21,24 @@ Method: tests under `open-brain/tests` that read source (or a copied source stri
 - `open-brain/tests/pipelines/sync/worktree-layout.test.ts` — same shape for `checkWorktreeLayout`.
 - `open-brain/tests/t048-r3.test.ts:116` — looks for `/* non-critical */` near `recordRecallEvent`. No fixture pair yet; the branch only fires when `handleRecall` is missing. Left as a listed gap, not edited, because the scan is inside a fallback.
 - `open-brain/tests/t048-r2b.test.ts:98` — `formatScoreCategoryLine` on `cli.ts`. Positive is the call. Near-miss is the same name in a `//` comment.
+- `open-brain/tests/harness/shadow-merge.test.ts:314-339` — CC-0 and CC-19. Positive is a code line that names `prepareShadowVerdict` or `it.skip`. Near-miss is that text in a `//` comment and in a one-line `/* */` comment.
+- `open-brain/tests/t048-r2b.test.ts:194-205` — D4, `unusableLog` in `invocation-logger.ts`. Positive is a code line `string | null`. Near-miss is that text in a `//` comment and in a one-line `/* */` comment.
+- `open-brain/tests/pipelines/bootstrap-fix-r4.test.ts:137-143` — R-BF-21, git grep absence of `OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK` under `open-brain/src`. Positive is a code line that names the variable. Near-miss is that name in a `//` comment and in a one-line `/* */` comment.
+
+## Out of scope: reads docs
+
+A test that reads repo markdown is not a source scan.
+
+- `open-brain/tests/pipelines/session-start/briefing.test.ts:589-601`
+- `open-brain/tests/pipelines/session-start/no-standing-cron.test.ts:65-73`
+- `open-brain/tests/pipelines/sync/start-legend.test.ts:15-31`
+- `open-brain/tests/pipelines/sync/start-parity.test.ts:74`
 
 ## Deferred: test file is in a PR that is in QA or frozen
 
 Do not edit until that PR merges.
 
-- deferred: `open-brain/tests/pipelines/sync/checks.test.ts` in PR #442 (audit already cites checks.test.ts:124 as covered; leave the file)
+- deferred: `open-brain/tests/pipelines/sync/checks.test.ts` in PR #442 (the audit cite checks.test.ts:124 is `harness/checks.test.ts`, listed above; leave this file)
 - deferred: `open-brain/tests/cli-bootstrap.test.ts` in PR #437
 - deferred: `open-brain/tests/cli-session-end-dedupe.test.ts` in PR #437
 - deferred: `open-brain/tests/shared/session-hook-claim.test.ts` in PR #437

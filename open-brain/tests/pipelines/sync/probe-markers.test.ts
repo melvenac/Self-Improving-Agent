@@ -70,10 +70,15 @@ describe("probe-markers", () => {
   it("index.ts runs the check", () => {
     const wired = (src: string) => src.split("\n").some((line) => {
       const trimmed = line.trim();
-      return !trimmed.startsWith("//") && !trimmed.startsWith("*") && trimmed.includes("checks.push(checkProbeMarkers(options.projectRoot))");
+      return trimmed.length > 0
+        && !trimmed.startsWith("//")
+        && !trimmed.startsWith("*")
+        && !trimmed.startsWith("/*")
+        && trimmed.includes("checks.push(checkProbeMarkers(options.projectRoot))");
     });
     expect(wired("checks.push(checkProbeMarkers(options.projectRoot));")).toBe(true);
     expect(wired("// checks.push(checkProbeMarkers(options.projectRoot)); is not wired")).toBe(false);
+    expect(wired("/* checks.push(checkProbeMarkers(options.projectRoot)); */")).toBe(false);
     const src = readFileSync(new URL("../../../src/pipelines/sync/index.ts", import.meta.url), "utf8");
     expect(wired(src)).toBe(true);
   });

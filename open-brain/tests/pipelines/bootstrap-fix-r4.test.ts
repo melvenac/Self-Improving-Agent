@@ -136,9 +136,21 @@ describe("R-BF-20: a failed undo is never printed as refused", () => {
 
 describe("R-BF-21: the shipped move-residue does not load code named by an environment variable", () => {
   it("git grep finds no OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK in src/", () => {
+    const namesHook = (src: string) => src.split("\n").some((line) => {
+      const trimmed = line.trim();
+      return trimmed.length > 0
+        && !trimmed.startsWith("//")
+        && !trimmed.startsWith("*")
+        && !trimmed.startsWith("/*")
+        && trimmed.includes("OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK");
+    });
+    expect(namesHook("const hook = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;")).toBe(true);
+    expect(namesHook("// OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not how residue moves")).toBe(false);
+    expect(namesHook("/* OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not loaded */")).toBe(false);
     const repoRoot = join(import.meta.dirname, "../../..");
     const g = spawnSync("git", ["grep", "-n", "OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK", "--", "open-brain/src"], { cwd: repoRoot, encoding: "utf8" });
     expect(g.status).toBe(1);
     expect(g.stdout).toBe("");
+    expect(namesHook(g.stdout ?? "")).toBe(false);
   });
 });
