@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/state-render.ts b/open-brain/src/pipelines/session-start/state-render.ts
+index ae91b60d..8910043c 100644
+--- a/open-brain/src/pipelines/session-start/state-render.ts
++++ b/open-brain/src/pipelines/session-start/state-render.ts
+@@ -268,7 +268,7 @@ export function checkMissingHandoff(state: State, options: MissingHandoffOptions
+   for (const s of attributable) if (compareFirstRev(s.first_rev, last.first_rev) >= 0) last = s;
+   if (state.handoffs.some((h) => h.session_uuid === last.uuid)) return { kind: "clear" };
+   const mapped = resolveCheckoutSeat(options.projectRoot);
+-  const who = (mapped.kind === "seat" ? mapped.seat : null) ?? last.seat ?? options.seat ?? checkout;
++  const who = options.seat ?? (mapped.kind === "seat" ? mapped.seat : null) ?? last.seat ?? checkout;
+   return {
+     kind: "missing",
+     line: `Handoff MISSING: last ${who} session #${last.n} (${last.uuid}, rev ${last.first_rev ?? "unknown"}) wrote the record, left no handoff; fix: ob_state set_handoff`,

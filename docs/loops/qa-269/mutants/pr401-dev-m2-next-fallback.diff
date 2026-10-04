@@ -1,0 +1,16 @@
+diff --git a/open-brain/src/pipelines/session-start/focus.ts b/open-brain/src/pipelines/session-start/focus.ts
+index 652368aa..a51ed639 100644
+--- a/open-brain/src/pipelines/session-start/focus.ts
++++ b/open-brain/src/pipelines/session-start/focus.ts
+@@ -58,7 +58,10 @@ export function focusLine(state: State, seat: SeatResolution): string | null {
+       return `FOCUS: ${seat.reason}`;
+   }
+   const mine = assigned(state, seat.seat);
+-  if (mine.length === 0) return "FOCUS: none assigned in the record";
++  if (mine.length === 0) {
++    const next = state.tasks.find((t) => t.status !== "done");
++    return next ? `FOCUS: ${next.id} ${clipTitle(next.title)} (${next.priority}, ${next.status})` : "FOCUS: none assigned in the record";
++  }
+   const top = mine[0]!;
+   const more = mine.length > 1 ? ` · +${mine.length - 1} more: ${FOCUS_MORE}` : "";
+   return `FOCUS: ${top.id} ${clipTitle(top.title)} (${top.priority}, ${top.status})${more}`;

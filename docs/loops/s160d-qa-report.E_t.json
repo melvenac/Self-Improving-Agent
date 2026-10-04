@@ -1,0 +1,68 @@
+{
+  "loop": "qa-269-s160d",
+  "candidate_git": {
+    "sha": "9cf6abc88ade145c5bd7d5cb027adcf968eea6d5",
+    "branch": "local qa269-merge (ef57c10c + 9ea9f54a + 5add9137 + 3212ed69 + c3ee949b), not pushed",
+    "frozen_at": "2026-10-04T01:20:52Z"
+  },
+  "candidates": [
+    { "task": "T-237", "sha": "9ea9f54a6e81ad3f465f56bf92243f3f129ceeba", "branch": "pull/397/head", "pr": 397, "verdict": "ACCEPT" },
+    { "task": "T-236", "sha": "c3ee949b8e6e6a45a2758af61c7d6bafd8ca8ce0", "branch": "pull/401/head", "pr": 401, "verdict": "ACCEPT" },
+    { "task": "T-199", "sha": "3212ed69a87bf3bbfad5f933691bc457b3435a13", "branch": "pull/402/head", "pr": 402, "verdict": "ACCEPT" },
+    { "task": "T-204", "sha": "5add91379641ef211f98b2f79d1551c0090821eb", "branch": "pull/404/head", "pr": 404, "verdict": "INCOMPLETE" }
+  ],
+  "runtime_checks": {
+    "build": {
+      "command": "npx tsc --noEmit and npm run typecheck:tests in qa269-pr397, qa269-pr401, qa269-pr402 and qa269-merge (9cf6abc8); tsc --outDir ~/qa-tmp/qa269-build then node --check server.js on the merge",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 90000,
+      "detail": "All 0. Every mutant was also tsc-clean before it was counted."
+    },
+    "unit": {
+      "command": "npx vitest run <one file> per run (LIGHT job; no full suite)",
+      "exit_code": 0,
+      "passed": true,
+      "duration_ms": 240000,
+      "detail": "#397: greeting-size head 12/12, on 3e95016c's bound 2 failed|10 passed; hub-presence 40/40. #401: focus 10/10 (master: module missing), focus-off 6/6 (master 6/6 by design), task-assignees 4/4 (master: module missing), state-writer 48/48 (master 1 failed|47). #402: missing-handoff 29/29 (master 26 failed|3), briefing-budget 32/32 (master 1 failed|31), a2a-byte-identical 3/3. Batch 9cf6abc8: briefing 48, briefing-budget 32, focus 10, missing-handoff 29, server 35, hub-presence 40, greeting-size 12, a2a-byte-identical 3."
+    },
+    "harness": {
+      "command": "powershell -File docs/loops/machine-lease-harness.ps1 ... (#404 rows 14, 15)",
+      "exit_code": null,
+      "passed": false,
+      "duration_ms": 0,
+      "detail": "NOT RUN: Linux QA host, no pwsh/powershell; the helper is Windows-only (USERPROFILE, Global\\ mutex, powershell.exe)."
+    }
+  },
+  "requirements": [],
+  "acceptance": [
+    { "id": "Q269-1", "status": "met", "order": "shown", "evidence": "Confined: #397 4 files (greeting-size.test.ts the one beyond the original three; remerge-diff of e14593ba empty); #401 14 files; #402 9 files; #404 6 docs/loops files. None outside its task." },
+    { "id": "Q269-4", "status": "met", "order": "shown", "evidence": "gh pr checks: #397 test pass run 37166239875; #401 pass 37166318026; #402 pass 37166132797; #404 test skipping (docs-only) 37164481585. All match the dispatch." },
+    { "id": "Q269-5", "status": "met", "order": "red-first", "evidence": "#397: head greeting-size.test.ts on 3e95016c's bound: 2 failed|10 passed (class row: bound 50 < longest 67; line-227 row). Head 12/12, hub-presence 40/40. QA mutant (drop the null/absent shapes): 2 failed." },
+    { "id": "Q269-2-401", "status": "met", "order": "red-first", "evidence": "Master: focus and task-assignees module missing (pinned by mutants); state-writer 1 failed (W1); focus-off 6/6 by design. Head 10, 6, 4, 48." },
+    { "id": "Q269-3-401", "status": "met", "order": "shown", "evidence": "Dev M8b (KEY_ORDER drops assignee): W1 red, and the ob_state probe shows 'applied' with the field gone. Dev M2 (NEXT fallback): F2, F5. QA-M1 (second roster fetch): S2 (2 calls). QA-M2 (priority reversed): F4, S1. Each landed, tsc 0, restored." },
+    { "id": "Q269-6", "status": "met", "order": "shown", "evidence": "Whole ob_start dump, 5 configs x {SIA, A2A 1c200b41}, head vs master: 10/10 identical after masking the tree path, pid/tmp dirs and the token estimate; no FOCUS/SEATS." },
+    { "id": "Q269-7", "status": "met", "order": "shown", "evidence": "S2 via ob_start asserts exactly 1 hub call; QA-M1 makes it 2 and red. F2 'none assigned in the record'; the NEXT-fallback mutant turns it red." },
+    { "id": "Q269-8", "status": "met", "order": "shown", "evidence": "handleState (ob_state) on a scratch record: rev 7->8, re-read assignee=\"infra\"; clear rev 8->9 removes the key. Master refuses (Unrecognized key). KEY_ORDER without assignee: W1 red." },
+    { "id": "Q269-9", "status": "met", "order": "shown", "evidence": "B1-MEASURE 30 lines 3704 chars (<= 30 / 4096)." },
+    { "id": "Q269-2-402", "status": "met", "order": "red-first", "evidence": "Master: missing-handoff 26 failed|3 passed (20 on missingHandoffLine not a function, pinned by mutants; 6 behavioural); briefing-budget 1 failed|31. Head 29/29, 32/32, a2a 3/3." },
+    { "id": "Q269-3-402", "status": "met", "order": "shown", "evidence": "Dev label-identity mutant: 4 failed. QA checkout-satisfies mutant: 3 failed. QA no-record-silent mutant SURVIVES 29/29 (G1); the QA probe kills it." },
+    { "id": "Q269-10", "status": "met", "order": "shown", "evidence": "Flag absent: a2a golden 3/3 and the A2A e2e row. Flag on (probe, a sia-infra checkout with a lying AGENT.local.md Builder): 'Handoff MISSING: last infra session #9001 ...' labelled by the map." },
+    { "id": "Q269-11", "status": "met", "order": "shown", "evidence": "All four not-checked reasons print (no root, no uuid, state.json invalid, no state.json); the last is verified by the QA probe only (G1). F3 refuses the whole greeting." },
+    { "id": "Q269-12", "status": "met", "order": "shown", "evidence": "Budgeted: header 'PICK UP HERE', body '<pick-up> · <notice>', notice 153 chars, no new line. Legacy: its own line after the pick-up body." },
+    { "id": "Q269-13", "status": "met", "order": "shown", "evidence": "range-diff: 2 = ; 1 ! only in a qa-launch.md hunk-header context line. Lease, harness, queue, plan and handoff byte-identical to source; master's qa-queue.ps1 unchanged since 066ed8ca." },
+    { "id": "Q269-14", "status": "unverified", "order": "not-run", "evidence": "No PowerShell on the Linux QA host; the harness is Windows-only." },
+    { "id": "Q269-15", "status": "unverified", "order": "not-run", "evidence": "Same as Q269-14; the nonatomic mutant and the QA queue mutant were not run." },
+    { "id": "Q269-16", "status": "met", "order": "shown", "evidence": "ef57c10c + #397 + #404 + #402 clean; #401 conflicts in CHANGELOG.md, briefing.ts and server.ts, resolved as ruled (FOCUS on the header, notice after the pick-up body); greeting.json auto-merged and sorted. tsc 0, typecheck:tests 0, 8 files green, node --check 0, 0 duplicate imports (src 104 files / 1150 bindings). Every flag on: 30 lines / 3863 chars (156-char notice), 30 / 3867 at the 160 cap." }
+  ],
+  "regressions": [],
+  "gaps": [
+    "G1 #402: no committed row pins 'not checked (no .agents/state.json ...)'; a mutant silencing it survives 29/29.",
+    "G2 #402: MISSING_HANDOFF_MAX_CHARS is a test constant; the checkout-name fallback or reason can exceed 160 for a long unlisted checkout name.",
+    "G3 #401: the greeting-flags.ts key-list comment does not name briefing_focus.",
+    "G4 #397 (pre-existing): the bound assumes unread <= 999.",
+    "G5 #404: harness rows 14/15 need a Windows host; CI test is skipped for the docs-only diff.",
+    "G6 (pre-existing): the budgeted pick-up body follows AGENT.local.md's role while FOCUS and the notice follow the checkout map."
+  ],
+  "notes": "QA 269, dispatch tree 617d0f80a8ba37005f58281ecd3ec5996a031cd6. Heads unmoved at start and end. Master moved ef57c10c -> 617d0f80 in docs/state only. TMPDIR not set (permission layer). No live Jev call; gh read-only. Per-PR: #397 ACCEPT, #401 ACCEPT, #402 ACCEPT, #404 INCOMPLETE (PowerShell rows not run); batch INCOMPLETE."
+}

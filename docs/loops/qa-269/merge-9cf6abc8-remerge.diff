@@ -1,0 +1,98 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+remerge CONFLICT (content): Merge conflict in CHANGELOG.md
+index 897033f7..b1df780b 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -4,20 +4,17 @@
+ 
+ ### Added
+ 
+-<<<<<<< 3e79a134 (Merge commit '3212ed69a87bf3bbfad5f933691bc457b3435a13' into HEAD)
+ - **`/start` names a checkout whose last session wrote the record and left no handoff (T-199, ported from Forge's loop/t199-missing-handoff).**
+   Opt-in per repo: `"missing_handoff": true` in `.agents/SYSTEM/greeting.json` (absent = off, so A2A renders exactly as before).
+   On, the Briefing prints `Handoff MISSING: last <seat> session #N (<uuid>, rev R) wrote the record, left no handoff; fix: ob_state
+   set_handoff` (the seat is the T-203 map's, by checkout), or `Handoff check: not checked (<why>)` when it cannot tell. In the budgeted
+   layout the notice is appended to the pick-up line, so it costs no line. A checkout with no session in the record is clear.
+ 
+-=======
+ - **FOCUS and SEATS in the budgeted briefing (T-236 (c)).** Opt-in: `briefing_focus` in `.agents/SYSTEM/greeting.json`,
+   effective only with `briefing_budget` (absent = off; A2A renders unchanged). A task gains an optional `assignee`, a seat
+   of `hub-partner-seats.json`, set by the planner with `update_task`. FOCUS names this checkout's seat's assigned task (or
+   `none assigned in the record`), on the PICK UP header line. SEATS lists every seat's, with presence words only from the
+   roster ob_start already fetched. Still 30 lines in the worst case. New `/sync` check `task-assignees`.
+->>>>>>> c3ee949b (Merge remote-tracking branch 'origin/master' into loop/t236c-focus)
+ - **Role docs print in full only when they changed since this seat last read them (T-236 slice 1, closes T-183).**
+   Opt-in per repo: `"role_docs_by_sha": true` in the new tracked `.agents/SYSTEM/greeting.json` (absent file or key = off,
+   so a repo that does not opt in, A2A included, renders exactly as before). On, `ob_start` prints an unchanged doc as one
+diff --git a/open-brain/src/pipelines/session-start/briefing.ts b/open-brain/src/pipelines/session-start/briefing.ts
+remerge CONFLICT (content): Merge conflict in open-brain/src/pipelines/session-start/briefing.ts
+index 34240f47..77cee818 100644
+--- a/open-brain/src/pipelines/session-start/briefing.ts
++++ b/open-brain/src/pipelines/session-start/briefing.ts
+@@ -41,19 +41,17 @@ export interface BriefingInput {
+    */
+   budget?: boolean;
+   /**
+-<<<<<<< 3e79a134 (Merge commit '3212ed69a87bf3bbfad5f933691bc457b3435a13' into HEAD)
+    * T-199, OPT-IN per repo (greeting.json `missing_handoff`), default OFF. The one-line notice that this checkout's last session
+    * wrote the record and left no handoff, or that the check could not run. Null or absent prints nothing, so every other render is
+    * byte-identical. The legacy layout prints it as its own line after the pick-up; the budgeted layout has no spare line (it is
+    * exactly at its cap), so it is APPENDED to the pick-up line, which is never cut after the append.
+    */
+   missingHandoff?: string | null;
+-=======
++  /**
+    * T-236 (c), OPT-IN (greeting.json `briefing_focus`), and only inside the budgeted layout. Precomputed by the caller
+    * (focus.ts) from the record and the roster ob_start already fetched. Absent: the budgeted layout of slice 2, unchanged.
+    */
+   focus?: { focus: string | null; seats: string | null };
+->>>>>>> c3ee949b (Merge remote-tracking branch 'origin/master' into loop/t236c-focus)
+ }
+ 
+ const NEXT_SHOWN = 3;
+@@ -184,18 +182,11 @@ function renderBudgeted(i: BriefingInput): string[] {
+   const seats = i.focus?.seats ?? null;
+   if (seats !== null) out.push(seats);
+   const own = i.seat ? newestHandoffForSeat(s.handoffs, i.seat) : null;
+-<<<<<<< 3e79a134 (Merge commit '3212ed69a87bf3bbfad5f933691bc457b3435a13' into HEAD)
+-  out.push("PICK UP HERE");
++  out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
+   const pickUp = own
+     ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars)
+     : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : `none recorded for this seat (${i.seat})`;
+   out.push(i.missingHandoff ? `${pickUp} · ${i.missingHandoff}` : pickUp);
+-=======
+-  out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
+-  if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars));
+-  else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
+-  else out.push(`none recorded for this seat (${i.seat})`);
+->>>>>>> c3ee949b (Merge remote-tracking branch 'origin/master' into loop/t236c-focus)
+ 
+   if (own) {
+     const live = own.watch_out.filter((w) => !isExpired(w, i.sessionNumber, i.date));
+diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts
+remerge CONFLICT (content): Merge conflict in open-brain/src/server.ts
+index 189171bd..05f61691 100644
+--- a/open-brain/src/server.ts
++++ b/open-brain/src/server.ts
+@@ -377,12 +377,10 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
+         skills: describeSkills(projectRoot),
+         // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
+         budget: greetingFlag(projectRoot, "briefing_budget"),
+-<<<<<<< 3e79a134 (Merge commit '3212ed69a87bf3bbfad5f933691bc457b3435a13' into HEAD)
+         // T-199, opt-in: a repo without `missing_handoff` renders exactly as before.
+         missingHandoff: greetingFlag(projectRoot, "missing_handoff")
+           ? missingHandoffLine(sj.data, { projectRoot, sessionUuid: proven.id, seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null })
+           : null,
+-=======
+         // T-236 (c): OPT-IN, and only with the budget. The seat is the CHECKOUT's; presence is the roster fetched above.
+         ...(greetingFlag(projectRoot, "briefing_budget") && greetingFlag(projectRoot, "briefing_focus")
+           ? {
+@@ -392,7 +390,6 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
+               },
+             }
+           : {}),
+->>>>>>> c3ee949b (Merge remote-tracking branch 'origin/master' into loop/t236c-focus)
+       }));
+     } else {
+       // F3: an unknown schema_version REFUSES, with no prose fallback.

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/hub-presence.ts b/open-brain/src/pipelines/session-start/hub-presence.ts
+index 997c2342..d658d99d 100644
+--- a/open-brain/src/pipelines/session-start/hub-presence.ts
++++ b/open-brain/src/pipelines/session-start/hub-presence.ts
+@@ -278,8 +278,6 @@ export function presenceBlockUpperBound(
+   const shapes: Array<PresenceAgent["rooms"]> = [
+     [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: 99 * 86_400_000 }],
+     [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: -1 }],
+-    [{ sessionId: "", unread: 999, pollingNow: false, pollAgeMs: null }],
+-    [{ sessionId: "", unread: 999, pollingNow: false }],
+     [{ sessionId: "", unread: 0, pollingNow: true, pollAgeMs: 0 }],
+     [],
+   ];

@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/focus.ts b/open-brain/src/pipelines/session-start/focus.ts
+index 652368aa..6892a0a7 100644
+--- a/open-brain/src/pipelines/session-start/focus.ts
++++ b/open-brain/src/pipelines/session-start/focus.ts
+@@ -26,7 +26,7 @@ function assigned(state: State, seat: string): Task[] {
+   const num = (id: string) => Number(id.replace(/\D/g, "")) || 0;
+   return state.tasks
+     .filter((t) => t.status !== "done" && t.assignee === seat)
+-    .sort((a, b) => PRIORITY_ORDER.indexOf(a.priority) - PRIORITY_ORDER.indexOf(b.priority) || num(a.id) - num(b.id));
++    .sort((a, b) => PRIORITY_ORDER.indexOf(b.priority) - PRIORITY_ORDER.indexOf(a.priority) || num(a.id) - num(b.id));
+ }
+ 
+ /** The seat map's seats, in map order, or null when there is no readable map. */

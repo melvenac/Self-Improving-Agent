@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts
+index 9d6ae787..99e71adb 100644
+--- a/open-brain/src/server.ts
++++ b/open-brain/src/server.ts
+@@ -409,7 +409,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
+         lines.push(`\nstate.json invalid at ${sj.error} — falling back to files`);
+       }
+       // T-199, opt-in: the detector reads the record, so with no readable record it says it did not check.
+-      if (greetingFlag(projectRoot, "missing_handoff")) {
++      if (greetingFlag(projectRoot, "missing_handoff") && sj.present) {
+         lines.push(`\nHandoff check: not checked (${sj.present ? "state.json invalid" : "no .agents/state.json"}, so there is no record to read)`);
+       }
+       const content: Record<string, string | null> = {

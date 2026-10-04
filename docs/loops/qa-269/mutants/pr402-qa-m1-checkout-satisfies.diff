@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/pipelines/session-start/state-render.ts b/open-brain/src/pipelines/session-start/state-render.ts
+index ae91b60d..b1fc2658 100644
+--- a/open-brain/src/pipelines/session-start/state-render.ts
++++ b/open-brain/src/pipelines/session-start/state-render.ts
+@@ -266,7 +266,7 @@ export function checkMissingHandoff(state: State, options: MissingHandoffOptions
+   }
+   let last = attributable[0]!;
+   for (const s of attributable) if (compareFirstRev(s.first_rev, last.first_rev) >= 0) last = s;
+-  if (state.handoffs.some((h) => h.session_uuid === last.uuid)) return { kind: "clear" };
++  if (state.handoffs.some((h) => h.session_uuid === last.uuid || h.checkout === last.checkout)) return { kind: "clear" };
+   const mapped = resolveCheckoutSeat(options.projectRoot);
+   const who = (mapped.kind === "seat" ? mapped.seat : null) ?? last.seat ?? options.seat ?? checkout;
+   return {

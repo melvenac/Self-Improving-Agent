@@ -1,0 +1,13 @@
+diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts
+index cdb3f814..e8aebd96 100644
+--- a/open-brain/src/server.ts
++++ b/open-brain/src/server.ts
+@@ -382,7 +382,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
+           ? {
+               focus: {
+                 focus: focusLine(sj.data, resolveCheckoutSeat(projectRoot)),
+-                seats: ((order) => (order ? seatsLine(sj.data, order, presence.statusByHubName ?? null) : null))(seatOrder(projectRoot)),
++                seats: ((order, again) => (order ? seatsLine(sj.data, order, again.statusByHubName ?? null) : null))(seatOrder(projectRoot), await describeHubPresence({ projectRoot, identity: roles.seat, callerLabel: "open-brain MCP server" })),
+               },
+             }
+           : {}),
