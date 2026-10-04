@@ -151,7 +151,8 @@ describe("T-236 (c) SEATS", () => {
     });
 
     it("ob_start (budget + focus on) prints FOCUS and SEATS with presence words, and fetched the roster exactly once", async () => {
-      const root = checkout("sia-planner");
+      // AGENT.local.md says Builder: an identity-keyed FOCUS would name builder's task, not the planner checkout's.
+      const root = checkout("sia-planner", "Builder");
       for (const d of ["TASKS", "SESSIONS"]) mkdirSync(join(root, ".agents", d), { recursive: true });
       writeFileSync(join(root, "package.json"), JSON.stringify({ version: "1.0.0" }));
       writeFileSync(join(root, ".agents", "SESSIONS", "SESSION_TEMPLATE.md"), "# Session N\n");
