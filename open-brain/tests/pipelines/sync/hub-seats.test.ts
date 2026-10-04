@@ -111,6 +111,47 @@ describe("checkHubSeats", () => {
     expect(result.message).toContain("no room");
   });
 
+  it("dispatch room deleted, top-level kept is an issue", () => {
+    writeHub({
+      talk: TALK,
+      readers: READERS,
+      seats: {
+        infra: {
+          hub_name: "cursor-infra",
+          runtime: "cursor",
+          host: "qa-pc",
+          model: "composer-2.5",
+          room: DISPATCH_CURSOR.room,
+          dispatch: { cursor: { ...DISPATCH_CURSOR, room: "" }, claude_code: DISPATCH_CC },
+        },
+      },
+    });
+    const result = checkHubSeats(root);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("no room");
+    expect(result.message).toContain("not a fallback");
+  });
+
+  it("the two differ is an issue", () => {
+    writeHub({
+      talk: TALK,
+      readers: READERS,
+      seats: {
+        infra: {
+          hub_name: "cursor-infra",
+          runtime: "cursor",
+          host: "qa-pc",
+          model: "composer-2.5",
+          room: "k-other-room-not-the-dispatch-one",
+          dispatch: { cursor: DISPATCH_CURSOR, claude_code: DISPATCH_CC },
+        },
+      },
+    });
+    const result = checkHubSeats(root);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("differs from dispatch.cursor.room");
+  });
+
   it("is green when every cursor runtime seat has a room and every name is a worktree seat", () => {
     writeHub({
       talk: TALK,

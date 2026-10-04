@@ -1,5 +1,5 @@
 {
-  "description": "One seat file. It is the single tracked map from a worktree (its basename, as sessions[].checkout records it) to seat, role, agent name and hub name (T-203, closing G-049): ob_start resolves the reader by CHECKOUT, never by AGENT.local.md, and /sync flags an AGENT.local.md that disagrees. ob_start also reads readers for partner presence (T-198), and the hub-seats check reads talk, seats and readers (T-196). worktree-seats.json stays the layout rule (which <project>-<seat> names may exist) and holds no seat attribute. Room ids are as clark created them on 2026-10-04 (session 160), one room per Cursor seat with participants [atlas, <hub_name>, <hub_name>-waker]. hub_name is a plain field, never derived from the seat name (D-115); the forge seat speaks as forge since T-213. T-240: `runtime` selects the active dispatch block; both dispatch.cursor and dispatch.claude_code are kept so a switch is one map edit plus waker stop/start (hub_name stays stable at a CC switch — D-115, T-240).",
+  "description": "One seat file. It is the single tracked map from a worktree (its basename, as sessions[].checkout records it) to seat, role, agent name and hub name (T-203, closing G-049): ob_start resolves the reader by CHECKOUT, never by AGENT.local.md, and /sync flags an AGENT.local.md that disagrees. ob_start also reads readers for partner presence (T-198), and the hub-seats check reads talk, seats and readers (T-196). worktree-seats.json stays the layout rule (which <project>-<seat> names may exist) and holds no seat attribute. Room ids are as clark created them on 2026-10-04 (session 160), one room per Cursor seat with participants [atlas, <hub_name>, <hub_name>-waker]. hub_name is a plain field, never derived from the seat name (D-115); the forge seat speaks as forge since T-213. T-240: `runtime` selects the active dispatch block; both dispatch.cursor and dispatch.claude_code are kept so a switch is one map edit plus waker stop/start (hub_name stays stable at a CC switch — D-115, T-240). The room id lives only on `dispatch.cursor.room` (T-240 r2); there is no top-level `room`.",
   "hub_url": "http://100.124.212.87:4000",
   "talk": "HUB_URL={hub_url} node <A2A-Hub>/scripts/hub-talk.mjs --as {hub_name} --session {room}",
   "talk_tokens": "Substitute {hub_url}, {hub_name}, and {room} only. Replace <A2A-Hub> with the absolute path of the local checkout of https://github.com/melvenac/A2A-Hub that contains scripts/hub-talk.mjs. The angle-bracket token is not filled from this file.",
@@ -26,7 +26,6 @@
       "runtime": "cursor",
       "host": "qa-pc",
       "model": "composer-2.5",
-      "room": "k575sfwr9wcx3r8fw83g3bc00x8fmar3",
       "dispatch": {
         "cursor": { "via": "hub-room", "hub_name": "cursor-builder", "room": "k575sfwr9wcx3r8fw83g3bc00x8fmar3", "waker": "cursor-builder-waker" },
         "claude_code": { "via": "session", "name": "builder", "host": "qa-pc" }
@@ -40,7 +39,6 @@
       "runtime": "cursor",
       "host": "qa-pc",
       "model": "composer-2.5",
-      "room": "k571z4ghp7nbp34djhecwnsk3n8fmhsf",
       "dispatch": {
         "cursor": { "via": "hub-room", "hub_name": "forge", "room": "k571z4ghp7nbp34djhecwnsk3n8fmhsf", "waker": "forge-waker" },
         "claude_code": { "via": "session", "name": "forge", "host": "qa-pc" }
@@ -54,7 +52,6 @@
       "runtime": "cursor",
       "host": "qa-pc",
       "model": "composer-2.5",
-      "room": "k57d92gqtjm9wpfs74ekbx9rns8fmy2f",
       "dispatch": {
         "cursor": { "via": "hub-room", "hub_name": "cursor-infra", "room": "k57d92gqtjm9wpfs74ekbx9rns8fmy2f", "waker": "cursor-infra-waker" },
         "claude_code": { "via": "session", "name": "infra", "host": "qa-pc" }

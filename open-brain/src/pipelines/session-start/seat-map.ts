@@ -56,14 +56,22 @@ export function readSeatMapRows(projectRoot: string): { ok: true; seats: Record<
   }
 }
 
-/** hub_name → runtime for partner presence formatting (T-240). */
-export function runtimeByHubName(projectRoot: string): Record<string, SeatRuntime> | null {
+/** A seat row that names a hub but has no runtime. Presence must not treat that as claude-code. */
+export const RUNTIME_MISSING = "missing" as const;
+export type HubRuntime = SeatRuntime | typeof RUNTIME_MISSING;
+
+/**
+ * hub_name → runtime for partner presence (T-240).
+ * A row with a hub name and no runtime is recorded as `missing`. Skipping it
+ * made ob_start treat a waker seat as a hub listener (T-240 r2).
+ */
+export function runtimeByHubName(projectRoot: string): Record<string, HubRuntime> | null {
   const map = readSeatMapRows(projectRoot);
   if (!map.ok) return null;
-  const out: Record<string, SeatRuntime> = {};
+  const out: Record<string, HubRuntime> = {};
   for (const row of Object.values(map.seats)) {
-    if (!isObject(row) || !filled(row.hub_name) || !isSeatRuntime(row.runtime)) continue;
-    out[row.hub_name.trim()] = row.runtime;
+    if (!isObject(row) || !filled(row.hub_name)) continue;
+    out[row.hub_name.trim()] = isSeatRuntime(row.runtime) ? row.runtime : RUNTIME_MISSING;
   }
   return out;
 }

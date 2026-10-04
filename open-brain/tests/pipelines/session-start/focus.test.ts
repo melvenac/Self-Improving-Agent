@@ -3,9 +3,9 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, cpSync } f
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { parseState, type State } from "../../../src/shared/state-schema.js";
-import { resolveCheckoutSeat } from "../../../src/pipelines/session-start/seat-map.js";
+import { resolveCheckoutSeat, runtimeByHubName } from "../../../src/pipelines/session-start/seat-map.js";
 import { focusLine, seatsLine, seatOrder } from "../../../src/pipelines/session-start/focus.js";
-import { describeHubPresence } from "../../../src/pipelines/session-start/hub-presence.js";
+import { describeHubPresence, formatPartnerLine, liveStateForHubAgent } from "../../../src/pipelines/session-start/hub-presence.js";
 import { BRIEFING_BUDGET, renderBriefing, type BriefingInput } from "../../../src/pipelines/session-start/briefing.js";
 import { handleStart } from "../../../src/server.js";
 
@@ -220,5 +220,31 @@ describe("T-236 (c) B1 the worst case still fits the budget with FOCUS and SEATS
     expect(text).toMatch(/\nSEATS: planner T-\d+ \(\+\d+\)/);
     expect(text).toContain("Latest brief: docs/loops/t236-brief.md (2026-10-03) · Skills: self-improving-agent-gotchas");
     console.log(`B1-MEASURE ${lines.length} lines ${text.length} chars`);
+  });
+});
+
+describe("T-240 r2 another seat missing runtime", () => {
+  it("stays on the SEATS line and a waker seat never falls back to not polling", () => {
+    const root = checkout("sia-infra");
+    const path = join(root, ".agents", "SYSTEM", "hub-partner-seats.json");
+    const map = JSON.parse(readFileSync(path, "utf8")) as { seats: Record<string, { runtime?: string }> };
+    delete map.seats.builder!.runtime;
+    writeFileSync(path, JSON.stringify(map));
+
+    const order = seatOrder(root);
+    expect(order).not.toBeNull();
+    const line = seatsLine(stateWith({}), order!, { "cursor-builder": "hub listener:not polling" })!;
+    expect(line).toContain("runtime missing in seat map");
+    expect(line).toContain("builder");
+    expect(line).toContain("infra");
+    expect(line).not.toContain("not polling");
+
+    expect(runtimeByHubName(root)?.["cursor-builder"]).toBe("missing");
+    const agent = { name: "cursor-builder", rooms: [{ sessionId: "x", unread: 2, pollingNow: false, pollAgeMs: 1000 }] };
+    expect(liveStateForHubAgent("missing", agent)).toBe("runtime missing in seat map");
+    expect(formatPartnerLine({ label: "Builder", hub_as: "cursor-builder", session_id: "x" }, [agent], "missing")).toBe(
+      "Builder: runtime missing in seat map",
+    );
+    expect(formatPartnerLine({ label: "Builder", hub_as: "cursor-builder", session_id: "x" }, [agent], "missing")).not.toContain("not polling");
   });
 });

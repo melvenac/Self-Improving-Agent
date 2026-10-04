@@ -52,8 +52,12 @@ function validateDispatch(seat: string, row: HubSeat, problems: string[]): void 
     if (!filled(cur.hub_name)) problems.push(`${seat} dispatch.cursor has no hub_name`);
     if (!filled(cur.waker)) problems.push(`${seat} dispatch.cursor has no waker`);
     if (row.runtime === "cursor") {
-      const room = typeof cur.room === "string" ? cur.room.trim() : typeof row.room === "string" ? row.room.trim() : "";
-      if (!room) problems.push(`${seat} is a cursor runtime seat with no room`);
+      const dispatchRoom = typeof cur.room === "string" ? cur.room.trim() : "";
+      const topRoom = typeof row.room === "string" ? row.room.trim() : "";
+      if (!dispatchRoom) problems.push(`${seat} is a cursor runtime seat with no room (dispatch.cursor.room; a top-level room is not a fallback)`);
+      if (dispatchRoom && topRoom && dispatchRoom !== topRoom) {
+        problems.push(`${seat} top-level room differs from dispatch.cursor.room`);
+      }
     }
   }
   const cc = d.claude_code;

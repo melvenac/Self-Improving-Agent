@@ -2,8 +2,9 @@ import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AgentIdentity } from "./agent-identity.js";
-import { formatHubSeatState, type SeatRuntime } from "./hub-seat-state.js";
-import { readSeatMapRows, resolveCheckoutSeat, runtimeByHubName } from "./seat-map.js";
+import { formatHubSeatState } from "./hub-seat-state.js";
+import { readSeatMapRows, resolveCheckoutSeat, runtimeByHubName, type HubRuntime } from "./seat-map.js";
+import { RUNTIME_MISSING_IN_SEAT_MAP } from "./focus.js";
 
 /** Interim until T-196; allowlisted at `.agents/SYSTEM/hub-partner-seats.json`. */
 export const HUB_PARTNER_SEATS_REL = ".agents/SYSTEM/hub-partner-seats.json";
@@ -149,8 +150,9 @@ function formatWakerSeatLine(partner: HubPartnerSeat, agent: PresenceAgent | und
 export function formatPartnerLine(
   partner: HubPartnerSeat,
   agents: PresenceAgent[] | null,
-  runtimeForHub: SeatRuntime | undefined,
+  runtimeForHub: HubRuntime | undefined,
 ): string {
+  if (runtimeForHub === "missing") return `${partner.label}: ${RUNTIME_MISSING_IN_SEAT_MAP}`;
   if (!agents) return `${partner.label}: absent`;
   const agent = agents.find((a) => a.name === partner.hub_as);
   if (!agent) return `${partner.label}: absent`;
@@ -159,7 +161,8 @@ export function formatPartnerLine(
 }
 
 /** Live state word(s) for SEATS from one agent row and the seat map runtime for that hub name. */
-export function liveStateForHubAgent(runtime: SeatRuntime | undefined, agent: PresenceAgent | undefined): string | null {
+export function liveStateForHubAgent(runtime: HubRuntime | undefined, agent: PresenceAgent | undefined): string | null {
+  if (runtime === "missing") return RUNTIME_MISSING_IN_SEAT_MAP;
   if (!agent) return "absent";
   if (runtime === "cursor") return formatHubSeatState(agent.seat?.seatState);
   const rooms = agent.rooms ?? [];

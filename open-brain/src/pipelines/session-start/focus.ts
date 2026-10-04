@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { TaskPriority, type State, type Task } from "../../shared/state-schema.js";
 import { SEAT_MAP_REL, seatRowRuntimeFields, type SeatMapRow } from "./seat-map.js";
+import { isSeatRuntime } from "./hub-seat-state.js";
 import type { SeatResolution } from "./seat-map.js";
 import { TITLE_CLIP } from "./state-render.js";
 
@@ -23,6 +24,8 @@ export interface SeatSlot {
 
 const FOCUS_MORE = "state.json tasks[] (assignee)";
 const SEATS_MORE = ".agents/SYSTEM/hub-partner-seats.json";
+/** Shown on the SEATS line for that seat. The line is not dropped (T-240 r2). */
+export const RUNTIME_MISSING_IN_SEAT_MAP = "runtime missing in seat map";
 const SEATS_CAP = 400;
 const PRIORITY_ORDER: readonly string[] = TaskPriority.options;
 /** The same clip the state render applies to task titles (state-render clipTitle). */
@@ -36,7 +39,7 @@ function assigned(state: State, seat: string): Task[] {
     .sort((a, b) => PRIORITY_ORDER.indexOf(a.priority) - PRIORITY_ORDER.indexOf(b.priority) || num(a.id) - num(b.id));
 }
 
-/** The seat map's seats, in map order, or null when there is no readable map or a row lacks runtime. */
+/** The seat map's seats, in map order, or null when there is no readable map or a row lacks host or model. */
 export function seatOrder(projectRoot: string): SeatSlot[] | null {
   const abs = join(projectRoot, SEAT_MAP_REL);
   if (!existsSync(abs)) return null;
@@ -45,15 +48,15 @@ export function seatOrder(projectRoot: string): SeatSlot[] | null {
     if (typeof data.seats !== "object" || data.seats === null) return null;
     const slots: SeatSlot[] = [];
     for (const [seat, row] of Object.entries(data.seats)) {
+      const hubName = typeof row?.hub_name === "string" && row.hub_name.trim() !== "" ? row.hub_name.trim() : null;
+      // A missing runtime stays on the line. Returning null here dropped every seat (T-240 r2).
+      if (!isSeatRuntime(row?.runtime)) {
+        slots.push({ seat, hubName, runtime: RUNTIME_MISSING_IN_SEAT_MAP, model: "", host: "" });
+        continue;
+      }
       const rt = seatRowRuntimeFields(row);
       if (!rt.ok) return null;
-      slots.push({
-        seat,
-        hubName: typeof row?.hub_name === "string" && row.hub_name.trim() !== "" ? row.hub_name.trim() : null,
-        runtime: rt.runtime,
-        model: rt.model,
-        host: rt.host,
-      });
+      slots.push({ seat, hubName, runtime: rt.runtime, model: rt.model, host: rt.host });
     }
     return slots;
   } catch {
@@ -90,6 +93,7 @@ export function seatsLine(
   const parts = seats.map(({ seat, hubName, runtime, model, host }) => {
     const mine = assigned(state, seat);
     const task = mine.length === 0 ? "—" : `${mine[0]!.id}${mine.length > 1 ? ` (+${mine.length - 1})` : ""}`;
+    if (runtime === RUNTIME_MISSING_IN_SEAT_MAP) return `${seat} ${task} ${RUNTIME_MISSING_IN_SEAT_MAP}`;
     const meta = `${runtime} ${model} ${host}`;
     const live = liveByHubName && hubName !== null ? liveByHubName[hubName] : undefined;
     return `${seat} ${task} ${meta}${live ? ` ${live}` : ""}`;
