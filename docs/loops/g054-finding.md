@@ -8,7 +8,7 @@
 Never touched the real `%USERPROFILE%\machine-lease\`.
 
 1. Copy `docs/loops/machine-lease.ps1` into a temp profile directory and set `USERPROFILE` to that directory.
-2. Resolve **owner** pid per D-119: nearest ancestor of the repro shell whose `CommandLine` contains `cursor-agent` (this run: **6088**).
+2. Resolve **owner** pid (this run: **6088**). Standing rule (code **#427** r2; shape `docs/loops/t235-p2-3-r2-measure.md`): the nearest **ancestor** of the calling shell — start from the parent, never the calling shell itself — that is cursor-agent's own host (`node.exe` running `cursor-agent`'s `versions/<ver>/index.js`). Claude Code: the `claude.exe` session's pid.
 3. `take -OwnerPid <owner> -Seat infra -TtlMinutes 90` → exit **0**, message `lease=taken`.
 4. `release -OwnerPid <other live pid>` with a different live PowerShell pid (**17312** in this run).
 
@@ -42,4 +42,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\machine-le
 
 After each call, read **`$LASTEXITCODE`** in the **same** PowerShell session (exit **12** = not yours; do not retry with a different pid per D-118a).
 
-Update **qa-launch.md** and planner **D-119 dispatch** text to state this explicitly when those files are next edited for lease work; this finding does not change `machine-lease.ps1`.
+**Tracked updates (G-054, `loop/g054-lease-callers`):** `docs/loops/qa-launch.md` (this section), `docs/loops/t204-plan.md`
+item 8, `.agents/roles/developer.md`, `.cursor/rules/machine-lease.mdc`. Planner D-119 dispatch text in
+`.agents/state.json` already uses `-File`. This finding does not change `machine-lease.ps1`; `take` already refuses a
+non-live `-OwnerPid` with exit **2** (no harness row added — behaviour present at T-204).
