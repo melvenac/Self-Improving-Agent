@@ -77,11 +77,6 @@ export interface RepoFixture {
  * it, a path comparison in a test fails for a reason that has nothing to do
  * with the thing under test.
  */
-/** G-053: `git gc --auto` can call `update-server-info`, which creates `<common>/info/refs` and fails ConfigWatch mid-loop. */
-export function disableAutoGc(repoRoot: string): void {
-  rawGit(repoRoot, ["config", "gc.auto", "0"]);
-}
-
 export function makeRepo(prefix = "harness-repo-"): RepoFixture {
   const root = realpathSync(mkdtempSync(join(tmpdir(), prefix)));
 
@@ -132,6 +127,11 @@ export function makeRepo(prefix = "harness-repo-"): RepoFixture {
     sha: () => rawGit(root, ["rev-parse", "HEAD"]),
     cleanup: () => rm(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }),
   };
+}
+
+/** G-053: `git gc --auto` can call `update-server-info`, which creates `<common>/info/refs` and fails ConfigWatch mid-loop. */
+export function disableAutoGc(repoRoot: string): void {
+  rawGit(repoRoot, ["config", "gc.auto", "0"]);
 }
 
 /**
