@@ -9,9 +9,34 @@
  */
 
 import { readFileSync, existsSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 const KEY_FLOOR = 32;
 const PRESENCE_PATH = "/a2a/agents/presence";
+
+/** `<host>-<port>`, same spelling as hub-key.mjs. Reimplemented here; session-start is not imported. */
+export function hubIdForUrl(hubUrl: string): string {
+  const u = new URL(hubUrl);
+  const port = u.port || (u.protocol === "https:" ? "443" : "80");
+  return `${u.hostname.toLowerCase()}-${port}`;
+}
+
+/**
+ * Per-agent key file: $A2A_KEY_DIR or ~/.a2a-hub/keys / <hub-id> / <hub_name>.key.
+ * Default name is this seat's hub_name (cursor-builder on this checkout).
+ */
+export function resolveSeatKeyPath(input: {
+  hubUrl: string;
+  hubName: string;
+  keyDir?: string;
+  home?: string;
+}): string {
+  const dir = input.keyDir && input.keyDir.trim()
+    ? input.keyDir
+    : join(input.home ?? homedir(), ".a2a-hub", "keys");
+  return join(dir, hubIdForUrl(input.hubUrl), `${input.hubName}.key`);
+}
 
 export interface CensusAgent {
   name: string;

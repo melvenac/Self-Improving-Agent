@@ -14,7 +14,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { agentsFromPresenceBody, decideSuiteStart, readCensus, type CensusResult } from "./suite-census.js";
+import { agentsFromPresenceBody, decideSuiteStart, readCensus, resolveSeatKeyPath, type CensusResult } from "./suite-census.js";
 import { buildSuiteMeta, vitestCountsFromJson } from "./suite-run-meta.js";
 
 const SIA_SEATS = ["atlas", "cursor-builder", "forge", "cursor-infra", "cursor-qa"];
@@ -110,7 +110,11 @@ async function censusFromEnv(hubUrl: string, keyPath: string | undefined): Promi
 async function main(): Promise<void> {
   const seat = arg("--seat") ?? process.env.SUITE_SEAT ?? "cursor-builder";
   const hubUrl = arg("--hub") ?? process.env.HUB_URL ?? "http://100.124.212.87:4000";
-  const keyPath = arg("--key") ?? process.env.SUITE_KEY_PATH;
+  const keyPath = arg("--key") ?? process.env.SUITE_KEY_PATH ?? resolveSeatKeyPath({
+    hubUrl,
+    hubName: seat,
+    keyDir: process.env.A2A_KEY_DIR,
+  });
   const metaPath = arg("--meta") ?? join(process.cwd(), "suite-run-meta.json");
   const ownerPid = arg("--owner-pid") ?? String(process.ppid);
   const leaseExit = leaseTake(ownerPid, seat);

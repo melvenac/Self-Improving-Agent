@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
-import { decideSuiteStart, readCensus, readKeyFile } from "../src/suite-census.js";
+import { decideSuiteStart, readCensus, readKeyFile, resolveSeatKeyPath } from "../src/suite-census.js";
 import { buildCiSuiteMeta, buildSuiteMeta, sidecarStillLive, vitestCountsFromJson } from "../src/suite-run-meta.js";
 
 const TSX = createRequire(import.meta.url).resolve("tsx/cli");
@@ -213,6 +213,13 @@ describe("T-168 suite meta", () => {
     expect(census.busySia).toContain("cursor-builder-waker");
   });
 
+  it("seat key path is A2A_KEY_DIR or ~/.a2a-hub/keys/<host>-<port>/<hub_name>.key", () => {
+    expect(resolveSeatKeyPath({
+      hubUrl: "http://100.124.212.87:4000",
+      hubName: "cursor-builder",
+      keyDir: "C:/keys",
+    }).replace(/\\/g, "/")).toBe("C:/keys/100.124.212.87-4000/cursor-builder.key");
+  });
   it("mutant: no key is unavailable, never an idle census", () => {
     expect(readKeyFile(undefined).ok).toBe(false);
     expect(readKeyFile(undefined)).toMatchObject({ reason: expect.stringMatching(/census unavailable:/) });
