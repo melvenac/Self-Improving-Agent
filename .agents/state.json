@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 321,
+  "revision": 323,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1472,6 +1472,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Observed at planner /start, session 160: `presence: UNKNOWN (malformed body: agents[0].rooms[0].pollAgeMs is not a finite number)`. Relay (A2A seat), session 160: A2A's src/presence.ts types pollAgeMs `number | null` and sets `pollAgeMs: rec ? now - rec.at : null` per room, in both v1.13.0 and v1.15.0 (3ac6d3e4). JSON null means 'no wait-poll seen in the window', by design, and it is unchanged in v1.15.0. SIA's open-brain/src/pipelines/session-start/hub-presence.ts (master 1d6f7ad0, around line 151) accepts only absent or a finite number, so ONE null room turns every seat's presence into UNKNOWN. A second defect sits on the same path: the render at around line 127 does `formatPollAge(room.pollAgeMs ?? 0)`, so a null or absent age would print as 'since 0s', a false freshness claim. ROWS: (1) null is accepted and the other rooms render normally; (2) a room with unread > 0 and a null age says no poll was seen, never an age; (3) a non-number that is not null (a string, NaN, Infinity) is still malformed; (4) red first on master for rows 1 and 2; (5) a mutant that maps null to 0 turns row 2 red.",
+      "note_by": [
+        "766a2128-4c5f-4b3f-93b7-3f9a88c1e594"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-238",
+      "title": "serializeState silently drops any schema field missing from KEY_ORDER: add a guard asserting KEY_ORDER covers every field of every slot's schema",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 160,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found by sia-infra while building T-236(c) (#401, session 160). It escaped into a red run and was caught before any push. open-brain/src/shared/state-schema.ts KEY_ORDER (around line 470, master bbc2acbf) lists the keys serializeState writes per slot, and it emits ONLY those keys. A field added to a schema but not to KEY_ORDER passes validation, applies, prints 'ob_state applied', and VANISHES from disk on write: the new tasks[].assignee did exactly that until infra added it. #401 pins assignee (W1, M8b); the CLASS is open, because nothing asserts that KEY_ORDER[slot] equals the key set of that slot's zod schema, for tasks or any other slot. ROWS: (1) for every slot, KEY_ORDER[slot] and the schema's shape keys are equal sets (a test derived from the schemas, not a hand list); (2) a mutant that deletes one key from any KEY_ORDER entry turns row 1 red; (3) a mutant that adds a schema field without a KEY_ORDER entry turns row 1 red. A runtime refusal on write ('field X has no KEY_ORDER entry') is the developer's call. Fails closed either way. Sequence after #401 merges (it edits KEY_ORDER).",
       "note_by": [
         "766a2128-4c5f-4b3f-93b7-3f9a88c1e594"
       ],
@@ -4138,6 +4152,12 @@
       "title": "T-202 approved: each seat's SessionStart posts one SEAT-ONLINE line to its planner hub room under its own key, 3 s bound, never blocking",
       "date": "2026-10-03",
       "note": "Aaron's word in AskUserQuestion in clark's window ~03:1x CDT 2026-10-03, recorded first-hand by clark (D-103 route), approving the planner's wording verbatim: 'Approve T-202: each seat's SessionStart posts one SEAT-ONLINE line (seat, host, runtime, checkout SHA, record rev) to its planner hub room under its own key, 3 s bound, never blocking'. This satisfies the 'Authority' section of docs/loops/t202-plan.md (loop/t202-seat-online @ 965a7c53). Code still waits on T-203 (checkout map with host) and on T-235 round 2 row 2 (whether cursor-agent fires sessionStart), per the planner's session-159 ruling in T-202's note."
+    },
+    {
+      "id": "D-117",
+      "title": "master requires branches to be up to date before merging (Aaron, 'Turn it on', planner's window, session 160)",
+      "date": "2026-10-03",
+      "note": "Ruleset 24343321: strict_required_status_checks_policy false -> true, set by the planner via gh api PUT on Aaron's word. Read back: true, `test` still required, all other rules byte-equal to the pre-change copy. WHY: QA 268 found that QA 267's duplicate greetingFlag import escaped because each PR's CI ran against an older master and was never re-run; two individually green PRs broke when combined. CONSEQUENCE: after any merge to master, every open PR is BEHIND and must merge master and re-pass CI before merging. That is a moved head, so the planner range-diffs it against the QA'd SHA (a merge-of-master-only commit with '=' commits goes on as reviewed)."
     }
   ],
   "handoffs": [
