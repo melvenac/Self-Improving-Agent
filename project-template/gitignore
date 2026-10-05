@@ -32,6 +32,8 @@ Thumbs.db
 /.recalled-entries.json
 
 # A2A-Hub seat-waker runtime (.cursor/wake.lock, waker.pid, wake-prompt-*.txt).
+# Hub --say-from-file scratch (hub-reply-*.txt).
 /.cursor/wake.lock
 /.cursor/waker.pid
 /.cursor/wake-prompt-*.txt
+/.cursor/hub-reply-*.txt

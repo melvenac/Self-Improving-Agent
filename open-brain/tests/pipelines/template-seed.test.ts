@@ -41,7 +41,12 @@ describe("project-template/.agents", () => {
   });
 
   it("root and template gitignore ignore A2A-Hub waker runtime files only under .cursor/", () => {
-    const wakerRules = ["/.cursor/wake.lock", "/.cursor/waker.pid", "/.cursor/wake-prompt-*.txt"];
+    const wakerRules = [
+      "/.cursor/wake.lock",
+      "/.cursor/waker.pid",
+      "/.cursor/wake-prompt-*.txt",
+      "/.cursor/hub-reply-*.txt",
+    ];
     const templateText = readFileSync(join(templateDir, "gitignore"), "utf-8");
     const rootText = readFileSync(join(templateDir, "..", ".gitignore"), "utf-8");
     for (const r of wakerRules) {

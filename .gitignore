@@ -69,10 +69,11 @@ Thumbs.db
 /.claude/*
 !/.claude/commands/
 # A2A-Hub seat-waker runtime under the worktree (.cursor/wake.lock, waker.pid, wake-prompt-*.txt).
-# Tracked: .cursor/rules/, .cursor/commands/.
+# Hub --say-from-file scratch (hub-reply-*.txt). Tracked: .cursor/rules/, .cursor/commands/.
 /.cursor/wake.lock
 /.cursor/waker.pid
 /.cursor/wake-prompt-*.txt
+/.cursor/hub-reply-*.txt
 # docs/: working material stays local, but LOOP CLOSE-OUTS ARE THE RECORD and are tracked.
 # Loop 10's six docs were tracked only because someone remembered `git add -f`; Loop 11's
 # close-out was silently dropped from its own commit because nobody did. A rule that must be
