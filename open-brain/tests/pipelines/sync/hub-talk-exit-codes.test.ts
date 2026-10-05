@@ -57,6 +57,18 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
+  it("hub-room.mdc cites A2A-Hub shared.md Hub transport at b6a8de79 and D-120 (HUBROOM-TURN-END amendment 1)", () => {
+    const cite = "b6a8de79";
+    const section = "Hub transport: how a seat waits";
+    for (const rel of [".cursor/rules/hub-room.mdc", "project-template/.cursor/rules/hub-room.mdc"]) {
+      const t = read(rel);
+      expect(t).toContain(cite);
+      expect(t).toContain(section);
+      expect(t).toContain("D-120:");
+      expect(t).toContain("never waits inside its turn");
+    }
+  });
+
   it("every changed Hub-room line in start.md is a complete line of the cursor_only table, so cursor-start-parity waives it (and only it)", () => {
     const table = JSON.parse(read("docs/loops/cursor-start-differences.json")) as { cursor_only: string[] };
     const lines = read("project-template/.cursor/commands/start.md").split("\n");

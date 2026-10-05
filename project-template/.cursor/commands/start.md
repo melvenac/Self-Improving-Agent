@@ -108,6 +108,8 @@ Read `.agents/SYSTEM/hub-partner-seats.json` for this worktree's seat. If the se
 
 `hub-talk` exit codes for `--inbox` and `--say` (A2A-Hub Loop 13, master 8e59f58, `docs/loops/loop-13-design-ruling.md`): exit 0, a turn was printed, act on it. Exit 1, refused or called wrong: fix the call and do not retry. Exit 2, the window elapsed: wait again. Exit 3, unavailable or throttled: the last stderr line is `[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>`; wait `retry-after` seconds, otherwise back off 5 s doubling to 60 s; after 5 consecutive exit-3 results over 2 minutes with no `retry-after`, stop and report.
 
+Turn-end and wait: A2A-Hub master b6a8de79 (PR 250), `.agents/roles/shared.md` § Hub transport: how a seat waits (T-103, revised 2026-10-05) — a Cursor seat with a waker never waits inside its turn; only a seat with no waker waits in the foreground. D-120: keep working until the assignment is FROZEN or BLOCKED before you post; ending the turn after you post is not permission to stop mid-work. Native A2A is Claude-to-Claude only; this hub carries the Cursor seats.
+
 ### 6. Present the briefing
 
 Print the lines from `## Briefing` down to and including `## End Briefing` from `ob_start`'s output, **verbatim**. No commentary, no summary of the summary, no
