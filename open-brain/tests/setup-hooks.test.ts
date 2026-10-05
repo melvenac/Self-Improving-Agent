@@ -7,7 +7,7 @@
 import { describe, it, expect } from "vitest";
 import { join } from "node:path";
 // @ts-expect-error — a plain .mjs module outside the TypeScript project
-import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook } from "../../scripts/setup-hooks.mjs";
+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook, withCursorRecallHook } from "../../scripts/setup-hooks.mjs";
 
 type Entry = { matcher: string; hooks: Array<{ type: string; command: string }> };
 type Settings = { hooks?: Record<string, Entry[]>; [k: string]: unknown };
@@ -169,5 +169,22 @@ describe("setup.mjs Cursor sessionEnd (T-235 P2-4)", () => {
     const r = alwaysConfigured({ version: 1, hooks: {} });
     expect((r.config.hooks.sessionEnd ?? []).length).toBe(0);
     expect(endHook({ version: 1, hooks: {} }).config.hooks.sessionEnd).toHaveLength(1);
+  });
+});
+
+describe("setup.mjs Cursor recall hook (T-235 P2-5)", () => {
+  const NODE = String.raw`C:\Program Files\nodejs\node.exe`;
+  const TRIGGER = String.raw`C:\repo\open-brain\build\cli-recall-trigger.js`;
+  const recallCmd = `"C:/Program Files/nodejs/node.exe" "C:/repo/open-brain/build/cli-recall-trigger.js"`;
+
+  it("registers postToolUse recall with absolute node", () => {
+    const r = withCursorRecallHook({ version: 1, hooks: {} }, TRIGGER, NODE);
+    expect(r.config.hooks.postToolUse).toEqual([{ command: recallCmd }]);
+    expect(r.changed).toBe(true);
+  });
+
+  it("idempotent on second run", () => {
+    const once = withCursorRecallHook({ version: 1, hooks: {} }, TRIGGER, NODE).config;
+    expect(withCursorRecallHook(once, TRIGGER, NODE).changed).toBe(false);
   });
 });

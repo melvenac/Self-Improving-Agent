@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { checkGreetingSize, composeGreeting, GREETING_LIMIT } from "../../../src/pipelines/sync/checks.js";
 import { runSync } from "../../../src/pipelines/sync/index.js";
 import { readRepoRecord } from "../../helpers/repo-record.js";
+import { roleFileFromGreetingSource } from "../../helpers/role-source.js";
 import type { State } from "../../../src/shared/state-schema.js";
 import { formatPartnerLine, presenceBlockUpperBound, type HubPartnerSeat } from "../../../src/pipelines/session-start/hub-presence.js";
 
@@ -170,26 +171,101 @@ function greetingRoot(): { root: string; cleanup: () => void } {
 }
 
 describe("the composed greeting carries the role files whole — T183-3", () => {
-  it("contains every role file this repository loads, byte for byte", () => {
+  it("contains every role file this repository loads, byte for byte, from the source the greeting used", () => {
     const { root, cleanup } = greetingRoot();
     let g: ReturnType<typeof composeGreeting>;
+    let shared: string;
+    let seatFiles: string[];
     try {
       g = composeGreeting(root, "0.0.0");
+      // T-200: the role files come from origin/master when this tree's record is behind it, so the
+      // expectation is read from that same source, not from the working tree.
+      shared = roleFileFromGreetingSource(root, ".agents/roles/shared.md").text;
+      seatFiles = ["planner", "developer", "qa"]
+        .map((r) => roleFileFromGreetingSource(root, `.agents/roles/${r}.md`).text)
+        .filter((c) => g!.text.includes(c));
     } finally {
       cleanup();
     }
     expect(g).not.toBeNull();
-    const shared = readFileSync(join(REPO_ROOT, ".agents", "roles", "shared.md"), "utf-8").replace(/\s+$/, "");
     expect(shared.length).toBeGreaterThan(1_000);
     expect(g!.text).toContain(shared);
     // The seat's own role file: whichever of the three the checkout greets as.
-    const seatFiles = ["planner", "developer", "qa"]
-      .map((r) => readFileSync(join(REPO_ROOT, ".agents", "roles", `${r}.md`), "utf-8").replace(/\s+$/, ""))
-      .filter((c) => g!.text.includes(c));
     expect(seatFiles).toHaveLength(1);
     // Explicit: 3.5s idle on win32 (it shells out to git for tree currency and
     // each role file's commit), too near vitest's 5s default under load (G-042).
   }, 30_000);
+
+  /**
+   * T-200 follow-up: the row above passed only while the working tree's role files matched
+   * master's. On a BEHIND checkout they need not, and the composition then carries master's.
+   * Real git: a bare origin, a seed that pushes a newer record AND a changed role file, a clone
+   * that fetches. The greeting must carry master's role text, and the working tree's must be
+   * absent: the pre-fix comparison (working tree vs greeting) is red on exactly this fixture.
+   */
+  describe("on a behind checkout whose role files differ from master's", () => {
+    const NL = String.fromCharCode(10);
+    let dir: string;
+    beforeAll(() => {
+      dir = mkdtempSync(join(tmpdir(), "t200-rolesrc-"));
+    });
+    afterAll(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));
+
+    function build(localRev: number, masterRev: number): string {
+      const g = (cwd: string, ...a: string[]) => execFileSync("git", a, { cwd, stdio: "ignore" });
+      const origin = join(dir, `o${localRev}-${masterRev}.git`);
+      const seed = join(dir, `s${localRev}-${masterRev}`);
+      const clone = join(dir, `c${localRev}-${masterRev}`);
+      mkdirSync(origin);
+      mkdirSync(seed);
+      g(origin, "init", "-q", "--bare", "-b", "master");
+      g(seed, "init", "-q", "-b", "master");
+      g(seed, "config", "user.email", "t@example.com");
+      g(seed, "config", "user.name", "T");
+      const write = (root: string, rev: number, role: string) => {
+        mkdirSync(join(root, ".agents", "roles"), { recursive: true });
+        writeFileSync(join(root, "package.json"), JSON.stringify({ name: "fixture", version: "0.0.0" }));
+        const s = JSON.parse(readFileSync(join(__dirname, "..", "..", "fixtures-state", "state.json"), "utf-8"));
+        s.revision = rev;
+        writeFileSync(join(root, ".agents", "state.json"), JSON.stringify(s, null, 2) + NL);
+        writeFileSync(join(root, ".agents", "roles", "shared.md"), ["# Shared rules", role.repeat(40), ""].join(NL));
+        writeFileSync(join(root, ".agents", "roles", "developer.md"), ["# Developer seat", role.repeat(40), ""].join(NL));
+      };
+      write(seed, localRev, "LOCAL-ROLE ");
+      g(seed, "add", "-A");
+      g(seed, "commit", "-q", "-m", "seed");
+      g(seed, "remote", "add", "origin", origin);
+      g(seed, "push", "-q", "origin", "master");
+      execFileSync("git", ["clone", "-q", origin, clone], { stdio: "ignore" });
+      writeFileSync(join(clone, ".agents", "AGENT.local.md"), ["---", "name: Seat", "role: developer", "partner: Atlas", "---", ""].join(NL));
+      write(seed, masterRev, "MASTER-ROLE ");
+      g(seed, "add", "-A");
+      g(seed, "commit", "-q", "-m", "master moves, role files change");
+      g(seed, "push", "-q", "origin", "master");
+      g(clone, "fetch", "-q", "origin");
+      return clone;
+    }
+
+    it("the greeting carries MASTER's role text and not the working tree's, and the helper reads master", () => {
+      const clone = build(140, 163);
+      const g = composeGreeting(clone, "0.0.0")!;
+      const tree = readFileSync(join(clone, ".agents", "roles", "shared.md"), "utf-8").trimEnd();
+      const expected = roleFileFromGreetingSource(clone, ".agents/roles/shared.md");
+      expect(expected.from).toBe("origin/master");
+      expect(expected.text).toContain("MASTER-ROLE");
+      expect(g.text).toContain(expected.text);
+      // The old assertion, on this fixture, is RED: the working tree's copy is not in the greeting.
+      expect(g.text).not.toContain(tree);
+    });
+
+    it("a level checkout carries its own role text, and the helper reads the working tree", () => {
+      const clone = build(163, 163);
+      const g = composeGreeting(clone, "0.0.0")!;
+      const expected = roleFileFromGreetingSource(clone, ".agents/roles/shared.md");
+      expect(expected.from).toBe("the working tree");
+      expect(g.text).toContain(expected.text);
+    });
+  });
 });
 
 /**
@@ -226,7 +302,7 @@ describe("greeting-size — T-198 presence bound", () => {
     expect(without.parts.presence).toBe(0);
     // QA 268 F1 (T-237): the longest form is the no-recorded-poll one, not "since 99d".
     for (const label of ["forge", "cursor-infra", "cursor-builder"]) {
-      expect(withBlock.text).toContain(`  ${label}: listener not polling, 999 unread, no listener poll recorded`);
+      expect(withBlock.text).toMatch(new RegExp(`  ${label}: (state:unknown\\([^)]+\\)|hub listener: not polling, 999 unread)`));
     }
     expect(withBlock.parts.presence).toBeGreaterThan(150);
     expect(withBlock.text.length - without.text.length).toBeGreaterThanOrEqual(withBlock.parts.presence);
@@ -245,11 +321,23 @@ describe("greeting-size — T-198 presence bound", () => {
     expect(bound).toHaveLength(partners.length);
     const ages = [undefined, null, -1, 0, 59_000, 3_599_000, 86_399_000, 99 * 86_400_000];
     partners.forEach((p, n) => {
-      const forms: string[] = [formatPartnerLine(p, null), formatPartnerLine(p, []), formatPartnerLine(p, [{ name: p.hub_as, rooms: [] }])];
+      const seatRow = Object.values(map.seats as Record<string, { hub_name?: string; runtime?: string }>).find(
+        (s) => s.hub_name === p.hub_as,
+      );
+      const runtime = seatRow?.runtime === "cursor" || seatRow?.runtime === "claude-code" ? seatRow.runtime : "claude-code";
+      const forms: string[] = [
+        formatPartnerLine(p, null, runtime),
+        formatPartnerLine(p, [], runtime),
+        formatPartnerLine(p, [{ name: p.hub_as, rooms: [] }], runtime),
+        formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "owes_reply" }, rooms: [] }], "cursor"),
+        formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "mystery" }, rooms: [] }], "cursor"),
+      ];
       for (const pollingNow of [true, false]) {
         for (const unread of [0, 999]) {
           for (const pollAgeMs of ages) {
-            forms.push(formatPartnerLine(p, [{ name: p.hub_as, rooms: [{ sessionId: p.session_id, unread, pollingNow, pollAgeMs }] }]));
+            forms.push(
+              formatPartnerLine(p, [{ name: p.hub_as, rooms: [{ sessionId: p.session_id, unread, pollingNow, pollAgeMs }] }], "claude-code"),
+            );
           }
         }
       }

@@ -13,7 +13,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook, repoRootFrom } from './setup-hooks.mjs';
+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook, withCursorRecallHook, repoRootFrom, copyCursorSlashCommands } from './setup-hooks.mjs';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
@@ -23,6 +23,7 @@ const OPEN_BRAIN_DIR = path.join(REPO_ROOT, 'open-brain');
 const OPEN_BRAIN_SERVER = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
 const OPEN_BRAIN_BOOTSTRAP = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');
 const OPEN_BRAIN_SESSION_END = path.join(OPEN_BRAIN_DIR, 'build', 'cli-session-end.js');
+const OPEN_BRAIN_RECALL_TRIGGER = path.join(OPEN_BRAIN_DIR, 'build', 'cli-recall-trigger.js');
 
 // Status indicators
 const OK = '\u2713';
@@ -221,27 +222,35 @@ function registerCursorHooks() {
   fs.writeFileSync(hooksPath, JSON.stringify(rEnd.config, null, 2) + '\n');
 }
 
-function copyCursorSlashCommands() {
-  const destDir = path.join(CURSOR_DIR, 'commands');
-  const repoCommandsDir = path.join(REPO_ROOT, 'project-template', '.cursor', 'commands');
+function registerCursorRecallHook() {
+  const hooksPath = path.join(CURSOR_DIR, 'hooks.json');
 
-  if (!fs.existsSync(repoCommandsDir)) {
+  let config = { version: 1, hooks: {} };
+  if (fs.existsSync(hooksPath)) {
+    config = JSON.parse(fs.readFileSync(hooksPath, 'utf-8'));
+  }
+
+  const r = withCursorRecallHook(config, OPEN_BRAIN_RECALL_TRIGGER, process.execPath);
+  for (const n of r.notes) log(n.includes('already') ? SKIP : OK, n);
+  if (!r.changed) return;
+
+  ensureDir(CURSOR_DIR);
+  fs.writeFileSync(hooksPath, JSON.stringify(r.config, null, 2) + '\n');
+}
+
+function installCursorSlashCommands() {
+  const r = copyCursorSlashCommands(REPO_ROOT, CURSOR_DIR);
+  const destDir = path.join(CURSOR_DIR, 'commands');
+  if (r.missingTemplate) {
     log(SKIP, 'No project-template/.cursor/commands/ in repo \u2014 skipped');
     return;
   }
-
-  ensureDir(destDir);
-  let copied = 0;
-  for (const file of fs.readdirSync(repoCommandsDir)) {
-    if (!file.endsWith('.md')) continue;
-    const src = path.join(repoCommandsDir, file);
-    const dest = path.join(destDir, file);
-    if (copyFileIfChanged(src, dest)) copied++;
+  for (const m of r.movedAside ?? []) {
+    log(OK, `Preserved user Cursor command: moved ${m.from} \u2192 ${m.to}`);
   }
-
-  if (copied > 0) {
-    log(OK, `${copied} Cursor slash command(s) copied \u2192 ${destDir}`);
-  } else {
+  if (r.copied > 0) {
+    log(OK, `${r.copied} Cursor slash command(s) copied \u2192 ${destDir}`);
+  } else if ((r.movedAside ?? []).length === 0) {
     log(SKIP, 'Cursor slash commands already up to date \u2014 skipped');
   }
 }
@@ -303,7 +312,8 @@ function main() {
   copySlashCommands();
   registerCursorMcp();
   registerCursorHooks();
-  copyCursorSlashCommands();
+  registerCursorRecallHook();
+  installCursorSlashCommands();
   setupObsidianVault();
 
   console.log('');

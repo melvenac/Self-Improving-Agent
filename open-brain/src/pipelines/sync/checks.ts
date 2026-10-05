@@ -4,13 +4,16 @@ import { homedir } from "node:os";
 import { execSync, execFileSync } from "node:child_process";
 import type { CheckResult, SyncRuntime } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
-import { parseState, SeatName, schemaVersionAdvice } from "../../shared/state-schema.js";
+import { parseState, SeatName, schemaVersionAdvice, type State } from "../../shared/state-schema.js";
 import { renderState } from "../session-start/state-render.js";
 import { describeRoleFiles } from "../session-start/role-files.js";
 import { readAgentIdentity } from "../session-start/agent-identity.js";
 import { presenceBlockUpperBound } from "../session-start/hub-presence.js";
 import { describeTreeCurrency } from "../session-start/tree-currency.js";
+import { resolveRecordSource } from "../session-start/record-source.js";
 import { checkSummaryFromState } from "./checks-state.js";
+import { settleGitNexusIndex, type GitNexusCheckOptions } from "./gitnexus-refresh.js";
+import { diffReferrerLineHashes, matchingLineHashes } from "./retirements-line-hash.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -34,7 +37,15 @@ export const MIRROR_EXCEPTIONS: Record<string, string> = {
  * the directory — mirror parity only compares files present in both sides, so
  * a command silently dropped from the template would never be flagged.
  */
-export const CURSOR_COMMAND_SET = ["checkpoint.md", "end.md", "start.md", "sync.md"];
+export const CURSOR_COMMAND_SET = [
+  "checkpoint.md",
+  "end.md",
+  "harness-audit.md",
+  "start.md",
+  "sync.md",
+  "task.md",
+  "test.md",
+];
 
 export function syncReadmeVersion(
   version: string,
@@ -1675,7 +1686,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
     // variable in dashboard.mjs — look like the retired `kb_*` TOOL prefix.
     // That is rule 8 arriving inside the check written to apply it.
     const re = () => new RegExp(r.pattern, r.ignore_case ? "i" : "");
-    const allowed = new Set((r.allowed_referrers ?? []).map((a) => a.path));
+    const allowedPaths = new Set((r.allowed_referrers ?? []).map((a) => a.path));
 
     for (const a of r.allowed_referrers ?? []) {
       const abs = join(projectRoot, a.path);
@@ -1683,16 +1694,31 @@ export function checkRetirements(projectRoot: string): CheckResult {
         stale.push(`${r.name}: allowed referrer ${a.path} no longer exists`);
         continue;
       }
-      if (!re().test(readFileSync(abs, "utf8"))) {
-        stale.push(`${r.name}: ${a.path} no longer names it — drop it from allowed_referrers`);
+      const text = readFileSync(abs, "utf8");
+      if (!re().test(text)) {
+        stale.push(`${r.name}: ${a.path} no longer names it — drop it from allowed_referrers or rehash`);
+        continue;
+      }
+      const actual = matchingLineHashes(text, r.pattern, r.ignore_case);
+      const diff = diffReferrerLineHashes(a.line_hashes, actual);
+      if (diff.status === "missing_line_hashes") {
+        stale.push(`${r.name}: ${a.path} has no line_hashes — run open-brain sync --retirements-rehash --write`);
+        continue;
+      }
+      if (diff.status === "stale") {
+        stale.push(`${r.name}: ${a.path} ${diff.detail}`);
+        continue;
+      }
+      if (diff.status === "unexpected") {
+        unexpected.push(`${a.path} names ${r.name} outside allowed line_hashes: ${diff.detail}`);
         continue;
       }
       verified++;
+      allowedPairsNotScanned++;
     }
 
     for (const rel of surface) {
-      if (allowed.has(rel)) {
-        allowedPairsNotScanned++;
+      if (allowedPaths.has(rel)) {
         continue;
       }
       const txt = texts.get(rel);
@@ -1737,7 +1763,7 @@ export function checkRetirements(projectRoot: string): CheckResult {
     severity: "pass",
     message:
       `${retirements.length} retirements across ${events.size} event classes, ${verified} allowed referrers all present and still naming their retirement, ` +
-      `0 unexpected across ${surface.length} live files read (${listing.label}), with ${allowedPairsNotScanned} (file, retirement) pair(s) not scanned because the file is a declared referrer; ${excludedNote}; ${live.length === listing.files.length ? "historical: none" : `historical: ${listing.files.length - live.length} (by rule)`} — ` +
+      `0 unexpected across ${surface.length} live files read (${listing.label}), with ${allowedPairsNotScanned} allowed referrer(s) verified by line_hashes; ${excludedNote}; ${live.length === listing.files.length ? "historical: none" : `historical: ${listing.files.length - live.length} (by rule)`} — ` +
       `resolvable against a registry: ${RESOLVABLE.join(", ")}; guarded by this record alone: ${unresolvable.join(", ")} ` +
       `(green means every RECORDED retirement is finished, not that every retirement is recorded)`,
     report: true,
@@ -1753,7 +1779,7 @@ interface RetirementRecord {
     ruled: string;
     classes?: string[];
     ignore_case?: boolean;
-    allowed_referrers?: Array<{ path: string; class: string; why: string }>;
+    allowed_referrers?: Array<{ path: string; class: string; why: string; line_hashes?: string[] }>;
   }>;
 }
 
@@ -2113,7 +2139,17 @@ function gitOut(cwd: string, args: string[]): string | null {
  * see whether anything it indexed actually changed — a hundred commits touching
  * only Markdown leave the graph perfectly valid.
  */
-export function checkGitNexusIndex(projectRoot: string): CheckResult {
+/**
+ * T-187 hunk: the only new call in this file. `/sync` passes options and
+ * settles in gitnexus-refresh.ts. Session start omits options and stays the
+ * read-only inspect below — it must not spawn analyze.
+ */
+export function checkGitNexusIndex(projectRoot: string, options?: GitNexusCheckOptions): CheckResult {
+  if (options === undefined) return inspectGitNexusIndex(projectRoot);
+  return settleGitNexusIndex(projectRoot, options, inspectGitNexusIndex);
+}
+
+function inspectGitNexusIndex(projectRoot: string): CheckResult {
   const name = "gitnexus-index";
   const metaPath = join(projectRoot, ".gitnexus", "meta.json");
   if (!existsSync(metaPath)) {
@@ -2360,20 +2396,34 @@ export interface ComposedGreeting {
  * stale. Null when there is no valid state.json to render.
  */
 export function composeGreeting(projectRoot: string, version: string): ComposedGreeting | null {
-  const statePath = join(projectRoot, ".agents", "state.json");
-  if (!existsSync(statePath)) return null;
-  const parsed = parseState(readFileSync(statePath, "utf-8"));
-  if (!parsed.ok) return null;
+  // T-200: the greeting renders master's record when this tree is behind it, so the size check
+  // composes from the same source — and counts the source line, which is part of the return.
+  const recordSource = resolveRecordSource(projectRoot);
+  let data: State;
+  if (recordSource.kind === "master") {
+    data = recordSource.state;
+  } else {
+    const statePath = join(projectRoot, ".agents", "state.json");
+    if (!existsSync(statePath)) return null;
+    const parsed = parseState(readFileSync(statePath, "utf-8"));
+    if (!parsed.ok) return null;
+    data = parsed.data;
+  }
 
-  const roles = describeRoleFiles(projectRoot, readAgentIdentity(projectRoot));
+  const roles = describeRoleFiles(
+    projectRoot,
+    readAgentIdentity(projectRoot),
+    recordSource.kind === "master" ? { fromRef: recordSource.upstreamRef } : {},
+  );
   const seat = roles.seat ? SeatName.safeParse(roles.seat.role) : null;
   const treeAndSeat = [
     ...describeTreeCurrency(projectRoot).lines,
+    recordSource.line,
     roles.seat ? `Seat: ${roles.seat.name} (${roles.seat.role})` : "Seat: UNRESOLVED",
     ...roles.lines,
     ...roles.problems,
   ].join("\n");
-  const state = renderState(parsed.data, version, {
+  const state = renderState(data, version, {
     seat: seat?.success ? seat.data : null,
     projectRoot,
   }).join("\n");

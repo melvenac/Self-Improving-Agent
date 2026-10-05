@@ -21,8 +21,9 @@ import {
   scorePipelineHealth,
 } from "./pipelines/sync/scorer.js";
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
-import { sessionStart, type StateFileSize } from "./pipelines/session-start/index.js";
+import { sessionStart, type StateFileSize, type StateJsonResult } from "./pipelines/session-start/index.js";
 import { describeTreeCurrency } from "./pipelines/session-start/tree-currency.js";
+import { resolveRecordSource, type RecordSource } from "./pipelines/session-start/record-source.js";
 import { describeRoleFiles, renderRoleDocs, recordRoleReads } from "./pipelines/session-start/role-files.js";
 import { greetingFlag, handoffCheckout } from "./pipelines/session-start/greeting-flags.js";
 import { focusLine, seatsLine, seatOrder } from "./pipelines/session-start/focus.js";
@@ -30,7 +31,7 @@ import { resolveCheckoutSeat } from "./pipelines/session-start/seat-map.js";
 import { SeatName, schemaVersionAdvice, type Seat } from "./shared/state-schema.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeHubPresence } from "./pipelines/session-start/hub-presence.js";
-import { countWords, estimateTokens } from "./pipelines/session-start/state-reader.js";
+import { countWords, estimateTokens, STATE_JSON_REL } from "./pipelines/session-start/state-reader.js";
 import { renderState, missingHandoffLine } from "./pipelines/session-start/state-render.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
@@ -106,7 +107,8 @@ function writeSessionId(): ProvenSession {
   // The parent is fixed for this process's life, so its start time is read
   // once (it costs a process spawn on Windows). The pid is re-checked anyway.
   if (!_parentStart || _parentStart.pid !== parent) _parentStart = { pid: parent, start: processStartTime(parent) };
-  return proveSession(byPidDir(resolvePaths(process.cwd()).activeSession), parent, _parentStart.start);
+  const cursorWalk = process.env.OPEN_BRAIN_IDE?.toLowerCase() === "cursor";
+  return proveSession(byPidDir(resolvePaths(process.cwd()).activeSession), parent, _parentStart.start, cursorWalk ? { cursorWalk: true } : undefined);
 }
 
 /**
@@ -223,6 +225,26 @@ const STATE_FILE_LABEL: Record<StateFileSize["file"], string> = {
   stateJson: "state.json",
 };
 
+/**
+ * The size block, with the state.json line describing what is RENDERED: when the record is read
+ * from master, the local file's size would describe text that is not in the return (T-200).
+ */
+function sizesFor(sizes: StateFileSize[], src: RecordSource): StateFileSize[] {
+  if (src.kind !== "master") return sizes;
+  const lines = src.text.split("\n").length;
+  const entry: StateFileSize = {
+    file: "stateJson",
+    path: `${STATE_JSON_REL} @ ${src.upstreamRef} ${src.sha}`,
+    present: true,
+    lines,
+    sourceLines: lines,
+    words: countWords(src.text),
+    estTokens: estimateTokens(src.text),
+    truncated: false,
+  };
+  return [...sizes.filter((s) => s.file !== "stateJson"), entry];
+}
+
 export async function handleStart(args: StartArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
@@ -252,12 +274,22 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     const serving = describeServingBuild(args.serving_build_dir);
     lines.push(serving);
     lines.push(...describeTreeCurrency(projectRoot).lines);
+
+    // T-200 / D-062: WHICH record the State block below is read from. When this tree's record
+    // is older than origin/master's, the block and the role files come from master (git show)
+    // and this line says so; when master cannot be read it says LOCAL and why. One line on every
+    // path, so a stale read is never silent and a quiet one is never ambiguous.
+    const recordSource = resolveRecordSource(projectRoot);
+    lines.push(recordSource.line);
     lines.push("");
 
     lines.push(`Session Start — ${result.state.mode} mode`);
     // The name is the record's (bootstrap-fix BF-8, frogger F12): the header
     // printed `Project: v0.0.1` while the State block below said `frogger v0.0.1`.
-    const recordName = result.state.stateJson.data?.project.name ?? null;
+    // The record actually rendered: master's when this tree is behind it (T-200), else its own.
+    const sj: StateJsonResult =
+      recordSource.kind === "master" ? { present: true, valid: true, data: recordSource.state } : result.state.stateJson;
+    const recordName = sj.data?.project.name ?? null;
     lines.push(recordName ? `Project: ${recordName} v${result.state.version}` : `Project: v${result.state.version}`);
 
     // Drift is a result, not an instruction: the caller relays it, it does not
@@ -311,7 +343,11 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     // The CONTENT is returned, not just the filenames. A greeting that named the
     // files without loading them would satisfy "the greeting says it did" and
     // leave G-032 exactly where it was: tracked, and read by nothing.
-    const roles = describeRoleFiles(projectRoot, readAgentIdentity(projectRoot));
+    const roles = describeRoleFiles(
+      projectRoot,
+      readAgentIdentity(projectRoot),
+      recordSource.kind === "master" ? { fromRef: recordSource.upstreamRef } : {},
+    );
     lines.push("");
     lines.push(
       roles.seat
@@ -338,7 +374,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
     // Size block precedes the content so a reader sees what is coming before
     // it arrives. Estimator: chars/4 rounded up (see StateFileSize).
     lines.push(`\n## Sizes (tokens estimated as chars/4)`);
-    for (const s of result.sizes) {
+    for (const s of sizesFor(result.sizes, recordSource)) {
       if (!s.present) {
         lines.push(`  ${STATE_FILE_LABEL[s.file]} (${s.path}): absent`);
         continue;
@@ -352,7 +388,6 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
     // says so and falls back. Absent leaves v0.28.0 output untouched. Each
     // prose file sits under its own header; "absent" is spelled out so a
     // missing file and an empty one never look alike.
-    const sj = result.state.stateJson;
     if (sj.present && sj.valid && sj.data) {
       // The reader's OWN seat, so the greeting renders this seat's handoff and
       // names the others by their close-out commit. A greeting that shows the
@@ -386,7 +421,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
           ? {
               focus: {
                 focus: focusLine(sj.data, resolveCheckoutSeat(projectRoot)),
-                seats: ((order) => (order ? seatsLine(sj.data, order, presence.statusByHubName ?? null) : null))(seatOrder(projectRoot)),
+                seats: ((order) => (order ? seatsLine(sj.data, order, presence.liveByHubName ?? null) : null))(seatOrder(projectRoot)),
               },
             }
           : {}),

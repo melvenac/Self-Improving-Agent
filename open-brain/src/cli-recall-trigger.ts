@@ -48,6 +48,31 @@ const DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-
 const LOG_PATH = process.env.RECALL_TRIGGER_LOG || join(dirname(DB_PATH), "recall-trigger.log");
 
 /**
+ * Shell commands the recall trigger may act on. Claude Code PostToolUse/Bash uses
+ * `Bash`. Cursor postToolUse was measured live (T-235 P2-5, 2026-10-04,
+ * scratch t235-p25-measure, cursor-agent 2026.10.01-e373342): tool_name `Shell`
+ * only — no other names are allowlisted without a new measurement row.
+ */
+export const CURSOR_MEASURED_SHELL_TOOL_NAMES = new Set<string>(["Shell"]);
+
+/**
+ * Extract the shell command from a PostToolUse / postToolUse hook payload, or
+ * null when this event is not one the trigger handles.
+ */
+export function shellCommandFromHookPayload(payload: Record<string, unknown>): string | null {
+  const toolName = payload.tool_name;
+  if (toolName === "Bash") {
+    const command = (payload.tool_input as Record<string, unknown> | undefined)?.command;
+    return typeof command === "string" && command.trim() !== "" ? command : null;
+  }
+  if (typeof toolName === "string" && CURSOR_MEASURED_SHELL_TOOL_NAMES.has(toolName)) {
+    const command = (payload.tool_input as Record<string, unknown> | undefined)?.command;
+    return typeof command === "string" && command.trim() !== "" ? command : null;
+  }
+  return null;
+}
+
+/**
  * The only thing this process ever says about a failure.
  *
  * Best-effort by design: if the log itself cannot be written there is nowhere
@@ -92,10 +117,8 @@ async function main(): Promise<void> {
     return;
   }
 
-  if (payload.tool_name !== "Bash") return;
-
-  const command = (payload.tool_input as Record<string, unknown> | undefined)?.command;
-  if (typeof command !== "string" || command.trim() === "") return;
+  const command = shellCommandFromHookPayload(payload);
+  if (command === null) return;
 
   const sessionUuid = typeof payload.session_id === "string" ? payload.session_id : "";
   if (!sessionUuid) {

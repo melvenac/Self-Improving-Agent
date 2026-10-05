@@ -32,8 +32,8 @@ import { join } from "node:path";
 import { runLoop, LoopRefused, LOOP_LIMITS, type LoopConfig } from "../../src/harness/runtime.js";
 import { StubDeveloper, StubPlanner, StubQa, type RoleContext, type RoleSession } from "../../src/harness/roles.js";
 import { pinFor, resolveRef, SAFE_MACHINE_KEYS } from "../../src/harness/git.js";
-import { resolveGitDirs, unsafeLocalKeys, watchedLocations, ConfigWatch } from "../../src/harness/configwatch.js";
-import { exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from "./fixture.js";
+import { isAllowedLocalConfigEntry, resolveGitDirs, unsafeLocalKeys, watchedLocations, ConfigWatch } from "../../src/harness/configwatch.js";
+import { disableAutoGc, exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from "./fixture.js";
 import { gitWithEnv, markerLines, scratch, shPath, withEnv, writeMarkerScript } from "./candidate-a-fixture.js";
 
 /** Rewrite an existing file in place — the way a role gets past a hidden attribute. */
@@ -694,11 +694,14 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
       const src = join(tmp.dir, "src");
       const clone = join(tmp.dir, "clone");
       rawGit(tmp.dir, ["init", "--quiet", "--initial-branch=main", src]);
+      disableAutoGc(src);
       writeFileSync(join(src, "f"), "f\n");
       rawGit(src, ["add", "f"]);
       rawGit(src, ["-c", "user.name=t", "-c", "user.email=t@t", "commit", "--quiet", "--no-verify", "--no-gpg-sign", "-m", "c"]);
       rawGit(tmp.dir, ["clone", "--quiet", src, clone]);
+      disableAutoGc(clone);
       rawGit(src, ["worktree", "add", "--quiet", join(tmp.dir, "wt2")]);
+      disableAutoGc(join(tmp.dir, "wt2"));
       for (const root of [src, clone, join(tmp.dir, "wt2")]) {
         const u = unsafeLocalKeys(root, resolveGitDirs(root));
         expect(u.error).toBeNull();
@@ -707,6 +710,80 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
       // The instrument can say "unsafe": a planted key in the same clone.
       rawGit(clone, ["config", "core.sshCommand", "x"]);
       expect(unsafeLocalKeys(clone, resolveGitDirs(clone)).keys.join(" ")).toContain("core.sshcommand");
+    });
+
+    it("G-053: git update-server-info writes <common>/info/refs (the path gc --auto can create)", () => {
+      const dirs = resolveGitDirs(repo.root);
+      const refs = join(dirs.commonDir, "info", "refs");
+      expect(existsSync(refs)).toBe(false);
+      rawGit(repo.root, ["update-server-info"]);
+      expect(existsSync(refs)).toBe(true);
+    });
+
+    it("G-053: harness fixtures disable gc.auto so background gc cannot create info/refs during a loop", () => {
+      expect(rawGit(repo.root, ["config", "gc.auto"])).toBe("0");
+    });
+
+    it("G-053 mutant: gc.auto=1 at base is refused (only gc.auto=0 is on the allowlist)", () => {
+      rawGit(repo.root, ["config", "gc.auto", "1"]);
+      expectRefusedCleanly(refusal(config()), "unsafe-config-at-base", "gc.auto");
+      rawGit(repo.root, ["config", "gc.auto", "0"]);
+    });
+
+    it("G-053: gc.auto admits only the raw value 0 (no trim)", () => {
+      const dirs = resolveGitDirs(repo.root);
+      expect(unsafeLocalKeys(repo.root, dirs).keys).toEqual([]);
+      for (const bad of [" 0", "0 ", "\t0", "00", "0x", "-0", "+0"]) {
+        rawGit(repo.root, ["config", "gc.auto", bad]);
+        expect(unsafeLocalKeys(repo.root, dirs).keys.some((k) => k.startsWith("gc.auto")), `gc.auto=${JSON.stringify(bad)}`).toBe(true);
+        expectRefusedCleanly(refusal(config()), "unsafe-config-at-base", "gc.auto");
+        rawGit(repo.root, ["config", "--unset", "gc.auto"]);
+        disableAutoGc(repo.root);
+      }
+      expect(isAllowedLocalConfigEntry("gc.auto", "0")).toBe(true);
+      expect(isAllowedLocalConfigEntry("gc.auto", "00")).toBe(false);
+    });
+
+    it("G-053: gc.auto with a trailing newline in the raw value is refused", () => {
+      expect(isAllowedLocalConfigEntry("gc.auto", "0\n")).toBe(false);
+    });
+
+    it("G-053: other gc.* keys (e.g. gc.autodetach) are refused at base", () => {
+      rawGit(repo.root, ["config", "gc.autodetach", "1"]);
+      expectRefusedCleanly(refusal(config()), "unsafe-config-at-base", "gc.autodetach");
+      rawGit(repo.root, ["config", "--unset", "gc.autodetach"]);
+    });
+
+    it("G-053: gc.autoPackLimit=0 is refused — a zero under another gc.* key is not gc.auto=0", () => {
+      rawGit(repo.root, ["config", "gc.autoPackLimit", "0"]);
+      expectRefusedCleanly(refusal(config()), "unsafe-config-at-base", "gc.autopacklimit");
+      rawGit(repo.root, ["config", "--unset", "gc.autoPackLimit"]);
+    });
+
+    it("G-053 mutant: /^0/ without end-anchor would admit 00 — product uses exact match", () => {
+      expect(isAllowedLocalConfigEntry("gc.auto", "00")).toBe(false);
+      expect(/^0/.test("00")).toBe(true);
+    });
+
+    it("G-053 mutant: widening the key to gc.* would admit gc.autodetach — product refuses all gc.* except gc.auto=0", () => {
+      expect(isAllowedLocalConfigEntry("gc.autodetach", "1")).toBe(false);
+      expect(/^gc\./.test("gc.autodetach")).toBe(true);
+    });
+
+    it("G-053: info/refs created during the developer stage fails the R21 gpgsign loop (known positive)", async () => {
+      rawGit(repo.root, ["config", "commit.gpgsign", "true"]);
+      const r = await runLoop(
+        config({
+          roles: {
+            planner: new StubPlanner(),
+            developer: sabotage(new StubDeveloper(), (ctx) => {
+              rawGit(ctx.repoRoot, ["update-server-info"]);
+            }),
+            qa: new StubQa(),
+          },
+        }),
+      );
+      expect(r.failure?.reason ?? "").toMatch(/info\/refs created/i);
     });
 
     it("R21: commit.gpgsign=true is allowed because no runtime commit is signed — every one has no gpgsig header", async () => {

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "policy": {
+      "type": "string",
+      "const": "effort"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "levels": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      }
+    },
+    "stages": {
+      "type": "object",
+      "properties": {
+        "planner": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
+        },
+        "developer": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
+        },
+        "qa": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
+        }
+      },
+      "required": [
+        "planner",
+        "developer",
+        "qa"
+      ],
+      "additionalProperties": false
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prefixes": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "xhigh",
+              "max"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "prefixes",
+          "level"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "retry": {
+      "type": "string",
+      "const": "one-up"
+    }
+  },
+  "required": [
+    "policy",
+    "description",
+    "levels",
+    "stages",
+    "paths",
+    "retry"
+  ],
+  "additionalProperties": false,
+  "title": "Effort policy",
+  "description": "Maps what the runtime already knows (stage, plan repair_targets, retry) to a claude --effort level. Values are data and may be edited; the SHAPE is derived from open-brain/src/harness/policies.ts and this file must not be edited by hand. LOWERING: a path rule may set a level below the stage base only when every repair target matches a path rule. Each repair target contributes its matched rule's level, or the stage base when nothing matches it. Effort is the maximum of those contributions. An empty target list keeps the stage base. A retry steps one level up the levels list and stops at the top. LIMIT: this chooses a launch flag. It does not judge the work. No Jev. PROVENANCE: the shipped levels are a starting position (T-173), not a calibration."
+}

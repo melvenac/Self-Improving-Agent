@@ -103,6 +103,7 @@ export function makeRepo(prefix = "harness-repo-"): RepoFixture {
     ].join("\n"),
     "utf-8",
   );
+  disableAutoGc(root);
 
   const write = (repoPath: string, content: string): void => {
     const abs = join(root, repoPath);
@@ -126,6 +127,11 @@ export function makeRepo(prefix = "harness-repo-"): RepoFixture {
     sha: () => rawGit(root, ["rev-parse", "HEAD"]),
     cleanup: () => rm(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }),
   };
+}
+
+/** G-053: `git gc --auto` can call `update-server-info`, which creates `<common>/info/refs` and fails ConfigWatch mid-loop. */
+export function disableAutoGc(repoRoot: string): void {
+  rawGit(repoRoot, ["config", "gc.auto", "0"]);
 }
 
 /**

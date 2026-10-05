@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 327 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 339 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-Dev seats switch to Cursor for new work (Aaron, 2026-10-03 ~22:1x CDT); dispatch waits on each seat's hub room + waker from clark. Open: #415 (T-239 follow-up) for the next QA batch; D-118's role-doc sentence (Aaron's merge). _(since session 160)_
+s161 batch landed: 9 PRs merged on Aaron's word (#421 #424 #436 #441 #442 #446 #427 #434 #444) plus #443. Left: #451 (T-187; checks.ts conflict, infra resolving), #437 (P2-7, QA 279 REJECT), #445 (T-156, QA 279 REJECT), #425 (after #437). Then close T-235. _(since session 161)_
 
 ## Top tasks
 
