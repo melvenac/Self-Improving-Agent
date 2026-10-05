@@ -5,6 +5,9 @@ import { detectIde } from "./active-session.js";
 /** T-235 P2-7: dual Cursor + Claude settings hooks can fire twice within milliseconds; legitimate resume is minutes later. */
 export const HOOK_CLAIM_TTL_MS = 120_000;
 
+/** Stale reclaim lock files older than this are removed so a crashed reclaimer cannot block forever. */
+export const RECLAIM_LOCK_TTL_MS = 60_000;
+
 export type HookClaimEvent = "sessionStart" | "sessionEnd";
 
 export type HookClaimResult = "claimed" | "duplicate" | "not_applicable";
@@ -26,14 +29,18 @@ function claimPath(home: string, event: HookClaimEvent, sessionId: string): stri
 }
 
 function tryCreateClaim(path: string): boolean {
-  try {
-    writeFileSync(path, `${new Date().toISOString()}\t${process.pid}\n`, { flag: "wx" });
-    return true;
-  } catch (err) {
-    const code = (err as NodeJS.ErrnoException).code;
-    if (code !== "EEXIST") throw err;
-    return false;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      writeFileSync(path, `${new Date().toISOString()}\t${process.pid}\n`, { flag: "wx" });
+      return true;
+    } catch (err) {
+      const code = errno(err);
+      if (code === "EEXIST") return false;
+      if (code === "EPERM" || code === "EBUSY") continue;
+      throw err;
+    }
   }
+  return false;
 }
 
 function errno(err: unknown): string | undefined {
@@ -43,7 +50,6 @@ function errno(err: unknown): string | undefined {
 /**
  * Rename. ENOENT means the other process already moved the file.
  * Windows also returns EPERM while that rename is in progress; retry, then treat it as a loss.
- * Either way the caller returns duplicate and does not throw.
  */
 function renameExclusive(from: string, to: string): "ok" | "lost" {
   for (let attempt = 0; attempt < 8; attempt++) {
@@ -60,47 +66,75 @@ function renameExclusive(from: string, to: string): "ok" | "lost" {
   return "lost";
 }
 
+function reclaimLockPath(claimPath: string): string {
+  return `${claimPath}.reclaim`;
+}
+
+function tryAcquireReclaimLock(lockPath: string): boolean {
+  if (tryCreateClaim(lockPath)) return true;
+  try {
+    if (existsSync(lockPath) && Date.now() - statSync(lockPath).mtimeMs > RECLAIM_LOCK_TTL_MS) {
+      unlinkSync(lockPath);
+      return tryCreateClaim(lockPath);
+    }
+  } catch (err) {
+    if (errno(err) !== "ENOENT") throw err;
+  }
+  return false;
+}
+
+function releaseReclaimLock(lockPath: string): void {
+  try {
+    unlinkSync(lockPath);
+  } catch (err) {
+    if (errno(err) !== "ENOENT") throw err;
+  }
+}
+
 /**
- * One process wins rename of a stale claim to claim.stale.<pid>.
- * A loser that sees ENOENT (or Windows EPERM) returns duplicate and does not throw.
+ * Reclaim a stale claim while holding an exclusive wx lock on claim.reclaim.
+ * Stat and rename run under the lock, so no other process can wx-create or rename the claim in between.
+ * There is no put-back onto the claim path (never overwrites an existing claim file).
  */
 function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
+  const lockPath = reclaimLockPath(path);
+  if (!tryAcquireReclaimLock(lockPath)) return "duplicate";
   try {
-    const mtime = statSync(path).mtimeMs;
-    if (Date.now() - mtime <= ttlMs) return "duplicate";
-  } catch (err) {
-    if (errno(err) === "ENOENT") return "duplicate";
-    throw err;
-  }
-  const aside = `${path}.stale.${process.pid}`;
-  if (renameExclusive(path, aside) === "lost") return "duplicate";
-  let ageMs: number;
-  try {
-    ageMs = Date.now() - statSync(aside).mtimeMs;
-  } catch (err) {
-    if (errno(err) === "ENOENT") return "duplicate";
-    throw err;
-  }
-  if (ageMs <= ttlMs) {
-    if (renameExclusive(aside, path) === "lost") {
-      try {
-        unlinkSync(aside);
-      } catch (cleanupErr) {
-        if (errno(cleanupErr) !== "ENOENT" && errno(cleanupErr) !== "EPERM") throw cleanupErr;
-      }
+    try {
+      const mtime = statSync(path).mtimeMs;
+      if (Date.now() - mtime <= ttlMs) return "duplicate";
+    } catch (err) {
+      if (errno(err) === "ENOENT") return "duplicate";
+      throw err;
     }
-    return "duplicate";
+    const aside = `${path}.stale.${process.pid}`;
+    if (renameExclusive(path, aside) === "lost") return "duplicate";
+    try {
+      if (Date.now() - statSync(aside).mtimeMs <= ttlMs) {
+        try {
+          unlinkSync(aside);
+        } catch (cleanupErr) {
+          if (errno(cleanupErr) !== "ENOENT" && errno(cleanupErr) !== "EPERM") throw cleanupErr;
+        }
+        return "duplicate";
+      }
+    } catch (err) {
+      if (errno(err) === "ENOENT") return "duplicate";
+      throw err;
+    }
+    try {
+      unlinkSync(aside);
+    } catch (err) {
+      if (errno(err) !== "ENOENT" && errno(err) !== "EPERM") throw err;
+    }
+    return "reclaimed";
+  } finally {
+    releaseReclaimLock(lockPath);
   }
-  try {
-    unlinkSync(aside);
-  } catch (err) {
-    if (errno(err) !== "ENOENT" && errno(err) !== "EPERM") throw err;
-  }
-  return "reclaimed";
 }
 
 /** Drop at most this many expired claim files per call, so a hook never walks an unbounded directory. */
-const SWEEP_CAP = 32;
+export const SWEEP_CAP = 32;
 
 function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
   const dir = join(home, ".claude", "open-brain", "hook-claims");
@@ -121,15 +155,15 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
       if (now - statSync(p).mtimeMs <= ttlMs) continue;
       unlinkSync(p);
       removed++;
-    } catch (err) {
-      if (errno(err) !== "ENOENT") throw err;
+    } catch {
+      // Unreadable or non-file entries (EISDIR, EPERM, etc.) are skipped so one bad name cannot crash a hook.
+      continue;
     }
   }
 }
 
 /**
- * Atomic exclusive claim (wx). A stale claim is reclaimed by rename, then wx.
- * ENOENT on that rename is a lost race: duplicate, never a throw.
+ * Atomic exclusive claim (wx). A stale claim is reclaimed under a per-path wx reclaim lock, then wx.
  */
 export function tryClaimHookRun(
   home: string,
@@ -162,6 +196,11 @@ export function appendHookMetric(home: string, line: HookMetricLine): void {
   const row = `${JSON.stringify(line)}\n`;
   appendFileSync(path, row, "utf8");
   process.stderr.write(`[ob-hook-metric] ${row}`);
+}
+
+/** Tests only — observe sweep without claiming. */
+export function sweepExpiredClaimsForTest(home: string, ttlMs: number, keep: string): void {
+  sweepExpiredClaims(home, ttlMs, keep);
 }
 
 /** Tests only — remove claim files under an isolated HOME. */
