@@ -12,6 +12,7 @@ import { presenceBlockUpperBound } from "../session-start/hub-presence.js";
 import { describeTreeCurrency } from "../session-start/tree-currency.js";
 import { resolveRecordSource } from "../session-start/record-source.js";
 import { checkSummaryFromState } from "./checks-state.js";
+import { settleGitNexusIndex, type GitNexusCheckOptions } from "./gitnexus-refresh.js";
 import { diffReferrerLineHashes, matchingLineHashes } from "./retirements-line-hash.js";
 
 /**
@@ -2138,7 +2139,17 @@ function gitOut(cwd: string, args: string[]): string | null {
  * see whether anything it indexed actually changed — a hundred commits touching
  * only Markdown leave the graph perfectly valid.
  */
-export function checkGitNexusIndex(projectRoot: string): CheckResult {
+/**
+ * T-187 hunk: the only new call in this file. `/sync` passes options and
+ * settles in gitnexus-refresh.ts. Session start omits options and stays the
+ * read-only inspect below — it must not spawn analyze.
+ */
+export function checkGitNexusIndex(projectRoot: string, options?: GitNexusCheckOptions): CheckResult {
+  if (options === undefined) return inspectGitNexusIndex(projectRoot);
+  return settleGitNexusIndex(projectRoot, options, inspectGitNexusIndex);
+}
+
+function inspectGitNexusIndex(projectRoot: string): CheckResult {
   const name = "gitnexus-index";
   const metaPath = join(projectRoot, ".gitnexus", "meta.json");
   if (!existsSync(metaPath)) {
