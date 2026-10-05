@@ -7,10 +7,14 @@ alwaysApply: true
 
 Your room is the seat entry with `runtime: "cursor"` in `.agents/SYSTEM/hub-partner-seats.json` whose key is this worktree's seat (`sia-<seat>`). The `talk` line there is the invocation. Substitute `{hub_url}`, `{hub_name}` and `{room}` from `dispatch.cursor.room` on that seat. There is no top-level `room`. `ob_start` reads the same file's `readers` map.
 
-On open, and after every post, run that line with `--wait --wait-timeout 3500` in the foreground. One wait at a time. Act on the exit code (A2A-Hub Loop 13, master 8e59f58, `docs/loops/loop-13-design-ruling.md`): exit 0, a turn was printed, act on it (the atlas turn, in this same turn). Exit 1, refused or called wrong: fix the call and do not retry. Exit 2, the window elapsed: wait again. Exit 3, unavailable or throttled: the last stderr line is `[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>`; wait `retry-after` seconds, otherwise back off 5 s doubling to 60 s; after 5 consecutive exit-3 results over 2 minutes with no `retry-after`, stop and report. Post when the work is done, not a bare acknowledgement.
+If your seat row has `runtime: "cursor"`, your waker starts this chat when atlas posts a turn. At the start of the run, run the `talk` line with `--inbox` before other work.
 
 An unread atlas turn is the assignment. Do not propose a backlog item beside it.
 
+Do the work, then post your reply with `--say`. When the post succeeds, end this turn. Never block on hub-talk waiting for the next atlas turn in this run — the waker starts the next run when that turn arrives. Post when the work is done, not a bare acknowledgement.
+
+When you run hub-talk with `--inbox` or `--say`, act on the exit code (A2A-Hub Loop 13, master 8e59f58, `docs/loops/loop-13-design-ruling.md`): exit 0, a turn was printed, act on it (the atlas turn, in this same turn for `--inbox`). Exit 1, refused or called wrong: fix the call and do not retry. Exit 2, the window elapsed: wait again. Exit 3, unavailable or throttled: the last stderr line is `[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>`; wait `retry-after` seconds, otherwise back off 5 s doubling to 60 s; after 5 consecutive exit-3 results over 2 minutes with no `retry-after`, stop and report.
+
 Start every work reply, in the hub and in chat, with one line `TASK: <task id> <phase>, <what> (<branch>)`, and update it as the work changes. The dashboard reads a Cursor seat's current dispatch only from that line, because it does not parse hub-talk output (T-235).
 
-This is the foreground-wait rule from A2A-Hub's planner role, section "Hub transport: how a seat waits". Native A2A is Claude-to-Claude only; this hub carries the Cursor seats.
+D-120: keep working until the assignment is FROZEN or BLOCKED before you post; ending the turn after you post is not permission to stop mid-work. Native A2A is Claude-to-Claude only; this hub carries the Cursor seats.

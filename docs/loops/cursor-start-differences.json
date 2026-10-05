@@ -3,8 +3,8 @@
   "cursor_only": [
     "Cursor MCP calls use CallDynamicTool. Read the schema with GetDynamicTools before the call.",
     "### Hub room",
-    "Read `.agents/SYSTEM/hub-partner-seats.json` for this worktree's seat. Cursor seats run the file's hub-talk line with `--inbox` before the briefing. An unread turn from atlas is the assignment: name it and propose nothing else. After each post, run hub-talk with `--wait --wait-timeout 3500` and act on its exit code (next line). One wait at a time.",
-    "`hub-talk` exit codes (A2A-Hub Loop 13, master 8e59f58, `docs/loops/loop-13-design-ruling.md`): exit 0, a turn was printed, act on it. Exit 1, refused or called wrong: fix the call and do not retry. Exit 2, the window elapsed: wait again. Exit 3, unavailable or throttled: the last stderr line is `[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>`; wait `retry-after` seconds, otherwise back off 5 s doubling to 60 s; after 5 consecutive exit-3 results over 2 minutes with no `retry-after`, stop and report."
+    "Read `.agents/SYSTEM/hub-partner-seats.json` for this worktree's seat. If the seat row has `runtime: \"cursor\"`, your waker started this run: run the file's hub-talk line with `--inbox` before the briefing. An unread turn from atlas is the assignment: name it and propose nothing else. Do the work, post your reply with `--say`, then end this turn; never block on hub-talk waiting for the next atlas turn in this run (see `.cursor/rules/hub-room.mdc`).",
+    "`hub-talk` exit codes for `--inbox` and `--say` (A2A-Hub Loop 13, master 8e59f58, `docs/loops/loop-13-design-ruling.md`): exit 0, a turn was printed, act on it. Exit 1, refused or called wrong: fix the call and do not retry. Exit 2, the window elapsed: wait again. Exit 3, unavailable or throttled: the last stderr line is `[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>`; wait `retry-after` seconds, otherwise back off 5 s doubling to 60 s; after 5 consecutive exit-3 results over 2 minutes with no `retry-after`, stop and report."
   ],
   "claude_only": []
 }

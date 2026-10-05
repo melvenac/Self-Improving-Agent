@@ -4,8 +4,8 @@ import { join } from "node:path";
 
 /**
  * T-228: relay's A2A Loop 13 contract for `hub-talk` exit codes (A2A-Hub master 8e59f58, docs/loops/loop-13-design-ruling.md).
- * Every Cursor-facing copy of the wait rule carries all four codes, including 3 (unavailable or throttled) with its
- * stderr line and its backoff, so a seat does not read a throttled hub as "the window elapsed" or as a refusal.
+ * Every Cursor-facing copy of the hub rule carries all four codes for `--inbox` and `--say`, including 3 (unavailable or
+ * throttled) with its stderr line and its backoff, so a seat does not read a throttled hub as "the window elapsed" or as a refusal.
  */
 const repo = join(process.cwd(), "..");
 const read = (rel: string): string => readFileSync(join(repo, rel), "utf-8").replace(/\r\n/g, "\n");
@@ -32,7 +32,7 @@ const REQUIRED = [
   "stop and report",
 ];
 
-describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the wait rule", () => {
+describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hub rule", () => {
   for (const rel of COPIES) {
     it(`${rel} carries the whole contract`, () => {
       const t = read(rel);
@@ -49,6 +49,12 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the wa
 
   it("the two hub-room.mdc copies are identical (the repo's own rule and the template's)", () => {
     expect(read(".cursor/rules/hub-room.mdc")).toBe(read("project-template/.cursor/rules/hub-room.mdc"));
+  });
+
+  it("hub-room.mdc does not tell a Cursor seat to run hub-talk --wait (HUBROOM-TURN-END)", () => {
+    for (const rel of [".cursor/rules/hub-room.mdc", "project-template/.cursor/rules/hub-room.mdc"]) {
+      expect(read(rel)).not.toContain("--wait");
+    }
   });
 
   it("every changed Hub-room line in start.md is a complete line of the cursor_only table, so cursor-start-parity waives it (and only it)", () => {
