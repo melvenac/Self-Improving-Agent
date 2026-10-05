@@ -30,3 +30,8 @@ Thumbs.db
 
 # Runtime artifacts (session-local / regenerated)
 /.recalled-entries.json
+
+# A2A-Hub seat-waker runtime (.cursor/wake.lock, waker.pid, wake-prompt-*.txt).
+/.cursor/wake.lock
+/.cursor/waker.pid
+/.cursor/wake-prompt-*.txt
