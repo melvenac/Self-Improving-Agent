@@ -5,7 +5,7 @@ import { join } from "node:path";
 /**
  * T-228: relay's A2A Loop 13 contract for `hub-talk` exit codes (A2A-Hub master 8e59f58, docs/loops/loop-13-design-ruling.md).
  * Every Cursor-facing copy of the hub rule carries all four codes for `--inbox` and `--say`, including 3 (unavailable or
- * throttled) with its stderr line and its backoff, so a seat does not read a throttled hub as "the window elapsed" or as a refusal.
+ * throttled) with its stderr line and its backoff, so a seat does not read a throttled hub as a refusal.
  */
 const repo = join(process.cwd(), "..");
 const read = (rel: string): string => readFileSync(join(repo, rel), "utf-8").replace(/\r\n/g, "\n");
@@ -22,8 +22,9 @@ const REQUIRED = [
   "act on it",
   "refused or called wrong",
   "do not retry",
-  "the window elapsed",
-  "wait again",
+  "comes only from --wait",
+  "seat with a waker does not run",
+  "if you see it, end the turn",
   "unavailable or throttled",
   "[hub-talk] retry status=<code|network> retry-after=<seconds|unknown>",
   "wait `retry-after` seconds",
@@ -47,13 +48,21 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
+  it("no Cursor copy tells a waker seat to wait again on exit 2 (HUBROOM-TURN-END r2)", () => {
+    for (const rel of COPIES) {
+      expect(read(rel)).not.toContain("wait again");
+    }
+  });
+
   it("the two hub-room.mdc copies are identical (the repo's own rule and the template's)", () => {
     expect(read(".cursor/rules/hub-room.mdc")).toBe(read("project-template/.cursor/rules/hub-room.mdc"));
   });
 
-  it("hub-room.mdc does not tell a Cursor seat to run hub-talk --wait (HUBROOM-TURN-END)", () => {
+  it("hub-room.mdc does not instruct foreground hub-talk --wait (HUBROOM-TURN-END)", () => {
     for (const rel of [".cursor/rules/hub-room.mdc", "project-template/.cursor/rules/hub-room.mdc"]) {
-      expect(read(rel)).not.toContain("--wait");
+      const t = read(rel);
+      expect(t).not.toMatch(/--wait --wait-timeout/);
+      expect(t).not.toMatch(/run the `talk` line with `--wait`/i);
     }
   });
 
@@ -69,13 +78,20 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
+  it("start.md Hub section cites b6a8de79 and shared.md Hub transport (HUBROOM-TURN-END amendment 1)", () => {
+    const t = read("project-template/.cursor/commands/start.md");
+    expect(t).toContain("b6a8de79");
+    expect(t).toContain("Hub transport: how a seat waits");
+    expect(t).toContain("D-120:");
+  });
+
   it("every changed Hub-room line in start.md is a complete line of the cursor_only table, so cursor-start-parity waives it (and only it)", () => {
     const table = JSON.parse(read("docs/loops/cursor-start-differences.json")) as { cursor_only: string[] };
     const lines = read("project-template/.cursor/commands/start.md").split("\n");
     const at = lines.indexOf("### Hub room");
     expect(at).toBeGreaterThan(-1);
     const section = lines.slice(at + 1).filter((l) => l.trim() !== "");
-    const hubLines = section.filter((l) => /hub-talk|exit 3/.test(l));
+    const hubLines = section.filter((l) => /hub-talk|exit 3|Turn-end and wait/.test(l));
     expect(hubLines.length).toBeGreaterThanOrEqual(2);
     for (const l of hubLines) expect(table.cursor_only, l.slice(0, 60)).toContain(l);
   });
