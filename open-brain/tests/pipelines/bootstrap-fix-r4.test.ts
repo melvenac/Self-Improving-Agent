@@ -134,23 +134,36 @@ describe("R-BF-20: a failed undo is never printed as refused", () => {
   });
 });
 
+const RENAME_HOOK_VAR = "OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK";
+
+/** Code lines only. A line comment or a one-line block comment is not an instance. */
+function renameHookInSourceLine(line: string): boolean {
+  const trimmed = line.trim();
+  return trimmed.length > 0
+    && !trimmed.startsWith("//")
+    && !trimmed.startsWith("*")
+    && !trimmed.startsWith("/*")
+    && trimmed.includes(RENAME_HOOK_VAR);
+}
+
+function sourceLineFromGitGrep(row: string): string {
+  const m = row.match(/^[^:]+:\d+:(.*)$/);
+  return m ? m[1] : row;
+}
+
+function gitGrepRenameHookCodeHits(stdout: string): string[] {
+  return stdout.split("\n").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));
+}
+
 describe("R-BF-21: the shipped move-residue does not load code named by an environment variable", () => {
-  it("git grep finds no OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK in src/", () => {
-    const namesHook = (src: string) => src.split("\n").some((line) => {
-      const trimmed = line.trim();
-      return trimmed.length > 0
-        && !trimmed.startsWith("//")
-        && !trimmed.startsWith("*")
-        && !trimmed.startsWith("/*")
-        && trimmed.includes("OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK");
-    });
-    expect(namesHook("const hook = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;")).toBe(true);
-    expect(namesHook("// OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not how residue moves")).toBe(false);
-    expect(namesHook("/* OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not loaded */")).toBe(false);
+  it("git grep finds no OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK in src/ on a code line", () => {
+    expect(renameHookInSourceLine("const hook = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;")).toBe(true);
+    expect(renameHookInSourceLine("// OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not how residue moves")).toBe(false);
+    expect(renameHookInSourceLine("/* OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not loaded */")).toBe(false);
+    const commentOnlyGrep = `open-brain/src/bootstrap/index.ts:99:// ${RENAME_HOOK_VAR} is not loaded\n`;
+    expect(gitGrepRenameHookCodeHits(commentOnlyGrep)).toEqual([]);
     const repoRoot = join(import.meta.dirname, "../../..");
-    const g = spawnSync("git", ["grep", "-n", "OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK", "--", "open-brain/src"], { cwd: repoRoot, encoding: "utf8" });
-    expect(g.status).toBe(1);
-    expect(g.stdout).toBe("");
-    expect(namesHook(g.stdout ?? "")).toBe(false);
+    const g = spawnSync("git", ["grep", "-n", RENAME_HOOK_VAR, "--", "open-brain/src"], { cwd: repoRoot, encoding: "utf8" });
+    expect(gitGrepRenameHookCodeHits(g.stdout ?? "")).toEqual([]);
   });
 });

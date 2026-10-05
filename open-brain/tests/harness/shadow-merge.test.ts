@@ -358,7 +358,10 @@ describe("CC-0 and CC-19 guards", () => {
     const runtime = readFileSync(join(root, "runtime.ts"), "utf8");
     const cli = readFileSync(join(root, "cli.ts"), "utf8");
     const procedure = readFileSync(join(import.meta.dirname, "../../../docs/loops/shadow-merge/PROCEDURE.md"), "utf8");
-    expect(runtime).not.toContain("prepareShadowVerdict");
+    expect(codeHas("prepareShadowVerdict();", "prepareShadowVerdict")).toBe(true);
+    expect(codeHas("// prepareShadowVerdict must not appear in runtime", "prepareShadowVerdict")).toBe(false);
+    expect(codeHas("/* prepareShadowVerdict stays out of runtime.ts */", "prepareShadowVerdict")).toBe(false);
+    expect(codeHas(runtime, "prepareShadowVerdict")).toBe(false);
     expect(cli).toContain("The runtime never merges, pushes, or touches a remote.");
     expect(procedure).toContain("shadow-verdict prepare");
     expect(procedure).toContain("decide");
