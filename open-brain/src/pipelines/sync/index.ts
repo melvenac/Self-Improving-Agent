@@ -107,7 +107,7 @@ export function runSync(input: SyncOptions): SyncResult {
   // Derived artifacts: the index is advice, the build is EXECUTED by the MCP
   // server and both hooks. Separate checks — one severity for two artifacts
   // would report a single outcome for two independent claims.
-  checks.push(checkGitNexusIndex(options.projectRoot));
+  checks.push(checkGitNexusIndex(options.projectRoot, { checkOnly: options.checkOnly }));
   checks.push(checkBuildFreshness(options.projectRoot));
   // T-193: registered worktrees are the main checkout or <project>-<seat>.
   checks.push(checkWorktreeLayout(options.projectRoot));
