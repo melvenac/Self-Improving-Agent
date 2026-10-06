@@ -18,7 +18,8 @@ describe("JEV-CAL-2 DEV r2 F1 — frozen shadow-done live uses global fetch via 
   });
 
   it("harness shadow-done --request --mode live calls fetch without an injected fetchImpl", async () => {
-    const recordsDir = mkdtempSync(join(tmpdir(), "cal2-f1-"));
+    const recordsDir = mkdtempSync(join(tmpdir(), "cal2-f1-live-"));
+    const ledgerPath = join(recordsDir, "attempts.jsonl");
     dirs.push(recordsDir);
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ model: "jev-1.13.0", answers: { touches_out_of_scope: { noul: 0.1 } } }), {
@@ -45,6 +46,8 @@ describe("JEV-CAL-2 DEV r2 F1 — frozen shadow-done live uses global fetch via 
       "live",
       "--records",
       recordsDir,
+      "--ledger",
+      ledgerPath,
       "--repo",
       ROOT,
     ]);
