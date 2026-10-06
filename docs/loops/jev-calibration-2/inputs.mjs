@@ -7,11 +7,10 @@ import { HERE, REPO, POLICY_REL, git, readJson, stable, writeJson } from "./lib.
 import { derivePlanFromDispatch } from "./dispatch-derive.mjs";
 import { filterPathList, filterUnifiedDiff } from "./diff-filter.mjs";
 import {
-  leakHitsDetailedFromPlan,
-  leakHitsDetailedFromRequest,
-  leakHitsFromPlan,
+  leakHitsDetailedFromRequestDiff,
   leakHitsFromRequest,
-  mergeLeakDetails,
+  redactPlanVerdictSentences,
+  verdictLeaksFromDiffText,
 } from "./leak.mjs";
 import { validatePlan } from "../../../open-brain/src/harness/schema.ts";
 import { buildDoneGateQuestions, buildJevRequest } from "../../../open-brain/src/harness/gate.ts";
@@ -51,8 +50,14 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
   if (!derived) return { refuse: "plan-no-rows" };
   const v = validatePlan(derived);
   if (!v.ok) return { refuse: `plan-invalid: ${v.problems.slice(0, 2).join("; ")}` };
-  const plan = v.value;
+  let plan = v.value;
   if (!plan.acceptance?.length) return { refuse: "plan-no-rows" };
+  const { plan: redactedPlan, redacted_sentences } = redactPlanVerdictSentences(plan);
+  plan = redactedPlan;
+  const vRed = validatePlan(plan);
+  if (!vRed.ok) return { refuse: `plan-invalid-after-redaction: ${vRed.problems.slice(0, 2).join("; ")}`, redacted_sentences };
+  plan = vRed.value;
+  if (!plan.acceptance?.length) return { refuse: "plan-no-rows-after-redaction", redacted_sentences };
   const hint = c.checks_hint ?? { checks: "none", source: "none", build_exit: 1, unit_exit: 1 };
   const checks = {
     source: hint.source ?? "none",
@@ -94,33 +99,17 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
   };
   const request = buildJevRequest(payload);
   const leak_hits = leakHitsFromRequest(request);
-  const plan_leak_hits = leakHitsFromPlan(plan);
-  const leak_details = mergeLeakDetails(leakHitsDetailedFromRequest(request), leakHitsDetailedFromPlan(plan));
-
-  let leak_before_filter = null;
-  if (rawDiff !== diff) {
-    const fullHunks = rawDiff.slice(0, 16_000);
-    const fullRows = plan.acceptance.map((row) => ({
-      id: row.id,
-      observable: row.observable,
-      hunks: fullHunks ? [fullHunks] : [],
-    }));
-    const fullPayload = {
-      ...payload,
-      context: { ...payload.context, requirement_rows: fullRows },
-    };
-    const fullRequest = buildJevRequest(fullPayload);
-    leak_before_filter = mergeLeakDetails(leakHitsDetailedFromRequest(fullRequest), leakHitsDetailedFromPlan(plan));
-  } else {
-    leak_before_filter = leak_details;
-  }
+  const leak_details = leakHitsDetailedFromRequestDiff(request);
+  const diffLeaksBeforeRecordFilter = verdictLeaksFromDiffText(rawDiff.slice(0, 16_000));
+  const diffLeaksAfterRecordFilter = verdictLeaksFromDiffText(diffHunks);
 
   return {
     request,
     leak_hits,
-    plan_leak_hits,
     leak_details,
-    leak_before_filter,
+    diffLeaksBeforeRecordFilter,
+    diffLeaksAfterRecordFilter,
+    redacted_sentences,
     meta: {
       case_id: c.case_id,
       case_no: c.case_no,
@@ -131,6 +120,7 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
       policy: POLICY_REL,
       checks_hint: hint,
       diff_paths_excluded,
+      plan_redacted_sentences: redacted_sentences,
     },
   };
 }
@@ -150,6 +140,7 @@ export function runInputs() {
   const excluded_leak = [];
   const leak_table_before = [];
   const leak_table_after = [];
+  const plan_redactions = [];
 
   for (const case_id of [...caseIds].sort()) {
     const c = byId.get(case_id);
@@ -162,22 +153,28 @@ export function runInputs() {
       refused.push({ case_id, reason: r.refuse });
       continue;
     }
-    const leak_hits = [...new Set([...(r.leak_hits ?? []), ...(r.plan_leak_hits ?? [])])].sort();
-    const beforeDetails = r.leak_before_filter ?? [];
-    const afterDetails = r.leak_details ?? [];
+    const leak_hits = [...new Set(r.leak_hits ?? [])].sort();
+    const beforeDetails = r.diffLeaksBeforeRecordFilter ?? [];
+    const afterDetails = r.diffLeaksAfterRecordFilter ?? r.leak_details ?? [];
     if (beforeDetails.length > 0) {
       leak_table_before.push({ case_id, hits: beforeDetails });
     }
     if (afterDetails.length > 0) {
       leak_table_after.push({ case_id, hits: afterDetails });
       excluded_leak.push({ case_id, leak_hits, leak_details: afterDetails });
-    } else if (leak_hits.length > 0) {
-      excluded_leak.push({ case_id, leak_hits });
+    }
+    if ((r.redacted_sentences ?? []).length > 0) {
+      plan_redactions.push({ case_id, redacted_sentences: r.redacted_sentences });
     }
     const file = `${String(c.case_no).padStart(3, "0")}-${c.case_id}.G_done-request.json`;
     writeFileSync(
       join(dir, file),
-      stable({ ...r.meta, leak_hits, leak_details: afterDetails, request: r.request }),
+      stable({
+        ...r.meta,
+        leak_hits,
+        leak_details: afterDetails,
+        request: r.request,
+      }),
     );
     built.push({
       case_id,
@@ -186,6 +183,7 @@ export function runInputs() {
       file: `inputs/${file}`,
       eligible: isEligibleCase(c),
       leak_excluded: leak_hits.length > 0,
+      plan_redacted: (r.redacted_sentences ?? []).length > 0,
     });
   }
   built.sort((a, b) => a.case_no - b.case_no);
@@ -196,6 +194,8 @@ export function runInputs() {
     leak_report: {
       before_work_diff_filter: { excluded_case_count: leak_table_before.length, by_case: leak_table_before },
       after_work_diff_filter: { excluded_case_count: leak_table_after.length, by_case: leak_table_after },
+      plan_redactions_by_case: plan_redactions,
+      plan_redaction_case_count: plan_redactions.length,
     },
     policy: POLICY_REL,
     split_seed: split.seed,

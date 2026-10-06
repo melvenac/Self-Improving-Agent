@@ -92,6 +92,7 @@ export function runManifest() {
       inputs_leak_excluded: inputs.excluded_leak.length,
       leak_excluded_before_work_diff_filter: inputs.leak_report?.before_work_diff_filter?.excluded_case_count ?? null,
       leak_excluded_after_work_diff_filter: inputs.leak_report?.after_work_diff_filter?.excluded_case_count ?? null,
+      plan_redaction_case_count: inputs.leak_report?.plan_redaction_case_count ?? null,
       phase_dev: dev.length,
       phase_heldout: heldout.length,
       phase_dev_by_label: countByLabel(dev),

@@ -18,6 +18,7 @@
   "leak_details": [],
   "leak_hits": [],
   "merge_commit": "73945125fe5f00d71cbd37bcf38803ee52f77d94",
+  "plan_redacted_sentences": [],
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
   "request": {
     "model": "jev-latest",

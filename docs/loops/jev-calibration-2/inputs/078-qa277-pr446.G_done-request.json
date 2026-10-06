@@ -15,32 +15,10 @@
   },
   "diff_paths_excluded": [],
   "label": "ACCEPT",
-  "leak_details": [
-    {
-      "field": "request.state.requirement_rows[0].hunks[0]",
-      "phrase": "reject",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[1].hunks[0]",
-      "phrase": "reject",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[2].hunks[0]",
-      "phrase": "reject",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[3].hunks[0]",
-      "phrase": "reject",
-      "source": "diff"
-    }
-  ],
-  "leak_hits": [
-    "reject"
-  ],
+  "leak_details": [],
+  "leak_hits": [],
   "merge_commit": "ef97fb61a021f7e1e56b0d5fe01096d0dce3f6ed",
+  "plan_redacted_sentences": [],
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
   "request": {
     "model": "jev-latest",

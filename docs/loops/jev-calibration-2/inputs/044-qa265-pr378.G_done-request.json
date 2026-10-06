@@ -15,42 +15,19 @@
   },
   "diff_paths_excluded": [],
   "label": "ACCEPT",
-  "leak_details": [
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "c954336ee3207444ce17d0539751f8f33ea87ac8",
+  "plan_redacted_sentences": [
     {
-      "field": "request.state.requirement_rows[4].observable",
-      "phrase": "reject",
-      "source": "diff"
+      "field": "acceptance.T5",
+      "sentence": "Only what changed since QA 264's REJECT at 7e0509e1:"
     },
     {
-      "field": "request.questions.plan_row:T5.instructions",
-      "phrase": "reject",
-      "source": "plan"
-    },
-    {
-      "field": "request.state.plan.acceptance[4].observable",
-      "phrase": "reject",
-      "source": "plan"
-    },
-    {
-      "field": "request.state.plan.tasks[4]",
-      "phrase": "reject",
-      "source": "plan"
-    },
-    {
-      "field": "plan.acceptance[4].observable",
-      "phrase": "reject",
-      "source": "plan"
-    },
-    {
-      "field": "plan.tasks[4]",
-      "phrase": "reject",
-      "source": "plan"
+      "field": "tasks[4]",
+      "sentence": "Only what changed since QA 264's REJECT at 7e0509e1:"
     }
   ],
-  "leak_hits": [
-    "reject"
-  ],
-  "merge_commit": "c954336ee3207444ce17d0539751f8f33ea87ac8",
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
   "request": {
     "model": "jev-latest",
@@ -100,7 +77,7 @@
         "type": "noul"
       },
       "plan_row:T5": {
-        "instructions": "Does the diff meet plan acceptance row \"T5\" (#374 r2 (narrow). Only what changed since QA 264's REJECT at 7e0509e1:), using the hunks shown for that row, rather than only adjacent work?",
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#374 r2 (narrow).), using the hunks shown for that row, rather than only adjacent work?",
         "type": "noul"
       },
       "plan_row:T6": {
@@ -175,7 +152,7 @@
           },
           {
             "id": "T5",
-            "observable": "#374 r2 (narrow). Only what changed since QA 264's REJECT at 7e0509e1:",
+            "observable": "#374 r2 (narrow).",
             "type": "blackbox"
           },
           {
@@ -245,7 +222,7 @@
           "Red then green. New/changed test files against master's source (fail) and the head (pass). Quote counts.",
           "One mutant of your own, plus re-run one of the developer's (named in the PR body). Each turns a row red.",
           "CI on the head (read only). gh pr checks <n>: test result and run id. A pre-#371 head will not have run typecheck:tests in CI: run npm run typecheck:tests at the head yourself and quote the exit code.",
-          "#374 r2 (narrow). Only what changed since QA 264's REJECT at 7e0509e1:",
+          "#374 r2 (narrow).",
           "start-parity.test.ts T-226 row: green at the head; the grab now matches brief.md; threshold still 3. Apply the mutant \"delete the brief.md sentence from ONE template copy\": the row must go red.",
           "SERVED_PATHS includes project-template: a commit touching only project-template/... counts as a CODE commit.",
           "Usage at sevenDayPct >= 98 prints band word STOP whatever the file's level; at 97 the file's own band stays.",
@@ -293,7 +270,7 @@
             "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
           ],
           "id": "T5",
-          "observable": "#374 r2 (narrow). Only what changed since QA 264's REJECT at 7e0509e1:"
+          "observable": "#374 r2 (narrow)."
         },
         {
           "hunks": [

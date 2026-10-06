@@ -2,6 +2,18 @@
   "phases": {
     "dev": [
       {
+        "base_sha": "8961ba1fede1a69ce53c143fcacd9efacd95d34f",
+        "case_id": "qa250-t-222",
+        "case_no": 2,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/002-qa250-t-222.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "0ae1fb33e79f62d854f71d25d8fb2d6a88c3d813",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "7b42ed6fe22539efd48f4ceaa774a0b33e3236c9"
+      },
+      {
         "base_sha": "f7ac983d4face4a88f5af9742cc91a54c01e3f4f",
         "case_id": "qa251-t-164",
         "case_no": 3,
@@ -170,6 +182,30 @@
         "scored_sha": "3f30e8258cdc1537a85b0b9eb3f5d3c81664a184"
       },
       {
+        "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+        "case_id": "qa261-pr302",
+        "case_no": 35,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/035-qa261-pr302.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "7e92b6f641ad776d886037e54139cb0e6fd4b617",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "7e92b6f641ad776d886037e54139cb0e6fd4b617"
+      },
+      {
+        "base_sha": "93f2a1beec0cd4072972832c8473b05013e3bf55",
+        "case_id": "qa264-pr371",
+        "case_no": 38,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/038-qa264-pr371.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "5a7bf167700d79149d2bd35278d72c6aa1bb8dd8",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "ef3fbd2394bf57f519fa488f8f735b1f272904f7"
+      },
+      {
         "base_sha": "93f2a1beec0cd4072972832c8473b05013e3bf55",
         "case_id": "qa264-pr373",
         "case_no": 40,
@@ -195,6 +231,18 @@
       },
       {
         "base_sha": "2b95434e6ee52052c2d31a4d2430a3aef36beba6",
+        "case_id": "qa267-pr391",
+        "case_no": 50,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/050-qa267-pr391.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "f8345f1b1929bb05a3cf3230d7a0cc91a30266a9",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "b2096051d207344e150e275648a5b6806c2b2aea"
+      },
+      {
+        "base_sha": "2b95434e6ee52052c2d31a4d2430a3aef36beba6",
         "case_id": "qa267-pr393",
         "case_no": 51,
         "checks": "recorded",
@@ -216,6 +264,18 @@
         "phase": "dev",
         "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
         "scored_sha": "6f145faf9d1bba962d281e16285fcb59b14b68c7"
+      },
+      {
+        "base_sha": "bbc2acbf65c54ab640713b03ec806a8e5a9c4f14",
+        "case_id": "qa269-pr397-r2",
+        "case_no": 54,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/054-qa269-pr397-r2.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "f4bc36d1185c081947cd85447c86bf430581bc0d",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "9ea9f54a6e81ad3f465f56bf92243f3f129ceeba"
       },
       {
         "base_sha": "be9132757ad040b7ab944e0adfaa19f3d3400eeb",
@@ -278,6 +338,18 @@
         "scored_sha": "b9026d71d1fbfa2ba42de465fac4d54feae702cd"
       },
       {
+        "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+        "case_id": "qa275-pr437",
+        "case_no": 72,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/072-qa275-pr437.G_done-request.json",
+        "label": "REJECT",
+        "merge_commit": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "23d46156a5fa34873ef1bee0ab723e52d1b33858"
+      },
+      {
         "base_sha": "bbea9698417a70344ea777c6e15283cdd6ec7ad7",
         "case_id": "qa277-pr441",
         "case_no": 74,
@@ -288,6 +360,42 @@
         "phase": "dev",
         "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
         "scored_sha": "48bf479562296a0f4c717fb91cc0fec92f11ed86"
+      },
+      {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "case_id": "qa277-pr442",
+        "case_no": 75,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/075-qa277-pr442.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "7723f592bb3e3cdf75225bfe61721fdfd9861324",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "08fa900211547aade6538792c88feab037ba23f8"
+      },
+      {
+        "base_sha": "6fe2866da45ea56af8277cd8c54698269187ca56",
+        "case_id": "qa277-pr451",
+        "case_no": 79,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/079-qa277-pr451.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "27dd1e77682c4b31e3ac6180c0e21ca98f70b218",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "1e8cba7c92d3639a17691e03700cd32a84b6711f"
+      },
+      {
+        "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+        "case_id": "qa279-pr437-r2",
+        "case_no": 82,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/082-qa279-pr437-r2.G_done-request.json",
+        "label": "REJECT",
+        "merge_commit": "3dfa24245cd1b3b99344cd2d675735bc608d04c8",
+        "phase": "dev",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "3dfa24245cd1b3b99344cd2d675735bc608d04c8"
       }
     ],
     "heldout": [
@@ -374,6 +482,18 @@
         "phase": "heldout",
         "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
         "scored_sha": "eb721dec39b13e6a17a8ca7f16cb574c56b62d02"
+      },
+      {
+        "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+        "case_id": "qa257-pr305",
+        "case_no": 19,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/019-qa257-pr305.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "8961635db5048e5ed5bbe01a19b9e031354aa082",
+        "phase": "heldout",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "84e756180e400cccba92e4d66ddbcf12ed15ec0c"
       },
       {
         "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
@@ -626,6 +746,66 @@
         "phase": "heldout",
         "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
         "scored_sha": "d292747f8ce5e9173edfc71e5feb3f249693b147"
+      },
+      {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "case_id": "qa277-pr446",
+        "case_no": 78,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/078-qa277-pr446.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "ef97fb61a021f7e1e56b0d5fe01096d0dce3f6ed",
+        "phase": "heldout",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "685b9fe931a08f31d59977c90fbbd06cb977588b"
+      },
+      {
+        "base_sha": "f8dc13a5bb8e2d9fe6d972fef0a7cadc2c202317",
+        "case_id": "qa279-pr427-r4",
+        "case_no": 80,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/080-qa279-pr427-r4.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "bda94d198da8ff99bb1b916434c8dd136200e31e",
+        "phase": "heldout",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "9daf38d8cdb575f6c51f9b30d43f96126c7a8eb4"
+      },
+      {
+        "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+        "case_id": "qa279-pr434-r2",
+        "case_no": 81,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/081-qa279-pr434-r2.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "4da1637059c9c37c9118ff414f008f0c597828c8",
+        "phase": "heldout",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "b9f8a5dfc2437b3d35049df691dd85483424e950"
+      },
+      {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "case_id": "qa279-pr444-r3",
+        "case_no": 83,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/083-qa279-pr444-r3.G_done-request.json",
+        "label": "ACCEPT",
+        "merge_commit": "59eb1c9dae473bba43a46b4b78ccd4799280e85c",
+        "phase": "heldout",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "9bfb2e1e78cc1701394988cc9c65288af4269582"
+      },
+      {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "case_id": "qa279-pr445-r2",
+        "case_no": 84,
+        "checks": "recorded",
+        "input": "docs/loops/jev-calibration-2/inputs/084-qa279-pr445-r2.G_done-request.json",
+        "label": "REJECT",
+        "merge_commit": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+        "phase": "heldout",
+        "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+        "scored_sha": "43ed65a9f2e55b649b4bd1dbb46baddc84d3e0e6"
       }
     ]
   },

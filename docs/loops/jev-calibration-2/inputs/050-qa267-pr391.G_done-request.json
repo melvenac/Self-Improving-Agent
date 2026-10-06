@@ -17,67 +17,10 @@
     "CHANGELOG.md"
   ],
   "label": "ACCEPT",
-  "leak_details": [
-    {
-      "field": "request.state.requirement_rows[0].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[1].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[10].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[2].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[3].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[4].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[5].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[6].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[7].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[8].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[9].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    }
-  ],
-  "leak_hits": [
-    "rejected"
-  ],
+  "leak_details": [],
+  "leak_hits": [],
   "merge_commit": "f8345f1b1929bb05a3cf3230d7a0cc91a30266a9",
+  "plan_redacted_sentences": [],
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
   "request": {
     "model": "jev-latest",

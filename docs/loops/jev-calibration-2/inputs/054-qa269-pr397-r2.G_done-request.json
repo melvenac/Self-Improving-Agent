@@ -17,32 +17,10 @@
     "CHANGELOG.md"
   ],
   "label": "ACCEPT",
-  "leak_details": [
-    {
-      "field": "request.state.requirement_rows[0].hunks[0]",
-      "phrase": "accepted",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[1].hunks[0]",
-      "phrase": "accepted",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[2].hunks[0]",
-      "phrase": "accepted",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[3].hunks[0]",
-      "phrase": "accepted",
-      "source": "diff"
-    }
-  ],
-  "leak_hits": [
-    "accepted"
-  ],
+  "leak_details": [],
+  "leak_hits": [],
   "merge_commit": "f4bc36d1185c081947cd85447c86bf430581bc0d",
+  "plan_redacted_sentences": [],
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
   "request": {
     "model": "jev-latest",

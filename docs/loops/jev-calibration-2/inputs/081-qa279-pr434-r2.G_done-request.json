@@ -15,32 +15,10 @@
   },
   "diff_paths_excluded": [],
   "label": "ACCEPT",
-  "leak_details": [
-    {
-      "field": "request.state.plan.new_capability",
-      "phrase": "rejected",
-      "source": "plan"
-    },
-    {
-      "field": "request.state.plan.objective",
-      "phrase": "rejected",
-      "source": "plan"
-    },
-    {
-      "field": "plan.new_capability",
-      "phrase": "rejected",
-      "source": "plan"
-    },
-    {
-      "field": "plan.objective",
-      "phrase": "rejected",
-      "source": "plan"
-    }
-  ],
-  "leak_hits": [
-    "rejected"
-  ],
+  "leak_details": [],
+  "leak_hits": [],
   "merge_commit": "4da1637059c9c37c9118ff414f008f0c597828c8",
+  "plan_redacted_sentences": [],
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
   "request": {
     "model": "jev-latest",

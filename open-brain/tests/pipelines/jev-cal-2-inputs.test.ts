@@ -30,6 +30,8 @@ console.log(JSON.stringify(x));`,
     };
     const held = new Set(runlist.phases.heldout.map((e) => e.case_id));
     for (const e of runlist.phases.dev) expect(held.has(e.case_id)).toBe(false);
+    expect(runlist.phases.heldout).toHaveLength(34);
+    expect(runlist.phases.dev).toHaveLength(33);
   });
 
   it("leak-excluded cases do not appear in any runlist phase", () => {

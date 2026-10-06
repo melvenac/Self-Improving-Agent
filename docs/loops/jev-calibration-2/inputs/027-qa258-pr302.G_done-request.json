@@ -17,163 +17,19 @@
     "docs/loops/t048-developer-handoff.md"
   ],
   "label": "REJECT",
-  "leak_details": [
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60",
+  "plan_redacted_sentences": [
     {
-      "field": "request.state.requirement_rows[9].observable",
-      "phrase": "accept",
-      "source": "diff"
+      "field": "acceptance.T10",
+      "sentence": "#290 equals QA 254's ACCEPT."
     },
     {
-      "field": "request.state.requirement_rows[0].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[1].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[10].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[11].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[12].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[13].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[14].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[15].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[16].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[17].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[18].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[19].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[2].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[20].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[21].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[22].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[23].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[3].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[4].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[5].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[6].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[7].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[8].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[9].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.questions.plan_row:T10.instructions",
-      "phrase": "accept",
-      "source": "plan"
-    },
-    {
-      "field": "request.state.plan.acceptance[9].observable",
-      "phrase": "accept",
-      "source": "plan"
-    },
-    {
-      "field": "request.state.plan.tasks[9]",
-      "phrase": "accept",
-      "source": "plan"
-    },
-    {
-      "field": "plan.acceptance[9].observable",
-      "phrase": "accept",
-      "source": "plan"
-    },
-    {
-      "field": "plan.tasks[9]",
-      "phrase": "accept",
-      "source": "plan"
+      "field": "tasks[9]",
+      "sentence": "#290 equals QA 254's ACCEPT."
     }
   ],
-  "leak_hits": [
-    "accept",
-    "rejected"
-  ],
-  "merge_commit": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60",
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
   "request": {
     "model": "jev-latest",
@@ -187,7 +43,7 @@
         "type": "noul"
       },
       "plan_row:T10": {
-        "instructions": "Does the diff meet plan acceptance row \"T10\" (#290 equals QA 254's ACCEPT. Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.), using the hunks shown for that row, rather than only adjacent work?",
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.), using the hunks shown for that row, rather than only adjacent work?",
         "type": "noul"
       },
       "plan_row:T11": {
@@ -370,7 +226,7 @@
           },
           {
             "id": "T10",
-            "observable": "#290 equals QA 254's ACCEPT. Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+            "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
             "type": "blackbox"
           },
           {
@@ -465,7 +321,7 @@
           "SSH-style stderr: the cause is the fatal: line.",
           "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
           "A hanging remote is bounded. Quote the wall time.",
-          "#290 equals QA 254's ACCEPT. Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+          "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
           "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
           "#294:",
           "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
@@ -552,7 +408,7 @@
             "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n   // clustered over are untouched — the scan was derived, not a store.\n \n   // ── Stage 3: Invocation logging ──────────────────────────────────────────────\n-  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();\n+  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0 } : logInvocations();\n \n   // ── Stage 4: Shadow recall ──────────────────────────────────────────────────\n   // Must run after Stage 2 so this session's own relevance labels already exist:\n@@ -262,6 +262,7 @@ export function formatSessionEndLines(result: SessionEndV2Result): string[] {\n         .join(\", \")}`,\n     );\n   }\n-  lines.push(`Invocations: ${result.invocations.logged} logged`);\n+  const inv = result.invocations;\n+  lines.push(`Invocations: ${inv.logged} logged (${inv.skippedSessions} already logged, ${inv.unreadableSessions} unreadable, ${inv.appendFailures} append failed)`);\n   return lines;\n }\ndiff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n@@ -97,16 +102,16 @@ const SESSIONS_DB_DIR = join(homedir(), \".claude\", \"context-mode\", \"sessions\");\n  * Extract skill/mcp/command invocations from session .db files and append to JSONL log.\n  * Skips sessions already logged (deduplication by session_id).\n  */\n-export function logInvocations(): InvocationLogResult {\n-  if (!existsSync(SESSIONS_DB_DIR)) {\n-    return { logged: 0, skippedSessions: 0 };\n+export function logInvocations(sessionsDbDir: string = SESSIONS_DB_DIR, logPath: string = INVOCATION_LOG_PATH): InvocationLogResult {\n+  if (!existsSync(sessionsDbDir)) {\n+    return { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0 };\n   }\n \n   // Read already-logged session IDs\n   const loggedSessions = new Set<string>();\n-  if (existsSync(INVOCATION_LOG_PATH)) {\n+  if (existsSync(logPath)) {\n     try {\n-      const lines = readFileSync(INVOCATION_LOG_PATH, \"utf8\").split(\"\\n\").filter(Boolean);\n+      const lines = readFileSync(logPath, \"utf8\").split(\"\\n\").filter(Boolean);\n       for (const line of lines) {\n         try {\n           const entry = JSON.parse(line) as { session?: string };\n@@ -116,14 +121,17 @@ export function logInvocations(): InvocationLogResult {\n     } catch { /* file read error — proceed without dedup */ }\n   }\n \n-  const dbFiles = readdirSync(SESSIONS_DB_DIR).filter((f) => f.endsWith(\".db\"));\n+  const dbFiles = readdirSync(sessionsDbDir).filter((f) => f.endsWith(\".db\"));\n   let totalLogged = 0;\n   let skippedSessions = 0;\n+  let unreadableSessions = 0;\n+  let appendFailures = 0;\n \n   for (const file of dbFiles) {\n-    const filePath = join(SESSIONS_DB_DIR, file);\n+    const filePath = join(sessionsDbDir, file);\n+    let sessionDb: Database.Database | null = null;\n     try {\n-      const sessionDb = new Database(filePath, { readonly: true });\n+      sessionDb = new Database(filePath, { readonly: true });\n \n       const hasEvents = sessionDb\n         .prepare(\"SELECT name FROM sqlite_master WHERE type='table' AND name='session_events'\")\n@@ -183,12 +191,16 @@ export function logInvocations(): InvocationLogResult {\n         };\n \n         try {\n-          appendFileSync(INVOCATION_LOG_PATH, JSON.stringify(entry) + \"\\n\");\n+          appendFileSync(logPath, JSON.stringify(entry) + \"\\n\");\n           totalLogged++;\n-        } catch { /* append error — skip */ }\n+        } catch { appendFailures++; }\n       }\n-    } catch { /* session db read error — skip */ }\n+    } catch {\n+      unreadableSessions++;\n+      // A db that opened but could not be read must not stay open: on Windows it locks the file.\n+      try { sessionDb?.close(); } catch { /* already closed */ }\n+    }\n   }\n \n-  return { logged: totalLogged, skippedSessions };\n+  return { logged: totalLogged, skippedSessions, unreadableSessions, appendFailures };\n }\ndiff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..a4c66aa9 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n@@ -105,6 +108,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n     }\n \n     const fileSessionId = parsed.session_id ?? null;\n+    const entriesInFile = (parsed.entries ?? []).length;\n     const ids = (parsed.entries ?? [])\n       .map((e) => e.id)\n       .filter((id): id is number => typeof id === \"number\");\n@@ -113,7 +117,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n     // file cannot be shown to describe this session. Refusing is the safe\n     // default now that a rating carries weight.\n     if (!sessionId) {\n-      if (fileSessionId === null) return { ids, origin: \"file\" };\n+      if (fileSessionId === null) return { ids, origin: \"file\", entriesInFile, droppedEntries: entriesInFile - ids.length };\n       return {\n         ids: [],\n         origin: \"none\",\n@@ -121,7 +125,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n       };\n     }\n \n-    if (fileSessionId === sessionId) return { ids, origin: \"file\" };\n+    if (fileSessionId === sessionId) return { ids, origin: \"file\", entriesInFile, droppedEntries: entriesInFile - ids.length };\n \n     return {\n       ids: [],\n@@ -160,6 +164,9 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n  */\n export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"  \"): string[] {\n   const lines = [`${indent}Recalled ids: ${resolved.ids.length} from ${resolved.origin}`];\n+  if (resolved.droppedEntries) {\n+    lines.push(`${indent}Dropped ${resolved.droppedEntries} of ${resolved.entriesInFile} entries in the file: no numeric id, so they were not rated`);\n+  }\n   if (resolved.rejected) {\n     lines.push(`${indent}Ignored ${resolved.rejected.path}: ${resolved.rejected.reason}`);\n   }\ndiff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..6553c504 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -61,12 +61,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n     try {\n       let newestSession: string | null = null;\n       let newestMtime = 0;\n+      let unreadableDirs = 0;\n       for (const projectDir of readdirSync(transcriptsDir)) {\n         const full = join(transcriptsDir, projectDir);\n         let files: string[];\n         try {\n           files = readdirSync(full).filter((f) => f.endsWith(\".jsonl\"));\n-        } catch { continue; }\n+        } catch { unreadableDirs++; continue; }\n         for (const f of files) {\n           const s = statSync(join(full, f));\n           if (s.mtimeMs > newestMtime) {\n@@ -76,6 +77,14 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n         }\n       }\n \n+      // T-048: the newest-transcript judgement below rests on the directories that WERE readable.\n+      if (unreadableDirs > 0) {\n+        warnings.push({\n+          category: \"pipeline\",\n+          message: `${unreadableDirs} transcript director${unreadableDirs === 1 ? \"y\" : \"ies\"} under ${transcriptsDir} could not be read; the newest-transcript check covers only the rest.`,\n+        });\n+      }\n+\n       const hoursStale = (Date.now() - newestMtime) / (1000 * 60 * 60);\n \n       // The current session is still open and has no summary yet by definition,\ndiff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex b5e1deb0..82f89dcf 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -27,7 +27,15 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {\n       // Absent is not silent: the caller prints this instead of a blank block.\n       session.skippedReason = \"no .agents/SESSIONS/ dir — log not created\";\n     } else {\n-      const existing = findExistingSessionLog(options.projectRoot, sessionId);\n+      const unreadableLogs: string[] = [];\n+      const existing = findExistingSessionLog(options.projectRoot, sessionId, (name) => unreadableLogs.push(name));\n+      // T-048: a log that could not be read may have been this session's own; say so rather than mint a duplicate in silence.\n+      if (unreadableLogs.length > 0) {\n+        health.warnings.push({\n+          category: \"session-log\",\n+          message: `${unreadableLogs.length} session log(s) in .agents/SESSIONS could not be read (${unreadableLogs.join(\", \")}); the search for this session's existing log skipped them.`,\n+        });\n+      }\n       if (existing) {\n         session = { sessionId, ...existing, reused: true, skippedReason: null };\n       } else {\ndiff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex f2d4dda1..6ca81537 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {\n  */\n export function findExistingSessionLog(\n   projectRoot: string,\n-  sessionId: string | null\n+  sessionId: string | null,\n+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */\n+  onUnreadable?: (name: string) => void\n ): { sessionNumber: number; logPath: string } | null {\n   if (!sessionId) return null;\n   const sessionsDir = join(projectRoot, \".agents\", \"SESSIONS\");\n@@ -56,7 +58,7 @@ export function findExistingSessionLog(\n     if (!m) continue;\n     const logPath = join(sessionsDir, f);\n     let content: string;\n-    try { content = readFileSync(logPath, \"utf-8\"); } catch { continue; }\n+    try { content = readFileSync(logPath, \"utf-8\"); } catch { onUnreadable?.(f); continue; }\n     const idMatch = content.match(SESSION_ID_LINE);\n     if (!idMatch || idMatch[1] !== sessionId) continue;\n     const sessionNumber = parseInt(m[1], 10);\ndiff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n+    if (!existsSync(p)) { deleted++; continue; } // tracked but deleted in the working tree\n     let buf: Buffer;\n-    try { buf = readFileSync(p); } catch { continue; }\n-    if (buf.subarray(0, 8192).includes(0)) continue; // binary\n+    try { buf = readFileSync(p); } catch { unreadable++; continue; }\n+    if (buf.subarray(0, 8192).includes(0)) { binary++; continue; } // binary\n     scanned++;\n     const lines = buf.toString(\"utf-8\").split(/\\r?\\n/);\n     const found: number[] = [];\n@@ -236,8 +240,10 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n       hits.push(`${rel}:${found.slice(0, 5).join(\",\")}${found.length > 5 ? \",…\" : \"\"}`);\n     }\n   }\n+  const notScanned = deleted + unreadable + binary;\n+  const skippedNote = `${notScanned} tracked file${notScanned === 1 ? \"\" : \"s\"} not scanned (${deleted} deleted, ${unreadable} unreadable, ${binary} binary)`;\n   if (markers === 0) {\n-    return { name, report: true, severity: \"pass\", message: `0 conflict markers in ${scanned} tracked text files` };\n+    return { name, report: true, severity: \"pass\", message: `0 conflict markers in ${scanned} tracked text files; ${skippedNote}` };\n   }\n-  return { name, report: true, severity: \"issue\", message: `${markers} conflict marker line(s) in ${hits.length} of ${scanned} tracked text files: ${hits.join(\"; \")}` };\n+  return { name, report: true, severity: \"issue\", message: `${markers} conflict marker line(s) in ${hits.length} of ${scanned} tracked text files: ${hits.join(\"; \")}; ${skippedNote}` };\n }\ndiff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..3c5f1df3 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n+    ignoredSeatNames = Array.isArray(seats.seats) ? seats.seats.length - known.length : 0;\n   } catch (error) {\n     return issue(`worktree-seats.json did not parse: ${error instanceof Error ? error.message : String(error)}`);\n   }\n@@ -57,6 +60,7 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n   }\n \n   const problems: string[] = [];\n+  if (ignoredSeatNames > 0) problems.push(`worktree-seats.json has ${ignoredSeatNames} seat name(s) that are not strings and were ignored`);\n   if (!hub.readers || typeof hub.readers !== \"object\" || Array.isArray(hub.readers)) {\n     problems.push(\"no readers map (ob_start reads readers)\");\n   } else {\ndiff --git a/open-brain/src/server.ts b/open-brain/src"
           ],
           "id": "T10",
-          "observable": "#290 equals QA 254's ACCEPT. Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk."
+          "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk."
         },
         {
           "hunks": [

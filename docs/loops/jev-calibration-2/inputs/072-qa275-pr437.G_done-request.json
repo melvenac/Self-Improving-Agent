@@ -17,32 +17,10 @@
     "docs/loops/t235-p2-7-plan.md"
   ],
   "label": "REJECT",
-  "leak_details": [
-    {
-      "field": "request.state.requirement_rows[0].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[1].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[2].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    },
-    {
-      "field": "request.state.requirement_rows[3].hunks[0]",
-      "phrase": "rejected",
-      "source": "diff"
-    }
-  ],
-  "leak_hits": [
-    "rejected"
-  ],
+  "leak_details": [],
+  "leak_hits": [],
   "merge_commit": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+  "plan_redacted_sentences": [],
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
   "request": {
     "model": "jev-latest",
