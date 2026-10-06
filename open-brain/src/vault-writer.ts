@@ -43,46 +43,7 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");        // trim leading/trailing hyphens
 }
 
-// ─── parseFrontmatter ────────────────────────────────────────────────────────
-
-export function parseFrontmatter(raw: string): Record<string, unknown> {
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return {};
-
-  const result: Record<string, unknown> = {};
-  const lines = match[1].split(/\r?\n/);
-
-  for (const line of lines) {
-    const colonIdx = line.indexOf(":");
-    if (colonIdx === -1) continue;
-
-    const key = line.slice(0, colonIdx).trim();
-    const value = line.slice(colonIdx + 1).trim();
-
-    if (!key) continue;
-
-    // Array: [a, b, c]
-    if (value.startsWith("[") && value.endsWith("]")) {
-      const inner = value.slice(1, -1);
-      if (inner.trim() === "") {
-        result[key] = [];
-      } else {
-        result[key] = inner.split(",").map((s) => s.trim());
-      }
-      continue;
-    }
-
-    // Number
-    if (/^-?\d+(\.\d+)?$/.test(value)) {
-      result[key] = Number(value);
-      continue;
-    }
-
-    result[key] = value;
-  }
-
-  return result;
-}
+export { parseFrontmatter } from "./shared/parse-frontmatter.js";
 
 // ─── writeExperience ─────────────────────────────────────────────────────────
 
