@@ -56,7 +56,7 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
   harness shadow-verdict summary
   harness validate plan <file>
   harness validate gate-record <file>
-  harness count-attempts [--ledger <file>] [--records <dir>] [--max <n>] [--repo <dir>]
+  harness count-attempts [--ledger <file>] [--records <dir>] [--max <n>] [--runlist <runlist.json>] [--repo <dir>]
   harness shadow-done --pr <n> --merge-commit <sha> --scored-sha <sha> [--base-sha <sha>] --dt <D_t.json>
                       (--checks-e-t <E_t.json> | --checks none) [--mode live|dry-run] [--records <dir>] [--ledger <file>]
   harness shadow-done --request <cal2-input.json> --policy <policy.json> --phase dev|heldout
@@ -415,13 +415,22 @@ async function cmdPlanGate(argv: readonly string[]): Promise<number> {
 function cmdCountAttempts(argv: readonly string[]): number {
   const flags = flagMap(argv, true);
   for (const key of flags.keys()) {
-    if (key !== "ledger" && key !== "records" && key !== "repo" && key !== "max") throw new UsageError(`unrecognised flag "--${key}"`);
+    if (key !== "ledger" && key !== "records" && key !== "repo" && key !== "max" && key !== "runlist") {
+      throw new UsageError(`unrecognised flag "--${key}"`);
+    }
   }
   const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
   const ledger = typeof flags.get("ledger") === "string" ? resolve(flags.get("ledger") as string) : join(repo, SLICE_RECORDS_DIR, SLICE_LEDGER_FILE);
   const records = typeof flags.get("records") === "string" ? resolve(flags.get("records") as string) : join(repo, "docs/loops");
   const maxFlag = flags.get("max");
-  const max = typeof maxFlag === "string" ? Number.parseInt(maxFlag, 10) : MAX_ATTEMPTS_TOTAL;
+  const runlistFlag = flags.get("runlist");
+  let max = typeof maxFlag === "string" ? Number.parseInt(maxFlag, 10) : MAX_ATTEMPTS_TOTAL;
+  if (maxFlag === undefined && typeof runlistFlag === "string") {
+    const rl = JSON.parse(readFileSync(resolve(runlistFlag), "utf-8")) as {
+      phases: { dev: unknown[]; heldout: unknown[] };
+    };
+    max = rl.phases.dev.length + rl.phases.heldout.length;
+  }
   if (!Number.isInteger(max) || max < 1) throw new UsageError("--max must be a positive integer");
   const report = countAttempts({ ledger, recordsDir: records, max, repoRoot: repo });
   process.stdout.write(`attempts: ${report.total}\n`);

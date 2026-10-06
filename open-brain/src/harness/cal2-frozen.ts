@@ -3,7 +3,7 @@
  * Does not rebuild from git or D_t.
  */
 
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import {
@@ -36,6 +36,9 @@ import {
   policyHash,
   type ShadowMode,
 } from "./shadow-gates.js";
+
+/** Deterministic pre-send ceiling for calibration 2 frozen wire bodies (bytes). */
+export const CAL2_MAX_WIRE_BYTES = 90_000;
 
 export const CAL2_INPUT_WRAPPER_KEYS = new Set([
   "base_sha",
@@ -135,7 +138,7 @@ export class FrozenWireTransport implements GateTransport {
     this.wireBody = wireBody;
     this.mode = mode;
     this.env = env;
-    this.fetchImpl = fetchImpl;
+    this.fetchImpl = fetchImpl ?? globalThis.fetch;
     this.sink = sink;
     this.name = mode === "live" ? "jev-frozen-wire" : "dry-run-frozen-wire";
   }
@@ -159,7 +162,8 @@ export class FrozenWireTransport implements GateTransport {
     if (typeof this.fetchImpl !== "function") {
       throw new GateUnavailable("no fetch implementation for live frozen request");
     }
-    const response = await this.fetchImpl(JEV_ENDPOINT, {
+    const fetchImpl = this.fetchImpl;
+    const response = await fetchImpl(JEV_ENDPOINT, {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: new Uint8Array(this.wireBody),
@@ -168,7 +172,7 @@ export class FrozenWireTransport implements GateTransport {
     const raw = await response.text().catch(() => "");
     const safe = redact(raw, this.env).slice(0, 2000);
     if (!response.ok) {
-      throw new GateCallFailed("transport", response.status, `developer-done: HTTP ${response.status}`, safe);
+      throw classifyFrozenHttp(response.status, raw, safe);
     }
     let parsed: unknown;
     try {
@@ -190,6 +194,49 @@ export class FrozenWireTransport implements GateTransport {
       usage: (parsed as { usage?: Record<string, unknown> }).usage ?? null,
     };
   }
+}
+
+/** Map HTTP status + body for frozen wire transport (calibration 2 QA runner). */
+export function classifyFrozenHttp(status: number, raw: string, safeDetail: string): GateCallFailed {
+  if (status === 401 || status === 403) {
+    return new GateCallFailed(
+      "auth",
+      status,
+      `developer-done: HTTP ${status} — key rejected or forbidden; not retried`,
+      safeDetail,
+    );
+  }
+  if (status === 400) {
+    try {
+      const parsed = JSON.parse(raw) as { detail?: { error_type?: string } };
+      if (parsed.detail?.error_type === "max_tokens_exceeded") {
+        return new GateCallFailed(
+          "request-invalid",
+          400,
+          "developer-done: HTTP 400 max_tokens_exceeded — request too large for the API; not retried",
+          safeDetail,
+        );
+      }
+    } catch {
+      /* fall through */
+    }
+    return new GateCallFailed("request-invalid", 400, `developer-done: HTTP 400`, safeDetail);
+  }
+  if (status === 429) {
+    return new GateCallFailed("rate-limited", 429, "developer-done: HTTP 429 — rate limited", safeDetail);
+  }
+  if (status === 529) {
+    return new GateCallFailed("overloaded", 529, "developer-done: HTTP 529 — overloaded", safeDetail);
+  }
+  if (status >= 500) {
+    return new GateCallFailed("transport", status, `developer-done: HTTP ${status} — server error`, safeDetail);
+  }
+  return new GateCallFailed(
+    "unexpected-status",
+    status,
+    `developer-done: HTTP ${status}`,
+    safeDetail,
+  );
 }
 
 export type Cal2RunlistPhase = "dev" | "heldout";
@@ -358,6 +405,49 @@ export async function runShadowDoneFrozen(options: RunShadowDoneFrozenOptions): 
   const recordPath = allocateRecordPath(recordsDir, stem, "G_done", at);
   const subject: Subject = { gate: "developer-done", key: scored, blob: createHash("sha256").update(wireBody).digest("hex") };
 
+  const caseId = typeof parsed.case_id === "string" ? parsed.case_id : options.caseId;
+
+  if (wireBody.length > CAL2_MAX_WIRE_BYTES) {
+    const requestObj = JSON.parse(wireBody.toString("utf-8")) as Record<string, unknown>;
+    const refused: ShadowDoneRecord = {
+      gate: "developer-done",
+      loop: plan.loop,
+      mode: options.mode,
+      sent: false,
+      requested_at: at.toISOString(),
+      answered_at: null,
+      model_requested: String(requestObj.model ?? "jev-latest"),
+      model_resolved: null,
+      request: requestObj,
+      answer: null,
+      usage: null,
+      decision: null,
+      runtime_action: SHADOW_RUNTIME_ACTION,
+      note: `cal2 request size ${wireBody.length} bytes exceeds ceiling ${CAL2_MAX_WIRE_BYTES}; nothing sent`,
+      source: "seat",
+      plan_provenance: "written-before",
+      attempt_id: randomUUID(),
+      subject,
+      attempt: 1,
+      retry_of: null,
+      outcome_class: "request-invalid",
+      attempted_at: options.mode === "live" ? at.toISOString() : null,
+      policy_hash: policyHash(dirname(policyAbs), basename(policyAbs)),
+      pr,
+      merge_commit: merge,
+      scored_sha: scored,
+      base_sha: base,
+      dt: { path: inputRel, blob: gitBlobSha(readFileSync(inputAbs)) },
+      checks_source: checksSource,
+      checks_passed: checksPassed,
+      diffstat: Array.isArray(state.diffstat) ? (state.diffstat as string[]) : [],
+      ...(caseId !== undefined ? { cal2_case_id: caseId } : {}),
+    };
+    const safe = redact(refused, env);
+    writeSliceRecord(recordPath, safe);
+    return { recordPath, record: safe, decision: null, exitCode: 1, wireBody };
+  }
+
   const transport =
     options.transport ??
     new FrozenWireTransport(wireBody, options.mode, env, options.fetchImpl);
@@ -390,6 +480,8 @@ export async function runShadowDoneFrozen(options: RunShadowDoneFrozenOptions): 
         });
 
   const requestObj = JSON.parse(wireBody.toString("utf-8")) as Record<string, unknown>;
+  const responseDetail =
+    result.error instanceof GateCallFailed && result.error.detail ? result.error.detail.slice(0, 4000) : undefined;
   const record: ShadowDoneRecord = {
     gate: "developer-done",
     loop: plan.loop,
@@ -422,6 +514,8 @@ export async function runShadowDoneFrozen(options: RunShadowDoneFrozenOptions): 
     checks_source: checksSource,
     checks_passed: checksPassed,
     diffstat: Array.isArray(state.diffstat) ? (state.diffstat as string[]) : [],
+    ...(caseId !== undefined ? { cal2_case_id: caseId } : {}),
+    ...(responseDetail !== undefined ? { response_detail: responseDetail } : {}),
   };
 
   const safe = redact(record, env);

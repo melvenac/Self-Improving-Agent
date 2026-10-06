@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 import { HERE, REPO, POLICY_REL, git, readJson, stable, writeJson } from "./lib.mjs";
 import { derivePlanFromDispatch } from "./dispatch-derive.mjs";
 import { filterPathList, filterUnifiedDiff } from "./diff-filter.mjs";
+import { requirementRowsWithHunks, trimRequirementRows } from "./diff-hunks.mjs";
+import { CAL2_MAX_WIRE_BYTES, sliceTopLevelRequestBytes } from "../../../open-brain/src/harness/cal2-frozen.ts";
 import {
   leakHitsDetailedFromRequestDiff,
   leakHitsFromRequest,
@@ -36,6 +38,7 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
   const rawDiff = gitFn(["diff", `${base}..${candidate}`, "-U3"], { allowFail: true }) ?? "";
   if (rawDiff.trim() === "") return { refuse: "empty-diff" };
   const { diff, excluded_paths: diff_paths_excluded } = filterUnifiedDiff(rawDiff);
+  const diffPathsExcluded = diff_paths_excluded;
   if (diff.trim() === "") return { refuse: "empty-diff-after-filter", diff_paths_excluded };
   const planText =
     (c.plan_blob ? gitFn(["cat-file", "-p", c.plan_blob], { allowFail: true }) : null) ??
@@ -71,13 +74,8 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
   } catch {
     return { refuse: "diffstat-failed" };
   }
-  const diffHunks = diff.slice(0, 16_000);
-  const requirementRows = plan.acceptance.map((row) => ({
-    id: row.id,
-    observable: row.observable,
-    hunks: diffHunks ? [diffHunks] : [],
-  }));
-  const payload = {
+  let requirementRows = requirementRowsWithHunks(plan, diff, diffstat);
+  const payloadFor = (rows) => ({
     gate: "developer-done",
     loop: plan.loop,
     model: "jev-latest",
@@ -86,7 +84,7 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
       plan,
       candidate,
       diffstat,
-      requirement_rows: requirementRows,
+      requirement_rows: rows,
       checks,
       prior_failures: [...(plan.repair_targets ?? [])],
       scored_diff: {
@@ -96,12 +94,41 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
         merge_commit: c.merge_commit ?? candidate,
       },
     },
+  });
+  const wireBytesFor = (request, meta) => {
+    const file = stable({ ...meta, leak_hits: [], leak_details: [], request });
+    return sliceTopLevelRequestBytes(file).length;
   };
-  const request = buildJevRequest(payload);
+  const metaStub = {
+    case_id: c.case_id,
+    case_no: c.case_no,
+    label: c.label,
+    base_sha: base,
+    candidate_sha: candidate,
+    merge_commit: c.merge_commit,
+    policy: POLICY_REL,
+    checks_hint: hint,
+    diff_paths_excluded: diffPathsExcluded,
+    plan_redacted_sentences: redacted_sentences,
+  };
+  let perRowBudget = 16_000;
+  let request;
+  let wireBytes = Infinity;
+  for (let pass = 0; pass < 40 && wireBytes > CAL2_MAX_WIRE_BYTES; pass += 1) {
+    requirementRows = trimRequirementRows(requirementRowsWithHunks(plan, diff, diffstat), perRowBudget);
+    request = buildJevRequest(payloadFor(requirementRows));
+    wireBytes = wireBytesFor(request, metaStub);
+    if (wireBytes <= CAL2_MAX_WIRE_BYTES) break;
+    perRowBudget = Math.max(400, Math.floor(perRowBudget * 0.82));
+  }
+  if (wireBytes > CAL2_MAX_WIRE_BYTES) {
+    return { refuse: `request-wire-exceeds-${CAL2_MAX_WIRE_BYTES}`, wire_bytes: wireBytes };
+  }
+  const diffHunksSample = requirementRows.flatMap((r) => r.hunks).join("\n").slice(0, 16_000);
   const leak_hits = leakHitsFromRequest(request);
   const leak_details = leakHitsDetailedFromRequestDiff(request);
   const diffLeaksBeforeRecordFilter = verdictLeaksFromDiffText(rawDiff.slice(0, 16_000));
-  const diffLeaksAfterRecordFilter = verdictLeaksFromDiffText(diffHunks);
+  const diffLeaksAfterRecordFilter = verdictLeaksFromDiffText(diffHunksSample);
 
   return {
     request,

@@ -94,10 +94,9 @@ describe("jev-calibration-2 runner (frozen wire)", () => {
     ).toThrow(/explicit --phase heldout/);
   });
 
-  it("reports request size distribution over frozen inputs", () => {
+  it("reports request size distribution over frozen inputs (all under 90 KB ceiling)", () => {
     const stats = reportCal2RequestSizes(ROOT, "docs/loops/jev-calibration-2/inputs");
     expect(stats.n).toBe(87);
-    expect(stats.median).toBeGreaterThan(50_000);
-    expect(stats.max).toBeGreaterThan(400_000);
+    expect(stats.max).toBeLessThanOrEqual(90_000);
   });
 });
