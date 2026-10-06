@@ -52,6 +52,27 @@ describe("session-hook-claim interleave (T-235 P2-7 r6 D3)", () => {
     expect(existsSync(lock)).toBe(true);
   });
 
+  it("r6 doubles gate: sweep restat gap must not rename a reclaim wx claim (GREEN on lock+snap)", () => {
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const race = join(dir, "sessionStart-race-sid.claim");
+    const other = join(dir, "sessionStart-other-0.claim");
+    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 600_000) / 1000;
+    writeFileSync(race, "old\n");
+    writeFileSync(other, "keep\n");
+    utimesSync(race, stale, stale);
+
+    setClaimTestSeamsForTest({
+      sweepAfterRestatBeforeRename: () => {
+        writeFileSync(race, `${Date.now()}\t${process.pid}\n`, { flag: "wx" });
+      },
+    });
+
+    sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, other);
+    expect(existsSync(race)).toBe(true);
+    expect(tryClaimHookRun(home, "sessionStart", "race-sid")).toBe("duplicate");
+  });
+
   it("F1 gate r6: cross-session sweep interleave still lets victim claim", () => {
     const dir = join(home, ".claude", "open-brain", "hook-claims");
     mkdirSync(dir, { recursive: true });

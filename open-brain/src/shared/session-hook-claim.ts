@@ -118,6 +118,7 @@ export type ClaimTestSeams = {
   breakerAfterStatBeforeBreak?: (lockPath: string) => void;
   breakerAfterRestatBeforeUnlink?: (lockPath: string) => void;
   sweepAfterStatBeforeRemove?: (claimPath: string) => void;
+  sweepAfterRestatBeforeRename?: (claimPath: string) => void;
 };
 
 let claimTestSeams: ClaimTestSeams | undefined;
@@ -206,7 +207,7 @@ function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
       mtimeMs = statSync(path).mtimeMs;
     } catch (err) {
       const code = errno(err);
-      if (code === "ENOENT") return "reclaimed";
+      if (code === "ENOENT") return "duplicate";
       if (code === "EPERM" || code === "EBUSY") return "duplicate";
       throw err;
     }
@@ -230,18 +231,28 @@ function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
   }
 }
 
-/** Remove an expired claim without taking its reclaim wx lock (cross-session liveness). */
+/** Remove an expired claim only while holding that claim generation's reclaim wx lock. */
 function sweepRemoveExpiredClaimFile(claimPath: string, ttlMs: number): boolean {
-  const before = snapStat(claimPath);
-  if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
-  claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
-  const after = snapStat(claimPath);
-  if (!after || !sameSnap(before, after)) return false;
-  if (Date.now() - after.mtimeMs <= ttlMs) return false;
-  const aside = `${claimPath}.swept.${process.pid}`;
-  if (renameExclusive(claimPath, aside) === "lost") return false;
-  unlinkQuiet(aside);
-  return true;
+  const { ok, lockPath } = tryAcquireReclaimLock(claimPath);
+  if (!ok) return false;
+  try {
+    const before = snapStat(claimPath);
+    if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
+    claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
+    const after = snapStat(claimPath);
+    if (!after || !sameSnap(before, after)) return false;
+    if (Date.now() - after.mtimeMs <= ttlMs) return false;
+    claimTestSeams?.sweepAfterRestatBeforeRename?.(claimPath);
+    const afterSeam = snapStat(claimPath);
+    if (!afterSeam || !sameSnap(before, afterSeam)) return false;
+    if (Date.now() - afterSeam.mtimeMs <= ttlMs) return false;
+    const aside = `${claimPath}.swept.${process.pid}`;
+    if (renameExclusive(claimPath, aside) === "lost") return false;
+    unlinkQuiet(aside);
+    return true;
+  } finally {
+    releaseReclaimLock(lockPath);
+  }
 }
 
 function sweepRemoveStaleTombstone(tombPath: string, ttlMs: number): boolean {
