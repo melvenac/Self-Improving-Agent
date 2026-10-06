@@ -33,7 +33,7 @@
 
 import type Database from "better-sqlite3";
 import { recordRecallEvent } from "../db-v2.js";
-import { sanitizeCommandLogText } from "./command-log.js";
+import { formatCommandFireLog } from "./command-log.js";
 
 /** The three states of one invocation. See the module header. */
 export type FireState = "not-asked" | "silent" | "injected";
@@ -75,19 +75,18 @@ export function recordFire(db: Database.Database, fire: FireRecord): void {
   }
 
   const now = new Date().toISOString();
-  const commandLog = sanitizeCommandLogText(fire.command);
-  const queryLog = fire.query === "" ? "" : sanitizeCommandLogText(fire.query);
+  const commandLog = formatCommandFireLog(fire.command);
   const insert = db.prepare(
     `INSERT INTO trigger_fires (session_uuid, command, query, state, injected_ids, created_at)
      VALUES (?, ?, ?, ?, ?, ?)`,
   );
 
   db.transaction(() => {
-    insert.run(fire.sessionUuid, commandLog, queryLog, fire.state, JSON.stringify(fire.injectedIds), now);
+    insert.run(fire.sessionUuid, commandLog, fire.query, fire.state, JSON.stringify(fire.injectedIds), now);
     if (fire.state === "injected") {
       // `hook`, never `explicit`: nobody asked. R6, and the reason is in
       // db-v2's RECALL_TRIGGERS comment.
-      recordRecallEvent(db, fire.sessionUuid, queryLog, fire.injectedIds, "hook");
+      recordRecallEvent(db, fire.sessionUuid, fire.query, fire.injectedIds, "hook");
 
       // R7 (amendment 1): an INJECTED entry bumps the recall counters; a
       // looked-at one does not. The counter means "this reached an agent",

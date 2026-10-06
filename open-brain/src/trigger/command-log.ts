@@ -1,121 +1,26 @@
-/** Fixed marker substituted for redacted secret material in trigger fire logs. */
-export const COMMAND_LOG_REDACTED = "[REDACTED]";
+import { createHash } from "node:crypto";
+import { basename } from "node:path";
 
-export const COMMAND_LOG_MAX_LEN = 200;
+const PROGRAM_RE = /^[A-Za-z0-9._-]{1,40}$/;
+const SUBCOMMAND_RE = /^[a-z][a-z0-9-]{0,30}$/;
 
-const TOKEN_PREFIXES = /\b(?:ghp_|gho_|github_pat_|sk-|xox[bpas]-)\S+/gi;
-
-const GIT_SHA_40 = /\b[0-9a-fA-F]{40}\b/g;
-const GIT_SHA_64 = /\b[0-9a-fA-F]{64}\b/g;
-
-function redactKnownPrefixes(s: string): string {
-  return s.replace(TOKEN_PREFIXES, COMMAND_LOG_REDACTED);
+function hash12(full: string): string {
+  return createHash("sha256").update(full, "utf8").digest("hex").slice(0, 12);
 }
 
-function redactUrlSecrets(s: string): string {
-  let out = s.replace(
-    /([a-z][a-z0-9+.-]*):\/\/([^/\s@]+):([^@\s/]+)@/gi,
-    `$1://${COMMAND_LOG_REDACTED}@`,
-  );
-  out = out.replace(/x-access-token:([^@\s/]+)@/gi, `x-access-token:${COMMAND_LOG_REDACTED}@`);
-  return out;
-}
-
-function redactHeaders(s: string): string {
-  let out = s.replace(/\bAuthorization:\s*[^\n]+/gi, `Authorization: ${COMMAND_LOG_REDACTED}`);
-  out = out.replace(/\bBearer\s+\S+/gi, `Bearer ${COMMAND_LOG_REDACTED}`);
-  out = out.replace(/\bX-[A-Za-z-]*Api[A-Za-z-]*-Key:\s*\S+/gi, (m) => m.replace(/:\s*\S+$/, `: ${COMMAND_LOG_REDACTED}`));
-  return out;
-}
-
-function redactCliFlags(s: string): string {
-  let out = s.replace(
-    /--(token|key|password|api[-_]?key|access-token|client-secret|secret)\s*(?:=\s*|\s+)(\S+)/gi,
-    `--$1 ${COMMAND_LOG_REDACTED}`,
-  );
-  out = out.replace(/(?:^|\s)-p(\S+)/g, (m, pass) => m.replace(pass, COMMAND_LOG_REDACTED));
-  out = out.replace(/\bcurl\b([^;|]*?)-u\s+(\S+)/gi, (m, mid, cred) => m.replace(cred, COMMAND_LOG_REDACTED));
-  return out;
-}
-
-function redactEnvAssignments(s: string): string {
-  return s.replace(
-    /\b([a-z0-9_]*(?:password|api_key|github_token|access_token|client_secret|secret|token))\s*=\s*(\S+)/gi,
-    `$1=${COMMAND_LOG_REDACTED}`,
-  );
-}
-
-function redactJsonAndColonSecrets(s: string): string {
-  let out = s.replace(
-    /"([^"]*(?:key|token|secret|password)[^"]*)"\s*:\s*"([^"]+)"/gi,
-    `"$1": "${COMMAND_LOG_REDACTED}"`,
-  );
-  out = out.replace(
-    /\b([a-z_]*(?:api_key|apikey|access_token|client_secret)[a-z_]*)\s*:\s*(\S+)/gi,
-    `$1: ${COMMAND_LOG_REDACTED}`,
-  );
-  return out;
-}
-
-/** Redact quoted values only when tied to a secret-named flag or assignment. */
-function redactQuotedSecrets(s: string): string {
-  let out = s.replace(
-    /(--(?:password|secret|token|api[-_]?key)|\b[a-z0-9_]*(?:password|api_key|token|secret)[a-z0-9_]*\s*=)\s*'([^']*)'/gi,
-    `$1 '${COMMAND_LOG_REDACTED}'`,
-  );
-  out = out.replace(
-    /(--(?:password|secret|token|api[-_]?key)|\b[a-z0-9_]*(?:password|api_key|token|secret)[a-z0-9_]*\s*=)\s*"([^"]*)"/gi,
-    `$1 "${COMMAND_LOG_REDACTED}"`,
-  );
-  return out;
-}
-
-function shieldGitShas(s: string): { text: string; restore: (t: string) => string } {
-  const placeholders = new Map<string, string>();
-  let n = 0;
-  const mark = (sha: string) => {
-    const token = `__GIT_SHA_${n++}__`;
-    placeholders.set(token, sha);
-    return token;
-  };
-  let text = s.replace(GIT_SHA_64, mark);
-  text = text.replace(GIT_SHA_40, mark);
-  const restore = (t: string) => {
-    let out = t;
-    for (const [token, sha] of placeholders) out = out.replaceAll(token, sha);
-    return out;
-  };
-  return { text, restore };
-}
-
-function redactLongOpaqueRuns(s: string): string {
-  const { text: shielded, restore } = shieldGitShas(s);
-  let out = shielded.replace(/\b[A-Za-z0-9+/]{40,}={0,2}\b/g, COMMAND_LOG_REDACTED);
-  out = out.replace(/\b[0-9a-fA-F]{32}\b/gi, COMMAND_LOG_REDACTED);
-  out = out.replace(/\b[0-9a-fA-F]{33,39}\b/gi, COMMAND_LOG_REDACTED);
-  out = out.replace(/\b[0-9a-fA-F]{41,63}\b/gi, COMMAND_LOG_REDACTED);
-  out = out.replace(/\b[0-9a-fA-F]{65,}\b/gi, COMMAND_LOG_REDACTED);
-  return restore(out);
+function firstTokens(command: string): string[] {
+  return command.trim().split(/\s+/).filter(Boolean);
 }
 
 /**
- * Bounded, redacted command text for `trigger_fires` (and derived `recall_log.query`).
- * `recall_log` does not store the raw command — only the derived query — but the query
- * can still echo secret fragments from the command, so apply the same treatment.
+ * Census-safe `trigger_fires.command` — program, optional subcommand, and a stable
+ * hash. No secret-bearing text from the original command is stored.
  */
-export function sanitizeCommandLogText(text: string): string {
-  let s = text;
-  s = redactUrlSecrets(s);
-  s = redactHeaders(s);
-  s = redactCliFlags(s);
-  s = redactEnvAssignments(s);
-  s = redactJsonAndColonSecrets(s);
-  s = redactQuotedSecrets(s);
-  s = redactKnownPrefixes(s);
-  s = redactLongOpaqueRuns(s);
-
-  if (s.length > COMMAND_LOG_MAX_LEN) {
-    s = `${s.slice(0, COMMAND_LOG_MAX_LEN)}…`;
-  }
-  return s;
+export function formatCommandFireLog(command: string): string {
+  const full = command.trim();
+  const tokens = firstTokens(full);
+  const programRaw = tokens[0] ? basename(tokens[0].replace(/\\/g, "/")) : "";
+  const program = PROGRAM_RE.test(programRaw) ? programRaw : "?";
+  const sub = tokens.length >= 2 && SUBCOMMAND_RE.test(tokens[1]) ? ` ${tokens[1]}` : "";
+  return `${program}${sub} #${hash12(full)}`;
 }
