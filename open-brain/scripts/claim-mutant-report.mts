@@ -1,16 +1,18 @@
 /**
- * QA evidence: doubles per 100 on the overlapping barrier row after a named mutant.
- * Usage: npx tsx scripts/claim-mutant-report.mts <no-lock|skip-self|sweep-stat-unlink> [trials] [mode]
+ * QA evidence: barrier trials after a named mutant (isolated build; checkout untouched).
+ * Usage: npx tsx scripts/claim-mutant-report.mts <no-lock|skip-self|sweep-stat-unlink|m2-no-restat-snap> [trials] [mode]
  */
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { spawnAsync } from "../tests/spawn-async.js";
 import { runClaimBarrierTrials } from "../tests/shared/claim-barrier-trials.js";
+import { applyM2PatchFromSource } from "./claim-isolated-build.mts";
 
 const obRoot = join(import.meta.dirname, "..");
 const srcPath = join(obRoot, "src/shared/session-hook-claim.ts");
-const built = join(obRoot, "build/shared/session-hook-claim.js");
 const mutant = process.argv[2];
 const trials = Number(process.argv[3] ?? 100);
 const mode = (process.argv[4] ?? (mutant === "sweep-stat-unlink" ? "crashed-lock" : "stale")) as
@@ -18,7 +20,9 @@ const mode = (process.argv[4] ?? (mutant === "sweep-stat-unlink" ? "crashed-lock
   | "stale";
 
 if (!mutant) {
-  console.error("usage: claim-mutant-report.mts <no-lock|skip-self|sweep-stat-unlink> [trials] [mode]");
+  console.error(
+    "usage: claim-mutant-report.mts <no-lock|skip-self|sweep-stat-unlink|m2-no-restat-snap> [trials] [mode]",
+  );
   process.exit(1);
 }
 
@@ -58,6 +62,8 @@ if (mutant === "no-lock") {
     `/** Remove an expired claim only while holding that claim generation's reclaim wx lock. */
 ${sweepMutant}`,
   );
+} else if (mutant === "m2-no-restat-snap") {
+  patched = applyM2PatchFromSource(patched);
 } else {
   console.error(`unknown mutant: ${mutant}`);
   process.exit(1);
@@ -68,17 +74,40 @@ if (patched === original) {
   process.exit(1);
 }
 
-writeFileSync(srcPath, patched);
+const work = mkdtempSync(join(tmpdir(), "ob-claim-mutant-"));
+const outDir = join(work, "build/shared");
+const inDir = join(work, "src/shared");
+mkdirSync(outDir, { recursive: true });
+mkdirSync(inDir, { recursive: true });
+writeFileSync(join(inDir, "session-hook-claim.ts"), patched);
+cpSync(join(obRoot, "src/shared/active-session.ts"), join(inDir, "active-session.ts"));
+const tsconfig = {
+  compilerOptions: {
+    target: "ES2022",
+    module: "NodeNext",
+    moduleResolution: "NodeNext",
+    outDir: join(work, "build"),
+    rootDir: join(work, "src"),
+    strict: true,
+    skipLibCheck: true,
+    types: ["node"],
+    typeRoots: [join(obRoot, "node_modules/@types")],
+  },
+  include: ["src/shared/session-hook-claim.ts", "src/shared/active-session.ts"],
+};
+writeFileSync(join(work, "tsconfig.json"), JSON.stringify(tsconfig, null, 2));
+
 const tsc = join(obRoot, "node_modules/typescript/lib/tsc.js");
-const tscRun = await spawnAsync(process.execPath, [tsc, "-p", join(obRoot, "tsconfig.json")], { cwd: obRoot });
+const tscRun = await spawnAsync(process.execPath, [tsc, "-p", join(work, "tsconfig.json")], { cwd: work });
 if (tscRun.status !== 0) {
-  writeFileSync(srcPath, original);
+  rmSync(work, { recursive: true, force: true });
   console.error(tscRun.stderr || tscRun.stdout);
   process.exit(1);
 }
 
+const built = join(outDir, "session-hook-claim.js");
 try {
-  const r = await runClaimBarrierTrials(built, 8, trials, mode);
+  const r = await runClaimBarrierTrials(pathToFileURL(built).href, 8, trials, mode);
   console.log(
     JSON.stringify({
       mutant,
@@ -92,6 +121,5 @@ try {
     }),
   );
 } finally {
-  writeFileSync(srcPath, original);
-  await spawnAsync(process.execPath, [tsc, "-p", join(obRoot, "tsconfig.json")], { cwd: obRoot });
+  rmSync(work, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
 }

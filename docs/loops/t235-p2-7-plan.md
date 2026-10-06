@@ -27,7 +27,9 @@
 
 Deterministic gates: `session-hook-claim-interleave.test.ts` (F1/F2, r6 doubles sweep-restat seam); mutants `claim-mutant-report.mts` (R7).
 
-**Known limits (advisory review, r7 — documented only):** **F3:** generation-lock / breaker exclusion holds only while no participant stalls past `RECLAIM_LOCK_TTL_MS`. **F5:** a crash while holding a generation reclaim lock can yield up to ~60 s of `duplicate` for that session until the lock is stale enough to break.
+**Known limits (advisory review — documented only):** **F3:** generation-lock / breaker exclusion holds only while no participant stalls past `RECLAIM_LOCK_TTL_MS`. **F4 (r8):** a crashed generation reclaim lock plus crashed `.breaker` and `.rot.*` aux files can wedge reclaim until manual cleanup (needs three crashes in tight windows; r7 aux sweep was removed as unsafe). **F5:** a crash while holding a generation reclaim lock can yield up to ~60 s of `duplicate` for that session until the lock is stale enough to break.
+
+**r8 (r7 evidence cleanup, frozen pending CI):** Removed `sweepRemoveAbandonedAuxWx` and `sweepSkipBreakerAndRot`. F1 RED/GREEN uses **M2** mutant (post-restat snap removed) via isolated temp build (`claim-m2-f1-gate.mts`); no checkout mutation. F9 cross-session row is GREEN smoke only. `claim-r7-gate-check.mts` deleted. Production test-only shape exports removed from `session-hook-claim.ts`.
 
 ## Live counts (QA PC)
 

@@ -16,7 +16,7 @@ describe("session-hook-claim cross-session (T-235 P2-7 r7 F9)", () => {
   }, 120_000);
 
   it(
-    "F9: N=8 mixed=2 cross-session row has 0 race-sid doubles/zero and other sessions claim",
+    "F9 GREEN smoke: N=8 mixed=2 cross-session row (20 trials, built module)",
     { timeout: 180_000 },
     async () => {
       const r = await runMixedCrossSessionTrials(built, 8, 2, 20);
@@ -29,12 +29,4 @@ describe("session-hook-claim cross-session (T-235 P2-7 r7 F9)", () => {
     },
   );
 
-  it("F9 RED on 57d86689 src (subprocess gate)", { timeout: 300_000 }, async () => {
-    const script = join(__dirname, "../../scripts/claim-r7-gate-check.mts");
-    const r = await spawnAsync(process.execPath, ["--import", "tsx", script, "f9", "57d86689"], {
-      cwd: join(__dirname, "../.."),
-    });
-    expect(r.status).toBe(0);
-    expect(r.stdout.trim()).toBe("RED");
-  });
 });

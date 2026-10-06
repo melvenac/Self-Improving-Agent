@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnAsync } from "../spawn-async.js";
@@ -11,7 +11,6 @@ import {
   clearHookClaimsForTest,
   dedupeCursorHookRuns,
   sweepExpiredClaimsForTest,
-  setClaimTestSeamsForTest,
   tryBreakStaleReclaimLockForTest,
   tryClaimHookRun,
 } from "../../src/shared/session-hook-claim.js";
@@ -105,37 +104,6 @@ describe("session-hook-claim (T-235 P2-7)", () => {
     expect(remainingStale.length).toBe(40 - SWEEP_CAP);
   });
 
-  it("F7: sweep removes stale .breaker and .rot. aux locks past HOOK_CLAIM_TTL", () => {
-    const dir = join(home, ".claude", "open-brain", "hook-claims");
-    mkdirSync(dir, { recursive: true });
-    const claim = join(dir, "sessionStart-seed.claim");
-    const gen = `${claim}.reclaim.1`;
-    const breaker = `${gen}.breaker`;
-    const rot = `${breaker}.rot.999`;
-    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
-    writeFileSync(claim, "x\n");
-    writeFileSync(breaker, `${Date.now()}\t1\n`);
-    writeFileSync(rot, `${Date.now()}\t1\n`);
-    utimesSync(breaker, stale, stale);
-    utimesSync(rot, stale, stale);
-    sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, join(dir, "sessionStart-other.claim"));
-    expect(existsSync(breaker)).toBe(false);
-    expect(existsSync(rot)).toBe(false);
-  });
-
-  it("F7 RED shape: sweepSkipBreakerAndRot leaves stale .breaker in place", () => {
-    const dir = join(home, ".claude", "open-brain", "hook-claims");
-    mkdirSync(dir, { recursive: true });
-    const breaker = join(dir, "sessionStart-target.claim.reclaim.1.breaker");
-    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
-    writeFileSync(breaker, "breaker\n");
-    utimesSync(breaker, stale, stale);
-    setClaimTestSeamsForTest({ sweepSkipBreakerAndRot: true });
-    sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, join(dir, "sessionStart-other.claim"));
-    expect(existsSync(breaker)).toBe(true);
-    setClaimTestSeamsForTest(undefined);
-  });
-
   it("sweep never removes a .reclaim lock file even when it is past TTL", () => {
     const dir = join(home, ".claude", "open-brain", "hook-claims");
     mkdirSync(dir, { recursive: true });
@@ -161,26 +129,6 @@ describe("session-hook-claim (T-235 P2-7)", () => {
     mkdirSync(join(dir, "oops"), { recursive: true });
     expect(() => tryClaimHookRun(home, "sessionStart", "eisdir")).not.toThrow();
     expect(tryClaimHookRun(home, "sessionStart", "eisdir")).toBe("duplicate");
-  });
-
-  it("F4: stale crashed breaker and .rot. do not block reclaim after sweep", () => {
-    const dir = join(home, ".claude", "open-brain", "hook-claims");
-    mkdirSync(dir, { recursive: true });
-    const id = "f4-wedge";
-    const claim = join(dir, `sessionStart-${id}.claim`);
-    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 600_000) / 1000;
-    writeFileSync(claim, "old\n");
-    utimesSync(claim, stale, stale);
-    const gen = `${claim}.reclaim.${statSync(claim).mtimeMs}`;
-    const breaker = `${gen}.breaker`;
-    const rot = `${breaker}.rot.${Date.now()}`;
-    writeFileSync(gen, "crashed\n");
-    writeFileSync(breaker, "crashed-breaker\n");
-    writeFileSync(rot, "crashed-rot\n");
-    utimesSync(gen, stale, stale);
-    utimesSync(breaker, stale, stale);
-    utimesSync(rot, stale, stale);
-    expect(tryClaimHookRun(home, "sessionStart", id)).toBe("claimed");
   });
 
   it("sessionEnd: duplicate claim is rejected like sessionStart", () => {

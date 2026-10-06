@@ -98,8 +98,8 @@ function reclaimLockPathForClaim(claimPath: string): string {
   return `${claimPath}.reclaim.${gen}`;
 }
 
-function isGenerationReclaimLockEntry(name: string): boolean {
-  return name.includes(".reclaim") && !isBreakerOrRotatedEntry(name);
+function isReclaimLockEntry(name: string): boolean {
+  return name.includes(".reclaim");
 }
 
 function isBreakerOrRotatedEntry(name: string): boolean {
@@ -120,7 +120,6 @@ export type ClaimTestSeams = {
   breakerAfterRestatBeforeUnlink?: (lockPath: string) => void;
   sweepAfterStatBeforeRemove?: (claimPath: string) => void;
   sweepAfterRestatBeforeRename?: (claimPath: string) => void;
-  sweepSkipBreakerAndRot?: boolean;
 };
 
 let claimTestSeams: ClaimTestSeams | undefined;
@@ -276,19 +275,6 @@ function sweepRemoveStaleTombstone(tombPath: string, ttlMs: number): boolean {
   return true;
 }
 
-function sweepRemoveAbandonedAuxWx(auxPath: string, ttlMs: number): boolean {
-  const before = snapStat(auxPath);
-  if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
-  const held = tryWxFreshOrRotated(auxPath, ttlMs);
-  if (!held) return false;
-  try {
-    if (!breakStaleWxLockWhileHolderHeld(auxPath, ttlMs)) return false;
-    return true;
-  } finally {
-    releaseOwnedWxLock(held);
-  }
-}
-
 /** Drop at most this many expired claim files per call, so a hook never walks an unbounded directory. */
 export const SWEEP_CAP = 32;
 
@@ -304,16 +290,10 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
   let removed = 0;
   for (const name of names) {
     if (removed >= SWEEP_CAP) break;
+    if (isReclaimLockEntry(name) || isBreakerOrRotatedEntry(name)) continue;
     const p = join(dir, name);
     if (p === keep) continue;
     try {
-      if (isGenerationReclaimLockEntry(name)) continue;
-      if (isBreakerOrRotatedEntry(name)) {
-        if (!claimTestSeams?.sweepSkipBreakerAndRot && sweepRemoveAbandonedAuxWx(p, HOOK_CLAIM_TTL_MS)) {
-          removed++;
-        }
-        continue;
-      }
       if (isClaimFileEntry(name)) {
         if (sweepRemoveExpiredClaimFile(p, ttlMs)) removed++;
         continue;
@@ -397,46 +377,6 @@ export function tryBreakStaleReclaimLockForTest(lockPath: string, ttlMs?: number
   } finally {
     releaseOwnedWxLock(breakerHeld);
   }
-}
-
-/** Tests only — r5 ba09e2c6 breaker shape (unlocked stat→re-stat→unlink) for red/green tables. */
-export function tryBreakStaleReclaimLockR5ShapeForTest(lockPath: string, ttlMs?: number): boolean {
-  const ttl = ttlMs ?? RECLAIM_LOCK_TTL_MS;
-  const before = snapStat(lockPath);
-  if (!before) return false;
-  if (Date.now() - before.mtimeMs <= ttl) return false;
-  claimTestSeams?.breakerAfterStatBeforeBreak?.(lockPath);
-  const after = snapStat(lockPath);
-  if (!after || !sameSnap(before, after)) return false;
-  if (Date.now() - after.mtimeMs <= ttl) return false;
-  claimTestSeams?.breakerAfterRestatBeforeUnlink?.(lockPath);
-  unlinkQuiet(lockPath);
-  return true;
-}
-
-/** Tests only — r5 sweep under reclaim lock (zero-claim shape). */
-export function sweepRemoveClaimR5ShapeForTest(claimPath: string, ttlMs: number): boolean {
-  const lockPath = reclaimLockPathForClaim(claimPath);
-  const { ok } = tryAcquireReclaimLock(claimPath);
-  if (!ok) return false;
-  try {
-    const before = snapStat(claimPath);
-    if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
-    claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
-    unlinkQuiet(claimPath);
-    return true;
-  } finally {
-    releaseReclaimLock(lockPath);
-  }
-}
-
-/** Tests only — stat-unlink sweep mutant shape. */
-export function sweepRemoveClaimStatUnlinkMutantForTest(claimPath: string, ttlMs: number): boolean {
-  const before = snapStat(claimPath);
-  if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
-  claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
-  unlinkQuiet(claimPath);
-  return true;
 }
 
 /** Tests only — remove claim files under an isolated HOME. */
