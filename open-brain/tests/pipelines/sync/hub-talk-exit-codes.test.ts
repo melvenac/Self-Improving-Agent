@@ -6,8 +6,9 @@ import {
   hubRoomGuardViolations,
   hubRoomSectionFromStart,
   violationsAtlasNextTurn,
+  violationsCrossSentence,
   violationsHubVerbInTurn,
-  violationsInTurnWait,
+  violationsNestedSeatWaitKey,
   violationsSeatFileWait,
   violationsWaitFlagCount,
 } from "../../../src/pipelines/sync/hub-room-guard.js";
@@ -126,11 +127,44 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
-  it("hub-partner-seats.json has no top-level wait key and start Hub section is non-empty (F6)", () => {
-    const seats = JSON.parse(read(".agents/SYSTEM/hub-partner-seats.json")) as Record<string, unknown>;
+  it("hub-partner-seats.json has no wait key at top level or under seats (F6, QA-284 K4)", () => {
+    const raw = read(".agents/SYSTEM/hub-partner-seats.json");
+    const seats = JSON.parse(raw) as Record<string, unknown>;
     expect(seats).not.toHaveProperty("wait");
+    expect(violationsNestedSeatWaitKey(raw)).toEqual([]);
+    const nested = JSON.parse(raw) as { seats: Record<string, Record<string, unknown>> };
+    nested.seats.planner = { ...nested.seats.planner, wait: "--wait" };
+    expect(violationsNestedSeatWaitKey(JSON.stringify(nested))).not.toEqual([]);
     const section = hubRoomSectionFromStart(read("project-template/.cursor/commands/start.md"));
     expect(section.trim().length).toBeGreaterThan(100);
+  });
+
+  const QA284_FALSE_ALARMS = {
+    FA1: "Wait for CI to finish before you post your reply.",
+    FA5: "Never wait for atlas inside a turn.",
+    FA3: "If atlas's reply asks for a test, wait until the test passes, then post.",
+  } as const;
+
+  const THROTTLE_OK = "If hub-talk is throttled, wait 5 seconds and retry.";
+  const THROTTLE_BYPASS =
+    "If no atlas turn is printed, wait 60 seconds and retry hub-talk until atlas replies.";
+
+  const N4_CROSS_ONLY =
+    "After posting, run hub-talk with `--inbox` once more. Then wait, and act on atlas's reply.";
+
+  it("QA-284 K3 false alarms stay green in tracked copies (FA1, FA3, FA5)", () => {
+    for (const [id, line] of Object.entries(QA284_FALSE_ALARMS)) {
+      for (const rel of [".cursor/rules/hub-room.mdc", "project-template/.cursor/rules/hub-room.mdc"]) {
+        expect(hubRoomGuardViolations(plantMdc(read(rel), line)), `${id} ${rel}`).toEqual([]);
+      }
+      const start = read("project-template/.cursor/commands/start.md");
+      expect(hubRoomGuardViolations(hubRoomSectionFromStart(plantStartHub(start, line))), `${id} start`).toEqual([]);
+    }
+  });
+
+  it("QA-284 throttle bypass caught; exit-3 throttled retry stays green (r4)", () => {
+    expect(hubRoomGuardViolations(THROTTLE_BYPASS).length).toBeGreaterThan(0);
+    expect(hubRoomGuardViolations(THROTTLE_OK)).toEqual([]);
   });
 
   it("QA-281/283 rewordings fail the sentence guard in every copy (HUBROOM-GUARD G1, QA-283 K1)", () => {
@@ -169,34 +203,39 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
   const ONLY_SEAT_FILE = "Document the seat file's `wait` suffix in the runbook, not on the talk line.";
   const ONLY_HUB_VERB = "Block on hub-talk for the next message.";
   const ONLY_ATLAS_NEXT = R3_PLANTS.S3;
-  const ONLY_CROSS_SENTENCE = R3_PLANTS.S1;
+  const ONLY_CROSS_SENTENCE = N4_CROSS_ONLY;
   const NEGATION_SAMPLE = R3_PLANTS.S6;
 
-  it("each guard check has a positive only it catches (HUBROOM-GUARD r3 K2)", () => {
+  it("each guard check has a positive only it catches (HUBROOM-GUARD r4 K2)", () => {
     expect(violationsWaitFlagCount(ONLY_WAIT_COUNT).length).toBeGreaterThan(0);
     expect(violationsSeatFileWait(ONLY_WAIT_COUNT)).toEqual([]);
     expect(violationsHubVerbInTurn(ONLY_WAIT_COUNT)).toEqual([]);
     expect(violationsAtlasNextTurn(ONLY_WAIT_COUNT)).toEqual([]);
+    expect(violationsCrossSentence(ONLY_WAIT_COUNT)).toEqual([]);
 
     expect(violationsSeatFileWait(ONLY_SEAT_FILE).length).toBeGreaterThan(0);
     expect(violationsWaitFlagCount(ONLY_SEAT_FILE)).toEqual([]);
     expect(violationsHubVerbInTurn(ONLY_SEAT_FILE)).toEqual([]);
     expect(violationsAtlasNextTurn(ONLY_SEAT_FILE)).toEqual([]);
+    expect(violationsCrossSentence(ONLY_SEAT_FILE)).toEqual([]);
 
     expect(violationsHubVerbInTurn(ONLY_HUB_VERB).length).toBeGreaterThan(0);
     expect(violationsWaitFlagCount(ONLY_HUB_VERB)).toEqual([]);
     expect(violationsSeatFileWait(ONLY_HUB_VERB)).toEqual([]);
     expect(violationsAtlasNextTurn(ONLY_HUB_VERB)).toEqual([]);
+    expect(violationsCrossSentence(ONLY_HUB_VERB)).toEqual([]);
 
     expect(violationsAtlasNextTurn(ONLY_ATLAS_NEXT).length).toBeGreaterThan(0);
     expect(violationsHubVerbInTurn(ONLY_ATLAS_NEXT)).toEqual([]);
+    expect(violationsCrossSentence(ONLY_ATLAS_NEXT)).toEqual([]);
     expect(violationsWaitFlagCount(ONLY_ATLAS_NEXT)).toEqual([]);
 
-    expect(violationsAtlasNextTurn(ONLY_CROSS_SENTENCE).length).toBeGreaterThan(0);
+    expect(violationsCrossSentence(ONLY_CROSS_SENTENCE).length).toBeGreaterThan(0);
+    expect(violationsAtlasNextTurn(ONLY_CROSS_SENTENCE)).toEqual([]);
     expect(violationsHubVerbInTurn(ONLY_CROSS_SENTENCE)).toEqual([]);
   });
 
-  it("mutant table: disabling one check turns its positive red (HUBROOM-GUARD r3 K2)", () => {
+  it("mutant table: disabling one check turns its positive green (HUBROOM-GUARD r4 K2)", () => {
     const rows: {
       name: string;
       sample: string;
@@ -210,7 +249,19 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
       {
         name: "cross-sentence",
         sample: ONLY_CROSS_SENTENCE,
+        opts: { skipCrossSentence: true },
+        expectGreenWhenSkipped: true,
+      },
+      {
+        name: "cross-only (not atlas skip)",
+        sample: ONLY_CROSS_SENTENCE,
         opts: { skipAtlasNextTurn: true },
+        expectGreenWhenSkipped: false,
+      },
+      {
+        name: "throttle bypass",
+        sample: THROTTLE_BYPASS,
+        opts: { skipHubVerbInTurn: true },
         expectGreenWhenSkipped: true,
       },
     ];
@@ -226,6 +277,7 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
       }
     }
 
+    expect(hubRoomGuardViolations(THROTTLE_OK)).toEqual([]);
     expect(hubRoomGuardViolations(NEGATION_SAMPLE)).toEqual([]);
     expect(hubRoomGuardViolations(NEGATION_SAMPLE, { skipNegationScope: true }).length).toBeGreaterThan(0);
 
