@@ -5,7 +5,7 @@ import { detectIde } from "./active-session.js";
 /** T-235 P2-7: dual Cursor + Claude settings hooks can fire twice within milliseconds; legitimate resume is minutes later. */
 export const HOOK_CLAIM_TTL_MS = 120_000;
 
-/** Stale reclaim lock files older than this are removed so a crashed reclaimer cannot block forever. */
+/** Crashed reclaim locks older than this may be broken; live locks younger than this are never unlinked after stat alone. */
 export const RECLAIM_LOCK_TTL_MS = 60_000;
 
 export type HookClaimEvent = "sessionStart" | "sessionEnd";
@@ -66,20 +66,62 @@ function renameExclusive(from: string, to: string): "ok" | "lost" {
   return "lost";
 }
 
+type FileStatSnap = { ino: number; mtimeMs: number; size: number };
+
+function snapStat(path: string): FileStatSnap | null {
+  try {
+    const s = statSync(path);
+    return { ino: Number(s.ino), mtimeMs: s.mtimeMs, size: s.size };
+  } catch {
+    return null;
+  }
+}
+
+function sameSnap(a: FileStatSnap, b: FileStatSnap): boolean {
+  return a.ino === b.ino && a.mtimeMs === b.mtimeMs && a.size === b.size;
+}
+
 function reclaimLockPath(claimPath: string): string {
   return `${claimPath}.reclaim`;
 }
 
+function isReclaimLockEntry(name: string): boolean {
+  return name.endsWith(".reclaim");
+}
+
+/**
+ * Break an expired lock by rename-aside, then verify the aside is still the file we inspected.
+ * Never unlink a path we only stat'd once (QA 280 F1 / r3 row 5).
+ */
+function tryBreakStaleLockFile(lockPath: string, ttlMs: number = RECLAIM_LOCK_TTL_MS): boolean {
+  const before = snapStat(lockPath);
+  if (!before) return false;
+  if (Date.now() - before.mtimeMs <= ttlMs) return false;
+
+  const aside = `${lockPath}.stale-break.${process.pid}`;
+  if (renameExclusive(lockPath, aside) === "lost") return false;
+
+  const asideSnap = snapStat(aside);
+  if (!asideSnap || !sameSnap(before, asideSnap)) {
+    try {
+      unlinkSync(aside);
+    } catch (err) {
+      if (errno(err) !== "ENOENT" && errno(err) !== "EPERM") throw err;
+    }
+    return false;
+  }
+
+  try {
+    unlinkSync(aside);
+  } catch (err) {
+    if (errno(err) !== "ENOENT" && errno(err) !== "EPERM") throw err;
+  }
+  return true;
+}
+
 function tryAcquireReclaimLock(lockPath: string): boolean {
   if (tryCreateClaim(lockPath)) return true;
-  try {
-    if (existsSync(lockPath) && Date.now() - statSync(lockPath).mtimeMs > RECLAIM_LOCK_TTL_MS) {
-      unlinkSync(lockPath);
-      return tryCreateClaim(lockPath);
-    }
-  } catch (err) {
-    if (errno(err) !== "ENOENT") throw err;
-  }
+  if (tryBreakStaleLockFile(lockPath) && tryCreateClaim(lockPath)) return true;
   return false;
 }
 
@@ -87,7 +129,8 @@ function releaseReclaimLock(lockPath: string): void {
   try {
     unlinkSync(lockPath);
   } catch (err) {
-    if (errno(err) !== "ENOENT") throw err;
+    const code = errno(err);
+    if (code !== "ENOENT" && code !== "EPERM" && code !== "EBUSY") throw err;
   }
 }
 
@@ -149,6 +192,7 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
   let removed = 0;
   for (const name of names) {
     if (removed >= SWEEP_CAP) break;
+    if (isReclaimLockEntry(name)) continue;
     const p = join(dir, name);
     if (p === keep) continue;
     try {
@@ -156,7 +200,6 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
       unlinkSync(p);
       removed++;
     } catch {
-      // Unreadable or non-file entries (EISDIR, EPERM, etc.) are skipped so one bad name cannot crash a hook.
       continue;
     }
   }
@@ -201,6 +244,11 @@ export function appendHookMetric(home: string, line: HookMetricLine): void {
 /** Tests only — observe sweep without claiming. */
 export function sweepExpiredClaimsForTest(home: string, ttlMs: number, keep: string): void {
   sweepExpiredClaims(home, ttlMs, keep);
+}
+
+/** Tests only — break a stale reclaim lock using production logic. */
+export function tryBreakStaleReclaimLockForTest(lockPath: string, ttlMs?: number): boolean {
+  return tryBreakStaleLockFile(lockPath, ttlMs ?? RECLAIM_LOCK_TTL_MS);
 }
 
 /** Tests only — remove claim files under an isolated HOME. */

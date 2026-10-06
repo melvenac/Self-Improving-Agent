@@ -2,14 +2,15 @@ import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { pathToFileURL } from "node:url";
 import { spawnAsync } from "../spawn-async.js";
+import { runClaimBarrierTrials } from "./claim-barrier-trials.js";
 import {
   HOOK_CLAIM_TTL_MS,
   SWEEP_CAP,
   clearHookClaimsForTest,
   dedupeCursorHookRuns,
   sweepExpiredClaimsForTest,
+  tryBreakStaleReclaimLockForTest,
   tryClaimHookRun,
 } from "../../src/shared/session-hook-claim.js";
 
@@ -102,6 +103,26 @@ describe("session-hook-claim (T-235 P2-7)", () => {
     expect(remainingStale.length).toBe(40 - SWEEP_CAP);
   });
 
+  it("sweep never removes a .reclaim lock file even when it is past TTL", () => {
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const lock = join(dir, "sessionStart-target.claim.reclaim");
+    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 5_000) / 1000;
+    writeFileSync(lock, "lock\n");
+    utimesSync(lock, stale, stale);
+    sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, join(dir, "sessionStart-other.claim"));
+    expect(existsSync(lock)).toBe(true);
+  });
+
+  it("a live reclaim lock inside TTL is not broken by the stale-lock breaker", () => {
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const lock = join(dir, "sessionStart-live.claim.reclaim");
+    writeFileSync(lock, "live\n");
+    expect(tryBreakStaleReclaimLockForTest(lock)).toBe(false);
+    expect(existsSync(lock)).toBe(true);
+  });
+
   it("sweep ignores a directory entry in hook-claims without throwing", () => {
     const dir = join(home, ".claude", "open-brain", "hook-claims");
     mkdirSync(join(dir, "oops"), { recursive: true });
@@ -127,96 +148,73 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     if (!existsSync(built)) throw new Error(`built module missing: ${built}`);
   }, 120_000);
 
-  async function barrierTrials(
-    procs: number,
-    trialCount: number,
-    stale: boolean,
-  ): Promise<{ exact: number; doubles: number; throws: number; sample: string }> {
-    let exact = 0;
-    let doubles = 0;
-    let throws = 0;
-    let sample = "";
-    const mod = pathToFileURL(built).href;
-    for (let i = 0; i < trialCount; i++) {
-      const trialHome = mkdtempSync(join(tmpdir(), "ob-claim-race-"));
-      try {
-        const id = `race-${procs}-${i}`;
-        if (stale) {
-          const dir = join(trialHome, ".claude", "open-brain", "hook-claims");
-          mkdirSync(dir, { recursive: true });
-          const claim = join(dir, `sessionStart-${id}.claim`);
-          writeFileSync(claim, "old\n");
-          const old = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
-          utimesSync(claim, old, old);
-        }
-        const start = Date.now() + 400;
-        const scriptPath = join(trialHome, "race.mjs");
-        writeFileSync(
-          scriptPath,
-          `const { tryClaimHookRun } = await import(${JSON.stringify(mod)});
-const start = ${start};
-while (Date.now() < start) {}
-process.stdout.write(String(tryClaimHookRun(process.env.HOME, "sessionStart", ${JSON.stringify(id)})));
-`,
-        );
-        const env = { ...process.env, HOME: trialHome, USERPROFILE: trialHome };
-        const runs = await Promise.all(
-          Array.from({ length: procs }, () => spawnAsync(process.execPath, [scriptPath], { env })),
-        );
-        const failed = runs.some((r) => r.status !== 0);
-        if (failed) {
-          throws++;
-          if (!sample) {
-            sample = runs.map((r) => `status=${r.status} out=${JSON.stringify(r.stdout)} err=${JSON.stringify(r.stderr)}`).join("\n");
-          }
-        }
-        const claimed = runs.filter((r) => (r.stdout ?? "").trim() === "claimed").length;
-        if (!failed && claimed === 1) exact++;
-        else if (claimed > 1) doubles++;
-      } finally {
-        rmSync(trialHome, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
-      }
-    }
-    return { exact, doubles, throws, sample };
-  }
-
   it("fresh claims: 2 children spin to one instant, 20 trials, exactly one wins", async () => {
-    const r = await barrierTrials(2, 20, false);
+    const r = await runClaimBarrierTrials(built, 2, 20, "fresh");
     expect(r.throws).toBe(0);
     expect(r.doubles).toBe(0);
+    expect(r.late).toBe(0);
     expect(r.exact).toBe(20);
   });
 
-  it("stale claims N=2: 100 trials, zero double claims and zero throws", async () => {
-    const r = await barrierTrials(2, 100, true);
+  it("crashed-lock N=8: 100 trials run 1, zero late, zero doubles, zero throws", async () => {
+    const r = await runClaimBarrierTrials(built, 8, 100, "crashed-lock");
+    expect(r.late, r.sample).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
-  it("stale claims N=3: 100 trials, zero double claims and zero throws", async () => {
-    const r = await barrierTrials(3, 100, true);
+  it("crashed-lock N=8: 100 trials run 2, zero late, zero doubles, zero throws", async () => {
+    const r = await runClaimBarrierTrials(built, 8, 100, "crashed-lock");
+    expect(r.late).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
-  it("stale claims N=8: 100 trials run 1, zero double claims and zero throws", async () => {
-    const r = await barrierTrials(8, 100, true);
+  it("crashed-lock N=8: 100 trials run 3, zero late, zero doubles, zero throws", async () => {
+    const r = await runClaimBarrierTrials(built, 8, 100, "crashed-lock");
+    expect(r.late).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
-  it("stale claims N=8: 100 trials run 2, zero double claims and zero throws", async () => {
-    const r = await barrierTrials(8, 100, true);
+  it("stale claims N=2: 100 trials, zero late, zero double claims and zero throws", async () => {
+    const r = await runClaimBarrierTrials(built, 2, 100, "stale");
+    expect(r.late, r.sample).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
-  it("stale claims N=8: 100 trials run 3, zero double claims and zero throws", async () => {
-    const r = await barrierTrials(8, 100, true);
+  it("stale claims N=3: 100 trials, zero late, zero double claims and zero throws", async () => {
+    const r = await runClaimBarrierTrials(built, 3, 100, "stale");
+    expect(r.late).toBe(0);
+    expect(r.throws, r.sample).toBe(0);
+    expect(r.doubles, r.sample).toBe(0);
+    expect(r.exact).toBe(100);
+  });
+
+  it("stale claims N=8: 100 trials run 1, zero late, zero double claims and zero throws", async () => {
+    const r = await runClaimBarrierTrials(built, 8, 100, "stale");
+    expect(r.late, r.sample).toBe(0);
+    expect(r.throws, r.sample).toBe(0);
+    expect(r.doubles, r.sample).toBe(0);
+    expect(r.exact).toBe(100);
+  });
+
+  it("stale claims N=8: 100 trials run 2, zero late, zero double claims and zero throws", async () => {
+    const r = await runClaimBarrierTrials(built, 8, 100, "stale");
+    expect(r.late).toBe(0);
+    expect(r.throws, r.sample).toBe(0);
+    expect(r.doubles, r.sample).toBe(0);
+    expect(r.exact).toBe(100);
+  });
+
+  it("stale claims N=8: 100 trials run 3, zero late, zero double claims and zero throws", async () => {
+    const r = await runClaimBarrierTrials(built, 8, 100, "stale");
+    expect(r.late).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
     expect(r.exact).toBe(100);
