@@ -1,6 +1,7 @@
 import type Database from 'better-sqlite3';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
 import { join, basename, relative } from 'node:path';
+import { parseFrontmatterScalar } from '../../shared/parse-frontmatter.js';
 
 /**
  * Generate Topic notes — one per subject tag, linking every note that carries it.
@@ -114,7 +115,7 @@ function readSummaries(vaultDir: string): Linkable[] {
     out.push({
       vaultPath: path,
       tags: parseTags(tags),
-      project: normalizeProject(project),
+      project: normalizeProject(project ? parseFrontmatterScalar(project) : undefined),
       projectFirst: true,
     });
   }

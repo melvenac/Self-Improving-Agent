@@ -12,14 +12,14 @@ afterEach(() => {
 });
 
 describe("AUDIT-FIX A6 — resolveOwnKey path confinement", () => {
-  it("refuses ../../escape and does not read a key planted at keyDir/../escape.key", () => {
+  it("refuses ../../escape and does not read a key planted at td/escape.key (master path)", () => {
     const td = mkdtempSync(join(tmpdir(), "audit-a6-"));
     tmpDirs.push(td);
     const keyDir = join(td, "keys");
     const hubSub = join(keyDir, "localhost-8787");
     mkdirSync(hubSub, { recursive: true });
     const secret = "s".repeat(40);
-    writeFileSync(join(keyDir, "escape.key"), secret);
+    writeFileSync(join(td, "escape.key"), secret);
 
     const r = resolveOwnKey("http://localhost:8787", "../../escape", keyDir);
     expect(r.ok).toBe(false);

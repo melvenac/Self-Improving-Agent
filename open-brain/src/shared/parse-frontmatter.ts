@@ -16,7 +16,7 @@ export function parseFrontmatterScalar(value: string): string {
   return v;
 }
 
-function parseInlineArray(inner: string): string[] {
+function parseInlineArrayInner(inner: string): string[] {
   const trimmed = inner.trim();
   if (!trimmed) return [];
   const items: string[] = [];
@@ -46,6 +46,16 @@ function parseInlineArray(inner: string): string[] {
     rest = comma === -1 ? "" : rest.slice(comma + 1);
   }
   return items;
+}
+
+/** Parse a YAML inline `[a, b]` list; never throws on hand-edited garbage. */
+export function parseInlineArray(inner: string): string[] {
+  try {
+    return parseInlineArrayInner(inner);
+  } catch {
+    const trimmed = inner.trim();
+    return trimmed ? [trimmed] : [];
+  }
 }
 
 /** Minimal YAML-like frontmatter reader for vault notes (line-based `key: value`). */
