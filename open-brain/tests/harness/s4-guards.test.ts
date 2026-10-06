@@ -245,8 +245,9 @@ describe("slice four guards", { timeout: 120_000 }, () => {
     const three = ["developer-done.json", "plan-gate.json", "merge.json"].map((f) => `open-brain/src/harness/policies/${f}`);
     expect(git(["diff", "--name-only", BASE, "--", ...three]).trim()).toBe("");
     const added = git(["diff", "--diff-filter=A", "--name-only", BASE, "--", ...SCOPES.policies]).trim().split("\n").filter(Boolean).sort();
-    // qa-score.json is slice four's addition. effort.json is T-173, after that base.
+    // qa-score.json is slice four's addition. effort.json is T-173. developer-done-cal2-r2.json is JEV-CAL-2 round 2.
     expect(added).toEqual([
+      "open-brain/src/harness/policies/developer-done-cal2-r2.json",
       "open-brain/src/harness/policies/effort.json",
       "open-brain/src/harness/policies/qa-score.json",
     ]);
