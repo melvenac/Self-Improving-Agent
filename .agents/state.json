@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 342,
+  "revision": 343,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4330,6 +4330,12 @@
       "title": "D-125 amended: SIA's first-pass QA bot is grok-qa-sia, not grok-qa-1",
       "date": "2026-10-06",
       "note": "Planner, s163, on clark's relay (told). A2A ruled its own first-pass bot differently (A2A D-053: no GitHub write, results as hub turns), so Argus (grokbot-vm) runs one QA bot per project, each with its own token. SIA's is grok-qa-sia: a room with atlas + grok-qa-sia, a qa/* push token for SIA only, and every other D-125 rule unchanged (wake line `QA JOB: <dispatch path>@<DISPATCH_SHA>`, FIRST-PASS PASS/FAIL wording, the MAY / MAY NOT row lists, Opus QA keeps the verdict). grok-qa-1 is A2A's bot and takes no SIA job. Read every D-125 mention of grok-qa-1 as grok-qa-sia. grok-sia-review is unchanged."
+    },
+    {
+      "id": "D-127",
+      "title": "Grok bots get read-only GitHub tokens; first-pass results arrive as hub turns and the planner commits them verbatim; Node 22 on the VM",
+      "date": "2026-10-06",
+      "note": "Planner, s163, on Argus's report relayed by clark (told). A fine-grained token cannot be limited to qa/* branches: contents write reaches master unless a ruleset protects everything else. Least privilege wins over convenience, as A2A D-053 ruled. This amends D-125/D-126: grok-qa-sia and grok-sia-review hold READ-ONLY tokens. grok-qa-sia posts its full first-pass report as hub turns in [atlas, grok-qa-sia]. The planner commits that text VERBATIM to a qa/* branch, plus a header naming the room, the turn numbers and the bot. Opus QA reads that committed file, so the report it reads is the bot's own words, not a planner summary. Rooms have no waker identity: each bot wakes on its own cron. Runtime: SIA is tested on Node 22, and the VM has Node 20.19. The bot runs Node 22 (nvm or a user-local install, no root needed) and states `node --version` in every report; a row run on another major is reported but is not first-pass evidence. The VM has no Docker and no Windows, which matches D-125's MAY NOT list. Revisit the push only if Aaron adds a ruleset protecting everything except qa/**."
     }
   ],
   "handoffs": [
