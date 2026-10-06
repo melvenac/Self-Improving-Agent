@@ -111,25 +111,50 @@ describe("checkHubSeats", () => {
     expect(result.message).toContain("no room");
   });
 
-  it("dispatch room deleted, top-level kept is an issue", () => {
-    writeHub({
-      talk: TALK,
-      readers: READERS,
-      seats: {
-        infra: {
-          hub_name: "cursor-infra",
-          runtime: "cursor",
-          host: "qa-pc",
-          model: "composer-2.5",
-          room: DISPATCH_CURSOR.room,
-          dispatch: { cursor: { ...DISPATCH_CURSOR, room: "" }, claude_code: DISPATCH_CC },
-        },
+  // G-056 (QA 279 #434 F1): this row used to be named for a deleted key and set `room: ""`, which r1's
+  // fallback also called an issue, so r1's fallback put back verbatim survived it. Each case below builds
+  // the dispatch.cursor block WITHOUT the key (or with a non-string value) while the top-level room stays.
+  const cursorSeatWithTopLevelRoom = (dispatchCursor: Record<string, unknown>) => ({
+    talk: TALK,
+    readers: READERS,
+    seats: {
+      infra: {
+        hub_name: "cursor-infra",
+        runtime: "cursor",
+        host: "qa-pc",
+        model: "composer-2.5",
+        room: DISPATCH_CURSOR.room,
+        dispatch: { cursor: dispatchCursor, claude_code: DISPATCH_CC },
       },
-    });
+    },
+  });
+
+  it("dispatch room deleted, top-level kept is an issue", () => {
+    const { room: _room, ...withoutRoom } = DISPATCH_CURSOR;
+    expect("room" in withoutRoom).toBe(false);
+    writeHub(cursorSeatWithTopLevelRoom(withoutRoom));
     const result = checkHubSeats(root);
     expect(result.severity).toBe("issue");
     expect(result.message).toContain("no room");
     expect(result.message).toContain("not a fallback");
+  });
+
+  it.each([
+    ["null", null],
+    ["an empty string", ""],
+    ["whitespace", "   "],
+    ["a number", 42],
+  ])("dispatch room %s, top-level kept is an issue", (_label, value) => {
+    writeHub(cursorSeatWithTopLevelRoom({ ...DISPATCH_CURSOR, room: value }));
+    const result = checkHubSeats(root);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("no room");
+    expect(result.message).toContain("not a fallback");
+  });
+
+  it("the same seat with its dispatch room present is green (control for the rows above)", () => {
+    writeHub(cursorSeatWithTopLevelRoom({ ...DISPATCH_CURSOR }));
+    expect(checkHubSeats(root).severity).toBe("pass");
   });
 
   it("the two differ is an issue", () => {

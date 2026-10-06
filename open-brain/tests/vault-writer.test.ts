@@ -331,4 +331,11 @@ describe("parseFrontmatter", () => {
     const fm = parseFrontmatter(raw);
     expect(fm).toEqual({});
   });
+
+  it("parses frontmatter when the file starts with a UTF-8 BOM", () => {
+    const raw = `\uFEFF---\ntype: pattern\nkey: bom-note\n---\nbody`;
+    const fm = parseFrontmatter(raw);
+    expect(fm.type).toBe("pattern");
+    expect(fm.key).toBe("bom-note");
+  });
 });
