@@ -97,27 +97,46 @@ export function splitClausesOutsideBackticks(sentence: string): string[] {
   return out.length > 0 ? out : [sentence.trim()];
 }
 
-/** Exit-3 throttled retry only — not a loop until atlas replies (QA 284 throttle bypass). */
+/** In-run wait for atlas / next turn — checked before exit-3 or throttle exemptions (r5). */
+export function sentenceHasInTurnAtlasWaitPattern(sentence: string): boolean {
+  if (/\buntil\b/i.test(sentence) && ATLAS_NEXT_TURN_RE.test(sentence)) return true;
+  if (
+    /\bno atlas turn\b/i.test(sentence) &&
+    /\bwait\b/i.test(sentence) &&
+    /\bretry\b/i.test(sentence) &&
+    HUB_INVOKE_RE.test(sentence)
+  ) {
+    return true;
+  }
+  for (const clause of splitClausesOutsideBackticks(sentence)) {
+    if (clauseIsBenignWaitOnly(clause)) continue;
+    if (clauseWaitsForAtlasNextTurn(clause)) return true;
+  }
+  return false;
+}
+
+/** CI / test-pass wait in a clause that does not also name atlas or next turn (r5: clause-scoped only). */
+function clauseIsBenignWaitOnly(clause: string): boolean {
+  if (ATLAS_NEXT_TURN_RE.test(clause)) return false;
+  if (/\bwait for CI\b/i.test(clause)) return true;
+  if (/\bwait until the test passes\b/i.test(clause)) return true;
+  return false;
+}
+
+/** Exit-3 throttled retry only when the sentence is not an in-run atlas wait (r5). */
 function clauseIsExit3ThrottledRetry(clause: string, sentence: string): boolean {
+  if (sentenceHasInTurnAtlasWaitPattern(sentence)) return false;
   if (clause.includes(EXIT3_WAIT_PHRASE)) return true;
-  if (/\buntil\b/i.test(sentence) && ATLAS_NEXT_TURN_RE.test(sentence)) return false;
   if (/\bwait\s+\d+\s+seconds\b/i.test(clause) && /\b(retry|throttl)/i.test(clause)) return true;
   if (/\bthrottl/i.test(clause) && /\bwait\s+\d+\s+seconds\b/i.test(clause) && /\bretry\b/i.test(clause)) return true;
   return false;
 }
 
-function sentenceIsBenignNonHubWait(sentence: string): boolean {
-  if (/\bwait for CI\b/i.test(sentence)) return true;
-  if (/\bwait until the test passes\b/i.test(sentence)) return true;
-  if (/\basks for a test\b/i.test(sentence) && /\bwait\b/i.test(sentence)) return true;
-  return false;
-}
-
 /** True when this clause's negation governs the forbidden hub-wait act in the same clause. */
-export function clauseNegatesHubWaitAct(clause: string): boolean {
+export function clauseNegatesHubWaitAct(clause: string, sentence?: string): boolean {
   const c = clause.toLowerCase();
   if (c.includes(NEVER_BLOCK_PHRASE)) return true;
-  if (clause.includes(EXIT3_WAIT_PHRASE)) return true;
+  if (clause.includes(EXIT3_WAIT_PHRASE) && (!sentence || !sentenceHasInTurnAtlasWaitPattern(sentence))) return true;
   if (/\bnever\s+wait\s+for\s+atlas\b/i.test(clause)) return true;
   if (/\bdoes not\s+run\b/i.test(clause) && /--wait\b/.test(clause)) return true;
   if (/\b(?:don't|doesn't|do not|never)\s+(?:wait|block|listen|poll)\b/i.test(clause) && HUB_INVOKE_RE.test(clause)) {
@@ -137,6 +156,13 @@ function clauseWaitsForAtlasNextTurn(clause: string): boolean {
 }
 
 function clauseHubVerbInTurnWait(clause: string, sentence: string): boolean {
+  if (sentenceHasInTurnAtlasWaitPattern(sentence)) {
+    if (HUB_INVOKE_RE.test(clause) && FORBIDDEN_VERB_RE.test(clause)) return true;
+    if (/\bhub-talk\b/i.test(clause) && /\b(repeat|rerun)\b/i.test(clause)) return true;
+    if (/\bwait\s+\d+\s+seconds\b/i.test(clause) && /\bretry\b/i.test(clause) && HUB_INVOKE_RE.test(sentence)) {
+      return true;
+    }
+  }
   if (clauseIsExit3ThrottledRetry(clause, sentence)) return false;
   if (HUB_INVOKE_RE.test(clause) && FORBIDDEN_VERB_RE.test(clause)) return true;
   if (/\bwait for hub-talk\b/i.test(clause)) return true;
@@ -164,7 +190,8 @@ function guardedClauseViolation(
   kind: "hub-verb" | "atlas-next-turn",
   message: string
 ): string | null {
-  if (negationScopeEnabled(opts) && clauseNegatesHubWaitAct(clause)) return null;
+  if (clauseIsBenignWaitOnly(clause) && kind === "atlas-next-turn") return null;
+  if (negationScopeEnabled(opts) && clauseNegatesHubWaitAct(clause, sentence)) return null;
   const hit =
     kind === "hub-verb"
       ? clauseHubVerbInTurnWait(clause, sentence)
@@ -240,7 +267,6 @@ export function violationsHubVerbInTurn(text: string, opts: HubRoomGuardOptions 
 export function violationsAtlasNextTurn(text: string, opts: HubRoomGuardOptions = {}): string[] {
   const violations: string[] = [];
   for (const sentence of splitSentencesOutsideBackticks(text.replace(/\r\n/g, "\n"))) {
-    if (sentenceIsBenignNonHubWait(sentence)) continue;
     for (const clause of splitClausesOutsideBackticks(sentence)) {
       const v = guardedClauseViolation(
         clause,
@@ -264,8 +290,7 @@ export function violationsCrossSentence(text: string, opts: HubRoomGuardOptions 
     const prev = sentences[i - 1];
     const cur = sentences[i];
     if (!HUB_INVOKE_RE.test(prev)) continue;
-    if (sentenceIsBenignNonHubWait(cur)) continue;
-    if (negationScopeEnabled(opts) && clauseNegatesHubWaitAct(cur)) continue;
+    if (negationScopeEnabled(opts) && clauseNegatesHubWaitAct(cur, cur)) continue;
     if (!/\bwait\b/i.test(cur)) continue;
     if (!ATLAS_NEXT_TURN_RE.test(cur)) continue;
     violations.push(`cross-sentence hub invoke then wait for atlas: ${cur.slice(0, 100)}…`);

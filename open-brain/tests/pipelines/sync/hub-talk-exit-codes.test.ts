@@ -9,6 +9,7 @@ import {
   violationsCrossSentence,
   violationsHubVerbInTurn,
   violationsNestedSeatWaitKey,
+  sentenceHasInTurnAtlasWaitPattern,
   violationsSeatFileWait,
   violationsWaitFlagCount,
 } from "../../../src/pipelines/sync/hub-room-guard.js";
@@ -148,6 +149,17 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
   const THROTTLE_OK = "If hub-talk is throttled, wait 5 seconds and retry.";
   const THROTTLE_BYPASS =
     "If no atlas turn is printed, wait 60 seconds and retry hub-talk until atlas replies.";
+  const THROTTLE_BYPASS_NO_UNTIL = "If no atlas turn is printed, wait 60 seconds and retry hub-talk.";
+
+  const R5_REGRESSION = {
+    R1a: "Wait for CI, then wait for atlas's reply before you end the turn.",
+    R1b: "If atlas asks for a test, wait for atlas's next turn in this run.",
+    R2a: "On exit 3 wait `retry-after` seconds and rerun hub-talk until atlas replies.",
+    R2b: THROTTLE_BYPASS_NO_UNTIL,
+    RevB: "Wait for CI to finish and for the next atlas turn before you end the turn.",
+    RevC: "After posting, wait until the test passes and the next atlas turn is printed, then act on it in this run.",
+    RevE: "After posting, run hub-talk again. Wait for CI and for atlas's reply in this run.",
+  } as const;
 
   const N4_CROSS_ONLY =
     "After posting, run hub-talk with `--inbox` once more. Then wait, and act on atlas's reply.";
@@ -162,9 +174,20 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
-  it("QA-284 throttle bypass caught; exit-3 throttled retry stays green (r4)", () => {
+  it("QA-284 throttle bypass caught; exit-3 throttled retry stays green (r4/r5)", () => {
     expect(hubRoomGuardViolations(THROTTLE_BYPASS).length).toBeGreaterThan(0);
+    expect(hubRoomGuardViolations(THROTTLE_BYPASS_NO_UNTIL).length).toBeGreaterThan(0);
     expect(hubRoomGuardViolations(THROTTLE_OK)).toEqual([]);
+    expect(hubRoomGuardViolations("wait `retry-after` seconds")).toEqual([]);
+  });
+
+  it("HUBROOM-GUARD r5 regression rows (planner-verified) must catch", () => {
+    for (const [id, line] of Object.entries(R5_REGRESSION)) {
+      expect(hubRoomGuardViolations(line), id).not.toEqual([]);
+    }
+    expect(sentenceHasInTurnAtlasWaitPattern(R5_REGRESSION.R1a)).toBe(true);
+    expect(sentenceHasInTurnAtlasWaitPattern(R5_REGRESSION.R2a)).toBe(true);
+    expect(sentenceHasInTurnAtlasWaitPattern(THROTTLE_OK)).toBe(false);
   });
 
   it("QA-281/283 rewordings fail the sentence guard in every copy (HUBROOM-GUARD G1, QA-283 K1)", () => {
