@@ -16,7 +16,7 @@
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runLoop, type GateMode } from "./runtime.js";
 import { stubRoles } from "./roles.js";
@@ -31,6 +31,7 @@ import { jsonSchemas, serialiseSchema, validateEvidence, validatePlan, type Deli
 import { defaultChecks, type CheckSpec } from "./checks.js";
 import { policyJsonSchemas } from "./policies.js";
 import { NO_CHECKS, ShadowRunError, checksFromEvidence, runShadowDoneGate } from "./shadow-gates.js";
+import { reportCal2RequestSizes, runShadowDoneFrozen, type Cal2RunlistPhase } from "./cal2-frozen.js";
 import { gitTry } from "./git.js";
 import { runShadowQaGate } from "./shadow-qa.js";
 import { buildCloseoutTables } from "./closeout-tables.js";
@@ -40,6 +41,7 @@ import {
   SLICE_RECORDS_DIR,
   countAttempts,
   gateRecordJsonSchema,
+  toPosix,
   validateGateRecord,
 } from "./gate-records.js";
 import { decideShadowVerdict, isLowerHexSha, ledgerPath, prepareShadowVerdict, summariseLedger } from "./shadow-merge.js";
@@ -57,6 +59,9 @@ const USAGE = `harness — HoH loop runtime (slice one: roles are stubbed)
   harness count-attempts [--ledger <file>] [--records <dir>] [--max <n>] [--repo <dir>]
   harness shadow-done --pr <n> --merge-commit <sha> --scored-sha <sha> [--base-sha <sha>] --dt <D_t.json>
                       (--checks-e-t <E_t.json> | --checks none) [--mode live|dry-run] [--records <dir>] [--ledger <file>]
+  harness shadow-done --request <cal2-input.json> --policy <policy.json> --phase dev|heldout
+                      [--case-id <id>] [--runlist <runlist.json>] [--mode live|dry-run] [--records <dir>] [--ledger <file>] [--repo <dir>]
+  harness cal2-request-sizes [--inputs <dir>] [--repo <dir>]
   harness shadow-qa --pr <n> --branch <qa/...> --commit <sha> --path <E_t path> [--mode live|dry-run]
                     [--records <dir>] [--ledger <file>]
   harness closeout-tables [--records <dir>] [--check <report.md>] [--repo <dir>]
@@ -438,8 +443,57 @@ function cmdCountAttempts(argv: readonly string[]): number {
  */
 async function cmdShadowDone(argv: readonly string[]): Promise<number> {
   const flags = flagMap(argv, true);
+  if (flags.has("request")) {
+    const allowed = new Set(["request", "policy", "phase", "case-id", "runlist", "mode", "records", "ledger", "repo"]);
+    for (const key of flags.keys()) if (!allowed.has(key)) throw new UsageError(`unrecognised flag "--${key}"`);
+    if (flags.has("pr") || flags.has("dt") || flags.has("merge-commit") || flags.has("scored-sha")) {
+      throw new UsageError("frozen cal2 path (--request) cannot be combined with --pr/--dt/--merge-commit/--scored-sha");
+    }
+    const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+    const phaseRaw = requiredFlag(flags, "phase");
+    if (phaseRaw !== "dev" && phaseRaw !== "heldout") {
+      throw new UsageError(`--phase must be dev or heldout, got "${phaseRaw}"`);
+    }
+    const phase = phaseRaw as Cal2RunlistPhase;
+    const modeRaw = flags.get("mode");
+    const mode = modeRaw === undefined ? "dry-run" : modeRaw;
+    if (mode !== "live" && mode !== "dry-run") throw new UsageError(`--mode must be live or dry-run, got "${String(modeRaw)}"`);
+    const ledgerFlag = flags.get("ledger");
+    const ledger =
+      mode === "live" ? (typeof ledgerFlag === "string" ? resolve(ledgerFlag) : join(repo, SLICE_RECORDS_DIR, SLICE_LEDGER_FILE)) : undefined;
+    const recordsFlag = flags.get("records");
+    const caseId = flags.get("case-id");
+    const runlist = flags.get("runlist");
+    try {
+      const result = await runShadowDoneFrozen({
+        repoRoot: repo,
+        inputPath: resolve(requiredFlag(flags, "request")),
+        policyPath: resolve(requiredFlag(flags, "policy")),
+        phase,
+        phaseDeclared: true,
+        caseId: typeof caseId === "string" ? caseId : undefined,
+        runlistPath: typeof runlist === "string" ? resolve(runlist) : undefined,
+        mode,
+        recordsDir: typeof recordsFlag === "string" ? resolve(recordsFlag) : undefined,
+        ledgerPath: ledger,
+      });
+      process.stdout.write(`${result.recordPath}\n`);
+      process.stdout.write(`decision: ${result.decision?.verdict ?? "none"} (shadow: recorded only)\n`);
+      return result.exitCode;
+    } catch (err) {
+      if (err instanceof ShadowRunError) {
+        process.stderr.write(`${err.message}\n`);
+        return err.exitCode;
+      }
+      throw err;
+    }
+  }
+
   const allowed = new Set(["pr", "merge-commit", "scored-sha", "base-sha", "dt", "checks-e-t", "checks", "mode", "records", "ledger", "repo"]);
   for (const key of flags.keys()) if (!allowed.has(key)) throw new UsageError(`unrecognised flag "--${key}"`);
+  if (flags.has("policy") || flags.has("phase") || flags.has("case-id") || flags.has("runlist")) {
+    throw new UsageError("use --request with --policy and --phase for frozen cal2 inputs (not --dt)");
+  }
   const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
   const pr = Number.parseInt(requiredFlag(flags, "pr"), 10);
   if (!Number.isInteger(pr) || pr < 1) throw new UsageError("--pr must be a positive integer");
@@ -491,6 +545,20 @@ async function cmdShadowDone(argv: readonly string[]): Promise<number> {
     }
     throw err;
   }
+}
+
+function cmdCal2RequestSizes(argv: readonly string[]): number {
+  const flags = flagMap(argv, true);
+  for (const key of flags.keys()) if (key !== "inputs" && key !== "repo") throw new UsageError(`unrecognised flag "--${key}"`);
+  const repo = typeof flags.get("repo") === "string" ? resolve(flags.get("repo") as string) : process.cwd();
+  const inputs =
+    typeof flags.get("inputs") === "string"
+      ? resolve(flags.get("inputs") as string)
+      : join(repo, "docs/loops/jev-calibration-2/inputs");
+  const rel = toPosix(relative(repo, inputs));
+  const stats = reportCal2RequestSizes(repo, rel);
+  process.stdout.write(`${JSON.stringify({ ...stats, transport_byte_limit: null, note: "no documented cap in HOH-JEV; HTTP 413 would signal refusal" }, null, 2)}\n`);
+  return 0;
 }
 
 /**
@@ -709,6 +777,7 @@ export async function main(argv: readonly string[]): Promise<number> {
     if (sub === "dispatch-check") return cmdDispatchCheck(rest);
     if (sub === "count-attempts") return cmdCountAttempts(rest);
     if (sub === "shadow-done") return await cmdShadowDone(rest);
+    if (sub === "cal2-request-sizes") return cmdCal2RequestSizes(rest);
     if (sub === "shadow-qa") return await cmdShadowQa(rest);
     if (sub === "closeout-tables") return cmdCloseoutTables(rest);
     if (sub === "dispatch") return await cmdDispatch(rest);
