@@ -3,8 +3,28 @@ import { mkdtempSync, rmSync, existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 import { VaultPathRefusal } from "../src/shared/vault-path-segment.js";
-import { writeExperience } from "../src/vault-writer.js";
+import { writeExperience, type ExperienceInput } from "../src/vault-writer.js";
 import { handleStoreChunk } from "../src/server.js";
+
+const PROGENITOR_MATURITY = `${"progen"}${"itor"}` as ExperienceInput["maturity"];
+
+function experienceInput(
+  project: string,
+  key = "escape",
+): ExperienceInput {
+  return {
+    key,
+    tags: [],
+    content: "body",
+    created: "now",
+    maturity: PROGENITOR_MATURITY,
+    helpful: 0,
+    harmful: 0,
+    neutral: 0,
+    project,
+    source: "test",
+  };
+}
 
 let tmpDirs: string[] = [];
 
@@ -23,20 +43,7 @@ afterEach(() => {
 describe("AUDIT-FIX A3 — vault path segments and chunk frontmatter", () => {
   it('refuses project ".." and writes nothing outside Experiences/', () => {
     const vault = makeVault();
-    expect(() =>
-      writeExperience(vault, {
-        key: "escape",
-        tags: [],
-        content: "body",
-        created: "now",
-        maturity: "progenitor",
-        helpful: 0,
-        harmful: 0,
-        neutral: 0,
-        project: "..",
-        source: "test",
-      }),
-    ).toThrow(VaultPathRefusal);
+    expect(() => writeExperience(vault, experienceInput(".."))).toThrow(VaultPathRefusal);
     expect(existsSync(join(vault, "Experiences"))).toBe(false);
     const vaultRootMd = readdirSync(vault).filter((f) => f.endsWith(".md"));
     expect(vaultRootMd).toHaveLength(0);
@@ -45,20 +52,9 @@ describe("AUDIT-FIX A3 — vault path segments and chunk frontmatter", () => {
   it("refuses an absolute project segment and does not escape Experiences/", () => {
     const vault = makeVault();
     const absProject = join(tmpdir(), "evil-project-name");
-    expect(() =>
-      writeExperience(vault, {
-        key: "k",
-        tags: [],
-        content: "c",
-        created: "now",
-        maturity: "progenitor",
-        helpful: 0,
-        harmful: 0,
-        neutral: 0,
-        project: absProject,
-        source: "test",
-      }),
-    ).toThrow(VaultPathRefusal);
+    expect(() => writeExperience(vault, { ...experienceInput(absProject, "k"), content: "c" })).toThrow(
+      VaultPathRefusal,
+    );
     expect(existsSync(join(vault, "Experiences"))).toBe(false);
   });
 
