@@ -1,12 +1,38 @@
 {
-  "ACCEPT": 3,
-  "REJECT": 9,
-  "checks_none": 14,
+  "ACCEPT": 62,
+  "REJECT": 24,
+  "cal1_collected_unscored": 0,
+  "cal1_seen": 1,
+  "checks_none": 88,
   "checks_recorded": 0,
-  "headline_pool": 11,
-  "leak_group": 3,
+  "headline_pool": 71,
+  "held_out_candidates": {
+    "ACCEPT": 48,
+    "REJECT": 20,
+    "no_plan": 0,
+    "rule": "labelled ACCEPT or REJECT, not in the leak group, not cal1-seen",
+    "total": 68,
+    "with_plan": 68
+  },
+  "leak_group": 17,
+  "max_qa": 281,
+  "min_qa": 250,
+  "no_plan": 0,
+  "pair_cases": 36,
+  "pair_prs": 15,
+  "pairs": 21,
+  "plan": 88,
+  "plan_by_source": {
+    "qa-dispatch-section": 14,
+    "qa-dispatch-whole": 67,
+    "task-brief": 7
+  },
+  "runs_considered": 31,
+  "runs_resolved": 31,
+  "runs_with_cases": 29,
   "runtime_built": 0,
-  "seat_built": 14,
-  "total": 14,
-  "unlabelled": 2
+  "seat_built": 88,
+  "total": 88,
+  "unlabelled": 2,
+  "unresolved": 6
 }

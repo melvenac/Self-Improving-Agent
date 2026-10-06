@@ -2,9 +2,11 @@
   "cases": [
     {
       "base_how": "merge-parent",
-      "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
-      "candidate_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
-      "case_id": "t209-t210",
+      "base_sha": "9ab021fdd2df605aacdff2de4db4b963f131d32d",
+      "cal1_collected_unscored": false,
+      "cal1_seen": true,
+      "candidate_sha": "9ab021fdd2df605aacdff2de4db4b963f131d32d",
+      "case_id": "qa250-t-221",
       "case_no": 1,
       "checks_hint": {
         "build_exit": 1,
@@ -12,35 +14,51 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "5bfc1a70de63d007ad13d6ab2a23d32436360bc0",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-253-t209-t210-dispatch.md",
-      "label": "REJECT",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "T-221"
+      ],
+      "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "6c495794145097d47f009963c2c93dadfb1a319b",
-        "5ceb6eef7ed217cbb4fdcc6c9f34f9cc5ea37cd4",
-        "79d1f5d915e2fb89680afec51ead485c9cf4e893"
+      "pair": [],
+      "pair_key": "T-221",
+      "pair_key_how": "task",
+      "plan": "plan",
+      "plan_blob": "995fe42166d7fcb2e8b933e748ae0920ef9aae8b",
+      "plan_headings": [
+        "QA 250: T-221 (CI concurrency per event) + T-222 (count-attempts, F6 to F8)"
       ],
+      "plan_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": null,
+      "prefix": "t221-t222",
       "provenance": "seat-built",
-      "qa_no": 253,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 250,
       "qa_report_ref": {
-        "commit": "a753fb7ff3570585b82757b4f6d24c8112943b99",
-        "path": "docs/loops/t209-t210-qa-report.md",
-        "ref": "origin/qa/t209-t210-report"
+        "commit": "75d7ec48ae7505c61d2b9f69912d8a564253e985",
+        "path": "docs/loops/t221-t222-qa-report.md",
+        "ref": "origin/qa/t221-t222-report"
       },
-      "verdict_text": "# QA 253 report: T-209 (gaps newest-first) + T-210 (latest brief by git commit date)  **By:** QA 253 (headless Claude Code, Opus 5.5), record session 253, 2026-10-02. **Dispatch:** `docs/loops/qa-253-"
+      "round": null,
+      "task": "T-221",
+      "verdict_text": "ACCEPT. One gap, not blocking (row 6)."
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
-      "candidate_sha": "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
-      "case_id": "t208-t212",
+      "base_sha": "7b42ed6fe22539efd48f4ceaa774a0b33e3236c9",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "7b42ed6fe22539efd48f4ceaa774a0b33e3236c9",
+      "case_id": "qa250-t-222",
       "case_no": 2,
       "checks_hint": {
         "build_exit": 1,
@@ -48,36 +66,51 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md",
-      "label": "REJECT",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "T-222"
+      ],
+      "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "e442b955f2b713c7bdddb1edb5bb86253dfe0203",
-        "626f7d1347d3080ae2dd15022391f4f402a6d495",
-        "1e61ccb20a9c427df530b2f976aefe3b1a2ae350",
-        "79d1f5d915e2fb89680afec51ead485c9cf4e893"
+      "pair": [],
+      "pair_key": "T-222",
+      "pair_key_how": "task",
+      "plan": "plan",
+      "plan_blob": "995fe42166d7fcb2e8b933e748ae0920ef9aae8b",
+      "plan_headings": [
+        "QA 250: T-221 (CI concurrency per event) + T-222 (count-attempts, F6 to F8)"
       ],
+      "plan_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": null,
+      "prefix": "t221-t222",
       "provenance": "seat-built",
-      "qa_no": 254,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 250,
       "qa_report_ref": {
-        "commit": "6a908ebff5bca2b999103a1081873ea915f2f3ef",
-        "path": "docs/loops/t208-t212-qa-report.md",
-        "ref": "origin/qa/t208-t212-report"
+        "commit": "75d7ec48ae7505c61d2b9f69912d8a564253e985",
+        "path": "docs/loops/t221-t222-qa-report.md",
+        "ref": "origin/qa/t221-t222-report"
       },
-      "verdict_text": "# QA 254 report: T-208 (fetch before currency) + T-212 (handoff check attributes by trailer)  **By:** QA 254 (headless Claude Code, Opus 5.5), record session 254, 2026-10-02. **Dispatch:** `docs/loops"
+      "round": null,
+      "task": "T-222",
+      "verdict_text": "ACCEPT."
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "507004147df01ec665ff5970257ee400534720ef",
-      "candidate_sha": "507004147df01ec665ff5970257ee400534720ef",
-      "case_id": "b1-start",
+      "base_sha": "892f7644b48cb49b56dc821406f35a84ca28369a",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "892f7644b48cb49b56dc821406f35a84ca28369a",
+      "case_id": "qa251-t-164",
       "case_no": 3,
       "checks_hint": {
         "build_exit": 1,
@@ -85,39 +118,51 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
-      "label": null,
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "T-164"
+      ],
+      "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "0085e78a81e445d942965efce1c358fb9e83f57e",
-        "79d1f5d915e2fb89680afec51ead485c9cf4e893",
-        "f76392d2963ad549defee2e52fecc5ba8eee20b6",
-        "fc71d9696527f97f28ac6a7c4cd8ee572e0fa1f0",
-        "19714baa42a002d306f118f6b5c4403617bdaf34",
-        "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
-        "a753fb7ff3570585b82757b4f6d24c8112943b99"
+      "pair": [],
+      "pair_key": "T-164",
+      "pair_key_how": "task",
+      "plan": "plan",
+      "plan_blob": "0f833a7826f79f4e096e339a9ce7b79e4745b7b6",
+      "plan_headings": [
+        "QA 251: T-164 + T-211 round 2, the narrow re-check of QA 249's F1 to F5"
       ],
+      "plan_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": null,
+      "prefix": "t164-t211-r2",
       "provenance": "seat-built",
-      "qa_no": 255,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 251,
       "qa_report_ref": {
-        "commit": "0736e432916e3aadfeed927a223a6fdc631d7e7c",
-        "path": "docs/loops/b1-start-qa-report.md",
-        "ref": "origin/qa/b1-start-report"
+        "commit": "d4dea22ada192590f857456a1f9b209fe56e3297",
+        "path": "docs/loops/t164-t211-r2-qa-report.md",
+        "ref": "origin/qa/t164-t211-r2-report"
       },
-      "verdict_text": "# QA 255, batch B1 (session-start render): #287, #291, #297, #312  **By:** QA 255 (record session 255), headless Claude Code on Opus, 2026-10-02. Dispatch: `docs/loops/qa-255-b1-start-dispatch.md`. **"
+      "round": null,
+      "task": "T-164",
+      "verdict_text": "ACCEPT. F1 is fixed. One max(n)+1 function serves both the greeting and the refusal."
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "7427ee5587f0343bc663cf2e6e8ba49357cab8bf",
-      "candidate_sha": "7427ee5587f0343bc663cf2e6e8ba49357cab8bf",
-      "case_id": "t203",
+      "base_sha": "3b0b8188976a97abe42d899300730bd1112b2d97",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "3b0b8188976a97abe42d899300730bd1112b2d97",
+      "case_id": "qa251-t-211",
       "case_no": 4,
       "checks_hint": {
         "build_exit": 1,
@@ -125,39 +170,51 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "dcc767c285144469f0539d360224df3c0a642205",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-266-t203-dispatch.md",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "T-211"
+      ],
       "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "09f82a12193788df0b50113aae20e2cd3cccf49c",
-        "f9a3af2ef3c23fc2ab5792a436c980adf7109a53",
-        "a947b8b47c7eb453207110fe5ca2b691f8affc52",
-        "b7f7f3a07940fb835a152750d39cc33dcb35e297",
-        "072fb18feec874259365ae858dbf40c609396be5",
-        "6c1fbb95e3b98c758e2a17f6a3981b74e40e3a6f",
-        "a29dbd94d6c259883fddedb53407fa38cd4bbc98"
+      "pair": [],
+      "pair_key": "T-211",
+      "pair_key_how": "task",
+      "plan": "plan",
+      "plan_blob": "0f833a7826f79f4e096e339a9ce7b79e4745b7b6",
+      "plan_headings": [
+        "QA 251: T-164 + T-211 round 2, the narrow re-check of QA 249's F1 to F5"
       ],
+      "plan_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": null,
+      "prefix": "t164-t211-r2",
       "provenance": "seat-built",
-      "qa_no": 266,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 251,
       "qa_report_ref": {
-        "commit": "9460e90f70caf768244425e91fc276dd3ecdb741",
-        "path": "docs/loops/t203-qa-report.md",
-        "ref": "origin/qa/t203-report"
+        "commit": "d4dea22ada192590f857456a1f9b209fe56e3297",
+        "path": "docs/loops/t164-t211-r2-qa-report.md",
+        "ref": "origin/qa/t164-t211-r2-report"
       },
-      "verdict_text": "# QA 266 report: T-203 (a seat is resolved by its checkout, #376)  **By:** QA 266 (headless Claude Code, Opus 5.5), record session 159, 2026-10-03. **Dispatch:** `docs/loops/qa-266-t203-dispatch.md`. "
+      "round": null,
+      "task": "T-211",
+      "verdict_text": "ACCEPT. F2 and F3: each QA 249 mutant now turns one row red. F4: the template's example"
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "7779e6fee1fc1ee013ad6523dcb5a2e115e9dbda",
-      "candidate_sha": "7779e6fee1fc1ee013ad6523dcb5a2e115e9dbda",
-      "case_id": "s160c",
+      "base_sha": "6c495794145097d47f009963c2c93dadfb1a319b",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "6c495794145097d47f009963c2c93dadfb1a319b",
+      "case_id": "qa253-t-209+t-210",
       "case_no": 5,
       "checks_hint": {
         "build_exit": 1,
@@ -165,39 +222,54 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "7431063d4ef8b2d3a4b411a02172b878b1cd18bb",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-268-s160c-dispatch.md",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-253-t209-t210-dispatch.md",
+      "head_from": "candidate-field",
+      "items": [
+        "T-209",
+        "T-210"
+      ],
       "label": "REJECT",
-      "leak_group": true,
-      "leak_hits": [
-        "accepted"
-      ],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "6f145faf9d1bba962d281e16285fcb59b14b68c7",
-        "3e95016c92844b67113ae44f9d9c7ed362335587",
-        "f8345f1b1929bb05a3cf3230d7a0cc91a30266a9",
-        "6e55119baeb6e9b87c5341e03120e16f8de586e7",
-        "4020a42bdd0b20e1299342af3b353e0eb84a90a6"
+      "pair": [
+        "rejected-then-fixed (fixed in qa255-pr287)"
       ],
+      "pair_key": 287,
+      "pair_key_how": "task T-209 belongs to one PR only",
+      "plan": "plan",
+      "plan_blob": "5bfc1a70de63d007ad13d6ab2a23d32436360bc0",
+      "plan_headings": [
+        "QA 253: T-209 (gaps newest-first) + T-210 (latest brief by git commit date)"
+      ],
+      "plan_path": "docs/loops/qa-253-t209-t210-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": null,
+      "prefix": "t209-t210",
       "provenance": "seat-built",
-      "qa_no": 268,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 253,
       "qa_report_ref": {
-        "commit": "eca6c256e33237d1b428c8d0c2e8b624b4bf52b4",
-        "path": "docs/loops/s160c-qa-report.md",
-        "ref": "origin/qa/s160c-report"
+        "commit": "a753fb7ff3570585b82757b4f6d24c8112943b99",
+        "path": "docs/loops/t209-t210-qa-report.md",
+        "ref": "origin/qa/t209-t210-report"
       },
-      "verdict_text": "# QA 268 report: session-160 batch c (#393 r2 narrow, #397)  **By:** QA 268 (headless Claude Code, Opus), record session 160, 2026-10-03 (UTC 2026-10-04). **Dispatch:** `docs/loops/qa-268-s160c-dispat"
+      "round": null,
+      "task": "T-209",
+      "verdict_text": "REJECT. Two defects: | T-210: ACCEPT on its own rows (5, 6 and 7 all met, and both mutants are killed). It ships in the same commit as T-209,"
     },
     {
-      "base_how": "merge-parent",
-      "base_sha": "617d0f80a8ba37005f58281ecd3ec5996a031cd6",
-      "candidate_sha": "617d0f80a8ba37005f58281ecd3ec5996a031cd6",
-      "case_id": "s160d",
+      "base_how": "origin/master",
+      "base_sha": "79d1f5d915e2fb89680afec51ead485c9cf4e893",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "e442b955f2b713c7bdddb1edb5bb86253dfe0203",
+      "case_id": "qa254-t-208",
       "case_no": 6,
       "checks_hint": {
         "build_exit": 1,
@@ -205,43 +277,53 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "T-208"
+      ],
       "label": "REJECT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "merged": true,
-      "other_candidates_named": [
-        "9ea9f54a6e81ad3f465f56bf92243f3f129ceeba",
-        "c3ee949b8e6e6a45a2758af61c7d6bafd8ca8ce0",
-        "3212ed69a87bf3bbfad5f933691bc457b3435a13",
-        "5add91379641ef211f98b2f79d1551c0090821eb",
-        "ef57c10ceae8c1ccb390e40eec28e8b1283992a1",
-        "3e95016c92844b67113ae44f9d9c7ed362335587",
-        "d4507be6950cc5c8f3f45c27970920f136898389",
-        "e14593baf387ca845df2789b72abeaf230f5e2c0",
-        "bbc2acbf65c54ab640713b03ec806a8e5a9c4f14",
-        "783cdc14c503b416e1d54837c5722ddcd42089e8",
-        "169956b843b716846131db12e2d0a2800bdeba2c"
+      "merge_commit": "e442b955f2b713c7bdddb1edb5bb86253dfe0203",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa258-pr289-r3)"
       ],
+      "pair_key": 289,
+      "pair_key_how": "task T-208 belongs to one PR only",
+      "plan": "plan",
+      "plan_blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
+      "plan_headings": [
+        "QA 254: T-208 (fetch before currency) + T-212 (handoff check attributes by trailer)"
+      ],
+      "plan_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": null,
+      "prefix": "t208-t212",
       "provenance": "seat-built",
-      "qa_no": 269,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 254,
       "qa_report_ref": {
-        "commit": "56ebcf3724a526b955ff44c856bf692d016ee0f1",
-        "path": "docs/loops/s160d-qa-report.md",
-        "ref": "origin/qa/s160d-report"
+        "commit": "6a908ebff5bca2b999103a1081873ea915f2f3ef",
+        "path": "docs/loops/t208-t212-qa-report.md",
+        "ref": "origin/qa/t208-t212-report"
       },
-      "verdict_text": "# QA 269 report: session-160 batch d (#397 r2 narrow, #401, #402, #404)  **By:** QA 269 (headless Claude Code, Opus), record session 160, 2026-10-03 (UTC 2026-10-04). **Dispatch:** `docs/loops/qa-269-"
+      "round": null,
+      "task": "T-208",
+      "verdict_text": "REJECT. A failed start fetch rewrites FETCHHEAD. The FAILED line then names the failed"
     },
     {
-      "base_how": "merge-parent",
-      "base_sha": "0bc93353a7eae700b59835e09e573549948ce13c",
-      "candidate_sha": "0bc93353a7eae700b59835e09e573549948ce13c",
-      "case_id": "s160e",
+      "base_how": "origin/master",
+      "base_sha": "79d1f5d915e2fb89680afec51ead485c9cf4e893",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "626f7d1347d3080ae2dd15022391f4f402a6d495",
+      "case_id": "qa254-t-212",
       "case_no": 7,
       "checks_hint": {
         "build_exit": 1,
@@ -249,36 +331,51 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "538059a1271a552b52f9d008e75a4d1324d49350",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "T-212"
+      ],
       "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "merged": true,
-      "other_candidates_named": [
-        "f918de5844a89d38f03d4d4e23173e4540c9f814",
-        "e00c0d5aae7ad902a589d09b60a672d0700ae78c",
-        "be9132757ad040b7ab944e0adfaa19f3d3400eeb",
-        "c1ed6b2af20a870b902f0d6f1f58ae71d7ef57b2"
+      "merge_commit": "626f7d1347d3080ae2dd15022391f4f402a6d495",
+      "merged": false,
+      "pair": [],
+      "pair_key": 290,
+      "pair_key_how": "task T-212 belongs to one PR only",
+      "plan": "plan",
+      "plan_blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
+      "plan_headings": [
+        "QA 254: T-208 (fetch before currency) + T-212 (handoff check attributes by trailer)"
       ],
+      "plan_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": null,
+      "prefix": "t208-t212",
       "provenance": "seat-built",
-      "qa_no": 270,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 254,
       "qa_report_ref": {
-        "commit": "70aefd51a231a48e04a7df259ce34afa388fae96",
-        "path": "docs/loops/s160e-qa-report.md",
-        "ref": "origin/qa/s160e-report"
+        "commit": "6a908ebff5bca2b999103a1081873ea915f2f3ef",
+        "path": "docs/loops/t208-t212-qa-report.md",
+        "ref": "origin/qa/t208-t212-report"
       },
-      "verdict_text": "# QA 270 report (s160e): #412 (T-238 KEY_ORDER guard) + #413 (T-239 handoff by checkout)  **By:** QA 270 (headless Claude Code, Opus 5.5), record session 160, 2026-10-04 UTC. **Dispatch:** `docs/loops"
+      "round": null,
+      "task": "T-212",
+      "verdict_text": "ACCEPT. Every row met. Notes below; none blocks."
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "71b2b924b1020a454e2eaa7035366c841de0f8f5",
-      "candidate_sha": "71b2b924b1020a454e2eaa7035366c841de0f8f5",
-      "case_id": "s160f",
+      "base_sha": "0085e78a81e445d942965efce1c358fb9e83f57e",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "0085e78a81e445d942965efce1c358fb9e83f57e",
+      "case_id": "qa255-pr287",
       "case_no": 8,
       "checks_hint": {
         "build_exit": 1,
@@ -286,39 +383,53 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "687200f90fe15927859568493c26fe622c894d39",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#287"
+      ],
       "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "4ada3bb375400ccddb795c9610aa51e2f123c997",
-        "dc092840af38f86dfe18af060564fe181988f159",
-        "8f14ca91d5ddfb5986bc025566c853af8d45e042",
-        "0d2bc66e94ebed4ca7008395eede8426f43e055c",
-        "651ac36b19a127adc1c365327e3e7e64a3669256",
-        "82aeb3da3e9036d5f6812738be541cb67ada1e07",
-        "b92df3c8fc3248105af635bb06a595d1c0d3822e"
+      "pair": [
+        "fix of qa253-t-209+t-210"
       ],
+      "pair_key": 287,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
+      "plan_headings": [
+        "QA 255, batch B1: session-start render (#287, #291, #297, #312)"
+      ],
+      "plan_path": "docs/loops/qa-255-b1-start-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 287,
+      "prefix": "b1-start",
       "provenance": "seat-built",
-      "qa_no": 272,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 255,
       "qa_report_ref": {
-        "commit": "d562eca0db647ecc3913287d4d522f382f4869a2",
-        "path": "docs/loops/s160f-qa-report.md",
-        "ref": "origin/qa/s160f-report"
+        "commit": "0736e432916e3aadfeed927a223a6fdc631d7e7c",
+        "path": "docs/loops/b1-start-qa-report.md",
+        "ref": "origin/qa/b1-start-report"
       },
-      "verdict_text": "# QA 272 report (s160f): #415 (T-239 follow-up), #420 (T-200 port), #421 (G-053), plus the #418 retro-check  **By:** QA 272 (headless Claude Code, Opus 5.5), record session 160, 2026-10-04 UTC. **Disp"
+      "round": null,
+      "task": "T-209",
+      "verdict_text": "ACCEPT."
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "0565c51ff97bac036cd4cac18bfa4ce4e1b2729d",
-      "candidate_sha": "0565c51ff97bac036cd4cac18bfa4ce4e1b2729d",
-      "case_id": "s161a",
+      "base_sha": "f76392d2963ad549defee2e52fecc5ba8eee20b6",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "f76392d2963ad549defee2e52fecc5ba8eee20b6",
+      "case_id": "qa255-pr291",
       "case_no": 9,
       "checks_hint": {
         "build_exit": 1,
@@ -326,41 +437,49 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
-      "label": "REJECT",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": null,
+      "head_from": "led-by-item",
+      "items": [
+        "#291"
+      ],
+      "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "9915a59baad67d9e29a415adec0a931b335c1cba",
-        "12c289264e433bb306f55e212193a7a2448c2eca",
-        "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b",
-        "270b550b97ada09f50c256f381e4ec26ff98782a",
-        "651ac36b19a127adc1c365327e3e7e64a3669256",
-        "71b2b924b1020a454e2eaa7035366c841de0f8f5",
-        "f8dc13a5bb8e2d9fe6d972fef0a7cadc2c202317",
-        "3bcd7d72ddd5e7ea1e64ca839fea5482c977682c",
-        "82aeb3da3e9036d5f6812738be541cb67ada1e07"
-      ],
+      "pair": [],
+      "pair_key": 291,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "3fd92b18e2d6d498cf073be2de54862acad76df4",
+      "plan_headings": [],
+      "plan_path": "docs/loops/t183-greeting-brief.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "task-brief",
+      "plan_why": null,
+      "pr": 291,
+      "prefix": "b1-start",
       "provenance": "seat-built",
-      "qa_no": 273,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 255,
       "qa_report_ref": {
-        "commit": "7ce087186ffac0afe156060c60c751b24da02dea",
-        "path": "docs/loops/s161a-qa-report.md",
-        "ref": "origin/qa/s161a-report"
+        "commit": "0736e432916e3aadfeed927a223a6fdc631d7e7c",
+        "path": "docs/loops/b1-start-qa-report.md",
+        "ref": "origin/qa/b1-start-report"
       },
-      "verdict_text": "# QA 273 (s161a) report: #421 r2, #424, #425, #427 (Plumb, Linux)  **By:** QA 273, record session 161, headless Claude Code on Opus on Plumb (Linux). Nobody watching live. **Dispatch:** `docs/loops/qa"
+      "round": null,
+      "task": "T-183",
+      "verdict_text": "ACCEPT."
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "bbea9698417a70344ea777c6e15283cdd6ec7ad7",
-      "candidate_sha": "bbea9698417a70344ea777c6e15283cdd6ec7ad7",
-      "case_id": "s161c",
+      "base_sha": "fc71d9696527f97f28ac6a7c4cd8ee572e0fa1f0",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "fc71d9696527f97f28ac6a7c4cd8ee572e0fa1f0",
+      "case_id": "qa255-pr297",
       "case_no": 10,
       "checks_hint": {
         "build_exit": 1,
@@ -368,50 +487,51 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
-      "label": "REJECT",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#297"
+      ],
+      "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "7ce087186ffac0afe156060c60c751b24da02dea",
-        "bfc225089a4be11b9c3cea7c734e472991a4efcc",
-        "8173cef6495dd9333cd199d0c05c82ac671589ed",
-        "b9026d71d1fbfa2ba42de465fac4d54feae702cd",
-        "987901c9cb43f3dd3a31b9e22fec164edd9769dd",
-        "12f26320fdb89ea9e9c76dfc30790628b707d6d7",
-        "144623d2f9707d7b501a0657f842f4a827d85562",
-        "23d46156a5fa34873ef1bee0ab723e52d1b33858",
-        "651ac36b19a127adc1c365327e3e7e64a3669256",
-        "71b2b924b1020a454e2eaa7035366c841de0f8f5",
-        "f8dc13a5bb8e2d9fe6d972fef0a7cadc2c202317",
-        "91e144511bf70477089aa10f1fb396c5954adc7d",
-        "270b550b97ada09f50c256f381e4ec26ff98782a",
-        "d8f4c9dcd17f71b8b76d41fabca46d395650eb1c",
-        "82aeb3da3e9036d5f6812738be541cb67ada1e07",
-        "9915a59baad67d9e29a415adec0a931b335c1cba",
-        "12c289264e433bb306f55e212193a7a2448c2eca",
-        "4100c8781ef83c4d07ed8508fe650922a02cffe8"
+      "pair": [],
+      "pair_key": 297,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
+      "plan_headings": [
+        "QA 255, batch B1: session-start render (#287, #291, #297, #312)"
       ],
+      "plan_path": "docs/loops/qa-255-b1-start-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 297,
+      "prefix": "b1-start",
       "provenance": "seat-built",
-      "qa_no": 275,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 255,
       "qa_report_ref": {
-        "commit": "2dc5f1149e5fd5b69909afdfc6f507f29e3078a6",
-        "path": "docs/loops/s161c-qa-report.md",
-        "ref": "origin/qa/s161c-report"
+        "commit": "0736e432916e3aadfeed927a223a6fdc631d7e7c",
+        "path": "docs/loops/b1-start-qa-report.md",
+        "ref": "origin/qa/b1-start-report"
       },
-      "verdict_text": "# QA 275 (s161c) report: #434, #436, #437, plus amendment 1 (#421 r3, #424 r2, #427 r2, batch merge) (Plumb, Linux)  **By:** QA 275, record session 161, headless Claude Code on Opus on Plumb (Linux). "
+      "round": null,
+      "task": "T-226",
+      "verdict_text": "ACCEPT."
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
-      "candidate_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
-      "case_id": "s161d",
+      "base_sha": "19714baa42a002d306f118f6b5c4403617bdaf34",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "19714baa42a002d306f118f6b5c4403617bdaf34",
+      "case_id": "qa255-pr312",
       "case_no": 11,
       "checks_hint": {
         "build_exit": 1,
@@ -419,34 +539,51 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "18ebc58b83113e9c18a5fd71fa9d45682708f8b9",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-276-s161d-dispatch.md",
-      "label": null,
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#312"
+      ],
+      "label": "ACCEPT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
       "merged": true,
-      "other_candidates_named": [
-        "987901c9cb43f3dd3a31b9e22fec164edd9769dd",
-        "270b550b97ada09f50c256f381e4ec26ff98782a"
+      "pair": [],
+      "pair_key": 312,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
+      "plan_headings": [
+        "QA 255, batch B1: session-start render (#287, #291, #297, #312)"
       ],
+      "plan_path": "docs/loops/qa-255-b1-start-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 312,
+      "prefix": "b1-start",
       "provenance": "seat-built",
-      "qa_no": 276,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 255,
       "qa_report_ref": {
-        "commit": "84aef34c17259d4fd59c07bd27545d5bd088ceaa",
-        "path": "docs/loops/s161d-qa-report.md",
-        "ref": "origin/qa/s161d-report"
+        "commit": "0736e432916e3aadfeed927a223a6fdc631d7e7c",
+        "path": "docs/loops/b1-start-qa-report.md",
+        "ref": "origin/qa/b1-start-report"
       },
-      "verdict_text": "# QA 276 (s161d): #427 r2's walk on real Windows  **Seat:** QA, headless Claude Code on Opus, record session 161. **Machine: the laptop (DESKTOP-0GV3HAD)**, Windows 10 Pro 19045, Windows PowerShell 5."
+      "round": null,
+      "task": "T-148",
+      "verdict_text": "ACCEPT."
     },
     {
-      "base_how": "merge-parent",
-      "base_sha": "b5c19fa45228cbe070e0a52fe2e3c2d5615f771a",
-      "candidate_sha": "b5c19fa45228cbe070e0a52fe2e3c2d5615f771a",
-      "case_id": "s161e",
+      "base_how": "origin/master",
+      "base_sha": "8b7aa9520b343b96470222ecd41a4fc49d3a982a",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "cc28573882497898e3ab0346777066ecf1e62287",
+      "case_id": "qa256-pr295",
       "case_no": 12,
       "checks_hint": {
         "build_exit": 1,
@@ -454,40 +591,53 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#295"
+      ],
       "label": "REJECT",
       "leak_group": false,
       "leak_hits": [],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "merged": true,
-      "other_candidates_named": [
-        "a6d75b5273091d75bbc127826853170fe3ddeb4a",
-        "48bf479562296a0f4c717fb91cc0fec92f11ed86",
-        "08fa900211547aade6538792c88feab037ba23f8",
-        "a5f118192f3479ad35dd58aebb3d24510f0f24b4",
-        "d292747f8ce5e9173edfc71e5feb3f249693b147",
-        "685b9fe931a08f31d59977c90fbbd06cb977588b",
-        "1e8cba7c92d3639a17691e03700cd32a84b6711f",
-        "987901c9cb43f3dd3a31b9e22fec164edd9769dd"
+      "merge_commit": "cc28573882497898e3ab0346777066ecf1e62287",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa262-pr295)"
       ],
+      "pair_key": 295,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+      "plan_headings": [
+        "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 295,
+      "prefix": "b2-sync",
       "provenance": "seat-built",
-      "qa_no": 277,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 256,
       "qa_report_ref": {
-        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
-        "path": "docs/loops/s161e-qa-report.md",
-        "ref": "origin/qa/s161e-report"
+        "commit": "336cf208ea73d001eb000248d45597736e5434c1",
+        "path": "docs/loops/b2-sync-qa-report.md",
+        "ref": "origin/qa/b2-sync-report"
       },
-      "verdict_text": "# QA 277 report: session-161 batch e (prefix `s161e`), seven PRs  **By:** QA 277, headless Claude Code (Opus 5.5) on Plumb (Linux), record session 161, 2026-10-04. **Dispatch:** `docs/loops/qa-277-s16"
+      "round": null,
+      "task": "T-008",
+      "verdict_text": "REJECT"
     },
     {
-      "base_how": "merge-parent",
-      "base_sha": "972c60264a336f20ece99b7eb9c55f13e83f2ec5",
-      "candidate_sha": "972c60264a336f20ece99b7eb9c55f13e83f2ec5",
-      "case_id": "s161g",
+      "base_how": "origin/master",
+      "base_sha": "8b7aa9520b343b96470222ecd41a4fc49d3a982a",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "7b09c5b7ce3aa661f4e2acfc6d4235e09239cebf",
+      "case_id": "qa256-pr298",
       "case_no": 13,
       "checks_hint": {
         "build_exit": 1,
@@ -495,44 +645,53 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#298"
+      ],
       "label": "REJECT",
-      "leak_group": true,
-      "leak_hits": [
-        "rejected"
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "7b09c5b7ce3aa661f4e2acfc6d4235e09239cebf",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa262-pr298)"
       ],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "merged": true,
-      "other_candidates_named": [
-        "9daf38d8cdb575f6c51f9b30d43f96126c7a8eb4",
-        "b9f8a5dfc2437b3d35049df691dd85483424e950",
-        "3dfa24245cd1b3b99344cd2d675735bc608d04c8",
-        "9bfb2e1e78cc1701394988cc9c65288af4269582",
-        "43ed65a9f2e55b649b4bd1dbb46baddc84d3e0e6",
-        "a6d75b5273091d75bbc127826853170fe3ddeb4a",
-        "12f26320fdb89ea9e9c76dfc30790628b707d6d7",
-        "23d46156a5fa34873ef1bee0ab723e52d1b33858",
-        "a5f118192f3479ad35dd58aebb3d24510f0f24b4",
-        "d292747f8ce5e9173edfc71e5feb3f249693b147"
+      "pair_key": 298,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+      "plan_headings": [
+        "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)"
       ],
+      "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 298,
+      "prefix": "b2-sync",
       "provenance": "seat-built",
-      "qa_no": 279,
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 256,
       "qa_report_ref": {
-        "commit": "8396ffbcc6b3085ad91dced7f0868964e68d0d06",
-        "path": "docs/loops/s161g-qa-report.md",
-        "ref": "origin/qa/s161g-report"
+        "commit": "336cf208ea73d001eb000248d45597736e5434c1",
+        "path": "docs/loops/b2-sync-qa-report.md",
+        "ref": "origin/qa/b2-sync-report"
       },
-      "verdict_text": "# QA 279 report: session-161 batch g (prefix `s161g`), narrow re-runs of five PRs (Plumb, Linux)  **Seat:** QA, headless Claude Code on Opus, record session 161. Machine: Plumb (Linux). 2026-10-04. Di"
+      "round": null,
+      "task": "T-008b",
+      "verdict_text": "REJECT"
     },
     {
       "base_how": "merge-parent",
-      "base_sha": "5e28a9103c21342666017a447ecd3e3317b4bed6",
-      "candidate_sha": "5e28a9103c21342666017a447ecd3e3317b4bed6",
-      "case_id": "s162a",
+      "base_sha": "5ae7f9f28bed80d58cbdb34056e87d620faecaed",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "5ae7f9f28bed80d58cbdb34056e87d620faecaed",
+      "case_id": "qa256-pr300",
       "case_no": 14,
       "checks_hint": {
         "build_exit": 1,
@@ -540,116 +699,4557 @@
         "source": "none",
         "unit_exit": 1
       },
-      "dispatch_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
-      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
-      "dispatch_how": "master-dispatch",
-      "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#300"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 300,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+      "plan_headings": [
+        "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 300,
+      "prefix": "b2-sync",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 256,
+      "qa_report_ref": {
+        "commit": "336cf208ea73d001eb000248d45597736e5434c1",
+        "path": "docs/loops/b2-sync-qa-report.md",
+        "ref": "origin/qa/b2-sync-report"
+      },
+      "round": null,
+      "task": "T-051",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "112a41396f78e2312c85ce71221aaeed15fa2979",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "112a41396f78e2312c85ce71221aaeed15fa2979",
+      "case_id": "qa256-pr303",
+      "case_no": 15,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#303"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 303,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+      "plan_headings": [
+        "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 303,
+      "prefix": "b2-sync",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 256,
+      "qa_report_ref": {
+        "commit": "336cf208ea73d001eb000248d45597736e5434c1",
+        "path": "docs/loops/b2-sync-qa-report.md",
+        "ref": "origin/qa/b2-sync-report"
+      },
+      "round": null,
+      "task": "T-176",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "d8dc12db5da04aabb66ec9e30433aee0ed637aab",
+      "case_id": "qa256-pr306",
+      "case_no": 16,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#306"
+      ],
       "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "d8dc12db5da04aabb66ec9e30433aee0ed637aab",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa260-pr306)"
+      ],
+      "pair_key": 306,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+      "plan_headings": [
+        "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 306,
+      "prefix": "b2-sync",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 256,
+      "qa_report_ref": {
+        "commit": "336cf208ea73d001eb000248d45597736e5434c1",
+        "path": "docs/loops/b2-sync-qa-report.md",
+        "ref": "origin/qa/b2-sync-report"
+      },
+      "round": null,
+      "task": "T-048",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "eb721dec39b13e6a17a8ca7f16cb574c56b62d02",
+      "case_id": "qa256-pr309",
+      "case_no": 17,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#309"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "eb721dec39b13e6a17a8ca7f16cb574c56b62d02",
+      "merged": false,
+      "pair": [],
+      "pair_key": 309,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+      "plan_headings": [
+        "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 309,
+      "prefix": "b2-sync",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 256,
+      "qa_report_ref": {
+        "commit": "336cf208ea73d001eb000248d45597736e5434c1",
+        "path": "docs/loops/b2-sync-qa-report.md",
+        "ref": "origin/qa/b2-sync-report"
+      },
+      "round": null,
+      "task": "T-048",
+      "verdict_text": "ACCEPT (its own diff; it merges only after #306)"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "11c183e478e513dc4e026d8ea47b19de37e47515",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "11c183e478e513dc4e026d8ea47b19de37e47515",
+      "case_id": "qa257-pr301",
+      "case_no": 18,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#301"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 301,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+      "plan_headings": [
+        "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)"
+      ],
+      "plan_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 301,
+      "prefix": "b3-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 257,
+      "qa_report_ref": {
+        "commit": "6533ba75370712a9590d5d6d34d790a521cad508",
+        "path": "docs/loops/b3-misc-qa-report.md",
+        "ref": "origin/qa/b3-misc-report"
+      },
+      "round": null,
+      "task": "T-163",
+      "verdict_text": "ACCEPT."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "84e756180e400cccba92e4d66ddbcf12ed15ec0c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "84e756180e400cccba92e4d66ddbcf12ed15ec0c",
+      "case_id": "qa257-pr305",
+      "case_no": 19,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": null,
+      "head_from": "verdict-line",
+      "items": [
+        "#305"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 305,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "06c35f7f24e02902a93d3fca2fdb219117215ca4",
+      "plan_headings": [],
+      "plan_path": "docs/loops/t152-brief.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "task-brief",
+      "plan_why": null,
+      "pr": 305,
+      "prefix": "b3-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 257,
+      "qa_report_ref": {
+        "commit": "6533ba75370712a9590d5d6d34d790a521cad508",
+        "path": "docs/loops/b3-misc-qa-report.md",
+        "ref": "origin/qa/b3-misc-report"
+      },
+      "round": null,
+      "task": "T-152",
+      "verdict_text": "ACCEPT."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "65eb9e947cff92cf0e03fc8ba2d42e20bc6043a6",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "65eb9e947cff92cf0e03fc8ba2d42e20bc6043a6",
+      "case_id": "qa257-pr308",
+      "case_no": 20,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#308"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 308,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+      "plan_headings": [
+        "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)"
+      ],
+      "plan_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 308,
+      "prefix": "b3-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 257,
+      "qa_report_ref": {
+        "commit": "6533ba75370712a9590d5d6d34d790a521cad508",
+        "path": "docs/loops/b3-misc-qa-report.md",
+        "ref": "origin/qa/b3-misc-report"
+      },
+      "round": null,
+      "task": "T-186",
+      "verdict_text": "ACCEPT."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "1c865761d7feb33cd95dc449c4e57742b1c38bd9",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "1c865761d7feb33cd95dc449c4e57742b1c38bd9",
+      "case_id": "qa257-pr313",
+      "case_no": 21,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#313"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 313,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+      "plan_headings": [
+        "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)"
+      ],
+      "plan_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 313,
+      "prefix": "b3-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 257,
+      "qa_report_ref": {
+        "commit": "6533ba75370712a9590d5d6d34d790a521cad508",
+        "path": "docs/loops/b3-misc-qa-report.md",
+        "ref": "origin/qa/b3-misc-report"
+      },
+      "round": null,
+      "task": "T-065",
+      "verdict_text": "ACCEPT, one non-blocking gap (row 3)."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "b20d99a46269739fcac4d6b8a0ea31eb89bbec43",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "b20d99a46269739fcac4d6b8a0ea31eb89bbec43",
+      "case_id": "qa257-pr314",
+      "case_no": 22,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#314"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 314,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+      "plan_headings": [
+        "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)"
+      ],
+      "plan_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 314,
+      "prefix": "b3-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 257,
+      "qa_report_ref": {
+        "commit": "6533ba75370712a9590d5d6d34d790a521cad508",
+        "path": "docs/loops/b3-misc-qa-report.md",
+        "ref": "origin/qa/b3-misc-report"
+      },
+      "round": null,
+      "task": "T-042",
+      "verdict_text": "ACCEPT, one non-blocking gap (row 3)."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "be32de21d7d448b5c91b4cfa5411698842c97d80",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "be32de21d7d448b5c91b4cfa5411698842c97d80",
+      "case_id": "qa258-pr289-r3",
+      "case_no": 23,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#289"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "accept"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa254-t-208"
+      ],
+      "pair_key": 289,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+      "plan_headings": [
+        "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)"
+      ],
+      "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 289,
+      "prefix": "b4-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 258,
+      "qa_report_ref": {
+        "commit": "64cee8abbeadd5847ac8f383d55c9760c2dc44c9",
+        "path": "docs/loops/b4-misc-qa-report.md",
+        "ref": "origin/qa/b4-misc-report"
+      },
+      "round": "r3",
+      "task": "T-208",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "f707a09c6b61833d5499998d22403037908ebd01",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "f707a09c6b61833d5499998d22403037908ebd01",
+      "case_id": "qa258-pr290",
+      "case_no": 24,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#290"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "accept"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 290,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+      "plan_headings": [
+        "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)"
+      ],
+      "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 290,
+      "prefix": "b4-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 258,
+      "qa_report_ref": {
+        "commit": "64cee8abbeadd5847ac8f383d55c9760c2dc44c9",
+        "path": "docs/loops/b4-misc-qa-report.md",
+        "ref": "origin/qa/b4-misc-report"
+      },
+      "round": null,
+      "task": "T-212",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "507004147df01ec665ff5970257ee400534720ef",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "39c3cca738081670ab6bb593645f210eab73917e",
+      "case_id": "qa258-pr294",
+      "case_no": 25,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#294"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "accept"
+      ],
+      "merge_commit": "39c3cca738081670ab6bb593645f210eab73917e",
+      "merged": false,
+      "pair": [],
+      "pair_key": 294,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+      "plan_headings": [
+        "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)"
+      ],
+      "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 294,
+      "prefix": "b4-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 258,
+      "qa_report_ref": {
+        "commit": "64cee8abbeadd5847ac8f383d55c9760c2dc44c9",
+        "path": "docs/loops/b4-misc-qa-report.md",
+        "ref": "origin/qa/b4-misc-report"
+      },
+      "round": null,
+      "task": "T-215",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "483061d04bafe0ac64c4c5692e1dc19e6840b16a",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "483061d04bafe0ac64c4c5692e1dc19e6840b16a",
+      "case_id": "qa258-pr299",
+      "case_no": 26,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#299"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "accept"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 299,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+      "plan_headings": [
+        "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)"
+      ],
+      "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 299,
+      "prefix": "b4-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 258,
+      "qa_report_ref": {
+        "commit": "64cee8abbeadd5847ac8f383d55c9760c2dc44c9",
+        "path": "docs/loops/b4-misc-qa-report.md",
+        "ref": "origin/qa/b4-misc-report"
+      },
+      "round": null,
+      "task": "T-050",
+      "verdict_text": "ACCEPT (one follow-up)"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60",
+      "case_id": "qa258-pr302",
+      "case_no": 27,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#302"
+      ],
+      "label": "REJECT",
+      "leak_group": true,
+      "leak_hits": [
+        "accept"
+      ],
+      "merge_commit": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa261-pr302)"
+      ],
+      "pair_key": 302,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+      "plan_headings": [
+        "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)"
+      ],
+      "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 302,
+      "prefix": "b4-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 258,
+      "qa_report_ref": {
+        "commit": "64cee8abbeadd5847ac8f383d55c9760c2dc44c9",
+        "path": "docs/loops/b4-misc-qa-report.md",
+        "ref": "origin/qa/b4-misc-report"
+      },
+      "round": null,
+      "task": "T-048",
+      "verdict_text": "REJECT (row 9, zero not reported at every site)"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "c77dce55677a71a4ede59bbab933adf3270f2c22",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "c77dce55677a71a4ede59bbab933adf3270f2c22",
+      "case_id": "qa259-pr292",
+      "case_no": 28,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#292"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 292,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "3167a3ed0416ebf461eaf5dfc9fe9d0a90acbe76",
+      "plan_headings": [
+        "QA 259, batch B5: placeholder reason, CI group pin, hub-talk exit codes (#292, #293, #320)"
+      ],
+      "plan_path": "docs/loops/qa-259-b5-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 292,
+      "prefix": "b5-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 259,
+      "qa_report_ref": {
+        "commit": "a161b4ad8bdf845345d332cc3f7b642787e39580",
+        "path": "docs/loops/b5-misc-qa-report.md",
+        "ref": "origin/qa/b5-misc-report"
+      },
+      "round": null,
+      "task": "T-224",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "58e0ce15eb5871c50eb01794c007a9a842fc5acb",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "58e0ce15eb5871c50eb01794c007a9a842fc5acb",
+      "case_id": "qa259-pr293",
+      "case_no": 29,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#293"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 293,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "3167a3ed0416ebf461eaf5dfc9fe9d0a90acbe76",
+      "plan_headings": [
+        "QA 259, batch B5: placeholder reason, CI group pin, hub-talk exit codes (#292, #293, #320)"
+      ],
+      "plan_path": "docs/loops/qa-259-b5-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 293,
+      "prefix": "b5-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 259,
+      "qa_report_ref": {
+        "commit": "a161b4ad8bdf845345d332cc3f7b642787e39580",
+        "path": "docs/loops/b5-misc-qa-report.md",
+        "ref": "origin/qa/b5-misc-report"
+      },
+      "round": null,
+      "task": "T-223",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "c9b5e7571d0b02c822372d78ed102281e7415c8e",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "c9b5e7571d0b02c822372d78ed102281e7415c8e",
+      "case_id": "qa259-pr320",
+      "case_no": 30,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#320"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 320,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "3167a3ed0416ebf461eaf5dfc9fe9d0a90acbe76",
+      "plan_headings": [
+        "QA 259, batch B5: placeholder reason, CI group pin, hub-talk exit codes (#292, #293, #320)"
+      ],
+      "plan_path": "docs/loops/qa-259-b5-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 320,
+      "prefix": "b5-misc",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 259,
+      "qa_report_ref": {
+        "commit": "a161b4ad8bdf845345d332cc3f7b642787e39580",
+        "path": "docs/loops/b5-misc-qa-report.md",
+        "ref": "origin/qa/b5-misc-report"
+      },
+      "round": null,
+      "task": "T-228",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "22ae3597abff2bed5ab42e1210d92ebc451dd0f2",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "7312a292c342e91c64c2de4263a6eb85cf8b3cc1",
+      "case_id": "qa260-pr295",
+      "case_no": 31,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#295"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "7312a292c342e91c64c2de4263a6eb85cf8b3cc1",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa262-pr295)"
+      ],
+      "pair_key": 295,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+      "plan_headings": [
+        "QA 260, B2 round 2: /sync checks re-check (#295, #298, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-260-b2r2-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 295,
+      "prefix": "b2r2-sync",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 260,
+      "qa_report_ref": {
+        "commit": "0f53d867b21d4a3bc56a8971e6692657adcca768",
+        "path": "docs/loops/b2r2-sync-qa-report.md",
+        "ref": "origin/qa/b2r2-sync-report"
+      },
+      "round": null,
+      "task": "T-008",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "22ae3597abff2bed5ab42e1210d92ebc451dd0f2",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "7afd7f1bbb31ff1ba54c924b386384be45f261a0",
+      "case_id": "qa260-pr298",
+      "case_no": 32,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#298"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "7afd7f1bbb31ff1ba54c924b386384be45f261a0",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa262-pr298)"
+      ],
+      "pair_key": 298,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+      "plan_headings": [
+        "QA 260, B2 round 2: /sync checks re-check (#295, #298, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-260-b2r2-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 298,
+      "prefix": "b2r2-sync",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 260,
+      "qa_report_ref": {
+        "commit": "0f53d867b21d4a3bc56a8971e6692657adcca768",
+        "path": "docs/loops/b2r2-sync-qa-report.md",
+        "ref": "origin/qa/b2r2-sync-report"
+      },
+      "round": null,
+      "task": "T-008b",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "3f30e8258cdc1537a85b0b9eb3f5d3c81664a184",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "3f30e8258cdc1537a85b0b9eb3f5d3c81664a184",
+      "case_id": "qa260-pr306",
+      "case_no": 33,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#306"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa256-pr306"
+      ],
+      "pair_key": 306,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+      "plan_headings": [
+        "QA 260, B2 round 2: /sync checks re-check (#295, #298, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-260-b2r2-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 306,
+      "prefix": "b2r2-sync",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 260,
+      "qa_report_ref": {
+        "commit": "0f53d867b21d4a3bc56a8971e6692657adcca768",
+        "path": "docs/loops/b2r2-sync-qa-report.md",
+        "ref": "origin/qa/b2r2-sync-report"
+      },
+      "round": null,
+      "task": "T-048",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "f1c2a338e20c3b5b041ad53d55df533ec72bcbed",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "f1c2a338e20c3b5b041ad53d55df533ec72bcbed",
+      "case_id": "qa260-pr309",
+      "case_no": 34,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#309"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 309,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+      "plan_headings": [
+        "QA 260, B2 round 2: /sync checks re-check (#295, #298, #306, #309)"
+      ],
+      "plan_path": "docs/loops/qa-260-b2r2-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 309,
+      "prefix": "b2r2-sync",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 260,
+      "qa_report_ref": {
+        "commit": "0f53d867b21d4a3bc56a8971e6692657adcca768",
+        "path": "docs/loops/b2r2-sync-qa-report.md",
+        "ref": "origin/qa/b2r2-sync-report"
+      },
+      "round": null,
+      "task": "T-048",
+      "verdict_text": "ACCEPT (its own diff; it merges only after #306)"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "7e92b6f641ad776d886037e54139cb0e6fd4b617",
+      "case_id": "qa261-pr302",
+      "case_no": 35,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-261-302r2-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#302"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "7e92b6f641ad776d886037e54139cb0e6fd4b617",
+      "merged": false,
+      "pair": [
+        "fix of qa258-pr302"
+      ],
+      "pair_key": 302,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "6c19f7858a406e6f634335b45cf0b99401dbc11f",
+      "plan_headings": [
+        "QA 261: #302 round 2, the narrow re-check (T-048 dropped counts, printed at zero)"
+      ],
+      "plan_path": "docs/loops/qa-261-302r2-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 302,
+      "prefix": "t048r2",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 261,
+      "qa_report_ref": {
+        "commit": "f395ee8431dc7da255e06c2cad5070516e3a0dfb",
+        "path": "docs/loops/t048r2-qa-report.md",
+        "ref": "origin/qa/t048r2-report"
+      },
+      "round": null,
+      "task": "T-048",
+      "verdict_text": "ACCEPT (needs a rebase on master, see row 7; one follow-up, see row 4)"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "a30fa359a583579a75b354ec26f7dd61e8a44b23",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "931998db3b5736cfb157e654669c58727dfb865f",
+      "case_id": "qa262-pr295",
+      "case_no": 36,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-262-r3-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#295"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "accepted",
+        "accepts"
+      ],
+      "merge_commit": "931998db3b5736cfb157e654669c58727dfb865f",
+      "merged": false,
+      "pair": [
+        "fix of qa256-pr295",
+        "fix of qa260-pr295"
+      ],
+      "pair_key": 295,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "5b10142333d96b5a40a311b9e2ff0e0be1c184f2",
+      "plan_headings": [
+        "QA 262: #295 and #298 round 3, the narrow re-check (T-008, T-008b)"
+      ],
+      "plan_path": "docs/loops/qa-262-r3-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 295,
+      "prefix": "t008r3",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 262,
+      "qa_report_ref": {
+        "commit": "f201665de9a2a03b83be6fd2a046f55089171574",
+        "path": "docs/loops/t008r3-qa-report.md",
+        "ref": "origin/qa/t008r3-report"
+      },
+      "round": null,
+      "task": "T-008",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "a30fa359a583579a75b354ec26f7dd61e8a44b23",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "3b485b7c6e9168282d05f8ac3751c5a96951d604",
+      "case_id": "qa262-pr298",
+      "case_no": 37,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-262-r3-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#298"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "accepted",
+        "accepts"
+      ],
+      "merge_commit": "3b485b7c6e9168282d05f8ac3751c5a96951d604",
+      "merged": false,
+      "pair": [
+        "fix of qa256-pr298",
+        "fix of qa260-pr298"
+      ],
+      "pair_key": 298,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "5b10142333d96b5a40a311b9e2ff0e0be1c184f2",
+      "plan_headings": [
+        "QA 262: #295 and #298 round 3, the narrow re-check (T-008, T-008b)"
+      ],
+      "plan_path": "docs/loops/qa-262-r3-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 298,
+      "prefix": "t008r3",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 262,
+      "qa_report_ref": {
+        "commit": "f201665de9a2a03b83be6fd2a046f55089171574",
+        "path": "docs/loops/t008r3-qa-report.md",
+        "ref": "origin/qa/t008r3-report"
+      },
+      "round": null,
+      "task": "T-008b",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "ef3fbd2394bf57f519fa488f8f735b1f272904f7",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "ef3fbd2394bf57f519fa488f8f735b1f272904f7",
+      "case_id": "qa264-pr371",
+      "case_no": 38,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": null,
+      "head_from": "led-by-item",
+      "items": [
+        "#371"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 371,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "06c35f7f24e02902a93d3fca2fdb219117215ca4",
+      "plan_headings": [],
+      "plan_path": "docs/loops/t152-brief.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "task-brief",
+      "plan_why": null,
+      "pr": 371,
+      "prefix": "s159-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 264,
+      "qa_report_ref": {
+        "commit": "03065f8eab562e6f45f8a8d9fe3ed7e73202de10",
+        "path": "docs/loops/s159-batch-qa-report.md",
+        "ref": "origin/qa/s159-batch-report"
+      },
+      "round": null,
+      "task": "T-152",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "4240a8beeddde0ef9865a411c571932eb2d9d75d",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "4240a8beeddde0ef9865a411c571932eb2d9d75d",
+      "case_id": "qa264-pr372",
+      "case_no": 39,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-264-s159-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#372"
+      ],
+      "label": null,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 372,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "f70e8d56bf717ad1f0efb20e36d93e103ee82060",
+      "plan_headings": [
+        "QA 264, session-159 batch: T-234 A+B, T-235 P2-1, T-152 (#373, #374, #372, #371)"
+      ],
+      "plan_path": "docs/loops/qa-264-s159-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 372,
+      "prefix": "s159-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 264,
+      "qa_report_ref": {
+        "commit": "03065f8eab562e6f45f8a8d9fe3ed7e73202de10",
+        "path": "docs/loops/s159-batch-qa-report.md",
+        "ref": "origin/qa/s159-batch-report"
+      },
+      "round": null,
+      "task": "T-235",
+      "verdict_text": "ACCEPT on rows run, INCOMPLETE on row 7c"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "1115ee190059ef6cb7e35ac34bc8d5de5d7b3e96",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "1115ee190059ef6cb7e35ac34bc8d5de5d7b3e96",
+      "case_id": "qa264-pr373",
+      "case_no": 40,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": null,
+      "head_from": "led-by-item",
+      "items": [
+        "#373"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 373,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "5c900f009d77ce681e052f7e2f97fa36fe4a9a02",
+      "plan_headings": [],
+      "plan_path": "docs/loops/t234-brief.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "task-brief",
+      "plan_why": null,
+      "pr": 373,
+      "prefix": "s159-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 264,
+      "qa_report_ref": {
+        "commit": "03065f8eab562e6f45f8a8d9fe3ed7e73202de10",
+        "path": "docs/loops/s159-batch-qa-report.md",
+        "ref": "origin/qa/s159-batch-report"
+      },
+      "round": null,
+      "task": "T-234",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "7e0509e17f0d1915dd4c82040cf273862b1ccfba",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "7e0509e17f0d1915dd4c82040cf273862b1ccfba",
+      "case_id": "qa264-pr374",
+      "case_no": 41,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": null,
+      "head_from": "led-by-item",
+      "items": [
+        "#374"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa265-pr374-r2)"
+      ],
+      "pair_key": 374,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "5c900f009d77ce681e052f7e2f97fa36fe4a9a02",
+      "plan_headings": [],
+      "plan_path": "docs/loops/t234-brief.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "task-brief",
+      "plan_why": null,
+      "pr": 374,
+      "prefix": "s159-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 264,
+      "qa_report_ref": {
+        "commit": "03065f8eab562e6f45f8a8d9fe3ed7e73202de10",
+        "path": "docs/loops/s159-batch-qa-report.md",
+        "ref": "origin/qa/s159-batch-report"
+      },
+      "round": null,
+      "task": "T-234",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "40105c1fa2ed6d40f85cbd18660e178d7ff787b7",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "40105c1fa2ed6d40f85cbd18660e178d7ff787b7",
+      "case_id": "qa265-pr374-r2",
+      "case_no": 42,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#374"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "reject"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa264-pr374"
+      ],
+      "pair_key": 374,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+      "plan_headings": [
+        "QA 265, session-159 batch 2: #374 r2 (narrow), #377, #378, #379, #382"
+      ],
+      "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 374,
+      "prefix": "s159b-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 265,
+      "qa_report_ref": {
+        "commit": "adf54d3cae4ef36f48b67b36c1400bdf579cd8c9",
+        "path": "docs/loops/s159b-batch-qa-report.md",
+        "ref": "origin/qa/s159b-batch-report"
+      },
+      "round": "r2",
+      "task": null,
+      "verdict_text": "ACCEPT at 40105c1fa2ed6d40f85cbd18660e178d7ff787b7"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "da6cdd97101318da51f995dfec0e1bff6430ae79",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "da6cdd97101318da51f995dfec0e1bff6430ae79",
+      "case_id": "qa265-pr377",
+      "case_no": 43,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#377"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "reject"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 377,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+      "plan_headings": [
+        "QA 265, session-159 batch 2: #374 r2 (narrow), #377, #378, #379, #382"
+      ],
+      "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 377,
+      "prefix": "s159b-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 265,
+      "qa_report_ref": {
+        "commit": "adf54d3cae4ef36f48b67b36c1400bdf579cd8c9",
+        "path": "docs/loops/s159b-batch-qa-report.md",
+        "ref": "origin/qa/s159b-batch-report"
+      },
+      "round": null,
+      "task": "T-229",
+      "verdict_text": "ACCEPT (G1 non-blocking)."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "b24ea6a0a43b9b92188e130ec814f502e457ae4b",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "b24ea6a0a43b9b92188e130ec814f502e457ae4b",
+      "case_id": "qa265-pr378",
+      "case_no": 44,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#378"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "reject"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 378,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+      "plan_headings": [
+        "QA 265, session-159 batch 2: #374 r2 (narrow), #377, #378, #379, #382"
+      ],
+      "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 378,
+      "prefix": "s159b-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 265,
+      "qa_report_ref": {
+        "commit": "adf54d3cae4ef36f48b67b36c1400bdf579cd8c9",
+        "path": "docs/loops/s159b-batch-qa-report.md",
+        "ref": "origin/qa/s159b-batch-report"
+      },
+      "round": null,
+      "task": "T-230",
+      "verdict_text": "ACCEPT."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "89ab68b25c4a642f275e5dd7dcf575b373e328f4",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "89ab68b25c4a642f275e5dd7dcf575b373e328f4",
+      "case_id": "qa265-pr379",
+      "case_no": 45,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#379"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "reject"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 379,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+      "plan_headings": [
+        "QA 265, session-159 batch 2: #374 r2 (narrow), #377, #378, #379, #382"
+      ],
+      "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 379,
+      "prefix": "s159b-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 265,
+      "qa_report_ref": {
+        "commit": "adf54d3cae4ef36f48b67b36c1400bdf579cd8c9",
+        "path": "docs/loops/s159b-batch-qa-report.md",
+        "ref": "origin/qa/s159b-batch-report"
+      },
+      "round": null,
+      "task": "T-231",
+      "verdict_text": "ACCEPT."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "688001ec55974314f1c846a709bba4cc476fded1",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "688001ec55974314f1c846a709bba4cc476fded1",
+      "case_id": "qa265-pr382",
+      "case_no": 46,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#382"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "reject"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 382,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+      "plan_headings": [
+        "QA 265, session-159 batch 2: #374 r2 (narrow), #377, #378, #379, #382"
+      ],
+      "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+      "plan_shared_with_cases": 5,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 382,
+      "prefix": "s159b-batch",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 265,
+      "qa_report_ref": {
+        "commit": "adf54d3cae4ef36f48b67b36c1400bdf579cd8c9",
+        "path": "docs/loops/s159b-batch-qa-report.md",
+        "ref": "origin/qa/s159b-batch-report"
+      },
+      "round": null,
+      "task": "T-232",
+      "verdict_text": "ACCEPT (G2 non-blocking)."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "09f82a12193788df0b50113aae20e2cd3cccf49c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "09f82a12193788df0b50113aae20e2cd3cccf49c",
+      "case_id": "qa266-pr376",
+      "case_no": 47,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-266-t203-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#376"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 376,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "dcc767c285144469f0539d360224df3c0a642205",
+      "plan_headings": [
+        "QA 266: T-203 seat resolved by checkout (#376)"
+      ],
+      "plan_path": "docs/loops/qa-266-t203-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 376,
+      "prefix": "t203",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 266,
+      "qa_report_ref": {
+        "commit": "9460e90f70caf768244425e91fc276dd3ecdb741",
+        "path": "docs/loops/t203-qa-report.md",
+        "ref": "origin/qa/t203-report"
+      },
+      "round": null,
+      "task": "T-203",
+      "verdict_text": "ACCEPT. All nine rows MET. There are three gaps, none blocking (row 5's surviving"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "9d1ed0c55751f07dd5fb1a184cfc999c9c43023d",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "9d1ed0c55751f07dd5fb1a184cfc999c9c43023d",
+      "case_id": "qa267-pr387",
+      "case_no": 48,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#387"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 387,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+      "plan_headings": [
+        "QA 267, session-160 batch: #387, #388, #391, #393"
+      ],
+      "plan_path": "docs/loops/qa-267-s160-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 387,
+      "prefix": "s160b",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 267,
+      "qa_report_ref": {
+        "commit": "827fc7aafaf4c60c8688371af7aa84b36405511a",
+        "path": "docs/loops/s160b-qa-report.md",
+        "ref": "origin/qa/s160b-report"
+      },
+      "round": null,
+      "task": null,
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "913a5a436c1d45fce1793b2d0454efbbf0a1111a",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "913a5a436c1d45fce1793b2d0454efbbf0a1111a",
+      "case_id": "qa267-pr388",
+      "case_no": 49,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#388"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 388,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+      "plan_headings": [
+        "QA 267, session-160 batch: #387, #388, #391, #393"
+      ],
+      "plan_path": "docs/loops/qa-267-s160-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 388,
+      "prefix": "s160b",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 267,
+      "qa_report_ref": {
+        "commit": "827fc7aafaf4c60c8688371af7aa84b36405511a",
+        "path": "docs/loops/s160b-qa-report.md",
+        "ref": "origin/qa/s160b-report"
+      },
+      "round": null,
+      "task": null,
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "b2096051d207344e150e275648a5b6806c2b2aea",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "b2096051d207344e150e275648a5b6806c2b2aea",
+      "case_id": "qa267-pr391",
+      "case_no": 50,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#391"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 391,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+      "plan_headings": [
+        "QA 267, session-160 batch: #387, #388, #391, #393"
+      ],
+      "plan_path": "docs/loops/qa-267-s160-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 391,
+      "prefix": "s160b",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 267,
+      "qa_report_ref": {
+        "commit": "827fc7aafaf4c60c8688371af7aa84b36405511a",
+        "path": "docs/loops/s160b-qa-report.md",
+        "ref": "origin/qa/s160b-report"
+      },
+      "round": null,
+      "task": null,
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "4020a42bdd0b20e1299342af3b353e0eb84a90a6",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "4020a42bdd0b20e1299342af3b353e0eb84a90a6",
+      "case_id": "qa267-pr393",
+      "case_no": 51,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#393"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa268-pr393-r2)"
+      ],
+      "pair_key": 393,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+      "plan_headings": [
+        "QA 267, session-160 batch: #387, #388, #391, #393"
+      ],
+      "plan_path": "docs/loops/qa-267-s160-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 393,
+      "prefix": "s160b",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 267,
+      "qa_report_ref": {
+        "commit": "827fc7aafaf4c60c8688371af7aa84b36405511a",
+        "path": "docs/loops/s160b-qa-report.md",
+        "ref": "origin/qa/s160b-report"
+      },
+      "round": null,
+      "task": null,
+      "verdict_text": "REJECT (row 12 only: the batch merge does not typecheck)"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "6f145faf9d1bba962d281e16285fcb59b14b68c7",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "6f145faf9d1bba962d281e16285fcb59b14b68c7",
+      "case_id": "qa268-pr393-r2",
+      "case_no": 52,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": null,
+      "head_from": "verdict-table",
+      "items": [
+        "#393"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa267-pr393"
+      ],
+      "pair_key": 393,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "22aef7c8bf6b8b9a41feb6deccc35af7a5f0ce10",
+      "plan_headings": [],
+      "plan_path": "docs/loops/t236-brief.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "task-brief",
+      "plan_why": null,
+      "pr": 393,
+      "prefix": "s160c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 268,
+      "qa_report_ref": {
+        "commit": "eca6c256e33237d1b428c8d0c2e8b624b4bf52b4",
+        "path": "docs/loops/s160c-qa-report.md",
+        "ref": "origin/qa/s160c-report"
+      },
+      "round": "r2",
+      "task": "T-236",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "3e95016c92844b67113ae44f9d9c7ed362335587",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "3e95016c92844b67113ae44f9d9c7ed362335587",
+      "case_id": "qa268-pr397",
+      "case_no": 53,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-268-s160c-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#397"
+      ],
+      "label": "REJECT",
+      "leak_group": true,
+      "leak_hits": [
+        "accepted"
+      ],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa269-pr397-r2)"
+      ],
+      "pair_key": 397,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "7431063d4ef8b2d3a4b411a02172b878b1cd18bb",
+      "plan_headings": [
+        "QA 268, session-160 batch c: #393 r2 (narrow), #397"
+      ],
+      "plan_path": "docs/loops/qa-268-s160c-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 397,
+      "prefix": "s160c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 268,
+      "qa_report_ref": {
+        "commit": "eca6c256e33237d1b428c8d0c2e8b624b4bf52b4",
+        "path": "docs/loops/s160c-qa-report.md",
+        "ref": "origin/qa/s160c-report"
+      },
+      "round": null,
+      "task": "T-237",
+      "verdict_text": "REJECT (one finding, F1: the presence worst-case bound is no longer an upper bound)"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "9ea9f54a6e81ad3f465f56bf92243f3f129ceeba",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "9ea9f54a6e81ad3f465f56bf92243f3f129ceeba",
+      "case_id": "qa269-pr397-r2",
+      "case_no": 54,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#397"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa268-pr397"
+      ],
+      "pair_key": 397,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
+      "plan_headings": [
+        "QA 269, session-160 batch d: #397 r2 (narrow), #401, #402, #404"
+      ],
+      "plan_path": "docs/loops/qa-269-s160d-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 397,
+      "prefix": "s160d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 269,
+      "qa_report_ref": {
+        "commit": "56ebcf3724a526b955ff44c856bf692d016ee0f1",
+        "path": "docs/loops/s160d-qa-report.md",
+        "ref": "origin/qa/s160d-report"
+      },
+      "round": "r2",
+      "task": "T-237",
+      "verdict_text": "ACCEPT (F1 fixed, the class row is red on the old bound and green at the head)"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "c3ee949b8e6e6a45a2758af61c7d6bafd8ca8ce0",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "c3ee949b8e6e6a45a2758af61c7d6bafd8ca8ce0",
+      "case_id": "qa269-pr401",
+      "case_no": 55,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": null,
+      "head_from": "verdict-table",
+      "items": [
+        "#401"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 401,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "22aef7c8bf6b8b9a41feb6deccc35af7a5f0ce10",
+      "plan_headings": [],
+      "plan_path": "docs/loops/t236-brief.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "task-brief",
+      "plan_why": null,
+      "pr": 401,
+      "prefix": "s160d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 269,
+      "qa_report_ref": {
+        "commit": "56ebcf3724a526b955ff44c856bf692d016ee0f1",
+        "path": "docs/loops/s160d-qa-report.md",
+        "ref": "origin/qa/s160d-report"
+      },
+      "round": null,
+      "task": "T-236",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "3212ed69a87bf3bbfad5f933691bc457b3435a13",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "3212ed69a87bf3bbfad5f933691bc457b3435a13",
+      "case_id": "qa269-pr402",
+      "case_no": 56,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#402"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 402,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
+      "plan_headings": [
+        "QA 269, session-160 batch d: #397 r2 (narrow), #401, #402, #404"
+      ],
+      "plan_path": "docs/loops/qa-269-s160d-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 402,
+      "prefix": "s160d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 269,
+      "qa_report_ref": {
+        "commit": "56ebcf3724a526b955ff44c856bf692d016ee0f1",
+        "path": "docs/loops/s160d-qa-report.md",
+        "ref": "origin/qa/s160d-report"
+      },
+      "round": null,
+      "task": "T-199",
+      "verdict_text": "ACCEPT (gap G1: one not-checked reason is correct at the head but no committed row pins it)"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "5add91379641ef211f98b2f79d1551c0090821eb",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "5add91379641ef211f98b2f79d1551c0090821eb",
+      "case_id": "qa269-pr404",
+      "case_no": 57,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#404"
+      ],
+      "label": null,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 404,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
+      "plan_headings": [
+        "QA 269, session-160 batch d: #397 r2 (narrow), #401, #402, #404"
+      ],
+      "plan_path": "docs/loops/qa-269-s160d-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 404,
+      "prefix": "s160d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 269,
+      "qa_report_ref": {
+        "commit": "56ebcf3724a526b955ff44c856bf692d016ee0f1",
+        "path": "docs/loops/s160d-qa-report.md",
+        "ref": "origin/qa/s160d-report"
+      },
+      "round": null,
+      "task": "T-204",
+      "verdict_text": "INCOMPLETE: rows 1, 4 and 13 met; rows 14 and 15 (the PowerShell harness and its mutants) not run, because this QA host is Linux with no PowerShell, and the hel"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "f918de5844a89d38f03d4d4e23173e4540c9f814",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "f918de5844a89d38f03d4d4e23173e4540c9f814",
+      "case_id": "qa270-pr412",
+      "case_no": 58,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#412"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 412,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "538059a1271a552b52f9d008e75a4d1324d49350",
+      "plan_headings": [
+        "QA 270, session-160 batch e: #412 (T-238), #413 (T-239)"
+      ],
+      "plan_path": "docs/loops/qa-270-s160e-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 412,
+      "prefix": "s160e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 270,
+      "qa_report_ref": {
+        "commit": "70aefd51a231a48e04a7df259ce34afa388fae96",
+        "path": "docs/loops/s160e-qa-report.md",
+        "ref": "origin/qa/s160e-report"
+      },
+      "round": null,
+      "task": "T-238",
+      "verdict_text": "ACCEPT. No gaps."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "e00c0d5aae7ad902a589d09b60a672d0700ae78c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "e00c0d5aae7ad902a589d09b60a672d0700ae78c",
+      "case_id": "qa270-pr413",
+      "case_no": 59,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#413"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 413,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "538059a1271a552b52f9d008e75a4d1324d49350",
+      "plan_headings": [
+        "QA 270, session-160 batch e: #412 (T-238), #413 (T-239)"
+      ],
+      "plan_path": "docs/loops/qa-270-s160e-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 413,
+      "prefix": "s160e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 270,
+      "qa_report_ref": {
+        "commit": "70aefd51a231a48e04a7df259ce34afa388fae96",
+        "path": "docs/loops/s160e-qa-report.md",
+        "ref": "origin/qa/s160e-report"
+      },
+      "round": null,
+      "task": "T-239",
+      "verdict_text": "ACCEPT. Two non-blocking gaps: a server-wiring mutant"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "dc092840af38f86dfe18af060564fe181988f159",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "dc092840af38f86dfe18af060564fe181988f159",
+      "case_id": "qa272-pr415",
+      "case_no": 60,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#415"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 415,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "687200f90fe15927859568493c26fe622c894d39",
+      "plan_headings": [
+        "QA 272, session-160 batch f: #415, #420, #421, plus a retro-check of the merged #418"
+      ],
+      "plan_path": "docs/loops/qa-272-s160f-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 415,
+      "prefix": "s160f",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 272,
+      "qa_report_ref": {
+        "commit": "d562eca0db647ecc3913287d4d522f382f4869a2",
+        "path": "docs/loops/s160f-qa-report.md",
+        "ref": "origin/qa/s160f-report"
+      },
+      "round": null,
+      "task": "T-239",
+      "verdict_text": "ACCEPT. No gaps. One out-of-scope note (row 5)."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "0d2bc66e94ebed4ca7008395eede8426f43e055c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "0d2bc66e94ebed4ca7008395eede8426f43e055c",
+      "case_id": "qa272-pr420",
+      "case_no": 61,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#420"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 420,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "687200f90fe15927859568493c26fe622c894d39",
+      "plan_headings": [
+        "QA 272, session-160 batch f: #415, #420, #421, plus a retro-check of the merged #418"
+      ],
+      "plan_path": "docs/loops/qa-272-s160f-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 420,
+      "prefix": "s160f",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 272,
+      "qa_report_ref": {
+        "commit": "d562eca0db647ecc3913287d4d522f382f4869a2",
+        "path": "docs/loops/s160f-qa-report.md",
+        "ref": "origin/qa/s160f-report"
+      },
+      "round": null,
+      "task": "T-200",
+      "verdict_text": "ACCEPT. There are three non-blocking gaps:"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "82aeb3da3e9036d5f6812738be541cb67ada1e07",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "82aeb3da3e9036d5f6812738be541cb67ada1e07",
+      "case_id": "qa272-pr421",
+      "case_no": 62,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
+      "head_from": "verdict-line",
+      "items": [
+        "#421"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa275-pr421-r3)"
+      ],
+      "pair_key": 421,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "687200f90fe15927859568493c26fe622c894d39",
+      "plan_headings": [
+        "QA 272, session-160 batch f: #415, #420, #421, plus a retro-check of the merged #418"
+      ],
+      "plan_path": "docs/loops/qa-272-s160f-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 421,
+      "prefix": "s160f",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 272,
+      "qa_report_ref": {
+        "commit": "d562eca0db647ecc3913287d4d522f382f4869a2",
+        "path": "docs/loops/s160f-qa-report.md",
+        "ref": "origin/qa/s160f-report"
+      },
+      "round": null,
+      "task": "G-053",
+      "verdict_text": "REJECT. It fails row 10, a condition the dispatch states outright:"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "9915a59baad67d9e29a415adec0a931b335c1cba",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "9915a59baad67d9e29a415adec0a931b335c1cba",
+      "case_id": "qa273-pr421-r2",
+      "case_no": 63,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#421"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa275-pr421-r3)"
+      ],
+      "pair_key": 421,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+      "plan_headings": [
+        "QA 273, session-161 batch a: #421 r2, #424, #425, #427 (QA 274 = their real-Windows rows)"
+      ],
+      "plan_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 421,
+      "prefix": "s161a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 273,
+      "qa_report_ref": {
+        "commit": "7ce087186ffac0afe156060c60c751b24da02dea",
+        "path": "docs/loops/s161a-qa-report.md",
+        "ref": "origin/qa/s161a-report"
+      },
+      "round": "r2",
+      "task": "G-053",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "12c289264e433bb306f55e212193a7a2448c2eca",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "12c289264e433bb306f55e212193a7a2448c2eca",
+      "case_id": "qa273-pr424",
+      "case_no": 64,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#424"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa275-pr424-r2)"
+      ],
+      "pair_key": 424,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+      "plan_headings": [
+        "QA 273, session-161 batch a: #421 r2, #424, #425, #427 (QA 274 = their real-Windows rows)"
+      ],
+      "plan_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 424,
+      "prefix": "s161a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 273,
+      "qa_report_ref": {
+        "commit": "7ce087186ffac0afe156060c60c751b24da02dea",
+        "path": "docs/loops/s161a-qa-report.md",
+        "ref": "origin/qa/s161a-report"
+      },
+      "round": null,
+      "task": "T-235",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "71b2b924b1020a454e2eaa7035366c841de0f8f5",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b",
+      "case_id": "qa273-pr425",
+      "case_no": 65,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#425"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b",
+      "merged": false,
+      "pair": [],
+      "pair_key": 425,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+      "plan_headings": [
+        "QA 273, session-161 batch a: #421 r2, #424, #425, #427 (QA 274 = their real-Windows rows)"
+      ],
+      "plan_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 425,
+      "prefix": "s161a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 273,
+      "qa_report_ref": {
+        "commit": "7ce087186ffac0afe156060c60c751b24da02dea",
+        "path": "docs/loops/s161a-qa-report.md",
+        "ref": "origin/qa/s161a-report"
+      },
+      "round": null,
+      "task": "T-235",
+      "verdict_text": "ACCEPT, and still HELD per the dispatch"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "270b550b97ada09f50c256f381e4ec26ff98782a",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "270b550b97ada09f50c256f381e4ec26ff98782a",
+      "case_id": "qa273-pr427",
+      "case_no": 66,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#427"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa277-pr427-r3)"
+      ],
+      "pair_key": 427,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+      "plan_headings": [
+        "QA 273, session-161 batch a: #421 r2, #424, #425, #427 (QA 274 = their real-Windows rows)"
+      ],
+      "plan_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "plan_shared_with_cases": 4,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 427,
+      "prefix": "s161a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 273,
+      "qa_report_ref": {
+        "commit": "7ce087186ffac0afe156060c60c751b24da02dea",
+        "path": "docs/loops/s161a-qa-report.md",
+        "ref": "origin/qa/s161a-report"
+      },
+      "round": null,
+      "task": "T-235",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "8173cef6495dd9333cd199d0c05c82ac671589ed",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "8173cef6495dd9333cd199d0c05c82ac671589ed",
+      "case_id": "qa275-pr421-r3",
+      "case_no": 67,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#421"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa272-pr421",
+        "fix of qa273-pr421-r2"
+      ],
+      "pair_key": 421,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "bb51c9db4dff81c5740594e2afaaa80e5c0bf395",
+      "plan_headings": [
+        "#421 r3 (narrow)"
+      ],
+      "plan_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 421,
+      "prefix": "s161c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 275,
+      "qa_report_ref": {
+        "commit": "2dc5f1149e5fd5b69909afdfc6f507f29e3078a6",
+        "path": "docs/loops/s161c-qa-report.md",
+        "ref": "origin/qa/s161c-report"
+      },
+      "round": "r3",
+      "task": "G-053",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "b9026d71d1fbfa2ba42de465fac4d54feae702cd",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "b9026d71d1fbfa2ba42de465fac4d54feae702cd",
+      "case_id": "qa275-pr424-r2",
+      "case_no": 68,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#424"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa273-pr424"
+      ],
+      "pair_key": 424,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "bb51c9db4dff81c5740594e2afaaa80e5c0bf395",
+      "plan_headings": [
+        "#424 r2 (QA 273 row 9 again, plus row 11's nit)"
+      ],
+      "plan_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 424,
+      "prefix": "s161c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 275,
+      "qa_report_ref": {
+        "commit": "2dc5f1149e5fd5b69909afdfc6f507f29e3078a6",
+        "path": "docs/loops/s161c-qa-report.md",
+        "ref": "origin/qa/s161c-report"
+      },
+      "round": "r2",
+      "task": "T-235",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "987901c9cb43f3dd3a31b9e22fec164edd9769dd",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "987901c9cb43f3dd3a31b9e22fec164edd9769dd",
+      "case_id": "qa275-pr427-r2",
+      "case_no": 69,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#427"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa277-pr427-r3)"
+      ],
+      "pair_key": 427,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "bb51c9db4dff81c5740594e2afaaa80e5c0bf395",
+      "plan_headings": [
+        "#427 r2 (QA 273 rows 17 to 19 again)"
+      ],
+      "plan_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 427,
+      "prefix": "s161c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 275,
+      "qa_report_ref": {
+        "commit": "2dc5f1149e5fd5b69909afdfc6f507f29e3078a6",
+        "path": "docs/loops/s161c-qa-report.md",
+        "ref": "origin/qa/s161c-report"
+      },
+      "round": "r2",
+      "task": "T-235",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "12f26320fdb89ea9e9c76dfc30790628b707d6d7",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "12f26320fdb89ea9e9c76dfc30790628b707d6d7",
+      "case_id": "qa275-pr434",
+      "case_no": 70,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#434"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa279-pr434-r2)"
+      ],
+      "pair_key": 434,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+      "plan_headings": [
+        "QA 275, session-161 batch c: #434 (T-240), #436 (T-235 P2-5), #437 (T-235 P2-7)"
+      ],
+      "plan_path": "docs/loops/qa-275-s161c-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 434,
+      "prefix": "s161c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 275,
+      "qa_report_ref": {
+        "commit": "2dc5f1149e5fd5b69909afdfc6f507f29e3078a6",
+        "path": "docs/loops/s161c-qa-report.md",
+        "ref": "origin/qa/s161c-report"
+      },
+      "round": null,
+      "task": "T-240",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "144623d2f9707d7b501a0657f842f4a827d85562",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "144623d2f9707d7b501a0657f842f4a827d85562",
+      "case_id": "qa275-pr436",
+      "case_no": 71,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#436"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 436,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+      "plan_headings": [
+        "QA 275, session-161 batch c: #434 (T-240), #436 (T-235 P2-5), #437 (T-235 P2-7)"
+      ],
+      "plan_path": "docs/loops/qa-275-s161c-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 436,
+      "prefix": "s161c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 275,
+      "qa_report_ref": {
+        "commit": "2dc5f1149e5fd5b69909afdfc6f507f29e3078a6",
+        "path": "docs/loops/s161c-qa-report.md",
+        "ref": "origin/qa/s161c-report"
+      },
+      "round": null,
+      "task": "T-235",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+      "case_id": "qa275-pr437",
+      "case_no": 72,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#437"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+      "merged": false,
+      "pair": [],
+      "pair_key": 437,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+      "plan_headings": [
+        "QA 275, session-161 batch c: #434 (T-240), #436 (T-235 P2-5), #437 (T-235 P2-7)"
+      ],
+      "plan_path": "docs/loops/qa-275-s161c-dispatch.md",
+      "plan_shared_with_cases": 6,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 437,
+      "prefix": "s161c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 275,
+      "qa_report_ref": {
+        "commit": "2dc5f1149e5fd5b69909afdfc6f507f29e3078a6",
+        "path": "docs/loops/s161c-qa-report.md",
+        "ref": "origin/qa/s161c-report"
+      },
+      "round": null,
+      "task": "T-235",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "a6d75b5273091d75bbc127826853170fe3ddeb4a",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "a6d75b5273091d75bbc127826853170fe3ddeb4a",
+      "case_id": "qa277-pr427-r3",
+      "case_no": 73,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#427"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa273-pr427",
+        "fix of qa275-pr427-r2"
+      ],
+      "pair_key": 427,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+      "plan_headings": [
+        "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)"
+      ],
+      "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "plan_shared_with_cases": 7,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 427,
+      "prefix": "s161e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 277,
+      "qa_report_ref": {
+        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
+        "path": "docs/loops/s161e-qa-report.md",
+        "ref": "origin/qa/s161e-report"
+      },
+      "round": "r3",
+      "task": "T-235",
+      "verdict_text": "ACCEPT (Linux half; row 7 is QA 278's)"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "48bf479562296a0f4c717fb91cc0fec92f11ed86",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "48bf479562296a0f4c717fb91cc0fec92f11ed86",
+      "case_id": "qa277-pr441",
+      "case_no": 74,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#441"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 441,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+      "plan_headings": [
+        "#441 (G-052)"
+      ],
+      "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 441,
+      "prefix": "s161e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 277,
+      "qa_report_ref": {
+        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
+        "path": "docs/loops/s161e-qa-report.md",
+        "ref": "origin/qa/s161e-report"
+      },
+      "round": null,
+      "task": "G-052",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "08fa900211547aade6538792c88feab037ba23f8",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "08fa900211547aade6538792c88feab037ba23f8",
+      "case_id": "qa277-pr442",
+      "case_no": 75,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#442"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 442,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+      "plan_headings": [
+        "#442 (G-050)"
+      ],
+      "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 442,
+      "prefix": "s161e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 277,
+      "qa_report_ref": {
+        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
+        "path": "docs/loops/s161e-qa-report.md",
+        "ref": "origin/qa/s161e-report"
+      },
+      "round": null,
+      "task": "G-050",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "a5f118192f3479ad35dd58aebb3d24510f0f24b4",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "a5f118192f3479ad35dd58aebb3d24510f0f24b4",
+      "case_id": "qa277-pr444",
+      "case_no": 76,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#444"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa279-pr444-r3)"
+      ],
+      "pair_key": 444,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+      "plan_headings": [
+        "#444 (T-168)"
+      ],
+      "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 444,
+      "prefix": "s161e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 277,
+      "qa_report_ref": {
+        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
+        "path": "docs/loops/s161e-qa-report.md",
+        "ref": "origin/qa/s161e-report"
+      },
+      "round": null,
+      "task": "T-168",
+      "verdict_text": "REJECT (D-119 owner pid; lease exits 11 and 2 run HEAVY)"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "d292747f8ce5e9173edfc71e5feb3f249693b147",
+      "case_id": "qa277-pr445",
+      "case_no": 77,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#445"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "d292747f8ce5e9173edfc71e5feb3f249693b147",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa281-pr445-r4)"
+      ],
+      "pair_key": 445,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+      "plan_headings": [
+        "#445 (T-156)"
+      ],
+      "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 445,
+      "prefix": "s161e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 277,
+      "qa_report_ref": {
+        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
+        "path": "docs/loops/s161e-qa-report.md",
+        "ref": "origin/qa/s161e-report"
+      },
+      "round": null,
+      "task": "T-156",
+      "verdict_text": "REJECT (scan list misses at least 3 source scans)"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "685b9fe931a08f31d59977c90fbbd06cb977588b",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "685b9fe931a08f31d59977c90fbbd06cb977588b",
+      "case_id": "qa277-pr446",
+      "case_no": 78,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#446"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 446,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+      "plan_headings": [
+        "#446 (T-173)"
+      ],
+      "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 446,
+      "prefix": "s161e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 277,
+      "qa_report_ref": {
+        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
+        "path": "docs/loops/s161e-qa-report.md",
+        "ref": "origin/qa/s161e-report"
+      },
+      "round": null,
+      "task": "T-173",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "1e8cba7c92d3639a17691e03700cd32a84b6711f",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "1e8cba7c92d3639a17691e03700cd32a84b6711f",
+      "case_id": "qa277-pr451",
+      "case_no": 79,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#451"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 451,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+      "plan_headings": [
+        "#451 (T-187)"
+      ],
+      "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 451,
+      "prefix": "s161e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 277,
+      "qa_report_ref": {
+        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
+        "path": "docs/loops/s161e-qa-report.md",
+        "ref": "origin/qa/s161e-report"
+      },
+      "round": null,
+      "task": "T-187",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "9daf38d8cdb575f6c51f9b30d43f96126c7a8eb4",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "9daf38d8cdb575f6c51f9b30d43f96126c7a8eb4",
+      "case_id": "qa279-pr427-r4",
+      "case_no": 80,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#427"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [],
+      "pair_key": 427,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+      "plan_headings": [
+        "#427 r4: the forged-table seam (QA 278 O2, QA 277 F1)"
+      ],
+      "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 427,
+      "prefix": "s161g",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 279,
+      "qa_report_ref": {
+        "commit": "8396ffbcc6b3085ad91dced7f0868964e68d0d06",
+        "path": "docs/loops/s161g-qa-report.md",
+        "ref": "origin/qa/s161g-report"
+      },
+      "round": "r4",
+      "task": "T-235",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "b9f8a5dfc2437b3d35049df691dd85483424e950",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "b9f8a5dfc2437b3d35049df691dd85483424e950",
+      "case_id": "qa279-pr434-r2",
+      "case_no": 81,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#434"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa275-pr434"
+      ],
+      "pair_key": 434,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+      "plan_headings": [
+        "#434 r2 (QA 275 row 6, row 9 nit)"
+      ],
+      "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 434,
+      "prefix": "s161g",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 279,
+      "qa_report_ref": {
+        "commit": "8396ffbcc6b3085ad91dced7f0868964e68d0d06",
+        "path": "docs/loops/s161g-qa-report.md",
+        "ref": "origin/qa/s161g-report"
+      },
+      "round": "r2",
+      "task": "T-240",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "3dfa24245cd1b3b99344cd2d675735bc608d04c8",
+      "case_id": "qa279-pr437-r2",
+      "case_no": 82,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#437"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "3dfa24245cd1b3b99344cd2d675735bc608d04c8",
+      "merged": false,
+      "pair": [],
+      "pair_key": 437,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+      "plan_headings": [
+        "#437 r2 (QA 275 rows 14 and 17, plus its M2 mutant)"
+      ],
+      "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 437,
+      "prefix": "s161g",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 279,
+      "qa_report_ref": {
+        "commit": "8396ffbcc6b3085ad91dced7f0868964e68d0d06",
+        "path": "docs/loops/s161g-qa-report.md",
+        "ref": "origin/qa/s161g-report"
+      },
+      "round": "r2",
+      "task": "T-235",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "9bfb2e1e78cc1701394988cc9c65288af4269582",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "9bfb2e1e78cc1701394988cc9c65288af4269582",
+      "case_id": "qa279-pr444-r3",
+      "case_no": 83,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#444"
+      ],
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "merged": true,
+      "pair": [
+        "fix of qa277-pr444"
+      ],
+      "pair_key": 444,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+      "plan_headings": [
+        "#444 r3 (QA 277 row 16 and F2)"
+      ],
+      "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 444,
+      "prefix": "s161g",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 279,
+      "qa_report_ref": {
+        "commit": "8396ffbcc6b3085ad91dced7f0868964e68d0d06",
+        "path": "docs/loops/s161g-qa-report.md",
+        "ref": "origin/qa/s161g-report"
+      },
+      "round": "r3",
+      "task": "T-168",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "43ed65a9f2e55b649b4bd1dbb46baddc84d3e0e6",
+      "case_id": "qa279-pr445-r2",
+      "case_no": 84,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#445"
+      ],
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "43ed65a9f2e55b649b4bd1dbb46baddc84d3e0e6",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa281-pr445-r4)"
+      ],
+      "pair_key": 445,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+      "plan_headings": [
+        "#445 r2 (QA 277 row 19)"
+      ],
+      "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-section",
+      "plan_why": null,
+      "pr": 445,
+      "prefix": "s161g",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 279,
+      "qa_report_ref": {
+        "commit": "8396ffbcc6b3085ad91dced7f0868964e68d0d06",
+        "path": "docs/loops/s161g-qa-report.md",
+        "ref": "origin/qa/s161g-report"
+      },
+      "round": "r2",
+      "task": "T-156",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "2f8e6489e7d816dff9fc667431425699569071c3",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "1eea3cdb3740690078fb2254b8c8b41887c3b3cd",
+      "case_id": "qa280-pr425",
+      "case_no": 85,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#425"
+      ],
+      "label": "ACCEPT",
       "leak_group": true,
       "leak_hits": [
         "accepted",
         "reject"
       ],
-      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-      "merged": true,
-      "other_candidates_named": [
-        "1671d00547c5c1ef1200d22698c4a607779928e2",
-        "8e751360ba2190b810323a623f74ee08def34b6a",
-        "260d68352fb89030a92029eae56053d00ed3f7d0",
-        "2f8e6489e7d816dff9fc667431425699569071c3",
-        "1eea3cdb3740690078fb2254b8c8b41887c3b3cd",
-        "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b"
+      "merge_commit": "1eea3cdb3740690078fb2254b8c8b41887c3b3cd",
+      "merged": false,
+      "pair": [],
+      "pair_key": 425,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
+      "plan_headings": [
+        "QA 280, session-162 batch a: narrow re-runs of #437 r3 and #445 r3, #425 after its conflict, and the batch merge"
       ],
+      "plan_path": "docs/loops/qa-280-s162a-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 425,
+      "prefix": "s162a",
       "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
       "qa_no": 280,
       "qa_report_ref": {
         "commit": "d8cb4652471d5d962beeae105bc9460f271950bb",
         "path": "docs/loops/s162a-qa-report.md",
         "ref": "origin/qa/s162a-report"
       },
-      "verdict_text": "# QA 280 report: session-162 batch a (prefix `s162a`), narrow re-runs of #437 r3 and #445 r3, #425 after its conflict, and the batch merge (Plumb, Linux)  **Seat:** QA, headless Claude Code on Opus, r"
+      "round": null,
+      "task": "T-235",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "8e751360ba2190b810323a623f74ee08def34b6a",
+      "case_id": "qa280-pr437-r3",
+      "case_no": 86,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#437"
+      ],
+      "label": "REJECT",
+      "leak_group": true,
+      "leak_hits": [
+        "accepted",
+        "reject"
+      ],
+      "merge_commit": "8e751360ba2190b810323a623f74ee08def34b6a",
+      "merged": false,
+      "pair": [],
+      "pair_key": 437,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
+      "plan_headings": [
+        "QA 280, session-162 batch a: narrow re-runs of #437 r3 and #445 r3, #425 after its conflict, and the batch merge"
+      ],
+      "plan_path": "docs/loops/qa-280-s162a-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 437,
+      "prefix": "s162a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 280,
+      "qa_report_ref": {
+        "commit": "d8cb4652471d5d962beeae105bc9460f271950bb",
+        "path": "docs/loops/s162a-qa-report.md",
+        "ref": "origin/qa/s162a-report"
+      },
+      "round": "r3",
+      "task": "T-235",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "260d68352fb89030a92029eae56053d00ed3f7d0",
+      "case_id": "qa280-pr445-r3",
+      "case_no": 87,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
+      "head_from": "verdict-table",
+      "items": [
+        "#445"
+      ],
+      "label": "REJECT",
+      "leak_group": true,
+      "leak_hits": [
+        "accepted",
+        "reject"
+      ],
+      "merge_commit": "260d68352fb89030a92029eae56053d00ed3f7d0",
+      "merged": false,
+      "pair": [
+        "rejected-then-fixed (fixed in qa281-pr445-r4)"
+      ],
+      "pair_key": 445,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
+      "plan_headings": [
+        "QA 280, session-162 batch a: narrow re-runs of #437 r3 and #445 r3, #425 after its conflict, and the batch merge"
+      ],
+      "plan_path": "docs/loops/qa-280-s162a-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 445,
+      "prefix": "s162a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 280,
+      "qa_report_ref": {
+        "commit": "d8cb4652471d5d962beeae105bc9460f271950bb",
+        "path": "docs/loops/s162a-qa-report.md",
+        "ref": "origin/qa/s162a-report"
+      },
+      "round": "r3",
+      "task": "T-156",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "origin/master",
+      "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "1e21deaea32e20591e65a5cf39eb40a0517542d6",
+      "case_id": "qa281-pr445-r4",
+      "case_no": 88,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "dispatch_commit": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "dispatch_path": "docs/loops/qa-281-s162b-dispatch.md",
+      "head_from": "led-by-item",
+      "items": [
+        "#445"
+      ],
+      "label": "ACCEPT",
+      "leak_group": true,
+      "leak_hits": [
+        "reject"
+      ],
+      "merge_commit": "1e21deaea32e20591e65a5cf39eb40a0517542d6",
+      "merged": false,
+      "pair": [
+        "fix of qa277-pr445",
+        "fix of qa279-pr445-r2",
+        "fix of qa280-pr445-r3"
+      ],
+      "pair_key": 445,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "803fe1f6304e23c6eb167520041aceb612fbf942",
+      "plan_headings": [
+        "QA 281, session-162 batch b: #445 r4, and a retro-check of #457 and #458 (merged without QA)"
+      ],
+      "plan_path": "docs/loops/qa-281-s162b-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 445,
+      "prefix": "s162b",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 281,
+      "qa_report_ref": {
+        "commit": "ae2baca7cd98a40013024f9b70f073c46142b828",
+        "path": "docs/loops/s162b-qa-report.md",
+        "ref": "origin/qa/s162b-report"
+      },
+      "round": "r4",
+      "task": null,
+      "verdict_text": "ACCEPT"
     }
   ],
-  "max_qa": 320,
-  "min_qa": 253,
-  "origin_master": "e71a8959d75e280e3670994265549fa5565b9537",
+  "max_qa": 281,
+  "min_qa": 250,
+  "origin_master": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+  "pairs": [
+    {
+      "fixed": "qa255-pr287",
+      "fixed_qa": 255,
+      "pair_key": 287,
+      "rejected": "qa253-t-209+t-210",
+      "rejected_qa": 253
+    },
+    {
+      "fixed": "qa258-pr289-r3",
+      "fixed_qa": 258,
+      "pair_key": 289,
+      "rejected": "qa254-t-208",
+      "rejected_qa": 254
+    },
+    {
+      "fixed": "qa262-pr295",
+      "fixed_qa": 262,
+      "pair_key": 295,
+      "rejected": "qa256-pr295",
+      "rejected_qa": 256
+    },
+    {
+      "fixed": "qa262-pr295",
+      "fixed_qa": 262,
+      "pair_key": 295,
+      "rejected": "qa260-pr295",
+      "rejected_qa": 260
+    },
+    {
+      "fixed": "qa262-pr298",
+      "fixed_qa": 262,
+      "pair_key": 298,
+      "rejected": "qa256-pr298",
+      "rejected_qa": 256
+    },
+    {
+      "fixed": "qa262-pr298",
+      "fixed_qa": 262,
+      "pair_key": 298,
+      "rejected": "qa260-pr298",
+      "rejected_qa": 260
+    },
+    {
+      "fixed": "qa260-pr306",
+      "fixed_qa": 260,
+      "pair_key": 306,
+      "rejected": "qa256-pr306",
+      "rejected_qa": 256
+    },
+    {
+      "fixed": "qa261-pr302",
+      "fixed_qa": 261,
+      "pair_key": 302,
+      "rejected": "qa258-pr302",
+      "rejected_qa": 258
+    },
+    {
+      "fixed": "qa265-pr374-r2",
+      "fixed_qa": 265,
+      "pair_key": 374,
+      "rejected": "qa264-pr374",
+      "rejected_qa": 264
+    },
+    {
+      "fixed": "qa268-pr393-r2",
+      "fixed_qa": 268,
+      "pair_key": 393,
+      "rejected": "qa267-pr393",
+      "rejected_qa": 267
+    },
+    {
+      "fixed": "qa269-pr397-r2",
+      "fixed_qa": 269,
+      "pair_key": 397,
+      "rejected": "qa268-pr397",
+      "rejected_qa": 268
+    },
+    {
+      "fixed": "qa275-pr421-r3",
+      "fixed_qa": 275,
+      "pair_key": 421,
+      "rejected": "qa272-pr421",
+      "rejected_qa": 272
+    },
+    {
+      "fixed": "qa275-pr421-r3",
+      "fixed_qa": 275,
+      "pair_key": 421,
+      "rejected": "qa273-pr421-r2",
+      "rejected_qa": 273
+    },
+    {
+      "fixed": "qa275-pr424-r2",
+      "fixed_qa": 275,
+      "pair_key": 424,
+      "rejected": "qa273-pr424",
+      "rejected_qa": 273
+    },
+    {
+      "fixed": "qa277-pr427-r3",
+      "fixed_qa": 277,
+      "pair_key": 427,
+      "rejected": "qa273-pr427",
+      "rejected_qa": 273
+    },
+    {
+      "fixed": "qa277-pr427-r3",
+      "fixed_qa": 277,
+      "pair_key": 427,
+      "rejected": "qa275-pr427-r2",
+      "rejected_qa": 275
+    },
+    {
+      "fixed": "qa279-pr434-r2",
+      "fixed_qa": 279,
+      "pair_key": 434,
+      "rejected": "qa275-pr434",
+      "rejected_qa": 275
+    },
+    {
+      "fixed": "qa279-pr444-r3",
+      "fixed_qa": 279,
+      "pair_key": 444,
+      "rejected": "qa277-pr444",
+      "rejected_qa": 277
+    },
+    {
+      "fixed": "qa281-pr445-r4",
+      "fixed_qa": 281,
+      "pair_key": 445,
+      "rejected": "qa277-pr445",
+      "rejected_qa": 277
+    },
+    {
+      "fixed": "qa281-pr445-r4",
+      "fixed_qa": 281,
+      "pair_key": 445,
+      "rejected": "qa279-pr445-r2",
+      "rejected_qa": 279
+    },
+    {
+      "fixed": "qa281-pr445-r4",
+      "fixed_qa": 281,
+      "pair_key": 445,
+      "rejected": "qa280-pr445-r3",
+      "rejected_qa": 280
+    }
+  ],
   "pool": {
-    "ACCEPT": 3,
-    "REJECT": 9,
-    "checks_none": 14,
+    "ACCEPT": 62,
+    "REJECT": 24,
+    "cal1_collected_unscored": 0,
+    "cal1_seen": 1,
+    "checks_none": 88,
     "checks_recorded": 0,
-    "headline_pool": 11,
-    "leak_group": 3,
+    "headline_pool": 71,
+    "held_out_candidates": {
+      "ACCEPT": 48,
+      "REJECT": 20,
+      "no_plan": 0,
+      "rule": "labelled ACCEPT or REJECT, not in the leak group, not cal1-seen",
+      "total": 68,
+      "with_plan": 68
+    },
+    "leak_group": 17,
+    "max_qa": 281,
+    "min_qa": 250,
+    "no_plan": 0,
+    "pair_cases": 36,
+    "pair_prs": 15,
+    "pairs": 21,
+    "plan": 88,
+    "plan_by_source": {
+      "qa-dispatch-section": 14,
+      "qa-dispatch-whole": 67,
+      "task-brief": 7
+    },
+    "runs_considered": 31,
+    "runs_resolved": 31,
+    "runs_with_cases": 29,
     "runtime_built": 0,
-    "seat_built": 14,
-    "total": 14,
-    "unlabelled": 2
+    "seat_built": 88,
+    "total": 88,
+    "unlabelled": 2,
+    "unresolved": 6
   },
-  "unusable": [
+  "runs": [
     {
-      "dispatch": "docs/loops/qa-258-b4-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/b4-qa-report.md",
-      "report_ref": "origin/qa/b4-report"
+      "branch": "origin/qa/t221-t222-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "t221-t222",
+      "prefix_source": "headless-prompt",
+      "qa_no": 250,
+      "reason": null,
+      "report_path": "docs/loops/t221-t222-qa-report.md",
+      "resolved": true
     },
     {
-      "dispatch": "docs/loops/qa-259-b5-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/b5-qa-report.md",
-      "report_ref": "origin/qa/b5-report"
+      "branch": "origin/qa/t164-t211-r2-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "t164-t211-r2",
+      "prefix_source": "headless-prompt",
+      "qa_no": 251,
+      "reason": null,
+      "report_path": "docs/loops/t164-t211-r2-qa-report.md",
+      "resolved": true
     },
     {
-      "dispatch": "docs/loops/qa-260-b2r2-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/b2r2-qa-report.md",
-      "report_ref": "origin/qa/b2r2-report"
+      "branch": "origin/qa/jev-cal-1-report",
+      "cases": 0,
+      "notes": [],
+      "prefix": "jev-cal-1",
+      "prefix_source": "headless-prompt",
+      "qa_no": 252,
+      "reason": null,
+      "report_path": "docs/loops/jev-calibration-1.md",
+      "resolved": true
     },
     {
-      "dispatch": "docs/loops/qa-261-302r2-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/302r2-qa-report.md",
-      "report_ref": "origin/qa/302r2-report"
+      "branch": "origin/qa/t209-t210-report",
+      "cases": 1,
+      "notes": [],
+      "prefix": "t209-t210",
+      "prefix_source": "headless-prompt",
+      "qa_no": 253,
+      "reason": null,
+      "report_path": "docs/loops/t209-t210-qa-report.md",
+      "resolved": true
     },
     {
-      "dispatch": "docs/loops/qa-262-r3-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/r3-qa-report.md",
-      "report_ref": "origin/qa/r3-report"
+      "branch": "origin/qa/t208-t212-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "t208-t212",
+      "prefix_source": "headless-prompt",
+      "qa_no": 254,
+      "reason": null,
+      "report_path": "docs/loops/t208-t212-qa-report.md",
+      "resolved": true
     },
     {
-      "dispatch": "docs/loops/qa-264-s159-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/s159-qa-report.md",
-      "report_ref": "origin/qa/s159-report"
+      "branch": "origin/qa/b1-start-report",
+      "cases": 4,
+      "notes": [],
+      "prefix": "b1-start",
+      "prefix_source": "headless-prompt",
+      "qa_no": 255,
+      "reason": null,
+      "report_path": "docs/loops/b1-start-qa-report.md",
+      "resolved": true
     },
     {
-      "dispatch": "docs/loops/qa-265-s159b-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/s159b-qa-report.md",
-      "report_ref": "origin/qa/s159b-report"
+      "branch": "origin/qa/b2-sync-report",
+      "cases": 6,
+      "notes": [],
+      "prefix": "b2-sync",
+      "prefix_source": "headless-prompt",
+      "qa_no": 256,
+      "reason": null,
+      "report_path": "docs/loops/b2-sync-qa-report.md",
+      "resolved": true
     },
     {
-      "dispatch": "docs/loops/qa-267-s160-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/s160-qa-report.md",
-      "report_ref": "origin/qa/s160-report"
+      "branch": "origin/qa/b3-misc-report",
+      "cases": 5,
+      "notes": [],
+      "prefix": "b3-misc",
+      "prefix_source": "headless-prompt",
+      "qa_no": 257,
+      "reason": null,
+      "report_path": "docs/loops/b3-misc-qa-report.md",
+      "resolved": true
     },
     {
-      "dispatch": "docs/loops/qa-271-t204-dispatch.md",
-      "reason": "report-missing",
-      "report_path": "docs/loops/t204-qa-report.md",
-      "report_ref": "origin/qa/t204-report"
+      "branch": "origin/qa/b4-misc-report",
+      "cases": 5,
+      "notes": [],
+      "prefix": "b4-misc",
+      "prefix_source": "headless-prompt",
+      "qa_no": 258,
+      "reason": null,
+      "report_path": "docs/loops/b4-misc-qa-report.md",
+      "resolved": true
     },
     {
-      "candidate": "507004147df01ec665ff5970257ee400534720ef",
-      "reason": "duplicate-candidate",
-      "report": "docs/loops/b2-sync-qa-report.md"
+      "branch": "origin/qa/b5-misc-report",
+      "cases": 3,
+      "notes": [],
+      "prefix": "b5-misc",
+      "prefix_source": "headless-prompt",
+      "qa_no": 259,
+      "reason": null,
+      "report_path": "docs/loops/b5-misc-qa-report.md",
+      "resolved": true
     },
     {
-      "candidate": "507004147df01ec665ff5970257ee400534720ef",
-      "reason": "duplicate-candidate",
-      "report": "docs/loops/b3-misc-qa-report.md"
+      "branch": "origin/qa/b2r2-sync-report",
+      "cases": 4,
+      "notes": [],
+      "prefix": "b2r2-sync",
+      "prefix_source": "headless-prompt",
+      "qa_no": 260,
+      "reason": null,
+      "report_path": "docs/loops/b2r2-sync-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/t048r2-report",
+      "cases": 1,
+      "notes": [],
+      "prefix": "t048r2",
+      "prefix_source": "headless-prompt",
+      "qa_no": 261,
+      "reason": null,
+      "report_path": "docs/loops/t048r2-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/t008r3-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "t008r3",
+      "prefix_source": "headless-prompt",
+      "qa_no": 262,
+      "reason": null,
+      "report_path": "docs/loops/t008r3-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s159-batch-report",
+      "cases": 4,
+      "notes": [],
+      "prefix": "s159-batch",
+      "prefix_source": "headless-prompt",
+      "qa_no": 264,
+      "reason": null,
+      "report_path": "docs/loops/s159-batch-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s159b-batch-report",
+      "cases": 5,
+      "notes": [],
+      "prefix": "s159b-batch",
+      "prefix_source": "headless-prompt",
+      "qa_no": 265,
+      "reason": null,
+      "report_path": "docs/loops/s159b-batch-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/t203-report",
+      "cases": 1,
+      "notes": [],
+      "prefix": "t203",
+      "prefix_source": "headless-prompt",
+      "qa_no": 266,
+      "reason": null,
+      "report_path": "docs/loops/t203-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s160b-report",
+      "cases": 4,
+      "notes": [],
+      "prefix": "s160b",
+      "prefix_source": "headless-prompt",
+      "qa_no": 267,
+      "reason": null,
+      "report_path": "docs/loops/s160b-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s160c-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "s160c",
+      "prefix_source": "headless-prompt",
+      "qa_no": 268,
+      "reason": null,
+      "report_path": "docs/loops/s160c-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s160d-report",
+      "cases": 4,
+      "notes": [],
+      "prefix": "s160d",
+      "prefix_source": "headless-prompt",
+      "qa_no": 269,
+      "reason": null,
+      "report_path": "docs/loops/s160d-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s160e-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "s160e",
+      "prefix_source": "headless-prompt",
+      "qa_no": 270,
+      "reason": null,
+      "report_path": "docs/loops/s160e-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/t204w-report",
+      "cases": 0,
+      "notes": [],
+      "prefix": "t204w",
+      "prefix_source": "headless-prompt",
+      "qa_no": 271,
+      "reason": null,
+      "report_path": "docs/loops/t204w-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s160f-report",
+      "cases": 3,
+      "notes": [],
+      "prefix": "s160f",
+      "prefix_source": "headless-prompt",
+      "qa_no": 272,
+      "reason": null,
+      "report_path": "docs/loops/s160f-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s161a-report",
+      "cases": 4,
+      "notes": [],
+      "prefix": "s161a",
+      "prefix_source": "headless-prompt",
+      "qa_no": 273,
+      "reason": null,
+      "report_path": "docs/loops/s161a-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s161b-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "s161b",
+      "prefix_source": "headless-prompt",
+      "qa_no": 274,
+      "reason": null,
+      "report_path": "docs/loops/s161b-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s161c-report",
+      "cases": 6,
+      "notes": [],
+      "prefix": "s161c",
+      "prefix_source": "headless-prompt",
+      "qa_no": 275,
+      "reason": null,
+      "report_path": "docs/loops/s161c-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s161d-report",
+      "cases": 1,
+      "notes": [],
+      "prefix": "s161d",
+      "prefix_source": "headless-prompt",
+      "qa_no": 276,
+      "reason": null,
+      "report_path": "docs/loops/s161d-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s161e-report",
+      "cases": 7,
+      "notes": [],
+      "prefix": "s161e",
+      "prefix_source": "headless-prompt",
+      "qa_no": 277,
+      "reason": null,
+      "report_path": "docs/loops/s161e-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s161f-report",
+      "cases": 1,
+      "notes": [],
+      "prefix": "s161f",
+      "prefix_source": "headless-prompt",
+      "qa_no": 278,
+      "reason": null,
+      "report_path": "docs/loops/s161f-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s161g-report",
+      "cases": 5,
+      "notes": [],
+      "prefix": "s161g",
+      "prefix_source": "headless-prompt",
+      "qa_no": 279,
+      "reason": null,
+      "report_path": "docs/loops/s161g-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s162a-report",
+      "cases": 3,
+      "notes": [],
+      "prefix": "s162a",
+      "prefix_source": "headless-prompt",
+      "qa_no": 280,
+      "reason": null,
+      "report_path": "docs/loops/s162a-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s162b-report",
+      "cases": 1,
+      "notes": [],
+      "prefix": "s162b",
+      "prefix_source": "headless-prompt",
+      "qa_no": 281,
+      "reason": null,
+      "report_path": "docs/loops/s162b-qa-report.md",
+      "resolved": true
+    }
+  ],
+  "unresolved": [
+    {
+      "prefix": "jev-cal-1",
+      "qa_no": 252,
+      "reason": "report resolved but it has no PR verdict rows (no verdict table and no ACCEPT/REJECT verdict lines naming a PR or task)",
+      "scope": "run"
+    },
+    {
+      "prefix": "t204w",
+      "qa_no": 271,
+      "reason": "report resolved but it has no PR verdict rows (no verdict table and no ACCEPT/REJECT verdict lines naming a PR or task)",
+      "scope": "run"
+    },
+    {
+      "item": "#425",
+      "qa_no": 274,
+      "reason": "same head 9fcb97ca as qa273-pr425 (QA 273, ACCEPT); the earlier verdict stands",
+      "scope": "case"
+    },
+    {
+      "item": "#427",
+      "qa_no": 274,
+      "reason": "same head 270b550b as qa273-pr427 (QA 273, REJECT); the earlier verdict stands. LATER RUN DISAGREES: ACCEPT",
+      "scope": "case"
+    },
+    {
+      "item": "#427",
+      "qa_no": 276,
+      "reason": "same head 987901c9 as qa275-pr427-r2 (QA 275, REJECT); the earlier verdict stands",
+      "scope": "case"
+    },
+    {
+      "item": "#427",
+      "qa_no": 278,
+      "reason": "same head a6d75b52 as qa277-pr427-r3 (QA 277, ACCEPT); the earlier verdict stands",
+      "scope": "case"
     }
   ]
 }
