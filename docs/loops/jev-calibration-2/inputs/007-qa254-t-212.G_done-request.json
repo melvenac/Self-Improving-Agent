@@ -1,0 +1,522 @@
+{
+  "base_sha": "79d1f5d915e2fb89680afec51ead485c9cf4e893",
+  "candidate_sha": "626f7d1347d3080ae2dd15022391f4f402a6d495",
+  "case_id": "qa254-t-212",
+  "case_no": 7,
+  "checks_hint": {
+    "build_exit": 1,
+    "checks": "none",
+    "reason": "gh run list --commit found no CI run for this head",
+    "source": "none",
+    "unit_exit": 1
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t208/mutants/skip-fetch.diff"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "626f7d1347d3080ae2dd15022391f4f402a6d495",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. git diff 79d1f5d9...e442b955 touches cli-bootstrap.ts, tree-currency.ts, their test and a mutant diff only.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" ((a) skip the fetch;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" ((b) drop the timeout;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" ((c) say level after a failed fetch.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (ob_start still states the fetch time it compared against. Quote it from a fixture run. The /start text has no fetch step. Run git grep and quote the result.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (Confined. git diff e442b955...626f7d13 touches handoff-guard.ts, cli-session-end.ts (one line, the only caller) and the test. Quote the cli-session-end.ts hunk.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (Red then green, as in row 2, against e442b955 source.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (Your own fixtures:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" ((a) Shared identity, no trailer: UNATTRIBUTED, not blamed on this seat.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" ((b) A trailer for another session: not counted.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" ((c) A trailer for this session: counted, and the missing-handoff warning still fires when the handoff is absent.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the candidate's tree-currency-fetch.test.ts against the base source: it is red. Against the candidate: green. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" ((d) No bridge-session line in the transcript: unknown, never a pass.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" ((e) A trailer whose id is session_<X> when the transcript says cse_<X>: matched.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" ((f) A trailer with different case or whitespace. Report what happens and whether it matters.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (Your own mutant: fall back to identity when no trailer exists. Report which row catches it.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (Regression check: for a seat whose own commits carry trailers, the check still warns when the handoff is missing. This is the reason the check exists, so show that T-212 did not make it inert.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Your own fixtures (local bare repos as origin):), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" ((a) The origin moves after the last fetch. Start reads behind, never level.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" ((b) An unreachable origin (a path that does not exist). Start prints fetch FAILED: <cause>; currency is against a fetch from <time>, and the word level does not appear after it.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" ((c) A hanging remote (for example an ext:: or file:// transport that never answers, or a wrapper that sleeps). Start returns within the 15 s bound plus a margin. Quote the wall time.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" ((d) Prune. A branch deleted on the origin is gone locally after start.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" ((e) Resume. The resume event takes the same path.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (Your own mutants:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "626f7d1347d3080ae2dd15022391f4f402a6d495",
+      "checks": {
+        "build": {
+          "exit_code": 1
+        },
+        "source": "none",
+        "unit": {
+          "exit_code": 1
+        }
+      },
+      "diffstat": [
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/cli-session-end.ts",
+        "open-brain/src/pipelines/session-start/tree-currency.ts",
+        "open-brain/src/shared/handoff-guard.ts",
+        "open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts",
+        "open-brain/tests/shared/handoff-guard.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. git diff 79d1f5d9...e442b955 touches cli-bootstrap.ts, tree-currency.ts, their test and a mutant diff only.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the candidate's tree-currency-fetch.test.ts against the base source: it is red. Against the candidate: green. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Your own fixtures (local bare repos as origin):",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "(a) The origin moves after the last fetch. Start reads behind, never level.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "(b) An unreachable origin (a path that does not exist). Start prints fetch FAILED: <cause>; currency is against a fetch from <time>, and the word level does not appear after it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "(c) A hanging remote (for example an ext:: or file:// transport that never answers, or a wrapper that sleeps). Start returns within the 15 s bound plus a margin. Quote the wall time.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "(d) Prune. A branch deleted on the origin is gone locally after start.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "(e) Resume. The resume event takes the same path.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Your own mutants:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "(a) skip the fetch;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "(b) drop the timeout;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "(c) say level after a failed fetch.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "ob_start still states the fetch time it compared against. Quote it from a fixture run. The /start text has no fetch step. Run git grep and quote the result.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Confined. git diff e442b955...626f7d13 touches handoff-guard.ts, cli-session-end.ts (one line, the only caller) and the test. Quote the cli-session-end.ts hunk.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "Red then green, as in row 2, against e442b955 source.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Your own fixtures:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "(a) Shared identity, no trailer: UNATTRIBUTED, not blamed on this seat.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "(b) A trailer for another session: not counted.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "(c) A trailer for this session: counted, and the missing-handoff warning still fires when the handoff is absent.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "(d) No bridge-session line in the transcript: unknown, never a pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "(e) A trailer whose id is session_<X> when the transcript says cse_<X>: matched.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "(f) A trailer with different case or whitespace. Report what happens and whether it matters.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "Your own mutant: fall back to identity when no trailer exists. Report which row catches it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "Regression check: for a seat whose own commits carry trailers, the check still warns when the handoff is missing. This is the reason the check exists, so show that T-212 did not make it inert.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "7-qa254-t-212",
+        "new_capability": "QA 254: T-208 (fetch before currency) + T-212 (handoff check attributes by trailer)",
+        "objective": "QA 254: T-208 (fetch before currency) + T-212 (handoff check attributes by trailer)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
+          "path": "docs/loops/qa-254-t208-t212-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. git diff 79d1f5d9...e442b955 touches cli-bootstrap.ts, tree-currency.ts, their test and a mutant diff only.",
+          "Red then green. Run the candidate's tree-currency-fetch.test.ts against the base source: it is red. Against the candidate: green. Quote the counts.",
+          "Your own fixtures (local bare repos as origin):",
+          "(a) The origin moves after the last fetch. Start reads behind, never level.",
+          "(b) An unreachable origin (a path that does not exist). Start prints fetch FAILED: <cause>; currency is against a fetch from <time>, and the word level does not appear after it.",
+          "(c) A hanging remote (for example an ext:: or file:// transport that never answers, or a wrapper that sleeps). Start returns within the 15 s bound plus a margin. Quote the wall time.",
+          "(d) Prune. A branch deleted on the origin is gone locally after start.",
+          "(e) Resume. The resume event takes the same path.",
+          "Your own mutants:",
+          "(a) skip the fetch;",
+          "(b) drop the timeout;",
+          "(c) say level after a failed fetch.",
+          "ob_start still states the fetch time it compared against. Quote it from a fixture run. The /start text has no fetch step. Run git grep and quote the result.",
+          "Confined. git diff e442b955...626f7d13 touches handoff-guard.ts, cli-session-end.ts (one line, the only caller) and the test. Quote the cli-session-end.ts hunk.",
+          "Red then green, as in row 2, against e442b955 source.",
+          "Your own fixtures:",
+          "(a) Shared identity, no trailer: UNATTRIBUTED, not blamed on this seat.",
+          "(b) A trailer for another session: not counted.",
+          "(c) A trailer for this session: counted, and the missing-handoff warning still fires when the handoff is absent.",
+          "(d) No bridge-session line in the transcript: unknown, never a pass.",
+          "(e) A trailer whose id is session_<X> when the transcript says cse_<X>: matched.",
+          "(f) A trailer with different case or whitespace. Report what happens and whether it matters.",
+          "Your own mutant: fall back to identity when no trailer exists. Report which row catches it.",
+          "Regression check: for a seat whose own commits carry trailers, the check still warns when the handoff is missing. This is the reason the check exists, so show that T-212 did not make it inert."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-bootstrap.ts b/open-brain/src/cli-bootstrap.ts\nindex 6b49821c..37d9bd8a 100644\n--- a/open-brain/src/cli-bootstrap.ts\n+++ b/open-brain/src/cli-bootstrap.ts\n@@ -15,7 +15,7 @@ import { runHealthChecks } from \"./pipelines/session-start/health-checks.js\";\n import { readAgentIdentity } from \"./pipelines/session-start/agent-identity.js\";\n import { describeRoleFiles } from \"./pipelines/session-start/role-files.js\";\n import { describeDerivedArtifacts } from \"./pipelines/session-start/derived-artifacts.js\";\n-import { describeTreeCurrency } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"./pipelines/session-start/tree-currency.js\";\n import {\n   resolveSessionId,\n   writeActiveSession,\n@@ -155,7 +155,10 @@ if (hasAgents) {\n // derived-artifacts.ts states about itself: two copies of a freshness rule\n // drift, and the drift is silent.\n if (hasAgents) {\n-  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);\n+  // T-208: fetch FIRST (bounded, pruning), on every SessionStart event: the hook\n+  // is registered without a matcher, so startup and resume take this one path.\n+  // The outcome rides into the currency lines, which say so when it failed.\n+  for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);\n }\n \n // Session UUID — emit so /start can pick it up and call ob_set_session.",
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined. git diff 79d1f5d9...e442b955 touches cli-bootstrap.ts, tree-currency.ts, their test and a mutant diff only."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the candidate's tree-currency-fetch.test.ts against the base source: it is red. Against the candidate: green. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "Your own fixtures (local bare repos as origin):"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "(a) The origin moves after the last fetch. Start reads behind, never level."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "(b) An unreachable origin (a path that does not exist). Start prints fetch FAILED: <cause>; currency is against a fetch from <time>, and the word level does not appear after it."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "(c) A hanging remote (for example an ext:: or file:// transport that never answers, or a wrapper that sleeps). Start returns within the 15 s bound plus a margin. Quote the wall time."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "(d) Prune. A branch deleted on the origin is gone locally after start."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "(e) Resume. The resume event takes the same path."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "Your own mutants:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "(a) skip the fetch;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "(b) drop the timeout;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "(c) say level after a failed fetch."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "ob_start still states the fetch time it compared against. Quote it from a fixture run. The /start text has no fetch step. Run git grep and quote the result."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "Confined. git diff e442b955...626f7d13 touches handoff-guard.ts, cli-session-end.ts (one line, the only caller) and the test. Quote the cli-session-end.ts hunk."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-bootstrap.ts b/open-brain/src/cli-bootstrap.ts\nindex 6b49821c..37d9bd8a 100644\n--- a/open-brain/src/cli-bootstrap.ts\n+++ b/open-brain/src/cli-bootstrap.ts\n@@ -15,7 +15,7 @@ import { runHealthChecks } from \"./pipelines/session-start/health-checks.js\";\n import { readAgentIdentity } from \"./pipelines/session-start/agent-identity.js\";\n import { describeRoleFiles } from \"./pipelines/session-start/role-files.js\";\n import { describeDerivedArtifacts } from \"./pipelines/session-start/derived-artifacts.js\";\n-import { describeTreeCurrency } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"./pipelines/session-start/tree-currency.js\";\n import {\n   resolveSessionId,\n   writeActiveSession,\n@@ -155,7 +155,10 @@ if (hasAgents) {\n // derived-artifacts.ts states about itself: two copies of a freshness rule\n // drift, and the drift is silent.\n if (hasAgents) {\n-  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);\n+  // T-208: fetch FIRST (bounded, pruning), on every SessionStart event: the hook\n+  // is registered without a matcher, so startup and resume take this one path.\n+  // The outcome rides into the currency lines, which say so when it failed.\n+  for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);\n }\n \n // Session UUID — emit so /start can pick it up and call ob_set_session."
+          ],
+          "id": "T15",
+          "observable": "Red then green, as in row 2, against e442b955 source."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "Your own fixtures:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "(a) Shared identity, no trailer: UNATTRIBUTED, not blamed on this seat."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "(b) A trailer for another session: not counted."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "(c) A trailer for this session: counted, and the missing-handoff warning still fires when the handoff is absent."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..d4130ef1 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n import { existsSync, readFileSync, statSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,79 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T20",
+          "observable": "(d) No bridge-session line in the transcript: unknown, never a pass."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "(e) A trailer whose id is session_<X> when the transcript says cse_<X>: matched."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..270892ae\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,149 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T22",
+          "observable": "(f) A trailer with different case or whitespace. Report what happens and whether it matters."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T23",
+          "observable": "Your own mutant: fall back to identity when no trailer exists. Report which row catches it."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T24",
+          "observable": "Regression check: for a seat whose own commits carry trailers, the check still warns when the handoff is missing. This is the reason the check exists, so show that T-212 did not make it inert."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "79d1f5d915e2fb89680afec51ead485c9cf4e893",
+        "merge_commit": "626f7d1347d3080ae2dd15022391f4f402a6d495",
+        "pr": 7,
+        "scored_sha": "626f7d1347d3080ae2dd15022391f4f402a6d495"
+      }
+    }
+  }
+}

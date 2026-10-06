@@ -1,0 +1,519 @@
+{
+  "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+  "candidate_sha": "483061d04bafe0ac64c4c5692e1dc19e6840b16a",
+  "case_id": "qa258-pr299",
+  "case_no": 26,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 36981312652,
+    "runs_found": 2,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t050-developer-handoff.md"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "2a26a91b3e46f5f8f4a0f968c7dc16aad505ecf7",
+  "plan_redacted_sentences": [
+    {
+      "field": "acceptance.T10",
+      "sentence": "#290 equals QA 254's ACCEPT."
+    },
+    {
+      "field": "tasks[9]",
+      "sentence": "#290 equals QA 254's ACCEPT."
+    }
+  ],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (#294:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (A third file losing a test still fails.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (The filename-only mutant goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (The retirements check passes with the reduced R-011 allowlist.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (backfill-success-rate.mjs is deleted.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (#299:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (The detector reads .recalled-entries.json only to report.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (The ids it returns never reach resolveRecalledIds: show the call graph by grep.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (It reports none present when the file is absent, and that is distinct from not checked.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head. Run gh pr checks <n> and quote test and the run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#289, QA 254's failures:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (SSH-style stderr: the cause is the fatal: line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (A hanging remote is bounded. Quote the wall time.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "483061d04bafe0ac64c4c5692e1dc19e6840b16a",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/cli-session-end.ts",
+        "open-brain/src/pipelines/session-end/recalled-ids.ts",
+        "open-brain/src/server.ts",
+        "open-brain/tests/pipelines/session-end/recalled-ids.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head. Run gh pr checks <n> and quote test and the run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#289, QA 254's failures:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "SSH-style stderr: the cause is the fatal: line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "A hanging remote is bounded. Quote the wall time.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "#294:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "A third file losing a test still fails.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "The filename-only mutant goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "The retirements check passes with the reduced R-011 allowlist.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "backfill-success-rate.mjs is deleted.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "#299:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "The detector reads .recalled-entries.json only to report.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "The ids it returns never reach resolveRecalledIds: show the call graph by grep.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "It reports none present when the file is absent, and that is distinct from not checked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "26-qa258-pr299",
+        "new_capability": "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)",
+        "objective": "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+          "path": "docs/loops/qa-258-b4-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined.",
+          "Red then green. Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head. Run gh pr checks <n> and quote test and the run id.",
+          "#289, QA 254's failures:",
+          "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.",
+          "SSH-style stderr: the cause is the fatal: line.",
+          "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
+          "A hanging remote is bounded. Quote the wall time.",
+          "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+          "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
+          "#294:",
+          "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
+          "A third file losing a test still fails.",
+          "The filename-only mutant goes red.",
+          "The retirements check passes with the reduced R-011 allowlist.",
+          "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.",
+          "backfill-success-rate.mjs is deleted.",
+          "#299:",
+          "The detector reads .recalled-entries.json only to report.",
+          "The ids it returns never reach resolveRecalledIds: show the call graph by grep.",
+          "It reports none present when the file is absent, and that is distinct from not checked.",
+          "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..03ea2ad7 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -33,7 +33,7 @@ import { resolveRepoRoot, describeNoRoot } from \"./shared/repo-root.js\";\n import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from \"./shared/state-writer.js\";\n import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from \"./db-v2.js\";\n import { sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { readLastInvocationTs } from \"./pipelines/session-end/invocation-logger.js\";\n import { computeScore as computeScoreShared } from \"./pipelines/sync/score.js\";\n import { invocationLogSuffix } from \"./pipelines/sync/score-line.js\";\n@@ -540,7 +540,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // No named id means the proven one. end.md calls ob_end that way, and a\n     // rating ob_recalled lists is in recall_log under that id (D3).\n     const endedId = endSession.id;\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db: v2db,\n       sessionId: endedId,\n       explicitIds: args.recalled_entry_ids,\n@@ -578,7 +578,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // Same lines the session-end hook prints, including the reason a none-origin\n     // resolved nothing. The count alone made \"no session id\" and \"no recall_log\n     // rows\" look identical.\n-    const originLine = formatRecalledResolution(resolved).join(\"\\n\");\n+    // T-050: who wrote .recalled-entries.json, observed beside the resolution and never fed into it.\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head. Run gh pr checks <n> and quote test and the run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "#289, QA 254's failures:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..03ea2ad7 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -33,7 +33,7 @@ import { resolveRepoRoot, describeNoRoot } from \"./shared/repo-root.js\";\n import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from \"./shared/state-writer.js\";\n import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from \"./db-v2.js\";\n import { sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { readLastInvocationTs } from \"./pipelines/session-end/invocation-logger.js\";\n import { computeScore as computeScoreShared } from \"./pipelines/sync/score.js\";\n import { invocationLogSuffix } from \"./pipelines/sync/score-line.js\";\n@@ -540,7 +540,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // No named id means the proven one. end.md calls ob_end that way, and a\n     // rating ob_recalled lists is in recall_log under that id (D3).\n     const endedId = endSession.id;\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db: v2db,\n       sessionId: endedId,\n       explicitIds: args.recalled_entry_ids,\n@@ -578,7 +578,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // Same lines the session-end hook prints, including the reason a none-origin\n     // resolved nothing. The count alone made \"no session id\" and \"no recall_log\n     // rows\" look identical.\n-    const originLine = formatRecalledResolution(resolved).join(\"\\n\");\n+    // T-050: who wrote .recalled-entries.json, observed beside the resolution and never fed into it.\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "SSH-style stderr: the cause is the fatal: line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "A hanging remote is bounded. Quote the wall time."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..e638cd71 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -15,7 +15,7 @@ import { join } from \"path\";\n import { homedir } from \"os\";\n import { openV2Database } from \"./db-v2.js\";\n import { formatSessionEndLines, sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { obsidianVaultDir } from \"./shared/paths.js\";\n import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n@@ -117,7 +117,7 @@ try {\n     // recall_log for this session wins; the file is consulted only when it\n     // names this same session. See resolveRecalledIds — the copy on disk had\n     // been two sessions stale and was being rated as if it were current.\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db,\n       sessionId: sessionId || null,\n       filePaths: [\n@@ -130,7 +130,7 @@ try {\n     // Loop 5 R3: this hook runs unattended, so it was the worst place for a\n     // silent no-rating. It previously spoke only when a file was refused; a\n     // session with no id and no file said nothing at all and rated nothing.\n-    for (const line of formatRecalledResolution(resolved, \"\")) console.log(`[session-end] ${line}`);\n+    for (const line of [...formatRecalledResolution(resolved, \"\"), ...formatForeignWriter(foreign, \"\")]) console.log(`[session-end] ${line}`);\n     const result = sessionEndV2({\n       db,\n       vaultDir: V2_VAULT,",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..03ea2ad7 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -33,7 +33,7 @@ import { resolveRepoRoot, describeNoRoot } from \"./shared/repo-root.js\";\n import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from \"./shared/state-writer.js\";\n import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from \"./db-v2.js\";\n import { sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { readLastInvocationTs } from \"./pipelines/session-end/invocation-logger.js\";\n import { computeScore as computeScoreShared } from \"./pipelines/sync/score.js\";\n import { invocationLogSuffix } from \"./pipelines/sync/score-line.js\";\n@@ -540,7 +540,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // No named id means the proven one. end.md calls ob_end that way, and a\n     // rating ob_recalled lists is in recall_log under that id (D3).\n     const endedId = endSession.id;\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db: v2db,\n       sessionId: endedId,\n       explicitIds: args.recalled_entry_ids,\n@@ -578,7 +578,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // Same lines the session-end hook prints, including the reason a none-origin\n     // resolved nothing. The count alone made \"no session id\" and \"no recall_log\n     // rows\" look identical.\n-    const originLine = formatRecalledResolution(resolved).join(\"\\n\");\n+    // T-050: who wrote .recalled-entries.json, observed beside the resolution and never fed into it.\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..03ea2ad7 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -33,7 +33,7 @@ import { resolveRepoRoot, describeNoRoot } from \"./shared/repo-root.js\";\n import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from \"./shared/state-writer.js\";\n import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from \"./db-v2.js\";\n import { sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { readLastInvocationTs } from \"./pipelines/session-end/invocation-logger.js\";\n import { computeScore as computeScoreShared } from \"./pipelines/sync/score.js\";\n import { invocationLogSuffix } from \"./pipelines/sync/score-line.js\";\n@@ -540,7 +540,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // No named id means the proven one. end.md calls ob_end that way, and a\n     // rating ob_recalled lists is in recall_log under that id (D3).\n     const endedId = endSession.id;\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db: v2db,\n       sessionId: endedId,\n       explicitIds: args.recalled_entry_ids,\n@@ -578,7 +578,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // Same lines the session-end hook prints, including the reason a none-origin\n     // resolved nothing. The count alone made \"no session id\" and \"no recall_log\n     // rows\" look identical.\n-    const originLine = formatRecalledResolution(resolved).join(\"\\n\");\n+    // T-050: who wrote .recalled-entries.json, observed beside the resolution and never fed into it.\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "#294:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..e638cd71 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -15,7 +15,7 @@ import { join } from \"path\";\n import { homedir } from \"os\";\n import { openV2Database } from \"./db-v2.js\";\n import { formatSessionEndLines, sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { obsidianVaultDir } from \"./shared/paths.js\";\n import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n@@ -117,7 +117,7 @@ try {\n     // recall_log for this session wins; the file is consulted only when it\n     // names this same session. See resolveRecalledIds — the copy on disk had\n     // been two sessions stale and was being rated as if it were current.\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db,\n       sessionId: sessionId || null,\n       filePaths: [\n@@ -130,7 +130,7 @@ try {\n     // Loop 5 R3: this hook runs unattended, so it was the worst place for a\n     // silent no-rating. It previously spoke only when a file was refused; a\n     // session with no id and no file said nothing at all and rated nothing.\n-    for (const line of formatRecalledResolution(resolved, \"\")) console.log(`[session-end] ${line}`);\n+    for (const line of [...formatRecalledResolution(resolved, \"\"), ...formatForeignWriter(foreign, \"\")]) console.log(`[session-end] ${line}`);\n     const result = sessionEndV2({\n       db,\n       vaultDir: V2_VAULT,"
+          ],
+          "id": "T13",
+          "observable": "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "A third file losing a test still fails."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..03ea2ad7 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -33,7 +33,7 @@ import { resolveRepoRoot, describeNoRoot } from \"./shared/repo-root.js\";\n import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from \"./shared/state-writer.js\";\n import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from \"./db-v2.js\";\n import { sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { readLastInvocationTs } from \"./pipelines/session-end/invocation-logger.js\";\n import { computeScore as computeScoreShared } from \"./pipelines/sync/score.js\";\n import { invocationLogSuffix } from \"./pipelines/sync/score-line.js\";\n@@ -540,7 +540,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // No named id means the proven one. end.md calls ob_end that way, and a\n     // rating ob_recalled lists is in recall_log under that id (D3).\n     const endedId = endSession.id;\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db: v2db,\n       sessionId: endedId,\n       explicitIds: args.recalled_entry_ids,\n@@ -578,7 +578,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // Same lines the session-end hook prints, including the reason a none-origin\n     // resolved nothing. The count alone made \"no session id\" and \"no recall_log\n     // rows\" look identical.\n-    const originLine = formatRecalledResolution(resolved).join(\"\\n\");\n+    // T-050: who wrote .recalled-entries.json, observed beside the resolution and never fed into it.\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "The filename-only mutant goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "The retirements check passes with the reduced R-011 allowlist."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..e638cd71 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -15,7 +15,7 @@ import { join } from \"path\";\n import { homedir } from \"os\";\n import { openV2Database } from \"./db-v2.js\";\n import { formatSessionEndLines, sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { obsidianVaultDir } from \"./shared/paths.js\";\n import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n@@ -117,7 +117,7 @@ try {\n     // recall_log for this session wins; the file is consulted only when it\n     // names this same session. See resolveRecalledIds — the copy on disk had\n     // been two sessions stale and was being rated as if it were current.\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db,\n       sessionId: sessionId || null,\n       filePaths: [\n@@ -130,7 +130,7 @@ try {\n     // Loop 5 R3: this hook runs unattended, so it was the worst place for a\n     // silent no-rating. It previously spoke only when a file was refused; a\n     // session with no id and no file said nothing at all and rated nothing.\n-    for (const line of formatRecalledResolution(resolved, \"\")) console.log(`[session-end] ${line}`);\n+    for (const line of [...formatRecalledResolution(resolved, \"\"), ...formatForeignWriter(foreign, \"\")]) console.log(`[session-end] ${line}`);\n     const result = sessionEndV2({\n       db,\n       vaultDir: V2_VAULT,"
+          ],
+          "id": "T17",
+          "observable": "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "backfill-success-rate.mjs is deleted."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..03ea2ad7 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -33,7 +33,7 @@ import { resolveRepoRoot, describeNoRoot } from \"./shared/repo-root.js\";\n import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from \"./shared/state-writer.js\";\n import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from \"./db-v2.js\";\n import { sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { readLastInvocationTs } from \"./pipelines/session-end/invocation-logger.js\";\n import { computeScore as computeScoreShared } from \"./pipelines/sync/score.js\";\n import { invocationLogSuffix } from \"./pipelines/sync/score-line.js\";\n@@ -540,7 +540,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // No named id means the proven one. end.md calls ob_end that way, and a\n     // rating ob_recalled lists is in recall_log under that id (D3).\n     const endedId = endSession.id;\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db: v2db,\n       sessionId: endedId,\n       explicitIds: args.recalled_entry_ids,\n@@ -578,7 +578,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // Same lines the session-end hook prints, including the reason a none-origin\n     // resolved nothing. The count alone made \"no session id\" and \"no recall_log\n     // rows\" look identical.\n-    const originLine = formatRecalledResolution(resolved).join(\"\\n\");\n+    // T-050: who wrote .recalled-entries.json, observed beside the resolution and never fed into it.\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "#299:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..03ea2ad7 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -33,7 +33,7 @@ import { resolveRepoRoot, describeNoRoot } from \"./shared/repo-root.js\";\n import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from \"./shared/state-writer.js\";\n import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from \"./db-v2.js\";\n import { sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { readLastInvocationTs } from \"./pipelines/session-end/invocation-logger.js\";\n import { computeScore as computeScoreShared } from \"./pipelines/sync/score.js\";\n import { invocationLogSuffix } from \"./pipelines/sync/score-line.js\";\n@@ -540,7 +540,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // No named id means the proven one. end.md calls ob_end that way, and a\n     // rating ob_recalled lists is in recall_log under that id (D3).\n     const endedId = endSession.id;\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db: v2db,\n       sessionId: endedId,\n       explicitIds: args.recalled_entry_ids,\n@@ -578,7 +578,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     // Same lines the session-end hook prints, including the reason a none-origin\n     // resolved nothing. The count alone made \"no session id\" and \"no recall_log\n     // rows\" look identical.\n-    const originLine = formatRecalledResolution(resolved).join(\"\\n\");\n+    // T-050: who wrote .recalled-entries.json, observed beside the resolution and never fed into it.\n…[cal2 diff truncated]"
+          ],
+          "id": "T20",
+          "observable": "The detector reads .recalled-entries.json only to report."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "The ids it returns never reach resolveRecalledIds: show the call graph by grep."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..e638cd71 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -15,7 +15,7 @@ import { join } from \"path\";\n import { homedir } from \"os\";\n import { openV2Database } from \"./db-v2.js\";\n import { formatSessionEndLines, sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { obsidianVaultDir } from \"./shared/paths.js\";\n import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n@@ -117,7 +117,7 @@ try {\n     // recall_log for this session wins; the file is consulted only when it\n     // names this same session. See resolveRecalledIds — the copy on disk had\n     // been two sessions stale and was being rated as if it were current.\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db,\n       sessionId: sessionId || null,\n       filePaths: [\n@@ -130,7 +130,7 @@ try {\n     // Loop 5 R3: this hook runs unattended, so it was the worst place for a\n     // silent no-rating. It previously spoke only when a file was refused; a\n     // session with no id and no file said nothing at all and rated nothing.\n-    for (const line of formatRecalledResolution(resolved, \"\")) console.log(`[session-end] ${line}`);\n+    for (const line of [...formatRecalledResolution(resolved, \"\"), ...formatForeignWriter(foreign, \"\")]) console.log(`[session-end] ${line}`);\n     const result = sessionEndV2({\n       db,\n       vaultDir: V2_VAULT,"
+          ],
+          "id": "T22",
+          "observable": "It reports none present when the file is absent, and that is distinct from not checked."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]"
+          ],
+          "id": "T23",
+          "observable": "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..e638cd71 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -15,7 +15,7 @@ import { join } from \"path\";\n import { homedir } from \"os\";\n import { openV2Database } from \"./db-v2.js\";\n import { formatSessionEndLines, sessionEndV2 } from \"./pipelines/session-end/index-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"./pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter } from \"./pipelines/session-end/recalled-ids.js\";\n import { obsidianVaultDir } from \"./shared/paths.js\";\n import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n@@ -117,7 +117,7 @@ try {\n     // recall_log for this session wins; the file is consulted only when it\n     // names this same session. See resolveRecalledIds — the copy on disk had\n     // been two sessions stale and was being rated as if it were current.\n-    const resolved = resolveRecalledIds({\n+    const { resolved, foreign } = resolveRecalledIdsObserved({\n       db,\n       sessionId: sessionId || null,\n       filePaths: [\n@@ -130,7 +130,7 @@ try {\n     // Loop 5 R3: this hook runs unattended, so it was the worst place for a\n     // silent no-rating. It previously spoke only when a file was refused; a\n     // session with no id and no file said nothing at all and rated nothing.\n-    for (const line of formatRecalledResolution(resolved, \"\")) console.log(`[session-end] ${line}`);\n+    for (const line of [...formatRecalledResolution(resolved, \"\"), ...formatForeignWriter(foreign, \"\")]) console.log(`[session-end] ${line}`);\n     const result = sessionEndV2({\n       db,\n       vaultDir: V2_VAULT,",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..32732184 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -169,3 +169,84 @@ export function formatRecalledResolution(resolved: RecalledIdsSource, indent = \"\n   }\n   return lines;\n }\n+\n+/**\n+ * T-050: observe a foreign `.recalled-entries.json` writer WITHOUT letting the file influence anything.\n+ *\n+ * v0.15.1's fix was to stop reading the file on the normal path, which made a foreign writer both unreachable and\n+ * uncountable: \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing. Removing a\n+ * read is not counting what you no longer read. This reads the file purely to REPORT who wrote it. It returns no\n+ * ids and no entries, `resolveRecalledIds`' precedence is untouched, and a finding is reported, never refused.\n+ */\n+export interface ForeignWriterFinding {\n+  path: string;\n+  kind: \"foreign\" | \"unattributed\" | \"unparseable\";\n+  fileSessionId: string | null;\n+}\n+\n+export interface ForeignWriterReport {\n+  /** The session the files were compared against (null when it was not known). */\n+  sessionId: string | null;\n+  /** False when the question could not be asked (no session id to compare against). */\n+  checked: boolean;\n+  notChecked?: string;\n+  /** Candidate locations examined. */\n+  looked: number;\n+  /** Of those, files that existed and were read. */\n+  present: number;\n+  findings: ForeignWriterFinding[];\n+}\n+\n+export function detectForeignWriter(input: {\n+  sessionId: string | null;\n+  filePaths: string[];\n+  readFile: (path: string) => string | null;\n+}): ForeignWriterReport {\n+  const { sessionId, filePaths, readFile } = input;\n+  if (!sessionId) {\n+    return { sessionId, checked: false, notChecked: \"no session id, so no file can be called foreign\", looked: filePaths.length, present: 0, findings: [] };\n+  }\n+  const findings: ForeignWriterFinding[] = [];\n+  let present = 0;\n+  for (const path of filePaths) {\n+    const raw = readFile(path);\n+    if (raw === null) continue;\n+    present += 1;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\nindex 8b7d6f24..5c82f350 100644\n--- a/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n+++ b/open-brain/tests/pipelines/session-end/recalled-ids.test.ts\n@@ -1,7 +1,7 @@\n import { describe, it, expect, beforeEach } from \"vitest\";\n import Database from \"better-sqlite3\";\n import { initSchemaV2, recordRecallEvent, getSessionRecalledIds } from \"../../../src/db-v2.js\";\n-import { resolveRecalledIds, formatRecalledResolution } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n+import { resolveRecalledIds, formatRecalledResolution, detectForeignWriter, formatForeignWriter, resolveRecalledIdsObserved } from \"../../../src/pipelines/session-end/recalled-ids.js\";\n \n const THIS_SESSION = \"efcaeb75-f5d5-421f-a1e5-645f155c59e4\";\n const OTHER_SESSION = \"2fb67133-f85a-4c1d-9e30-000000000000\";\n@@ -198,3 +198,69 @@ describe(\"R3: a session that rates nothing says why\", () => {\n     expect(formatRecalledResolution(r, \"  \")[0]).toBe(\"  Recalled ids: 0 from none\");\n   });\n });\n+\n+/**\n+ * T-050: v0.15.1 made a foreign `.recalled-entries.json` writer unreachable AND uncountable: on the normal path the\n+ * file is never read, so \"no foreign writer\" and \"a foreign writer never looked at\" printed the same nothing.\n+ * The detector reads the file only to REPORT. It never resolves ids, and the resolver's precedence is untouched.\n+ */\n+describe(\"detectForeignWriter — T-050\", () => {\n+  const OURS = THIS_SESSION;\n+  const run = (sessionId: string | null, files: Record<string, string>) =>\n+    detectForeignWriter({ sessionId, filePaths: Object.keys(files), readFile: (p) => files[p] ?? null });\n+\n+  it(\"FW-1: a file written by another session is reported, with the path and the session it names\", () => {\n+    const r = run(OURS, { \"/p/.recalled-entries.json\": fileFor(OTHER_SESSION, [1, 2]) });\n+    expect(r.checked).toBe(true);\n+    expect(r.findings).toEqual([{ path: \"/p/.recalled-entries.json\", kind: \"foreign\", fileSessionId: OTHER_SESSION }]);\n+    expect(formatForeignWriter(r)).toEqual([\n…[cal2 diff truncated]"
+          ],
+          "id": "T24",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+        "merge_commit": "2a26a91b3e46f5f8f4a0f968c7dc16aad505ecf7",
+        "pr": 299,
+        "scored_sha": "483061d04bafe0ac64c4c5692e1dc19e6840b16a"
+      }
+    }
+  }
+}

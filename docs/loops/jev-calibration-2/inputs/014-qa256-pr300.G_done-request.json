@@ -1,0 +1,423 @@
+{
+  "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+  "candidate_sha": "5ae7f9f28bed80d58cbdb34056e87d620faecaed",
+  "case_id": "qa256-pr300",
+  "case_no": 14,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 36981372828,
+    "runs_found": 2,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t051-developer-handoff.md",
+    "docs/loops/t051/mutants/skip-no-frontmatter.diff"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "d06952a2bc156b623777b0d5311c5375db3323b4",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files each PR's own commits touch beyond its base.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Confirm the layout on a real install, read-only.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (Report whether ${CLAUDE_PLUGIN_ROOT} is resolved, and how.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (#309, real settings. Run hook-configs read-only against this machine's ~/.claude/settings.json. Quote the counts line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (Then add sh -c \"…\" and node \"C:\\path with spaces\\x.js\" entries to a fixture.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (The sh -c entry must be not-checked. The quoted path with spaces must be stat'ed as one path.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (#303. Fixture repos for the four cases: at HEAD, behind, ahead (warn) and diverged (issue, naming both counts and the merge-base).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (Batch merge order. On a scratch branch from origin/master, merge the heads in order: #295, #298, #300, #303, #306, #309.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (Known conflict: #295 and #309 both edit the node:path import line in checks.ts. Report every conflict.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (Resolve ONLY that import-line conflict, by taking the union of the imported names, and say so. Stop on any other conflict.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (On the merged result, run every touched sync test file, one per invocation, plus tsc --noEmit. Then run node open-brain/build/cli.js sync --check after npm run build, in the scratch tree only, and quote every new check's line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. The PR's new or changed test files fail against its base's source and pass on its head. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own on the core change, and report which row catches it. Re-run one of the developer's stated mutants from docs/loops/t0xx/mutants/.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head (read only). gh pr checks <n>, quoting the test conclusion and the run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (\"Not checked\" is never a pass.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (For #295, #298, #303, #306 and #309, feed each check an input it cannot read: absent config, unreadable file, an unknown SHA, an unparseable command.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (Its result must be skip or warn, stating \"not checked\", and never pass.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Quote each one.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (#298, the plugin layout. Its fixture follows enabledPlugins, then installed_plugins.json, then .claude-plugin/plugin.json or .mcp.json.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "5ae7f9f28bed80d58cbdb34056e87d620faecaed",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/tests/pipelines/sync/skills-contract.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files each PR's own commits touch beyond its base.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. The PR's new or changed test files fail against its base's source and pass on its head. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own on the core change, and report which row catches it. Re-run one of the developer's stated mutants from docs/loops/t0xx/mutants/.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head (read only). gh pr checks <n>, quoting the test conclusion and the run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "\"Not checked\" is never a pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "For #295, #298, #303, #306 and #309, feed each check an input it cannot read: absent config, unreadable file, an unknown SHA, an unparseable command.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Its result must be skip or warn, stating \"not checked\", and never pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Quote each one.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "#298, the plugin layout. Its fixture follows enabledPlugins, then installed_plugins.json, then .claude-plugin/plugin.json or .mcp.json.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Confirm the layout on a real install, read-only.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Report whether ${CLAUDE_PLUGIN_ROOT} is resolved, and how.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "#309, real settings. Run hook-configs read-only against this machine's ~/.claude/settings.json. Quote the counts line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Then add sh -c \"…\" and node \"C:\\path with spaces\\x.js\" entries to a fixture.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "The sh -c entry must be not-checked. The quoted path with spaces must be stat'ed as one path.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "#303. Fixture repos for the four cases: at HEAD, behind, ahead (warn) and diverged (issue, naming both counts and the merge-base).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge the heads in order: #295, #298, #300, #303, #306, #309.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "Known conflict: #295 and #309 both edit the node:path import line in checks.ts. Report every conflict.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "Resolve ONLY that import-line conflict, by taking the union of the imported names, and say so. Stop on any other conflict.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "On the merged result, run every touched sync test file, one per invocation, plus tsc --noEmit. Then run node open-brain/build/cli.js sync --check after npm run build, in the scratch tree only, and quote every new check's line.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "14-qa256-pr300",
+        "new_capability": "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)",
+        "objective": "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+          "path": "docs/loops/qa-256-b2-sync-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files each PR's own commits touch beyond its base.",
+          "Red then green. The PR's new or changed test files fail against its base's source and pass on its head. Quote the counts.",
+          "One mutant of your own on the core change, and report which row catches it. Re-run one of the developer's stated mutants from docs/loops/t0xx/mutants/.",
+          "CI on the head (read only). gh pr checks <n>, quoting the test conclusion and the run id.",
+          "\"Not checked\" is never a pass.",
+          "For #295, #298, #303, #306 and #309, feed each check an input it cannot read: absent config, unreadable file, an unknown SHA, an unparseable command.",
+          "Its result must be skip or warn, stating \"not checked\", and never pass.",
+          "Quote each one.",
+          "#298, the plugin layout. Its fixture follows enabledPlugins, then installed_plugins.json, then .claude-plugin/plugin.json or .mcp.json.",
+          "Confirm the layout on a real install, read-only.",
+          "Report whether ${CLAUDE_PLUGIN_ROOT} is resolved, and how.",
+          "#309, real settings. Run hook-configs read-only against this machine's ~/.claude/settings.json. Quote the counts line.",
+          "Then add sh -c \"…\" and node \"C:\\path with spaces\\x.js\" entries to a fixture.",
+          "The sh -c entry must be not-checked. The quoted path with spaces must be stat'ed as one path.",
+          "#303. Fixture repos for the four cases: at HEAD, behind, ahead (warn) and diverged (issue, naming both counts and the merge-base).",
+          "Batch merge order. On a scratch branch from origin/master, merge the heads in order: #295, #298, #300, #303, #306, #309.",
+          "Known conflict: #295 and #309 both edit the node:path import line in checks.ts. Report every conflict.",
+          "Resolve ONLY that import-line conflict, by taking the union of the imported names, and say so. Stop on any other conflict.",
+          "On the merged result, run every touched sync test file, one per invocation, plus tsc --noEmit. Then run node open-brain/build/cli.js sync --check after npm run build, in the scratch tree only, and quote every new check's line."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..afaa7912 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -15,6 +15,7 @@ import {\n   checkObsidianVault,\n   checkVaultPathRefs,\n   checkSkillIndex,\n+  checkSkillsContract,\n   checkTemplatePersonalNames,\n   checkTemplate,\n   checkSpecProvenance,\n@@ -68,6 +69,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkObsidianVault(paths.obsidianVault));\n   checks.push(checkVaultPathRefs(options.projectRoot));\n   checks.push(checkSkillIndex(paths.obsidianVault));\n+  checks.push(checkSkillsContract(options.projectRoot));\n   checks.push(checkTemplatePersonalNames(options.projectRoot));\n \n   // The memory module's three checks, supplied rather than imported (Loop 13)."
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files each PR's own commits touch beyond its base."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/skills-contract.test.ts b/open-brain/tests/pipelines/sync/skills-contract.test.ts\nnew file mode 100644\nindex 00000000..5906aaf7\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/skills-contract.test.ts\n@@ -0,0 +1,111 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkSkillsContract } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-051: each skill has three identities (directory, SKILL.md frontmatter `name`, INDEX.md\n+ * row) and they must agree. Fixture trees for the rows; the last test runs the real tree.\n+ */\n+describe(\"checkSkillsContract (T-051)\", () => {\n+  let root: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t051-\"));\n+  });\n+  afterEach(() => rmSync(root, { recursive: true, force: true }));\n+\n+  const skills = () => join(root, \".agents\", \"skills\");\n+  function skill(dir: string, body: string | null): void {\n+    mkdirSync(join(skills(), dir), { recursive: true });\n+    if (body !== null) writeFileSync(join(skills(), dir, \"SKILL.md\"), body);\n+  }\n+  const fm = (name: string) => `---\\nname: ${name}\\ndescription: d\\n---\\n\\n# ${name}\\n`;\n+  function index(rows: Array<[string, string]>): void {\n+    mkdirSync(skills(), { recursive: true });\n+    const table = rows.map(([s, d]) => `| ${s} | \\`${d}/\\` | some description | 2026-01-01 |`).join(\"\\n\");\n+    writeFileSync(join(skills(), \"INDEX.md\"), `# Skills Index\\n\\n## Registered Skills\\n\\n| Skill | Directory | Description | Created |\\n|---|---|---|---|\\n${table}\\n`);\n+  }\n+\n+  it(\"passes when all three identities agree for every skill\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"beta\", fm(\"beta\"));\n+    index([[\"alpha\", \"alpha\"], [\"beta\", \"beta\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"2 skill(s)\");\n+  });\n+\n+  it(\"row 1: a SKILL.md with no frontmatter is a finding naming the directory, the missing name and the index row\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"guide\", \"# Guide\\n\\nno frontmatter at all\\n\");\n+    index([[\"alpha\", \"alpha\"], [\"guide\", \"guide\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory guide; SKILL.md name none (no frontmatter); INDEX.md row \"guide\" -> guide/');\n+  });\n+\n+  it(\"row 2: a frontmatter name that differs from the directory is a finding with both names\", () => {\n+    skill(\"gotchas\", fm(\"self-improving-agent-gotchas\"));\n+    index([[\"self-improving-agent-gotchas\", \"self-improving-agent-gotchas\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory gotchas; SKILL.md name \"self-improving-agent-gotchas\"; INDEX.md no row');\n+    expect(r.message).toContain('directory absent; SKILL.md name none (no directory); INDEX.md row \"self-improving-agent-gotchas\" -> self-improving-agent-gotchas/');\n+  });\n+\n+  it(\"row 3: an INDEX row with no directory is a finding\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. The PR's new or changed test files fail against its base's source and pass on its head. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own on the core change, and report which row catches it. Re-run one of the developer's stated mutants from docs/loops/t0xx/mutants/."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/skills-contract.test.ts b/open-brain/tests/pipelines/sync/skills-contract.test.ts\nnew file mode 100644\nindex 00000000..5906aaf7\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/skills-contract.test.ts\n@@ -0,0 +1,111 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkSkillsContract } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-051: each skill has three identities (directory, SKILL.md frontmatter `name`, INDEX.md\n+ * row) and they must agree. Fixture trees for the rows; the last test runs the real tree.\n+ */\n+describe(\"checkSkillsContract (T-051)\", () => {\n+  let root: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t051-\"));\n+  });\n+  afterEach(() => rmSync(root, { recursive: true, force: true }));\n+\n+  const skills = () => join(root, \".agents\", \"skills\");\n+  function skill(dir: string, body: string | null): void {\n+    mkdirSync(join(skills(), dir), { recursive: true });\n+    if (body !== null) writeFileSync(join(skills(), dir, \"SKILL.md\"), body);\n+  }\n+  const fm = (name: string) => `---\\nname: ${name}\\ndescription: d\\n---\\n\\n# ${name}\\n`;\n+  function index(rows: Array<[string, string]>): void {\n+    mkdirSync(skills(), { recursive: true });\n+    const table = rows.map(([s, d]) => `| ${s} | \\`${d}/\\` | some description | 2026-01-01 |`).join(\"\\n\");\n+    writeFileSync(join(skills(), \"INDEX.md\"), `# Skills Index\\n\\n## Registered Skills\\n\\n| Skill | Directory | Description | Created |\\n|---|---|---|---|\\n${table}\\n`);\n+  }\n+\n+  it(\"passes when all three identities agree for every skill\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"beta\", fm(\"beta\"));\n+    index([[\"alpha\", \"alpha\"], [\"beta\", \"beta\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"2 skill(s)\");\n+  });\n+\n+  it(\"row 1: a SKILL.md with no frontmatter is a finding naming the directory, the missing name and the index row\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"guide\", \"# Guide\\n\\nno frontmatter at all\\n\");\n+    index([[\"alpha\", \"alpha\"], [\"guide\", \"guide\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory guide; SKILL.md name none (no frontmatter); INDEX.md row \"guide\" -> guide/');\n+  });\n+\n+  it(\"row 2: a frontmatter name that differs from the directory is a finding with both names\", () => {\n+    skill(\"gotchas\", fm(\"self-improving-agent-gotchas\"));\n+    index([[\"self-improving-agent-gotchas\", \"self-improving-agent-gotchas\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory gotchas; SKILL.md name \"self-improving-agent-gotchas\"; INDEX.md no row');\n+    expect(r.message).toContain('directory absent; SKILL.md name none (no directory); INDEX.md row \"self-improving-agent-gotchas\" -> self-improving-agent-gotchas/');\n+  });\n+\n+  it(\"row 3: an INDEX row with no directory is a finding\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head (read only). gh pr checks <n>, quoting the test conclusion and the run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/skills-contract.test.ts b/open-brain/tests/pipelines/sync/skills-contract.test.ts\nnew file mode 100644\nindex 00000000..5906aaf7\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/skills-contract.test.ts\n@@ -0,0 +1,111 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkSkillsContract } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-051: each skill has three identities (directory, SKILL.md frontmatter `name`, INDEX.md\n+ * row) and they must agree. Fixture trees for the rows; the last test runs the real tree.\n+ */\n+describe(\"checkSkillsContract (T-051)\", () => {\n+  let root: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t051-\"));\n+  });\n+  afterEach(() => rmSync(root, { recursive: true, force: true }));\n+\n+  const skills = () => join(root, \".agents\", \"skills\");\n+  function skill(dir: string, body: string | null): void {\n+    mkdirSync(join(skills(), dir), { recursive: true });\n+    if (body !== null) writeFileSync(join(skills(), dir, \"SKILL.md\"), body);\n+  }\n+  const fm = (name: string) => `---\\nname: ${name}\\ndescription: d\\n---\\n\\n# ${name}\\n`;\n+  function index(rows: Array<[string, string]>): void {\n+    mkdirSync(skills(), { recursive: true });\n+    const table = rows.map(([s, d]) => `| ${s} | \\`${d}/\\` | some description | 2026-01-01 |`).join(\"\\n\");\n+    writeFileSync(join(skills(), \"INDEX.md\"), `# Skills Index\\n\\n## Registered Skills\\n\\n| Skill | Directory | Description | Created |\\n|---|---|---|---|\\n${table}\\n`);\n+  }\n+\n+  it(\"passes when all three identities agree for every skill\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"beta\", fm(\"beta\"));\n+    index([[\"alpha\", \"alpha\"], [\"beta\", \"beta\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"2 skill(s)\");\n+  });\n+\n+  it(\"row 1: a SKILL.md with no frontmatter is a finding naming the directory, the missing name and the index row\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"guide\", \"# Guide\\n\\nno frontmatter at all\\n\");\n+    index([[\"alpha\", \"alpha\"], [\"guide\", \"guide\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory guide; SKILL.md name none (no frontmatter); INDEX.md row \"guide\" -> guide/');\n+  });\n+\n+  it(\"row 2: a frontmatter name that differs from the directory is a finding with both names\", () => {\n+    skill(\"gotchas\", fm(\"self-improving-agent-gotchas\"));\n+    index([[\"self-improving-agent-gotchas\", \"self-improving-agent-gotchas\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory gotchas; SKILL.md name \"self-improving-agent-gotchas\"; INDEX.md no row');\n+    expect(r.message).toContain('directory absent; SKILL.md name none (no directory); INDEX.md row \"self-improving-agent-gotchas\" -> self-improving-agent-gotchas/');\n+  });\n+\n+  it(\"row 3: an INDEX row with no directory is a finding\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "\"Not checked\" is never a pass."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "For #295, #298, #303, #306 and #309, feed each check an input it cannot read: absent config, unreadable file, an unknown SHA, an unparseable command."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..afaa7912 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -15,6 +15,7 @@ import {\n   checkObsidianVault,\n   checkVaultPathRefs,\n   checkSkillIndex,\n+  checkSkillsContract,\n   checkTemplatePersonalNames,\n   checkTemplate,\n   checkSpecProvenance,\n@@ -68,6 +69,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkObsidianVault(paths.obsidianVault));\n   checks.push(checkVaultPathRefs(options.projectRoot));\n   checks.push(checkSkillIndex(paths.obsidianVault));\n+  checks.push(checkSkillsContract(options.projectRoot));\n   checks.push(checkTemplatePersonalNames(options.projectRoot));\n \n   // The memory module's three checks, supplied rather than imported (Loop 13)."
+          ],
+          "id": "T7",
+          "observable": "Its result must be skip or warn, stating \"not checked\", and never pass."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/skills-contract.test.ts b/open-brain/tests/pipelines/sync/skills-contract.test.ts\nnew file mode 100644\nindex 00000000..5906aaf7\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/skills-contract.test.ts\n@@ -0,0 +1,111 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkSkillsContract } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-051: each skill has three identities (directory, SKILL.md frontmatter `name`, INDEX.md\n+ * row) and they must agree. Fixture trees for the rows; the last test runs the real tree.\n+ */\n+describe(\"checkSkillsContract (T-051)\", () => {\n+  let root: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t051-\"));\n+  });\n+  afterEach(() => rmSync(root, { recursive: true, force: true }));\n+\n+  const skills = () => join(root, \".agents\", \"skills\");\n+  function skill(dir: string, body: string | null): void {\n+    mkdirSync(join(skills(), dir), { recursive: true });\n+    if (body !== null) writeFileSync(join(skills(), dir, \"SKILL.md\"), body);\n+  }\n+  const fm = (name: string) => `---\\nname: ${name}\\ndescription: d\\n---\\n\\n# ${name}\\n`;\n+  function index(rows: Array<[string, string]>): void {\n+    mkdirSync(skills(), { recursive: true });\n+    const table = rows.map(([s, d]) => `| ${s} | \\`${d}/\\` | some description | 2026-01-01 |`).join(\"\\n\");\n+    writeFileSync(join(skills(), \"INDEX.md\"), `# Skills Index\\n\\n## Registered Skills\\n\\n| Skill | Directory | Description | Created |\\n|---|---|---|---|\\n${table}\\n`);\n+  }\n+\n+  it(\"passes when all three identities agree for every skill\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"beta\", fm(\"beta\"));\n+    index([[\"alpha\", \"alpha\"], [\"beta\", \"beta\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"2 skill(s)\");\n+  });\n+\n+  it(\"row 1: a SKILL.md with no frontmatter is a finding naming the directory, the missing name and the index row\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"guide\", \"# Guide\\n\\nno frontmatter at all\\n\");\n+    index([[\"alpha\", \"alpha\"], [\"guide\", \"guide\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory guide; SKILL.md name none (no frontmatter); INDEX.md row \"guide\" -> guide/');\n+  });\n+\n+  it(\"row 2: a frontmatter name that differs from the directory is a finding with both names\", () => {\n+    skill(\"gotchas\", fm(\"self-improving-agent-gotchas\"));\n+    index([[\"self-improving-agent-gotchas\", \"self-improving-agent-gotchas\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory gotchas; SKILL.md name \"self-improving-agent-gotchas\"; INDEX.md no row');\n+    expect(r.message).toContain('directory absent; SKILL.md name none (no directory); INDEX.md row \"self-improving-agent-gotchas\" -> self-improving-agent-gotchas/');\n+  });\n+\n+  it(\"row 3: an INDEX row with no directory is a finding\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "Quote each one."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "#298, the plugin layout. Its fixture follows enabledPlugins, then installed_plugins.json, then .claude-plugin/plugin.json or .mcp.json."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..afaa7912 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -15,6 +15,7 @@ import {\n   checkObsidianVault,\n   checkVaultPathRefs,\n   checkSkillIndex,\n+  checkSkillsContract,\n   checkTemplatePersonalNames,\n   checkTemplate,\n   checkSpecProvenance,\n@@ -68,6 +69,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkObsidianVault(paths.obsidianVault));\n   checks.push(checkVaultPathRefs(options.projectRoot));\n   checks.push(checkSkillIndex(paths.obsidianVault));\n+  checks.push(checkSkillsContract(options.projectRoot));\n   checks.push(checkTemplatePersonalNames(options.projectRoot));\n \n   // The memory module's three checks, supplied rather than imported (Loop 13)."
+          ],
+          "id": "T10",
+          "observable": "Confirm the layout on a real install, read-only."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/skills-contract.test.ts b/open-brain/tests/pipelines/sync/skills-contract.test.ts\nnew file mode 100644\nindex 00000000..5906aaf7\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/skills-contract.test.ts\n@@ -0,0 +1,111 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkSkillsContract } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-051: each skill has three identities (directory, SKILL.md frontmatter `name`, INDEX.md\n+ * row) and they must agree. Fixture trees for the rows; the last test runs the real tree.\n+ */\n+describe(\"checkSkillsContract (T-051)\", () => {\n+  let root: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t051-\"));\n+  });\n+  afterEach(() => rmSync(root, { recursive: true, force: true }));\n+\n+  const skills = () => join(root, \".agents\", \"skills\");\n+  function skill(dir: string, body: string | null): void {\n+    mkdirSync(join(skills(), dir), { recursive: true });\n+    if (body !== null) writeFileSync(join(skills(), dir, \"SKILL.md\"), body);\n+  }\n+  const fm = (name: string) => `---\\nname: ${name}\\ndescription: d\\n---\\n\\n# ${name}\\n`;\n+  function index(rows: Array<[string, string]>): void {\n+    mkdirSync(skills(), { recursive: true });\n+    const table = rows.map(([s, d]) => `| ${s} | \\`${d}/\\` | some description | 2026-01-01 |`).join(\"\\n\");\n+    writeFileSync(join(skills(), \"INDEX.md\"), `# Skills Index\\n\\n## Registered Skills\\n\\n| Skill | Directory | Description | Created |\\n|---|---|---|---|\\n${table}\\n`);\n+  }\n+\n+  it(\"passes when all three identities agree for every skill\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"beta\", fm(\"beta\"));\n+    index([[\"alpha\", \"alpha\"], [\"beta\", \"beta\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"2 skill(s)\");\n+  });\n+\n+  it(\"row 1: a SKILL.md with no frontmatter is a finding naming the directory, the missing name and the index row\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"guide\", \"# Guide\\n\\nno frontmatter at all\\n\");\n+    index([[\"alpha\", \"alpha\"], [\"guide\", \"guide\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory guide; SKILL.md name none (no frontmatter); INDEX.md row \"guide\" -> guide/');\n+  });\n+\n+  it(\"row 2: a frontmatter name that differs from the directory is a finding with both names\", () => {\n+    skill(\"gotchas\", fm(\"self-improving-agent-gotchas\"));\n+    index([[\"self-improving-agent-gotchas\", \"self-improving-agent-gotchas\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory gotchas; SKILL.md name \"self-improving-agent-gotchas\"; INDEX.md no row');\n+    expect(r.message).toContain('directory absent; SKILL.md name none (no directory); INDEX.md row \"self-improving-agent-gotchas\" -> self-improving-agent-gotchas/');\n+  });\n+\n+  it(\"row 3: an INDEX row with no directory is a finding\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "Report whether ${CLAUDE_PLUGIN_ROOT} is resolved, and how."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "#309, real settings. Run hook-configs read-only against this machine's ~/.claude/settings.json. Quote the counts line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..afaa7912 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -15,6 +15,7 @@ import {\n   checkObsidianVault,\n   checkVaultPathRefs,\n   checkSkillIndex,\n+  checkSkillsContract,\n   checkTemplatePersonalNames,\n   checkTemplate,\n   checkSpecProvenance,\n@@ -68,6 +69,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkObsidianVault(paths.obsidianVault));\n   checks.push(checkVaultPathRefs(options.projectRoot));\n   checks.push(checkSkillIndex(paths.obsidianVault));\n+  checks.push(checkSkillsContract(options.projectRoot));\n   checks.push(checkTemplatePersonalNames(options.projectRoot));\n \n   // The memory module's three checks, supplied rather than imported (Loop 13)."
+          ],
+          "id": "T13",
+          "observable": "Then add sh -c \"…\" and node \"C:\\path with spaces\\x.js\" entries to a fixture."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/skills-contract.test.ts b/open-brain/tests/pipelines/sync/skills-contract.test.ts\nnew file mode 100644\nindex 00000000..5906aaf7\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/skills-contract.test.ts\n@@ -0,0 +1,111 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkSkillsContract } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-051: each skill has three identities (directory, SKILL.md frontmatter `name`, INDEX.md\n+ * row) and they must agree. Fixture trees for the rows; the last test runs the real tree.\n+ */\n+describe(\"checkSkillsContract (T-051)\", () => {\n+  let root: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t051-\"));\n+  });\n+  afterEach(() => rmSync(root, { recursive: true, force: true }));\n+\n+  const skills = () => join(root, \".agents\", \"skills\");\n+  function skill(dir: string, body: string | null): void {\n+    mkdirSync(join(skills(), dir), { recursive: true });\n+    if (body !== null) writeFileSync(join(skills(), dir, \"SKILL.md\"), body);\n+  }\n+  const fm = (name: string) => `---\\nname: ${name}\\ndescription: d\\n---\\n\\n# ${name}\\n`;\n+  function index(rows: Array<[string, string]>): void {\n+    mkdirSync(skills(), { recursive: true });\n+    const table = rows.map(([s, d]) => `| ${s} | \\`${d}/\\` | some description | 2026-01-01 |`).join(\"\\n\");\n+    writeFileSync(join(skills(), \"INDEX.md\"), `# Skills Index\\n\\n## Registered Skills\\n\\n| Skill | Directory | Description | Created |\\n|---|---|---|---|\\n${table}\\n`);\n+  }\n+\n+  it(\"passes when all three identities agree for every skill\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"beta\", fm(\"beta\"));\n+    index([[\"alpha\", \"alpha\"], [\"beta\", \"beta\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"2 skill(s)\");\n+  });\n+\n+  it(\"row 1: a SKILL.md with no frontmatter is a finding naming the directory, the missing name and the index row\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"guide\", \"# Guide\\n\\nno frontmatter at all\\n\");\n+    index([[\"alpha\", \"alpha\"], [\"guide\", \"guide\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory guide; SKILL.md name none (no frontmatter); INDEX.md row \"guide\" -> guide/');\n+  });\n+\n+  it(\"row 2: a frontmatter name that differs from the directory is a finding with both names\", () => {\n+    skill(\"gotchas\", fm(\"self-improving-agent-gotchas\"));\n+    index([[\"self-improving-agent-gotchas\", \"self-improving-agent-gotchas\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory gotchas; SKILL.md name \"self-improving-agent-gotchas\"; INDEX.md no row');\n+    expect(r.message).toContain('directory absent; SKILL.md name none (no directory); INDEX.md row \"self-improving-agent-gotchas\" -> self-improving-agent-gotchas/');\n+  });\n+\n+  it(\"row 3: an INDEX row with no directory is a finding\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "The sh -c entry must be not-checked. The quoted path with spaces must be stat'ed as one path."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "#303. Fixture repos for the four cases: at HEAD, behind, ahead (warn) and diverged (issue, naming both counts and the merge-base)."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..afaa7912 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -15,6 +15,7 @@ import {\n   checkObsidianVault,\n   checkVaultPathRefs,\n   checkSkillIndex,\n+  checkSkillsContract,\n   checkTemplatePersonalNames,\n   checkTemplate,\n   checkSpecProvenance,\n@@ -68,6 +69,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkObsidianVault(paths.obsidianVault));\n   checks.push(checkVaultPathRefs(options.projectRoot));\n   checks.push(checkSkillIndex(paths.obsidianVault));\n+  checks.push(checkSkillsContract(options.projectRoot));\n   checks.push(checkTemplatePersonalNames(options.projectRoot));\n \n   // The memory module's three checks, supplied rather than imported (Loop 13)."
+          ],
+          "id": "T16",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge the heads in order: #295, #298, #300, #303, #306, #309."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..afaa7912 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -15,6 +15,7 @@ import {\n   checkObsidianVault,\n   checkVaultPathRefs,\n   checkSkillIndex,\n+  checkSkillsContract,\n   checkTemplatePersonalNames,\n   checkTemplate,\n   checkSpecProvenance,\n@@ -68,6 +69,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkObsidianVault(paths.obsidianVault));\n   checks.push(checkVaultPathRefs(options.projectRoot));\n   checks.push(checkSkillIndex(paths.obsidianVault));\n+  checks.push(checkSkillsContract(options.projectRoot));\n   checks.push(checkTemplatePersonalNames(options.projectRoot));\n \n   // The memory module's three checks, supplied rather than imported (Loop 13).",
+            "diff --git a/open-brain/tests/pipelines/sync/skills-contract.test.ts b/open-brain/tests/pipelines/sync/skills-contract.test.ts\nnew file mode 100644\nindex 00000000..5906aaf7\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/skills-contract.test.ts\n@@ -0,0 +1,111 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkSkillsContract } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-051: each skill has three identities (directory, SKILL.md frontmatter `name`, INDEX.md\n+ * row) and they must agree. Fixture trees for the rows; the last test runs the real tree.\n+ */\n+describe(\"checkSkillsContract (T-051)\", () => {\n+  let root: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t051-\"));\n+  });\n+  afterEach(() => rmSync(root, { recursive: true, force: true }));\n+\n+  const skills = () => join(root, \".agents\", \"skills\");\n+  function skill(dir: string, body: string | null): void {\n+    mkdirSync(join(skills(), dir), { recursive: true });\n+    if (body !== null) writeFileSync(join(skills(), dir, \"SKILL.md\"), body);\n+  }\n+  const fm = (name: string) => `---\\nname: ${name}\\ndescription: d\\n---\\n\\n# ${name}\\n`;\n+  function index(rows: Array<[string, string]>): void {\n+    mkdirSync(skills(), { recursive: true });\n+    const table = rows.map(([s, d]) => `| ${s} | \\`${d}/\\` | some description | 2026-01-01 |`).join(\"\\n\");\n+    writeFileSync(join(skills(), \"INDEX.md\"), `# Skills Index\\n\\n## Registered Skills\\n\\n| Skill | Directory | Description | Created |\\n|---|---|---|---|\\n${table}\\n`);\n+  }\n+\n+  it(\"passes when all three identities agree for every skill\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"beta\", fm(\"beta\"));\n+    index([[\"alpha\", \"alpha\"], [\"beta\", \"beta\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"2 skill(s)\");\n+  });\n+\n+  it(\"row 1: a SKILL.md with no frontmatter is a finding naming the directory, the missing name and the index row\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"guide\", \"# Guide\\n\\nno frontmatter at all\\n\");\n+    index([[\"alpha\", \"alpha\"], [\"guide\", \"guide\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory guide; SKILL.md name none (no frontmatter); INDEX.md row \"guide\" -> guide/');\n+  });\n+\n+  it(\"row 2: a frontmatter name that differs from the directory is a finding with both names\", () => {\n+    skill(\"gotchas\", fm(\"self-improving-agent-gotchas\"));\n+    index([[\"self-improving-agent-gotchas\", \"self-improving-agent-gotchas\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory gotchas; SKILL.md name \"self-improving-agent-gotchas\"; INDEX.md no row');\n+    expect(r.message).toContain('directory absent; SKILL.md name none (no directory); INDEX.md row \"self-improving-agent-gotchas\" -> self-improving-agent-gotchas/');\n+  });\n+\n+  it(\"row 3: an INDEX row with no directory is a finding\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "Known conflict: #295 and #309 both edit the node:path import line in checks.ts. Report every conflict."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "Resolve ONLY that import-line conflict, by taking the union of the imported names, and say so. Stop on any other conflict."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..5dcf05f2 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -351,6 +351,88 @@ export function checkSkillIndex(vaultPath: string): CheckResult {\n   return { name: \"skill-index\", severity: \"pass\", message: `SKILL-INDEX.md parses cleanly (${rows.length} skill(s))` };\n }\n \n+/**\n+ * `.agents/skills/` has three identities per skill and nothing used to check they agree\n+ * (T-051): the directory name, the `name` in SKILL.md's frontmatter, and the row in\n+ * `.agents/skills/INDEX.md`. Prime's loader found three directories and loaded two\n+ * different ones than the index registered; a 192-line guide had no frontmatter at all and\n+ * never loaded, for months. Neither reader was wrong about its own file.\n+ *\n+ * Every disagreement is one finding naming all three sources. A directory without a\n+ * SKILL.md, a SKILL.md without frontmatter or a `name`, a name that is not the directory,\n+ * a directory with no INDEX row, an INDEX row whose Skill or Directory cell is not the\n+ * directory, and an INDEX row naming a directory that does not exist, are all findings.\n+ * Absent `.agents/skills/` is SKIP: nothing was looked at, and that is not a pass.\n+ */\n+export function checkSkillsContract(projectRoot: string): CheckResult {\n+  const name = \"skills-contract\";\n+  const skillsDir = join(projectRoot, \".agents\", \"skills\");\n+  if (!existsSync(skillsDir)) {\n+    return { name, severity: \"skip\", message: \"not checked: .agents/skills/ does not exist in this checkout. This is not a pass.\" };\n+  }\n+\n+  const dirs = readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();\n+\n+  // INDEX.md: the table rows, whichever heading they sit under. Header and separator rows are structure.\n+  const indexPath = join(skillsDir, \"INDEX.md\");\n+  const indexRows: Array<{ skill: string; directory: string }> = [];\n+  let indexNote: string | null = null;\n+  if (!existsSync(indexPath)) {\n+    indexNote = \"INDEX.md does not exist\";\n+  } else {\n+    try {\n+      for (const line of readFileSync(indexPath, \"utf-8\").replace(/^﻿/, \"\").split(/\\r?\\n/)) {\n+        if (!line.trim().startsWith(\"|\")) continue;\n+        const cells = line.split(\"|\").map((c) => c.trim());\n+        const filled = cells.filter(Boolean);\n+        if (filled.length === 0 || filled.every((c) => /^:?-+:?$/.test(c))) continue;\n+        if (cells[1]?.toLowerCase() === \"skill\") continue;\n+        indexRows.push({ skill: (cells[1] ?? \"\").replace(/`/g, \"\"), directory: (cells[2] ?? \"\").replace(/`/g, \"\").replace(/[\\\\/]+$/, \"\") });\n+      }\n+    } catch (e) {\n+      indexNote = `INDEX.md could not be read (${(e as Error).message.split(\"\\n\")[0]})`;\n+    }\n+  }\n+\n+  const findings: string[] = [];\n+  const describe = (dir: string | null, fm: string, row: string): string =>\n+    `directory ${dir ?? \"absent\"}; SKILL.md name ${fm}; INDEX.md ${row}`;\n+  const rowFor = (dir: string) => indexRows.filter((r) => r.directory === dir);\n+\n+  for (const dir of dirs) {\n+    const skillMd = join(skillsDir, dir, \"SKILL.md\");\n+    let fm: string;\n+    if (!existsSync(skillMd)) {\n+      fm = \"none (no SKILL.md)\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..afaa7912 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -15,6 +15,7 @@ import {\n   checkObsidianVault,\n   checkVaultPathRefs,\n   checkSkillIndex,\n+  checkSkillsContract,\n   checkTemplatePersonalNames,\n   checkTemplate,\n   checkSpecProvenance,\n@@ -68,6 +69,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkObsidianVault(paths.obsidianVault));\n   checks.push(checkVaultPathRefs(options.projectRoot));\n   checks.push(checkSkillIndex(paths.obsidianVault));\n+  checks.push(checkSkillsContract(options.projectRoot));\n   checks.push(checkTemplatePersonalNames(options.projectRoot));\n \n   // The memory module's three checks, supplied rather than imported (Loop 13).",
+            "diff --git a/open-brain/tests/pipelines/sync/skills-contract.test.ts b/open-brain/tests/pipelines/sync/skills-contract.test.ts\nnew file mode 100644\nindex 00000000..5906aaf7\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/skills-contract.test.ts\n@@ -0,0 +1,111 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkSkillsContract } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-051: each skill has three identities (directory, SKILL.md frontmatter `name`, INDEX.md\n+ * row) and they must agree. Fixture trees for the rows; the last test runs the real tree.\n+ */\n+describe(\"checkSkillsContract (T-051)\", () => {\n+  let root: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t051-\"));\n+  });\n+  afterEach(() => rmSync(root, { recursive: true, force: true }));\n+\n+  const skills = () => join(root, \".agents\", \"skills\");\n+  function skill(dir: string, body: string | null): void {\n+    mkdirSync(join(skills(), dir), { recursive: true });\n+    if (body !== null) writeFileSync(join(skills(), dir, \"SKILL.md\"), body);\n+  }\n+  const fm = (name: string) => `---\\nname: ${name}\\ndescription: d\\n---\\n\\n# ${name}\\n`;\n+  function index(rows: Array<[string, string]>): void {\n+    mkdirSync(skills(), { recursive: true });\n+    const table = rows.map(([s, d]) => `| ${s} | \\`${d}/\\` | some description | 2026-01-01 |`).join(\"\\n\");\n+    writeFileSync(join(skills(), \"INDEX.md\"), `# Skills Index\\n\\n## Registered Skills\\n\\n| Skill | Directory | Description | Created |\\n|---|---|---|---|\\n${table}\\n`);\n+  }\n+\n+  it(\"passes when all three identities agree for every skill\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"beta\", fm(\"beta\"));\n+    index([[\"alpha\", \"alpha\"], [\"beta\", \"beta\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"2 skill(s)\");\n+  });\n+\n+  it(\"row 1: a SKILL.md with no frontmatter is a finding naming the directory, the missing name and the index row\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n+    skill(\"guide\", \"# Guide\\n\\nno frontmatter at all\\n\");\n+    index([[\"alpha\", \"alpha\"], [\"guide\", \"guide\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory guide; SKILL.md name none (no frontmatter); INDEX.md row \"guide\" -> guide/');\n+  });\n+\n+  it(\"row 2: a frontmatter name that differs from the directory is a finding with both names\", () => {\n+    skill(\"gotchas\", fm(\"self-improving-agent-gotchas\"));\n+    index([[\"self-improving-agent-gotchas\", \"self-improving-agent-gotchas\"]]);\n+    const r = checkSkillsContract(root);\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain('directory gotchas; SKILL.md name \"self-improving-agent-gotchas\"; INDEX.md no row');\n+    expect(r.message).toContain('directory absent; SKILL.md name none (no directory); INDEX.md row \"self-improving-agent-gotchas\" -> self-improving-agent-gotchas/');\n+  });\n+\n+  it(\"row 3: an INDEX row with no directory is a finding\", () => {\n+    skill(\"alpha\", fm(\"alpha\"));\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "On the merged result, run every touched sync test file, one per invocation, plus tsc --noEmit. Then run node open-brain/build/cli.js sync --check after npm run build, in the scratch tree only, and quote every new check's line."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+        "merge_commit": "d06952a2bc156b623777b0d5311c5375db3323b4",
+        "pr": 300,
+        "scored_sha": "5ae7f9f28bed80d58cbdb34056e87d620faecaed"
+      }
+    }
+  }
+}

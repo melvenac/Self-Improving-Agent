@@ -1,0 +1,179 @@
+{
+  "base_sha": "651ac36b19a127adc1c365327e3e7e64a3669256",
+  "candidate_sha": "82aeb3da3e9036d5f6812738be541cb67ada1e07",
+  "case_id": "qa272-pr421",
+  "case_no": 62,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37179333080,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [],
+  "label": "REJECT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "315e116fc50eb99edb8cb11ee105a3163e1c2ee6",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. Flag any file outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). Record the test result and run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (In master's .agents/SYSTEM/hub-partner-seats.json, confirm: - infra = cursor-infra / k57d92gqtjm9wpfs74ekbx9rns8fmy2f; - builder = cursor-builder / k575sfwr9wcx3r8fw83g3bc00x8fmar3; - forge = forge / k571z4ghp7nbp34djhecwnsk3n8fmhsf; - the atlas reader pairs match these rooms in both directions; - \"grok\" and the three old room ids appear nowhere in the file. Run seat-map, hub-presence, hub-seats and focus one file per run. Report any finding as a fix-forward item.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "82aeb3da3e9036d5f6812738be541cb67ada1e07",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/harness/configwatch.ts",
+        "open-brain/tests/harness/config-channel.test.ts",
+        "open-brain/tests/harness/fixture.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. Flag any file outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). Record the test result and run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "In master's .agents/SYSTEM/hub-partner-seats.json, confirm: - infra = cursor-infra / k57d92gqtjm9wpfs74ekbx9rns8fmy2f; - builder = cursor-builder / k575sfwr9wcx3r8fw83g3bc00x8fmar3; - forge = forge / k571z4ghp7nbp34djhecwnsk3n8fmhsf; - the atlas reader pairs match these rooms in both directions; - \"grok\" and the three old room ids appear nowhere in the file. Run seat-map, hub-presence, hub-seats and focus one file per run. Report any finding as a fix-forward item.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "62-qa272-pr421",
+        "new_capability": "QA 272, session-160 batch f: #415, #420, #421, plus a retro-check of the merged #418",
+        "objective": "QA 272, session-160 batch f: #415, #420, #421, plus a retro-check of the merged #418",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "687200f90fe15927859568493c26fe622c894d39",
+          "path": "docs/loops/qa-272-s160f-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. Flag any file outside the task.",
+          "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.",
+          "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.",
+          "CI (read only). Record the test result and run id.",
+          "In master's .agents/SYSTEM/hub-partner-seats.json, confirm: - infra = cursor-infra / k57d92gqtjm9wpfs74ekbx9rns8fmy2f; - builder = cursor-builder / k575sfwr9wcx3r8fw83g3bc00x8fmar3; - forge = forge / k571z4ghp7nbp34djhecwnsk3n8fmhsf; - the atlas reader pairs match these rooms in both directions; - \"grok\" and the three old room ids appear nowhere in the file. Run seat-map, hub-presence, hub-seats and focus one file per run. Report any finding as a fix-forward item."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/config-channel.test.ts b/open-brain/tests/harness/config-channel.test.ts\nindex 2ab1d3a7..8aef2778 100644\n--- a/open-brain/tests/harness/config-channel.test.ts\n+++ b/open-brain/tests/harness/config-channel.test.ts\n@@ -33,7 +33,7 @@ import { runLoop, LoopRefused, LOOP_LIMITS, type LoopConfig } from \"../../src/ha\n import { StubDeveloper, StubPlanner, StubQa, type RoleContext, type RoleSession } from \"../../src/harness/roles.js\";\n import { pinFor, resolveRef, SAFE_MACHINE_KEYS } from \"../../src/harness/git.js\";\n import { resolveGitDirs, unsafeLocalKeys, watchedLocations, ConfigWatch } from \"../../src/harness/configwatch.js\";\n-import { exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from \"./fixture.js\";\n+import { disableAutoGc, exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from \"./fixture.js\";\n import { gitWithEnv, markerLines, scratch, shPath, withEnv, writeMarkerScript } from \"./candidate-a-fixture.js\";\n \n /** Rewrite an existing file in place — the way a role gets past a hidden attribute. */\n@@ -694,11 +694,14 @@ describe(\"candidate A — the config/hooks channel\", { timeout: 120_000 }, () =>\n       const src = join(tmp.dir, \"src\");\n       const clone = join(tmp.dir, \"clone\");\n       rawGit(tmp.dir, [\"init\", \"--quiet\", \"--initial-branch=main\", src]);\n+      disableAutoGc(src);\n       writeFileSync(join(src, \"f\"), \"f\\n\");\n       rawGit(src, [\"add\", \"f\"]);\n       rawGit(src, [\"-c\", \"user.name=t\", \"-c\", \"user.email=t@t\", \"commit\", \"--quiet\", \"--no-verify\", \"--no-gpg-sign\", \"-m\", \"c\"]);\n       rawGit(tmp.dir, [\"clone\", \"--quiet\", src, clone]);\n+      disableAutoGc(clone);\n       rawGit(src, [\"worktree\", \"add\", \"--quiet\", join(tmp.dir, \"wt2\")]);\n+      disableAutoGc(join(tmp.dir, \"wt2\"));\n       for (const root of [src, clone, join(tmp.dir, \"wt2\")]) {\n         const u = unsafeLocalKeys(root, resolveGitDirs(root));\n         expect(u.error).toBeNull();\n@@ -709,6 +712,40 @@ describe(\"candidate A — the config/hooks channel\", { timeout: 120_000 }, () =>\n       expect(unsafeLocalKeys(clone, resolveGitDirs(clone)).keys.join(\" \")).toContain(\"core.sshcommand\");\n     });\n \n+    it(\"G-053: git update-server-info writes <common>/info/refs (the path gc --auto can create)\", () => {\n+      const dirs = resolveGitDirs(repo.root);\n+      const refs = join(dirs.commonDir, \"info\", \"refs\");\n+      expect(existsSync(refs)).toBe(false);\n+      rawGit(repo.root, [\"update-server-info\"]);\n+      expect(existsSync(refs)).toBe(true);\n+    });\n+\n+    it(\"G-053: harness fixtures disable gc.auto so background gc cannot create info/refs during a loop\", () => {\n+      expect(rawGit(repo.root, [\"config\", \"gc.auto\"])).toBe(\"0\");\n+    });\n+\n+    it(\"G-053 mutant: gc.auto=1 at base is refused (only gc.auto=0 is on the allowlist)\", () => {\n+      rawGit(repo.root, [\"config\", \"gc.auto\", \"1\"]);\n+      expectRefusedCleanly(refusal(config()), \"unsafe-config-at-base\", \"gc.auto\");\n+      rawGit(repo.root, [\"config\", \"gc.auto\", \"0\"]);\n+    });\n+\n+    it(\"G-053: info/refs created during the developer stage fails the R21 gpgsign loop (known positive)\", async () => {\n+      rawGit(repo.root, [\"config\", \"commit.gpgsign\", \"true\"]);\n+      const r = await runLoop(\n+        config({\n+          roles: {\n+            planner: new StubPlanner(),\n+            developer: sabotage(new StubDeveloper(), (ctx) => {\n+              rawGit(ctx.repoRoot, [\"update-server-info\"]);\n+            }),\n+            qa: new StubQa(),\n+          },\n+        }),\n+      );\n+      expect(r.failure?.reason ?? \"\").toMatch(/info\\/refs created/i);\n+    });\n+\n     it(\"R21: commit.gpgsign=true is allowed because no runtime commit is signed — every one has no gpgsig header\", async () => {\n       rawGit(repo.root, [\"config\", \"commit.gpgsign\", \"true\"]);\n       const r = await runLoop(config());"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. Flag any file outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/config-channel.test.ts b/open-brain/tests/harness/config-channel.test.ts\nindex 2ab1d3a7..8aef2778 100644\n--- a/open-brain/tests/harness/config-channel.test.ts\n+++ b/open-brain/tests/harness/config-channel.test.ts\n@@ -33,7 +33,7 @@ import { runLoop, LoopRefused, LOOP_LIMITS, type LoopConfig } from \"../../src/ha\n import { StubDeveloper, StubPlanner, StubQa, type RoleContext, type RoleSession } from \"../../src/harness/roles.js\";\n import { pinFor, resolveRef, SAFE_MACHINE_KEYS } from \"../../src/harness/git.js\";\n import { resolveGitDirs, unsafeLocalKeys, watchedLocations, ConfigWatch } from \"../../src/harness/configwatch.js\";\n-import { exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from \"./fixture.js\";\n+import { disableAutoGc, exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from \"./fixture.js\";\n import { gitWithEnv, markerLines, scratch, shPath, withEnv, writeMarkerScript } from \"./candidate-a-fixture.js\";\n \n /** Rewrite an existing file in place — the way a role gets past a hidden attribute. */\n@@ -694,11 +694,14 @@ describe(\"candidate A — the config/hooks channel\", { timeout: 120_000 }, () =>\n       const src = join(tmp.dir, \"src\");\n       const clone = join(tmp.dir, \"clone\");\n       rawGit(tmp.dir, [\"init\", \"--quiet\", \"--initial-branch=main\", src]);\n+      disableAutoGc(src);\n       writeFileSync(join(src, \"f\"), \"f\\n\");\n       rawGit(src, [\"add\", \"f\"]);\n       rawGit(src, [\"-c\", \"user.name=t\", \"-c\", \"user.email=t@t\", \"commit\", \"--quiet\", \"--no-verify\", \"--no-gpg-sign\", \"-m\", \"c\"]);\n       rawGit(tmp.dir, [\"clone\", \"--quiet\", src, clone]);\n+      disableAutoGc(clone);\n       rawGit(src, [\"worktree\", \"add\", \"--quiet\", join(tmp.dir, \"wt2\")]);\n+      disableAutoGc(join(tmp.dir, \"wt2\"));\n       for (const root of [src, clone, join(tmp.dir, \"wt2\")]) {\n         const u = unsafeLocalKeys(root, resolveGitDirs(root));\n         expect(u.error).toBeNull();\n@@ -709,6 +712,40 @@ describe(\"candidate A — the config/hooks channel\", { timeout: 120_000 }, () =>\n       expect(unsafeLocalKeys(clone, resolveGitDirs(clone)).keys.join(\" \")).toContain(\"core.sshcommand\");\n     });\n \n+    it(\"G-053: git update-server-info writes <common>/info/refs (the path gc --auto can create)\", () => {\n+      const dirs = resolveGitDirs(repo.root);\n+      const refs = join(dirs.commonDir, \"info\", \"refs\");\n+      expect(existsSync(refs)).toBe(false);\n+      rawGit(repo.root, [\"update-server-info\"]);\n+      expect(existsSync(refs)).toBe(true);\n+    });\n+\n+    it(\"G-053: harness fixtures disable gc.auto so background gc cannot create info/refs during a loop\", () => {\n+      expect(rawGit(repo.root, [\"config\", \"gc.auto\"])).toBe(\"0\");\n+    });\n+\n+    it(\"G-053 mutant: gc.auto=1 at base is refused (only gc.auto=0 is on the allowlist)\", () => {\n+      rawGit(repo.root, [\"config\", \"gc.auto\", \"1\"]);\n+      expectRefusedCleanly(refusal(config()), \"unsafe-config-at-base\", \"gc.auto\");\n+      rawGit(repo.root, [\"config\", \"gc.auto\", \"0\"]);\n+    });\n+\n+    it(\"G-053: info/refs created during the developer stage fails the R21 gpgsign loop (known positive)\", async () => {\n+      rawGit(repo.root, [\"config\", \"commit.gpgsign\", \"true\"]);\n+      const r = await runLoop(\n+        config({\n+          roles: {\n+            planner: new StubPlanner(),\n+            developer: sabotage(new StubDeveloper(), (ctx) => {\n+              rawGit(ctx.repoRoot, [\"update-server-info\"]);\n+            }),\n+            qa: new StubQa(),\n+          },\n+        }),\n+      );\n+      expect(r.failure?.reason ?? \"\").toMatch(/info\\/refs created/i);\n+    });\n+\n     it(\"R21: commit.gpgsign=true is allowed because no runtime commit is signed — every one has no gpgsig header\", async () => {\n       rawGit(repo.root, [\"config\", \"commit.gpgsign\", \"true\"]);\n       const r = await runLoop(config());",
+            "diff --git a/open-brain/tests/harness/fixture.ts b/open-brain/tests/harness/fixture.ts\nindex 6d9e2bd3..f06ed3a3 100644\n--- a/open-brain/tests/harness/fixture.ts\n+++ b/open-brain/tests/harness/fixture.ts\n@@ -77,6 +77,11 @@ export interface RepoFixture {\n  * it, a path comparison in a test fails for a reason that has nothing to do\n  * with the thing under test.\n  */\n+/** G-053: `git gc --auto` can call `update-server-info`, which creates `<common>/info/refs` and fails ConfigWatch mid-loop. */\n+export function disableAutoGc(repoRoot: string): void {\n+  rawGit(repoRoot, [\"config\", \"gc.auto\", \"0\"]);\n+}\n+\n export function makeRepo(prefix = \"harness-repo-\"): RepoFixture {\n   const root = realpathSync(mkdtempSync(join(tmpdir(), prefix)));\n \n@@ -103,6 +108,7 @@ export function makeRepo(prefix = \"harness-repo-\"): RepoFixture {\n     ].join(\"\\n\"),\n     \"utf-8\",\n   );\n+  disableAutoGc(root);\n \n   const write = (repoPath: string, content: string): void => {\n     const abs = join(root, repoPath);\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/harness/configwatch.ts b/open-brain/src/harness/configwatch.ts\nindex 08e811a1..561d6373 100644\n--- a/open-brain/src/harness/configwatch.ts\n+++ b/open-brain/src/harness/configwatch.ts\n@@ -1445,6 +1445,7 @@ export const SAFE_LOCAL_KEYS: ReadonlyArray<{ key: RegExp; value?: RegExp; why:\n   { key: /^user\\.(name|email)$/, why: \"identity: a name and an address, never a program\" },\n   { key: /^commit\\.gpgsign$/, why: \"every runtime commit passes --no-gpg-sign, so no signing program runs\" },\n   { key: /^core\\.(autocrlf|eol)$/, why: \"line-ending handling only\" },\n+  { key: /^gc\\.auto$/, value: /^0$/, why: \"disables background gc that can write info/refs via update-server-info (G-053)\" },\n   { key: /^extensions\\.worktreeconfig$/, why: \"a flag enabling config.worktree, which is itself watched and held to this list\" },\n ];\n "
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/config-channel.test.ts b/open-brain/tests/harness/config-channel.test.ts\nindex 2ab1d3a7..8aef2778 100644\n--- a/open-brain/tests/harness/config-channel.test.ts\n+++ b/open-brain/tests/harness/config-channel.test.ts\n@@ -33,7 +33,7 @@ import { runLoop, LoopRefused, LOOP_LIMITS, type LoopConfig } from \"../../src/ha\n import { StubDeveloper, StubPlanner, StubQa, type RoleContext, type RoleSession } from \"../../src/harness/roles.js\";\n import { pinFor, resolveRef, SAFE_MACHINE_KEYS } from \"../../src/harness/git.js\";\n import { resolveGitDirs, unsafeLocalKeys, watchedLocations, ConfigWatch } from \"../../src/harness/configwatch.js\";\n-import { exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from \"./fixture.js\";\n+import { disableAutoGc, exitingChecks, makeRepo, rawGit, requireGit, type RepoFixture } from \"./fixture.js\";\n import { gitWithEnv, markerLines, scratch, shPath, withEnv, writeMarkerScript } from \"./candidate-a-fixture.js\";\n \n /** Rewrite an existing file in place — the way a role gets past a hidden attribute. */\n@@ -694,11 +694,14 @@ describe(\"candidate A — the config/hooks channel\", { timeout: 120_000 }, () =>\n       const src = join(tmp.dir, \"src\");\n       const clone = join(tmp.dir, \"clone\");\n       rawGit(tmp.dir, [\"init\", \"--quiet\", \"--initial-branch=main\", src]);\n+      disableAutoGc(src);\n       writeFileSync(join(src, \"f\"), \"f\\n\");\n       rawGit(src, [\"add\", \"f\"]);\n       rawGit(src, [\"-c\", \"user.name=t\", \"-c\", \"user.email=t@t\", \"commit\", \"--quiet\", \"--no-verify\", \"--no-gpg-sign\", \"-m\", \"c\"]);\n       rawGit(tmp.dir, [\"clone\", \"--quiet\", src, clone]);\n+      disableAutoGc(clone);\n       rawGit(src, [\"worktree\", \"add\", \"--quiet\", join(tmp.dir, \"wt2\")]);\n+      disableAutoGc(join(tmp.dir, \"wt2\"));\n       for (const root of [src, clone, join(tmp.dir, \"wt2\")]) {\n         const u = unsafeLocalKeys(root, resolveGitDirs(root));\n         expect(u.error).toBeNull();\n@@ -709,6 +712,40 @@ describe(\"candidate A — the config/hooks channel\", { timeout: 120_000 }, () =>\n       expect(unsafeLocalKeys(clone, resolveGitDirs(clone)).keys.join(\" \")).toContain(\"core.sshcommand\");\n     });\n \n+    it(\"G-053: git update-server-info writes <common>/info/refs (the path gc --auto can create)\", () => {\n+      const dirs = resolveGitDirs(repo.root);\n+      const refs = join(dirs.commonDir, \"info\", \"refs\");\n+      expect(existsSync(refs)).toBe(false);\n+      rawGit(repo.root, [\"update-server-info\"]);\n+      expect(existsSync(refs)).toBe(true);\n+    });\n+\n+    it(\"G-053: harness fixtures disable gc.auto so background gc cannot create info/refs during a loop\", () => {\n+      expect(rawGit(repo.root, [\"config\", \"gc.auto\"])).toBe(\"0\");\n+    });\n+\n+    it(\"G-053 mutant: gc.auto=1 at base is refused (only gc.auto=0 is on the allowlist)\", () => {\n+      rawGit(repo.root, [\"config\", \"gc.auto\", \"1\"]);\n+      expectRefusedCleanly(refusal(config()), \"unsafe-config-at-base\", \"gc.auto\");\n+      rawGit(repo.root, [\"config\", \"gc.auto\", \"0\"]);\n+    });\n+\n+    it(\"G-053: info/refs created during the developer stage fails the R21 gpgsign loop (known positive)\", async () => {\n+      rawGit(repo.root, [\"config\", \"commit.gpgsign\", \"true\"]);\n+      const r = await runLoop(\n+        config({\n+          roles: {\n+            planner: new StubPlanner(),\n+            developer: sabotage(new StubDeveloper(), (ctx) => {\n+              rawGit(ctx.repoRoot, [\"update-server-info\"]);\n+            }),\n+            qa: new StubQa(),\n+          },\n+        }),\n+      );\n+      expect(r.failure?.reason ?? \"\").toMatch(/info\\/refs created/i);\n+    });\n+\n     it(\"R21: commit.gpgsign=true is allowed because no runtime commit is signed — every one has no gpgsig header\", async () => {\n       rawGit(repo.root, [\"config\", \"commit.gpgsign\", \"true\"]);\n       const r = await runLoop(config());",
+            "diff --git a/open-brain/tests/harness/fixture.ts b/open-brain/tests/harness/fixture.ts\nindex 6d9e2bd3..f06ed3a3 100644\n--- a/open-brain/tests/harness/fixture.ts\n+++ b/open-brain/tests/harness/fixture.ts\n@@ -77,6 +77,11 @@ export interface RepoFixture {\n  * it, a path comparison in a test fails for a reason that has nothing to do\n  * with the thing under test.\n  */\n+/** G-053: `git gc --auto` can call `update-server-info`, which creates `<common>/info/refs` and fails ConfigWatch mid-loop. */\n+export function disableAutoGc(repoRoot: string): void {\n+  rawGit(repoRoot, [\"config\", \"gc.auto\", \"0\"]);\n+}\n+\n export function makeRepo(prefix = \"harness-repo-\"): RepoFixture {\n   const root = realpathSync(mkdtempSync(join(tmpdir(), prefix)));\n \n@@ -103,6 +108,7 @@ export function makeRepo(prefix = \"harness-repo-\"): RepoFixture {\n     ].join(\"\\n\"),\n     \"utf-8\",\n   );\n+  disableAutoGc(root);\n \n   const write = (repoPath: string, content: string): void => {\n     const abs = join(root, repoPath);\n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). Record the test result and run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/fixture.ts b/open-brain/tests/harness/fixture.ts\nindex 6d9e2bd3..f06ed3a3 100644\n--- a/open-brain/tests/harness/fixture.ts\n+++ b/open-brain/tests/harness/fixture.ts\n@@ -77,6 +77,11 @@ export interface RepoFixture {\n  * it, a path comparison in a test fails for a reason that has nothing to do\n  * with the thing under test.\n  */\n+/** G-053: `git gc --auto` can call `update-server-info`, which creates `<common>/info/refs` and fails ConfigWatch mid-loop. */\n+export function disableAutoGc(repoRoot: string): void {\n+  rawGit(repoRoot, [\"config\", \"gc.auto\", \"0\"]);\n+}\n+\n export function makeRepo(prefix = \"harness-repo-\"): RepoFixture {\n   const root = realpathSync(mkdtempSync(join(tmpdir(), prefix)));\n \n@@ -103,6 +108,7 @@ export function makeRepo(prefix = \"harness-repo-\"): RepoFixture {\n     ].join(\"\\n\"),\n     \"utf-8\",\n   );\n+  disableAutoGc(root);\n \n   const write = (repoPath: string, content: string): void => {\n     const abs = join(root, repoPath);\n"
+          ],
+          "id": "T5",
+          "observable": "In master's .agents/SYSTEM/hub-partner-seats.json, confirm: - infra = cursor-infra / k57d92gqtjm9wpfs74ekbx9rns8fmy2f; - builder = cursor-builder / k575sfwr9wcx3r8fw83g3bc00x8fmar3; - forge = forge / k571z4ghp7nbp34djhecwnsk3n8fmhsf; - the atlas reader pairs match these rooms in both directions; - \"grok\" and the three old room ids appear nowhere in the file. Run seat-map, hub-presence, hub-seats and focus one file per run. Report any finding as a fix-forward item."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "651ac36b19a127adc1c365327e3e7e64a3669256",
+        "merge_commit": "315e116fc50eb99edb8cb11ee105a3163e1c2ee6",
+        "pr": 421,
+        "scored_sha": "82aeb3da3e9036d5f6812738be541cb67ada1e07"
+      }
+    }
+  }
+}

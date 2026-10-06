@@ -1,0 +1,170 @@
+{
+  "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+  "candidate_sha": "685b9fe931a08f31d59977c90fbbd06cb977588b",
+  "case_id": "qa277-pr446",
+  "case_no": 78,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37198063161,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "ef97fb61a021f7e1e56b0d5fe01096d0dce3f6ed",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. Flag any file outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. New or changed test files against master's source (red) and the head (green); quote counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). The test result and run id above, for the pinned head.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "685b9fe931a08f31d59977c90fbbd06cb977588b",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/harness/cli.ts",
+        "open-brain/src/harness/index.ts",
+        "open-brain/src/harness/policies.ts",
+        "open-brain/src/harness/policies/effort.json",
+        "open-brain/src/harness/roles.ts",
+        "open-brain/src/harness/schemas/policy-effort.schema.json",
+        "open-brain/tests/harness/effort-policy.test.ts",
+        "open-brain/tests/harness/policies.test.ts",
+        "open-brain/tests/harness/s4-guards.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. Flag any file outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. New or changed test files against master's source (red) and the head (green); quote counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). The test result and run id above, for the pinned head.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "78-qa277-pr446",
+        "new_capability": "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)",
+        "objective": "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+          "path": "docs/loops/qa-277-s161e-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. Flag any file outside the task.",
+          "Red then green. New or changed test files against master's source (red) and the head (green); quote counts.",
+          "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.",
+          "CI (read only). The test result and run id above, for the pinned head."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/policies.test.ts b/open-brain/tests/harness/policies.test.ts\nindex b67a0b3c..799c8544 100644\n--- a/open-brain/tests/harness/policies.test.ts\n+++ b/open-brain/tests/harness/policies.test.ts\n@@ -136,6 +136,7 @@ describe(\"gate policies\", { timeout: 60_000 }, () => {\n       [\"plan\", \"policy-plan.schema.json\"],\n       [\"done\", \"policy-developer-done.schema.json\"],\n       [\"merge\", \"policy-merge.schema.json\"],\n+      [\"effort\", \"policy-effort.schema.json\"],\n     ] as const)(\"%s policy schema matches what zod derives\", (kind, file) => {\n       const onDisk = readFileSync(join(schemaDir(), file), \"utf-8\");\n       const derived = serialiseSchema(policyJsonSchemas()[kind]);"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. Flag any file outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/effort-policy.test.ts b/open-brain/tests/harness/effort-policy.test.ts\nnew file mode 100644\nindex 00000000..6fe86d4a\n--- /dev/null\n+++ b/open-brain/tests/harness/effort-policy.test.ts\n@@ -0,0 +1,185 @@\n+/**\n+ * T-173. The effort policy is data. These rows pin the shipped table and the\n+ * max-over-targets rule (a doc beside an unmatched source file stays at the\n+ * stage base). Mutants M1-M6 are local edits, not part of this history.\n+ */\n+\n+import { describe, it, expect } from \"vitest\";\n+import { mkdtempSync, readFileSync, writeFileSync, existsSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import {\n+  EFFORT_LOWERING_MARK,\n+  EFFORT_POLICY_FILE,\n+  chooseEffort,\n+  loadEffortPolicy,\n+  policiesDir,\n+  policyJsonSchemas,\n+  PolicyUnreadable,\n+  type EffortPolicy,\n+} from \"../../src/harness/policies.js\";\n+import { serialiseSchema } from \"../../src/harness/schema.js\";\n+import { policySchemaFileName, schemaDir } from \"../../src/harness/cli.js\";\n+import { Allowlist } from \"../../src/harness/workspace.js\";\n+import { claudeAdapter, commandAdapter, ProcessRole, type RoleContext } from \"../../src/harness/roles.js\";\n+import type { Plan } from \"../../src/harness/schema.js\";\n+\n+const shipped = (): EffortPolicy => loadEffortPolicy();\n+\n+const choose = (\n+  stage: \"planner\" | \"developer\" | \"qa\",\n+  repairTargets: string[],\n+  attempt = 1,\n+  policy: EffortPolicy = shipped(),\n+) => chooseEffort({ policy, stage, repairTargets, attempt });\n+\n+describe(\"T-173 effort policy\", () => {\n+  it(\"the shipped file states the lowering rule and the default table\", () => {\n+    const policy = shipped();\n+    expect(policy.description).toContain(EFFORT_LOWERING_MARK);\n+    expect(policy.levels).toEqual([\"low\", \"medium\", \"high\", \"xhigh\", \"max\"]);\n+    expect(policy.stages).toEqual({ planner: \"high\", developer: \"high\", qa: \"max\" });\n+    expect(policy.paths.map((rule) => [rule.id, rule.level])).toEqual([\n+      [\"harness-security\", \"xhigh\"],\n+      [\"docs-version\", \"medium\"],\n+    ]);\n+    expect(policy.retry).toBe(\"one-up\");\n+  });\n+\n+  it(\"drift: policy-effort.schema.json matches the derived schema\", () => {\n+    const file = policySchemaFileName(\"effort\");\n+    expect(file).toBe(\"policy-effort.schema.json\");\n+    const onDisk = readFileSync(join(schemaDir(), file), \"utf-8\");\n+    expect(onDisk).toBe(serialiseSchema(policyJsonSchemas().effort));\n+    expect(onDisk).toContain(EFFORT_LOWERING_MARK);\n+  });\n+\n+  it(\"R1 qa with no paths at attempt 1 is max\", () => {\n+    expect(choose(\"qa\", []).level).toBe(\"max\");\n+  });\n+\n+  it(\"R2 developer plus harness/git.ts is xhigh\", () => {\n+    const choice = choose(\"developer\", [\"open-brain/src/harness/git.ts\"]);\n+    expect(choice.level).toBe(\"xhigh\");\n+    expect(choice.path_rule).toBe(\"harness-security\");\n+  });\n+\n+  it(\"R3 developer plus a doc is medium\", () => {\n+    const choice = choose(\"developer\", [\"docs/loops/x.md\"]);\n+    expect(choice.level).toBe(\"medium\");\n+    expect(choice.path_rule).toBe(\"docs-version\");\n+  });\n+\n+  it(\"R4 that doc on attempt 2 steps to high\", () => {\n+    const choice = choose(\"developer\", [\"docs/loops/x.md\"], 2);\n+    expect(choice.level).toBe(\"high\");\n+    expect(choice.retry_bumped).toBe(true);\n+  });\n+\n+  it(\"R5 git.ts and a doc together is xhigh, and attempt 2 is max\", () => {\n+    expect(choose(\"developer\", [\"open-brain/src/harness/git.ts\", \"docs/loops/x.md\"]).level).toBe(\"xhigh\");\n+    expect(choose(\"developer\", [\"open-brain/src/harness/git.ts\", \"docs/loops/x.md\"], 2).level).toBe(\"max\");\n+  });\n+\n+  it(\"R6 planner with empty repair_targets at attempt 1 is high\", () => {\n+    const choice = choose(\"planner\", []);\n+    expect(choice.level).toBe(\"high\");\n+    expect(choice.path_rule).toBeNull();\n+  });\n+\n+  it(\"R7 qa on attempt 2 stays max\", () => {\n+    const choice = choose(\"qa\", [], 2);\n+    expect(choice.level).toBe(\"max\");\n+    expect(choice.retry_bumped).toBe(false);\n+  });\n+\n+  it(\"R8 a level absent from the ladder is refused\", () => {\n+    const dir = mkdtempSync(join(tmpdir(), \"t173-r8-\"));\n+    const policy = shipped();\n+    writeFileSync(\n+      join(dir, EFFORT_POLICY_FILE),\n+      JSON.stringify({ ...policy, stages: { ...policy.stages, developer: \"ultra\" } }),\n+    );\n+    expect(() => loadEffortPolicy(dir)).toThrow(PolicyUnreadable);\n+    writeFileSync(\n+      join(dir, EFFORT_POLICY_FILE),\n+      JSON.stringify({\n+        ...policy,\n+        levels: [\"medium\", \"high\", \"xhigh\", \"max\"],\n+        stages: { ...policy.stages, developer: \"low\" },\n+      }),\n+    );\n+    expect(() => loadEffortPolicy(dir)).toThrow(/not on the levels ladder/);\n+  });\n+\n+  it(\"R9 a missing effort.json throws and does not spawn\", async () => {\n+    const dir = mkdtempSync(join(tmpdir(), \"t173-r9-\"));\n+    const marker = join(dir, \"spawned\");\n+    const role = new ProcessRole(\"developer\", {\n+      adapter: commandAdapter(\n+        process.execPath,\n+        [\"-e\", \"require('fs').writeFileSync(process.env.MARKER, '1')\"],\n+        [\"MARKER\"],\n+      ),\n+      envSet: { MARKER: marker },\n+      policiesDir: dir,\n+    });\n+    const ctx: RoleContext = {\n+      role: \"developer\",\n+      loop: \"t001\",\n+      repoRoot: dir,\n+      attempt: 1,\n+      allowlist: new Allowlist([]),\n+      previousProblems: [],\n+      schema: null,\n+      plan: null,\n+      candidate: null,\n+      checks: null,\n+      write: () => {},\n+    };\n+    await expect(role.execute(ctx)).rejects.toThrow(PolicyUnreadable);\n+    expect(existsSync(marker)).toBe(false);\n+  });\n+\n+  it(\"R10 adapter args contain --effort and the resolved level\", () => {\n+    const args = claudeAdapter().args({ sessionId: \"s\", effort: \"high\" });\n+    const at = args.indexOf(\"--effort\");\n+    expect(at).toBeGreaterThan(-1);\n+    expect(args[at + 1]).toBe(\"high\");\n+    expect(() => claudeAdapter().args({ sessionId: \"s\", effort: \"\" })).toThrow(/effort policy/);\n+  });\n+\n+  it(\"R11 the process record carries the level beside the result\", async () => {\n+    const dir = mkdtempSync(join(tmpdir(), \"t173-r11-\"));\n+    const role = new ProcessRole(\"developer\", {\n+      adapter: commandAdapter(process.execPath, [\n+        \"-e\",\n+        \"require('fs').writeFileSync(process.env.HOH_DELIVERABLE_PATH, '{\\\"ok\\\":true}\\\\n')\",\n+      ]),\n+    });\n+    const plan = { repair_targets: [\"open-brain/src/harness/git.ts\"] } as Plan;\n+    const ctx: RoleContext = {\n+      role: \"developer\",\n+      loop: \"t001\",\n+      repoRoot: dir,\n+      attempt: 1,\n+      allowlist: new Allowlist([]),\n+      previousProblems: [],\n+      schema: null,\n+      plan,\n+      candidate: null,\n+      checks: null,\n+      write: () => {},\n+    };\n+    const record = await role.execute(ctx);\n+    expect(record.effort.level).toBe(\"xhigh\");\n+    expect(record.effort.path_rule).toBe(\"harness-security\");\n+    expect(record.outcome.exitCode).toBe(0);\n+  });\n+\n+  it(\"R12 developer, docs/x.md plus an unmatched source file, attempt 1 is high\", () => {\n+    const choice = choose(\"developer\", [\"docs/x.md\", \"open-brain/src/foo.ts\"]);\n+    expect(choice.level).toBe(\"high\");\n+    expect(choice.path_rule).toBeNull();\n+  });\n+});",
+            "diff --git a/open-brain/tests/harness/policies.test.ts b/open-brain/tests/harness/policies.test.ts\nindex b67a0b3c..799c8544 100644\n--- a/open-brain/tests/harness/policies.test.ts\n+++ b/open-brain/tests/harness/policies.test.ts\n@@ -136,6 +136,7 @@ describe(\"gate policies\", { timeout: 60_000 }, () => {\n       [\"plan\", \"policy-plan.schema.json\"],\n       [\"done\", \"policy-developer-done.schema.json\"],\n       [\"merge\", \"policy-merge.schema.json\"],\n+      [\"effort\", \"policy-effort.schema.json\"],\n     ] as const)(\"%s policy schema matches what zod derives\", (kind, file) => {\n       const onDisk = readFileSync(join(schemaDir(), file), \"utf-8\");\n       const derived = serialiseSchema(policyJsonSchemas()[kind]);",
+            "diff --git a/open-brain/tests/harness/s4-guards.test.ts b/open-brain/tests/harness/s4-guards.test.ts\nindex 3be15b0f..d799246b 100644\n--- a/open-brain/tests/harness/s4-guards.test.ts\n+++ b/open-brain/tests/harness/s4-guards.test.ts\n@@ -241,11 +241,15 @@ describe(\"slice four guards\", { timeout: 120_000 }, () => {\n     expect(testCountFindings(rows, ALLOWED_TEST_LOSSES)).toEqual([]);\n   });\n \n-  it(\"S4-5c.1 the three policy files are unchanged, and qa-score.json is the one added policy\", () => {\n+  it(\"S4-5c.1 the three policy files are unchanged, and later policies are the named additions\", () => {\n     const three = [\"developer-done.json\", \"plan-gate.json\", \"merge.json\"].map((f) => `open-brain/src/harness/policies/${f}`);\n     expect(git([\"diff\", \"--name-only\", BASE, \"--\", ...three]).trim()).toBe(\"\");\n-    const added = git([\"diff\", \"--diff-filter=A\", \"--name-only\", BASE, \"--\", ...SCOPES.policies]).trim();\n-    expect(added).toBe(\"open-brain/src/harness/policies/qa-score.json\");\n+    const added = git([\"diff\", \"--diff-filter=A\", \"--name-only\", BASE, \"--\", ...SCOPES.policies]).trim().split(\"\\n\").filter(Boolean).sort();\n+    // qa-score.json is slice four's addition. effort.json is T-173, after that base.\n+    expect(added).toEqual([\n+      \"open-brain/src/harness/policies/effort.json\",\n+      \"open-brain/src/harness/policies/qa-score.json\",\n+    ]);\n   });\n \n   it(\"S4-5c.3 merge.json keeps both required-gate switches false\", () => {\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. New or changed test files against master's source (red) and the head (green); quote counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/harness/cli.ts b/open-brain/src/harness/cli.ts\nindex 33aa568f..cd9f4b4d 100644\n--- a/open-brain/src/harness/cli.ts\n+++ b/open-brain/src/harness/cli.ts\n@@ -187,12 +187,14 @@ export const schemaFileName = (kind: DeliverableKind): string =>\n  * too — becoming exactly the stale authoritative-looking artifact this file\n  * already refuses to create.\n  */\n-export const policySchemaFileName = (kind: \"plan\" | \"done\" | \"merge\"): string =>\n+export const policySchemaFileName = (kind: \"plan\" | \"done\" | \"merge\" | \"effort\"): string =>\n   kind === \"plan\"\n     ? \"policy-plan.schema.json\"\n     : kind === \"done\"\n       ? \"policy-developer-done.schema.json\"\n-      : \"policy-merge.schema.json\";\n+      : kind === \"merge\"\n+        ? \"policy-merge.schema.json\"\n+        : \"policy-effort.schema.json\";\n \n /**\n  * Validate an `E_t` file with the runtime's own validator.\n@@ -628,7 +630,7 @@ function cmdSchemas(argv: readonly string[]): number {\n   }\n   const schemas = jsonSchemas();\n   const policySchemas = policyJsonSchemas();\n-  for (const kind of [\"plan\", \"done\", \"merge\"] as const) {\n+  for (const kind of [\"plan\", \"done\", \"merge\", \"effort\"] as const) {\n     const text = serialiseSchema(policySchemas[kind]);\n     if (write) {\n       const target = join(schemaDir(), policySchemaFileName(kind));"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/effort-policy.test.ts b/open-brain/tests/harness/effort-policy.test.ts\nnew file mode 100644\nindex 00000000..6fe86d4a\n--- /dev/null\n+++ b/open-brain/tests/harness/effort-policy.test.ts\n@@ -0,0 +1,185 @@\n+/**\n+ * T-173. The effort policy is data. These rows pin the shipped table and the\n+ * max-over-targets rule (a doc beside an unmatched source file stays at the\n+ * stage base). Mutants M1-M6 are local edits, not part of this history.\n+ */\n+\n+import { describe, it, expect } from \"vitest\";\n+import { mkdtempSync, readFileSync, writeFileSync, existsSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import {\n+  EFFORT_LOWERING_MARK,\n+  EFFORT_POLICY_FILE,\n+  chooseEffort,\n+  loadEffortPolicy,\n+  policiesDir,\n+  policyJsonSchemas,\n+  PolicyUnreadable,\n+  type EffortPolicy,\n+} from \"../../src/harness/policies.js\";\n+import { serialiseSchema } from \"../../src/harness/schema.js\";\n+import { policySchemaFileName, schemaDir } from \"../../src/harness/cli.js\";\n+import { Allowlist } from \"../../src/harness/workspace.js\";\n+import { claudeAdapter, commandAdapter, ProcessRole, type RoleContext } from \"../../src/harness/roles.js\";\n+import type { Plan } from \"../../src/harness/schema.js\";\n+\n+const shipped = (): EffortPolicy => loadEffortPolicy();\n+\n+const choose = (\n+  stage: \"planner\" | \"developer\" | \"qa\",\n+  repairTargets: string[],\n+  attempt = 1,\n+  policy: EffortPolicy = shipped(),\n+) => chooseEffort({ policy, stage, repairTargets, attempt });\n+\n+describe(\"T-173 effort policy\", () => {\n+  it(\"the shipped file states the lowering rule and the default table\", () => {\n+    const policy = shipped();\n+    expect(policy.description).toContain(EFFORT_LOWERING_MARK);\n+    expect(policy.levels).toEqual([\"low\", \"medium\", \"high\", \"xhigh\", \"max\"]);\n+    expect(policy.stages).toEqual({ planner: \"high\", developer: \"high\", qa: \"max\" });\n+    expect(policy.paths.map((rule) => [rule.id, rule.level])).toEqual([\n+      [\"harness-security\", \"xhigh\"],\n+      [\"docs-version\", \"medium\"],\n+    ]);\n+    expect(policy.retry).toBe(\"one-up\");\n+  });\n+\n+  it(\"drift: policy-effort.schema.json matches the derived schema\", () => {\n+    const file = policySchemaFileName(\"effort\");\n+    expect(file).toBe(\"policy-effort.schema.json\");\n+    const onDisk = readFileSync(join(schemaDir(), file), \"utf-8\");\n+    expect(onDisk).toBe(serialiseSchema(policyJsonSchemas().effort));\n+    expect(onDisk).toContain(EFFORT_LOWERING_MARK);\n+  });\n+\n+  it(\"R1 qa with no paths at attempt 1 is max\", () => {\n+    expect(choose(\"qa\", []).level).toBe(\"max\");\n+  });\n+\n+  it(\"R2 developer plus harness/git.ts is xhigh\", () => {\n+    const choice = choose(\"developer\", [\"open-brain/src/harness/git.ts\"]);\n+    expect(choice.level).toBe(\"xhigh\");\n+    expect(choice.path_rule).toBe(\"harness-security\");\n+  });\n+\n+  it(\"R3 developer plus a doc is medium\", () => {\n+    const choice = choose(\"developer\", [\"docs/loops/x.md\"]);\n+    expect(choice.level).toBe(\"medium\");\n+    expect(choice.path_rule).toBe(\"docs-version\");\n+  });\n+\n+  it(\"R4 that doc on attempt 2 steps to high\", () => {\n+    const choice = choose(\"developer\", [\"docs/loops/x.md\"], 2);\n+    expect(choice.level).toBe(\"high\");\n+    expect(choice.retry_bumped).toBe(true);\n+  });\n+\n+  it(\"R5 git.ts and a doc together is xhigh, and attempt 2 is max\", () => {\n+    expect(choose(\"developer\", [\"open-brain/src/harness/git.ts\", \"docs/loops/x.md\"]).level).toBe(\"xhigh\");\n+    expect(choose(\"developer\", [\"open-brain/src/harness/git.ts\", \"docs/loops/x.md\"], 2).level).toBe(\"max\");\n+  });\n+\n+  it(\"R6 planner with empty repair_targets at attempt 1 is high\", () => {\n+    const choice = choose(\"planner\", []);\n+    expect(choice.level).toBe(\"high\");\n+    expect(choice.path_rule).toBeNull();\n+  });\n+\n+  it(\"R7 qa on attempt 2 stays max\", () => {\n+    const choice = choose(\"qa\", [], 2);\n+    expect(choice.level).toBe(\"max\");\n+    expect(choice.retry_bumped).toBe(false);\n+  });\n+\n+  it(\"R8 a level absent from the ladder is refused\", () => {\n+    const dir = mkdtempSync(join(tmpdir(), \"t173-r8-\"));\n+    const policy = shipped();\n+    writeFileSync(\n+      join(dir, EFFORT_POLICY_FILE),\n+      JSON.stringify({ ...policy, stages: { ...policy.stages, developer: \"ultra\" } }),\n+    );\n+    expect(() => loadEffortPolicy(dir)).toThrow(PolicyUnreadable);\n+    writeFileSync(\n+      join(dir, EFFORT_POLICY_FILE),\n+      JSON.stringify({\n+        ...policy,\n+        levels: [\"medium\", \"high\", \"xhigh\", \"max\"],\n+        stages: { ...policy.stages, developer: \"low\" },\n+      }),\n+    );\n+    expect(() => loadEffortPolicy(dir)).toThrow(/not on the levels ladder/);\n+  });\n+\n+  it(\"R9 a missing effort.json throws and does not spawn\", async () => {\n+    const dir = mkdtempSync(join(tmpdir(), \"t173-r9-\"));\n+    const marker = join(dir, \"spawned\");\n+    const role = new ProcessRole(\"developer\", {\n+      adapter: commandAdapter(\n+        process.execPath,\n+        [\"-e\", \"require('fs').writeFileSync(process.env.MARKER, '1')\"],\n+        [\"MARKER\"],\n+      ),\n+      envSet: { MARKER: marker },\n+      policiesDir: dir,\n+    });\n+    const ctx: RoleContext = {\n+      role: \"developer\",\n+      loop: \"t001\",\n+      repoRoot: dir,\n+      attempt: 1,\n+      allowlist: new Allowlist([]),\n+      previousProblems: [],\n+      schema: null,\n+      plan: null,\n+      candidate: null,\n+      checks: null,\n+      write: () => {},\n+    };\n+    await expect(role.execute(ctx)).rejects.toThrow(PolicyUnreadable);\n+    expect(existsSync(marker)).toBe(false);\n+  });\n+\n+  it(\"R10 adapter args contain --effort and the resolved level\", () => {\n+    const args = claudeAdapter().args({ sessionId: \"s\", effort: \"high\" });\n+    const at = args.indexOf(\"--effort\");\n+    expect(at).toBeGreaterThan(-1);\n+    expect(args[at + 1]).toBe(\"high\");\n+    expect(() => claudeAdapter().args({ sessionId: \"s\", effort: \"\" })).toThrow(/effort policy/);\n+  });\n+\n+  it(\"R11 the process record carries the level beside the result\", async () => {\n+    const dir = mkdtempSync(join(tmpdir(), \"t173-r11-\"));\n+    const role = new ProcessRole(\"developer\", {\n+      adapter: commandAdapter(process.execPath, [\n+        \"-e\",\n+        \"require('fs').writeFileSync(process.env.HOH_DELIVERABLE_PATH, '{\\\"ok\\\":true}\\\\n')\",\n+      ]),\n+    });\n+    const plan = { repair_targets: [\"open-brain/src/harness/git.ts\"] } as Plan;\n+    const ctx: RoleContext = {\n+      role: \"developer\",\n+      loop: \"t001\",\n+      repoRoot: dir,\n+      attempt: 1,\n+      allowlist: new Allowlist([]),\n+      previousProblems: [],\n+      schema: null,\n+      plan,\n+      candidate: null,\n+      checks: null,\n+      write: () => {},\n+    };\n+    const record = await role.execute(ctx);\n+    expect(record.effort.level).toBe(\"xhigh\");\n+    expect(record.effort.path_rule).toBe(\"harness-security\");\n+    expect(record.outcome.exitCode).toBe(0);\n+  });\n+\n+  it(\"R12 developer, docs/x.md plus an unmatched source file, attempt 1 is high\", () => {\n+    const choice = choose(\"developer\", [\"docs/x.md\", \"open-brain/src/foo.ts\"]);\n+    expect(choice.level).toBe(\"high\");\n+    expect(choice.path_rule).toBeNull();\n+  });\n+});",
+            "diff --git a/open-brain/tests/harness/policies.test.ts b/open-brain/tests/harness/policies.test.ts\nindex b67a0b3c..799c8544 100644\n--- a/open-brain/tests/harness/policies.test.ts\n+++ b/open-brain/tests/harness/policies.test.ts\n@@ -136,6 +136,7 @@ describe(\"gate policies\", { timeout: 60_000 }, () => {\n       [\"plan\", \"policy-plan.schema.json\"],\n       [\"done\", \"policy-developer-done.schema.json\"],\n       [\"merge\", \"policy-merge.schema.json\"],\n+      [\"effort\", \"policy-effort.schema.json\"],\n     ] as const)(\"%s policy schema matches what zod derives\", (kind, file) => {\n       const onDisk = readFileSync(join(schemaDir(), file), \"utf-8\");\n       const derived = serialiseSchema(policyJsonSchemas()[kind]);",
+            "diff --git a/open-brain/tests/harness/s4-guards.test.ts b/open-brain/tests/harness/s4-guards.test.ts\nindex 3be15b0f..d799246b 100644\n--- a/open-brain/tests/harness/s4-guards.test.ts\n+++ b/open-brain/tests/harness/s4-guards.test.ts\n@@ -241,11 +241,15 @@ describe(\"slice four guards\", { timeout: 120_000 }, () => {\n     expect(testCountFindings(rows, ALLOWED_TEST_LOSSES)).toEqual([]);\n   });\n \n-  it(\"S4-5c.1 the three policy files are unchanged, and qa-score.json is the one added policy\", () => {\n+  it(\"S4-5c.1 the three policy files are unchanged, and later policies are the named additions\", () => {\n     const three = [\"developer-done.json\", \"plan-gate.json\", \"merge.json\"].map((f) => `open-brain/src/harness/policies/${f}`);\n     expect(git([\"diff\", \"--name-only\", BASE, \"--\", ...three]).trim()).toBe(\"\");\n-    const added = git([\"diff\", \"--diff-filter=A\", \"--name-only\", BASE, \"--\", ...SCOPES.policies]).trim();\n-    expect(added).toBe(\"open-brain/src/harness/policies/qa-score.json\");\n+    const added = git([\"diff\", \"--diff-filter=A\", \"--name-only\", BASE, \"--\", ...SCOPES.policies]).trim().split(\"\\n\").filter(Boolean).sort();\n+    // qa-score.json is slice four's addition. effort.json is T-173, after that base.\n+    expect(added).toEqual([\n+      \"open-brain/src/harness/policies/effort.json\",\n+      \"open-brain/src/harness/policies/qa-score.json\",\n+    ]);\n   });\n \n   it(\"S4-5c.3 merge.json keeps both required-gate switches false\", () => {\n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). The test result and run id above, for the pinned head."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "merge_commit": "ef97fb61a021f7e1e56b0d5fe01096d0dce3f6ed",
+        "pr": 446,
+        "scored_sha": "685b9fe931a08f31d59977c90fbbd06cb977588b"
+      }
+    }
+  }
+}

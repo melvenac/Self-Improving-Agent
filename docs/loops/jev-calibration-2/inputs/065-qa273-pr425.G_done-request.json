@@ -1,0 +1,163 @@
+{
+  "base_sha": "71b2b924b1020a454e2eaa7035366c841de0f8f5",
+  "candidate_sha": "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b",
+  "case_id": "qa273-pr425",
+  "case_no": 65,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37180118545,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. Flag any file outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). Record the test result and run id above, and confirm it is the pinned head's run.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/setup-hooks.test.ts",
+        "open-brain/tests/setup-scratch-home.test.ts",
+        "scripts/setup-hooks.mjs",
+        "scripts/setup.mjs"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. Flag any file outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). Record the test result and run id above, and confirm it is the pinned head's run.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "65-qa273-pr425",
+        "new_capability": "QA 273, session-161 batch a: #421 r2, #424, #425, #427 (QA 274 = their real-Windows rows)",
+        "objective": "QA 273, session-161 batch a: #421 r2, #424, #425, #427 (QA 274 = their real-Windows rows)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+          "path": "docs/loops/qa-273-s161a-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. Flag any file outside the task.",
+          "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.",
+          "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.",
+          "CI (read only). Record the test result and run id above, and confirm it is the pinned head's run."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/setup-scratch-home.test.ts b/open-brain/tests/setup-scratch-home.test.ts\nnew file mode 100644\nindex 00000000..66772338\n--- /dev/null\n+++ b/open-brain/tests/setup-scratch-home.test.ts\n@@ -0,0 +1,84 @@\n+/**\n+ * T-235 P2-4: setup.mjs under a scratch HOME — sessionEnd registered, real profile untouched.\n+ */\n+import { describe, it, expect, beforeAll, afterAll } from \"vitest\";\n+import { execFileSync } from \"node:child_process\";\n+import { createHash } from \"node:crypto\";\n+import {\n+  mkdtempSync,\n+  mkdirSync,\n+  writeFileSync,\n+  readFileSync,\n+  rmSync,\n+  existsSync,\n+} from \"node:fs\";\n+import { join, dirname } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { fileURLToPath } from \"node:url\";\n+\n+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), \"..\", \"..\");\n+\n+function sha256(file: string): string | null {\n+  if (!existsSync(file)) return null;\n+  return createHash(\"sha256\").update(readFileSync(file)).digest(\"hex\");\n+}\n+\n+describe(\"setup.mjs under scratch HOME (T-235 P2-4)\", { timeout: 180_000 }, () => {\n+  let scratchHome: string;\n+  const realProfile = process.env.USERPROFILE || process.env.HOME || \"\";\n+  const realHashes: Record<string, string | null> = {};\n+\n+  beforeAll(() => {\n+    for (const rel of [\".cursor/hooks.json\", \".cursor/mcp.json\", \".claude/settings.json\"]) {\n+      realHashes[rel] = sha256(join(realProfile, rel));\n+    }\n+    scratchHome = mkdtempSync(join(tmpdir(), \"t235-p24-home-\"));\n+    mkdirSync(join(scratchHome, \".cursor\"), { recursive: true });\n+    mkdirSync(join(scratchHome, \".claude\"), { recursive: true });\n+    writeFileSync(join(scratchHome, \".claude\", \".mcp.json\"), \"{}\\n\");\n+    writeFileSync(\n+      join(scratchHome, \".cursor\", \"hooks.json\"),\n+      JSON.stringify({\n+        version: 1,\n+        hooks: {\n+          sessionStart: [{ command: 'node \"C:/old/open-brain/build/cli-bootstrap.js\" --ide cursor' }],\n+          sessionEnd: [{ command: \"echo user-session-end\" }],\n+        },\n+      }, null, 2),\n+    );\n+    writeFileSync(join(scratchHome, \".cursor\", \"mcp.json\"), JSON.stringify({ mcpServers: { other: { command: \"foo\" } } }));\n+  });\n+\n+  afterAll(() => {\n+    rmSync(scratchHome, { recursive: true, force: true });\n+  });\n+\n+  it(\"two setup runs add one absolute sessionEnd entry and leave the user's unrelated hook\", () => {\n+    const env = {\n+      ...process.env,\n+      HOME: scratchHome,\n+      USERPROFILE: scratchHome,\n+      OPEN_BRAIN_VAULT_DIR: join(scratchHome, \"vault\"),\n+    };\n+    execFileSync(\"node\", [\"scripts/setup.mjs\"], { cwd: REPO_ROOT, env, stdio: \"pipe\" });\n+    const hooks1 = JSON.parse(readFileSync(join(scratchHome, \".cursor\", \"hooks.json\"), \"utf8\")) as {\n+      hooks: { sessionEnd: Array<{ command: string }>; sessionStart: Array<{ command: string }> };\n+    };\n+    const endCmds = hooks1.hooks.sessionEnd.map((e) => e.command);\n+    const ours = endCmds.find((c) => c.includes(\"cli-session-end.js\"));\n+    expect(ours).toBeDefined();\n+    expect(ours).toMatch(/^\"[^\"]+\" \"[^\"]*cli-session-end\\.js\"$/);\n+    expect(ours).toContain(process.execPath.replace(/\\\\/g, \"/\"));\n+    expect(endCmds.some((c) => c === \"echo user-session-end\")).toBe(true);\n+\n+    execFileSync(\"node\", [\"scripts/setup.mjs\"], { cwd: REPO_ROOT, env, stdio: \"pipe\" });\n+    const hooks2 = JSON.parse(readFileSync(join(scratchHome, \".cursor\", \"hooks.json\"), \"utf8\")) as {\n+      hooks: { sessionEnd: Array<{ command: string }> };\n+    };\n+    expect(hooks2.hooks.sessionEnd.filter((e) => e.command.includes(\"cli-session-end.js\"))).toHaveLength(1);\n+\n+    for (const rel of Object.keys(realHashes)) {\n+      expect(sha256(join(realProfile, rel))).toBe(realHashes[rel]);\n+    }\n+  });\n+});"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. Flag any file outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/setup-hooks.test.ts b/open-brain/tests/setup-hooks.test.ts\nindex 92269d31..5e6ef37f 100644\n--- a/open-brain/tests/setup-hooks.test.ts\n+++ b/open-brain/tests/setup-hooks.test.ts\n@@ -7,7 +7,7 @@\n import { describe, it, expect } from \"vitest\";\n import { join } from \"node:path\";\n // @ts-expect-error — a plain .mjs module outside the TypeScript project\n-import { withSessionHooks, withCursorMcp, withCursorSessionHook } from \"../../scripts/setup-hooks.mjs\";\n+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook } from \"../../scripts/setup-hooks.mjs\";\n \n type Entry = { matcher: string; hooks: Array<{ type: string; command: string }> };\n type Settings = { hooks?: Record<string, Entry[]>; [k: string]: unknown };\n@@ -115,3 +115,59 @@ describe(\"setup.mjs Cursor registration pins the running Node (T-235 P2-1)\", ()\n     expect((once.hooks as Record<string, unknown>).stop).toEqual([{ command: \"s\" }]);\n   });\n });\n+\n+// T-235 P2-4: Cursor sessionEnd → cli-session-end.js (absolute node, idempotent, user hooks preserved).\n+describe(\"setup.mjs Cursor sessionEnd (T-235 P2-4)\", () => {\n+  const NODE = String.raw`C:\\Program Files\\nodejs\\node.exe`;\n+  const BOOT = String.raw`C:\\repo\\open-brain\\build\\cli-bootstrap.js`;\n+  const END = String.raw`C:\\repo\\open-brain\\build\\cli-session-end.js`;\n+  const hookStartCmd = `\"C:/Program Files/nodejs/node.exe\" \"C:/repo/open-brain/build/cli-bootstrap.js\" --ide cursor`;\n+  const hookEndCmd = `\"C:/Program Files/nodejs/node.exe\" \"C:/repo/open-brain/build/cli-session-end.js\"`;\n+  type Hooks = { version?: number; hooks: { sessionStart?: Array<{ command: string }>; sessionEnd?: Array<{ command: string }>; stop?: Array<{ command: string }> } };\n+  const endHook = (c: unknown, node = NODE): { config: Hooks; changed: boolean } => withCursorSessionEndHook(c, END, node);\n+\n+  it(\"adds one sessionEnd entry with the absolute node path\", () => {\n+    const r = endHook({ version: 1, hooks: {} });\n+    expect(r.config.hooks.sessionEnd).toEqual([{ command: hookEndCmd }]);\n+    expect(r.changed).toBe(true);\n+  });\n+\n+  it(\"is idempotent: a second run changes nothing and does not duplicate\", () => {\n+    const once = endHook({ version: 1, hooks: {} }).config;\n+    const twice = endHook(once);\n+    expect(twice.changed).toBe(false);\n+    expect(twice.config.hooks.sessionEnd).toHaveLength(1);\n+  });\n+\n+  it(\"preserves an existing user sessionEnd hook and upgrades a stale bare-node cli-session-end entry\", () => {\n+    const bare = `node \"C:/repo/open-brain/build/cli-session-end.js\"`;\n+    const r = endHook({\n+      version: 1,\n+      hooks: { sessionEnd: [{ command: \"echo unrelated\" }, { command: bare }] },\n+    });\n+    expect(r.changed).toBe(true);\n+    expect(r.config.hooks.sessionEnd).toEqual([{ command: \"echo unrelated\" }, { command: hookEndCmd }]);\n+  });\n+\n+  it(\"keeps sessionStart and other events when sessionEnd is added\", () => {\n+    const start = withCursorSessionHook({ version: 1, hooks: { stop: [{ command: \"s\" }] } }, BOOT, NODE).config as Hooks;\n+    const r = endHook(start);\n+    expect(r.config.hooks.sessionStart).toEqual([{ command: hookStartCmd }]);\n+    expect((r.config.hooks as { stop: unknown }).stop).toEqual([{ command: \"s\" }]);\n+    expect(r.config.hooks.sessionEnd).toEqual([{ command: hookEndCmd }]);\n+  });\n+\n+  it(\"Claude Code withSessionHooks output is independent (byte-identical across Cursor sessionEnd registration)\", () => {\n+    const claude: Settings = { hooks: { SessionStart: [{ matcher: \"\", hooks: [{ type: \"command\", command: cmd(\"cli-bootstrap.js\") }] }] } };\n+    const before = JSON.stringify(run(claude).settings);\n+    endHook({ version: 1, hooks: { sessionStart: [{ command: hookStartCmd }] } });\n+    expect(JSON.stringify(run(claude).settings)).toBe(before);\n+  });\n+\n+  it(\"mutant: treating every tree as already configured would skip registration (red on empty hooks)\", () => {\n+    const alwaysConfigured = (c: unknown) => ({ config: c as Hooks, changed: false, notes: [] as string[] });\n+    const r = alwaysConfigured({ version: 1, hooks: {} });\n+    expect((r.config.hooks.sessionEnd ?? []).length).toBe(0);\n+    expect(endHook({ version: 1, hooks: {} }).config.hooks.sessionEnd).toHaveLength(1);\n+  });\n+});",
+            "diff --git a/open-brain/tests/setup-scratch-home.test.ts b/open-brain/tests/setup-scratch-home.test.ts\nnew file mode 100644\nindex 00000000..66772338\n--- /dev/null\n+++ b/open-brain/tests/setup-scratch-home.test.ts\n@@ -0,0 +1,84 @@\n+/**\n+ * T-235 P2-4: setup.mjs under a scratch HOME — sessionEnd registered, real profile untouched.\n+ */\n+import { describe, it, expect, beforeAll, afterAll } from \"vitest\";\n+import { execFileSync } from \"node:child_process\";\n+import { createHash } from \"node:crypto\";\n+import {\n+  mkdtempSync,\n+  mkdirSync,\n+  writeFileSync,\n+  readFileSync,\n+  rmSync,\n+  existsSync,\n+} from \"node:fs\";\n+import { join, dirname } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { fileURLToPath } from \"node:url\";\n+\n+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), \"..\", \"..\");\n+\n+function sha256(file: string): string | null {\n+  if (!existsSync(file)) return null;\n+  return createHash(\"sha256\").update(readFileSync(file)).digest(\"hex\");\n+}\n+\n+describe(\"setup.mjs under scratch HOME (T-235 P2-4)\", { timeout: 180_000 }, () => {\n+  let scratchHome: string;\n+  const realProfile = process.env.USERPROFILE || process.env.HOME || \"\";\n+  const realHashes: Record<string, string | null> = {};\n+\n+  beforeAll(() => {\n+    for (const rel of [\".cursor/hooks.json\", \".cursor/mcp.json\", \".claude/settings.json\"]) {\n+      realHashes[rel] = sha256(join(realProfile, rel));\n+    }\n+    scratchHome = mkdtempSync(join(tmpdir(), \"t235-p24-home-\"));\n+    mkdirSync(join(scratchHome, \".cursor\"), { recursive: true });\n+    mkdirSync(join(scratchHome, \".claude\"), { recursive: true });\n+    writeFileSync(join(scratchHome, \".claude\", \".mcp.json\"), \"{}\\n\");\n+    writeFileSync(\n+      join(scratchHome, \".cursor\", \"hooks.json\"),\n+      JSON.stringify({\n+        version: 1,\n+        hooks: {\n+          sessionStart: [{ command: 'node \"C:/old/open-brain/build/cli-bootstrap.js\" --ide cursor' }],\n+          sessionEnd: [{ command: \"echo user-session-end\" }],\n+        },\n+      }, null, 2),\n+    );\n+    writeFileSync(join(scratchHome, \".cursor\", \"mcp.json\"), JSON.stringify({ mcpServers: { other: { command: \"foo\" } } }));\n+  });\n+\n+  afterAll(() => {\n+    rmSync(scratchHome, { recursive: true, force: true });\n+  });\n+\n+  it(\"two setup runs add one absolute sessionEnd entry and leave the user's unrelated hook\", () => {\n+    const env = {\n+      ...process.env,\n+      HOME: scratchHome,\n+      USERPROFILE: scratchHome,\n+      OPEN_BRAIN_VAULT_DIR: join(scratchHome, \"vault\"),\n+    };\n+    execFileSync(\"node\", [\"scripts/setup.mjs\"], { cwd: REPO_ROOT, env, stdio: \"pipe\" });\n+    const hooks1 = JSON.parse(readFileSync(join(scratchHome, \".cursor\", \"hooks.json\"), \"utf8\")) as {\n+      hooks: { sessionEnd: Array<{ command: string }>; sessionStart: Array<{ command: string }> };\n+    };\n+    const endCmds = hooks1.hooks.sessionEnd.map((e) => e.command);\n+    const ours = endCmds.find((c) => c.includes(\"cli-session-end.js\"));\n+    expect(ours).toBeDefined();\n+    expect(ours).toMatch(/^\"[^\"]+\" \"[^\"]*cli-session-end\\.js\"$/);\n+    expect(ours).toContain(process.execPath.replace(/\\\\/g, \"/\"));\n+    expect(endCmds.some((c) => c === \"echo user-session-end\")).toBe(true);\n+\n+    execFileSync(\"node\", [\"scripts/setup.mjs\"], { cwd: REPO_ROOT, env, stdio: \"pipe\" });\n+    const hooks2 = JSON.parse(readFileSync(join(scratchHome, \".cursor\", \"hooks.json\"), \"utf8\")) as {\n+      hooks: { sessionEnd: Array<{ command: string }> };\n+    };\n+    expect(hooks2.hooks.sessionEnd.filter((e) => e.command.includes(\"cli-session-end.js\"))).toHaveLength(1);\n+\n+    for (const rel of Object.keys(realHashes)) {\n+      expect(sha256(join(realProfile, rel))).toBe(realHashes[rel]);\n+    }\n+  });\n+});"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/scripts/setup.mjs b/scripts/setup.mjs\nindex d590e41a..b5b316ed 100644\n--- a/scripts/setup.mjs\n+++ b/scripts/setup.mjs\n@@ -13,7 +13,7 @@ import path from 'node:path';\n import os from 'node:os';\n import { execSync } from 'node:child_process';\n import { createHash } from 'node:crypto';\n-import { withSessionHooks, withCursorMcp, withCursorSessionHook, repoRootFrom } from './setup-hooks.mjs';\n+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook, repoRootFrom } from './setup-hooks.mjs';\n \n const HOME = os.homedir();\n const CLAUDE_DIR = path.join(HOME, '.claude');\n@@ -22,6 +22,7 @@ const REPO_ROOT = repoRootFrom(import.meta.url);\n const OPEN_BRAIN_DIR = path.join(REPO_ROOT, 'open-brain');\n const OPEN_BRAIN_SERVER = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');\n const OPEN_BRAIN_BOOTSTRAP = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');\n+const OPEN_BRAIN_SESSION_END = path.join(OPEN_BRAIN_DIR, 'build', 'cli-session-end.js');\n \n // Status indicators\n const OK = '\\u2713';\n@@ -210,12 +211,14 @@ function registerCursorHooks() {\n     config = JSON.parse(fs.readFileSync(hooksPath, 'utf-8'));\n   }\n \n-  const r = withCursorSessionHook(config, OPEN_BRAIN_BOOTSTRAP, process.execPath);\n-  for (const n of r.notes) log(n.includes('already') ? SKIP : OK, n);\n-  if (!r.changed) return;\n+  const rStart = withCursorSessionHook(config, OPEN_BRAIN_BOOTSTRAP, process.execPath);\n+  const rEnd = withCursorSessionEndHook(rStart.config, OPEN_BRAIN_SESSION_END, process.execPath);\n+  const changed = rStart.changed || rEnd.changed;\n+  for (const n of [...rStart.notes, ...rEnd.notes]) log(n.includes('already') ? SKIP : OK, n);\n+  if (!changed) return;\n \n   ensureDir(CURSOR_DIR);\n-  fs.writeFileSync(hooksPath, JSON.stringify(r.config, null, 2) + '\\n');\n+  fs.writeFileSync(hooksPath, JSON.stringify(rEnd.config, null, 2) + '\\n');\n }\n \n function copyCursorSlashCommands() {\n"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/setup-hooks.test.ts b/open-brain/tests/setup-hooks.test.ts\nindex 92269d31..5e6ef37f 100644\n--- a/open-brain/tests/setup-hooks.test.ts\n+++ b/open-brain/tests/setup-hooks.test.ts\n@@ -7,7 +7,7 @@\n import { describe, it, expect } from \"vitest\";\n import { join } from \"node:path\";\n // @ts-expect-error — a plain .mjs module outside the TypeScript project\n-import { withSessionHooks, withCursorMcp, withCursorSessionHook } from \"../../scripts/setup-hooks.mjs\";\n+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook } from \"../../scripts/setup-hooks.mjs\";\n \n type Entry = { matcher: string; hooks: Array<{ type: string; command: string }> };\n type Settings = { hooks?: Record<string, Entry[]>; [k: string]: unknown };\n@@ -115,3 +115,59 @@ describe(\"setup.mjs Cursor registration pins the running Node (T-235 P2-1)\", ()\n     expect((once.hooks as Record<string, unknown>).stop).toEqual([{ command: \"s\" }]);\n   });\n });\n+\n+// T-235 P2-4: Cursor sessionEnd → cli-session-end.js (absolute node, idempotent, user hooks preserved).\n+describe(\"setup.mjs Cursor sessionEnd (T-235 P2-4)\", () => {\n+  const NODE = String.raw`C:\\Program Files\\nodejs\\node.exe`;\n+  const BOOT = String.raw`C:\\repo\\open-brain\\build\\cli-bootstrap.js`;\n+  const END = String.raw`C:\\repo\\open-brain\\build\\cli-session-end.js`;\n+  const hookStartCmd = `\"C:/Program Files/nodejs/node.exe\" \"C:/repo/open-brain/build/cli-bootstrap.js\" --ide cursor`;\n+  const hookEndCmd = `\"C:/Program Files/nodejs/node.exe\" \"C:/repo/open-brain/build/cli-session-end.js\"`;\n+  type Hooks = { version?: number; hooks: { sessionStart?: Array<{ command: string }>; sessionEnd?: Array<{ command: string }>; stop?: Array<{ command: string }> } };\n+  const endHook = (c: unknown, node = NODE): { config: Hooks; changed: boolean } => withCursorSessionEndHook(c, END, node);\n+\n+  it(\"adds one sessionEnd entry with the absolute node path\", () => {\n+    const r = endHook({ version: 1, hooks: {} });\n+    expect(r.config.hooks.sessionEnd).toEqual([{ command: hookEndCmd }]);\n+    expect(r.changed).toBe(true);\n+  });\n+\n+  it(\"is idempotent: a second run changes nothing and does not duplicate\", () => {\n+    const once = endHook({ version: 1, hooks: {} }).config;\n+    const twice = endHook(once);\n+    expect(twice.changed).toBe(false);\n+    expect(twice.config.hooks.sessionEnd).toHaveLength(1);\n+  });\n+\n+  it(\"preserves an existing user sessionEnd hook and upgrades a stale bare-node cli-session-end entry\", () => {\n+    const bare = `node \"C:/repo/open-brain/build/cli-session-end.js\"`;\n+    const r = endHook({\n+      version: 1,\n+      hooks: { sessionEnd: [{ command: \"echo unrelated\" }, { command: bare }] },\n+    });\n+    expect(r.changed).toBe(true);\n+    expect(r.config.hooks.sessionEnd).toEqual([{ command: \"echo unrelated\" }, { command: hookEndCmd }]);\n+  });\n+\n+  it(\"keeps sessionStart and other events when sessionEnd is added\", () => {\n+    const start = withCursorSessionHook({ version: 1, hooks: { stop: [{ command: \"s\" }] } }, BOOT, NODE).config as Hooks;\n+    const r = endHook(start);\n+    expect(r.config.hooks.sessionStart).toEqual([{ command: hookStartCmd }]);\n+    expect((r.config.hooks as { stop: unknown }).stop).toEqual([{ command: \"s\" }]);\n+    expect(r.config.hooks.sessionEnd).toEqual([{ command: hookEndCmd }]);\n+  });\n+\n+  it(\"Claude Code withSessionHooks output is independent (byte-identical across Cursor sessionEnd registration)\", () => {\n+    const claude: Settings = { hooks: { SessionStart: [{ matcher: \"\", hooks: [{ type: \"command\", command: cmd(\"cli-bootstrap.js\") }] }] } };\n+    const before = JSON.stringify(run(claude).settings);\n+    endHook({ version: 1, hooks: { sessionStart: [{ command: hookStartCmd }] } });\n+    expect(JSON.stringify(run(claude).settings)).toBe(before);\n+  });\n+\n+  it(\"mutant: treating every tree as already configured would skip registration (red on empty hooks)\", () => {\n+    const alwaysConfigured = (c: unknown) => ({ config: c as Hooks, changed: false, notes: [] as string[] });\n+    const r = alwaysConfigured({ version: 1, hooks: {} });\n+    expect((r.config.hooks.sessionEnd ?? []).length).toBe(0);\n+    expect(endHook({ version: 1, hooks: {} }).config.hooks.sessionEnd).toHaveLength(1);\n+  });\n+});",
+            "diff --git a/open-brain/tests/setup-scratch-home.test.ts b/open-brain/tests/setup-scratch-home.test.ts\nnew file mode 100644\nindex 00000000..66772338\n--- /dev/null\n+++ b/open-brain/tests/setup-scratch-home.test.ts\n@@ -0,0 +1,84 @@\n+/**\n+ * T-235 P2-4: setup.mjs under a scratch HOME — sessionEnd registered, real profile untouched.\n+ */\n+import { describe, it, expect, beforeAll, afterAll } from \"vitest\";\n+import { execFileSync } from \"node:child_process\";\n+import { createHash } from \"node:crypto\";\n+import {\n+  mkdtempSync,\n+  mkdirSync,\n+  writeFileSync,\n+  readFileSync,\n+  rmSync,\n+  existsSync,\n+} from \"node:fs\";\n+import { join, dirname } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { fileURLToPath } from \"node:url\";\n+\n+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), \"..\", \"..\");\n+\n+function sha256(file: string): string | null {\n+  if (!existsSync(file)) return null;\n+  return createHash(\"sha256\").update(readFileSync(file)).digest(\"hex\");\n+}\n+\n+describe(\"setup.mjs under scratch HOME (T-235 P2-4)\", { timeout: 180_000 }, () => {\n+  let scratchHome: string;\n+  const realProfile = process.env.USERPROFILE || process.env.HOME || \"\";\n+  const realHashes: Record<string, string | null> = {};\n+\n+  beforeAll(() => {\n+    for (const rel of [\".cursor/hooks.json\", \".cursor/mcp.json\", \".claude/settings.json\"]) {\n+      realHashes[rel] = sha256(join(realProfile, rel));\n+    }\n+    scratchHome = mkdtempSync(join(tmpdir(), \"t235-p24-home-\"));\n+    mkdirSync(join(scratchHome, \".cursor\"), { recursive: true });\n+    mkdirSync(join(scratchHome, \".claude\"), { recursive: true });\n+    writeFileSync(join(scratchHome, \".claude\", \".mcp.json\"), \"{}\\n\");\n+    writeFileSync(\n+      join(scratchHome, \".cursor\", \"hooks.json\"),\n+      JSON.stringify({\n+        version: 1,\n+        hooks: {\n+          sessionStart: [{ command: 'node \"C:/old/open-brain/build/cli-bootstrap.js\" --ide cursor' }],\n+          sessionEnd: [{ command: \"echo user-session-end\" }],\n+        },\n+      }, null, 2),\n+    );\n+    writeFileSync(join(scratchHome, \".cursor\", \"mcp.json\"), JSON.stringify({ mcpServers: { other: { command: \"foo\" } } }));\n+  });\n+\n+  afterAll(() => {\n+    rmSync(scratchHome, { recursive: true, force: true });\n+  });\n+\n+  it(\"two setup runs add one absolute sessionEnd entry and leave the user's unrelated hook\", () => {\n+    const env = {\n+      ...process.env,\n+      HOME: scratchHome,\n+      USERPROFILE: scratchHome,\n+      OPEN_BRAIN_VAULT_DIR: join(scratchHome, \"vault\"),\n+    };\n+    execFileSync(\"node\", [\"scripts/setup.mjs\"], { cwd: REPO_ROOT, env, stdio: \"pipe\" });\n+    const hooks1 = JSON.parse(readFileSync(join(scratchHome, \".cursor\", \"hooks.json\"), \"utf8\")) as {\n+      hooks: { sessionEnd: Array<{ command: string }>; sessionStart: Array<{ command: string }> };\n+    };\n+    const endCmds = hooks1.hooks.sessionEnd.map((e) => e.command);\n+    const ours = endCmds.find((c) => c.includes(\"cli-session-end.js\"));\n+    expect(ours).toBeDefined();\n+    expect(ours).toMatch(/^\"[^\"]+\" \"[^\"]*cli-session-end\\.js\"$/);\n+    expect(ours).toContain(process.execPath.replace(/\\\\/g, \"/\"));\n+    expect(endCmds.some((c) => c === \"echo user-session-end\")).toBe(true);\n+\n+    execFileSync(\"node\", [\"scripts/setup.mjs\"], { cwd: REPO_ROOT, env, stdio: \"pipe\" });\n+    const hooks2 = JSON.parse(readFileSync(join(scratchHome, \".cursor\", \"hooks.json\"), \"utf8\")) as {\n+      hooks: { sessionEnd: Array<{ command: string }> };\n+    };\n+    expect(hooks2.hooks.sessionEnd.filter((e) => e.command.includes(\"cli-session-end.js\"))).toHaveLength(1);\n+\n+    for (const rel of Object.keys(realHashes)) {\n+      expect(sha256(join(realProfile, rel))).toBe(realHashes[rel]);\n+    }\n+  });\n+});"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). Record the test result and run id above, and confirm it is the pinned head's run."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "71b2b924b1020a454e2eaa7035366c841de0f8f5",
+        "merge_commit": "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b",
+        "pr": 425,
+        "scored_sha": "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b"
+      }
+    }
+  }
+}

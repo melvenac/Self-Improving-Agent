@@ -1,0 +1,169 @@
+{
+  "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+  "candidate_sha": "d292747f8ce5e9173edfc71e5feb3f249693b147",
+  "case_id": "qa277-pr445",
+  "case_no": 77,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37197994785,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t156-scan-list.md"
+  ],
+  "label": "REJECT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. Flag any file outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. New or changed test files against master's source (red) and the head (green); quote counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). The test result and run id above, for the pinned head.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "d292747f8ce5e9173edfc71e5feb3f249693b147",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/harness/s4-g5-qa.test.ts",
+        "open-brain/tests/pipelines/sync/probe-markers.test.ts",
+        "open-brain/tests/pipelines/sync/worktree-layout.test.ts",
+        "open-brain/tests/t048-r2b.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. Flag any file outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. New or changed test files against master's source (red) and the head (green); quote counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). The test result and run id above, for the pinned head.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "77-qa277-pr445",
+        "new_capability": "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)",
+        "objective": "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+          "path": "docs/loops/qa-277-s161e-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. Flag any file outside the task.",
+          "Red then green. New or changed test files against master's source (red) and the head (green); quote counts.",
+          "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.",
+          "CI (read only). The test result and run id above, for the pinned head."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..d0d1dbad 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,13 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && !trimmed.startsWith(\"*\") && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    expect(wired(src)).toBe(true);\n   });\n });"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. Flag any file outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/s4-g5-qa.test.ts b/open-brain/tests/harness/s4-g5-qa.test.ts\nindex 859c03df..35fc7e6c 100644\n--- a/open-brain/tests/harness/s4-g5-qa.test.ts\n+++ b/open-brain/tests/harness/s4-g5-qa.test.ts\n@@ -143,6 +143,7 @@ describe(\"S4-6a — qa-score.json, its schema, and the threshold-scan guard\", {\n     const plantedPrompt = gate.replace('\"Is the artifact complete enough,', '\"Answer at least 0.6 if so. Is the artifact complete enough,');\n     expect(plantedPrompt).not.toBe(gate);\n     expect(thresholdLiterals(plantedPrompt)).toContain(\"0.6\");\n+    expect(thresholdLiterals(\"// never plant 0.6 in a prompt\")).toEqual([]);\n     const pol = readFileSync(join(SRC, \"policies.ts\"), \"utf-8\");\n     const plantedDecision = pol.replace(\"if (input.regressionOfValidated === null)\", \"if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)\");\n     expect(plantedDecision).not.toBe(pol);\n@@ -357,6 +358,7 @@ describe(\"S4-6b/6c/6d — the runner\", { timeout: 120_000 }, () => {\n       const text = readFileSync(join(SRC, f), \"utf-8\");\n       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);\n       expect(thresholdLiterals(`${text}\\nconst planted = 0.6;`)).toContain(\"0.6\");\n+      expect(thresholdLiterals(`${text}\\n// do not write 0.6 in this runner`)).toEqual([]);\n     }\n   });\n ",
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..d0d1dbad 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,13 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && !trimmed.startsWith(\"*\") && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    expect(wired(src)).toBe(true);\n   });\n });",
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..b2bef838 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,13 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && !trimmed.startsWith(\"*\") && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    expect(wired(src)).toBe(true);\n   });\n });",
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..afe21ac8 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. New or changed test files against master's source (red) and the head (green); quote counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..afe21ac8 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/s4-g5-qa.test.ts b/open-brain/tests/harness/s4-g5-qa.test.ts\nindex 859c03df..35fc7e6c 100644\n--- a/open-brain/tests/harness/s4-g5-qa.test.ts\n+++ b/open-brain/tests/harness/s4-g5-qa.test.ts\n@@ -143,6 +143,7 @@ describe(\"S4-6a — qa-score.json, its schema, and the threshold-scan guard\", {\n     const plantedPrompt = gate.replace('\"Is the artifact complete enough,', '\"Answer at least 0.6 if so. Is the artifact complete enough,');\n     expect(plantedPrompt).not.toBe(gate);\n     expect(thresholdLiterals(plantedPrompt)).toContain(\"0.6\");\n+    expect(thresholdLiterals(\"// never plant 0.6 in a prompt\")).toEqual([]);\n     const pol = readFileSync(join(SRC, \"policies.ts\"), \"utf-8\");\n     const plantedDecision = pol.replace(\"if (input.regressionOfValidated === null)\", \"if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)\");\n     expect(plantedDecision).not.toBe(pol);\n@@ -357,6 +358,7 @@ describe(\"S4-6b/6c/6d — the runner\", { timeout: 120_000 }, () => {\n       const text = readFileSync(join(SRC, f), \"utf-8\");\n       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);\n       expect(thresholdLiterals(`${text}\\nconst planted = 0.6;`)).toContain(\"0.6\");\n+      expect(thresholdLiterals(`${text}\\n// do not write 0.6 in this runner`)).toEqual([]);\n     }\n   });\n ",
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..d0d1dbad 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,13 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && !trimmed.startsWith(\"*\") && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    expect(wired(src)).toBe(true);\n   });\n });",
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..b2bef838 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,13 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && !trimmed.startsWith(\"*\") && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    expect(wired(src)).toBe(true);\n   });\n });",
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..afe21ac8 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). The test result and run id above, for the pinned head."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "merge_commit": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+        "pr": 445,
+        "scored_sha": "d292747f8ce5e9173edfc71e5feb3f249693b147"
+      }
+    }
+  }
+}

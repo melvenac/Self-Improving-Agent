@@ -1,0 +1,478 @@
+{
+  "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+  "candidate_sha": "7e92b6f641ad776d886037e54139cb0e6fd4b617",
+  "case_id": "qa261-pr302",
+  "case_no": 35,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "push",
+    "ci_run_id": 37010576779,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t048-developer-handoff.md"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "7e92b6f641ad776d886037e54139cb0e6fd4b617",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the round-2 diff with git diff ac4323f4 7e92b6f6 --stat. Name every file. One line in cli-bootstrap.ts (DC-7) is expected; quote it.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (scan-counts silent at zero;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (the hub-seats count dropped;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (the slot line deleted.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (Nothing regressed. Run the round-1 rows t048-dropped-counts.test.ts and checks-state.test.ts, plus server, recalled-ids, active-session and hub-seats. Run each one on its own. Then tsc --noEmit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (CI on the head (read only). Run gh pr checks 302.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (Merge with B4.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (On a scratch branch from origin/master, merge #289 at be32de21 first, then #302 at 7e92b6f6. #289 also touches cli-bootstrap.ts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (Report any conflict.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (Run the touched tests and tsc on the result.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Zero reaches the reader. For each site below, show the output that a seat or /sync actually prints, with nothing dropped:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (DC-3: formatRecalledResolution prints the dropped line at 0 for a file origin.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (DC-4 and DC-5: ob_start prints Session logs unreadable: 0 and Transcript directories unreadable: 0. When the scan did not run, it prints not searched or not scanned. Show that both forms appear and that they differ.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (DC-6: a passing hub-seats check ends ; 0 seat names ignored, and sync prints it (report:true).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (DC-7: the slot file carries workspace_unusable_roots. Show it written by the real hook on a scratch slot path.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (Red then green. Run t048-zero-case.test.ts and the changed cli-bootstrap.test.ts against ac4323f4's source; they should fail. Then run them on the head; they should pass. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Mutants. Re-run the developer's four:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (the if (count) guard restored;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "7e92b6f641ad776d886037e54139cb0e6fd4b617",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/pipelines/session-end/index-v2.ts",
+        "open-brain/src/pipelines/session-end/invocation-logger.ts",
+        "open-brain/src/pipelines/session-end/recalled-ids.ts",
+        "open-brain/src/pipelines/session-start/health-checks.ts",
+        "open-brain/src/pipelines/session-start/index.ts",
+        "open-brain/src/pipelines/session-start/scan-counts.ts",
+        "open-brain/src/pipelines/session-start/session-log.ts",
+        "open-brain/src/pipelines/session-start/types.ts",
+        "open-brain/src/pipelines/sync/checks-state.ts",
+        "open-brain/src/pipelines/sync/hub-seats.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/active-session.ts",
+        "open-brain/tests/cli-bootstrap.test.ts",
+        "open-brain/tests/pipelines/sync/checks-state.test.ts",
+        "open-brain/tests/t048-dropped-counts.test.ts",
+        "open-brain/tests/t048-zero-case.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the round-2 diff with git diff ac4323f4 7e92b6f6 --stat. Name every file. One line in cli-bootstrap.ts (DC-7) is expected; quote it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Zero reaches the reader. For each site below, show the output that a seat or /sync actually prints, with nothing dropped:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "DC-3: formatRecalledResolution prints the dropped line at 0 for a file origin.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "DC-4 and DC-5: ob_start prints Session logs unreadable: 0 and Transcript directories unreadable: 0. When the scan did not run, it prints not searched or not scanned. Show that both forms appear and that they differ.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "DC-6: a passing hub-seats check ends ; 0 seat names ignored, and sync prints it (report:true).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "DC-7: the slot file carries workspace_unusable_roots. Show it written by the real hook on a scratch slot path.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Red then green. Run t048-zero-case.test.ts and the changed cli-bootstrap.test.ts against ac4323f4's source; they should fail. Then run them on the head; they should pass. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Mutants. Re-run the developer's four:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "the if (count) guard restored;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "scan-counts silent at zero;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "the hub-seats count dropped;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "the slot line deleted.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Nothing regressed. Run the round-1 rows t048-dropped-counts.test.ts and checks-state.test.ts, plus server, recalled-ids, active-session and hub-seats. Run each one on its own. Then tsc --noEmit.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "CI on the head (read only). Run gh pr checks 302.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "Merge with B4.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "On a scratch branch from origin/master, merge #289 at be32de21 first, then #302 at 7e92b6f6. #289 also touches cli-bootstrap.ts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "Report any conflict.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "Run the touched tests and tsc on the result.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "35-qa261-pr302",
+        "new_capability": "QA 261: #302 round 2, the narrow re-check (T-048 dropped counts, printed at zero)",
+        "objective": "QA 261: #302 round 2, the narrow re-check (T-048 dropped counts, printed at zero)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "6c19f7858a406e6f634335b45cf0b99401dbc11f",
+          "path": "docs/loops/qa-261-302r2-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the round-2 diff with git diff ac4323f4 7e92b6f6 --stat. Name every file. One line in cli-bootstrap.ts (DC-7) is expected; quote it.",
+          "Zero reaches the reader. For each site below, show the output that a seat or /sync actually prints, with nothing dropped:",
+          "DC-3: formatRecalledResolution prints the dropped line at 0 for a file origin.",
+          "DC-4 and DC-5: ob_start prints Session logs unreadable: 0 and Transcript directories unreadable: 0. When the scan did not run, it prints not searched or not scanned. Show that both forms appear and that they differ.",
+          "DC-6: a passing hub-seats check ends ; 0 seat names ignored, and sync prints it (report:true).",
+          "DC-7: the slot file carries workspace_unusable_roots. Show it written by the real hook on a scratch slot path.",
+          "Red then green. Run t048-zero-case.test.ts and the changed cli-bootstrap.test.ts against ac4323f4's source; they should fail. Then run them on the head; they should pass. Quote the counts.",
+          "Mutants. Re-run the developer's four:",
+          "the if (count) guard restored;",
+          "scan-counts silent at zero;",
+          "the hub-seats count dropped;",
+          "the slot line deleted.",
+          "Nothing regressed. Run the round-1 rows t048-dropped-counts.test.ts and checks-state.test.ts, plus server, recalled-ids, active-session and hub-seats. Run each one on its own. Then tsc --noEmit.",
+          "CI on the head (read only). Run gh pr checks 302.",
+          "Merge with B4.",
+          "On a scratch branch from origin/master, merge #289 at be32de21 first, then #302 at 7e92b6f6. #289 also touches cli-bootstrap.ts.",
+          "Report any conflict.",
+          "Run the touched tests and tsc on the result."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-bootstrap.ts b/open-brain/src/cli-bootstrap.ts\nindex 6b49821c..c8be1ddb 100644\n--- a/open-brain/src/cli-bootstrap.ts\n+++ b/open-brain/src/cli-bootstrap.ts\n@@ -228,6 +228,7 @@ try {\n     // than re-argued.\n     dir_source: workspace.dir_source,\n     workspace_root_count: workspace.root_count,\n+    workspace_unusable_roots: workspace.unusable_roots,\n     ...resolveAgentIdentity(payload),\n   });\n } catch { /* provenance is best-effort — never fail session start */ }",
+            "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..36bbb92a 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..5cc9f590 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -10,6 +10,8 @@ export interface HealthWarning {\n \n export interface HealthCheckResult {\n   warnings: HealthWarning[];\n+  /** T-048: transcript directories that could not be listed; null when ~/.claude/projects was not scanned. */\n+  transcriptDirsUnreadable: number | null;\n }\n \n /**\n@@ -18,6 +20,7 @@ export interface HealthCheckResult {\n  */\n export function runHealthChecks(homePath: string): HealthCheckResult {\n   const warnings: HealthWarning[] = [];\n+  let transcriptDirsUnreadable: number | null = null;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex b5e1deb0..f01c7b73 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -27,7 +27,17 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {\n       // Absent is not silent: the caller prints this instead of a blank block.\n       session.skippedReason = \"no .agents/SESSIONS/ dir — log not created\";\n     } else {\n-      const existing = findExistingSessionLog(options.projectRoot, sessionId);\n+      const unreadableLogs: string[] = [];\n+      let searched = false;\n+      searched = sessionId !== null && sessionId !== \"\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/scan-counts.ts b/open-brain/src/pipelines/session-start/scan-counts.ts\nnew file mode 100644\nindex 00000000..f9d1720f\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/scan-counts.ts\n@@ -0,0 +1,19 @@\n+import type { HealthCheckResult, SessionInfo } from \"./types.js\";\n+\n+/**\n+ * T-048 round 2: what the two scans in `ob_start` could not read, printed at zero as well.\n+ *\n+ * The first round warned only when the count was above zero, which leaves \"nothing was unreadable\" and \"the scan did\n+ * not run\" looking the same (no line). A count that exists only when it is non-zero is the collapse the invariant names.\n+ * Each line says a number, or says the scan did not run and why.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex f2d4dda1..6ca81537 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {\n  */\n export function findExistingSessionLog(\n   projectRoot: string,\n-  sessionId: string | null\n+  sessionId: string | null,\n+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */\n+  onUnreadable?: (name: string) => void\n ): { sessionNumber: number; logPath: string } | null {\n   if (!sessionId) return null;\n   const sessionsDir = join(projectRoot, \".agents\", \"SESSIONS\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/types.ts b/open-brain/src/pipelines/session-start/types.ts\nindex e963ad86..757941fd 100644\n--- a/open-brain/src/pipelines/session-start/types.ts\n+++ b/open-brain/src/pipelines/session-start/types.ts\n@@ -94,10 +94,14 @@ export interface SessionInfo {\n   skippedReason: string | null;\n   /** Where sessionNumber came from when the log was created (T-164). Omitted when reused or skipped. */\n   sessionNumberSource?: SessionNumberSource;\n+  /** T-048: Session_N.md files that could not be read during the existing-log search. Undefined when no search ran (no session id). */\n+  unreadableLogs?: number;\n }\n \n export interface HealthCheckResult {\n   warnings: Array<{ category: string; message: string }>;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..e05f97dc 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the round-2 diff with git diff ac4323f4 7e92b6f6 --stat. Name every file. One line in cli-bootstrap.ts (DC-7) is expected; quote it."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..e05f97dc 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..8fea7d1b\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-zero-case.test.ts b/open-brain/tests/t048-zero-case.test.ts\nnew file mode 100644\nindex 00000000..613ea0e5\n--- /dev/null\n+++ b/open-brain/tests/t048-zero-case.test.ts\n@@ -0,0 +1,84 @@\n+/**\n+ * T-048 round 2 (QA 258 row 9): absent and zero must not collapse FOR THE READER. Round 1 printed a count only when it\n+ * was above zero, so \"nothing was unreadable\" and \"the scan did not run\" produced the same silence. Each row here is the\n+ * ZERO case (and the did-not-run case) of a site round 1 fixed.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { sessionStart } from \"../src/pipelines/session-start/index.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Zero reaches the reader. For each site below, show the output that a seat or /sync actually prints, with nothing dropped:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..36bbb92a 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..5cc9f590 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -10,6 +10,8 @@ export interface HealthWarning {\n \n export interface HealthCheckResult {\n   warnings: HealthWarning[];\n+  /** T-048: transcript directories that could not be listed; null when ~/.claude/projects was not scanned. */\n+  transcriptDirsUnreadable: number | null;\n }\n \n /**\n@@ -18,6 +20,7 @@ export interface HealthCheckResult {\n  */\n export function runHealthChecks(homePath: string): HealthCheckResult {\n   const warnings: HealthWarning[] = [];\n+  let transcriptDirsUnreadable: number | null = null;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex b5e1deb0..f01c7b73 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -27,7 +27,17 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {\n       // Absent is not silent: the caller prints this instead of a blank block.\n       session.skippedReason = \"no .agents/SESSIONS/ dir — log not created\";\n     } else {\n-      const existing = findExistingSessionLog(options.projectRoot, sessionId);\n+      const unreadableLogs: string[] = [];\n+      let searched = false;\n+      searched = sessionId !== null && sessionId !== \"\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/scan-counts.ts b/open-brain/src/pipelines/session-start/scan-counts.ts\nnew file mode 100644\nindex 00000000..f9d1720f\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/scan-counts.ts\n@@ -0,0 +1,19 @@\n+import type { HealthCheckResult, SessionInfo } from \"./types.js\";\n+\n+/**\n+ * T-048 round 2: what the two scans in `ob_start` could not read, printed at zero as well.\n+ *\n+ * The first round warned only when the count was above zero, which leaves \"nothing was unreadable\" and \"the scan did\n+ * not run\" looking the same (no line). A count that exists only when it is non-zero is the collapse the invariant names.\n+ * Each line says a number, or says the scan did not run and why.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex f2d4dda1..6ca81537 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {\n  */\n export function findExistingSessionLog(\n   projectRoot: string,\n-  sessionId: string | null\n+  sessionId: string | null,\n+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */\n+  onUnreadable?: (name: string) => void\n ): { sessionNumber: number; logPath: string } | null {\n   if (!sessionId) return null;\n   const sessionsDir = join(projectRoot, \".agents\", \"SESSIONS\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/types.ts b/open-brain/src/pipelines/session-start/types.ts\nindex e963ad86..757941fd 100644\n--- a/open-brain/src/pipelines/session-start/types.ts\n+++ b/open-brain/src/pipelines/session-start/types.ts\n@@ -94,10 +94,14 @@ export interface SessionInfo {\n   skippedReason: string | null;\n   /** Where sessionNumber came from when the log was created (T-164). Omitted when reused or skipped. */\n   sessionNumberSource?: SessionNumberSource;\n+  /** T-048: Session_N.md files that could not be read during the existing-log search. Undefined when no search ran (no session id). */\n+  unreadableLogs?: number;\n }\n \n export interface HealthCheckResult {\n   warnings: Array<{ category: string; message: string }>;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..e05f97dc 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..8fea7d1b\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "DC-3: formatRecalledResolution prints the dropped line at 0 for a file origin."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..36bbb92a 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..5cc9f590 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -10,6 +10,8 @@ export interface HealthWarning {\n \n export interface HealthCheckResult {\n   warnings: HealthWarning[];\n+  /** T-048: transcript directories that could not be listed; null when ~/.claude/projects was not scanned. */\n+  transcriptDirsUnreadable: number | null;\n }\n \n /**\n@@ -18,6 +20,7 @@ export interface HealthCheckResult {\n  */\n export function runHealthChecks(homePath: string): HealthCheckResult {\n   const warnings: HealthWarning[] = [];\n+  let transcriptDirsUnreadable: number | null = null;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex b5e1deb0..f01c7b73 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -27,7 +27,17 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {\n       // Absent is not silent: the caller prints this instead of a blank block.\n       session.skippedReason = \"no .agents/SESSIONS/ dir — log not created\";\n     } else {\n-      const existing = findExistingSessionLog(options.projectRoot, sessionId);\n+      const unreadableLogs: string[] = [];\n+      let searched = false;\n+      searched = sessionId !== null && sessionId !== \"\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/scan-counts.ts b/open-brain/src/pipelines/session-start/scan-counts.ts\nnew file mode 100644\nindex 00000000..f9d1720f\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/scan-counts.ts\n@@ -0,0 +1,19 @@\n+import type { HealthCheckResult, SessionInfo } from \"./types.js\";\n+\n+/**\n+ * T-048 round 2: what the two scans in `ob_start` could not read, printed at zero as well.\n+ *\n+ * The first round warned only when the count was above zero, which leaves \"nothing was unreadable\" and \"the scan did\n+ * not run\" looking the same (no line). A count that exists only when it is non-zero is the collapse the invariant names.\n+ * Each line says a number, or says the scan did not run and why.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex f2d4dda1..6ca81537 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {\n  */\n export function findExistingSessionLog(\n   projectRoot: string,\n-  sessionId: string | null\n+  sessionId: string | null,\n+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */\n+  onUnreadable?: (name: string) => void\n ): { sessionNumber: number; logPath: string } | null {\n   if (!sessionId) return null;\n   const sessionsDir = join(projectRoot, \".agents\", \"SESSIONS\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/types.ts b/open-brain/src/pipelines/session-start/types.ts\nindex e963ad86..757941fd 100644\n--- a/open-brain/src/pipelines/session-start/types.ts\n+++ b/open-brain/src/pipelines/session-start/types.ts\n@@ -94,10 +94,14 @@ export interface SessionInfo {\n   skippedReason: string | null;\n   /** Where sessionNumber came from when the log was created (T-164). Omitted when reused or skipped. */\n   sessionNumberSource?: SessionNumberSource;\n+  /** T-048: Session_N.md files that could not be read during the existing-log search. Undefined when no search ran (no session id). */\n+  unreadableLogs?: number;\n }\n \n export interface HealthCheckResult {\n   warnings: Array<{ category: string; message: string }>;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/shared/active-session.ts b/open-brain/src/shared/active-session.ts\nindex 0421b729..9cc474f9 100644\n--- a/open-brain/src/shared/active-session.ts\n+++ b/open-brain/src/shared/active-session.ts\n@@ -53,6 +53,8 @@ export interface ActiveSessionEntry {\n   dir_source?: string;\n   /** How many workspace roots the payload offered. 0 with the key present is the bug. */\n   workspace_root_count?: number;\n+  /** T-048: workspace_roots entries present but unusable (0 when none). Beside workspace_root_count so a reader can tell 'one root' from 'three roots, two unusable'. */\n+  workspace_unusable_roots?: number;\n   /** Model that drove the session, when the host reports one. */\n   model?: string;\n   /** Host CLI/app version, when reported. Lets a harness regression be dated. */\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "DC-4 and DC-5: ob_start prints Session logs unreadable: 0 and Transcript directories unreadable: 0. When the scan did not run, it prints not searched or not scanned. Show that both forms appear and that they differ."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..5cc9f590 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -10,6 +10,8 @@ export interface HealthWarning {\n \n export interface HealthCheckResult {\n   warnings: HealthWarning[];\n+  /** T-048: transcript directories that could not be listed; null when ~/.claude/projects was not scanned. */\n+  transcriptDirsUnreadable: number | null;\n }\n \n /**\n@@ -18,6 +20,7 @@ export interface HealthCheckResult {\n  */\n export function runHealthChecks(homePath: string): HealthCheckResult {\n   const warnings: HealthWarning[] = [];\n+  let transcriptDirsUnreadable: number | null = null;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..e05f97dc 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "DC-6: a passing hub-seats check ends ; 0 seat names ignored, and sync prints it (report:true)."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "DC-7: the slot file carries workspace_unusable_roots. Show it written by the real hook on a scratch slot path."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/scan-counts.ts b/open-brain/src/pipelines/session-start/scan-counts.ts\nnew file mode 100644\nindex 00000000..f9d1720f\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/scan-counts.ts\n@@ -0,0 +1,19 @@\n+import type { HealthCheckResult, SessionInfo } from \"./types.js\";\n+\n+/**\n+ * T-048 round 2: what the two scans in `ob_start` could not read, printed at zero as well.\n+ *\n+ * The first round warned only when the count was above zero, which leaves \"nothing was unreadable\" and \"the scan did\n+ * not run\" looking the same (no line). A count that exists only when it is non-zero is the collapse the invariant names.\n+ * Each line says a number, or says the scan did not run and why.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/cli-bootstrap.test.ts b/open-brain/tests/cli-bootstrap.test.ts\nindex 6e06296d..757b7a54 100644\n--- a/open-brain/tests/cli-bootstrap.test.ts\n+++ b/open-brain/tests/cli-bootstrap.test.ts\n@@ -1,6 +1,6 @@\n import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n import { spawnAsync } from \"./spawn-async.js\";\n-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from \"node:fs\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync, readFileSync } from \"node:fs\";\n import { join, resolve } from \"node:path\";\n import { tmpdir } from \"node:os\";\n import { createRequire } from \"node:module\";\n@@ -171,6 +171,16 @@ describe(\"cli-bootstrap SESSION_UUID contract\", { timeout: 30_000 }, () => {\n     expect(existsSync(slotPath)).toBe(false);\n   });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..8fea7d1b\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-zero-case.test.ts b/open-brain/tests/t048-zero-case.test.ts\nnew file mode 100644\nindex 00000000..613ea0e5\n--- /dev/null\n+++ b/open-brain/tests/t048-zero-case.test.ts\n@@ -0,0 +1,84 @@\n+/**\n+ * T-048 round 2 (QA 258 row 9): absent and zero must not collapse FOR THE READER. Round 1 printed a count only when it\n+ * was above zero, so \"nothing was unreadable\" and \"the scan did not run\" produced the same silence. Each row here is the\n+ * ZERO case (and the did-not-run case) of a site round 1 fixed.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { sessionStart } from \"../src/pipelines/session-start/index.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "Red then green. Run t048-zero-case.test.ts and the changed cli-bootstrap.test.ts against ac4323f4's source; they should fail. Then run them on the head; they should pass. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..5cc9f590 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -10,6 +10,8 @@ export interface HealthWarning {\n \n export interface HealthCheckResult {\n   warnings: HealthWarning[];\n+  /** T-048: transcript directories that could not be listed; null when ~/.claude/projects was not scanned. */\n+  transcriptDirsUnreadable: number | null;\n }\n \n /**\n@@ -18,6 +20,7 @@ export interface HealthCheckResult {\n  */\n export function runHealthChecks(homePath: string): HealthCheckResult {\n   const warnings: HealthWarning[] = [];\n+  let transcriptDirsUnreadable: number | null = null;\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "Mutants. Re-run the developer's four:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/scan-counts.ts b/open-brain/src/pipelines/session-start/scan-counts.ts\nnew file mode 100644\nindex 00000000..f9d1720f\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/scan-counts.ts\n@@ -0,0 +1,19 @@\n+import type { HealthCheckResult, SessionInfo } from \"./types.js\";\n+\n+/**\n+ * T-048 round 2: what the two scans in `ob_start` could not read, printed at zero as well.\n+ *\n+ * The first round warned only when the count was above zero, which leaves \"nothing was unreadable\" and \"the scan did\n+ * not run\" looking the same (no line). A count that exists only when it is non-zero is the collapse the invariant names.\n+ * Each line says a number, or says the scan did not run and why.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..8fea7d1b\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "the if (count) guard restored;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/scan-counts.ts b/open-brain/src/pipelines/session-start/scan-counts.ts\nnew file mode 100644\nindex 00000000..f9d1720f\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/scan-counts.ts\n@@ -0,0 +1,19 @@\n+import type { HealthCheckResult, SessionInfo } from \"./types.js\";\n+\n+/**\n+ * T-048 round 2: what the two scans in `ob_start` could not read, printed at zero as well.\n+ *\n+ * The first round warned only when the count was above zero, which leaves \"nothing was unreadable\" and \"the scan did\n+ * not run\" looking the same (no line). A count that exists only when it is non-zero is the collapse the invariant names.\n+ * Each line says a number, or says the scan did not run and why.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-zero-case.test.ts b/open-brain/tests/t048-zero-case.test.ts\nnew file mode 100644\nindex 00000000..613ea0e5\n--- /dev/null\n+++ b/open-brain/tests/t048-zero-case.test.ts\n@@ -0,0 +1,84 @@\n+/**\n+ * T-048 round 2 (QA 258 row 9): absent and zero must not collapse FOR THE READER. Round 1 printed a count only when it\n+ * was above zero, so \"nothing was unreadable\" and \"the scan did not run\" produced the same silence. Each row here is the\n+ * ZERO case (and the did-not-run case) of a site round 1 fixed.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { sessionStart } from \"../src/pipelines/session-start/index.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "scan-counts silent at zero;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/scan-counts.ts b/open-brain/src/pipelines/session-start/scan-counts.ts\nnew file mode 100644\nindex 00000000..f9d1720f\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/scan-counts.ts\n@@ -0,0 +1,19 @@\n+import type { HealthCheckResult, SessionInfo } from \"./types.js\";\n+\n+/**\n+ * T-048 round 2: what the two scans in `ob_start` could not read, printed at zero as well.\n+ *\n+ * The first round warned only when the count was above zero, which leaves \"nothing was unreadable\" and \"the scan did\n+ * not run\" looking the same (no line). A count that exists only when it is non-zero is the collapse the invariant names.\n+ * Each line says a number, or says the scan did not run and why.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..e05f97dc 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..8fea7d1b\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "the hub-seats count dropped;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..36bbb92a 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..5cc9f590 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -10,6 +10,8 @@ export interface HealthWarning {\n \n export interface HealthCheckResult {\n   warnings: HealthWarning[];\n+  /** T-048: transcript directories that could not be listed; null when ~/.claude/projects was not scanned. */\n+  transcriptDirsUnreadable: number | null;\n }\n \n /**\n@@ -18,6 +20,7 @@ export interface HealthCheckResult {\n  */\n export function runHealthChecks(homePath: string): HealthCheckResult {\n   const warnings: HealthWarning[] = [];\n+  let transcriptDirsUnreadable: number | null = null;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex b5e1deb0..f01c7b73 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -27,7 +27,17 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {\n       // Absent is not silent: the caller prints this instead of a blank block.\n       session.skippedReason = \"no .agents/SESSIONS/ dir — log not created\";\n     } else {\n-      const existing = findExistingSessionLog(options.projectRoot, sessionId);\n+      const unreadableLogs: string[] = [];\n+      let searched = false;\n+      searched = sessionId !== null && sessionId !== \"\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/scan-counts.ts b/open-brain/src/pipelines/session-start/scan-counts.ts\nnew file mode 100644\nindex 00000000..f9d1720f\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/scan-counts.ts\n@@ -0,0 +1,19 @@\n+import type { HealthCheckResult, SessionInfo } from \"./types.js\";\n+\n+/**\n+ * T-048 round 2: what the two scans in `ob_start` could not read, printed at zero as well.\n+ *\n+ * The first round warned only when the count was above zero, which leaves \"nothing was unreadable\" and \"the scan did\n+ * not run\" looking the same (no line). A count that exists only when it is non-zero is the collapse the invariant names.\n+ * Each line says a number, or says the scan did not run and why.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex f2d4dda1..6ca81537 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {\n  */\n export function findExistingSessionLog(\n   projectRoot: string,\n-  sessionId: string | null\n+  sessionId: string | null,\n+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */\n+  onUnreadable?: (name: string) => void\n ): { sessionNumber: number; logPath: string } | null {\n   if (!sessionId) return null;\n   const sessionsDir = join(projectRoot, \".agents\", \"SESSIONS\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/types.ts b/open-brain/src/pipelines/session-start/types.ts\nindex e963ad86..757941fd 100644\n--- a/open-brain/src/pipelines/session-start/types.ts\n+++ b/open-brain/src/pipelines/session-start/types.ts\n@@ -94,10 +94,14 @@ export interface SessionInfo {\n   skippedReason: string | null;\n   /** Where sessionNumber came from when the log was created (T-164). Omitted when reused or skipped. */\n   sessionNumberSource?: SessionNumberSource;\n+  /** T-048: Session_N.md files that could not be read during the existing-log search. Undefined when no search ran (no session id). */\n+  unreadableLogs?: number;\n }\n \n export interface HealthCheckResult {\n   warnings: Array<{ category: string; message: string }>;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..e05f97dc 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "the slot line deleted."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..36bbb92a 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..e05f97dc 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..7e47893e 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -29,6 +29,7 @@ import { readAgentIdentity, readStandingCron } from \"./pipelines/session-start/a\n import { describeHubPresence } from \"./pipelines/session-start/hub-presence.js\";\n import { countWords, estimateTokens } from \"./pipelines/session-start/state-reader.js\";\n import { renderState } from \"./pipelines/session-start/state-render.js\";\n+import { formatScanCounts } from \"./pipelines/session-start/scan-counts.js\";\n import { resolveRepoRoot, describeNoRoot } from \"./shared/repo-root.js\";\n import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from \"./shared/state-writer.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/shared/active-session.ts b/open-brain/src/shared/active-session.ts\nindex 0421b729..9cc474f9 100644\n--- a/open-brain/src/shared/active-session.ts\n+++ b/open-brain/src/shared/active-session.ts\n@@ -53,6 +53,8 @@ export interface ActiveSessionEntry {\n   dir_source?: string;\n   /** How many workspace roots the payload offered. 0 with the key present is the bug. */\n   workspace_root_count?: number;\n+  /** T-048: workspace_roots entries present but unusable (0 when none). Beside workspace_root_count so a reader can tell 'one root' from 'three roots, two unusable'. */\n+  workspace_unusable_roots?: number;\n   /** Model that drove the session, when the host reports one. */\n   model?: string;\n   /** Host CLI/app version, when reported. Lets a harness regression be dated. */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..8fea7d1b\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "Nothing regressed. Run the round-1 rows t048-dropped-counts.test.ts and checks-state.test.ts, plus server, recalled-ids, active-session and hub-seats. Run each one on its own. Then tsc --noEmit."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..5cc9f590 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -10,6 +10,8 @@ export interface HealthWarning {\n \n export interface HealthCheckResult {\n   warnings: HealthWarning[];\n+  /** T-048: transcript directories that could not be listed; null when ~/.claude/projects was not scanned. */\n+  transcriptDirsUnreadable: number | null;\n }\n \n /**\n@@ -18,6 +20,7 @@ export interface HealthCheckResult {\n  */\n export function runHealthChecks(homePath: string): HealthCheckResult {\n   const warnings: HealthWarning[] = [];\n+  let transcriptDirsUnreadable: number | null = null;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "CI on the head (read only). Run gh pr checks 302."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/t048-zero-case.test.ts b/open-brain/tests/t048-zero-case.test.ts\nnew file mode 100644\nindex 00000000..613ea0e5\n--- /dev/null\n+++ b/open-brain/tests/t048-zero-case.test.ts\n@@ -0,0 +1,84 @@\n+/**\n+ * T-048 round 2 (QA 258 row 9): absent and zero must not collapse FOR THE READER. Round 1 printed a count only when it\n+ * was above zero, so \"nothing was unreadable\" and \"the scan did not run\" produced the same silence. Each row here is the\n+ * ZERO case (and the did-not-run case) of a site round 1 fixed.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { sessionStart } from \"../src/pipelines/session-start/index.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "Merge with B4."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-bootstrap.ts b/open-brain/src/cli-bootstrap.ts\nindex 6b49821c..c8be1ddb 100644\n--- a/open-brain/src/cli-bootstrap.ts\n+++ b/open-brain/src/cli-bootstrap.ts\n@@ -228,6 +228,7 @@ try {\n     // than re-argued.\n     dir_source: workspace.dir_source,\n     workspace_root_count: workspace.root_count,\n+    workspace_unusable_roots: workspace.unusable_roots,\n     ...resolveAgentIdentity(payload),\n   });\n } catch { /* provenance is best-effort — never fail session start */ }"
+          ],
+          "id": "T16",
+          "observable": "On a scratch branch from origin/master, merge #289 at be32de21 first, then #302 at 7e92b6f6. #289 also touches cli-bootstrap.ts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "Report any conflict."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/cli-bootstrap.test.ts b/open-brain/tests/cli-bootstrap.test.ts\nindex 6e06296d..757b7a54 100644\n--- a/open-brain/tests/cli-bootstrap.test.ts\n+++ b/open-brain/tests/cli-bootstrap.test.ts\n@@ -1,6 +1,6 @@\n import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n import { spawnAsync } from \"./spawn-async.js\";\n-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from \"node:fs\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync, readFileSync } from \"node:fs\";\n import { join, resolve } from \"node:path\";\n import { tmpdir } from \"node:os\";\n import { createRequire } from \"node:module\";\n@@ -171,6 +171,16 @@ describe(\"cli-bootstrap SESSION_UUID contract\", { timeout: 30_000 }, () => {\n     expect(existsSync(slotPath)).toBe(false);\n   });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..8fea7d1b\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-zero-case.test.ts b/open-brain/tests/t048-zero-case.test.ts\nnew file mode 100644\nindex 00000000..613ea0e5\n--- /dev/null\n+++ b/open-brain/tests/t048-zero-case.test.ts\n@@ -0,0 +1,84 @@\n+/**\n+ * T-048 round 2 (QA 258 row 9): absent and zero must not collapse FOR THE READER. Round 1 printed a count only when it\n+ * was above zero, so \"nothing was unreadable\" and \"the scan did not run\" produced the same silence. Each row here is the\n+ * ZERO case (and the did-not-run case) of a site round 1 fixed.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { sessionStart } from \"../src/pipelines/session-start/index.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "Run the touched tests and tsc on the result."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+        "merge_commit": "7e92b6f641ad776d886037e54139cb0e6fd4b617",
+        "pr": 302,
+        "scored_sha": "7e92b6f641ad776d886037e54139cb0e6fd4b617"
+      }
+    }
+  }
+}

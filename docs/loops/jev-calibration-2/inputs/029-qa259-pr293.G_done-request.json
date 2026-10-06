@@ -1,0 +1,481 @@
+{
+  "base_sha": "9f6d20df3f97db45431dff95911f92ffcad47266",
+  "candidate_sha": "58e0ce15eb5871c50eb01794c007a9a842fc5acb",
+  "case_id": "qa259-pr293",
+  "case_no": 29,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37003859495,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "baa7e3027f1dbeb8a3e808d7d7eaf1ef5f7992b9",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files each PR's own commits touch beyond master.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (The template example, read at test time, gives status_to is an unfilled placeholder (<agent-name>).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (#293.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (On master, ci.yml's groups are ci-pr-<number>, ci-push-<sha> and ci-dispatch-<run_id>. Show that the new row asserts exactly these strings.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (The same digits used as a PR number, a SHA and a run id give three distinct groups.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (Apply each mutant to ci.yml in your tree only, then restore it. Mutant M1: the PR group loses pr-. Mutant M2: the push group gains pr-. Each must turn the new row red while #310's own T-227 row stays green.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (#320.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (Every copy that carries the hub-talk wait sentence states rc 0 to 3 as relay's table gives them. Find the copies with git grep -n \"wait-timeout 3500\".), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (rc 3's text includes the stderr line [hub-talk] retry status=<code|network> retry-after=<seconds|unknown>, the retry-after wait, the 5 s doubling to 60 s backoff, and the stop after 5 consecutive rc 3 over 2 minutes with no retry-after.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (The two hub-room.mdc files are byte-identical.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (start-parity, command-parity, mirror-parity and hub-seats pass.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the new or changed test files against master's source (they fail) and against the head (they pass). Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (The cursor-start-differences.json change only replaces the hub-room entry.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #293, #292, #320.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (Report any conflict.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (Run the touched test files one per invocation, and run tsc --noEmit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head (read only). Run gh pr checks <n> and quote the test result and the run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#292.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (At the head, read cat -A of PLACEHOLDER in agent-identity.ts. It must read /<[^<>\\s]+>/.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (These values count as placeholders: <status>, <seat>, <sia-status-recipient>.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (The prose a < b > c does not count as a placeholder.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (An absent key still says \"missing\".), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "58e0ce15eb5871c50eb01794c007a9a842fc5acb",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/pipelines/sync/ci-runs-on.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files each PR's own commits touch beyond master.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the new or changed test files against master's source (they fail) and against the head (they pass). Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head (read only). Run gh pr checks <n> and quote the test result and the run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#292.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "At the head, read cat -A of PLACEHOLDER in agent-identity.ts. It must read /<[^<>\\s]+>/.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "These values count as placeholders: <status>, <seat>, <sia-status-recipient>.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The prose a < b > c does not count as a placeholder.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "An absent key still says \"missing\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "The template example, read at test time, gives status_to is an unfilled placeholder (<agent-name>).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "#293.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "On master, ci.yml's groups are ci-pr-<number>, ci-push-<sha> and ci-dispatch-<run_id>. Show that the new row asserts exactly these strings.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "The same digits used as a PR number, a SHA and a run id give three distinct groups.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Apply each mutant to ci.yml in your tree only, then restore it. Mutant M1: the PR group loses pr-. Mutant M2: the push group gains pr-. Each must turn the new row red while #310's own T-227 row stays green.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "#320.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Every copy that carries the hub-talk wait sentence states rc 0 to 3 as relay's table gives them. Find the copies with git grep -n \"wait-timeout 3500\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "rc 3's text includes the stderr line [hub-talk] retry status=<code|network> retry-after=<seconds|unknown>, the retry-after wait, the 5 s doubling to 60 s backoff, and the stop after 5 consecutive rc 3 over 2 minutes with no retry-after.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "The two hub-room.mdc files are byte-identical.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "start-parity, command-parity, mirror-parity and hub-seats pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "The cursor-start-differences.json change only replaces the hub-room entry.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #293, #292, #320.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "Report any conflict.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "Run the touched test files one per invocation, and run tsc --noEmit.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "29-qa259-pr293",
+        "new_capability": "QA 259, batch B5: placeholder reason, CI group pin, hub-talk exit codes (#292, #293, #320)",
+        "objective": "QA 259, batch B5: placeholder reason, CI group pin, hub-talk exit codes (#292, #293, #320)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "3167a3ed0416ebf461eaf5dfc9fe9d0a90acbe76",
+          "path": "docs/loops/qa-259-b5-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files each PR's own commits touch beyond master.",
+          "Red then green. Run the new or changed test files against master's source (they fail) and against the head (they pass). Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head (read only). Run gh pr checks <n> and quote the test result and the run id.",
+          "#292.",
+          "At the head, read cat -A of PLACEHOLDER in agent-identity.ts. It must read /<[^<>\\s]+>/.",
+          "These values count as placeholders: <status>, <seat>, <sia-status-recipient>.",
+          "The prose a < b > c does not count as a placeholder.",
+          "An absent key still says \"missing\".",
+          "The template example, read at test time, gives status_to is an unfilled placeholder (<agent-name>).",
+          "#293.",
+          "On master, ci.yml's groups are ci-pr-<number>, ci-push-<sha> and ci-dispatch-<run_id>. Show that the new row asserts exactly these strings.",
+          "The same digits used as a PR number, a SHA and a run id give three distinct groups.",
+          "Apply each mutant to ci.yml in your tree only, then restore it. Mutant M1: the PR group loses pr-. Mutant M2: the push group gains pr-. Each must turn the new row red while #310's own T-227 row stays green.",
+          "#320.",
+          "Every copy that carries the hub-talk wait sentence states rc 0 to 3 as relay's table gives them. Find the copies with git grep -n \"wait-timeout 3500\".",
+          "rc 3's text includes the stderr line [hub-talk] retry status=<code|network> retry-after=<seconds|unknown>, the retry-after wait, the 5 s doubling to 60 s backoff, and the stop after 5 consecutive rc 3 over 2 minutes with no retry-after.",
+          "The two hub-room.mdc files are byte-identical.",
+          "start-parity, command-parity, mirror-parity and hub-seats pass.",
+          "The cursor-start-differences.json change only replaces the hub-room entry.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #293, #292, #320.",
+          "Report any conflict.",
+          "Run the touched test files one per invocation, and run tsc --noEmit."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files each PR's own commits touch beyond master."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the new or changed test files against master's source (they fail) and against the head (they pass). Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T4",
+          "observable": "CI on the head (read only). Run gh pr checks <n> and quote the test result and the run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T5",
+          "observable": "#292."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T6",
+          "observable": "At the head, read cat -A of PLACEHOLDER in agent-identity.ts. It must read /<[^<>\\s]+>/."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T7",
+          "observable": "These values count as placeholders: <status>, <seat>, <sia-status-recipient>."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T8",
+          "observable": "The prose a < b > c does not count as a placeholder."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T9",
+          "observable": "An absent key still says \"missing\"."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T10",
+          "observable": "The template example, read at test time, gives status_to is an unfilled placeholder (<agent-name>)."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T11",
+          "observable": "#293."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T12",
+          "observable": "On master, ci.yml's groups are ci-pr-<number>, ci-push-<sha> and ci-dispatch-<run_id>. Show that the new row asserts exactly these strings."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T13",
+          "observable": "The same digits used as a PR number, a SHA and a run id give three distinct groups."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T14",
+          "observable": "Apply each mutant to ci.yml in your tree only, then restore it. Mutant M1: the PR group loses pr-. Mutant M2: the push group gains pr-. Each must turn the new row red while #310's own T-227 row stays green."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T15",
+          "observable": "#320."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T16",
+          "observable": "Every copy that carries the hub-talk wait sentence states rc 0 to 3 as relay's table gives them. Find the copies with git grep -n \"wait-timeout 3500\"."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T17",
+          "observable": "rc 3's text includes the stderr line [hub-talk] retry status=<code|network> retry-after=<seconds|unknown>, the retry-after wait, the 5 s doubling to 60 s backoff, and the stop after 5 consecutive rc 3 over 2 minutes with no retry-after."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T18",
+          "observable": "The two hub-room.mdc files are byte-identical."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T19",
+          "observable": "start-parity, command-parity, mirror-parity and hub-seats pass."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T20",
+          "observable": "The cursor-start-differences.json change only replaces the hub-room entry."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T21",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #293, #292, #320."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T22",
+          "observable": "Report any conflict."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\nindex 7adaa865..408e0b3e 100644\n--- a/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n+++ b/open-brain/tests/pipelines/sync/ci-runs-on.test.ts\n@@ -394,6 +394,27 @@ describe(\"ci.yml runs-on (T-192)\", () => {\n     expect([d1, d2]).not.toContain(m1);\n   });\n \n+  it(\"T-223: the concurrency group strings are EXACT, and no run kind can land in another kind's group\", () => {\n+    const group = String(workflow().concurrency?.group ?? \"\");\n+    const grp = (ctx: Partial<Ctx> & { event: string; ref: string }) => String(evalRunsOn(group, { ...ctx }));\n+    const pr = (n: string, sha = \"aaa\") => grp({ event: \"pull_request\", ref: `refs/pull/${n}/merge`, headRef: \"loop/x\", prNumber: n, sha });\n+    const push = (sha: string) => grp({ event: \"push\", ref: \"refs/heads/master\", sha });\n+    const dispatch = (runId: string) => grp({ event: \"workflow_dispatch\", ref: \"refs/heads/loop/x\", runId });\n+    // The exact strings. Same-vs-different properties alone let a rename of any prefix through (QA 250's M-push-only mutant\n+    // survived the T-221 row for the same reason).\n+    expect(pr(\"7\")).toBe(\"ci-pr-7\");\n+    expect(push(\"9f8e7d\")).toBe(\"ci-push-9f8e7d\");\n+    expect(dispatch(\"11\")).toBe(\"ci-dispatch-11\");\n+    // The PR group does not depend on the commit: two commits of one PR share it (that is how the superseded one is cancelled).\n+    expect(pr(\"7\", \"aaa\")).toBe(pr(\"7\", \"bbb\"));\n+    // Collisions a bare number or sha could cause: the same digits as a PR number, a push sha and a dispatch run id.\n+    const same = [pr(\"7\"), push(\"7\"), dispatch(\"7\")];\n+    expect(new Set(same).size).toBe(3);\n+    // PR 1 and PR 11 are different groups (a prefix match would join them), and a PR group never equals a push sha of the head commit.\n+    expect(pr(\"1\")).not.toBe(pr(\"11\"));\n+    expect(pr(\"7\", \"abc123\")).not.toBe(push(\"abc123\"));\n+  });\n+\n   it(\"T-227: only a pull request run is cancellable (the superseded commit), a master push and a dispatch are never cancelled\", () => {\n     const cancel = String(workflow().concurrency?.[\"cancel-in-progress\"] ?? \"\");\n     const c = (event: string, ref: string) => truthy(evalRunsOn(cancel, { event, ref, tcm: null }));\n"
+          ],
+          "id": "T23",
+          "observable": "Run the touched test files one per invocation, and run tsc --noEmit."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "9f6d20df3f97db45431dff95911f92ffcad47266",
+        "merge_commit": "baa7e3027f1dbeb8a3e808d7d7eaf1ef5f7992b9",
+        "pr": 293,
+        "scored_sha": "58e0ce15eb5871c50eb01794c007a9a842fc5acb"
+      }
+    }
+  }
+}

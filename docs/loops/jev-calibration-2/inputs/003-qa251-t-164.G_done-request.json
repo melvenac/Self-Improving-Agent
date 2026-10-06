@@ -1,0 +1,567 @@
+{
+  "base_sha": "f7ac983d4face4a88f5af9742cc91a54c01e3f4f",
+  "candidate_sha": "892f7644b48cb49b56dc821406f35a84ca28369a",
+  "case_id": "qa251-t-164",
+  "case_no": 3,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 36976289271,
+    "runs_found": 2,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t164-developer-handoff.md",
+    "docs/loops/t164-port-developer-handoff.md",
+    "docs/loops/t164-port/mutants/sc4-local-count-restored.diff"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "bd07f604c4f35486f5c93489d53700b67d9914b6",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Its SC-2 case uses the record 76, 147..155 and expects \"next free number is 157\". It passes at 892f7644. Copy it into a fbf94ae6 worktree and show it fails there.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (Also run the candidate's own record-session-number.test.ts at both SHAs.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (F2 and F3.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (Apply qa249-a-status-to-only-no-shadow.diff and qa249-b-minute-accepts-60.diff, each alone, to 3b0b8188. Run standing-cron.test.ts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (Each mutant turns at least one row red. Name the row and quote the assertion.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (Restore the tree after each.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (F4.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (Show the template's documented example as it stands at 3b0b8188.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (Run the start-time reader on that exact text. Don't use a copy, and don't use the test's own fixture if it differs from the file. It prints the present-shape line, not INVALID.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (The test that guards this reads the template file itself. Show where.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Compare round 1 to round 2 with git diff fbf94ae6 892f7644 --stat and git diff 9f6fcea4 3b0b8188 --stat.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (F5. The SR-5 row text in the handoff names SR-6 as the guard for the dropped-line mutant. Apply docs/loops/t211/mutants/sr5a-line-dropped.diff and show SR-6 goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (Nothing else moved.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (Run every test file the round-2 diff touches at the candidate heads, and quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (Check that tsc --noEmit is 0 in open-brain.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (CI on the heads (read only). gh run list --commit for 892f7644 and 3b0b8188. Quote each run's event, conclusion and test job. T-221 is now on master, so a push run and a PR run should no longer cancel each other. Report any run that was cancelled anyway.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Every file that changed between rounds belongs to F1 to F5, the round-2 handoff, or the rebase onto f7ac983d.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (Name any file that does not, and say whether it matters.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (F1, read in the code.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (At 892f7644, nextFreeSessionNumber is gone, or it is unexported with no callers. Show it with git grep over open-brain/src and open-brain/tests.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (The SC-2 refusal and the greeting call the same function, and that function returns max(n)+1. Quote both call sites.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (F1, red then green.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (Copy docs/loops/qa-249/tests/qa249-t164.test.ts from origin/qa/t164-t211-report, unchanged, into the candidate's test tree.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "892f7644b48cb49b56dc821406f35a84ca28369a",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/pipelines/session-start/index.ts",
+        "open-brain/src/pipelines/session-start/session-log.ts",
+        "open-brain/src/pipelines/session-start/types.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/src/shared/state-writer.ts",
+        "open-brain/tests/pipelines/session-start/record-session-number.test.ts",
+        "open-brain/tests/pipelines/session-start/session-log.test.ts",
+        "open-brain/tests/pipelines/state-import.test.ts",
+        "open-brain/tests/pipelines/sync/record-erasure.test.ts",
+        "open-brain/tests/server.test.ts",
+        "open-brain/tests/shared/closeout-erasure.test.ts",
+        "open-brain/tests/shared/session-order.test.ts",
+        "open-brain/tests/shared/state-writer.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Compare round 1 to round 2 with git diff fbf94ae6 892f7644 --stat and git diff 9f6fcea4 3b0b8188 --stat.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Every file that changed between rounds belongs to F1 to F5, the round-2 handoff, or the rebase onto f7ac983d.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Name any file that does not, and say whether it matters.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "F1, read in the code.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "At 892f7644, nextFreeSessionNumber is gone, or it is unexported with no callers. Show it with git grep over open-brain/src and open-brain/tests.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The SC-2 refusal and the greeting call the same function, and that function returns max(n)+1. Quote both call sites.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "F1, red then green.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Copy docs/loops/qa-249/tests/qa249-t164.test.ts from origin/qa/t164-t211-report, unchanged, into the candidate's test tree.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Its SC-2 case uses the record 76, 147..155 and expects \"next free number is 157\". It passes at 892f7644. Copy it into a fbf94ae6 worktree and show it fails there.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Also run the candidate's own record-session-number.test.ts at both SHAs.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "F2 and F3.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Apply qa249-a-status-to-only-no-shadow.diff and qa249-b-minute-accepts-60.diff, each alone, to 3b0b8188. Run standing-cron.test.ts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Each mutant turns at least one row red. Name the row and quote the assertion.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "Restore the tree after each.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "F4.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "Show the template's documented example as it stands at 3b0b8188.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "Run the start-time reader on that exact text. Don't use a copy, and don't use the test's own fixture if it differs from the file. It prints the present-shape line, not INVALID.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "The test that guards this reads the template file itself. Show where.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "F5. The SR-5 row text in the handoff names SR-6 as the guard for the dropped-line mutant. Apply docs/loops/t211/mutants/sr5a-line-dropped.diff and show SR-6 goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "Nothing else moved.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "Run every test file the round-2 diff touches at the candidate heads, and quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "Check that tsc --noEmit is 0 in open-brain.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "CI on the heads (read only). gh run list --commit for 892f7644 and 3b0b8188. Quote each run's event, conclusion and test job. T-221 is now on master, so a push run and a PR run should no longer cancel each other. Report any run that was cancelled anyway.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "3-qa251-t-164",
+        "new_capability": "QA 251: T-164 + T-211 round 2, the narrow re-check of QA 249's F1 to F5",
+        "objective": "QA 251: T-164 + T-211 round 2, the narrow re-check of QA 249's F1 to F5",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "0f833a7826f79f4e096e339a9ce7b79e4745b7b6",
+          "path": "docs/loops/qa-251-t164-t211-r2-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined.",
+          "Compare round 1 to round 2 with git diff fbf94ae6 892f7644 --stat and git diff 9f6fcea4 3b0b8188 --stat.",
+          "Every file that changed between rounds belongs to F1 to F5, the round-2 handoff, or the rebase onto f7ac983d.",
+          "Name any file that does not, and say whether it matters.",
+          "F1, read in the code.",
+          "At 892f7644, nextFreeSessionNumber is gone, or it is unexported with no callers. Show it with git grep over open-brain/src and open-brain/tests.",
+          "The SC-2 refusal and the greeting call the same function, and that function returns max(n)+1. Quote both call sites.",
+          "F1, red then green.",
+          "Copy docs/loops/qa-249/tests/qa249-t164.test.ts from origin/qa/t164-t211-report, unchanged, into the candidate's test tree.",
+          "Its SC-2 case uses the record 76, 147..155 and expects \"next free number is 157\". It passes at 892f7644. Copy it into a fbf94ae6 worktree and show it fails there.",
+          "Also run the candidate's own record-session-number.test.ts at both SHAs.",
+          "F2 and F3.",
+          "Apply qa249-a-status-to-only-no-shadow.diff and qa249-b-minute-accepts-60.diff, each alone, to 3b0b8188. Run standing-cron.test.ts.",
+          "Each mutant turns at least one row red. Name the row and quote the assertion.",
+          "Restore the tree after each.",
+          "F4.",
+          "Show the template's documented example as it stands at 3b0b8188.",
+          "Run the start-time reader on that exact text. Don't use a copy, and don't use the test's own fixture if it differs from the file. It prints the present-shape line, not INVALID.",
+          "The test that guards this reads the template file itself. Show where.",
+          "F5. The SR-5 row text in the handoff names SR-6 as the guard for the dropped-line mutant. Apply docs/loops/t211/mutants/sr5a-line-dropped.diff and show SR-6 goes red.",
+          "Nothing else moved.",
+          "Run every test file the round-2 diff touches at the candidate heads, and quote the counts.",
+          "Check that tsc --noEmit is 0 in open-brain.",
+          "CI on the heads (read only). gh run list --commit for 892f7644 and 3b0b8188. Quote each run's event, conclusion and test job. T-221 is now on master, so a push run and a PR run should no longer cancel each other. Report any run that was cancelled anyway."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/session-log.test.ts b/open-brain/tests/pipelines/session-start/session-log.test.ts\nindex 6c19d665..4b6fe671 100644\n--- a/open-brain/tests/pipelines/session-start/session-log.test.ts\n+++ b/open-brain/tests/pipelines/session-start/session-log.test.ts\n@@ -111,7 +111,9 @@ describe(\"findExistingSessionLog / idempotent sessionStart\", () => {\n     expect(logs()).toEqual([\"Session_1.md\"]);\n \n     const second = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: \"same-id\" });\n-    expect(second.session).toEqual({ ...first.session, reused: true });\n+    expect(second.session.sessionNumber).toBe(first.session.sessionNumber);\n+    expect(second.session.logPath).toBe(first.session.logPath);\n+    expect(second.session.reused).toBe(true);\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/state-import.test.ts b/open-brain/tests/pipelines/state-import.test.ts\nindex 10bc7647..44c72c83 100644\n--- a/open-brain/tests/pipelines/state-import.test.ts\n+++ b/open-brain/tests/pipelines/state-import.test.ts\n@@ -214,8 +214,9 @@ describe(\"state import (Loop 4 C1) on a fixture built from this repo's prose fil\n     expect(w.dropped_task_ids).toEqual([]);\n     let rev = 1;\n     let last = w;\n+    let sessionN = 55;\n     for (const u of [\"s-1\", \"s-2\", \"s-3\"]) {\n-      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: \"set_objective\", text: u }], version: \"0.30.0\" });\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Compare round 1 to round 2 with git diff fbf94ae6 892f7644 --stat and git diff 9f6fcea4 3b0b8188 --stat."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/record-erasure.test.ts b/open-brain/tests/pipelines/sync/record-erasure.test.ts\nindex c9645f51..71990aec 100644\n--- a/open-brain/tests/pipelines/sync/record-erasure.test.ts\n+++ b/open-brain/tests/pipelines/sync/record-erasure.test.ts\n@@ -92,7 +92,7 @@ describe(\"record-erasure (T163-2)\", () => {\n \n   it(\"does NOT flag a retention drop — the rule is recomputed from the state after the step\", () => {\n     handOff(dir, 40, \"OLD\", \"old builder handoff\");\n-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);\n+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);\n     handOff(dir, 56, \"NEW\", \"new builder handoff\"); // same seat + checkout, the 11th session since OLD: retention drops OLD\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "Every file that changed between rounds belongs to F1 to F5, the round-2 handoff, or the rebase onto f7ac983d."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex ee20ee4d..b3f90770 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -121,7 +121,7 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"summary-version: expected 2.0.0, got 1.9.0 (not fixed)\");\n \n       // Session block.\n-      expect(text).toMatch(/Session #1\\nLog: .*Session_1\\.md\\nSession ID: /);\n+      expect(text).toMatch(/Session #1( \\(local — from this checkout's session logs; no valid state\\.json\\))?\\nLog: .*Session_1\\.md\\nSession ID: /);\n \n       // Size block: one line per file, absent spelled out, truncated: no.\n       expect(text).toContain(\"## Sizes (tokens estimated as chars/4)\");\n@@ -246,11 +246,11 @@ describe(\"server handlers\", () => {\n     });\n \n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "Name any file that does not, and say whether it matters."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-erasure.test.ts b/open-brain/tests/shared/closeout-erasure.test.ts\nindex f7af426b..ebea9a31 100644\n--- a/open-brain/tests/shared/closeout-erasure.test.ts\n+++ b/open-brain/tests/shared/closeout-erasure.test.ts\n@@ -139,7 +139,7 @@ describe(\"T163-1: a close-out can only add its own record\", () => {\n   // session numbers (R179-1 as amended): `others(k)` writes k sessions in\n   // checkouts of their own, each its instance's only entry.\n   const others = (k: number) => {\n-    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n+    for (let i = 0; i < k; i++) handoff(root, 42 + i, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n   };\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "F1, read in the code."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex d95f4223..b5e1deb0 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -3,7 +3,7 @@ import { join } from \"node:path\";\n import { readProjectState } from \"./state-reader.js\";\n import { discoverSessionUuid } from \"./session-discovery.js\";\n import { detectDrift } from \"./drift-detector.js\";\n-import { findNextSessionNumber, findExistingSessionLog, createSessionLog } from \"./session-log.js\";\n+import { findExistingSessionLog, createSessionLog, nextGreetingSessionNumber } from \"./session-log.js\";\n import { runHealthChecks } from \"./health-checks.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex c845e5a0..f2d4dda1 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -1,7 +1,25 @@\n import { existsSync, readdirSync, readFileSync, writeFileSync } from \"node:fs\";\n import { join } from \"node:path\";\n+import { nextSessionNumber } from \"../../shared/state-schema.js\";\n+import type { StateJsonResult } from \"./types.js\";\n \n const SESSION_FILE = /^Session_(\\d+)\\.md$/;\n+\n+export type SessionNumberSource = \"record\" | \"local\";\n+\n+/**\n+ * T-164: the greeting's session number comes from the record when state.json\n+ * is present and valid; otherwise from this checkout's Session_N.md files.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/types.ts b/open-brain/src/pipelines/session-start/types.ts\nindex 5cd24237..e963ad86 100644\n--- a/open-brain/src/pipelines/session-start/types.ts\n+++ b/open-brain/src/pipelines/session-start/types.ts\n@@ -81,6 +81,9 @@ export interface DriftResult {\n   fixed: boolean;\n }\n \n+/** T-164: record vs local checkout counter. */\n+export type SessionNumberSource = \"record\" | \"local\";\n+\n export interface SessionInfo {\n   sessionId: string | null;\n   sessionNumber: number;\n@@ -89,6 +92,8 @@ export interface SessionInfo {\n   reused: boolean;\n   /** Set when no log was created and the caller should say why (e.g. no SESSIONS/ dir). */\n   skippedReason: string | null;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex f9c4d935..16782ff6 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -260,7 +260,13 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {\n     }\n \n     if (result.session.logPath) {\n-      lines.push(`\\nSession #${result.session.sessionNumber}${result.session.reused ? \" (existing log for this session id — reused, nothing created)\" : \"\"}`);\n+      const localNote =\n+        result.session.sessionNumberSource === \"local\"\n+          ? \" (local — from this checkout's session logs; no valid state.json)\"\n+          : \"\";\n+      lines.push(\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/shared/state-schema.ts b/open-brain/src/shared/state-schema.ts\nindex 63f36b38..147e2c5f 100644\n--- a/open-brain/src/shared/state-schema.ts\n+++ b/open-brain/src/shared/state-schema.ts\n@@ -360,6 +360,15 @@ export function lastSession(state: Pick<State, \"sessions\">): SessionRecord | nul\n   return best;\n }\n \n+/**\n+ * The number a new session takes: max(n)+1 over sessions[], 1 for an empty record.\n+ * One function for the greeting AND the SC-2 refusal text, so the two cannot\n+ * disagree (QA 249 F1).\n+ */\n+export function nextSessionNumber(sessions: readonly Pick<SessionRecord, \"n\">[]): number {\n+  return sessions.length === 0 ? 1 : Math.max(...sessions.map((s) => s.n)) + 1;\n+}\n+\n /**\n  * The handoffs a reader is shown: the newest per (seat, checkout), which is one\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/shared/state-writer.ts b/open-brain/src/shared/state-writer.ts\nindex 7491b527..aeafed98 100644\n--- a/open-brain/src/shared/state-writer.ts\n+++ b/open-brain/src/shared/state-writer.ts\n@@ -31,6 +31,7 @@ import {\n   parseState,\n   serializeState,\n   compareFirstRev,\n+  nextSessionNumber,\n   type Seat,\n   type State,\n   type Task,\n@@ -258,6 +259,18 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions):\n   const checkout = options.checkout ?? basename(resolve(projectRoot));\n   const today = options.today ?? localIsoDate();\n   const mine = uuid === null ? undefined : next.sessions.find((s) => s.uuid === uuid);\n+  // T-164 SC-2: the greeting number is provisional until this write. A different\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/session-log.test.ts b/open-brain/tests/pipelines/session-start/session-log.test.ts\nindex 6c19d665..4b6fe671 100644\n--- a/open-brain/tests/pipelines/session-start/session-log.test.ts\n+++ b/open-brain/tests/pipelines/session-start/session-log.test.ts\n@@ -111,7 +111,9 @@ describe(\"findExistingSessionLog / idempotent sessionStart\", () => {\n     expect(logs()).toEqual([\"Session_1.md\"]);\n \n     const second = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: \"same-id\" });\n-    expect(second.session).toEqual({ ...first.session, reused: true });\n+    expect(second.session.sessionNumber).toBe(first.session.sessionNumber);\n+    expect(second.session.logPath).toBe(first.session.logPath);\n+    expect(second.session.reused).toBe(true);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/state-import.test.ts b/open-brain/tests/pipelines/state-import.test.ts\nindex 10bc7647..44c72c83 100644\n--- a/open-brain/tests/pipelines/state-import.test.ts\n+++ b/open-brain/tests/pipelines/state-import.test.ts\n@@ -214,8 +214,9 @@ describe(\"state import (Loop 4 C1) on a fixture built from this repo's prose fil\n     expect(w.dropped_task_ids).toEqual([]);\n     let rev = 1;\n     let last = w;\n+    let sessionN = 55;\n     for (const u of [\"s-1\", \"s-2\", \"s-3\"]) {\n-      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: \"set_objective\", text: u }], version: \"0.30.0\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/record-erasure.test.ts b/open-brain/tests/pipelines/sync/record-erasure.test.ts\nindex c9645f51..71990aec 100644\n--- a/open-brain/tests/pipelines/sync/record-erasure.test.ts\n+++ b/open-brain/tests/pipelines/sync/record-erasure.test.ts\n@@ -92,7 +92,7 @@ describe(\"record-erasure (T163-2)\", () => {\n \n   it(\"does NOT flag a retention drop — the rule is recomputed from the state after the step\", () => {\n     handOff(dir, 40, \"OLD\", \"old builder handoff\");\n-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);\n+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);\n     handOff(dir, 56, \"NEW\", \"new builder handoff\"); // same seat + checkout, the 11th session since OLD: retention drops OLD\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex ee20ee4d..b3f90770 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -121,7 +121,7 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"summary-version: expected 2.0.0, got 1.9.0 (not fixed)\");\n \n       // Session block.\n-      expect(text).toMatch(/Session #1\\nLog: .*Session_1\\.md\\nSession ID: /);\n+      expect(text).toMatch(/Session #1( \\(local — from this checkout's session logs; no valid state\\.json\\))?\\nLog: .*Session_1\\.md\\nSession ID: /);\n \n       // Size block: one line per file, absent spelled out, truncated: no.\n       expect(text).toContain(\"## Sizes (tokens estimated as chars/4)\");\n@@ -246,11 +246,11 @@ describe(\"server handlers\", () => {\n     });\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/closeout-erasure.test.ts b/open-brain/tests/shared/closeout-erasure.test.ts\nindex f7af426b..ebea9a31 100644\n--- a/open-brain/tests/shared/closeout-erasure.test.ts\n+++ b/open-brain/tests/shared/closeout-erasure.test.ts\n@@ -139,7 +139,7 @@ describe(\"T163-1: a close-out can only add its own record\", () => {\n   // session numbers (R179-1 as amended): `others(k)` writes k sessions in\n   // checkouts of their own, each its instance's only entry.\n   const others = (k: number) => {\n-    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n+    for (let i = 0; i < k; i++) handoff(root, 42 + i, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n   };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/session-order.test.ts b/open-brain/tests/shared/session-order.test.ts\nindex d3797e85..703ca29f 100644\n--- a/open-brain/tests/shared/session-order.test.ts\n+++ b/open-brain/tests/shared/session-order.test.ts\n@@ -113,11 +113,11 @@ describe(\"R179-1: a session number orders nothing\", () => {\n   it(\"retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and not at 10\", () => {\n     hand(1, U(1), \"old builder\", \"sia-builder\");\n     // Nine other sessions, then the builder's successor: 10 sessions after U(1).\n-    for (let i = 2; i <= 10; i++) hand(1, U(i), `other ${i}`, `other-${i}`, \"qa\");\n-    hand(1, U(11), \"new builder\", \"sia-builder\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/state-writer.test.ts b/open-brain/tests/shared/state-writer.test.ts\nindex 64abfc96..bb121ca8 100644\n--- a/open-brain/tests/shared/state-writer.test.ts\n+++ b/open-brain/tests/shared/state-writer.test.ts\n@@ -481,7 +481,7 @@ describe(\"applyStateOps (Loop 3 writer)\", () => {\n \n   it(\"two SEATS in two sessions both keep their handoffs — G-046, now by construction\", () => {\n     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: \"dev\", ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: \"dev\", watch_out: [], open_questions: [] }] });\n-    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: \"qa\", ops: [{ op: \"set_handoff\", seat: \"qa\", pick_up: \"qa\", watch_out: [], open_questions: [] }] });\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "At 892f7644, nextFreeSessionNumber is gone, or it is unexported with no callers. Show it with git grep over open-brain/src and open-brain/tests."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/state-writer.test.ts b/open-brain/tests/shared/state-writer.test.ts\nindex 64abfc96..bb121ca8 100644\n--- a/open-brain/tests/shared/state-writer.test.ts\n+++ b/open-brain/tests/shared/state-writer.test.ts\n@@ -481,7 +481,7 @@ describe(\"applyStateOps (Loop 3 writer)\", () => {\n \n   it(\"two SEATS in two sessions both keep their handoffs — G-046, now by construction\", () => {\n     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: \"dev\", ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: \"dev\", watch_out: [], open_questions: [] }] });\n-    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: \"qa\", ops: [{ op: \"set_handoff\", seat: \"qa\", pick_up: \"qa\", watch_out: [], open_questions: [] }] });\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "The SC-2 refusal and the greeting call the same function, and that function returns max(n)+1. Quote both call sites."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex d95f4223..b5e1deb0 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -3,7 +3,7 @@ import { join } from \"node:path\";\n import { readProjectState } from \"./state-reader.js\";\n import { discoverSessionUuid } from \"./session-discovery.js\";\n import { detectDrift } from \"./drift-detector.js\";\n-import { findNextSessionNumber, findExistingSessionLog, createSessionLog } from \"./session-log.js\";\n+import { findExistingSessionLog, createSessionLog, nextGreetingSessionNumber } from \"./session-log.js\";\n import { runHealthChecks } from \"./health-checks.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "F1, red then green."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/session-log.test.ts b/open-brain/tests/pipelines/session-start/session-log.test.ts\nindex 6c19d665..4b6fe671 100644\n--- a/open-brain/tests/pipelines/session-start/session-log.test.ts\n+++ b/open-brain/tests/pipelines/session-start/session-log.test.ts\n@@ -111,7 +111,9 @@ describe(\"findExistingSessionLog / idempotent sessionStart\", () => {\n     expect(logs()).toEqual([\"Session_1.md\"]);\n \n     const second = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: \"same-id\" });\n-    expect(second.session).toEqual({ ...first.session, reused: true });\n+    expect(second.session.sessionNumber).toBe(first.session.sessionNumber);\n+    expect(second.session.logPath).toBe(first.session.logPath);\n+    expect(second.session.reused).toBe(true);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/state-import.test.ts b/open-brain/tests/pipelines/state-import.test.ts\nindex 10bc7647..44c72c83 100644\n--- a/open-brain/tests/pipelines/state-import.test.ts\n+++ b/open-brain/tests/pipelines/state-import.test.ts\n@@ -214,8 +214,9 @@ describe(\"state import (Loop 4 C1) on a fixture built from this repo's prose fil\n     expect(w.dropped_task_ids).toEqual([]);\n     let rev = 1;\n     let last = w;\n+    let sessionN = 55;\n     for (const u of [\"s-1\", \"s-2\", \"s-3\"]) {\n-      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: \"set_objective\", text: u }], version: \"0.30.0\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/record-erasure.test.ts b/open-brain/tests/pipelines/sync/record-erasure.test.ts\nindex c9645f51..71990aec 100644\n--- a/open-brain/tests/pipelines/sync/record-erasure.test.ts\n+++ b/open-brain/tests/pipelines/sync/record-erasure.test.ts\n@@ -92,7 +92,7 @@ describe(\"record-erasure (T163-2)\", () => {\n \n   it(\"does NOT flag a retention drop — the rule is recomputed from the state after the step\", () => {\n     handOff(dir, 40, \"OLD\", \"old builder handoff\");\n-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);\n+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);\n     handOff(dir, 56, \"NEW\", \"new builder handoff\"); // same seat + checkout, the 11th session since OLD: retention drops OLD\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex ee20ee4d..b3f90770 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -121,7 +121,7 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"summary-version: expected 2.0.0, got 1.9.0 (not fixed)\");\n \n       // Session block.\n-      expect(text).toMatch(/Session #1\\nLog: .*Session_1\\.md\\nSession ID: /);\n+      expect(text).toMatch(/Session #1( \\(local — from this checkout's session logs; no valid state\\.json\\))?\\nLog: .*Session_1\\.md\\nSession ID: /);\n \n       // Size block: one line per file, absent spelled out, truncated: no.\n       expect(text).toContain(\"## Sizes (tokens estimated as chars/4)\");\n@@ -246,11 +246,11 @@ describe(\"server handlers\", () => {\n     });\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/closeout-erasure.test.ts b/open-brain/tests/shared/closeout-erasure.test.ts\nindex f7af426b..ebea9a31 100644\n--- a/open-brain/tests/shared/closeout-erasure.test.ts\n+++ b/open-brain/tests/shared/closeout-erasure.test.ts\n@@ -139,7 +139,7 @@ describe(\"T163-1: a close-out can only add its own record\", () => {\n   // session numbers (R179-1 as amended): `others(k)` writes k sessions in\n   // checkouts of their own, each its instance's only entry.\n   const others = (k: number) => {\n-    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n+    for (let i = 0; i < k; i++) handoff(root, 42 + i, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n   };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/session-order.test.ts b/open-brain/tests/shared/session-order.test.ts\nindex d3797e85..703ca29f 100644\n--- a/open-brain/tests/shared/session-order.test.ts\n+++ b/open-brain/tests/shared/session-order.test.ts\n@@ -113,11 +113,11 @@ describe(\"R179-1: a session number orders nothing\", () => {\n   it(\"retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and not at 10\", () => {\n     hand(1, U(1), \"old builder\", \"sia-builder\");\n     // Nine other sessions, then the builder's successor: 10 sessions after U(1).\n-    for (let i = 2; i <= 10; i++) hand(1, U(i), `other ${i}`, `other-${i}`, \"qa\");\n-    hand(1, U(11), \"new builder\", \"sia-builder\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/state-writer.test.ts b/open-brain/tests/shared/state-writer.test.ts\nindex 64abfc96..bb121ca8 100644\n--- a/open-brain/tests/shared/state-writer.test.ts\n+++ b/open-brain/tests/shared/state-writer.test.ts\n@@ -481,7 +481,7 @@ describe(\"applyStateOps (Loop 3 writer)\", () => {\n \n   it(\"two SEATS in two sessions both keep their handoffs — G-046, now by construction\", () => {\n     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: \"dev\", ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: \"dev\", watch_out: [], open_questions: [] }] });\n-    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: \"qa\", ops: [{ op: \"set_handoff\", seat: \"qa\", pick_up: \"qa\", watch_out: [], open_questions: [] }] });\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "Copy docs/loops/qa-249/tests/qa249-t164.test.ts from origin/qa/t164-t211-report, unchanged, into the candidate's test tree."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/record-erasure.test.ts b/open-brain/tests/pipelines/sync/record-erasure.test.ts\nindex c9645f51..71990aec 100644\n--- a/open-brain/tests/pipelines/sync/record-erasure.test.ts\n+++ b/open-brain/tests/pipelines/sync/record-erasure.test.ts\n@@ -92,7 +92,7 @@ describe(\"record-erasure (T163-2)\", () => {\n \n   it(\"does NOT flag a retention drop — the rule is recomputed from the state after the step\", () => {\n     handOff(dir, 40, \"OLD\", \"old builder handoff\");\n-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);\n+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);\n     handOff(dir, 56, \"NEW\", \"new builder handoff\"); // same seat + checkout, the 11th session since OLD: retention drops OLD\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "Its SC-2 case uses the record 76, 147..155 and expects \"next free number is 157\". It passes at 892f7644. Copy it into a fbf94ae6 worktree and show it fails there."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "Also run the candidate's own record-session-number.test.ts at both SHAs."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex c845e5a0..f2d4dda1 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -1,7 +1,25 @@\n import { existsSync, readdirSync, readFileSync, writeFileSync } from \"node:fs\";\n import { join } from \"node:path\";\n+import { nextSessionNumber } from \"../../shared/state-schema.js\";\n+import type { StateJsonResult } from \"./types.js\";\n \n const SESSION_FILE = /^Session_(\\d+)\\.md$/;\n+\n+export type SessionNumberSource = \"record\" | \"local\";\n+\n+/**\n+ * T-164: the greeting's session number comes from the record when state.json\n+ * is present and valid; otherwise from this checkout's Session_N.md files.\n+ */\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "F2 and F3."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/types.ts b/open-brain/src/pipelines/session-start/types.ts\nindex 5cd24237..e963ad86 100644\n--- a/open-brain/src/pipelines/session-start/types.ts\n+++ b/open-brain/src/pipelines/session-start/types.ts\n@@ -81,6 +81,9 @@ export interface DriftResult {\n   fixed: boolean;\n }\n \n+/** T-164: record vs local checkout counter. */\n+export type SessionNumberSource = \"record\" | \"local\";\n+\n export interface SessionInfo {\n   sessionId: string | null;\n   sessionNumber: number;\n@@ -89,6 +92,8 @@ export interface SessionInfo {\n   reused: boolean;\n   /** Set when no log was created and the caller should say why (e.g. no SESSIONS/ dir). */\n   skippedReason: string | null;\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "Apply qa249-a-status-to-only-no-shadow.diff and qa249-b-minute-accepts-60.diff, each alone, to 3b0b8188. Run standing-cron.test.ts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex f9c4d935..16782ff6 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -260,7 +260,13 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {\n     }\n \n     if (result.session.logPath) {\n-      lines.push(`\\nSession #${result.session.sessionNumber}${result.session.reused ? \" (existing log for this session id — reused, nothing created)\" : \"\"}`);\n+      const localNote =\n+        result.session.sessionNumberSource === \"local\"\n+          ? \" (local — from this checkout's session logs; no valid state.json)\"\n+          : \"\";\n+      lines.push(\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "Each mutant turns at least one row red. Name the row and quote the assertion."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/state-schema.ts b/open-brain/src/shared/state-schema.ts\nindex 63f36b38..147e2c5f 100644\n--- a/open-brain/src/shared/state-schema.ts\n+++ b/open-brain/src/shared/state-schema.ts\n@@ -360,6 +360,15 @@ export function lastSession(state: Pick<State, \"sessions\">): SessionRecord | nul\n   return best;\n }\n \n+/**\n+ * The number a new session takes: max(n)+1 over sessions[], 1 for an empty record.\n+ * One function for the greeting AND the SC-2 refusal text, so the two cannot\n+ * disagree (QA 249 F1).\n+ */\n+export function nextSessionNumber(sessions: readonly Pick<SessionRecord, \"n\">[]): number {\n+  return sessions.length === 0 ? 1 : Math.max(...sessions.map((s) => s.n)) + 1;\n+}\n+\n /**\n  * The handoffs a reader is shown: the newest per (seat, checkout), which is one\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "Restore the tree after each."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/state-writer.ts b/open-brain/src/shared/state-writer.ts\nindex 7491b527..aeafed98 100644\n--- a/open-brain/src/shared/state-writer.ts\n+++ b/open-brain/src/shared/state-writer.ts\n@@ -31,6 +31,7 @@ import {\n   parseState,\n   serializeState,\n   compareFirstRev,\n+  nextSessionNumber,\n   type Seat,\n   type State,\n   type Task,\n@@ -258,6 +259,18 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions):\n   const checkout = options.checkout ?? basename(resolve(projectRoot));\n   const today = options.today ?? localIsoDate();\n   const mine = uuid === null ? undefined : next.sessions.find((s) => s.uuid === uuid);\n+  // T-164 SC-2: the greeting number is provisional until this write. A different\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "F4."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "Show the template's documented example as it stands at 3b0b8188."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex d95f4223..b5e1deb0 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -3,7 +3,7 @@ import { join } from \"node:path\";\n import { readProjectState } from \"./state-reader.js\";\n import { discoverSessionUuid } from \"./session-discovery.js\";\n import { detectDrift } from \"./drift-detector.js\";\n-import { findNextSessionNumber, findExistingSessionLog, createSessionLog } from \"./session-log.js\";\n+import { findExistingSessionLog, createSessionLog, nextGreetingSessionNumber } from \"./session-log.js\";\n import { runHealthChecks } from \"./health-checks.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex c845e5a0..f2d4dda1 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -1,7 +1,25 @@\n import { existsSync, readdirSync, readFileSync, writeFileSync } from \"node:fs\";\n import { join } from \"node:path\";\n+import { nextSessionNumber } from \"../../shared/state-schema.js\";\n+import type { StateJsonResult } from \"./types.js\";\n \n const SESSION_FILE = /^Session_(\\d+)\\.md$/;\n+\n+export type SessionNumberSource = \"record\" | \"local\";\n+\n+/**\n+ * T-164: the greeting's session number comes from the record when state.json\n+ * is present and valid; otherwise from this checkout's Session_N.md files.\n+ */\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/types.ts b/open-brain/src/pipelines/session-start/types.ts\nindex 5cd24237..e963ad86 100644\n--- a/open-brain/src/pipelines/session-start/types.ts\n+++ b/open-brain/src/pipelines/session-start/types.ts\n@@ -81,6 +81,9 @@ export interface DriftResult {\n   fixed: boolean;\n }\n \n+/** T-164: record vs local checkout counter. */\n+export type SessionNumberSource = \"record\" | \"local\";\n+\n export interface SessionInfo {\n   sessionId: string | null;\n   sessionNumber: number;\n@@ -89,6 +92,8 @@ export interface SessionInfo {\n   reused: boolean;\n   /** Set when no log was created and the caller should say why (e.g. no SESSIONS/ dir). */\n   skippedReason: string | null;\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/session-log.test.ts b/open-brain/tests/pipelines/session-start/session-log.test.ts\nindex 6c19d665..4b6fe671 100644\n--- a/open-brain/tests/pipelines/session-start/session-log.test.ts\n+++ b/open-brain/tests/pipelines/session-start/session-log.test.ts\n@@ -111,7 +111,9 @@ describe(\"findExistingSessionLog / idempotent sessionStart\", () => {\n     expect(logs()).toEqual([\"Session_1.md\"]);\n \n     const second = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: \"same-id\" });\n-    expect(second.session).toEqual({ ...first.session, reused: true });\n+    expect(second.session.sessionNumber).toBe(first.session.sessionNumber);\n+    expect(second.session.logPath).toBe(first.session.logPath);\n+    expect(second.session.reused).toBe(true);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/state-import.test.ts b/open-brain/tests/pipelines/state-import.test.ts\nindex 10bc7647..44c72c83 100644\n--- a/open-brain/tests/pipelines/state-import.test.ts\n+++ b/open-brain/tests/pipelines/state-import.test.ts\n@@ -214,8 +214,9 @@ describe(\"state import (Loop 4 C1) on a fixture built from this repo's prose fil\n     expect(w.dropped_task_ids).toEqual([]);\n     let rev = 1;\n     let last = w;\n+    let sessionN = 55;\n     for (const u of [\"s-1\", \"s-2\", \"s-3\"]) {\n-      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: \"set_objective\", text: u }], version: \"0.30.0\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/record-erasure.test.ts b/open-brain/tests/pipelines/sync/record-erasure.test.ts\nindex c9645f51..71990aec 100644\n--- a/open-brain/tests/pipelines/sync/record-erasure.test.ts\n+++ b/open-brain/tests/pipelines/sync/record-erasure.test.ts\n@@ -92,7 +92,7 @@ describe(\"record-erasure (T163-2)\", () => {\n \n   it(\"does NOT flag a retention drop — the rule is recomputed from the state after the step\", () => {\n     handOff(dir, 40, \"OLD\", \"old builder handoff\");\n-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);\n+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);\n     handOff(dir, 56, \"NEW\", \"new builder handoff\"); // same seat + checkout, the 11th session since OLD: retention drops OLD\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex ee20ee4d..b3f90770 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -121,7 +121,7 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"summary-version: expected 2.0.0, got 1.9.0 (not fixed)\");\n \n       // Session block.\n-      expect(text).toMatch(/Session #1\\nLog: .*Session_1\\.md\\nSession ID: /);\n+      expect(text).toMatch(/Session #1( \\(local — from this checkout's session logs; no valid state\\.json\\))?\\nLog: .*Session_1\\.md\\nSession ID: /);\n \n       // Size block: one line per file, absent spelled out, truncated: no.\n       expect(text).toContain(\"## Sizes (tokens estimated as chars/4)\");\n@@ -246,11 +246,11 @@ describe(\"server handlers\", () => {\n     });\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/closeout-erasure.test.ts b/open-brain/tests/shared/closeout-erasure.test.ts\nindex f7af426b..ebea9a31 100644\n--- a/open-brain/tests/shared/closeout-erasure.test.ts\n+++ b/open-brain/tests/shared/closeout-erasure.test.ts\n@@ -139,7 +139,7 @@ describe(\"T163-1: a close-out can only add its own record\", () => {\n   // session numbers (R179-1 as amended): `others(k)` writes k sessions in\n   // checkouts of their own, each its instance's only entry.\n   const others = (k: number) => {\n-    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n+    for (let i = 0; i < k; i++) handoff(root, 42 + i, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n   };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/session-order.test.ts b/open-brain/tests/shared/session-order.test.ts\nindex d3797e85..703ca29f 100644\n--- a/open-brain/tests/shared/session-order.test.ts\n+++ b/open-brain/tests/shared/session-order.test.ts\n@@ -113,11 +113,11 @@ describe(\"R179-1: a session number orders nothing\", () => {\n   it(\"retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and not at 10\", () => {\n     hand(1, U(1), \"old builder\", \"sia-builder\");\n     // Nine other sessions, then the builder's successor: 10 sessions after U(1).\n-    for (let i = 2; i <= 10; i++) hand(1, U(i), `other ${i}`, `other-${i}`, \"qa\");\n-    hand(1, U(11), \"new builder\", \"sia-builder\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/state-writer.test.ts b/open-brain/tests/shared/state-writer.test.ts\nindex 64abfc96..bb121ca8 100644\n--- a/open-brain/tests/shared/state-writer.test.ts\n+++ b/open-brain/tests/shared/state-writer.test.ts\n@@ -481,7 +481,7 @@ describe(\"applyStateOps (Loop 3 writer)\", () => {\n \n   it(\"two SEATS in two sessions both keep their handoffs — G-046, now by construction\", () => {\n     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: \"dev\", ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: \"dev\", watch_out: [], open_questions: [] }] });\n-    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: \"qa\", ops: [{ op: \"set_handoff\", seat: \"qa\", pick_up: \"qa\", watch_out: [], open_questions: [] }] });\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "Run the start-time reader on that exact text. Don't use a copy, and don't use the test's own fixture if it differs from the file. It prints the present-shape line, not INVALID."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/session-log.test.ts b/open-brain/tests/pipelines/session-start/session-log.test.ts\nindex 6c19d665..4b6fe671 100644\n--- a/open-brain/tests/pipelines/session-start/session-log.test.ts\n+++ b/open-brain/tests/pipelines/session-start/session-log.test.ts\n@@ -111,7 +111,9 @@ describe(\"findExistingSessionLog / idempotent sessionStart\", () => {\n     expect(logs()).toEqual([\"Session_1.md\"]);\n \n     const second = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: \"same-id\" });\n-    expect(second.session).toEqual({ ...first.session, reused: true });\n+    expect(second.session.sessionNumber).toBe(first.session.sessionNumber);\n+    expect(second.session.logPath).toBe(first.session.logPath);\n+    expect(second.session.reused).toBe(true);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/state-import.test.ts b/open-brain/tests/pipelines/state-import.test.ts\nindex 10bc7647..44c72c83 100644\n--- a/open-brain/tests/pipelines/state-import.test.ts\n+++ b/open-brain/tests/pipelines/state-import.test.ts\n@@ -214,8 +214,9 @@ describe(\"state import (Loop 4 C1) on a fixture built from this repo's prose fil\n     expect(w.dropped_task_ids).toEqual([]);\n     let rev = 1;\n     let last = w;\n+    let sessionN = 55;\n     for (const u of [\"s-1\", \"s-2\", \"s-3\"]) {\n-      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: \"set_objective\", text: u }], version: \"0.30.0\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/record-erasure.test.ts b/open-brain/tests/pipelines/sync/record-erasure.test.ts\nindex c9645f51..71990aec 100644\n--- a/open-brain/tests/pipelines/sync/record-erasure.test.ts\n+++ b/open-brain/tests/pipelines/sync/record-erasure.test.ts\n@@ -92,7 +92,7 @@ describe(\"record-erasure (T163-2)\", () => {\n \n   it(\"does NOT flag a retention drop — the rule is recomputed from the state after the step\", () => {\n     handOff(dir, 40, \"OLD\", \"old builder handoff\");\n-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);\n+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);\n     handOff(dir, 56, \"NEW\", \"new builder handoff\"); // same seat + checkout, the 11th session since OLD: retention drops OLD\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex ee20ee4d..b3f90770 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -121,7 +121,7 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"summary-version: expected 2.0.0, got 1.9.0 (not fixed)\");\n \n       // Session block.\n-      expect(text).toMatch(/Session #1\\nLog: .*Session_1\\.md\\nSession ID: /);\n+      expect(text).toMatch(/Session #1( \\(local — from this checkout's session logs; no valid state\\.json\\))?\\nLog: .*Session_1\\.md\\nSession ID: /);\n \n       // Size block: one line per file, absent spelled out, truncated: no.\n       expect(text).toContain(\"## Sizes (tokens estimated as chars/4)\");\n@@ -246,11 +246,11 @@ describe(\"server handlers\", () => {\n     });\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/closeout-erasure.test.ts b/open-brain/tests/shared/closeout-erasure.test.ts\nindex f7af426b..ebea9a31 100644\n--- a/open-brain/tests/shared/closeout-erasure.test.ts\n+++ b/open-brain/tests/shared/closeout-erasure.test.ts\n@@ -139,7 +139,7 @@ describe(\"T163-1: a close-out can only add its own record\", () => {\n   // session numbers (R179-1 as amended): `others(k)` writes k sessions in\n   // checkouts of their own, each its instance's only entry.\n   const others = (k: number) => {\n-    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n+    for (let i = 0; i < k; i++) handoff(root, 42 + i, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n   };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/session-order.test.ts b/open-brain/tests/shared/session-order.test.ts\nindex d3797e85..703ca29f 100644\n--- a/open-brain/tests/shared/session-order.test.ts\n+++ b/open-brain/tests/shared/session-order.test.ts\n@@ -113,11 +113,11 @@ describe(\"R179-1: a session number orders nothing\", () => {\n   it(\"retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and not at 10\", () => {\n     hand(1, U(1), \"old builder\", \"sia-builder\");\n     // Nine other sessions, then the builder's successor: 10 sessions after U(1).\n-    for (let i = 2; i <= 10; i++) hand(1, U(i), `other ${i}`, `other-${i}`, \"qa\");\n-    hand(1, U(11), \"new builder\", \"sia-builder\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/state-writer.test.ts b/open-brain/tests/shared/state-writer.test.ts\nindex 64abfc96..bb121ca8 100644\n--- a/open-brain/tests/shared/state-writer.test.ts\n+++ b/open-brain/tests/shared/state-writer.test.ts\n@@ -481,7 +481,7 @@ describe(\"applyStateOps (Loop 3 writer)\", () => {\n \n   it(\"two SEATS in two sessions both keep their handoffs — G-046, now by construction\", () => {\n     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: \"dev\", ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: \"dev\", watch_out: [], open_questions: [] }] });\n-    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: \"qa\", ops: [{ op: \"set_handoff\", seat: \"qa\", pick_up: \"qa\", watch_out: [], open_questions: [] }] });\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "The test that guards this reads the template file itself. Show where."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex d95f4223..b5e1deb0 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -3,7 +3,7 @@ import { join } from \"node:path\";\n import { readProjectState } from \"./state-reader.js\";\n import { discoverSessionUuid } from \"./session-discovery.js\";\n import { detectDrift } from \"./drift-detector.js\";\n-import { findNextSessionNumber, findExistingSessionLog, createSessionLog } from \"./session-log.js\";\n+import { findExistingSessionLog, createSessionLog, nextGreetingSessionNumber } from \"./session-log.js\";\n import { runHealthChecks } from \"./health-checks.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T20",
+          "observable": "F5. The SR-5 row text in the handoff names SR-6 as the guard for the dropped-line mutant. Apply docs/loops/t211/mutants/sr5a-line-dropped.diff and show SR-6 goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex c845e5a0..f2d4dda1 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -1,7 +1,25 @@\n import { existsSync, readdirSync, readFileSync, writeFileSync } from \"node:fs\";\n import { join } from \"node:path\";\n+import { nextSessionNumber } from \"../../shared/state-schema.js\";\n+import type { StateJsonResult } from \"./types.js\";\n \n const SESSION_FILE = /^Session_(\\d+)\\.md$/;\n+\n+export type SessionNumberSource = \"record\" | \"local\";\n+\n+/**\n+ * T-164: the greeting's session number comes from the record when state.json\n+ * is present and valid; otherwise from this checkout's Session_N.md files.\n+ */\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "Nothing else moved."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/session-log.test.ts b/open-brain/tests/pipelines/session-start/session-log.test.ts\nindex 6c19d665..4b6fe671 100644\n--- a/open-brain/tests/pipelines/session-start/session-log.test.ts\n+++ b/open-brain/tests/pipelines/session-start/session-log.test.ts\n@@ -111,7 +111,9 @@ describe(\"findExistingSessionLog / idempotent sessionStart\", () => {\n     expect(logs()).toEqual([\"Session_1.md\"]);\n \n     const second = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: \"same-id\" });\n-    expect(second.session).toEqual({ ...first.session, reused: true });\n+    expect(second.session.sessionNumber).toBe(first.session.sessionNumber);\n+    expect(second.session.logPath).toBe(first.session.logPath);\n+    expect(second.session.reused).toBe(true);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/state-import.test.ts b/open-brain/tests/pipelines/state-import.test.ts\nindex 10bc7647..44c72c83 100644\n--- a/open-brain/tests/pipelines/state-import.test.ts\n+++ b/open-brain/tests/pipelines/state-import.test.ts\n@@ -214,8 +214,9 @@ describe(\"state import (Loop 4 C1) on a fixture built from this repo's prose fil\n     expect(w.dropped_task_ids).toEqual([]);\n     let rev = 1;\n     let last = w;\n+    let sessionN = 55;\n     for (const u of [\"s-1\", \"s-2\", \"s-3\"]) {\n-      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: \"set_objective\", text: u }], version: \"0.30.0\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/record-erasure.test.ts b/open-brain/tests/pipelines/sync/record-erasure.test.ts\nindex c9645f51..71990aec 100644\n--- a/open-brain/tests/pipelines/sync/record-erasure.test.ts\n+++ b/open-brain/tests/pipelines/sync/record-erasure.test.ts\n@@ -92,7 +92,7 @@ describe(\"record-erasure (T163-2)\", () => {\n \n   it(\"does NOT flag a retention drop — the rule is recomputed from the state after the step\", () => {\n     handOff(dir, 40, \"OLD\", \"old builder handoff\");\n-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);\n+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);\n     handOff(dir, 56, \"NEW\", \"new builder handoff\"); // same seat + checkout, the 11th session since OLD: retention drops OLD\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex ee20ee4d..b3f90770 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -121,7 +121,7 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"summary-version: expected 2.0.0, got 1.9.0 (not fixed)\");\n \n       // Session block.\n-      expect(text).toMatch(/Session #1\\nLog: .*Session_1\\.md\\nSession ID: /);\n+      expect(text).toMatch(/Session #1( \\(local — from this checkout's session logs; no valid state\\.json\\))?\\nLog: .*Session_1\\.md\\nSession ID: /);\n \n       // Size block: one line per file, absent spelled out, truncated: no.\n       expect(text).toContain(\"## Sizes (tokens estimated as chars/4)\");\n@@ -246,11 +246,11 @@ describe(\"server handlers\", () => {\n     });\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/closeout-erasure.test.ts b/open-brain/tests/shared/closeout-erasure.test.ts\nindex f7af426b..ebea9a31 100644\n--- a/open-brain/tests/shared/closeout-erasure.test.ts\n+++ b/open-brain/tests/shared/closeout-erasure.test.ts\n@@ -139,7 +139,7 @@ describe(\"T163-1: a close-out can only add its own record\", () => {\n   // session numbers (R179-1 as amended): `others(k)` writes k sessions in\n   // checkouts of their own, each its instance's only entry.\n   const others = (k: number) => {\n-    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n+    for (let i = 0; i < k; i++) handoff(root, 42 + i, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n   };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/session-order.test.ts b/open-brain/tests/shared/session-order.test.ts\nindex d3797e85..703ca29f 100644\n--- a/open-brain/tests/shared/session-order.test.ts\n+++ b/open-brain/tests/shared/session-order.test.ts\n@@ -113,11 +113,11 @@ describe(\"R179-1: a session number orders nothing\", () => {\n   it(\"retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and not at 10\", () => {\n     hand(1, U(1), \"old builder\", \"sia-builder\");\n     // Nine other sessions, then the builder's successor: 10 sessions after U(1).\n-    for (let i = 2; i <= 10; i++) hand(1, U(i), `other ${i}`, `other-${i}`, \"qa\");\n-    hand(1, U(11), \"new builder\", \"sia-builder\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/state-writer.test.ts b/open-brain/tests/shared/state-writer.test.ts\nindex 64abfc96..bb121ca8 100644\n--- a/open-brain/tests/shared/state-writer.test.ts\n+++ b/open-brain/tests/shared/state-writer.test.ts\n@@ -481,7 +481,7 @@ describe(\"applyStateOps (Loop 3 writer)\", () => {\n \n   it(\"two SEATS in two sessions both keep their handoffs — G-046, now by construction\", () => {\n     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: \"dev\", ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: \"dev\", watch_out: [], open_questions: [] }] });\n-    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: \"qa\", ops: [{ op: \"set_handoff\", seat: \"qa\", pick_up: \"qa\", watch_out: [], open_questions: [] }] });\n…[cal2 diff truncated]"
+          ],
+          "id": "T22",
+          "observable": "Run every test file the round-2 diff touches at the candidate heads, and quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex f9c4d935..16782ff6 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -260,7 +260,13 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {\n     }\n \n     if (result.session.logPath) {\n-      lines.push(`\\nSession #${result.session.sessionNumber}${result.session.reused ? \" (existing log for this session id — reused, nothing created)\" : \"\"}`);\n+      const localNote =\n+        result.session.sessionNumberSource === \"local\"\n+          ? \" (local — from this checkout's session logs; no valid state.json)\"\n+          : \"\";\n+      lines.push(\n…[cal2 diff truncated]"
+          ],
+          "id": "T23",
+          "observable": "Check that tsc --noEmit is 0 in open-brain."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/record-session-number.test.ts b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\nnew file mode 100644\nindex 00000000..38d3ab3a\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/record-session-number.test.ts\n@@ -0,0 +1,208 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { sessionStart } from \"../../../src/pipelines/session-start/index.js\";\n+import { findNextSessionNumber, nextGreetingSessionNumber } from \"../../../src/pipelines/session-start/session-log.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/session-log.test.ts b/open-brain/tests/pipelines/session-start/session-log.test.ts\nindex 6c19d665..4b6fe671 100644\n--- a/open-brain/tests/pipelines/session-start/session-log.test.ts\n+++ b/open-brain/tests/pipelines/session-start/session-log.test.ts\n@@ -111,7 +111,9 @@ describe(\"findExistingSessionLog / idempotent sessionStart\", () => {\n     expect(logs()).toEqual([\"Session_1.md\"]);\n \n     const second = sessionStart({ projectRoot: tempDir, homePath: tempDir, sessionId: \"same-id\" });\n-    expect(second.session).toEqual({ ...first.session, reused: true });\n+    expect(second.session.sessionNumber).toBe(first.session.sessionNumber);\n+    expect(second.session.logPath).toBe(first.session.logPath);\n+    expect(second.session.reused).toBe(true);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/state-import.test.ts b/open-brain/tests/pipelines/state-import.test.ts\nindex 10bc7647..44c72c83 100644\n--- a/open-brain/tests/pipelines/state-import.test.ts\n+++ b/open-brain/tests/pipelines/state-import.test.ts\n@@ -214,8 +214,9 @@ describe(\"state import (Loop 4 C1) on a fixture built from this repo's prose fil\n     expect(w.dropped_task_ids).toEqual([]);\n     let rev = 1;\n     let last = w;\n+    let sessionN = 55;\n     for (const u of [\"s-1\", \"s-2\", \"s-3\"]) {\n-      last = applyStateOps(root, { session: 55, expected_revision: rev++, session_uuid: u, ops: [{ op: \"set_objective\", text: u }], version: \"0.30.0\" });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/record-erasure.test.ts b/open-brain/tests/pipelines/sync/record-erasure.test.ts\nindex c9645f51..71990aec 100644\n--- a/open-brain/tests/pipelines/sync/record-erasure.test.ts\n+++ b/open-brain/tests/pipelines/sync/record-erasure.test.ts\n@@ -92,7 +92,7 @@ describe(\"record-erasure (T163-2)\", () => {\n \n   it(\"does NOT flag a retention drop — the rule is recomputed from the state after the step\", () => {\n     handOff(dir, 40, \"OLD\", \"old builder handoff\");\n-    for (let i = 0; i < 10; i++) handOff(dir, 41, `MID${i}`, `other ${i}`, `other-${i}`);\n+    for (let i = 0; i < 10; i++) handOff(dir, 41 + i, `MID${i}`, `other ${i}`, `other-${i}`);\n     handOff(dir, 56, \"NEW\", \"new builder handoff\"); // same seat + checkout, the 11th session since OLD: retention drops OLD\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex ee20ee4d..b3f90770 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -121,7 +121,7 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"summary-version: expected 2.0.0, got 1.9.0 (not fixed)\");\n \n       // Session block.\n-      expect(text).toMatch(/Session #1\\nLog: .*Session_1\\.md\\nSession ID: /);\n+      expect(text).toMatch(/Session #1( \\(local — from this checkout's session logs; no valid state\\.json\\))?\\nLog: .*Session_1\\.md\\nSession ID: /);\n \n       // Size block: one line per file, absent spelled out, truncated: no.\n       expect(text).toContain(\"## Sizes (tokens estimated as chars/4)\");\n@@ -246,11 +246,11 @@ describe(\"server handlers\", () => {\n     });\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/closeout-erasure.test.ts b/open-brain/tests/shared/closeout-erasure.test.ts\nindex f7af426b..ebea9a31 100644\n--- a/open-brain/tests/shared/closeout-erasure.test.ts\n+++ b/open-brain/tests/shared/closeout-erasure.test.ts\n@@ -139,7 +139,7 @@ describe(\"T163-1: a close-out can only add its own record\", () => {\n   // session numbers (R179-1 as amended): `others(k)` writes k sessions in\n   // checkouts of their own, each its instance's only entry.\n   const others = (k: number) => {\n-    for (let i = 0; i < k; i++) handoff(root, 1, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n+    for (let i = 0; i < k; i++) handoff(root, 42 + i, `cccccccc-3333-4333-8333-${String(i).padStart(12, \"0\")}`, `other ${i}`, `other-${i}`, \"qa\");\n   };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/session-order.test.ts b/open-brain/tests/shared/session-order.test.ts\nindex d3797e85..703ca29f 100644\n--- a/open-brain/tests/shared/session-order.test.ts\n+++ b/open-brain/tests/shared/session-order.test.ts\n@@ -113,11 +113,11 @@ describe(\"R179-1: a session number orders nothing\", () => {\n   it(\"retention counts SESSIONS WRITTEN SINCE: the older of one (seat, checkout) leaves once more than 10 distinct sessions have first written after it, and not at 10\", () => {\n     hand(1, U(1), \"old builder\", \"sia-builder\");\n     // Nine other sessions, then the builder's successor: 10 sessions after U(1).\n-    for (let i = 2; i <= 10; i++) hand(1, U(i), `other ${i}`, `other-${i}`, \"qa\");\n-    hand(1, U(11), \"new builder\", \"sia-builder\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/state-writer.test.ts b/open-brain/tests/shared/state-writer.test.ts\nindex 64abfc96..bb121ca8 100644\n--- a/open-brain/tests/shared/state-writer.test.ts\n+++ b/open-brain/tests/shared/state-writer.test.ts\n@@ -481,7 +481,7 @@ describe(\"applyStateOps (Loop 3 writer)\", () => {\n \n   it(\"two SEATS in two sessions both keep their handoffs — G-046, now by construction\", () => {\n     applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: \"dev\", ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: \"dev\", watch_out: [], open_questions: [] }] });\n-    const r = applyStateOps(root, { session: SESSION, expected_revision: 8, session_uuid: \"qa\", ops: [{ op: \"set_handoff\", seat: \"qa\", pick_up: \"qa\", watch_out: [], open_questions: [] }] });\n…[cal2 diff truncated]"
+          ],
+          "id": "T24",
+          "observable": "CI on the heads (read only). gh run list --commit for 892f7644 and 3b0b8188. Quote each run's event, conclusion and test job. T-221 is now on master, so a push run and a PR run should no longer cancel each other. Report any run that was cancelled anyway."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "f7ac983d4face4a88f5af9742cc91a54c01e3f4f",
+        "merge_commit": "bd07f604c4f35486f5c93489d53700b67d9914b6",
+        "pr": 3,
+        "scored_sha": "892f7644b48cb49b56dc821406f35a84ca28369a"
+      }
+    }
+  }
+}

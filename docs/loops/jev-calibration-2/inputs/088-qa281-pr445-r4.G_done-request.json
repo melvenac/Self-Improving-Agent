@@ -1,0 +1,443 @@
+{
+  "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+  "candidate_sha": "1e21deaea32e20591e65a5cf39eb40a0517542d6",
+  "case_id": "qa281-pr445-r4",
+  "case_no": 88,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37406327038,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t156-scan-list.md"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+  "plan_redacted_sentences": [
+    {
+      "field": "acceptance.T1",
+      "sentence": "#445 | T-156 r4 | 1e21deaea32e20591e65a5cf39eb40a0517542d6 (previous: r3 260d68352fb89030a92029eae56053d00ed3f7d0, QA 280 REJECT) | open, CI green"
+    },
+    {
+      "field": "acceptance.T1",
+      "sentence": "#445 | T-156 r4 | 1e21deaea32e20591e65a5cf39eb40a0517542d6 (previous: r3 260d68352fb89030a92029eae56053d00ed3f7d0, QA 280 REJECT) | open, CI green"
+    },
+    {
+      "field": "tasks[0]",
+      "sentence": "#445 | T-156 r4 | 1e21deaea32e20591e65a5cf39eb40a0517542d6 (previous: r3 260d68352fb89030a92029eae56053d00ed3f7d0, QA 280 REJECT) | open, CI green"
+    }
+  ],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (The rule says one thing everywhere. At 2f8e6489, .cursor/rules/hub-room.mdc and project-template/.cursor/rules/hub-room.mdc are byte-identical (CRLF-normalised), and the Hub-room section of project-template/.cursor/commands/start.md and docs/loops/cursor-start-differences.json say the same: a seat with a waker reads with --inbox, posts, and ends its turn; exit 2 comes only from --wait.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (No live instruction still tells a Cursor seat to wait inside its turn. Grep .cursor/, project-template/, .agents/roles/, .agents/SYSTEM/ and scripts/ for --wait, wait again, foreground and in this same turn. Classify every hit: instruction to a waker seat (a defect), planner listener, history, or exit-code text.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (Can the guard fail? The PR narrowed its \"no --wait\" test to two exact phrases. Write three rewordings of a wait instruction that a seat would obey (for example \"after posting, run hub-talk --wait\"). Report which the test catches. A rewording that passes is a finding, with a proposed parse-shaped check.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (Exactly the waker files. At 1671d005, git check-ignore -v shows .cursor/wake.lock, .cursor/waker.pid, a .cursor/wake-prompt-<n>.txt and a .cursor/hub-reply-<x>.txt ignored, and .cursor/rules/hub-room.mdc, .cursor/commands/start.md and a new .cursor/rules/x.mdc NOT ignored. The same holds for a project seeded from project-template/gitignore.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (The guard can fail. Remove each pattern in turn from the root .gitignore and from the template: the template-seed row goes red each time.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (You are QA 281, prefix s162b. Push ONLY qa/s162b- branches, and only through node docs/loops/qa-281/push-qa.mjs <branch>, run from your qa281-wt tree.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (Never create, comment on or edit an issue or a PR. Use gh only to read.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (From real config and key files report only counts, names, paths and hash match/no-match, never values (G-051).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (Commit docs/loops/s162b-qa-report.md on qa/s162b-report.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (One verdict for #445 r4 with its pinned head. For #457 and #458, HOLDS or FINDINGS (they are merged). The report's last line is exactly QA-281: REPORT COMPLETE.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (#457 | HUBROOM-TURN-END | merged at 2f8e6489e7d816dff9fc667431425699569071c3 | merged), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (#458 | WAKER-IGNORE | merged at 1671d00547c5c1ef1200d22698c4a607779928e2 | merged), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (Confined. git diff 260d6835 1e21deae lists only test files and docs/loops/t156-scan-list.md; name any other.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (CI. The test result and run id for 1e21deae.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (R-BF-21 controls the real scan (QA 280 row 9). In bootstrap-fix-r4.test.ts, with a real code line (export const … = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;) planted in src/cli.ts, each of these turns R-BF-21 red: (a) a typo'd needle; (b) a pathspec typo (open-brain/srcX); (c) a line extractor that returns nothing for every row; (d) a git grep that errors (for example a bad flag), which must not read as zero hits. A // comment-only near-miss in a real src file stays green. Run each yourself; tsc exit 0 on each.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (QA 280's lows. t195-plan-gate.test.ts:153 is listed or paired with a reason; CC-19's raw cli presence checks are paired or listed; the CC-19 and git.test ranges match the head.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Rows 7, 8, 10 and 11 still hold (QA 280's): CC-19's comment mutants green and the real call red; the doc readers listed; ranges match (spot-check six); row 18's widen and narrow mutants red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (Your own sweep. Grep open-brain/tests at the head for source-text scans (toContain, toMatch, not.toContain and git grep over src or tracked files). Report any scan that is neither paired nor listed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "1e21deaea32e20591e65a5cf39eb40a0517542d6",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/harness/s4-g5-qa.test.ts",
+        "open-brain/tests/harness/shadow-merge.test.ts",
+        "open-brain/tests/pipelines/bootstrap-fix-r4.test.ts",
+        "open-brain/tests/pipelines/sync/probe-markers.test.ts",
+        "open-brain/tests/pipelines/sync/worktree-layout.test.ts",
+        "open-brain/tests/t048-r2b.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T2",
+            "observable": "#457 | HUBROOM-TURN-END | merged at 2f8e6489e7d816dff9fc667431425699569071c3 | merged",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "#458 | WAKER-IGNORE | merged at 1671d00547c5c1ef1200d22698c4a607779928e2 | merged",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Confined. git diff 260d6835 1e21deae lists only test files and docs/loops/t156-scan-list.md; name any other.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "CI. The test result and run id for 1e21deae.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "R-BF-21 controls the real scan (QA 280 row 9). In bootstrap-fix-r4.test.ts, with a real code line (export const … = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;) planted in src/cli.ts, each of these turns R-BF-21 red: (a) a typo'd needle; (b) a pathspec typo (open-brain/srcX); (c) a line extractor that returns nothing for every row; (d) a git grep that errors (for example a bad flag), which must not read as zero hits. A // comment-only near-miss in a real src file stays green. Run each yourself; tsc exit 0 on each.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "QA 280's lows. t195-plan-gate.test.ts:153 is listed or paired with a reason; CC-19's raw cli presence checks are paired or listed; the CC-19 and git.test ranges match the head.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Rows 7, 8, 10 and 11 still hold (QA 280's): CC-19's comment mutants green and the real call red; the doc readers listed; ranges match (spot-check six); row 18's widen and narrow mutants red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "Your own sweep. Grep open-brain/tests at the head for source-text scans (toContain, toMatch, not.toContain and git grep over src or tracked files). Report any scan that is neither paired nor listed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "The rule says one thing everywhere. At 2f8e6489, .cursor/rules/hub-room.mdc and project-template/.cursor/rules/hub-room.mdc are byte-identical (CRLF-normalised), and the Hub-room section of project-template/.cursor/commands/start.md and docs/loops/cursor-start-differences.json say the same: a seat with a waker reads with --inbox, posts, and ends its turn; exit 2 comes only from --wait.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "No live instruction still tells a Cursor seat to wait inside its turn. Grep .cursor/, project-template/, .agents/roles/, .agents/SYSTEM/ and scripts/ for --wait, wait again, foreground and in this same turn. Classify every hit: instruction to a waker seat (a defect), planner listener, history, or exit-code text.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Can the guard fail? The PR narrowed its \"no --wait\" test to two exact phrases. Write three rewordings of a wait instruction that a seat would obey (for example \"after posting, run hub-talk --wait\"). Report which the test catches. A rewording that passes is a finding, with a proposed parse-shaped check.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Exactly the waker files. At 1671d005, git check-ignore -v shows .cursor/wake.lock, .cursor/waker.pid, a .cursor/wake-prompt-<n>.txt and a .cursor/hub-reply-<x>.txt ignored, and .cursor/rules/hub-room.mdc, .cursor/commands/start.md and a new .cursor/rules/x.mdc NOT ignored. The same holds for a project seeded from project-template/gitignore.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "The guard can fail. Remove each pattern in turn from the root .gitignore and from the template: the template-seed row goes red each time.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "You are QA 281, prefix s162b. Push ONLY qa/s162b- branches, and only through node docs/loops/qa-281/push-qa.mjs <branch>, run from your qa281-wt tree.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Never create, comment on or edit an issue or a PR. Use gh only to read.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "From real config and key files report only counts, names, paths and hash match/no-match, never values (G-051).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "Commit docs/loops/s162b-qa-report.md on qa/s162b-report.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "One verdict for #445 r4 with its pinned head. For #457 and #458, HOLDS or FINDINGS (they are merged). The report's last line is exactly QA-281: REPORT COMPLETE.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "88-qa281-pr445-r4",
+        "new_capability": "QA 281, session-162 batch b: #445 r4, and a retro-check of #457 and #458 (merged without QA)",
+        "objective": "QA 281, session-162 batch b: #445 r4, and a retro-check of #457 and #458 (merged without QA)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "803fe1f6304e23c6eb167520041aceb612fbf942",
+          "path": "docs/loops/qa-281-s162b-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "#457 | HUBROOM-TURN-END | merged at 2f8e6489e7d816dff9fc667431425699569071c3 | merged",
+          "#458 | WAKER-IGNORE | merged at 1671d00547c5c1ef1200d22698c4a607779928e2 | merged",
+          "Confined. git diff 260d6835 1e21deae lists only test files and docs/loops/t156-scan-list.md; name any other.",
+          "CI. The test result and run id for 1e21deae.",
+          "R-BF-21 controls the real scan (QA 280 row 9). In bootstrap-fix-r4.test.ts, with a real code line (export const … = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;) planted in src/cli.ts, each of these turns R-BF-21 red: (a) a typo'd needle; (b) a pathspec typo (open-brain/srcX); (c) a line extractor that returns nothing for every row; (d) a git grep that errors (for example a bad flag), which must not read as zero hits. A // comment-only near-miss in a real src file stays green. Run each yourself; tsc exit 0 on each.",
+          "QA 280's lows. t195-plan-gate.test.ts:153 is listed or paired with a reason; CC-19's raw cli presence checks are paired or listed; the CC-19 and git.test ranges match the head.",
+          "Rows 7, 8, 10 and 11 still hold (QA 280's): CC-19's comment mutants green and the real call red; the doc readers listed; ranges match (spot-check six); row 18's widen and narrow mutants red.",
+          "Your own sweep. Grep open-brain/tests at the head for source-text scans (toContain, toMatch, not.toContain and git grep over src or tracked files). Report any scan that is neither paired nor listed.",
+          "The rule says one thing everywhere. At 2f8e6489, .cursor/rules/hub-room.mdc and project-template/.cursor/rules/hub-room.mdc are byte-identical (CRLF-normalised), and the Hub-room section of project-template/.cursor/commands/start.md and docs/loops/cursor-start-differences.json say the same: a seat with a waker reads with --inbox, posts, and ends its turn; exit 2 comes only from --wait.",
+          "No live instruction still tells a Cursor seat to wait inside its turn. Grep .cursor/, project-template/, .agents/roles/, .agents/SYSTEM/ and scripts/ for --wait, wait again, foreground and in this same turn. Classify every hit: instruction to a waker seat (a defect), planner listener, history, or exit-code text.",
+          "Can the guard fail? The PR narrowed its \"no --wait\" test to two exact phrases. Write three rewordings of a wait instruction that a seat would obey (for example \"after posting, run hub-talk --wait\"). Report which the test catches. A rewording that passes is a finding, with a proposed parse-shaped check.",
+          "Exactly the waker files. At 1671d005, git check-ignore -v shows .cursor/wake.lock, .cursor/waker.pid, a .cursor/wake-prompt-<n>.txt and a .cursor/hub-reply-<x>.txt ignored, and .cursor/rules/hub-room.mdc, .cursor/commands/start.md and a new .cursor/rules/x.mdc NOT ignored. The same holds for a project seeded from project-template/gitignore.",
+          "The guard can fail. Remove each pattern in turn from the root .gitignore and from the template: the template-seed row goes red each time.",
+          "You are QA 281, prefix s162b. Push ONLY qa/s162b- branches, and only through node docs/loops/qa-281/push-qa.mjs <branch>, run from your qa281-wt tree.",
+          "Never create, comment on or edit an issue or a PR. Use gh only to read.",
+          "From real config and key files report only counts, names, paths and hash match/no-match, never values (G-051).",
+          "Commit docs/loops/s162b-qa-report.md on qa/s162b-report.",
+          "One verdict for #445 r4 with its pinned head. For #457 and #458, HOLDS or FINDINGS (they are merged). The report's last line is exactly QA-281: REPORT COMPLETE."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "#457 | HUBROOM-TURN-END | merged at 2f8e6489e7d816dff9fc667431425699569071c3 | merged"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "#458 | WAKER-IGNORE | merged at 1671d00547c5c1ef1200d22698c4a607779928e2 | merged"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/s4-g5-qa.test.ts b/open-brain/tests/harness/s4-g5-qa.test.ts\nindex 859c03df..35fc7e6c 100644\n--- a/open-brain/tests/harness/s4-g5-qa.test.ts\n+++ b/open-brain/tests/harness/s4-g5-qa.test.ts\n@@ -143,6 +143,7 @@ describe(\"S4-6a — qa-score.json, its schema, and the threshold-scan guard\", {\n     const plantedPrompt = gate.replace('\"Is the artifact complete enough,', '\"Answer at least 0.6 if so. Is the artifact complete enough,');\n     expect(plantedPrompt).not.toBe(gate);\n     expect(thresholdLiterals(plantedPrompt)).toContain(\"0.6\");\n+    expect(thresholdLiterals(\"// never plant 0.6 in a prompt\")).toEqual([]);\n     const pol = readFileSync(join(SRC, \"policies.ts\"), \"utf-8\");\n     const plantedDecision = pol.replace(\"if (input.regressionOfValidated === null)\", \"if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)\");\n     expect(plantedDecision).not.toBe(pol);\n@@ -357,6 +358,7 @@ describe(\"S4-6b/6c/6d — the runner\", { timeout: 120_000 }, () => {\n       const text = readFileSync(join(SRC, f), \"utf-8\");\n       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..dd4e4ade 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..3c8f2e66 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,18 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkWorktreeLayout(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..7de2e2f0 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n@@ -191,7 +197,18 @@ describe(\"T-048 round 2b\", () => {\n       \"utf8\",\n     );\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "Confined. git diff 260d6835 1e21deae lists only test files and docs/loops/t156-scan-list.md; name any other."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/s4-g5-qa.test.ts b/open-brain/tests/harness/s4-g5-qa.test.ts\nindex 859c03df..35fc7e6c 100644\n--- a/open-brain/tests/harness/s4-g5-qa.test.ts\n+++ b/open-brain/tests/harness/s4-g5-qa.test.ts\n@@ -143,6 +143,7 @@ describe(\"S4-6a — qa-score.json, its schema, and the threshold-scan guard\", {\n     const plantedPrompt = gate.replace('\"Is the artifact complete enough,', '\"Answer at least 0.6 if so. Is the artifact complete enough,');\n     expect(plantedPrompt).not.toBe(gate);\n     expect(thresholdLiterals(plantedPrompt)).toContain(\"0.6\");\n+    expect(thresholdLiterals(\"// never plant 0.6 in a prompt\")).toEqual([]);\n     const pol = readFileSync(join(SRC, \"policies.ts\"), \"utf-8\");\n     const plantedDecision = pol.replace(\"if (input.regressionOfValidated === null)\", \"if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)\");\n     expect(plantedDecision).not.toBe(pol);\n@@ -357,6 +358,7 @@ describe(\"S4-6b/6c/6d — the runner\", { timeout: 120_000 }, () => {\n       const text = readFileSync(join(SRC, f), \"utf-8\");\n       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..dd4e4ade 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..3c8f2e66 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,18 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkWorktreeLayout(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..7de2e2f0 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n@@ -191,7 +197,18 @@ describe(\"T-048 round 2b\", () => {\n       \"utf8\",\n     );\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "CI. The test result and run id for 1e21deae."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/s4-g5-qa.test.ts b/open-brain/tests/harness/s4-g5-qa.test.ts\nindex 859c03df..35fc7e6c 100644\n--- a/open-brain/tests/harness/s4-g5-qa.test.ts\n+++ b/open-brain/tests/harness/s4-g5-qa.test.ts\n@@ -143,6 +143,7 @@ describe(\"S4-6a — qa-score.json, its schema, and the threshold-scan guard\", {\n     const plantedPrompt = gate.replace('\"Is the artifact complete enough,', '\"Answer at least 0.6 if so. Is the artifact complete enough,');\n     expect(plantedPrompt).not.toBe(gate);\n     expect(thresholdLiterals(plantedPrompt)).toContain(\"0.6\");\n+    expect(thresholdLiterals(\"// never plant 0.6 in a prompt\")).toEqual([]);\n     const pol = readFileSync(join(SRC, \"policies.ts\"), \"utf-8\");\n     const plantedDecision = pol.replace(\"if (input.regressionOfValidated === null)\", \"if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)\");\n     expect(plantedDecision).not.toBe(pol);\n@@ -357,6 +358,7 @@ describe(\"S4-6b/6c/6d — the runner\", { timeout: 120_000 }, () => {\n       const text = readFileSync(join(SRC, f), \"utf-8\");\n       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..dd4e4ade 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..3c8f2e66 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,18 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkWorktreeLayout(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..7de2e2f0 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n@@ -191,7 +197,18 @@ describe(\"T-048 round 2b\", () => {\n       \"utf8\",\n     );\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "R-BF-21 controls the real scan (QA 280 row 9). In bootstrap-fix-r4.test.ts, with a real code line (export const … = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;) planted in src/cli.ts, each of these turns R-BF-21 red: (a) a typo'd needle; (b) a pathspec typo (open-brain/srcX); (c) a line extractor that returns nothing for every row; (d) a git grep that errors (for example a bad flag), which must not read as zero hits. A // comment-only near-miss in a real src file stays green. Run each yourself; tsc exit 0 on each."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..dd4e4ade 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "QA 280's lows. t195-plan-gate.test.ts:153 is listed or paired with a reason; CC-19's raw cli presence checks are paired or listed; the CC-19 and git.test ranges match the head."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "Rows 7, 8, 10 and 11 still hold (QA 280's): CC-19's comment mutants green and the real call red; the doc readers listed; ranges match (spot-check six); row 18's widen and narrow mutants red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/s4-g5-qa.test.ts b/open-brain/tests/harness/s4-g5-qa.test.ts\nindex 859c03df..35fc7e6c 100644\n--- a/open-brain/tests/harness/s4-g5-qa.test.ts\n+++ b/open-brain/tests/harness/s4-g5-qa.test.ts\n@@ -143,6 +143,7 @@ describe(\"S4-6a — qa-score.json, its schema, and the threshold-scan guard\", {\n     const plantedPrompt = gate.replace('\"Is the artifact complete enough,', '\"Answer at least 0.6 if so. Is the artifact complete enough,');\n     expect(plantedPrompt).not.toBe(gate);\n     expect(thresholdLiterals(plantedPrompt)).toContain(\"0.6\");\n+    expect(thresholdLiterals(\"// never plant 0.6 in a prompt\")).toEqual([]);\n     const pol = readFileSync(join(SRC, \"policies.ts\"), \"utf-8\");\n     const plantedDecision = pol.replace(\"if (input.regressionOfValidated === null)\", \"if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)\");\n     expect(plantedDecision).not.toBe(pol);\n@@ -357,6 +358,7 @@ describe(\"S4-6b/6c/6d — the runner\", { timeout: 120_000 }, () => {\n       const text = readFileSync(join(SRC, f), \"utf-8\");\n       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..dd4e4ade 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..3c8f2e66 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,18 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkWorktreeLayout(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..7de2e2f0 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n@@ -191,7 +197,18 @@ describe(\"T-048 round 2b\", () => {\n       \"utf8\",\n     );\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "Your own sweep. Grep open-brain/tests at the head for source-text scans (toContain, toMatch, not.toContain and git grep over src or tracked files). Report any scan that is neither paired nor listed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..dd4e4ade 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "The rule says one thing everywhere. At 2f8e6489, .cursor/rules/hub-room.mdc and project-template/.cursor/rules/hub-room.mdc are byte-identical (CRLF-normalised), and the Hub-room section of project-template/.cursor/commands/start.md and docs/loops/cursor-start-differences.json say the same: a seat with a waker reads with --inbox, posts, and ends its turn; exit 2 comes only from --wait."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "No live instruction still tells a Cursor seat to wait inside its turn. Grep .cursor/, project-template/, .agents/roles/, .agents/SYSTEM/ and scripts/ for --wait, wait again, foreground and in this same turn. Classify every hit: instruction to a waker seat (a defect), planner listener, history, or exit-code text."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/s4-g5-qa.test.ts b/open-brain/tests/harness/s4-g5-qa.test.ts\nindex 859c03df..35fc7e6c 100644\n--- a/open-brain/tests/harness/s4-g5-qa.test.ts\n+++ b/open-brain/tests/harness/s4-g5-qa.test.ts\n@@ -143,6 +143,7 @@ describe(\"S4-6a — qa-score.json, its schema, and the threshold-scan guard\", {\n     const plantedPrompt = gate.replace('\"Is the artifact complete enough,', '\"Answer at least 0.6 if so. Is the artifact complete enough,');\n     expect(plantedPrompt).not.toBe(gate);\n     expect(thresholdLiterals(plantedPrompt)).toContain(\"0.6\");\n+    expect(thresholdLiterals(\"// never plant 0.6 in a prompt\")).toEqual([]);\n     const pol = readFileSync(join(SRC, \"policies.ts\"), \"utf-8\");\n     const plantedDecision = pol.replace(\"if (input.regressionOfValidated === null)\", \"if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)\");\n     expect(plantedDecision).not.toBe(pol);\n@@ -357,6 +358,7 @@ describe(\"S4-6b/6c/6d — the runner\", { timeout: 120_000 }, () => {\n       const text = readFileSync(join(SRC, f), \"utf-8\");\n       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..dd4e4ade 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..3c8f2e66 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,18 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkWorktreeLayout(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..7de2e2f0 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n@@ -191,7 +197,18 @@ describe(\"T-048 round 2b\", () => {\n       \"utf8\",\n     );\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "Can the guard fail? The PR narrowed its \"no --wait\" test to two exact phrases. Write three rewordings of a wait instruction that a seat would obey (for example \"after posting, run hub-talk --wait\"). Report which the test catches. A rewording that passes is a finding, with a proposed parse-shaped check."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..3c8f2e66 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,18 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkWorktreeLayout(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "Exactly the waker files. At 1671d005, git check-ignore -v shows .cursor/wake.lock, .cursor/waker.pid, a .cursor/wake-prompt-<n>.txt and a .cursor/hub-reply-<x>.txt ignored, and .cursor/rules/hub-room.mdc, .cursor/commands/start.md and a new .cursor/rules/x.mdc NOT ignored. The same holds for a project seeded from project-template/gitignore."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/t048-r2b.test.ts b/open-brain/tests/t048-r2b.test.ts\nindex 73685ba6..7de2e2f0 100644\n--- a/open-brain/tests/t048-r2b.test.ts\n+++ b/open-brain/tests/t048-r2b.test.ts\n@@ -96,7 +96,13 @@ describe(\"T-048 round 2b\", () => {\n       details: { invocationLog: \"ran\" },\n     })).not.toContain(\"invocation log:\");\n     const cli = readFileSync(join(import.meta.dirname, \"../src/cli.ts\"), \"utf8\");\n-    expect(cli, \"sync --score uses that printer\").toContain(\"formatScoreCategoryLine\");\n+    const namesPrinter = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return !trimmed.startsWith(\"//\") && trimmed.includes(\"formatScoreCategoryLine\");\n+    });\n+    expect(namesPrinter(\"formatScoreCategoryLine(row);\")).toBe(true);\n+    expect(namesPrinter(\"// formatScoreCategoryLine is not called\")).toBe(false);\n+    expect(namesPrinter(cli), \"sync --score uses that printer\").toBe(true);\n   });\n \n   it(\"D2: a readable db with no session_meta holds no session\", () => {\n@@ -191,7 +197,18 @@ describe(\"T-048 round 2b\", () => {\n       \"utf8\",\n     );\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "The guard can fail. Remove each pattern in turn from the root .gitignore and from the template: the template-seed row goes red each time."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/s4-g5-qa.test.ts b/open-brain/tests/harness/s4-g5-qa.test.ts\nindex 859c03df..35fc7e6c 100644\n--- a/open-brain/tests/harness/s4-g5-qa.test.ts\n+++ b/open-brain/tests/harness/s4-g5-qa.test.ts\n@@ -143,6 +143,7 @@ describe(\"S4-6a — qa-score.json, its schema, and the threshold-scan guard\", {\n     const plantedPrompt = gate.replace('\"Is the artifact complete enough,', '\"Answer at least 0.6 if so. Is the artifact complete enough,');\n     expect(plantedPrompt).not.toBe(gate);\n     expect(thresholdLiterals(plantedPrompt)).toContain(\"0.6\");\n+    expect(thresholdLiterals(\"// never plant 0.6 in a prompt\")).toEqual([]);\n     const pol = readFileSync(join(SRC, \"policies.ts\"), \"utf-8\");\n     const plantedDecision = pol.replace(\"if (input.regressionOfValidated === null)\", \"if (input.regressionOfValidated > 0.6 || input.regressionOfValidated === null)\");\n     expect(plantedDecision).not.toBe(pol);\n@@ -357,6 +358,7 @@ describe(\"S4-6b/6c/6d — the runner\", { timeout: 120_000 }, () => {\n       const text = readFileSync(join(SRC, f), \"utf-8\");\n       expect(thresholdLiterals(text), `${f} already holds a literal`).toEqual([]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "You are QA 281, prefix s162b. Push ONLY qa/s162b- branches, and only through node docs/loops/qa-281/push-qa.mjs <branch>, run from your qa281-wt tree."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..dd4e4ade 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "Never create, comment on or edit an issue or a PR. Use gh only to read."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "From real config and key files report only counts, names, paths and hash match/no-match, never values (G-051)."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "Commit docs/loops/s162b-qa-report.md on qa/s162b-report."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..165d95cf 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -134,11 +134,80 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n   });\n });\n \n+const RENAME_HOOK_VAR = \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\";\n+\n+/** Code lines only. A line comment or a one-line block comment is not an instance. */\n+function renameHookInSourceLine(line: string): boolean {\n+  const trimmed = line.trim();\n+  return trimmed.length > 0\n+    && !trimmed.startsWith(\"//\")\n+    && !trimmed.startsWith(\"*\")\n+    && !trimmed.startsWith(\"/*\")\n+    && trimmed.includes(RENAME_HOOK_VAR);\n+}\n+\n+function sourceLineFromGitGrep(row: string): string {\n+  const m = row.match(/^[^:]+:\\d+:(.*)$/);\n+  return m ? m[1] : row;\n+}\n+\n+function gitGrepRenameHookCodeHits(stdout: string): string[] {\n+  return stdout.split(\"\\n\").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));\n+}\n+\n+const OPEN_BRAIN_SRC = \"open-brain/src\";\n+\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..3c8f2e66 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,18 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkWorktreeLayout(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "One verdict for #445 r4 with its pinned head. For #457 and #458, HOLDS or FINDINGS (they are merged). The report's last line is exactly QA-281: REPORT COMPLETE."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "merge_commit": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+        "pr": 445,
+        "scored_sha": "1e21deaea32e20591e65a5cf39eb40a0517542d6"
+      }
+    }
+  }
+}

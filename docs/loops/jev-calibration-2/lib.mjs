@@ -9,6 +9,7 @@ export const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(HERE, "../../..");
 // QA 250 onward (atlas s162): every QA run with a report, up to the highest QA number that has a prompt on master.
 export const MIN_QA = 250;
+export const POLICY_REL = "open-brain/src/harness/policies/developer-done-cal2-r2.json";
 
 export function git(args, { allowFail = false } = {}) {
   try {

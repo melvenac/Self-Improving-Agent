@@ -1,0 +1,166 @@
+{
+  "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+  "candidate_sha": "a5f118192f3479ad35dd58aebb3d24510f0f24b4",
+  "case_id": "qa277-pr444",
+  "case_no": 76,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37197465284,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t168-suite-meta.md"
+  ],
+  "label": "REJECT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "59eb1c9dae473bba43a46b4b78ccd4799280e85c",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. Flag any file outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. New or changed test files against master's source (red) and the head (green); quote counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). The test result and run id above, for the pinned head.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "a5f118192f3479ad35dd58aebb3d24510f0f24b4",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        ".github/workflows/ci.yml",
+        "open-brain/package.json",
+        "open-brain/scripts/write-ci-suite-meta.mjs",
+        "open-brain/src/cli-suite-run.ts",
+        "open-brain/src/suite-census.ts",
+        "open-brain/src/suite-run-meta.ts",
+        "open-brain/tests/suite-run-meta.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. Flag any file outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. New or changed test files against master's source (red) and the head (green); quote counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). The test result and run id above, for the pinned head.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "76-qa277-pr444",
+        "new_capability": "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)",
+        "objective": "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+          "path": "docs/loops/qa-277-s161e-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. Flag any file outside the task.",
+          "Red then green. New or changed test files against master's source (red) and the head (green); quote counts.",
+          "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.",
+          "CI (read only). The test result and run id above, for the pinned head."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml\nindex 89800ff9..15adaffc 100644\n--- a/.github/workflows/ci.yml\n+++ b/.github/workflows/ci.yml\n@@ -141,6 +141,24 @@ jobs:\n         working-directory: open-brain\n         run: npm test -- --reporter=verbose\n \n+      # T-168: CI has no hub census. The writer records runner name, labels and\n+      # timestamp; concurrent_jobs stays \"unknown\" unless a token is present.\n+      # This file merges on Aaron's word (CI workflow).\n+      - name: Write CI suite meta\n+        if: always()\n+        working-directory: open-brain\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+        run: node scripts/write-ci-suite-meta.mjs suite-run-meta.json\n+\n+      - name: Upload suite run meta\n+        if: always()\n+        uses: actions/upload-artifact@v4\n+        with:\n+          name: suite-meta-${{ github.run_id }}-${{ github.run_attempt }}\n+          path: open-brain/suite-run-meta.json\n+          if-no-files-found: warn\n+\n   # Windows, on the laptop runner (laptop-win). Opt-in: only a dispatch with windows=true runs it, so a new\n   # platform cannot block D-032's merge gate while it proves itself. Its jobs are firewalled from every private\n   # network by a rule scoped to the runner service (planner session 109). The first step proves it, like tcm's."
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. Flag any file outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/suite-run-meta.test.ts b/open-brain/tests/suite-run-meta.test.ts\nnew file mode 100644\nindex 00000000..9de8acd6\n--- /dev/null\n+++ b/open-brain/tests/suite-run-meta.test.ts\n@@ -0,0 +1,264 @@\n+import { describe, it, expect } from \"vitest\";\n+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { spawnSync } from \"node:child_process\";\n+import { createRequire } from \"node:module\";\n+import { decideSuiteStart, readCensus, readKeyFile, resolveSeatKeyPath } from \"../src/suite-census.js\";\n+import { buildCiSuiteMeta, buildSuiteMeta, sidecarStillLive, vitestCountsFromJson } from \"../src/suite-run-meta.js\";\n+\n+const TSX = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const CLI = join(import.meta.dirname, \"../src/cli-suite-run.ts\");\n+const SIA = [\"atlas\", \"cursor-builder\", \"forge\", \"cursor-infra\"];\n+\n+function presence(agents: { name: string; seatState: string }[]) {\n+  return { agents: agents.map((a) => ({ name: a.name, seat: { seatState: a.seatState } })) };\n+}\n+\n+function fetchBodies(bodies: unknown[], status = 200): typeof fetch {\n+  let i = 0;\n+  return (async () => {\n+    const body = bodies[Math.min(i, bodies.length - 1)];\n+    i += 1;\n+    return new Response(JSON.stringify(body), { status });\n+  }) as typeof fetch;\n+}\n+\n+describe(\"T-168 suite meta\", () => {\n+  const keyDir = mkdtempSync(join(tmpdir(), \"t168-key-\"));\n+  const keyPath = join(keyDir, \"seat.key\");\n+  writeFileSync(keyPath, \"k\".repeat(40));\n+\n+  it(\"R1 lease exit 10 refuses\", () => {\n+    const census = {\n+      source: \"hub-presence\" as const,\n+      timestamp: \"t\",\n+      available: true,\n+      reason: null,\n+      agents: [],\n+      busySia: [],\n+      samples: 2,\n+    };\n+    expect(decideSuiteStart({ leaseExit: 10, census, controlledRerun: false })).toEqual({\n+      refuse: true,\n+      why: \"lease held (exit 10)\",\n+    });\n+  });\n+\n+  it(\"R2 lease free meta carries seat and sha\", () => {\n+    const meta = buildSuiteMeta({\n+      gitSha: \"abc\",\n+      seat: \"cursor-builder\",\n+      leaseExit: 0,\n+      census: {\n+        source: \"hub-presence\",\n+        timestamp: \"t\",\n+        available: true,\n+        reason: null,\n+        agents: [{ name: \"forge\", seatState: \"idle\" }],\n+        busySia: [],\n+        samples: 2,\n+      },\n+      vitest: { counts: { passed: 1, failed: 0, errors: 0 }, exitCode: 0 },\n+    });\n+    expect(meta.git_sha).toBe(\"abc\");\n+    expect(meta.seat).toBe(\"cursor-builder\");\n+    expect(meta.lease_status).toBe(\"taken\");\n+    expect(meta.vitest.exit_code).toBe(0);\n+  });\n+\n+  it(\"R3 foreign working seat is recorded and the run is not refused\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([\n+        presence([{ name: \"chisel\", seatState: \"working\" }]),\n+        presence([{ name: \"chisel\", seatState: \"working\" }]),\n+      ]),\n+    });\n+    expect(census.available).toBe(true);\n+    expect(census.busySia).toEqual([]);\n+    expect(census.agents.map((a) => a.name)).toContain(\"chisel\");\n+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: false }).refuse).toBe(false);\n+  });\n+\n+  it(\"R4 controlled rerun refuses a busy SIA seat\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([\n+        presence([{ name: \"forge\", seatState: \"working\" }]),\n+        presence([{ name: \"forge\", seatState: \"idle\" }]),\n+      ]),\n+    });\n+    expect(census.busySia).toContain(\"forge\");\n+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: true }).refuse).toBe(true);\n+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: false }).refuse).toBe(false);\n+  });\n+\n+  it(\"R5 a single empty sample is not idle; both empty is unavailable\", async () => {\n+    const oneEmpty = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([presence([]), presence([{ name: \"atlas\", seatState: \"idle\" }])]),\n+    });\n+    expect(oneEmpty.available).toBe(true);\n+    expect(oneEmpty.reason).toBeNull();\n+    const bothEmpty = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([presence([]), presence([])]),\n+    });\n+    expect(bothEmpty.available).toBe(false);\n+    expect(bothEmpty.reason).toMatch(/not idle/);\n+  });\n+\n+  it(\"R6 an expired sidecar is not live and is not an idle census\", () => {\n+    expect(sidecarStillLive(\"2000-01-01T00:00:00.000Z\", 60_000, Date.parse(\"2026-01-01T00:00:00.000Z\"))).toBe(false);\n+    const census = {\n+      source: \"hub-presence\" as const,\n+      timestamp: \"2000-01-01T00:00:00.000Z\",\n+      available: false,\n+      reason: \"census unavailable: sidecar expired\",\n+      agents: [],\n+      busySia: [],\n+      samples: 0,\n+    };\n+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: false }).refuse).toBe(false);\n+    expect(census.available).toBe(false);\n+  });\n+\n+  it(\"R7 cli writes the meta file\", () => {\n+    const dir = mkdtempSync(join(tmpdir(), \"t168-meta-\"));\n+    const fixture = join(dir, \"presence.json\");\n+    const vitestJson = join(dir, \"vitest.json\");\n+    const meta = join(dir, \"suite-run-meta.json\");\n+    writeFileSync(\n+      fixture,\n+      JSON.stringify({\n+        samples: [\n+          presence([{ name: \"forge\", seatState: \"idle\" }]),\n+          presence([{ name: \"forge\", seatState: \"idle\" }]),\n+        ],\n+      }),\n+    );\n+    writeFileSync(vitestJson, JSON.stringify({ numPassedTests: 3, numFailedTests: 1, unhandledErrors: 0 }));\n+    const r = spawnSync(process.execPath, [TSX, CLI, \"--seat\", \"cursor-builder\", \"--meta\", meta], {\n+      encoding: \"utf8\",\n+      cwd: dir,\n+      env: {\n+        ...process.env,\n+        SUITE_CENSUS_FIXTURE: fixture,\n+        SUITE_LEASE_EXIT: \"0\",\n+        SUITE_VITEST_JSON: vitestJson,\n+        SUITE_VITEST_EXIT: \"0\",\n+      },\n+    });\n+    expect(r.status).toBe(0);\n+    const written = JSON.parse(readFileSync(meta, \"utf8\"));\n+    expect(written.seat).toBe(\"cursor-builder\");\n+    expect(written.vitest).toEqual({ passed: 3, failed: 1, errors: 0, exit_code: 0 });\n+    expect(written.census.source).toBe(\"hub-presence\");\n+    rmSync(dir, { recursive: true, force: true });\n+  });\n+\n+  it(\"CI row has runner fields and unknown concurrent jobs without a token\", () => {\n+    const meta = buildCiSuiteMeta({\n+      gitSha: \"abc\",\n+      runnerName: \"tcm-2\",\n+      runnerLabels: [\"self-hosted\", \"Linux\"],\n+      timestamp: \"t\",\n+      concurrentJobs: \"unknown\",\n+    });\n+    expect(meta.ci?.runner_name).toBe(\"tcm-2\");\n+    expect(meta.ci?.runner_labels).toEqual([\"self-hosted\", \"Linux\"]);\n+    expect(meta.ci?.concurrent_jobs).toBe(\"unknown\");\n+    expect(meta.census.reason).toMatch(/census unavailable/);\n+  });\n+\n+  it(\"unreachable hub records unavailable, not idle\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: (async () => {\n+        throw new Error(\"connect ECONNREFUSED\");\n+      }) as typeof fetch,\n+    });\n+    expect(census.available).toBe(false);\n+    expect(census.reason).toMatch(/census unavailable:/);\n+    expect(census.reason).not.toMatch(/idle$/);\n+  });\n+\n+  it(\"a waker seat reporting working counts as busy\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([\n+        presence([{ name: \"cursor-builder-waker\", seatState: \"working\" }]),\n+        presence([{ name: \"cursor-builder-waker\", seatState: \"working\" }]),\n+      ]),\n+    });\n+    expect(census.busySia).toContain(\"cursor-builder-waker\");\n+  });\n+\n+  it(\"seat key path is A2A_KEY_DIR or ~/.a2a-hub/keys/<host>-<port>/<hub_name>.key\", () => {\n+    expect(resolveSeatKeyPath({\n+      hubUrl: \"http://100.124.212.87:4000\",\n+      hubName: \"cursor-builder\",\n+      keyDir: \"C:/keys\",\n+    }).replace(/\\\\/g, \"/\")).toBe(\"C:/keys/100.124.212.87-4000/cursor-builder.key\");\n+  });\n+  it(\"mutant: no key is unavailable, never an idle census\", () => {\n+    expect(readKeyFile(undefined).ok).toBe(false);\n+    expect(readKeyFile(undefined)).toMatchObject({ reason: expect.stringMatching(/census unavailable:/) });\n+  });\n+\n+  it(\"mutant: a body without seat.seatState is unavailable\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([\n+        { agents: [{ name: \"forge\", state: \"idle\" }] },\n+        { agents: [{ name: \"forge\", state: \"idle\" }] },\n+      ]),\n+    });\n+    expect(census.available).toBe(false);\n+    expect(census.reason).toMatch(/seat\\.seatState/);\n+  });\n+\n+  it(\"G-042: passed and failed counts are separate from exit_code\", () => {\n+    const counts = vitestCountsFromJson({ numPassedTests: 1096, numFailedTests: 0 });\n+    const meta = buildSuiteMeta({\n+      gitSha: \"abc\",\n+      seat: \"forge\",\n+      leaseExit: 0,\n+      census: {\n+        source: \"hub-presence\",\n+        timestamp: \"t\",\n+        available: true,\n+        reason: null,\n+        agents: [],\n+        busySia: [],\n+        samples: 2,\n+      },\n+      vitest: { counts, exitCode: 1 },\n+    });\n+    expect(meta.vitest.failed).toBe(0);\n+    expect(meta.vitest.passed).toBe(1096);\n+    expect(meta.vitest.exit_code).toBe(1);\n+  });\n+});\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. New or changed test files against master's source (red) and the head (green); quote counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/scripts/write-ci-suite-meta.mjs b/open-brain/scripts/write-ci-suite-meta.mjs\nnew file mode 100644\nindex 00000000..5f298760\n--- /dev/null\n+++ b/open-brain/scripts/write-ci-suite-meta.mjs\n@@ -0,0 +1,46 @@\n+#!/usr/bin/env node\n+/**\n+ * T-168 CI meta. No hub census. Concurrent jobs only when a GitHub token is set.\n+ * Usage: node scripts/write-ci-suite-meta.mjs <out.json>\n+ */\n+import { writeFileSync } from \"node:fs\";\n+import { spawnSync } from \"node:child_process\";\n+\n+const out = process.argv[2] ?? \"suite-run-meta.json\";\n+const sha = (spawnSync(\"git\", [\"rev-parse\", \"HEAD\"], { encoding: \"utf8\" }).stdout ?? \"\").trim() || \"unknown\";\n+const timestamp = new Date().toISOString();\n+const runnerName = process.env.RUNNER_NAME ?? \"unknown\";\n+const labels = (process.env.RUNNER_LABELS ?? process.env.RUNNER_OS ?? \"unknown\").split(\",\").map((s) => s.trim()).filter(Boolean);\n+const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN || \"\";\n+let concurrent = \"unknown\";\n+if (token && process.env.GITHUB_REPOSITORY && process.env.GITHUB_RUN_ID) {\n+  const r = spawnSync(\n+    \"gh\",\n+    [\"api\", `repos/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/jobs`, \"--jq\", \".jobs | length\"],\n+    { encoding: \"utf8\", env: { ...process.env, GH_TOKEN: token } },\n+  );\n+  concurrent = r.status === 0 && (r.stdout ?? \"\").trim() ? (r.stdout ?? \"\").trim() : \"unknown\";\n+}\n+\n+const meta = {\n+  git_sha: sha,\n+  seat: \"ci\",\n+  lease_status: \"skipped\",\n+  census: {\n+    source: \"ci\",\n+    timestamp,\n+    available: false,\n+    reason: \"census unavailable: CI runner has no hub census\",\n+    agents: [],\n+    busy_sia: [],\n+    samples: 0,\n+  },\n+  vitest: { passed: null, failed: null, errors: null, exit_code: null },\n+  ci: {\n+    runner_name: runnerName,\n+    runner_labels: labels,\n+    timestamp,\n+    concurrent_jobs: concurrent,\n+  },\n+};\n+writeFileSync(out, JSON.stringify(meta, null, 2) + \"\\n\");"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/suite-run-meta.test.ts b/open-brain/tests/suite-run-meta.test.ts\nnew file mode 100644\nindex 00000000..9de8acd6\n--- /dev/null\n+++ b/open-brain/tests/suite-run-meta.test.ts\n@@ -0,0 +1,264 @@\n+import { describe, it, expect } from \"vitest\";\n+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { spawnSync } from \"node:child_process\";\n+import { createRequire } from \"node:module\";\n+import { decideSuiteStart, readCensus, readKeyFile, resolveSeatKeyPath } from \"../src/suite-census.js\";\n+import { buildCiSuiteMeta, buildSuiteMeta, sidecarStillLive, vitestCountsFromJson } from \"../src/suite-run-meta.js\";\n+\n+const TSX = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const CLI = join(import.meta.dirname, \"../src/cli-suite-run.ts\");\n+const SIA = [\"atlas\", \"cursor-builder\", \"forge\", \"cursor-infra\"];\n+\n+function presence(agents: { name: string; seatState: string }[]) {\n+  return { agents: agents.map((a) => ({ name: a.name, seat: { seatState: a.seatState } })) };\n+}\n+\n+function fetchBodies(bodies: unknown[], status = 200): typeof fetch {\n+  let i = 0;\n+  return (async () => {\n+    const body = bodies[Math.min(i, bodies.length - 1)];\n+    i += 1;\n+    return new Response(JSON.stringify(body), { status });\n+  }) as typeof fetch;\n+}\n+\n+describe(\"T-168 suite meta\", () => {\n+  const keyDir = mkdtempSync(join(tmpdir(), \"t168-key-\"));\n+  const keyPath = join(keyDir, \"seat.key\");\n+  writeFileSync(keyPath, \"k\".repeat(40));\n+\n+  it(\"R1 lease exit 10 refuses\", () => {\n+    const census = {\n+      source: \"hub-presence\" as const,\n+      timestamp: \"t\",\n+      available: true,\n+      reason: null,\n+      agents: [],\n+      busySia: [],\n+      samples: 2,\n+    };\n+    expect(decideSuiteStart({ leaseExit: 10, census, controlledRerun: false })).toEqual({\n+      refuse: true,\n+      why: \"lease held (exit 10)\",\n+    });\n+  });\n+\n+  it(\"R2 lease free meta carries seat and sha\", () => {\n+    const meta = buildSuiteMeta({\n+      gitSha: \"abc\",\n+      seat: \"cursor-builder\",\n+      leaseExit: 0,\n+      census: {\n+        source: \"hub-presence\",\n+        timestamp: \"t\",\n+        available: true,\n+        reason: null,\n+        agents: [{ name: \"forge\", seatState: \"idle\" }],\n+        busySia: [],\n+        samples: 2,\n+      },\n+      vitest: { counts: { passed: 1, failed: 0, errors: 0 }, exitCode: 0 },\n+    });\n+    expect(meta.git_sha).toBe(\"abc\");\n+    expect(meta.seat).toBe(\"cursor-builder\");\n+    expect(meta.lease_status).toBe(\"taken\");\n+    expect(meta.vitest.exit_code).toBe(0);\n+  });\n+\n+  it(\"R3 foreign working seat is recorded and the run is not refused\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([\n+        presence([{ name: \"chisel\", seatState: \"working\" }]),\n+        presence([{ name: \"chisel\", seatState: \"working\" }]),\n+      ]),\n+    });\n+    expect(census.available).toBe(true);\n+    expect(census.busySia).toEqual([]);\n+    expect(census.agents.map((a) => a.name)).toContain(\"chisel\");\n+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: false }).refuse).toBe(false);\n+  });\n+\n+  it(\"R4 controlled rerun refuses a busy SIA seat\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([\n+        presence([{ name: \"forge\", seatState: \"working\" }]),\n+        presence([{ name: \"forge\", seatState: \"idle\" }]),\n+      ]),\n+    });\n+    expect(census.busySia).toContain(\"forge\");\n+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: true }).refuse).toBe(true);\n+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: false }).refuse).toBe(false);\n+  });\n+\n+  it(\"R5 a single empty sample is not idle; both empty is unavailable\", async () => {\n+    const oneEmpty = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([presence([]), presence([{ name: \"atlas\", seatState: \"idle\" }])]),\n+    });\n+    expect(oneEmpty.available).toBe(true);\n+    expect(oneEmpty.reason).toBeNull();\n+    const bothEmpty = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([presence([]), presence([])]),\n+    });\n+    expect(bothEmpty.available).toBe(false);\n+    expect(bothEmpty.reason).toMatch(/not idle/);\n+  });\n+\n+  it(\"R6 an expired sidecar is not live and is not an idle census\", () => {\n+    expect(sidecarStillLive(\"2000-01-01T00:00:00.000Z\", 60_000, Date.parse(\"2026-01-01T00:00:00.000Z\"))).toBe(false);\n+    const census = {\n+      source: \"hub-presence\" as const,\n+      timestamp: \"2000-01-01T00:00:00.000Z\",\n+      available: false,\n+      reason: \"census unavailable: sidecar expired\",\n+      agents: [],\n+      busySia: [],\n+      samples: 0,\n+    };\n+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: false }).refuse).toBe(false);\n+    expect(census.available).toBe(false);\n+  });\n+\n+  it(\"R7 cli writes the meta file\", () => {\n+    const dir = mkdtempSync(join(tmpdir(), \"t168-meta-\"));\n+    const fixture = join(dir, \"presence.json\");\n+    const vitestJson = join(dir, \"vitest.json\");\n+    const meta = join(dir, \"suite-run-meta.json\");\n+    writeFileSync(\n+      fixture,\n+      JSON.stringify({\n+        samples: [\n+          presence([{ name: \"forge\", seatState: \"idle\" }]),\n+          presence([{ name: \"forge\", seatState: \"idle\" }]),\n+        ],\n+      }),\n+    );\n+    writeFileSync(vitestJson, JSON.stringify({ numPassedTests: 3, numFailedTests: 1, unhandledErrors: 0 }));\n+    const r = spawnSync(process.execPath, [TSX, CLI, \"--seat\", \"cursor-builder\", \"--meta\", meta], {\n+      encoding: \"utf8\",\n+      cwd: dir,\n+      env: {\n+        ...process.env,\n+        SUITE_CENSUS_FIXTURE: fixture,\n+        SUITE_LEASE_EXIT: \"0\",\n+        SUITE_VITEST_JSON: vitestJson,\n+        SUITE_VITEST_EXIT: \"0\",\n+      },\n+    });\n+    expect(r.status).toBe(0);\n+    const written = JSON.parse(readFileSync(meta, \"utf8\"));\n+    expect(written.seat).toBe(\"cursor-builder\");\n+    expect(written.vitest).toEqual({ passed: 3, failed: 1, errors: 0, exit_code: 0 });\n+    expect(written.census.source).toBe(\"hub-presence\");\n+    rmSync(dir, { recursive: true, force: true });\n+  });\n+\n+  it(\"CI row has runner fields and unknown concurrent jobs without a token\", () => {\n+    const meta = buildCiSuiteMeta({\n+      gitSha: \"abc\",\n+      runnerName: \"tcm-2\",\n+      runnerLabels: [\"self-hosted\", \"Linux\"],\n+      timestamp: \"t\",\n+      concurrentJobs: \"unknown\",\n+    });\n+    expect(meta.ci?.runner_name).toBe(\"tcm-2\");\n+    expect(meta.ci?.runner_labels).toEqual([\"self-hosted\", \"Linux\"]);\n+    expect(meta.ci?.concurrent_jobs).toBe(\"unknown\");\n+    expect(meta.census.reason).toMatch(/census unavailable/);\n+  });\n+\n+  it(\"unreachable hub records unavailable, not idle\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: (async () => {\n+        throw new Error(\"connect ECONNREFUSED\");\n+      }) as typeof fetch,\n+    });\n+    expect(census.available).toBe(false);\n+    expect(census.reason).toMatch(/census unavailable:/);\n+    expect(census.reason).not.toMatch(/idle$/);\n+  });\n+\n+  it(\"a waker seat reporting working counts as busy\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([\n+        presence([{ name: \"cursor-builder-waker\", seatState: \"working\" }]),\n+        presence([{ name: \"cursor-builder-waker\", seatState: \"working\" }]),\n+      ]),\n+    });\n+    expect(census.busySia).toContain(\"cursor-builder-waker\");\n+  });\n+\n+  it(\"seat key path is A2A_KEY_DIR or ~/.a2a-hub/keys/<host>-<port>/<hub_name>.key\", () => {\n+    expect(resolveSeatKeyPath({\n+      hubUrl: \"http://100.124.212.87:4000\",\n+      hubName: \"cursor-builder\",\n+      keyDir: \"C:/keys\",\n+    }).replace(/\\\\/g, \"/\")).toBe(\"C:/keys/100.124.212.87-4000/cursor-builder.key\");\n+  });\n+  it(\"mutant: no key is unavailable, never an idle census\", () => {\n+    expect(readKeyFile(undefined).ok).toBe(false);\n+    expect(readKeyFile(undefined)).toMatchObject({ reason: expect.stringMatching(/census unavailable:/) });\n+  });\n+\n+  it(\"mutant: a body without seat.seatState is unavailable\", async () => {\n+    const census = await readCensus({\n+      hubUrl: \"http://hub\",\n+      keyPath,\n+      siaSeatNames: SIA,\n+      gapMs: 0,\n+      fetchFn: fetchBodies([\n+        { agents: [{ name: \"forge\", state: \"idle\" }] },\n+        { agents: [{ name: \"forge\", state: \"idle\" }] },\n+      ]),\n+    });\n+    expect(census.available).toBe(false);\n+    expect(census.reason).toMatch(/seat\\.seatState/);\n+  });\n+\n+  it(\"G-042: passed and failed counts are separate from exit_code\", () => {\n+    const counts = vitestCountsFromJson({ numPassedTests: 1096, numFailedTests: 0 });\n+    const meta = buildSuiteMeta({\n+      gitSha: \"abc\",\n+      seat: \"forge\",\n+      leaseExit: 0,\n+      census: {\n+        source: \"hub-presence\",\n+        timestamp: \"t\",\n+        available: true,\n+        reason: null,\n+        agents: [],\n+        busySia: [],\n+        samples: 2,\n+      },\n+      vitest: { counts, exitCode: 1 },\n+    });\n+    expect(meta.vitest.failed).toBe(0);\n+    expect(meta.vitest.passed).toBe(1096);\n+    expect(meta.vitest.exit_code).toBe(1);\n+  });\n+});\n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). The test result and run id above, for the pinned head."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "merge_commit": "59eb1c9dae473bba43a46b4b78ccd4799280e85c",
+        "pr": 444,
+        "scored_sha": "a5f118192f3479ad35dd58aebb3d24510f0f24b4"
+      }
+    }
+  }
+}

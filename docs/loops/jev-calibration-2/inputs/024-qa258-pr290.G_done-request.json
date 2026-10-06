@@ -1,0 +1,516 @@
+{
+  "base_sha": "9f6d20df3f97db45431dff95911f92ffcad47266",
+  "candidate_sha": "f707a09c6b61833d5499998d22403037908ebd01",
+  "case_id": "qa258-pr290",
+  "case_no": 24,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37004018054,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t208-t212-developer-handoff.md",
+    "docs/loops/t212/mutants/identity-fallback.diff"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "67cdf0a21da431e85cb0f1544078b5cf47f5e07e",
+  "plan_redacted_sentences": [
+    {
+      "field": "acceptance.T10",
+      "sentence": "#290 equals QA 254's ACCEPT."
+    },
+    {
+      "field": "tasks[9]",
+      "sentence": "#290 equals QA 254's ACCEPT."
+    }
+  ],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (#294:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (A third file losing a test still fails.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (The filename-only mutant goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (The retirements check passes with the reduced R-011 allowlist.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (backfill-success-rate.mjs is deleted.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (#299:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (The detector reads .recalled-entries.json only to report.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (The ids it returns never reach resolveRecalledIds: show the call graph by grep.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (It reports none present when the file is absent, and that is distinct from not checked.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head. Run gh pr checks <n> and quote test and the run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#289, QA 254's failures:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (SSH-style stderr: the cause is the fatal: line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (A hanging remote is bounded. Quote the wall time.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "f707a09c6b61833d5499998d22403037908ebd01",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/cli-session-end.ts",
+        "open-brain/src/shared/handoff-guard.ts",
+        "open-brain/tests/shared/handoff-guard.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head. Run gh pr checks <n> and quote test and the run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#289, QA 254's failures:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "SSH-style stderr: the cause is the fatal: line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "A hanging remote is bounded. Quote the wall time.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "#294:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "A third file losing a test still fails.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "The filename-only mutant goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "The retirements check passes with the reduced R-011 allowlist.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "backfill-success-rate.mjs is deleted.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "#299:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "The detector reads .recalled-entries.json only to report.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "The ids it returns never reach resolveRecalledIds: show the call graph by grep.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "It reports none present when the file is absent, and that is distinct from not checked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "24-qa258-pr290",
+        "new_capability": "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)",
+        "objective": "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+          "path": "docs/loops/qa-258-b4-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined.",
+          "Red then green. Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head. Run gh pr checks <n> and quote test and the run id.",
+          "#289, QA 254's failures:",
+          "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.",
+          "SSH-style stderr: the cause is the fatal: line.",
+          "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
+          "A hanging remote is bounded. Quote the wall time.",
+          "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+          "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
+          "#294:",
+          "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
+          "A third file losing a test still fails.",
+          "The filename-only mutant goes red.",
+          "The retirements check passes with the reduced R-011 allowlist.",
+          "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.",
+          "backfill-success-rate.mjs is deleted.",
+          "#299:",
+          "The detector reads .recalled-entries.json only to report.",
+          "The ids it returns never reach resolveRecalledIds: show the call graph by grep.",
+          "It reports none present when the file is absent, and that is distinct from not checked.",
+          "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n  * - a commit whose committer date predates the window (amended or rebased from\n  *   older work) is not counted;\n  * - a handoff committed under a name that does not end `-handoff.md`, or outside\n@@ -52,6 +53,8 @@ export interface HandoffCheck {\n   commits: number;\n   /** docs/loops/*-handoff.md paths this session's commits added or modified. */\n   handoffs: string[];\n+  /** Commits in the window on loop/* with NO Claude-Session trailer: reported, never counted for any seat (T-212). */\n+  unattributed: number;\n   reason?: string;\n }\n \n@@ -90,10 +93,36 @@ function git(cwd: string, args: string[]): string {\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head. Run gh pr checks <n> and quote test and the run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "#289, QA 254's failures:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n  * - a commit whose committer date predates the window (amended or rebased from\n  *   older work) is not counted;\n  * - a handoff committed under a name that does not end `-handoff.md`, or outside\n@@ -52,6 +53,8 @@ export interface HandoffCheck {\n   commits: number;\n   /** docs/loops/*-handoff.md paths this session's commits added or modified. */\n   handoffs: string[];\n+  /** Commits in the window on loop/* with NO Claude-Session trailer: reported, never counted for any seat (T-212). */\n+  unattributed: number;\n   reason?: string;\n }\n \n@@ -90,10 +93,36 @@ function git(cwd: string, args: string[]): string {\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "SSH-style stderr: the cause is the fatal: line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "A hanging remote is bounded. Quote the wall time."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n  * - a commit whose committer date predates the window (amended or rebased from\n  *   older work) is not counted;\n  * - a handoff committed under a name that does not end `-handoff.md`, or outside\n@@ -52,6 +53,8 @@ export interface HandoffCheck {\n   commits: number;\n   /** docs/loops/*-handoff.md paths this session's commits added or modified. */\n   handoffs: string[];\n+  /** Commits in the window on loop/* with NO Claude-Session trailer: reported, never counted for any seat (T-212). */\n+  unattributed: number;\n   reason?: string;\n }\n \n@@ -90,10 +93,36 @@ function git(cwd: string, args: string[]): string {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "#294:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n  * - a commit whose committer date predates the window (amended or rebased from\n  *   older work) is not counted;\n  * - a handoff committed under a name that does not end `-handoff.md`, or outside\n@@ -52,6 +53,8 @@ export interface HandoffCheck {\n   commits: number;\n   /** docs/loops/*-handoff.md paths this session's commits added or modified. */\n   handoffs: string[];\n+  /** Commits in the window on loop/* with NO Claude-Session trailer: reported, never counted for any seat (T-212). */\n+  unattributed: number;\n   reason?: string;\n }\n \n@@ -90,10 +93,36 @@ function git(cwd: string, args: string[]): string {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "A third file losing a test still fails."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "The filename-only mutant goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n  * - a commit whose committer date predates the window (amended or rebased from\n  *   older work) is not counted;\n  * - a handoff committed under a name that does not end `-handoff.md`, or outside\n@@ -52,6 +53,8 @@ export interface HandoffCheck {\n   commits: number;\n   /** docs/loops/*-handoff.md paths this session's commits added or modified. */\n   handoffs: string[];\n+  /** Commits in the window on loop/* with NO Claude-Session trailer: reported, never counted for any seat (T-212). */\n+  unattributed: number;\n   reason?: string;\n }\n \n@@ -90,10 +93,36 @@ function git(cwd: string, args: string[]): string {\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "The retirements check passes with the reduced R-011 allowlist."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "backfill-success-rate.mjs is deleted."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n  * - a commit whose committer date predates the window (amended or rebased from\n  *   older work) is not counted;\n  * - a handoff committed under a name that does not end `-handoff.md`, or outside\n@@ -52,6 +53,8 @@ export interface HandoffCheck {\n   commits: number;\n   /** docs/loops/*-handoff.md paths this session's commits added or modified. */\n   handoffs: string[];\n+  /** Commits in the window on loop/* with NO Claude-Session trailer: reported, never counted for any seat (T-212). */\n+  unattributed: number;\n   reason?: string;\n }\n \n@@ -90,10 +93,36 @@ function git(cwd: string, args: string[]): string {\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "#299:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T20",
+          "observable": "The detector reads .recalled-entries.json only to report."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "The ids it returns never reach resolveRecalledIds: show the call graph by grep."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/handoff-guard.ts b/open-brain/src/shared/handoff-guard.ts\nindex 3288f56d..5f7c9e30 100644\n--- a/open-brain/src/shared/handoff-guard.ts\n+++ b/open-brain/src/shared/handoff-guard.ts\n@@ -15,13 +15,14 @@\n  *\n  * ## How \"this session's\" commits are found — and what that misses\n  *\n- * By TIME: the session's start is the first timestamp in its own transcript\n- * (the hook payload's `transcript_path`), and a commit is this session's when\n- * its committer date is at or after that start and it is on a local `loop/*`\n- * branch and not on origin/master. Commits carry no session uuid today, so a\n- * trailer could not be relied on. What this misses, stated rather than hidden:\n- * - another session committing to a `loop/*` branch of the same checkout in the\n- *   same window is counted as this one's;\n+ * By TIME AND TRAILER (T-212): the session's start is the first timestamp in its own\n+ * transcript (the hook payload's `transcript_path`), and a commit is this session's\n+ * when its committer date is at or after that start, it is on a local `loop/*`\n+ * branch and not on origin/master, AND its `Claude-Session:` trailer names this\n+ * session. A commit with no trailer is UNATTRIBUTED: counted apart, never assigned\n+ * to the checkout's seat by git identity (seats share one identity). What this misses,\n+ * stated rather than hidden:\n+ * - a commit made without the trailer by this session is not counted as its work;\n  * - a commit whose committer date predates the window (amended or rebased from\n  *   older work) is not counted;\n  * - a handoff committed under a name that does not end `-handoff.md`, or outside\n@@ -52,6 +53,8 @@ export interface HandoffCheck {\n   commits: number;\n   /** docs/loops/*-handoff.md paths this session's commits added or modified. */\n   handoffs: string[];\n+  /** Commits in the window on loop/* with NO Claude-Session trailer: reported, never counted for any seat (T-212). */\n+  unattributed: number;\n   reason?: string;\n }\n \n@@ -90,10 +93,36 @@ function git(cwd: string, args: string[]): string {\n…[cal2 diff truncated]"
+          ],
+          "id": "T22",
+          "observable": "It reports none present when the file is absent, and that is distinct from not checked."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T23",
+          "observable": "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex b2b8874e..bf67b5c0 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -21,7 +21,7 @@ import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n import { resolveSessionId } from \"./shared/active-session.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n \n const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), \".claude\", \"open-brain\", \"knowledge-v2.db\");\n const V2_VAULT = obsidianVaultDir();\n@@ -77,7 +77,7 @@ try {\n   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());\n   if (existsSync(join(dir, \".agents\"))) {\n     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || \"\";\n-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path));\n+    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));\n     if (check.status === \"missing\") {\n       const msg = describeMissing(check, id);\n       console.log(`[session-end] ${msg}`);\n@@ -86,7 +86,7 @@ try {\n     } else if (check.status === \"unknown\") {\n       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);\n     } else {\n-      console.log(`[session-end] handoff check: ${check.status === \"ok\" ? `handoff committed (${check.handoffs.join(\", \")})` : \"no loop/* commits this session\"}`);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/shared/handoff-guard.test.ts b/open-brain/tests/shared/handoff-guard.test.ts\nindex c3740dbd..e211c627 100644\n--- a/open-brain/tests/shared/handoff-guard.test.ts\n+++ b/open-brain/tests/shared/handoff-guard.test.ts\n@@ -11,6 +11,7 @@ import { execFileSync, spawnSync } from \"node:child_process\";\n import {\n   checkSessionHandoff,\n   sessionStartFromTranscript,\n+  sessionIdsFromTranscript,\n   recordMissingHandoff,\n   takeMissingHandoffNotices,\n   describeMissing,\n@@ -23,17 +24,28 @@ const hookEntry = join(import.meta.dirname, \"../../src/cli-session-end.ts\");\n function git(cwd: string, ...args: string[]): string {\n   return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n }\n-/** Commit with an explicit committer date, so the session window is exact. */\n-function commitAt(dir: string, when: string, file: string, msg: string): string {\n+/**\n+ * Commit with an explicit committer date, so the session window is exact. T-212: a commit is\n+ * this session's by its Claude-Session TRAILER (default: this session's), never by author;\n+ * pass null for a commit with no trailer.\n+ */\n+function commitAt(dir: string, when: string, file: string, msg: string, trailer: string | null = ME_TRAILER, author = \"T\"): string {\n   mkdirSync(join(dir, file, \"..\"), { recursive: true });\n   writeFileSync(join(dir, file), `${msg}\\n`);\n   git(dir, \"add\", \"-A\");\n-  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=T\", \"commit\", \"-q\", \"-m\", msg], {\n+  execFileSync(\"git\", [\"-c\", \"user.email=t@example.com\", \"-c\", \"user.name=\" + author, \"commit\", \"-q\", \"-m\", msg, ...(trailer === null ? [] : [\"-m\", trailer])], {\n     cwd: dir, stdio: \"ignore\", env: { ...process.env, GIT_COMMITTER_DATE: when, GIT_AUTHOR_DATE: when },\n   });\n   return git(dir, \"rev-parse\", \"HEAD\");\n }\n \n+// T-212: this session's id as the trailer carries it (https://claude.ai/code/session_<X>), and another seat's.\n+const ME = \"01MeMeMeMeMeMeMeMeMeMeMe\";\n+const OTHER = \"01OtherOtherOtherOtherOth\";\n+const ME_TRAILER = `Claude-Session: https://claude.ai/code/session_${ME}`;\n…[cal2 diff truncated]"
+          ],
+          "id": "T24",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "9f6d20df3f97db45431dff95911f92ffcad47266",
+        "merge_commit": "67cdf0a21da431e85cb0f1544078b5cf47f5e07e",
+        "pr": 290,
+        "scored_sha": "f707a09c6b61833d5499998d22403037908ebd01"
+      }
+    }
+  }
+}

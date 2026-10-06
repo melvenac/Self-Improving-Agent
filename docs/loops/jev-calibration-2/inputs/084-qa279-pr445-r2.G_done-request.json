@@ -1,0 +1,165 @@
+{
+  "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+  "candidate_sha": "43ed65a9f2e55b649b4bd1dbb46baddc84d3e0e6",
+  "case_id": "qa279-pr445-r2",
+  "case_no": 84,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37202540671,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t156-scan-list.md"
+  ],
+  "label": "REJECT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Race row can fail. QA's M1 (read-then-write) goes red on the new barrier race row. Run it yourself.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Stale reclaim. Your own barrier (a claim pre-created with an old mtime), 100 trials: zero double claims, zero throws. Read the reclaim code: rename-to-tombstone, then wx; an ENOENT or EPERM loser returns duplicate.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (M2 at the cli-session-end call site is red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (Cleanup deletes only claims older than the TTL, at most 32 per call, never the path being claimed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "43ed65a9f2e55b649b4bd1dbb46baddc84d3e0e6",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/harness/s4-g5-qa.test.ts",
+        "open-brain/tests/harness/shadow-merge.test.ts",
+        "open-brain/tests/pipelines/bootstrap-fix-r4.test.ts",
+        "open-brain/tests/pipelines/sync/probe-markers.test.ts",
+        "open-brain/tests/pipelines/sync/worktree-layout.test.ts",
+        "open-brain/tests/t048-r2b.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Race row can fail. QA's M1 (read-then-write) goes red on the new barrier race row. Run it yourself.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Stale reclaim. Your own barrier (a claim pre-created with an old mtime), 100 trials: zero double claims, zero throws. Read the reclaim code: rename-to-tombstone, then wx; an ENOENT or EPERM loser returns duplicate.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "M2 at the cli-session-end call site is red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "Cleanup deletes only claims older than the TTL, at most 32 per call, never the path being claimed.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "84-qa279-pr445-r2",
+        "new_capability": "QA 279, session-161 batch g: narrow re-runs of five rejected or must-fix PRs",
+        "objective": "QA 279, session-161 batch g: narrow re-runs of five rejected or must-fix PRs",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+          "path": "docs/loops/qa-279-s161g-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Race row can fail. QA's M1 (read-then-write) goes red on the new barrier race row. Run it yourself.",
+          "Stale reclaim. Your own barrier (a claim pre-created with an old mtime), 100 trials: zero double claims, zero throws. Read the reclaim code: rename-to-tombstone, then wx; an ENOENT or EPERM loser returns duplicate.",
+          "M2 at the cli-session-end call site is red.",
+          "Cleanup deletes only claims older than the TTL, at most 32 per call, never the path being claimed."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/harness/shadow-merge.test.ts b/open-brain/tests/harness/shadow-merge.test.ts\nindex 7fd6f15f..834c97a7 100644\n--- a/open-brain/tests/harness/shadow-merge.test.ts\n+++ b/open-brain/tests/harness/shadow-merge.test.ts\n@@ -310,19 +310,47 @@ describe(\"harness shadow-verdict CLI\", () => {\n   });\n });\n \n+/** Code lines only. A line comment, a star line, or a one-line block comment is not an instance. */\n+function codeHas(src: string, needle: string): boolean {\n+  return src.split(\"\\n\").some((line) => {\n+    const trimmed = line.trim();\n+    return trimmed.length > 0\n+      && !trimmed.startsWith(\"//\")\n+      && !trimmed.startsWith(\"*\")\n+      && !trimmed.startsWith(\"/*\")\n+      && trimmed.includes(needle);\n+  });\n+}\n+\n describe(\"CC-0 and CC-19 guards\", () => {\n   it(\"CC-0 does not touch the evidence schema, declared parser, or runLoop, and adds no skip\", () => {\n     const root = join(import.meta.dirname, \"../../src/harness\");\n     const runtime = readFileSync(join(root, \"runtime.ts\"), \"utf8\");\n     const schema = readFileSync(join(root, \"schema.ts\"), \"utf8\");\n     const declared = readFileSync(join(root, \"declared.ts\"), \"utf8\");\n-    expect(runtime).not.toContain(\"prepareShadowVerdict\");\n-    expect(runtime).not.toContain(\"shadow-verdict\");\n-    expect(schema).not.toContain(\"would-merge\");\n-    expect(declared).not.toContain(\"would-merge\");\n+    expect(codeHas(\"prepareShadowVerdict();\", \"prepareShadowVerdict\")).toBe(true);\n+    expect(codeHas(\"// prepareShadowVerdict is not called from the runtime\", \"prepareShadowVerdict\")).toBe(false);\n+    expect(codeHas(\"/* prepareShadowVerdict stays out of runtime.ts */\", \"prepareShadowVerdict\")).toBe(false);\n+    expect(codeHas(runtime, \"prepareShadowVerdict\")).toBe(false);\n+    expect(codeHas(runtime, \"shadow-verdict\")).toBe(false);\n+    expect(codeHas(schema, \"would-merge\")).toBe(false);\n+    expect(codeHas(declared, \"would-merge\")).toBe(false);\n     const tests = readFileSync(join(import.meta.dirname, \"shadow-merge.test.ts\"), \"utf8\");\n-    expect(tests).not.toMatch(/\\b(?:it|describe|test)\\.skip\\b/);\n-    expect(tests).not.toMatch(/\\bskipIf\\b/);\n+    const skipCall = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && (/\\b(?:it|describe|test)\\.skip\\b/.test(trimmed) || /\\bskipIf\\b/.test(trimmed));\n+    });\n+    const plantedSkip = \"it\" + \".skip\";\n+    const plantedSkipIf = \"skip\" + \"If\";\n+    expect(skipCall(plantedSkip + '(\"\")')).toBe(true);\n+    expect(skipCall(plantedSkipIf + \"()\")).toBe(true);\n+    expect(skipCall(\"// \" + plantedSkip + \" is not how this file is written\")).toBe(false);\n+    expect(skipCall(\"/* \" + plantedSkip + \" stays out of this file */\")).toBe(false);\n+    expect(skipCall(tests)).toBe(false);\n   });\n \n   it(\"CC-19 the merge point is prepare, and the runtime still never merges\", () => {"
+          ],
+          "id": "T1",
+          "observable": "Race row can fail. QA's M1 (read-then-write) goes red on the new barrier race row. Run it yourself."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\nindex 12bb30b8..14ef226a 100644\n--- a/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n+++ b/open-brain/tests/pipelines/bootstrap-fix-r4.test.ts\n@@ -136,9 +136,21 @@ describe(\"R-BF-20: a failed undo is never printed as refused\", () => {\n \n describe(\"R-BF-21: the shipped move-residue does not load code named by an environment variable\", () => {\n   it(\"git grep finds no OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK in src/\", () => {\n+    const namesHook = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\");\n+    });\n+    expect(namesHook(\"const hook = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;\")).toBe(true);\n+    expect(namesHook(\"// OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not how residue moves\")).toBe(false);\n+    expect(namesHook(\"/* OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not loaded */\")).toBe(false);\n     const repoRoot = join(import.meta.dirname, \"../../..\");\n     const g = spawnSync(\"git\", [\"grep\", \"-n\", \"OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK\", \"--\", \"open-brain/src\"], { cwd: repoRoot, encoding: \"utf8\" });\n     expect(g.status).toBe(1);\n     expect(g.stdout).toBe(\"\");\n+    expect(namesHook(g.stdout ?? \"\")).toBe(false);\n   });\n });"
+          ],
+          "id": "T2",
+          "observable": "Stale reclaim. Your own barrier (a claim pre-created with an old mtime), 100 trials: zero double claims, zero throws. Read the reclaim code: rename-to-tombstone, then wx; an ENOENT or EPERM loser returns duplicate."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/probe-markers.test.ts b/open-brain/tests/pipelines/sync/probe-markers.test.ts\nindex bb930ccc..fd4fabc7 100644\n--- a/open-brain/tests/pipelines/sync/probe-markers.test.ts\n+++ b/open-brain/tests/pipelines/sync/probe-markers.test.ts\n@@ -68,7 +68,18 @@ describe(\"probe-markers\", () => {\n   });\n \n   it(\"index.ts runs the check\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkProbeMarkers(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkProbeMarkers(options.projectRoot)); is not wired\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkProbeMarkers(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(new URL(\"../../../src/pipelines/sync/index.ts\", import.meta.url), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkProbeMarkers(options.projectRoot))\");\n+    expect(wired(src)).toBe(true);\n   });\n });"
+          ],
+          "id": "T3",
+          "observable": "M2 at the cli-session-end call site is red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/worktree-layout.test.ts b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\nindex 3d3633b9..3c8f2e66 100644\n--- a/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n+++ b/open-brain/tests/pipelines/sync/worktree-layout.test.ts\n@@ -180,7 +180,18 @@ describe(\"checkWorktreeLayout\", () => {\n   });\n \n   it(\"runSync is wired to checkWorktreeLayout\", () => {\n+    const wired = (src: string) => src.split(\"\\n\").some((line) => {\n+      const trimmed = line.trim();\n+      return trimmed.length > 0\n+        && !trimmed.startsWith(\"//\")\n+        && !trimmed.startsWith(\"*\")\n+        && !trimmed.startsWith(\"/*\")\n+        && trimmed.includes(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    });\n+    expect(wired(\"checks.push(checkWorktreeLayout(options.projectRoot));\")).toBe(true);\n+    expect(wired(\"// checks.push(checkWorktreeLayout(options.projectRoot)); stays a comment\")).toBe(false);\n+    expect(wired(\"/* checks.push(checkWorktreeLayout(options.projectRoot)); */\")).toBe(false);\n     const src = readFileSync(join(import.meta.dirname, \"../../../src/pipelines/sync/index.ts\"), \"utf8\");\n-    expect(src).toContain(\"checks.push(checkWorktreeLayout(options.projectRoot))\");\n+    expect(wired(src)).toBe(true);\n   });\n });"
+          ],
+          "id": "T4",
+          "observable": "Cleanup deletes only claims older than the TTL, at most 32 per call, never the path being claimed."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+        "merge_commit": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+        "pr": 445,
+        "scored_sha": "43ed65a9f2e55b649b4bd1dbb46baddc84d3e0e6"
+      }
+    }
+  }
+}

@@ -370,6 +370,14 @@
           "items": {
             "type": "string"
           }
+        },
+        "cal2_case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "response_detail": {
+          "type": "string",
+          "maxLength": 4000
         }
       },
       "required": [

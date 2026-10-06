@@ -1,0 +1,509 @@
+{
+  "base_sha": "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
+  "candidate_sha": "b20d99a46269739fcac4d6b8a0ea31eb89bbec43",
+  "case_id": "qa257-pr314",
+  "case_no": 22,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 36986192184,
+    "runs_found": 2,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t042-developer-handoff.md"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "09aef42ccd75575732d4f9e3555a24dd1ee9619f",
+  "plan_redacted_sentences": [],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files each PR's own commits touch beyond master.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (git diff master...84e75618 -- open-brain/src is empty.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (policies.test.ts still has a hasPriorFailures: true case.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" ((a) no BOM: the output is byte-identical to master's;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" ((b) a BOM and markers;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" ((c) a BOM and no markers: the region lands after the title, and the BOM stays first.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (#314.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (Seed a temp vault with ob-server-x.md: the check warns with the count and path.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (A clean vault passes.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (An absent vault is \"not checked\".), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head (read only). gh pr checks <n>.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#301. Its fixture runs the REAL writer:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (seat B's close-out cannot remove seat A's handoff or session;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (the seat-keyed mutant goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Run the record-erasure check on a scratch copy of this repo and quote its line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (#305, test-only.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "b20d99a46269739fcac4d6b8a0ea31eb89bbec43",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/src/pipelines/sync/vault-pollution.ts",
+        "open-brain/tests/pipelines/sync/vault-pollution.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files each PR's own commits touch beyond master.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head (read only). gh pr checks <n>.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#301. Its fixture runs the REAL writer:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "seat B's close-out cannot remove seat A's handoff or session;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "the seat-keyed mutant goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Run the record-erasure check on a scratch copy of this repo and quote its line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "#305, test-only.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "git diff master...84e75618 -- open-brain/src is empty.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "policies.test.ts still has a hasPriorFailures: true case.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "(a) no BOM: the output is byte-identical to master's;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "(b) a BOM and markers;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "(c) a BOM and no markers: the region lands after the title, and the BOM stays first.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "#314.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "Seed a temp vault with ob-server-x.md: the check warns with the count and path.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "A clean vault passes.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "An absent vault is \"not checked\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4).",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "22-qa257-pr314",
+        "new_capability": "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)",
+        "objective": "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+          "path": "docs/loops/qa-257-b3-misc-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files each PR's own commits touch beyond master.",
+          "Red then green. Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head (read only). gh pr checks <n>.",
+          "#301. Its fixture runs the REAL writer:",
+          "seat B's close-out cannot remove seat A's handoff or session;",
+          "the seat-keyed mutant goes red.",
+          "Run the record-erasure check on a scratch copy of this repo and quote its line.",
+          "#305, test-only.",
+          "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.",
+          "git diff master...84e75618 -- open-brain/src is empty.",
+          "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.",
+          "policies.test.ts still has a hasPriorFailures: true case.",
+          "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:",
+          "(a) no BOM: the output is byte-identical to master's;",
+          "(b) a BOM and markers;",
+          "(c) a BOM and no markers: the region lands after the title, and the BOM stays first.",
+          "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.",
+          "#314.",
+          "Seed a temp vault with ob-server-x.md: the check warns with the count and path.",
+          "A clean vault passes.",
+          "An absent vault is \"not checked\".",
+          "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4)."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files each PR's own commits touch beyond master."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..06e2a5c2 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -36,6 +36,7 @@ import { checkWorktreeLayout } from \"./worktree-layout.js\";\n import { checkHubSeats } from \"./hub-seats.js\";\n import { checkCursorStartParity } from \"./start-parity.js\";\n import { checkProbeMarkers } from \"./probe-markers.js\";\n+import { checkVaultPollution } from \"./vault-pollution.js\";\n import { checkCursorHookCompat } from \"./cursor-hook-compat.js\";\n import { checkShadowMergeLedger } from \"../../harness/shadow-merge.js\";\n \n@@ -108,6 +109,8 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkCursorStartParity(options.projectRoot));\n   // Record 198: a file under open-brain/tests that says \"not for merge\" is an issue.\n   checks.push(checkProbeMarkers(options.projectRoot));\n+  // T-042: ob-server-* test artifacts in the real vault (a preventer existed; this is the detector).\n+  checks.push(checkVaultPollution(options.projectRoot));\n   checks.push(checkMirrorParity(options.projectRoot));\n   // Loop 10 R1: the runtime label travels with the check, because the same code\n   // passing in one process and failing in the other IS the signal."
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head (read only). gh pr checks <n>."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "#301. Its fixture runs the REAL writer:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..06e2a5c2 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -36,6 +36,7 @@ import { checkWorktreeLayout } from \"./worktree-layout.js\";\n import { checkHubSeats } from \"./hub-seats.js\";\n import { checkCursorStartParity } from \"./start-parity.js\";\n import { checkProbeMarkers } from \"./probe-markers.js\";\n+import { checkVaultPollution } from \"./vault-pollution.js\";\n import { checkCursorHookCompat } from \"./cursor-hook-compat.js\";\n import { checkShadowMergeLedger } from \"../../harness/shadow-merge.js\";\n \n@@ -108,6 +109,8 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkCursorStartParity(options.projectRoot));\n   // Record 198: a file under open-brain/tests that says \"not for merge\" is an issue.\n   checks.push(checkProbeMarkers(options.projectRoot));\n+  // T-042: ob-server-* test artifacts in the real vault (a preventer existed; this is the detector).\n+  checks.push(checkVaultPollution(options.projectRoot));\n   checks.push(checkMirrorParity(options.projectRoot));\n   // Loop 10 R1: the runtime label travels with the check, because the same code\n   // passing in one process and failing in the other IS the signal."
+          ],
+          "id": "T6",
+          "observable": "seat B's close-out cannot remove seat A's handoff or session;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "the seat-keyed mutant goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "Run the record-erasure check on a scratch copy of this repo and quote its line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..06e2a5c2 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -36,6 +36,7 @@ import { checkWorktreeLayout } from \"./worktree-layout.js\";\n import { checkHubSeats } from \"./hub-seats.js\";\n import { checkCursorStartParity } from \"./start-parity.js\";\n import { checkProbeMarkers } from \"./probe-markers.js\";\n+import { checkVaultPollution } from \"./vault-pollution.js\";\n import { checkCursorHookCompat } from \"./cursor-hook-compat.js\";\n import { checkShadowMergeLedger } from \"../../harness/shadow-merge.js\";\n \n@@ -108,6 +109,8 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkCursorStartParity(options.projectRoot));\n   // Record 198: a file under open-brain/tests that says \"not for merge\" is an issue.\n   checks.push(checkProbeMarkers(options.projectRoot));\n+  // T-042: ob-server-* test artifacts in the real vault (a preventer existed; this is the detector).\n+  checks.push(checkVaultPollution(options.projectRoot));\n   checks.push(checkMirrorParity(options.projectRoot));\n   // Loop 10 R1: the runtime label travels with the check, because the same code\n   // passing in one process and failing in the other IS the signal."
+          ],
+          "id": "T9",
+          "observable": "#305, test-only."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..06e2a5c2 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -36,6 +36,7 @@ import { checkWorktreeLayout } from \"./worktree-layout.js\";\n import { checkHubSeats } from \"./hub-seats.js\";\n import { checkCursorStartParity } from \"./start-parity.js\";\n import { checkProbeMarkers } from \"./probe-markers.js\";\n+import { checkVaultPollution } from \"./vault-pollution.js\";\n import { checkCursorHookCompat } from \"./cursor-hook-compat.js\";\n import { checkShadowMergeLedger } from \"../../harness/shadow-merge.js\";\n \n@@ -108,6 +109,8 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkCursorStartParity(options.projectRoot));\n   // Record 198: a file under open-brain/tests that says \"not for merge\" is an issue.\n   checks.push(checkProbeMarkers(options.projectRoot));\n+  // T-042: ob-server-* test artifacts in the real vault (a preventer existed; this is the detector).\n+  checks.push(checkVaultPollution(options.projectRoot));\n   checks.push(checkMirrorParity(options.projectRoot));\n   // Loop 10 R1: the runtime label travels with the check, because the same code\n   // passing in one process and failing in the other IS the signal.",
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "git diff master...84e75618 -- open-brain/src is empty."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "policies.test.ts still has a hasPriorFailures: true case."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..06e2a5c2 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -36,6 +36,7 @@ import { checkWorktreeLayout } from \"./worktree-layout.js\";\n import { checkHubSeats } from \"./hub-seats.js\";\n import { checkCursorStartParity } from \"./start-parity.js\";\n import { checkProbeMarkers } from \"./probe-markers.js\";\n+import { checkVaultPollution } from \"./vault-pollution.js\";\n import { checkCursorHookCompat } from \"./cursor-hook-compat.js\";\n import { checkShadowMergeLedger } from \"../../harness/shadow-merge.js\";\n \n@@ -108,6 +109,8 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkCursorStartParity(options.projectRoot));\n   // Record 198: a file under open-brain/tests that says \"not for merge\" is an issue.\n   checks.push(checkProbeMarkers(options.projectRoot));\n+  // T-042: ob-server-* test artifacts in the real vault (a preventer existed; this is the detector).\n+  checks.push(checkVaultPollution(options.projectRoot));\n   checks.push(checkMirrorParity(options.projectRoot));\n   // Loop 10 R1: the runtime label travels with the check, because the same code\n   // passing in one process and failing in the other IS the signal."
+          ],
+          "id": "T15",
+          "observable": "(a) no BOM: the output is byte-identical to master's;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "(b) a BOM and markers;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "(c) a BOM and no markers: the region lands after the title, and the BOM stays first."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex 51292e91..06e2a5c2 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -36,6 +36,7 @@ import { checkWorktreeLayout } from \"./worktree-layout.js\";\n import { checkHubSeats } from \"./hub-seats.js\";\n import { checkCursorStartParity } from \"./start-parity.js\";\n import { checkProbeMarkers } from \"./probe-markers.js\";\n+import { checkVaultPollution } from \"./vault-pollution.js\";\n import { checkCursorHookCompat } from \"./cursor-hook-compat.js\";\n import { checkShadowMergeLedger } from \"../../harness/shadow-merge.js\";\n \n@@ -108,6 +109,8 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkCursorStartParity(options.projectRoot));\n   // Record 198: a file under open-brain/tests that says \"not for merge\" is an issue.\n   checks.push(checkProbeMarkers(options.projectRoot));\n+  // T-042: ob-server-* test artifacts in the real vault (a preventer existed; this is the detector).\n+  checks.push(checkVaultPollution(options.projectRoot));\n   checks.push(checkMirrorParity(options.projectRoot));\n   // Loop 10 R1: the runtime label travels with the check, because the same code\n   // passing in one process and failing in the other IS the signal.",
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "#314."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T20",
+          "observable": "Seed a temp vault with ob-server-x.md: the check warns with the count and path."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "A clean vault passes."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/vault-pollution.ts b/open-brain/src/pipelines/sync/vault-pollution.ts\nnew file mode 100644\nindex 00000000..2e393fb5\n--- /dev/null\n+++ b/open-brain/src/pipelines/sync/vault-pollution.ts\n@@ -0,0 +1,85 @@\n+import { readdirSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { obsidianVaultDir } from \"../../shared/paths.js\";\n+import type { CheckResult } from \"./types.js\";\n+\n+/**\n+ * T-042: test artifacts in the REAL Obsidian vault.\n+ *\n+ * The suite once wrote session summaries named `<date>-ob-server-<slug>.md` into the developer's real vault: 57 files\n+ * before April, 13 more on 2026-08-31, both found by accident (an /end step happened to list `Summaries/`), never by a\n+ * check. There is a preventer (`tests/setup-env.ts`, and `obsidianVaultDir()` throws under vitest when it would resolve to\n+ * the real vault) and, until this, no detector. `server.test.ts` names its temp project `ob-server-<mkdtemp slug>`, and\n+ * `writeSummary` names the note for it.\n+ *\n+ * LIMIT: a file NAME rule (`ob-server-<slug>.md`, any folder, dot-folders skipped). A test artifact named any other way is\n+ * not seen, and nothing is read from inside a note. The vault is the directory `obsidianVaultDir()` resolves.\n+ */\n+const ARTIFACT = /(^|-)ob-server-[a-z0-9]+\\.md$/i;\n+const MAX_LISTED = 10;\n+\n+export interface VaultScan {\n+  /** Vault-relative, forward-slash paths of the artifacts. */\n+  found: string[];\n+  /** `.md` notes examined. */\n+  notes: number;\n+  /** Directories that could not be listed, with the error code. They are not a clean bill. */\n+  unreadable: string[];\n+}\n+\n+type ReadDir = (path: string, options: { withFileTypes: true }) => import(\"node:fs\").Dirent[];\n+\n+export function scanVaultForTestArtifacts(vaultDir: string, readDir: ReadDir = readdirSync as unknown as ReadDir): VaultScan {\n+  const scan: VaultScan = { found: [], notes: 0, unreadable: [] };\n+  const walk = (abs: string, rel: string): void => {\n+    let entries: import(\"node:fs\").Dirent[];\n+    try {\n+      entries = readDir(abs, { withFileTypes: true });\n+    } catch (err) {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T22",
+          "observable": "An absent vault is \"not checked\"."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T23",
+          "observable": "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nnew file mode 100644\nindex 00000000..f089109e\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -0,0 +1,83 @@\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { checkVaultPollution, scanVaultForTestArtifacts } from \"../../../src/pipelines/sync/vault-pollution.js\";\n+\n+/**\n+ * T-042: vault pollution had a preventer (the isolation in tests/setup-env.ts and the throw in obsidianVaultDir) and no\n+ * detector. The 13 files named ob-server-<slug>.md that the suite wrote into the real vault were found by accident, at\n+ * /end, while listing Summaries/. This counts them.\n+ */\n+const made: string[] = [];\n+const vault = (): string => {\n+  const d = mkdtempSync(join(tmpdir(), \"t042-vault-\"));\n+  made.push(d);\n+  return d;\n+};\n+afterAll(() => {\n+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+});\n+const put = (root: string, rel: string, body = \"test\\n\"): void => {\n+  const p = join(root, ...rel.split(\"/\"));\n+  mkdirSync(join(p, \"..\"), { recursive: true });\n+  writeFileSync(p, body);\n+};\n+\n+describe(\"checkVaultPollution — T-042\", () => {\n+  it(\"VP-1: a seeded vault warns with the count and the paths\", () => {\n+    const v = vault();\n+    put(v, \"Summaries/2026-08-31-ob-server-cz4uxz.md\");\n+    put(v, \"Summaries/2026-08-31-ob-server-abc123.md\");\n+    put(v, \"Checkpoints/deep/ob-server-q.md\");\n+    put(v, \"Summaries/2026-09-01-real-session.md\");\n+    const r = checkVaultPollution(\"/unused\", v);\n+    expect(r.name).toBe(\"vault-pollution\");\n+    expect(r.severity).toBe(\"warn\");\n+    expect(r.report).toBe(true);\n+    expect(r.message).toContain(\"3 ob-server-* file(s) in the vault\");\n+    for (const p of [\"Summaries/2026-08-31-ob-server-cz4uxz.md\", \"Summaries/2026-08-31-ob-server-abc123.md\", \"Checkpoints/deep/ob-server-q.md\"]) expect(r.message).toContain(p);\n…[cal2 diff truncated]"
+          ],
+          "id": "T24",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4)."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
+        "merge_commit": "09aef42ccd75575732d4f9e3555a24dd1ee9619f",
+        "pr": 314,
+        "scored_sha": "b20d99a46269739fcac4d6b8a0ea31eb89bbec43"
+      }
+    }
+  }
+}

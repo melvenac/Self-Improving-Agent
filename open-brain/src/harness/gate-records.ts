@@ -109,6 +109,10 @@ export const ShadowDoneRecordSchema = z.strictObject({
   checks_source: z.string().min(1),
   checks_passed: z.boolean(),
   diffstat: z.array(z.string()),
+  /** Calibration 2 frozen runner: the input case id (join key for score.mjs). */
+  cal2_case_id: z.string().min(1).optional(),
+  /** Redacted HTTP response body when the frozen transport received a non-2xx. */
+  response_detail: z.string().max(4000).optional(),
 });
 
 export const QaResultSchema = z.strictObject({

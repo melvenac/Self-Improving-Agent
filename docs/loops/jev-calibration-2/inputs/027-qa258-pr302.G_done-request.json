@@ -1,0 +1,551 @@
+{
+  "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+  "candidate_sha": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60",
+  "case_id": "qa258-pr302",
+  "case_no": 27,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 36982048552,
+    "runs_found": 2,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t048-developer-handoff.md"
+  ],
+  "label": "REJECT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60",
+  "plan_redacted_sentences": [
+    {
+      "field": "acceptance.T10",
+      "sentence": "#290 equals QA 254's ACCEPT."
+    },
+    {
+      "field": "tasks[9]",
+      "sentence": "#290 equals QA 254's ACCEPT."
+    }
+  ],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (#294:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (A third file losing a test still fails.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (The filename-only mutant goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (The retirements check passes with the reduced R-011 allowlist.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (backfill-success-rate.mjs is deleted.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (#299:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (The detector reads .recalled-entries.json only to report.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (The ids it returns never reach resolveRecalledIds: show the call graph by grep.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (It reports none present when the file is absent, and that is distinct from not checked.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head. Run gh pr checks <n> and quote test and the run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#289, QA 254's failures:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (SSH-style stderr: the cause is the fatal: line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (A hanging remote is bounded. Quote the wall time.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/pipelines/session-end/index-v2.ts",
+        "open-brain/src/pipelines/session-end/invocation-logger.ts",
+        "open-brain/src/pipelines/session-end/recalled-ids.ts",
+        "open-brain/src/pipelines/session-start/health-checks.ts",
+        "open-brain/src/pipelines/session-start/index.ts",
+        "open-brain/src/pipelines/session-start/session-log.ts",
+        "open-brain/src/pipelines/sync/checks-state.ts",
+        "open-brain/src/pipelines/sync/hub-seats.ts",
+        "open-brain/src/server.ts",
+        "open-brain/src/shared/active-session.ts",
+        "open-brain/tests/pipelines/sync/checks-state.test.ts",
+        "open-brain/tests/t048-dropped-counts.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head. Run gh pr checks <n> and quote test and the run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#289, QA 254's failures:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "SSH-style stderr: the cause is the fatal: line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "A hanging remote is bounded. Quote the wall time.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "#294:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "A third file losing a test still fails.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "The filename-only mutant goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "The retirements check passes with the reduced R-011 allowlist.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "backfill-success-rate.mjs is deleted.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "#299:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "The detector reads .recalled-entries.json only to report.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "The ids it returns never reach resolveRecalledIds: show the call graph by grep.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "It reports none present when the file is absent, and that is distinct from not checked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "27-qa258-pr302",
+        "new_capability": "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)",
+        "objective": "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+          "path": "docs/loops/qa-258-b4-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined.",
+          "Red then green. Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head. Run gh pr checks <n> and quote test and the run id.",
+          "#289, QA 254's failures:",
+          "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.",
+          "SSH-style stderr: the cause is the fatal: line.",
+          "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
+          "A hanging remote is bounded. Quote the wall time.",
+          "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+          "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
+          "#294:",
+          "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
+          "A third file losing a test still fails.",
+          "The filename-only mutant goes red.",
+          "The retirements check passes with the reduced R-011 allowlist.",
+          "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.",
+          "backfill-success-rate.mjs is deleted.",
+          "#299:",
+          "The detector reads .recalled-entries.json only to report.",
+          "The ids it returns never reach resolveRecalledIds: show the call graph by grep.",
+          "It reports none present when the file is absent, and that is distinct from not checked.",
+          "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n@@ -97,16 +102,16 @@ const SESSIONS_DB_DIR = join(homedir(), \".claude\", \"context-mode\", \"sessions\");\n  * Extract skill/mcp/command invocations from session .db files and append to JSONL log.\n  * Skips sessions already logged (deduplication by session_id).\n  */\n-export function logInvocations(): InvocationLogResult {\n-  if (!existsSync(SESSIONS_DB_DIR)) {\n-    return { logged: 0, skippedSessions: 0 };\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..0d1a71f3\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { logInvocations } from \"../src/pipelines/session-end/invocation-logger.js\";\n+import { formatSessionEndLines } from \"../src/pipelines/session-end/index-v2.js\";\n+import { formatRecalledResolution, resolveRecalledIds } from \"../src/pipelines/session-end/recalled-ids.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..6553c504 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -61,12 +61,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n     try {\n       let newestSession: string | null = null;\n       let newestMtime = 0;\n+      let unreadableDirs = 0;\n       for (const projectDir of readdirSync(transcriptsDir)) {\n         const full = join(transcriptsDir, projectDir);\n         let files: string[];\n         try {\n           files = readdirSync(full).filter((f) => f.endsWith(\".jsonl\"));\n-        } catch { continue; }\n+        } catch { unreadableDirs++; continue; }\n         for (const f of files) {\n           const s = statSync(join(full, f));\n           if (s.mtimeMs > newestMtime) {\n@@ -76,6 +77,14 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n         }\n       }\n \n+      // T-048: the newest-transcript judgement below rests on the directories that WERE readable.\n+      if (unreadableDirs > 0) {\n+        warnings.push({\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..6553c504 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -61,12 +61,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n     try {\n       let newestSession: string | null = null;\n       let newestMtime = 0;\n+      let unreadableDirs = 0;\n       for (const projectDir of readdirSync(transcriptsDir)) {\n         const full = join(transcriptsDir, projectDir);\n         let files: string[];\n         try {\n           files = readdirSync(full).filter((f) => f.endsWith(\".jsonl\"));\n-        } catch { continue; }\n+        } catch { unreadableDirs++; continue; }\n         for (const f of files) {\n           const s = statSync(join(full, f));\n           if (s.mtimeMs > newestMtime) {\n@@ -76,6 +77,14 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n         }\n       }\n \n+      // T-048: the newest-transcript judgement below rests on the directories that WERE readable.\n+      if (unreadableDirs > 0) {\n+        warnings.push({\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n+    if (!existsSync(p)) { deleted++; continue; } // tracked but deleted in the working tree\n     let buf: Buffer;\n-    try { buf = readFileSync(p); } catch { continue; }\n-    if (buf.subarray(0, 8192).includes(0)) continue; // binary\n+    try { buf = readFileSync(p); } catch { unreadable++; continue; }\n+    if (buf.subarray(0, 8192).includes(0)) { binary++; continue; } // binary\n     scanned++;\n     const lines = buf.toString(\"utf-8\").split(/\\r?\\n/);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n+    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)\" });\n   });\n \n   it(\"fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned\", () => {\n@@ -314,7 +314,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     git(\"add\", \"CHANGELOG.md\", \"clean.md\");\n     const r = checkMergeMarkers(root);\n     expect(r.severity).toBe(\"issue\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..0d1a71f3\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { logInvocations } from \"../src/pipelines/session-end/invocation-logger.js\";\n+import { formatSessionEndLines } from \"../src/pipelines/session-end/index-v2.js\";\n+import { formatRecalledResolution, resolveRecalledIds } from \"../src/pipelines/session-end/recalled-ids.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head. Run gh pr checks <n> and quote test and the run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex f2d4dda1..6ca81537 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {\n  */\n export function findExistingSessionLog(\n   projectRoot: string,\n-  sessionId: string | null\n+  sessionId: string | null,\n+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */\n+  onUnreadable?: (name: string) => void\n ): { sessionNumber: number; logPath: string } | null {\n   if (!sessionId) return null;\n   const sessionsDir = join(projectRoot, \".agents\", \"SESSIONS\");\n@@ -56,7 +58,7 @@ export function findExistingSessionLog(\n     if (!m) continue;\n     const logPath = join(sessionsDir, f);\n     let content: string;\n-    try { content = readFileSync(logPath, \"utf-8\"); } catch { continue; }\n+    try { content = readFileSync(logPath, \"utf-8\"); } catch { onUnreadable?.(f); continue; }\n     const idMatch = content.match(SESSION_ID_LINE);\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "#289, QA 254's failures:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n+    if (!existsSync(p)) { deleted++; continue; } // tracked but deleted in the working tree\n     let buf: Buffer;\n-    try { buf = readFileSync(p); } catch { continue; }\n-    if (buf.subarray(0, 8192).includes(0)) continue; // binary\n+    try { buf = readFileSync(p); } catch { unreadable++; continue; }\n+    if (buf.subarray(0, 8192).includes(0)) { binary++; continue; } // binary\n     scanned++;\n     const lines = buf.toString(\"utf-8\").split(/\\r?\\n/);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..3c5f1df3 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n+    ignoredSeatNames = Array.isArray(seats.seats) ? seats.seats.length - known.length : 0;\n   } catch (error) {\n     return issue(`worktree-seats.json did not parse: ${error instanceof Error ? error.message : String(error)}`);\n   }\n@@ -57,6 +60,7 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n   }\n \n   const problems: string[] = [];\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n+    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)\" });\n   });\n \n   it(\"fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned\", () => {\n@@ -314,7 +314,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     git(\"add\", \"CHANGELOG.md\", \"clean.md\");\n     const r = checkMergeMarkers(root);\n     expect(r.severity).toBe(\"issue\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..3c5f1df3 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n+    ignoredSeatNames = Array.isArray(seats.seats) ? seats.seats.length - known.length : 0;\n   } catch (error) {\n     return issue(`worktree-seats.json did not parse: ${error instanceof Error ? error.message : String(error)}`);\n   }\n@@ -57,6 +60,7 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n   }\n \n   const problems: string[] = [];\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "SSH-style stderr: the cause is the fatal: line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n   // clustered over are untouched — the scan was derived, not a store.\n \n   // ── Stage 3: Invocation logging ──────────────────────────────────────────────\n-  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();\n+  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0 } : logInvocations();\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n@@ -97,16 +102,16 @@ const SESSIONS_DB_DIR = join(homedir(), \".claude\", \"context-mode\", \"sessions\");\n  * Extract skill/mcp/command invocations from session .db files and append to JSONL log.\n  * Skips sessions already logged (deduplication by session_id).\n  */\n-export function logInvocations(): InvocationLogResult {\n-  if (!existsSync(SESSIONS_DB_DIR)) {\n-    return { logged: 0, skippedSessions: 0 };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..a4c66aa9 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n@@ -105,6 +108,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n     }\n \n     const fileSessionId = parsed.session_id ?? null;\n+    const entriesInFile = (parsed.entries ?? []).length;\n     const ids = (parsed.entries ?? [])\n       .map((e) => e.id)\n       .filter((id): id is number => typeof id === \"number\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..6553c504 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -61,12 +61,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n     try {\n       let newestSession: string | null = null;\n       let newestMtime = 0;\n+      let unreadableDirs = 0;\n       for (const projectDir of readdirSync(transcriptsDir)) {\n         const full = join(transcriptsDir, projectDir);\n         let files: string[];\n         try {\n           files = readdirSync(full).filter((f) => f.endsWith(\".jsonl\"));\n-        } catch { continue; }\n+        } catch { unreadableDirs++; continue; }\n         for (const f of files) {\n           const s = statSync(join(full, f));\n           if (s.mtimeMs > newestMtime) {\n@@ -76,6 +77,14 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n         }\n       }\n \n+      // T-048: the newest-transcript judgement below rests on the directories that WERE readable.\n+      if (unreadableDirs > 0) {\n+        warnings.push({\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex b5e1deb0..82f89dcf 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -27,7 +27,15 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {\n       // Absent is not silent: the caller prints this instead of a blank block.\n       session.skippedReason = \"no .agents/SESSIONS/ dir — log not created\";\n     } else {\n-      const existing = findExistingSessionLog(options.projectRoot, sessionId);\n+      const unreadableLogs: string[] = [];\n+      const existing = findExistingSessionLog(options.projectRoot, sessionId, (name) => unreadableLogs.push(name));\n+      // T-048: a log that could not be read may have been this session's own; say so rather than mint a duplicate in silence.\n+      if (unreadableLogs.length > 0) {\n+        health.warnings.push({\n+          category: \"session-log\",\n+          message: `${unreadableLogs.length} session log(s) in .agents/SESSIONS could not be read (${unreadableLogs.join(\", \")}); the search for this session's existing log skipped them.`,\n+        });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex f2d4dda1..6ca81537 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {\n  */\n export function findExistingSessionLog(\n   projectRoot: string,\n-  sessionId: string | null\n+  sessionId: string | null,\n+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */\n+  onUnreadable?: (name: string) => void\n ): { sessionNumber: number; logPath: string } | null {\n   if (!sessionId) return null;\n   const sessionsDir = join(projectRoot, \".agents\", \"SESSIONS\");\n@@ -56,7 +58,7 @@ export function findExistingSessionLog(\n     if (!m) continue;\n     const logPath = join(sessionsDir, f);\n     let content: string;\n-    try { content = readFileSync(logPath, \"utf-8\"); } catch { continue; }\n+    try { content = readFileSync(logPath, \"utf-8\"); } catch { onUnreadable?.(f); continue; }\n     const idMatch = content.match(SESSION_ID_LINE);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n+    if (!existsSync(p)) { deleted++; continue; } // tracked but deleted in the working tree\n     let buf: Buffer;\n-    try { buf = readFileSync(p); } catch { continue; }\n-    if (buf.subarray(0, 8192).includes(0)) continue; // binary\n+    try { buf = readFileSync(p); } catch { unreadable++; continue; }\n+    if (buf.subarray(0, 8192).includes(0)) { binary++; continue; } // binary\n     scanned++;\n     const lines = buf.toString(\"utf-8\").split(/\\r?\\n/);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..3c5f1df3 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n+    ignoredSeatNames = Array.isArray(seats.seats) ? seats.seats.length - known.length : 0;\n   } catch (error) {\n     return issue(`worktree-seats.json did not parse: ${error instanceof Error ? error.message : String(error)}`);\n   }\n@@ -57,6 +60,7 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n   }\n \n   const problems: string[] = [];\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n+    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)\" });\n   });\n \n   it(\"fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned\", () => {\n@@ -314,7 +314,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     git(\"add\", \"CHANGELOG.md\", \"clean.md\");\n     const r = checkMergeMarkers(root);\n     expect(r.severity).toBe(\"issue\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/active-session.ts b/open-brain/src/shared/active-session.ts\nindex 0421b729..0d6fbc62 100644\n--- a/open-brain/src/shared/active-session.ts\n+++ b/open-brain/src/shared/active-session.ts\n@@ -114,6 +114,8 @@ export interface WorkspaceResolution {\n   dir_source: string;\n   /** Usable roots the payload offered. Zero alongside a present key is the fault. */\n   root_count: number;\n+  /** T-048: entries of workspace_roots that were present but could not be used. 0 when the key is absent or empty. */\n+  unusable_roots: number;\n }\n \n /**\n@@ -145,22 +147,24 @@ export function describeWorkspaceDir(\n \n   const present = \"workspace_roots\" in payload || \"workspaceRoots\" in payload;\n   const roots = payload.workspace_roots ?? payload.workspaceRoots;\n-  const candidates = Array.isArray(roots) ? roots : [roots];\n+  const candidates = Array.isArray(roots) ? roots : roots === undefined ? [] : [roots];\n \n   let chosen: string | null = null;\n   let usable = 0;\n+  let unusable = 0;\n   for (const candidate of candidates) {\n     const found = pick(candidate);\n-    if (!found) continue;\n+    if (!found) { unusable++; continue; }\n     usable++;\n     if (!chosen) chosen = found;\n   }\n \n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "A hanging remote is bounded. Quote the wall time."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n   // clustered over are untouched — the scan was derived, not a store.\n \n   // ── Stage 3: Invocation logging ──────────────────────────────────────────────\n-  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();\n+  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0 } : logInvocations();\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n@@ -97,16 +102,16 @@ const SESSIONS_DB_DIR = join(homedir(), \".claude\", \"context-mode\", \"sessions\");\n  * Extract skill/mcp/command invocations from session .db files and append to JSONL log.\n  * Skips sessions already logged (deduplication by session_id).\n  */\n-export function logInvocations(): InvocationLogResult {\n-  if (!existsSync(SESSIONS_DB_DIR)) {\n-    return { logged: 0, skippedSessions: 0 };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..a4c66aa9 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n@@ -105,6 +108,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n     }\n \n     const fileSessionId = parsed.session_id ?? null;\n+    const entriesInFile = (parsed.entries ?? []).length;\n     const ids = (parsed.entries ?? [])\n       .map((e) => e.id)\n       .filter((id): id is number => typeof id === \"number\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..6553c504 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -61,12 +61,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n     try {\n       let newestSession: string | null = null;\n       let newestMtime = 0;\n+      let unreadableDirs = 0;\n       for (const projectDir of readdirSync(transcriptsDir)) {\n         const full = join(transcriptsDir, projectDir);\n         let files: string[];\n         try {\n           files = readdirSync(full).filter((f) => f.endsWith(\".jsonl\"));\n-        } catch { continue; }\n+        } catch { unreadableDirs++; continue; }\n         for (const f of files) {\n           const s = statSync(join(full, f));\n           if (s.mtimeMs > newestMtime) {\n@@ -76,6 +77,14 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n         }\n       }\n \n+      // T-048: the newest-transcript judgement below rests on the directories that WERE readable.\n+      if (unreadableDirs > 0) {\n+        warnings.push({\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex b5e1deb0..82f89dcf 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -27,7 +27,15 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {\n       // Absent is not silent: the caller prints this instead of a blank block.\n       session.skippedReason = \"no .agents/SESSIONS/ dir — log not created\";\n     } else {\n-      const existing = findExistingSessionLog(options.projectRoot, sessionId);\n+      const unreadableLogs: string[] = [];\n+      const existing = findExistingSessionLog(options.projectRoot, sessionId, (name) => unreadableLogs.push(name));\n+      // T-048: a log that could not be read may have been this session's own; say so rather than mint a duplicate in silence.\n+      if (unreadableLogs.length > 0) {\n+        health.warnings.push({\n+          category: \"session-log\",\n+          message: `${unreadableLogs.length} session log(s) in .agents/SESSIONS could not be read (${unreadableLogs.join(\", \")}); the search for this session's existing log skipped them.`,\n+        });\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-start/session-log.ts b/open-brain/src/pipelines/session-start/session-log.ts\nindex f2d4dda1..6ca81537 100644\n--- a/open-brain/src/pipelines/session-start/session-log.ts\n+++ b/open-brain/src/pipelines/session-start/session-log.ts\n@@ -44,7 +44,9 @@ export function findNextSessionNumber(projectRoot: string): number {\n  */\n export function findExistingSessionLog(\n   projectRoot: string,\n-  sessionId: string | null\n+  sessionId: string | null,\n+  /** T-048: called with the name of each Session_N.md that could not be read, so a skipped log is not invisible. */\n+  onUnreadable?: (name: string) => void\n ): { sessionNumber: number; logPath: string } | null {\n   if (!sessionId) return null;\n   const sessionsDir = join(projectRoot, \".agents\", \"SESSIONS\");\n@@ -56,7 +58,7 @@ export function findExistingSessionLog(\n     if (!m) continue;\n     const logPath = join(sessionsDir, f);\n     let content: string;\n-    try { content = readFileSync(logPath, \"utf-8\"); } catch { continue; }\n+    try { content = readFileSync(logPath, \"utf-8\"); } catch { onUnreadable?.(f); continue; }\n     const idMatch = content.match(SESSION_ID_LINE);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n+    if (!existsSync(p)) { deleted++; continue; } // tracked but deleted in the working tree\n     let buf: Buffer;\n-    try { buf = readFileSync(p); } catch { continue; }\n-    if (buf.subarray(0, 8192).includes(0)) continue; // binary\n+    try { buf = readFileSync(p); } catch { unreadable++; continue; }\n+    if (buf.subarray(0, 8192).includes(0)) { binary++; continue; } // binary\n     scanned++;\n     const lines = buf.toString(\"utf-8\").split(/\\r?\\n/);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/hub-seats.ts b/open-brain/src/pipelines/sync/hub-seats.ts\nindex 5f8571a0..3c5f1df3 100644\n--- a/open-brain/src/pipelines/sync/hub-seats.ts\n+++ b/open-brain/src/pipelines/sync/hub-seats.ts\n@@ -44,9 +44,12 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n     return issue(\"hub-partner-seats.json is present but worktree-seats.json is not, so seat names cannot be checked\");\n   }\n   let known: string[];\n+  let ignoredSeatNames = 0;\n   try {\n     const seats = JSON.parse(readFileSync(seatsPath, \"utf-8\")) as SeatFile;\n     known = Array.isArray(seats.seats) ? seats.seats.filter((s): s is string => typeof s === \"string\") : [];\n+    // T-048: a seat name that is not a string used to vanish here, which made the seat it was meant to name look unknown.\n+    ignoredSeatNames = Array.isArray(seats.seats) ? seats.seats.length - known.length : 0;\n   } catch (error) {\n     return issue(`worktree-seats.json did not parse: ${error instanceof Error ? error.message : String(error)}`);\n   }\n@@ -57,6 +60,7 @@ export function checkHubSeats(projectRoot: string): CheckResult {\n   }\n \n   const problems: string[] = [];\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..f72bb3c8 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -589,7 +589,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     return {\n       content: [{\n         type: \"text\",\n-        text: `Session End:\\n  Summary: ${result.summary.written ? \"written\" : \"skipped\"}${result.summary.selfGenerated ? \" (self-generated)\" : \"\"}\\n${originLine}\\n  Feedback: ${result.feedback.processed} entries rated\\n  Invocations: ${result.invocations.logged} logged\\n${shadowLine}\\n\\n${shadowReport}`,\n+        text: `Session End:\\n  Summary: ${result.summary.written ? \"written\" : \"skipped\"}${result.summary.selfGenerated ? \" (self-generated)\" : \"\"}\\n${originLine}\\n  Feedback: ${result.feedback.processed} entries rated\\n  Invocations: ${result.invocations.logged} logged (${result.invocations.skippedSessions} already logged, ${result.invocations.unreadableSessions} unreadable, ${result.invocations.appendFailures} append failed)\\n${shadowLine}\\n\\n${shadowReport}`,\n       }],\n     };\n   } catch (err) {",
+            "diff --git a/open-brain/src/shared/active-session.ts b/open-brain/src/shared/active-session.ts\nindex 0421b729..0d6fbc62 100644\n--- a/open-brain/src/shared/active-session.ts\n+++ b/open-brain/src/shared/active-session.ts\n@@ -114,6 +114,8 @@ export interface WorkspaceResolution {\n   dir_source: string;\n   /** Usable roots the payload offered. Zero alongside a present key is the fault. */\n   root_count: number;\n+  /** T-048: entries of workspace_roots that were present but could not be used. 0 when the key is absent or empty. */\n+  unusable_roots: number;\n }\n \n /**\n@@ -145,22 +147,24 @@ export function describeWorkspaceDir(\n \n   const present = \"workspace_roots\" in payload || \"workspaceRoots\" in payload;\n   const roots = payload.workspace_roots ?? payload.workspaceRoots;\n-  const candidates = Array.isArray(roots) ? roots : [roots];\n+  const candidates = Array.isArray(roots) ? roots : roots === undefined ? [] : [roots];\n \n   let chosen: string | null = null;\n   let usable = 0;\n+  let unusable = 0;\n   for (const candidate of candidates) {\n     const found = pick(candidate);\n-    if (!found) continue;\n+    if (!found) { unusable++; continue; }\n     usable++;\n     if (!chosen) chosen = found;\n   }\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n+    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)\" });\n   });\n \n   it(\"fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned\", () => {\n@@ -314,7 +314,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     git(\"add\", \"CHANGELOG.md\", \"clean.md\");\n     const r = checkMergeMarkers(root);\n     expect(r.severity).toBe(\"issue\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..0d1a71f3\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { logInvocations } from \"../src/pipelines/session-end/invocation-logger.js\";\n+import { formatSessionEndLines } from \"../src/pipelines/session-end/index-v2.js\";\n+import { formatRecalledResolution, resolveRecalledIds } from \"../src/pipelines/session-end/recalled-ids.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..a4c66aa9 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n@@ -105,6 +108,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n     }\n \n     const fileSessionId = parsed.session_id ?? null;\n+    const entriesInFile = (parsed.entries ?? []).length;\n     const ids = (parsed.entries ?? [])\n       .map((e) => e.id)\n       .filter((id): id is number => typeof id === \"number\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..6553c504 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -61,12 +61,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n     try {\n       let newestSession: string | null = null;\n       let newestMtime = 0;\n+      let unreadableDirs = 0;\n       for (const projectDir of readdirSync(transcriptsDir)) {\n         const full = join(transcriptsDir, projectDir);\n         let files: string[];\n         try {\n           files = readdirSync(full).filter((f) => f.endsWith(\".jsonl\"));\n-        } catch { continue; }\n+        } catch { unreadableDirs++; continue; }\n         for (const f of files) {\n           const s = statSync(join(full, f));\n           if (s.mtimeMs > newestMtime) {\n@@ -76,6 +77,14 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n         }\n       }\n \n+      // T-048: the newest-transcript judgement below rests on the directories that WERE readable.\n+      if (unreadableDirs > 0) {\n+        warnings.push({\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "#294:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..0d1a71f3\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { logInvocations } from \"../src/pipelines/session-end/invocation-logger.js\";\n+import { formatSessionEndLines } from \"../src/pipelines/session-end/index-v2.js\";\n+import { formatRecalledResolution, resolveRecalledIds } from \"../src/pipelines/session-end/recalled-ids.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n+    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)\" });\n   });\n \n   it(\"fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned\", () => {\n@@ -314,7 +314,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     git(\"add\", \"CHANGELOG.md\", \"clean.md\");\n     const r = checkMergeMarkers(root);\n     expect(r.severity).toBe(\"issue\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..0d1a71f3\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { logInvocations } from \"../src/pipelines/session-end/invocation-logger.js\";\n+import { formatSessionEndLines } from \"../src/pipelines/session-end/index-v2.js\";\n+import { formatRecalledResolution, resolveRecalledIds } from \"../src/pipelines/session-end/recalled-ids.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "A third file losing a test still fails."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n+    if (!existsSync(p)) { deleted++; continue; } // tracked but deleted in the working tree\n     let buf: Buffer;\n-    try { buf = readFileSync(p); } catch { continue; }\n-    if (buf.subarray(0, 8192).includes(0)) continue; // binary\n+    try { buf = readFileSync(p); } catch { unreadable++; continue; }\n+    if (buf.subarray(0, 8192).includes(0)) { binary++; continue; } // binary\n     scanned++;\n     const lines = buf.toString(\"utf-8\").split(/\\r?\\n/);\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "The filename-only mutant goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/health-checks.ts b/open-brain/src/pipelines/session-start/health-checks.ts\nindex 8bef3d36..6553c504 100644\n--- a/open-brain/src/pipelines/session-start/health-checks.ts\n+++ b/open-brain/src/pipelines/session-start/health-checks.ts\n@@ -61,12 +61,13 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n     try {\n       let newestSession: string | null = null;\n       let newestMtime = 0;\n+      let unreadableDirs = 0;\n       for (const projectDir of readdirSync(transcriptsDir)) {\n         const full = join(transcriptsDir, projectDir);\n         let files: string[];\n         try {\n           files = readdirSync(full).filter((f) => f.endsWith(\".jsonl\"));\n-        } catch { continue; }\n+        } catch { unreadableDirs++; continue; }\n         for (const f of files) {\n           const s = statSync(join(full, f));\n           if (s.mtimeMs > newestMtime) {\n@@ -76,6 +77,14 @@ export function runHealthChecks(homePath: string): HealthCheckResult {\n         }\n       }\n \n+      // T-048: the newest-transcript judgement below rests on the directories that WERE readable.\n+      if (unreadableDirs > 0) {\n+        warnings.push({\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/checks-state.ts b/open-brain/src/pipelines/sync/checks-state.ts\nindex 33d3adc4..9e6bb745 100644\n--- a/open-brain/src/pipelines/sync/checks-state.ts\n+++ b/open-brain/src/pipelines/sync/checks-state.ts\n@@ -221,12 +221,16 @@ export function checkMergeMarkers(projectRoot: string, run: CommandRunner = exec\n   const hits: string[] = [];\n   let scanned = 0;\n   let markers = 0;\n+  // T-048: tracked files that were NOT scanned, by reason, so \"0 markers\" cannot be read as \"every tracked file was clean\".\n+  let deleted = 0;\n+  let unreadable = 0;\n+  let binary = 0;\n   for (const rel of files) {\n     const p = join(projectRoot, rel);\n-    if (!existsSync(p)) continue; // tracked but deleted in the working tree\n+    if (!existsSync(p)) { deleted++; continue; } // tracked but deleted in the working tree\n     let buf: Buffer;\n-    try { buf = readFileSync(p); } catch { continue; }\n-    if (buf.subarray(0, 8192).includes(0)) continue; // binary\n+    try { buf = readFileSync(p); } catch { unreadable++; continue; }\n+    if (buf.subarray(0, 8192).includes(0)) { binary++; continue; } // binary\n     scanned++;\n     const lines = buf.toString(\"utf-8\").split(/\\r?\\n/);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n+    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)\" });\n   });\n \n   it(\"fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned\", () => {\n@@ -314,7 +314,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     git(\"add\", \"CHANGELOG.md\", \"clean.md\");\n     const r = checkMergeMarkers(root);\n     expect(r.severity).toBe(\"issue\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "The retirements check passes with the reduced R-011 allowlist."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/server.ts b/open-brain/src/server.ts\nindex 4ac1bd40..f72bb3c8 100644\n--- a/open-brain/src/server.ts\n+++ b/open-brain/src/server.ts\n@@ -589,7 +589,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {\n     return {\n       content: [{\n         type: \"text\",\n-        text: `Session End:\\n  Summary: ${result.summary.written ? \"written\" : \"skipped\"}${result.summary.selfGenerated ? \" (self-generated)\" : \"\"}\\n${originLine}\\n  Feedback: ${result.feedback.processed} entries rated\\n  Invocations: ${result.invocations.logged} logged\\n${shadowLine}\\n\\n${shadowReport}`,\n+        text: `Session End:\\n  Summary: ${result.summary.written ? \"written\" : \"skipped\"}${result.summary.selfGenerated ? \" (self-generated)\" : \"\"}\\n${originLine}\\n  Feedback: ${result.feedback.processed} entries rated\\n  Invocations: ${result.invocations.logged} logged (${result.invocations.skippedSessions} already logged, ${result.invocations.unreadableSessions} unreadable, ${result.invocations.appendFailures} append failed)\\n${shadowLine}\\n\\n${shadowReport}`,\n       }],\n     };\n   } catch (err) {"
+          ],
+          "id": "T17",
+          "observable": "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/active-session.ts b/open-brain/src/shared/active-session.ts\nindex 0421b729..0d6fbc62 100644\n--- a/open-brain/src/shared/active-session.ts\n+++ b/open-brain/src/shared/active-session.ts\n@@ -114,6 +114,8 @@ export interface WorkspaceResolution {\n   dir_source: string;\n   /** Usable roots the payload offered. Zero alongside a present key is the fault. */\n   root_count: number;\n+  /** T-048: entries of workspace_roots that were present but could not be used. 0 when the key is absent or empty. */\n+  unusable_roots: number;\n }\n \n /**\n@@ -145,22 +147,24 @@ export function describeWorkspaceDir(\n \n   const present = \"workspace_roots\" in payload || \"workspaceRoots\" in payload;\n   const roots = payload.workspace_roots ?? payload.workspaceRoots;\n-  const candidates = Array.isArray(roots) ? roots : [roots];\n+  const candidates = Array.isArray(roots) ? roots : roots === undefined ? [] : [roots];\n \n   let chosen: string | null = null;\n   let usable = 0;\n+  let unusable = 0;\n   for (const candidate of candidates) {\n     const found = pick(candidate);\n-    if (!found) continue;\n+    if (!found) { unusable++; continue; }\n     usable++;\n     if (!chosen) chosen = found;\n   }\n \n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "backfill-success-rate.mjs is deleted."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n+    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)\" });\n   });\n \n   it(\"fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned\", () => {\n@@ -314,7 +314,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     git(\"add\", \"CHANGELOG.md\", \"clean.md\");\n     const r = checkMergeMarkers(root);\n     expect(r.severity).toBe(\"issue\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "#299:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..a4c66aa9 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n@@ -105,6 +108,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n     }\n \n     const fileSessionId = parsed.session_id ?? null;\n+    const entriesInFile = (parsed.entries ?? []).length;\n     const ids = (parsed.entries ?? [])\n       .map((e) => e.id)\n       .filter((id): id is number => typeof id === \"number\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T20",
+          "observable": "The detector reads .recalled-entries.json only to report."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..a4c66aa9 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n@@ -105,6 +108,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n     }\n \n     const fileSessionId = parsed.session_id ?? null;\n+    const entriesInFile = (parsed.entries ?? []).length;\n     const ids = (parsed.entries ?? [])\n       .map((e) => e.id)\n       .filter((id): id is number => typeof id === \"number\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "The ids it returns never reach resolveRecalledIds: show the call graph by grep."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/index.ts b/open-brain/src/pipelines/session-start/index.ts\nindex b5e1deb0..82f89dcf 100644\n--- a/open-brain/src/pipelines/session-start/index.ts\n+++ b/open-brain/src/pipelines/session-start/index.ts\n@@ -27,7 +27,15 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {\n       // Absent is not silent: the caller prints this instead of a blank block.\n       session.skippedReason = \"no .agents/SESSIONS/ dir — log not created\";\n     } else {\n-      const existing = findExistingSessionLog(options.projectRoot, sessionId);\n+      const unreadableLogs: string[] = [];\n+      const existing = findExistingSessionLog(options.projectRoot, sessionId, (name) => unreadableLogs.push(name));\n+      // T-048: a log that could not be read may have been this session's own; say so rather than mint a duplicate in silence.\n+      if (unreadableLogs.length > 0) {\n+        health.warnings.push({\n+          category: \"session-log\",\n+          message: `${unreadableLogs.length} session log(s) in .agents/SESSIONS could not be read (${unreadableLogs.join(\", \")}); the search for this session's existing log skipped them.`,\n+        });\n…[cal2 diff truncated]"
+          ],
+          "id": "T22",
+          "observable": "It reports none present when the file is absent, and that is distinct from not checked."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..0d1a71f3\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { logInvocations } from \"../src/pipelines/session-end/invocation-logger.js\";\n+import { formatSessionEndLines } from \"../src/pipelines/session-end/index-v2.js\";\n+import { formatRecalledResolution, resolveRecalledIds } from \"../src/pipelines/session-end/recalled-ids.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T23",
+          "observable": "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-end/index-v2.ts b/open-brain/src/pipelines/session-end/index-v2.ts\nindex 967f71b5..32a16b9d 100644\n--- a/open-brain/src/pipelines/session-end/index-v2.ts\n+++ b/open-brain/src/pipelines/session-end/index-v2.ts\n@@ -65,7 +65,7 @@ interface SessionEndV2Result {\n     /** Ratings whose feedback_log write threw (SILENT 16). */\n     notWritten?: Array<{ id: number; reason: string }>;\n   };\n-  invocations: { logged: number; skippedSessions: number };\n+  invocations: { logged: number; skippedSessions: number; unreadableSessions: number; appendFailures: number };\n   topics: { written: number; removed: number; orphans: number };\n   shadow: ShadowStageResult;\n }\n@@ -188,7 +188,7 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {\n   // clustered over are untouched — the scan was derived, not a store.\n \n   // ── Stage 3: Invocation logging ──────────────────────────────────────────────\n-  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0 } : logInvocations();\n+  const invocationResult = dryRun ? { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0 } : logInvocations();\n \n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/invocation-logger.ts b/open-brain/src/pipelines/session-end/invocation-logger.ts\nindex 36f30911..6d5e916f 100644\n--- a/open-brain/src/pipelines/session-end/invocation-logger.ts\n+++ b/open-brain/src/pipelines/session-end/invocation-logger.ts\n@@ -26,7 +26,12 @@ export interface InvocationEntry {\n \n export interface InvocationLogResult {\n   logged: number;\n+  /** Sessions already in the log (deduplicated): a benign skip, counted on its own. */\n   skippedSessions: number;\n+  /** T-048: session dbs that could not be opened or read. */\n+  unreadableSessions: number;\n+  /** T-048: events read whose append to the log failed. */\n+  appendFailures: number;\n }\n \n // ─── Helpers ────────────────────────────────────────────────────────────────\n@@ -97,16 +102,16 @@ const SESSIONS_DB_DIR = join(homedir(), \".claude\", \"context-mode\", \"sessions\");\n  * Extract skill/mcp/command invocations from session .db files and append to JSONL log.\n  * Skips sessions already logged (deduplication by session_id).\n  */\n-export function logInvocations(): InvocationLogResult {\n-  if (!existsSync(SESSIONS_DB_DIR)) {\n-    return { logged: 0, skippedSessions: 0 };\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/session-end/recalled-ids.ts b/open-brain/src/pipelines/session-end/recalled-ids.ts\nindex f51c25c4..a4c66aa9 100644\n--- a/open-brain/src/pipelines/session-end/recalled-ids.ts\n+++ b/open-brain/src/pipelines/session-end/recalled-ids.ts\n@@ -47,6 +47,9 @@ import { getSessionRecalledIds } from \"../../db-v2.js\";\n  */\n export interface RecalledIdsSource {\n   ids: number[];\n+  /** T-048: set only for origin \"file\": entries the file listed, and how many had no numeric id and were not rated. */\n+  entriesInFile?: number;\n+  droppedEntries?: number;\n   origin: \"explicit\" | \"recall-log\" | \"file\" | \"none\";\n   /** Set when a file existed but was not trusted. */\n   rejected?: { path: string; fileSessionId: string | null; reason: string };\n@@ -105,6 +108,7 @@ export function resolveRecalledIds(input: ResolveRecalledIdsInput): RecalledIdsS\n     }\n \n     const fileSessionId = parsed.session_id ?? null;\n+    const entriesInFile = (parsed.entries ?? []).length;\n     const ids = (parsed.entries ?? [])\n       .map((e) => e.id)\n       .filter((id): id is number => typeof id === \"number\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks-state.test.ts b/open-brain/tests/pipelines/sync/checks-state.test.ts\nindex 58947c69..951ac827 100644\n--- a/open-brain/tests/pipelines/sync/checks-state.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks-state.test.ts\n@@ -304,7 +304,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     writeFileSync(join(root, \"bin\", \"blob.bin\"), Buffer.from([0, 1, 2, 60, 60, 60, 60, 60, 60, 60, 32]));\n     git(\"add\", \"-A\");\n     const r = checkMergeMarkers(root);\n-    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files\" });\n+    expect(r).toEqual({ name: \"merge-markers\", report: true, severity: \"pass\", message: \"0 conflict markers in 2 tracked text files; 1 tracked file not scanned (0 deleted, 0 unreadable, 1 binary)\" });\n   });\n \n   it(\"fails (issue) naming file and lines when a tracked file carries markers; untracked files are not scanned\", () => {\n@@ -314,7 +314,7 @@ describe(\"merge-markers (Loop 4 R7)\", () => {\n     git(\"add\", \"CHANGELOG.md\", \"clean.md\");\n     const r = checkMergeMarkers(root);\n     expect(r.severity).toBe(\"issue\");\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/t048-dropped-counts.test.ts b/open-brain/tests/t048-dropped-counts.test.ts\nnew file mode 100644\nindex 00000000..0d1a71f3\n--- /dev/null\n+++ b/open-brain/tests/t048-dropped-counts.test.ts\n@@ -0,0 +1,155 @@\n+/**\n+ * T-048: any filter that drops rows must emit the dropped count, so \"absent\" and \"zero\" never collapse into one\n+ * value. One row per fixed site; each is red on the base (the drop is invisible) and green after (the count appears).\n+ * The audit table and the sites NOT fixed are in docs/loops/t048-developer-handoff.md.\n+ */\n+import { describe, it, expect, afterAll } from \"vitest\";\n+import Database from \"better-sqlite3\";\n+import { execFileSync } from \"node:child_process\";\n+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { tmpdir } from \"node:os\";\n+import { join } from \"node:path\";\n+import { logInvocations } from \"../src/pipelines/session-end/invocation-logger.js\";\n+import { formatSessionEndLines } from \"../src/pipelines/session-end/index-v2.js\";\n+import { formatRecalledResolution, resolveRecalledIds } from \"../src/pipelines/session-end/recalled-ids.js\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T24",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+        "merge_commit": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60",
+        "pr": 302,
+        "scored_sha": "ac4323f46eb35527ce0eceeeef6ac6d6afc8cb60"
+      }
+    }
+  }
+}

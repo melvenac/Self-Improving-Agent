@@ -1,0 +1,529 @@
+{
+  "base_sha": "507004147df01ec665ff5970257ee400534720ef",
+  "candidate_sha": "be32de21d7d448b5c91b4cfa5411698842c97d80",
+  "case_id": "qa258-pr289-r3",
+  "case_no": 23,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37005482571,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "diff_paths_excluded": [
+    "docs/loops/t208-r3-developer-handoff.md",
+    "docs/loops/t208/mutants/drift-invalid-as-none.diff",
+    "docs/loops/t208/mutants/drift-names-dropped.diff",
+    "docs/loops/t208/mutants/fetch-head-mtime.diff",
+    "docs/loops/t208/mutants/last-stderr-line.diff",
+    "docs/loops/t208/mutants/skip-fetch.diff"
+  ],
+  "label": "ACCEPT",
+  "leak_details": [],
+  "leak_hits": [],
+  "merge_commit": "5440cfa9273d657ae016c085904ef192c974bcbd",
+  "plan_redacted_sentences": [
+    {
+      "field": "acceptance.T10",
+      "sentence": "#290 equals QA 254's ACCEPT."
+    },
+    {
+      "field": "tasks[9]",
+      "sentence": "#290 equals QA 254's ACCEPT."
+    }
+  ],
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (#294:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (A third file losing a test still fails.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (The filename-only mutant goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (The retirements check passes with the reduced R-011 allowlist.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (backfill-success-rate.mjs is deleted.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (#299:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (The detector reads .recalled-entries.json only to report.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (The ids it returns never reach resolveRecalledIds: show the call graph by grep.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (It reports none present when the file is absent, and that is distinct from not checked.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head. Run gh pr checks <n> and quote test and the run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#289, QA 254's failures:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (SSH-style stderr: the cause is the fatal: line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (A hanging remote is bounded. Quote the wall time.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "be32de21d7d448b5c91b4cfa5411698842c97d80",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/pipelines/session-start/drift-line.ts",
+        "open-brain/src/pipelines/session-start/tree-currency.ts",
+        "open-brain/tests/pipelines/session-start/drift-line.test.ts",
+        "open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head. Run gh pr checks <n> and quote test and the run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#289, QA 254's failures:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "SSH-style stderr: the cause is the fatal: line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "A hanging remote is bounded. Quote the wall time.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "#294:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "A third file losing a test still fails.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "The filename-only mutant goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "The retirements check passes with the reduced R-011 allowlist.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "backfill-success-rate.mjs is deleted.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "#299:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "The detector reads .recalled-entries.json only to report.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "The ids it returns never reach resolveRecalledIds: show the call graph by grep.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "It reports none present when the file is absent, and that is distinct from not checked.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "23-qa258-pr289-r3",
+        "new_capability": "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)",
+        "objective": "QA 258, batch B4: session-start fetch and attribution, maturity cut, session-end counts (#289, #290, #294, #299, #302)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+          "path": "docs/loops/qa-258-b4-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined.",
+          "Red then green. Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head. Run gh pr checks <n> and quote test and the run id.",
+          "#289, QA 254's failures:",
+          "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch.",
+          "SSH-style stderr: the cause is the fatal: line.",
+          "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked.",
+          "A hanging remote is bounded. Quote the wall time.",
+          "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk.",
+          "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c.",
+          "#294:",
+          "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex.",
+          "A third file losing a test still fails.",
+          "The filename-only mutant goes red.",
+          "The retirements check passes with the reduced R-011 allowlist.",
+          "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines.",
+          "backfill-success-rate.mjs is deleted.",
+          "#299:",
+          "The detector reads .recalled-entries.json only to report.",
+          "The ids it returns never reach resolveRecalledIds: show the call graph by grep.",
+          "It reports none present when the file is absent, and that is distinct from not checked.",
+          "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-bootstrap.ts b/open-brain/src/cli-bootstrap.ts\nindex 6b49821c..3d96334a 100644\n--- a/open-brain/src/cli-bootstrap.ts\n+++ b/open-brain/src/cli-bootstrap.ts\n@@ -15,7 +15,8 @@ import { runHealthChecks } from \"./pipelines/session-start/health-checks.js\";\n import { readAgentIdentity } from \"./pipelines/session-start/agent-identity.js\";\n import { describeRoleFiles } from \"./pipelines/session-start/role-files.js\";\n import { describeDerivedArtifacts } from \"./pipelines/session-start/derived-artifacts.js\";\n-import { describeTreeCurrency } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeDriftLine } from \"./pipelines/session-start/drift-line.js\";\n import {\n   resolveSessionId,\n   writeActiveSession,\n@@ -155,7 +156,12 @@ if (hasAgents) {\n // derived-artifacts.ts states about itself: two copies of a freshness rule\n // drift, and the drift is silent.\n if (hasAgents) {\n-  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);\n+  // T-208: fetch FIRST (bounded, pruning), on every SessionStart event: the hook\n+  // is registered without a matcher, so startup and resume take this one path.\n+  // The outcome rides into the currency lines, which say so when it failed.\n+  for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);\n+  // T-208 r3: drift beside currency, on startup and resume (same check ob_start reports).\n+  lines.push(describeDriftLine(cwd));\n }\n \n // Session UUID — emit so /start can pick it up and call ob_set_session."
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head. Run gh pr checks <n> and quote test and the run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..58ebedd5 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n-import { existsSync, readFileSync, statSync } from \"node:fs\";\n+import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,143 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n+ * \"level with origin/master\" against a ref nobody had refreshed, while master\n+ * was 16 revisions ahead. The hook owns the fetch so the comparison is made\n+ * against a fetch that just happened, or says that it did not. --prune is part\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "#289, QA 254's failures:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "3b and 5: the fetch fails while origin is ahead. Neither the hook, nor ob_start, nor /sync reads level. The time they name is the last successful fetch."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/drift-line.ts b/open-brain/src/pipelines/session-start/drift-line.ts\nnew file mode 100644\nindex 00000000..b1c52613\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/drift-line.ts\n@@ -0,0 +1,23 @@\n+import { readProjectState } from \"./state-reader.js\";\n+import { detectDrift } from \"./drift-detector.js\";\n+\n+/**\n+ * The SessionStart hook's drift line (T-208 r3): the same check ob_start reports\n+ * (`detectDrift` over the rendered views), on ONE line so it sits beside the tree\n+ * currency line it is not the same thing as. A check that cannot run says so and\n+ * why; it never degrades to `none`, because \"none\" is a claim about the views.\n+ */\n+export function describeDriftLine(projectRoot: string): string {\n+  try {\n+    const state = readProjectState(projectRoot);\n+    if (state.stateJson.present && !state.stateJson.valid) {\n+      return `Drift: not checked (.agents/state.json is unreadable or invalid: ${state.stateJson.error ?? \"no detail\"})`;\n+    }\n+    const drift = detectDrift(state);\n+    if (drift.length === 0) return \"Drift: none\";\n+    const items = drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? \" (fixed)\" : \" (not fixed)\"}`);\n+    return `Drift detected (${drift.length}): ${items.join(\"; \")}`;\n+  } catch (err) {\n+    return `Drift: not checked (${err instanceof Error ? err.message : String(err)})`;\n+  }\n+}",
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "SSH-style stderr: the cause is the fatal: line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/drift-line.ts b/open-brain/src/pipelines/session-start/drift-line.ts\nnew file mode 100644\nindex 00000000..b1c52613\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/drift-line.ts\n@@ -0,0 +1,23 @@\n+import { readProjectState } from \"./state-reader.js\";\n+import { detectDrift } from \"./drift-detector.js\";\n+\n+/**\n+ * The SessionStart hook's drift line (T-208 r3): the same check ob_start reports\n+ * (`detectDrift` over the rendered views), on ONE line so it sits beside the tree\n+ * currency line it is not the same thing as. A check that cannot run says so and\n+ * why; it never degrades to `none`, because \"none\" is a claim about the views.\n+ */\n+export function describeDriftLine(projectRoot: string): string {\n+  try {\n+    const state = readProjectState(projectRoot);\n+    if (state.stateJson.present && !state.stateJson.valid) {\n+      return `Drift: not checked (.agents/state.json is unreadable or invalid: ${state.stateJson.error ?? \"no detail\"})`;\n+    }\n+    const drift = detectDrift(state);\n+    if (drift.length === 0) return \"Drift: none\";\n+    const items = drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? \" (fixed)\" : \" (not fixed)\"}`);\n+    return `Drift detected (${drift.length}): ${items.join(\"; \")}`;\n+  } catch (err) {\n+    return `Drift: not checked (${err instanceof Error ? err.message : String(err)})`;\n+  }\n+}",
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..58ebedd5 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n-import { existsSync, readFileSync, statSync } from \"node:fs\";\n+import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,143 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n+ * \"level with origin/master\" against a ref nobody had refreshed, while master\n+ * was 16 revisions ahead. The hook owns the fetch so the comparison is made\n+ * against a fetch that just happened, or says that it did not. --prune is part\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "The drift line on startup and resume: a drifted fixture is named, a clean one reads none, and an unreadable state.json reads not checked."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/drift-line.ts b/open-brain/src/pipelines/session-start/drift-line.ts\nnew file mode 100644\nindex 00000000..b1c52613\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/drift-line.ts\n@@ -0,0 +1,23 @@\n+import { readProjectState } from \"./state-reader.js\";\n+import { detectDrift } from \"./drift-detector.js\";\n+\n+/**\n+ * The SessionStart hook's drift line (T-208 r3): the same check ob_start reports\n+ * (`detectDrift` over the rendered views), on ONE line so it sits beside the tree\n+ * currency line it is not the same thing as. A check that cannot run says so and\n+ * why; it never degrades to `none`, because \"none\" is a claim about the views.\n+ */\n+export function describeDriftLine(projectRoot: string): string {\n+  try {\n+    const state = readProjectState(projectRoot);\n+    if (state.stateJson.present && !state.stateJson.valid) {\n+      return `Drift: not checked (.agents/state.json is unreadable or invalid: ${state.stateJson.error ?? \"no detail\"})`;\n+    }\n+    const drift = detectDrift(state);\n+    if (drift.length === 0) return \"Drift: none\";\n+    const items = drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? \" (fixed)\" : \" (not fixed)\"}`);\n+    return `Drift detected (${drift.length}): ${items.join(\"; \")}`;\n+  } catch (err) {\n+    return `Drift: not checked (${err instanceof Error ? err.message : String(err)})`;\n+  }\n+}"
+          ],
+          "id": "T9",
+          "observable": "A hanging remote is bounded. Quote the wall time."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-bootstrap.ts b/open-brain/src/cli-bootstrap.ts\nindex 6b49821c..3d96334a 100644\n--- a/open-brain/src/cli-bootstrap.ts\n+++ b/open-brain/src/cli-bootstrap.ts\n@@ -15,7 +15,8 @@ import { runHealthChecks } from \"./pipelines/session-start/health-checks.js\";\n import { readAgentIdentity } from \"./pipelines/session-start/agent-identity.js\";\n import { describeRoleFiles } from \"./pipelines/session-start/role-files.js\";\n import { describeDerivedArtifacts } from \"./pipelines/session-start/derived-artifacts.js\";\n-import { describeTreeCurrency } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeDriftLine } from \"./pipelines/session-start/drift-line.js\";\n import {\n   resolveSessionId,\n   writeActiveSession,\n@@ -155,7 +156,12 @@ if (hasAgents) {\n // derived-artifacts.ts states about itself: two copies of a freshness rule\n // drift, and the drift is silent.\n if (hasAgents) {\n-  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);\n+  // T-208: fetch FIRST (bounded, pruning), on every SessionStart event: the hook\n+  // is registered without a matcher, so startup and resume take this one path.\n+  // The outcome rides into the currency lines, which say so when it failed.\n+  for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);\n+  // T-208 r3: drift beside currency, on startup and resume (same check ob_start reports).\n+  lines.push(describeDriftLine(cwd));\n }\n \n // Session UUID — emit so /start can pick it up and call ob_set_session.",
+            "diff --git a/open-brain/src/pipelines/session-start/drift-line.ts b/open-brain/src/pipelines/session-start/drift-line.ts\nnew file mode 100644\nindex 00000000..b1c52613\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/drift-line.ts\n@@ -0,0 +1,23 @@\n+import { readProjectState } from \"./state-reader.js\";\n+import { detectDrift } from \"./drift-detector.js\";\n+\n+/**\n+ * The SessionStart hook's drift line (T-208 r3): the same check ob_start reports\n+ * (`detectDrift` over the rendered views), on ONE line so it sits beside the tree\n+ * currency line it is not the same thing as. A check that cannot run says so and\n+ * why; it never degrades to `none`, because \"none\" is a claim about the views.\n+ */\n+export function describeDriftLine(projectRoot: string): string {\n+  try {\n+    const state = readProjectState(projectRoot);\n+    if (state.stateJson.present && !state.stateJson.valid) {\n+      return `Drift: not checked (.agents/state.json is unreadable or invalid: ${state.stateJson.error ?? \"no detail\"})`;\n+    }\n+    const drift = detectDrift(state);\n+    if (drift.length === 0) return \"Drift: none\";\n+    const items = drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? \" (fixed)\" : \" (not fixed)\"}`);\n+    return `Drift detected (${drift.length}): ${items.join(\"; \")}`;\n+  } catch (err) {\n+    return `Drift: not checked (${err instanceof Error ? err.message : String(err)})`;\n+  }\n+}",
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..58ebedd5 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n-import { existsSync, readFileSync, statSync } from \"node:fs\";\n+import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,143 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n+ * \"level with origin/master\" against a ref nobody had refreshed, while master\n+ * was 16 revisions ahead. The hook owns the fetch so the comparison is made\n+ * against a fetch that just happened, or says that it did not. --prune is part\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "Run git diff 626f7d13 9b076970 -- open-brain/: it must be empty, or explain every hunk."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..58ebedd5 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n-import { existsSync, readFileSync, statSync } from \"node:fs\";\n+import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,143 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n+ * \"level with origin/master\" against a ref nobody had refreshed, while master\n+ * was 16 revisions ahead. The hook owns the fetch so the comparison is made\n+ * against a fetch that just happened, or says that it did not. --prune is part\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "Re-run QA 254's T-212 rows 8a to 8e and row 10 at f707a09c."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "#294:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "S4-9.2 passes with the ALLOWED_TEST_LOSSES table, and the table's counts use the guard's own regex."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "A third file losing a test still fails."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/drift-line.ts b/open-brain/src/pipelines/session-start/drift-line.ts\nnew file mode 100644\nindex 00000000..b1c52613\n--- /dev/null\n+++ b/open-brain/src/pipelines/session-start/drift-line.ts\n@@ -0,0 +1,23 @@\n+import { readProjectState } from \"./state-reader.js\";\n+import { detectDrift } from \"./drift-detector.js\";\n+\n+/**\n+ * The SessionStart hook's drift line (T-208 r3): the same check ob_start reports\n+ * (`detectDrift` over the rendered views), on ONE line so it sits beside the tree\n+ * currency line it is not the same thing as. A check that cannot run says so and\n+ * why; it never degrades to `none`, because \"none\" is a claim about the views.\n+ */\n+export function describeDriftLine(projectRoot: string): string {\n+  try {\n+    const state = readProjectState(projectRoot);\n+    if (state.stateJson.present && !state.stateJson.valid) {\n+      return `Drift: not checked (.agents/state.json is unreadable or invalid: ${state.stateJson.error ?? \"no detail\"})`;\n+    }\n+    const drift = detectDrift(state);\n+    if (drift.length === 0) return \"Drift: none\";\n+    const items = drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? \" (fixed)\" : \" (not fixed)\"}`);\n+    return `Drift detected (${drift.length}): ${items.join(\"; \")}`;\n+  } catch (err) {\n+    return `Drift: not checked (${err instanceof Error ? err.message : String(err)})`;\n+  }\n+}"
+          ],
+          "id": "T15",
+          "observable": "The filename-only mutant goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..58ebedd5 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n-import { existsSync, readFileSync, statSync } from \"node:fs\";\n+import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,143 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n+ * \"level with origin/master\" against a ref nobody had refreshed, while master\n+ * was 16 revisions ahead. The hook owns the fetch so the comparison is made\n+ * against a fetch that just happened, or says that it did not. --prune is part\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "The retirements check passes with the reduced R-011 allowlist."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "dashboard.mjs no longer presents success_rate or maturity as live. Read it and quote the relevant lines."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "backfill-success-rate.mjs is deleted."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-bootstrap.ts b/open-brain/src/cli-bootstrap.ts\nindex 6b49821c..3d96334a 100644\n--- a/open-brain/src/cli-bootstrap.ts\n+++ b/open-brain/src/cli-bootstrap.ts\n@@ -15,7 +15,8 @@ import { runHealthChecks } from \"./pipelines/session-start/health-checks.js\";\n import { readAgentIdentity } from \"./pipelines/session-start/agent-identity.js\";\n import { describeRoleFiles } from \"./pipelines/session-start/role-files.js\";\n import { describeDerivedArtifacts } from \"./pipelines/session-start/derived-artifacts.js\";\n-import { describeTreeCurrency } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeDriftLine } from \"./pipelines/session-start/drift-line.js\";\n import {\n   resolveSessionId,\n   writeActiveSession,\n@@ -155,7 +156,12 @@ if (hasAgents) {\n // derived-artifacts.ts states about itself: two copies of a freshness rule\n // drift, and the drift is silent.\n if (hasAgents) {\n-  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);\n+  // T-208: fetch FIRST (bounded, pruning), on every SessionStart event: the hook\n+  // is registered without a matcher, so startup and resume take this one path.\n+  // The outcome rides into the currency lines, which say so when it failed.\n+  for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);\n+  // T-208 r3: drift beside currency, on startup and resume (same check ob_start reports).\n+  lines.push(describeDriftLine(cwd));\n }\n \n // Session UUID — emit so /start can pick it up and call ob_set_session."
+          ],
+          "id": "T19",
+          "observable": "#299:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/tree-currency.ts b/open-brain/src/pipelines/session-start/tree-currency.ts\nindex 45333ebd..58ebedd5 100644\n--- a/open-brain/src/pipelines/session-start/tree-currency.ts\n+++ b/open-brain/src/pipelines/session-start/tree-currency.ts\n@@ -1,6 +1,6 @@\n-import { existsSync, readFileSync, statSync } from \"node:fs\";\n+import { existsSync, readFileSync, statSync, writeFileSync, rmSync } from \"node:fs\";\n import { join, isAbsolute } from \"node:path\";\n-import { execFileSync } from \"node:child_process\";\n+import { execFileSync, spawnSync } from \"node:child_process\";\n import { parseState } from \"../../shared/state-schema.js\";\n \n /**\n@@ -86,11 +86,143 @@ export interface TreeCurrency {\n export interface TreeCurrencyOptions {\n   /** Defaults to `origin/master`. */\n   upstreamRef?: string;\n+  /**\n+   * The result of the `git fetch --prune origin` the CALLER just made (T-208).\n+   * Only the SessionStart hook fetches; ob_start and /sync compare against\n+   * whatever fetch is on disk and say so. When this is a failure, no line below\n+   * says `level` without the FAILED qualifier in front of it.\n+   */\n+  fetch?: FetchResult;\n+}\n+\n+export interface FetchResult {\n+  ok: boolean;\n+  /** ISO time the fetch finished. */\n+  at: string;\n+  /** Why it failed; null when ok. */\n+  cause: string | null;\n+}\n+\n+/** Bounded: a fetch that cannot finish must not hold up a session start. */\n+export const FETCH_TIMEOUT_MS = 15_000;\n+\n+/**\n+ * `git fetch --prune origin`, bounded (T-208). The evidence: a /start printed\n+ * \"level with origin/master\" against a ref nobody had refreshed, while master\n+ * was 16 revisions ahead. The hook owns the fetch so the comparison is made\n+ * against a fetch that just happened, or says that it did not. --prune is part\n…[cal2 diff truncated]"
+          ],
+          "id": "T20",
+          "observable": "The detector reads .recalled-entries.json only to report."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "The ids it returns never reach resolveRecalledIds: show the call graph by grep."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T22",
+          "observable": "It reports none present when the file is absent, and that is distinct from not checked."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-bootstrap.ts b/open-brain/src/cli-bootstrap.ts\nindex 6b49821c..3d96334a 100644\n--- a/open-brain/src/cli-bootstrap.ts\n+++ b/open-brain/src/cli-bootstrap.ts\n@@ -15,7 +15,8 @@ import { runHealthChecks } from \"./pipelines/session-start/health-checks.js\";\n import { readAgentIdentity } from \"./pipelines/session-start/agent-identity.js\";\n import { describeRoleFiles } from \"./pipelines/session-start/role-files.js\";\n import { describeDerivedArtifacts } from \"./pipelines/session-start/derived-artifacts.js\";\n-import { describeTreeCurrency } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeTreeCurrency, fetchOrigin } from \"./pipelines/session-start/tree-currency.js\";\n+import { describeDriftLine } from \"./pipelines/session-start/drift-line.js\";\n import {\n   resolveSessionId,\n   writeActiveSession,\n@@ -155,7 +156,12 @@ if (hasAgents) {\n // derived-artifacts.ts states about itself: two copies of a freshness rule\n // drift, and the drift is silent.\n if (hasAgents) {\n-  for (const line of describeTreeCurrency(cwd).lines) lines.push(line);\n+  // T-208: fetch FIRST (bounded, pruning), on every SessionStart event: the hook\n+  // is registered without a matcher, so startup and resume take this one path.\n+  // The outcome rides into the currency lines, which say so when it failed.\n+  for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);\n+  // T-208 r3: drift beside currency, on startup and resume (same check ob_start reports).\n+  lines.push(describeDriftLine(cwd));\n }\n \n // Session UUID — emit so /start can pick it up and call ob_set_session."
+          ],
+          "id": "T23",
+          "observable": "#302: pick 3 of the fixed sites. Each one reports its dropped count, including at zero, and is red before."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/drift-line.test.ts b/open-brain/tests/pipelines/session-start/drift-line.test.ts\nnew file mode 100644\nindex 00000000..416289f1\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/drift-line.test.ts\n@@ -0,0 +1,77 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeDriftLine } from \"../../../src/pipelines/session-start/drift-line.js\";\n+\n+/**\n+ * T-208 r3: the SessionStart hook prints drift beside tree currency, on startup and resume.\n+ * Three states must stay distinct: drifted views are NAMED, a clean fixture says none, and a\n+ * check that cannot run says \"not checked\" with the cause (never \"none\").\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+const VALID_STATE = { schema_version: 3, revision: 1, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [], decisions: [], handoffs: [], sessions: [] };\n+\n+function fixture(dir: string, o: { summaryVersion: string; state: string | null }): void {\n+  mkdirSync(join(dir, \".agents\", \"SYSTEM\"), { recursive: true });\n+  mkdirSync(join(dir, \".agents\", \"SESSIONS\"), { recursive: true });\n+  writeFileSync(join(dir, \"package.json\"), JSON.stringify({ name: \"fixture\", version: \"1.2.3\" }));\n+  writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), `# Summary\\n\\n**Version:** ${o.summaryVersion}\\n`);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\nnew file mode 100644\nindex 00000000..1d6d6c55\n--- /dev/null\n+++ b/open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts\n@@ -0,0 +1,219 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { execFileSync } from \"node:child_process\";\n+import { spawnAsync } from \"../../spawn-async.js\";\n+import { describeTreeCurrency, fetchOrigin, informativeLine } from \"../../../src/pipelines/session-start/tree-currency.js\";\n+\n+/**\n+ * T-208: the SessionStart hook fetches (bounded, pruning) BEFORE it judges\n+ * currency, on startup AND resume. Every row runs the real hook entry point on a\n+ * local-path origin: no network. The first row is the evidence's own shape: an\n+ * origin that moved after the last fetch read \"level\" before the change.\n+ */\n+const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+const SCRIPT = resolve(__dirname, \"../../../src/cli-bootstrap.ts\");\n+\n+function git(cwd: string, ...args: string[]): string {\n+  return execFileSync(\"git\", args, { cwd, encoding: \"utf8\", stdio: [\"ignore\", \"pipe\", \"pipe\"] }).trim();\n+}\n+\n+function writeState(dir: string, revision: number): void {\n+  mkdirSync(join(dir, \".agents\"), { recursive: true });\n+  writeFileSync(\n+    join(dir, \".agents\", \"state.json\"),\n+    JSON.stringify({\n+      schema_version: 1, revision, project: { name: \"fixture\" }, objective: null, tasks: [], verified: [], gaps: [],\n…[cal2 diff truncated]"
+          ],
+          "id": "T24",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #290, #289, #294, #302, #299. - #299 and #302 both touch session-end files, so a trivial conflict is possible. Report it and do not resolve it. - On the merged result, run each touched test file, one per invocation, plus tsc --noEmit."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "507004147df01ec665ff5970257ee400534720ef",
+        "merge_commit": "5440cfa9273d657ae016c085904ef192c974bcbd",
+        "pr": 289,
+        "scored_sha": "be32de21d7d448b5c91b4cfa5411698842c97d80"
+      }
+    }
+  }
+}
