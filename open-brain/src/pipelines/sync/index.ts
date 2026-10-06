@@ -31,6 +31,7 @@ import {
   checkModuleBoundary,
   checkGitNexusIndex,
   checkBuildFreshness,
+  checkExperienceFrontmatter,
 } from "./checks.js";
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 import { checkRecordErasure } from "./record-erasure.js";
@@ -121,6 +122,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkProbeMarkers(options.projectRoot));
   // T-042: ob-server-* test artifacts in the real vault (a preventer existed; this is the detector).
   checks.push(checkVaultPollution(options.projectRoot));
+  // T-025: optional one-token experience `type` (docs/loops/t025-ruling.md).
+  checks.push(checkExperienceFrontmatter(options.projectRoot));
   checks.push(checkMirrorParity(options.projectRoot));
   // Loop 10 R1: the runtime label travels with the check, because the same code
   // passing in one process and failing in the other IS the signal.

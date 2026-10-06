@@ -14,6 +14,8 @@ import { resolveRecordSource } from "../session-start/record-source.js";
 import { checkSummaryFromState } from "./checks-state.js";
 import { settleGitNexusIndex, type GitNexusCheckOptions } from "./gitnexus-refresh.js";
 import { diffReferrerLineHashes, matchingLineHashes } from "./retirements-line-hash.js";
+import { parseFrontmatter } from "../../shared/parse-frontmatter.js";
+import { obsidianVaultDir } from "../../shared/paths.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -365,6 +367,149 @@ export function checkClaudeMd(projectRoot: string): CheckResult {
     return { name: "claude-md", severity: "warn", message: `CLAUDE.md references missing dirs: ${missing.join(", ")}` };
   }
   return { name: "claude-md", severity: "pass", message: "CLAUDE.md exists and referenced dirs are valid" };
+}
+
+const EXPERIENCE_FRONTMATTER_LIMIT =
+  'LIMIT: only .md files under the vault\'s Experiences/ tree; only the frontmatter `type` field (fact_kind is not read here). Sessions, Summaries and Topic notes are not walked. A note with no `type` key passes.';
+
+/**
+ * T-025 (docs/loops/t025-ruling.md): frontmatter `type` is an optional one-token free label, not enumerated.
+ * Returns null when the value is acceptable (including absent).
+ */
+export function experienceTypeViolation(typeValue: unknown): string | null {
+  if (typeValue === undefined) return null;
+  if (typeof typeValue !== "string") return "type is not a string";
+  const v = typeValue.trim();
+  if (v === "") return "type is empty";
+  if (/\s/.test(v)) return "type must be one token";
+  return null;
+}
+
+/** Closed list from pre-ruling ENTITIES.md — used only in tests to prove the mutant would fail. */
+export const LEGACY_CLOSED_EXPERIENCE_TYPES = new Set(["gotcha", "pattern", "decision", "fix", "optimization"]);
+
+export interface ExperienceFrontmatterScan {
+  /** Vault-relative paths under Experiences/, forward slashes. */
+  notes: string[];
+  findings: { path: string; reason: string }[];
+  unreadable: string[];
+}
+
+type ReadDir = (path: string, options: { withFileTypes: true }) => import("node:fs").Dirent[];
+type ReadFile = (path: string) => string;
+
+export interface ExperienceFrontmatterDeps {
+  readDir?: ReadDir;
+  readFile?: ReadFile;
+}
+
+export function scanExperienceFrontmatter(
+  vaultDir: string,
+  deps: ExperienceFrontmatterDeps = {},
+): ExperienceFrontmatterScan {
+  const readDir = deps.readDir ?? (readdirSync as unknown as ReadDir);
+  const readFile = deps.readFile ?? ((p: string) => readFileSync(p, "utf8"));
+  const scan: ExperienceFrontmatterScan = { notes: [], findings: [], unreadable: [] };
+  const expRoot = join(vaultDir, "Experiences");
+  if (!existsSync(expRoot)) return scan;
+
+  const walk = (abs: string, rel: string): void => {
+    let entries: import("node:fs").Dirent[];
+    try {
+      entries = readDir(abs, { withFileTypes: true });
+    } catch (err) {
+      scan.unreadable.push(`${rel || "Experiences"} (${(err as NodeJS.ErrnoException).code ?? "error"})`);
+      return;
+    }
+    for (const ent of entries) {
+      if (ent.name.startsWith(".")) continue;
+      const childRel = rel ? `${rel}/${ent.name}` : ent.name;
+      const childAbs = join(abs, ent.name);
+      if (ent.isDirectory()) walk(childAbs, childRel);
+      else if (ent.isFile() && ent.name.toLowerCase().endsWith(".md")) {
+        const vaultRel = `Experiences/${childRel}`.replace(/\\/g, "/");
+        let text: string;
+        try {
+          text = readFile(childAbs);
+        } catch (err) {
+          scan.unreadable.push(`${vaultRel} (${(err as NodeJS.ErrnoException).code ?? "error"})`);
+          continue;
+        }
+        scan.notes.push(vaultRel);
+        const fm = parseFrontmatter(text);
+        const reason = experienceTypeViolation(fm.type);
+        if (reason) scan.findings.push({ path: vaultRel, reason });
+      }
+    }
+  };
+  walk(expRoot, "");
+  scan.notes.sort();
+  return scan;
+}
+
+export function experienceFrontmatterResultFromScan(scan: ExperienceFrontmatterScan): CheckResult {
+  const name = "experience-frontmatter";
+  if (scan.unreadable.length > 0) {
+    return {
+      name,
+      report: true,
+      severity: "issue",
+      message: `${scan.unreadable.length} path(s) under Experiences/ could not be read, so a bad type there cannot be ruled out: ${scan.unreadable.slice(0, 5).join(", ")}. Walked ${scan.notes.length} readable note(s). This is not a pass. ${EXPERIENCE_FRONTMATTER_LIMIT}`,
+    };
+  }
+  if (scan.findings.length > 0) {
+    const listed = scan.findings
+      .slice(0, 5)
+      .map((f) => `${f.path} (${f.reason})`)
+      .join("; ");
+    const more = scan.findings.length > 5 ? `; +${scan.findings.length - 5} more` : "";
+    return {
+      name,
+      report: true,
+      severity: "issue",
+      message: `${scan.findings.length} experience note(s) with invalid type frontmatter (of ${scan.notes.length} walked): ${listed}${more}. ${EXPERIENCE_FRONTMATTER_LIMIT}`,
+    };
+  }
+  return {
+    name,
+    report: true,
+    severity: "pass",
+    message: `Walked ${scan.notes.length} experience note(s) under Experiences/; all type labels absent or one token. ${EXPERIENCE_FRONTMATTER_LIMIT}`,
+  };
+}
+
+/** T-025: optional one-token `type` on experience notes; missing passes. */
+export function checkExperienceFrontmatter(
+  _projectRoot: string,
+  vaultDir?: string,
+  deps: ExperienceFrontmatterDeps = {},
+): CheckResult {
+  const name = "experience-frontmatter";
+  let dir: string;
+  try {
+    dir = vaultDir ?? obsidianVaultDir();
+  } catch (err) {
+    return {
+      name,
+      report: true,
+      severity: "skip",
+      message: `not checked: the vault path could not be resolved (${(err as Error).message.split("\n")[0]}). This is not a pass. ${EXPERIENCE_FRONTMATTER_LIMIT}`,
+    };
+  }
+  const shown = dir.replace(/\\/g, "/");
+  try {
+    accessSync(dir, fsConstants.R_OK);
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code ?? "error";
+    return {
+      name,
+      report: true,
+      severity: "skip",
+      message: `not checked: no readable vault at ${shown} (${code}), so experience frontmatter was not read. This is not a pass. ${EXPERIENCE_FRONTMATTER_LIMIT}`,
+    };
+  }
+
+  return experienceFrontmatterResultFromScan(scanExperienceFrontmatter(dir, deps));
 }
 
 export function checkObsidianVault(vaultPath: string): CheckResult {
