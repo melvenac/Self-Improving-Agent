@@ -362,10 +362,16 @@ describe("CC-0 and CC-19 guards", () => {
     expect(codeHas("// prepareShadowVerdict must not appear in runtime", "prepareShadowVerdict")).toBe(false);
     expect(codeHas("/* prepareShadowVerdict stays out of runtime.ts */", "prepareShadowVerdict")).toBe(false);
     expect(codeHas(runtime, "prepareShadowVerdict")).toBe(false);
-    expect(cli).toContain("The runtime never merges, pushes, or touches a remote.");
+    const runtimeNeverMerges = "The runtime never merges, pushes, or touches a remote.";
+    expect(codeHas(`console.log("${runtimeNeverMerges}");`, runtimeNeverMerges)).toBe(true);
+    expect(codeHas(`// ${runtimeNeverMerges}`, runtimeNeverMerges)).toBe(false);
+    expect(codeHas(cli, runtimeNeverMerges)).toBe(true);
     expect(procedure).toContain("shadow-verdict prepare");
     expect(procedure).toContain("decide");
-    expect(cli).toContain('sub === "shadow-verdict"');
+    const shadowSub = 'sub === "shadow-verdict"';
+    expect(codeHas(`if (${shadowSub}) {}`, shadowSub)).toBe(true);
+    expect(codeHas(`// ${shadowSub}`, shadowSub)).toBe(false);
+    expect(codeHas(cli, shadowSub)).toBe(true);
   });
 });
 

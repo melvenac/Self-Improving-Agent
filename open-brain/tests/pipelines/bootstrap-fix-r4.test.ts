@@ -155,15 +155,59 @@ function gitGrepRenameHookCodeHits(stdout: string): string[] {
   return stdout.split("\n").filter(Boolean).filter((row) => renameHookInSourceLine(sourceLineFromGitGrep(row)));
 }
 
+const OPEN_BRAIN_SRC = "open-brain/src";
+
+function grepInRepo(cwd: string, needle: string, pathspec: string): { error: Error | undefined; status: number | null; stdout: string } {
+  const g = spawnSync("git", ["grep", "-n", needle, "--", pathspec], { cwd, encoding: "utf8" });
+  return { error: g.error, status: g.status, stdout: g.stdout ?? "" };
+}
+
+function renameHookGrep(cwd: string, pathspec: string = OPEN_BRAIN_SRC) {
+  return grepInRepo(cwd, RENAME_HOOK_VAR, pathspec);
+}
+
+function initTinyRepo(dir: string, relPath: string, content: string) {
+  execFileSync("git", ["init", "-q", "-b", "main"], { cwd: dir, shell: false });
+  execFileSync("git", ["config", "user.email", "r-bf-21@example.invalid"], { cwd: dir, shell: false });
+  execFileSync("git", ["config", "user.name", "R-BF-21"], { cwd: dir, shell: false });
+  const file = join(dir, relPath);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, content);
+  execFileSync("git", ["add", relPath], { cwd: dir, shell: false });
+  execFileSync("git", ["commit", "-q", "-m", "init"], { cwd: dir, shell: false });
+}
+
 describe("R-BF-21: the shipped move-residue does not load code named by an environment variable", () => {
   it("git grep finds no OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK in src/ on a code line", () => {
     expect(renameHookInSourceLine("const hook = process.env.OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK;")).toBe(true);
     expect(renameHookInSourceLine("// OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not how residue moves")).toBe(false);
     expect(renameHookInSourceLine("/* OPEN_BRAIN_BOOTSTRAP_RENAME_HOOK is not loaded */")).toBe(false);
+
+    const plantedRow = `open-brain/src/cli.ts:42:const hook = process.env.${RENAME_HOOK_VAR};\n`;
+    expect(gitGrepRenameHookCodeHits(plantedRow)).toHaveLength(1);
     const commentOnlyGrep = `open-brain/src/bootstrap/index.ts:99:// ${RENAME_HOOK_VAR} is not loaded\n`;
     expect(gitGrepRenameHookCodeHits(commentOnlyGrep)).toEqual([]);
+
+    const tmp = mkdtempSync(join(tmpdir(), "r-bf-21-grep-"));
+    try {
+      initTinyRepo(tmp, "src/planted.ts", `export const x = process.env.${RENAME_HOOK_VAR};\n`);
+      const planted = renameHookGrep(tmp, "src");
+      expect(planted.error).toBeUndefined();
+      expect(planted.status).toBe(0);
+      expect(gitGrepRenameHookCodeHits(planted.stdout)).toHaveLength(1);
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+
     const repoRoot = join(import.meta.dirname, "../../..");
-    const g = spawnSync("git", ["grep", "-n", RENAME_HOOK_VAR, "--", "open-brain/src"], { cwd: repoRoot, encoding: "utf8" });
-    expect(gitGrepRenameHookCodeHits(g.stdout ?? "")).toEqual([]);
+    const ctrl = grepInRepo(repoRoot, "export function formatMoveResidueFailure", OPEN_BRAIN_SRC);
+    expect(ctrl.error).toBeUndefined();
+    expect(ctrl.status).toBe(0);
+    expect(ctrl.stdout.trim().split("\n").filter(Boolean)).toHaveLength(1);
+
+    const g = renameHookGrep(repoRoot);
+    expect(g.error).toBeUndefined();
+    expect(g.status === 0 || g.status === 1).toBe(true);
+    expect(gitGrepRenameHookCodeHits(g.stdout)).toEqual([]);
   });
 });

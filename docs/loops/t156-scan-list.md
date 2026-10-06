@@ -4,7 +4,7 @@ Method: tests under `open-brain/tests` that read source (or a copied source stri
 
 ## Already has a planted positive and a near-miss
 
-- `open-brain/tests/harness/git.test.ts:61-66` — no git push / denied subcommand. Positive and the sentence that forbids it.
+- `open-brain/tests/harness/git.test.ts:61-72` — no git push / denied subcommand. Positive, negative, and deny-list near-miss before the tree walk.
 - `open-brain/tests/harness/gate-artifacts.test.ts:126-144` — artifact scan. Positive and near-miss in the same test.
 - `open-brain/tests/harness/policies.test.ts:310` and `:419-421` — `thresholdLiterals`. Positive `0.7`, comment and block-comment near-miss, version string.
 - `open-brain/tests/harness/s4-guards.test.ts:132-148` — `importsMerge` and `doneGate` / spread. String positive and string near-miss, then the real files.
@@ -23,9 +23,9 @@ Method: tests under `open-brain/tests` that read source (or a copied source stri
 - `open-brain/tests/t048-r3.test.ts:116` — looks for `/* non-critical */` near `recordRecallEvent`. No fixture pair yet; the branch only fires when `handleRecall` is missing. Left as a listed gap, not edited, because the scan is inside a fallback.
 - `open-brain/tests/t048-r2b.test.ts:98` — `formatScoreCategoryLine` on `cli.ts`. Positive is the call. Near-miss is the same name in a `//` comment.
 - `open-brain/tests/harness/shadow-merge.test.ts:313-354` — CC-0. `codeHas` / `skipCall` with planted positives and `//` / `/* */` near-misses; then runtime, schema, declared, and this test file.
-- `open-brain/tests/harness/shadow-merge.test.ts:356-367` — CC-19. `codeHas` on `prepareShadowVerdict` with planted positive and comment near-misses; then runtime (no code hit), plus `cli.ts` / `PROCEDURE.md` string checks.
+- `open-brain/tests/harness/shadow-merge.test.ts:356-375` — CC-19. `codeHas` on `prepareShadowVerdict` with planted positive and comment near-misses; runtime (no code hit); `codeHas` pairs for the runtime-never-merges line and `sub === "shadow-verdict"` in `cli.ts`; `PROCEDURE.md` is out of scope below.
 - `open-brain/tests/t048-r2b.test.ts:194-217` — D4, `unusableLog` in `invocation-logger.ts`. `badReturn` pair at `:200-211` for `string | null`; then the real helper body must not match.
-- `open-brain/tests/pipelines/bootstrap-fix-r4.test.ts:137-168` — R-BF-21. `renameHookInSourceLine` pair; real `git grep` hits filtered through `gitGrepRenameHookCodeHits` (comment-only matches in `src/` stay green).
+- `open-brain/tests/pipelines/bootstrap-fix-r4.test.ts:137-212` — R-BF-21. `renameHookInSourceLine` pair; planted grep row (exactly one code hit); temp-repo `renameHookGrep` positive; `formatMoveResidueFailure` grep control on `open-brain/src`; absence via `renameHookGrep` with status 0/1 and `g.error` undefined.
 
 ## Out of scope: reads docs
 
@@ -46,6 +46,7 @@ A test that reads repo markdown is not a source scan.
 ## Out of scope: not a source-text includes scan
 
 - `open-brain/tests/harness/s4-g5-qa.test.ts:134-139` — Q5 presence check that named regions contain `buildQaScoreQuestions` / `decideQaScore` and `scanThresholds()` is empty; threshold literals are paired in Q6/Q8.
+- `open-brain/tests/harness/t195-plan-gate.test.ts:153` — reads shipped `plan-gate.json` for `has_observable_acceptance_min` (policy JSON on disk, not a live `src/` line scan).
 
 ## Deferred: test file is in a PR that is in QA or frozen
 
