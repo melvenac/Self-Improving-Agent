@@ -1,7 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { hubRoomGuardViolations, hubRoomSectionFromStart } from "../../../src/pipelines/sync/hub-room-guard.js";
+import {
+  EXIT2_WAIT_PHRASE,
+  hubRoomGuardViolations,
+  hubRoomSectionFromStart,
+  violationsInTurnWait,
+  violationsSeatFileWait,
+  violationsWaitFlagCount,
+} from "../../../src/pipelines/sync/hub-room-guard.js";
 
 /**
  * T-228: relay's A2A Loop 13 contract for `hub-talk` exit codes (A2A-Hub master 8e59f58, docs/loops/loop-13-design-ruling.md).
@@ -59,12 +66,23 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     expect(read(".cursor/rules/hub-room.mdc")).toBe(read("project-template/.cursor/rules/hub-room.mdc"));
   });
 
-  const QA_REWORDINGS = {
+  const QA281_REWORDINGS = {
     R1: "After posting, run hub-talk --wait for the next atlas turn.",
     R2: "When the post succeeds, run the `talk` line again with `--wait` and handle the next atlas turn in this run.",
     R3: "Then keep listening: append the seat file's `wait` suffix to the talk line and act on what it prints before you end the turn.",
     R4: "After posting, run the talk line with --wait --wait-timeout 3500.",
   } as const;
+
+  const QA283_REWORDINGS = {
+    Own1: "After you post, run hub-talk with `--inbox` again and repeat until atlas has replied, then act on the reply before ending this turn.",
+    Own2: "Stay in this run after posting: rerun the talk line every minute until the next atlas turn is printed.",
+    Own3: "Do not end the turn after posting, wait for hub-talk to print the next atlas turn and act on it.",
+    Disp1: "Listen on the room until atlas answers.",
+    Disp2: "Block on hub-talk for the next message.",
+    Disp3: "Keep polling the room before ending.",
+  } as const;
+
+  const QA_REWORDINGS = { ...QA281_REWORDINGS, ...QA283_REWORDINGS };
 
   const MDC_ANCHOR = "Post when the work is done, not a bare acknowledgement.";
   const plantMdc = (mdc: string, line: string) => mdc.replace(MDC_ANCHOR, `${MDC_ANCHOR}\n\n${line}`);
@@ -92,13 +110,53 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
-  it("QA-281 rewordings R1–R4 fail the sentence guard in every copy (HUBROOM-GUARD G1)", () => {
+  it("QA-281/283 rewordings fail the sentence guard in every copy (HUBROOM-GUARD G1, QA-283 K1)", () => {
     for (const [id, line] of Object.entries(QA_REWORDINGS)) {
       const mdc = read(".cursor/rules/hub-room.mdc");
       const start = read("project-template/.cursor/commands/start.md");
       expect(hubRoomGuardViolations(plantMdc(mdc, line)), `${id} mdc`).not.toEqual([]);
       expect(hubRoomGuardViolations(hubRoomSectionFromStart(plantStartHub(start, line))), `${id} start`).not.toEqual([]);
     }
+  });
+
+  it("allowlisted hub sentences stay green in isolation (QA-283 row 8)", () => {
+    const greens = [
+      EXIT2_WAIT_PHRASE,
+      "Never block on hub-talk waiting for the next atlas turn in this run — the waker starts the next run when that turn arrives.",
+      "wait `retry-after` seconds",
+      "run the `talk` line with `--inbox` before other work",
+    ];
+    for (const s of greens) expect(hubRoomGuardViolations(s)).toEqual([]);
+  });
+
+  const ONLY_WAIT_COUNT = "The phrase --wait appears here without the exit-2 explain sentence.";
+  const ONLY_SEAT_FILE = "Document the seat file's `wait` suffix in the runbook, not on the talk line.";
+  const ONLY_IN_TURN = "Block on hub-talk for the next message.";
+
+  it("each guard check has a positive only it catches (QA-283 K2)", () => {
+    expect(violationsWaitFlagCount(ONLY_WAIT_COUNT).length).toBeGreaterThan(0);
+    expect(violationsSeatFileWait(ONLY_WAIT_COUNT)).toEqual([]);
+    expect(violationsInTurnWait(ONLY_WAIT_COUNT)).toEqual([]);
+
+    expect(violationsSeatFileWait(ONLY_SEAT_FILE).length).toBeGreaterThan(0);
+    expect(violationsWaitFlagCount(ONLY_SEAT_FILE)).toEqual([]);
+    expect(violationsInTurnWait(ONLY_SEAT_FILE)).toEqual([]);
+
+    expect(violationsInTurnWait(ONLY_IN_TURN).length).toBeGreaterThan(0);
+    expect(violationsWaitFlagCount(ONLY_IN_TURN)).toEqual([]);
+    expect(violationsSeatFileWait(ONLY_IN_TURN)).toEqual([]);
+  });
+
+  it("disabling one guard check turns its positive green while the others stay red (QA-283 K2 mutants)", () => {
+    expect(hubRoomGuardViolations(ONLY_WAIT_COUNT, { skipWaitCount: true })).toEqual([]);
+    expect(hubRoomGuardViolations(ONLY_WAIT_COUNT, { skipSeatFileWait: true }).length).toBeGreaterThan(0);
+    expect(hubRoomGuardViolations(ONLY_WAIT_COUNT, { skipInTurnWait: true }).length).toBeGreaterThan(0);
+
+    expect(hubRoomGuardViolations(ONLY_SEAT_FILE, { skipSeatFileWait: true })).toEqual([]);
+    expect(hubRoomGuardViolations(ONLY_SEAT_FILE, { skipWaitCount: true }).length).toBeGreaterThan(0);
+
+    expect(hubRoomGuardViolations(ONLY_IN_TURN, { skipInTurnWait: true })).toEqual([]);
+    expect(hubRoomGuardViolations(ONLY_IN_TURN, { skipWaitCount: true }).length).toBeGreaterThan(0);
   });
 
   it("hub-room.mdc cites A2A-Hub shared.md Hub transport at b6a8de79 and D-120 (HUBROOM-TURN-END amendment 1)", () => {
