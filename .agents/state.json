@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 341,
+  "revision": 342,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4324,6 +4324,12 @@
       "title": "Grok seats for SIA: grok-sia-review is advisory and blind to QA; grok-qa-1 is first-pass QA on Linux-safe rows; Opus QA keeps the verdict",
       "date": "2026-10-06",
       "note": "Planner ruling, s163, on Aaron's direction RELAYED by clark (told, not read in the planner window): move review and first-pass QA to new Grok Bot agents because the Claude Code weekly limit stands at 83%. (1) grok-sia-review: wake line `REVIEW JOB: <branch>@<sha>` in its room with atlas; read-only; advisory. Its review is never QA evidence and cannot accept or block on its own. The planner reads it and may send findings to the developer before a freeze. Blind both ways, as A2A D-052: it never sees a QA report for that head before QA has reported, and its review is not given to QA before QA reports, so the two stay separate observations. (2) grok-qa-1: wake line `QA JOB: <dispatch path>@<DISPATCH_SHA>`; the dispatch lists its rows. MAY run: full suite and one-file-per-run tests, typecheck, mutants (tsc exit 0, restored after), static audit and read rows, CLI smoke on its Linux VM. MAY NOT run: Windows-specific rows (PowerShell/Git Bash hooks, wakers, Cursor seats, win32 paths), live calls that use an API key (Jev live), rows that read real user config (G-051), anything needing the QA PC lease. It pushes a qa/* report whose verdict word is FIRST-PASS PASS or FIRST-PASS FAIL, never ACCEPT or REJECT. (3) Opus QA gives the final verdict: it reads the first-pass report after it is pushed, re-runs itself every row that decides the verdict (every red row and every blocking-criterion row) plus all Windows rows, and names the rows it took from first-pass without re-running. Agreement on a row Opus did not re-run is one observation, not two. Merge rules are unchanged: a merge still needs an Opus QA ACCEPT."
+    },
+    {
+      "id": "D-126",
+      "title": "D-125 amended: SIA's first-pass QA bot is grok-qa-sia, not grok-qa-1",
+      "date": "2026-10-06",
+      "note": "Planner, s163, on clark's relay (told). A2A ruled its own first-pass bot differently (A2A D-053: no GitHub write, results as hub turns), so Argus (grokbot-vm) runs one QA bot per project, each with its own token. SIA's is grok-qa-sia: a room with atlas + grok-qa-sia, a qa/* push token for SIA only, and every other D-125 rule unchanged (wake line `QA JOB: <dispatch path>@<DISPATCH_SHA>`, FIRST-PASS PASS/FAIL wording, the MAY / MAY NOT row lists, Opus QA keeps the verdict). grok-qa-1 is A2A's bot and takes no SIA job. Read every D-125 mention of grok-qa-1 as grok-qa-sia. grok-sia-review is unchanged."
     }
   ],
   "handoffs": [
