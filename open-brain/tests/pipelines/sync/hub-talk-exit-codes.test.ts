@@ -5,6 +5,8 @@ import {
   EXIT2_WAIT_PHRASE,
   hubRoomGuardViolations,
   hubRoomSectionFromStart,
+  violationsAtlasNextTurn,
+  violationsHubVerbInTurn,
   violationsInTurnWait,
   violationsSeatFileWait,
   violationsWaitFlagCount,
@@ -82,6 +84,20 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     Disp3: "Keep polling the room before ending.",
   } as const;
 
+  const R3_PLANTS = {
+    S1: "After posting, run the talk line again. Wait for the next atlas turn and act on it before you end the turn.",
+    S2: "Run node scripts/hub-talk.mjs --as you --session room and wait for the reply.",
+    S3: "Then keep listening for atlas's next turn before you end the turn.",
+    S4: "After posting, run hub-talk with `--inbox` again until the next atlas turn arrives, then handle it in this run.",
+    S5: "Once hub-talk has waited for atlas, act on its reply.",
+    S6: "Don't wait on hub-talk after you post.",
+  } as const;
+
+  const STAY_CAUGHT = {
+    C1: "Keep polling hub-talk until atlas replies, and do not end the turn before then.",
+    C2: "Keep listening on the talk line and never end the turn before atlas answers.",
+  } as const;
+
   const QA_REWORDINGS = { ...QA281_REWORDINGS, ...QA283_REWORDINGS };
 
   const MDC_ANCHOR = "Post when the work is done, not a bare acknowledgement.";
@@ -110,6 +126,13 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
+  it("hub-partner-seats.json has no top-level wait key and start Hub section is non-empty (F6)", () => {
+    const seats = JSON.parse(read(".agents/SYSTEM/hub-partner-seats.json")) as Record<string, unknown>;
+    expect(seats).not.toHaveProperty("wait");
+    const section = hubRoomSectionFromStart(read("project-template/.cursor/commands/start.md"));
+    expect(section.trim().length).toBeGreaterThan(100);
+  });
+
   it("QA-281/283 rewordings fail the sentence guard in every copy (HUBROOM-GUARD G1, QA-283 K1)", () => {
     for (const [id, line] of Object.entries(QA_REWORDINGS)) {
       const mdc = read(".cursor/rules/hub-room.mdc");
@@ -119,44 +142,96 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
-  it("allowlisted hub sentences stay green in isolation (QA-283 row 8)", () => {
+  it("planner S1–S6 table (HUBROOM-GUARD r3)", () => {
+    const mustCatch = ["S1", "S2", "S3", "S4", "S5"] as const;
+    for (const id of mustCatch) {
+      expect(hubRoomGuardViolations(R3_PLANTS[id]), id).not.toEqual([]);
+    }
+    expect(hubRoomGuardViolations(R3_PLANTS.S6), "S6").toEqual([]);
+    for (const [id, line] of Object.entries(STAY_CAUGHT)) {
+      expect(hubRoomGuardViolations(line), id).not.toEqual([]);
+    }
+  });
+
+  it("allowlisted hub sentences stay green in isolation (QA-283 row 8, r3 throttled retry)", () => {
     const greens = [
       EXIT2_WAIT_PHRASE,
       "Never block on hub-talk waiting for the next atlas turn in this run — the waker starts the next run when that turn arrives.",
       "wait `retry-after` seconds",
       "run the `talk` line with `--inbox` before other work",
+      "If hub-talk is throttled, wait 5 seconds and retry.",
+      R3_PLANTS.S6,
     ];
     for (const s of greens) expect(hubRoomGuardViolations(s)).toEqual([]);
   });
 
   const ONLY_WAIT_COUNT = "The phrase --wait appears here without the exit-2 explain sentence.";
   const ONLY_SEAT_FILE = "Document the seat file's `wait` suffix in the runbook, not on the talk line.";
-  const ONLY_IN_TURN = "Block on hub-talk for the next message.";
+  const ONLY_HUB_VERB = "Block on hub-talk for the next message.";
+  const ONLY_ATLAS_NEXT = R3_PLANTS.S3;
+  const ONLY_CROSS_SENTENCE = R3_PLANTS.S1;
+  const NEGATION_SAMPLE = R3_PLANTS.S6;
 
-  it("each guard check has a positive only it catches (QA-283 K2)", () => {
+  it("each guard check has a positive only it catches (HUBROOM-GUARD r3 K2)", () => {
     expect(violationsWaitFlagCount(ONLY_WAIT_COUNT).length).toBeGreaterThan(0);
     expect(violationsSeatFileWait(ONLY_WAIT_COUNT)).toEqual([]);
-    expect(violationsInTurnWait(ONLY_WAIT_COUNT)).toEqual([]);
+    expect(violationsHubVerbInTurn(ONLY_WAIT_COUNT)).toEqual([]);
+    expect(violationsAtlasNextTurn(ONLY_WAIT_COUNT)).toEqual([]);
 
     expect(violationsSeatFileWait(ONLY_SEAT_FILE).length).toBeGreaterThan(0);
     expect(violationsWaitFlagCount(ONLY_SEAT_FILE)).toEqual([]);
-    expect(violationsInTurnWait(ONLY_SEAT_FILE)).toEqual([]);
+    expect(violationsHubVerbInTurn(ONLY_SEAT_FILE)).toEqual([]);
+    expect(violationsAtlasNextTurn(ONLY_SEAT_FILE)).toEqual([]);
 
-    expect(violationsInTurnWait(ONLY_IN_TURN).length).toBeGreaterThan(0);
-    expect(violationsWaitFlagCount(ONLY_IN_TURN)).toEqual([]);
-    expect(violationsSeatFileWait(ONLY_IN_TURN)).toEqual([]);
+    expect(violationsHubVerbInTurn(ONLY_HUB_VERB).length).toBeGreaterThan(0);
+    expect(violationsWaitFlagCount(ONLY_HUB_VERB)).toEqual([]);
+    expect(violationsSeatFileWait(ONLY_HUB_VERB)).toEqual([]);
+    expect(violationsAtlasNextTurn(ONLY_HUB_VERB)).toEqual([]);
+
+    expect(violationsAtlasNextTurn(ONLY_ATLAS_NEXT).length).toBeGreaterThan(0);
+    expect(violationsHubVerbInTurn(ONLY_ATLAS_NEXT)).toEqual([]);
+    expect(violationsWaitFlagCount(ONLY_ATLAS_NEXT)).toEqual([]);
+
+    expect(violationsAtlasNextTurn(ONLY_CROSS_SENTENCE).length).toBeGreaterThan(0);
+    expect(violationsHubVerbInTurn(ONLY_CROSS_SENTENCE)).toEqual([]);
   });
 
-  it("disabling one guard check turns its positive green while the others stay red (QA-283 K2 mutants)", () => {
-    expect(hubRoomGuardViolations(ONLY_WAIT_COUNT, { skipWaitCount: true })).toEqual([]);
-    expect(hubRoomGuardViolations(ONLY_WAIT_COUNT, { skipSeatFileWait: true }).length).toBeGreaterThan(0);
-    expect(hubRoomGuardViolations(ONLY_WAIT_COUNT, { skipInTurnWait: true }).length).toBeGreaterThan(0);
+  it("mutant table: disabling one check turns its positive red (HUBROOM-GUARD r3 K2)", () => {
+    const rows: {
+      name: string;
+      sample: string;
+      opts: Parameters<typeof hubRoomGuardViolations>[1];
+      expectGreenWhenSkipped: boolean;
+    }[] = [
+      { name: "wait count", sample: ONLY_WAIT_COUNT, opts: { skipWaitCount: true }, expectGreenWhenSkipped: true },
+      { name: "seat-file wait", sample: ONLY_SEAT_FILE, opts: { skipSeatFileWait: true }, expectGreenWhenSkipped: true },
+      { name: "hub-verb in-turn", sample: ONLY_HUB_VERB, opts: { skipHubVerbInTurn: true }, expectGreenWhenSkipped: true },
+      { name: "atlas/next-turn", sample: ONLY_ATLAS_NEXT, opts: { skipAtlasNextTurn: true }, expectGreenWhenSkipped: true },
+      {
+        name: "cross-sentence",
+        sample: ONLY_CROSS_SENTENCE,
+        opts: { skipAtlasNextTurn: true },
+        expectGreenWhenSkipped: true,
+      },
+    ];
 
-    expect(hubRoomGuardViolations(ONLY_SEAT_FILE, { skipSeatFileWait: true })).toEqual([]);
-    expect(hubRoomGuardViolations(ONLY_SEAT_FILE, { skipWaitCount: true }).length).toBeGreaterThan(0);
+    for (const row of rows) {
+      const full = hubRoomGuardViolations(row.sample);
+      expect(full.length, `${row.name} full`).toBeGreaterThan(0);
+      const skipped = hubRoomGuardViolations(row.sample, row.opts);
+      if (row.expectGreenWhenSkipped) {
+        expect(skipped, `${row.name} skipped`).toEqual([]);
+      } else {
+        expect(skipped.length, `${row.name} skipped`).toBeGreaterThan(0);
+      }
+    }
 
-    expect(hubRoomGuardViolations(ONLY_IN_TURN, { skipInTurnWait: true })).toEqual([]);
-    expect(hubRoomGuardViolations(ONLY_IN_TURN, { skipWaitCount: true }).length).toBeGreaterThan(0);
+    expect(hubRoomGuardViolations(NEGATION_SAMPLE)).toEqual([]);
+    expect(hubRoomGuardViolations(NEGATION_SAMPLE, { skipNegationScope: true }).length).toBeGreaterThan(0);
+
+    const negationProbe = "Don't block on hub-talk for the next atlas turn.";
+    expect(hubRoomGuardViolations(negationProbe)).toEqual([]);
+    expect(hubRoomGuardViolations(negationProbe, { skipNegationScope: true }).length).toBeGreaterThan(0);
   });
 
   it("hub-room.mdc cites A2A-Hub shared.md Hub transport at b6a8de79 and D-120 (HUBROOM-TURN-END amendment 1)", () => {
