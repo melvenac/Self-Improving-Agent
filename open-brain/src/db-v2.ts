@@ -2,6 +2,7 @@ import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { canonicalizeProjectDir } from './shared/paths.js';
+import { migrateStoredCommandFireLog } from './trigger/command-log.js';
 import {
   type Maturity,
   type Rating,
@@ -36,6 +37,24 @@ export function migrateProjectDirToCanonical(db: Database.Database): number {
     if (canonical && canonical !== project_dir) {
       const result = stmt.run(canonical, project_dir);
       updated += Number(result.changes);
+    }
+  }
+  return updated;
+}
+
+/** Rewrite legacy raw or r4-hash `trigger_fires.command` rows to program-only. */
+export function migrateTriggerFireCommands(db: Database.Database): number {
+  const rows = db.prepare('SELECT id, command FROM trigger_fires').all() as Array<{
+    id: number;
+    command: string;
+  }>;
+  const update = db.prepare('UPDATE trigger_fires SET command = ? WHERE id = ?');
+  let updated = 0;
+  for (const { id, command } of rows) {
+    const next = migrateStoredCommandFireLog(command);
+    if (next !== command) {
+      update.run(next, id);
+      updated += 1;
     }
   }
   return updated;
@@ -333,6 +352,7 @@ export function openV2Database(dbPath: string): Database.Database {
   initSchemaV2(db);
   migrateAddedColumns(db);
   migrateProjectDirToCanonical(db);
+  migrateTriggerFireCommands(db);
   // Stamp forward only: a newer build raises the version, an older one must
   // never lower it — the stamp is how an older writer learns it is behind.
   const stamped = Number(db.pragma('user_version', { simple: true })) || 0;
