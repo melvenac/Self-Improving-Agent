@@ -116,6 +116,42 @@ export const PLAN_GATE_QUESTIONS: readonly GateQuestion[] = [
   },
 ];
 
+/** Prefix for per-acceptance-row done-gate questions (Jev calibration 2, T-225). */
+export const PLAN_ROW_QUESTION_PREFIX = "plan_row:";
+
+export function planRowQuestionId(rowId: string): string {
+  return `${PLAN_ROW_QUESTION_PREFIX}${rowId}`;
+}
+
+export type DonePlanMatchMode = "whole_diff" | "requirement_rows";
+
+/** Plan for done-gate question building (acceptance rows only). */
+export interface DoneGatePlanShape {
+  acceptance: readonly { id: string; observable: string }[];
+}
+
+/**
+ * Done-gate questions for the policy mode. Default (`whole_diff` or absent) is the historical set;
+ * `requirement_rows` replaces `diff_matches_plan` with one noul question per plan acceptance row.
+ */
+export function buildDoneGateQuestions(
+  plan: DoneGatePlanShape,
+  policy: { plan_match?: DonePlanMatchMode },
+): readonly GateQuestion[] {
+  if (policy.plan_match !== "requirement_rows") {
+    return DONE_GATE_QUESTIONS;
+  }
+  const rowQuestions: GateQuestion[] = plan.acceptance.map((row) => ({
+    id: planRowQuestionId(row.id),
+    kind: "noul",
+    prompt:
+      `Does the diff meet plan acceptance row "${row.id}" (${row.observable}), ` +
+      `using the hunks shown for that row, rather than only adjacent work?`,
+  }));
+  const rest = DONE_GATE_QUESTIONS.filter((q) => q.id !== "diff_matches_plan");
+  return [...rowQuestions, ...rest];
+}
+
 export const DONE_GATE_QUESTIONS: readonly GateQuestion[] = [
   {
     id: "diff_matches_plan",
@@ -162,6 +198,25 @@ export const QA_COMPLETE_QUESTION_ID = "artifact_complete_enough_to_stop";
 
 export const qaResultQuestionId = (from: string, id: string): string => `res:${from}:${id}`;
 export const qaSeverityQuestionId = (from: string, id: string): string => `sev:${from}:${id}`;
+
+/** Evidence copy for a Jev request: requirement/acceptance statuses are never sent (G_qa calibration 2). */
+export function e_tStateForJev(ev: {
+  requirements: readonly { id: string; status: string; evidence: string; severity?: string }[];
+  acceptance: readonly { id: string; status: string; evidence: string; order?: string; severity?: string }[];
+  [key: string]: unknown;
+}): Record<string, unknown> {
+  const row = (r: { id: string; evidence: string; severity?: string; order?: string }) => {
+    const out: Record<string, unknown> = { id: r.id, evidence: r.evidence };
+    if (r.severity !== undefined) out.severity = r.severity;
+    if (r.order !== undefined) out.order = r.order;
+    return out;
+  };
+  return {
+    ...ev,
+    requirements: ev.requirements.map((r) => row(r)),
+    acceptance: ev.acceptance.map((r) => row(r)),
+  };
+}
 
 export function buildQaScoreQuestions(rows: readonly { from: string; id: string }[]): GateQuestion[] {
   const questions: GateQuestion[] = [];

@@ -121,6 +121,13 @@ export const DoneGatePolicySchema = z
     risk_of_regression_rollback_at_or_above: z.number(),
     /** Hand to QA only with green deterministic checks. Exit codes, never the gate. */
     hand_to_qa_requires_green_checks: z.boolean(),
+    /**
+     * `whole_diff` (default when absent): one `diff_matches_plan` question.
+     * `requirement_rows`: one noul question per plan acceptance row; combined via `requirement_row_min_noul`.
+     */
+    plan_match: z.enum(["whole_diff", "requirement_rows"]).optional(),
+    /** Minimum noul per acceptance row when `plan_match` is `requirement_rows`. Defaults to `diff_matches_plan_min`. */
+    requirement_row_min_noul: probability.optional(),
   })
   .strict();
 
@@ -674,6 +681,8 @@ export interface DoneGateContext {
   checksPassed: boolean;
   /** Where the exit codes came from; `none` means none were supplied (T-222 F6). Absent: from process exit codes. */
   checksSource?: string;
+  /** Plan acceptance row ids when `plan_match` is `requirement_rows`. */
+  planAcceptanceIds?: readonly string[];
 }
 
 /** Apply the developer done-gate policy. No number in this function; see {@link decidePlanGate}. */
@@ -699,9 +708,21 @@ export function decideDoneGate(
     return a;
   };
 
-  const matches = need("diff_matches_plan");
-  if (matches !== null && matches.noul < policy.diff_matches_plan_min) {
-    reasons.push(`diff_matches_plan ${matches.noul} is below the required ${policy.diff_matches_plan_min}`);
+  if (policy.plan_match === "requirement_rows") {
+    const min = policy.requirement_row_min_noul ?? policy.diff_matches_plan_min;
+    const ids = ctx.planAcceptanceIds ?? [];
+    for (const id of ids) {
+      const qid = `plan_row:${id}`;
+      const row = need(qid);
+      if (row !== null && row.noul < min) {
+        reasons.push(`${qid} ${row.noul} is below the required ${min}`);
+      }
+    }
+  } else {
+    const matches = need("diff_matches_plan");
+    if (matches !== null && matches.noul < policy.diff_matches_plan_min) {
+      reasons.push(`diff_matches_plan ${matches.noul} is below the required ${policy.diff_matches_plan_min}`);
+    }
   }
 
   const outOfScope = need("touches_out_of_scope");
