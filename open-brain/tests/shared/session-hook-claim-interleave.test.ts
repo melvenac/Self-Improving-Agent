@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, unlinkSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync, unlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -8,11 +8,14 @@ import {
   clearHookClaimsForTest,
   setClaimTestSeamsForTest,
   sweepExpiredClaimsForTest,
-  sweepRemoveClaimR4ShapeForTest,
+  sweepRemoveClaimR5ShapeForTest,
+  sweepRemoveClaimStatUnlinkMutantForTest,
   tryBreakStaleReclaimLockForTest,
+  tryBreakStaleReclaimLockR5ShapeForTest,
+  tryClaimHookRun,
 } from "../../src/shared/session-hook-claim.js";
 
-describe("session-hook-claim interleave (T-235 P2-7 r5 D3)", () => {
+describe("session-hook-claim interleave (T-235 P2-7 r6 D3)", () => {
   let home: string;
 
   beforeEach(() => {
@@ -26,37 +29,34 @@ describe("session-hook-claim interleave (T-235 P2-7 r5 D3)", () => {
     rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
   });
 
-  it("D3a r5: breaker interleave leaves B's fresh reclaim lock and does not break it", () => {
+  it("F2 gate r6: breaker restat gap leaves B's fresh reclaim lock intact", () => {
     const dir = join(home, ".claude", "open-brain", "hook-claims");
     mkdirSync(dir, { recursive: true });
-    const lock = join(dir, "sessionStart-a.claim.reclaim");
+    const claim = join(dir, "sessionStart-a.claim");
     const stale = (Date.now() - RECLAIM_LOCK_TTL_MS - 60_000) / 1000;
-    writeFileSync(lock, "stale\n");
-    utimesSync(lock, stale, stale);
+    writeFileSync(claim, "old\n");
+    utimesSync(claim, stale, stale);
+    const lock = `${claim}.reclaim.${statSync(claim).mtimeMs}`;
+    const staleLock = (Date.now() - RECLAIM_LOCK_TTL_MS - 60_000) / 1000;
+    writeFileSync(lock, "stale-lock\n");
+    utimesSync(lock, staleLock, staleLock);
 
     setClaimTestSeamsForTest({
-      breakerAfterStatBeforeBreak: () => {
-        unlinkSync(lock);
-        writeFileSync(lock, `${Date.now()}\tfresh-b\n`, { flag: "wx" });
+      breakerAfterRestatBeforeUnlink: (p) => {
+        unlinkSync(p);
+        writeFileSync(p, `${Date.now()}\tfresh-b\n`, { flag: "wx" });
       },
     });
 
     expect(tryBreakStaleReclaimLockForTest(lock)).toBe(false);
     expect(existsSync(lock)).toBe(true);
-    let lockHeld = false;
-    try {
-      writeFileSync(lock, "probe\n", { flag: "wx" });
-    } catch {
-      lockHeld = true;
-    }
-    expect(lockHeld).toBe(true);
   });
 
-  it("D3b r5: sweep interleave leaves a fresh wx claim on p", () => {
+  it("F1 gate r6: cross-session sweep interleave still lets victim claim", () => {
     const dir = join(home, ".claude", "open-brain", "hook-claims");
     mkdirSync(dir, { recursive: true });
     const victim = join(dir, "sessionStart-victim.claim");
-    const keep = join(dir, "sessionStart-keeper.claim");
+    const keep = join(dir, "sessionStart-other.claim");
     const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
     writeFileSync(victim, "old\n");
     writeFileSync(keep, "keep\n");
@@ -65,27 +65,36 @@ describe("session-hook-claim interleave (T-235 P2-7 r5 D3)", () => {
     setClaimTestSeamsForTest({
       sweepAfterStatBeforeRemove: () => {
         unlinkSync(victim);
-        writeFileSync(victim, `${Date.now()}\tfresh\n`, { flag: "wx" });
       },
     });
 
     sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, keep);
-    expect(existsSync(victim)).toBe(true);
+    expect(existsSync(victim)).toBe(false);
+    expect(tryClaimHookRun(home, "sessionStart", "victim")).toBe("claimed");
   });
 
-  it("D3a r4-shape (610dbbba): mismatch aside branch destroys a fresh lock (RED)", () => {
-    const dir = join(tmpdir(), "ob-claim-r4a-");
-    mkdirSync(dir, { recursive: true });
-    const aside = join(dir, "fresh.claim.reclaim.stale-break.1");
-    writeFileSync(aside, "fresh-holder\n", { flag: "wx" });
-    // tryBreakStaleLockFile L105-110: on inode mismatch, unlinkSync(aside) deletes a live lock.
-    unlinkSync(aside);
-    expect(existsSync(aside)).toBe(false);
+  it("D3a ba09e2c6 shape: unlocked breaker gap destroys fresh lock (RED)", () => {
+    const dir = mkdtempSync(join(tmpdir(), "ob-claim-r5a-"));
+    const lock = join(dir, "x.claim.reclaim.1");
+    const stale = (Date.now() - RECLAIM_LOCK_TTL_MS - 60_000) / 1000;
+    writeFileSync(lock, "stale\n");
+    utimesSync(lock, stale, stale);
+
+    setClaimTestSeamsForTest({
+      breakerAfterRestatBeforeUnlink: () => {
+        unlinkSync(lock);
+        writeFileSync(lock, `${Date.now()}\tholder\n`, { flag: "wx" });
+      },
+    });
+
+    tryBreakStaleReclaimLockR5ShapeForTest(lock);
+    expect(existsSync(lock)).toBe(false);
+    setClaimTestSeamsForTest(undefined);
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it("D3b r4-shape stat-unlink (610dbbba sweep): fresh claim is deleted (RED)", () => {
-    const dir = join(tmpdir(), "ob-claim-r4b-");
+  it("D3b ba09e2c6 shape: sweep under reclaim lock deletes fresh claim (RED)", () => {
+    const dir = join(tmpdir(), "ob-claim-r5b-");
     mkdirSync(dir, { recursive: true });
     const victim = join(dir, "sessionStart-v.claim");
     const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
@@ -99,7 +108,27 @@ describe("session-hook-claim interleave (T-235 P2-7 r5 D3)", () => {
       },
     });
 
-    expect(sweepRemoveClaimR4ShapeForTest(victim, HOOK_CLAIM_TTL_MS)).toBe(true);
+    expect(sweepRemoveClaimR5ShapeForTest(victim, HOOK_CLAIM_TTL_MS)).toBe(true);
+    expect(existsSync(victim)).toBe(false);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it("stat-unlink sweep mutant row goes red on fresh claim", () => {
+    const dir = join(tmpdir(), "ob-claim-mut-");
+    mkdirSync(dir, { recursive: true });
+    const victim = join(dir, "sessionStart-m.claim");
+    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
+    writeFileSync(victim, "old\n");
+    utimesSync(victim, stale, stale);
+
+    setClaimTestSeamsForTest({
+      sweepAfterStatBeforeRemove: () => {
+        unlinkSync(victim);
+        writeFileSync(victim, `${Date.now()}\tfresh\n`, { flag: "wx" });
+      },
+    });
+
+    expect(sweepRemoveClaimStatUnlinkMutantForTest(victim, HOOK_CLAIM_TTL_MS)).toBe(true);
     expect(existsSync(victim)).toBe(false);
     rmSync(dir, { recursive: true, force: true });
   });

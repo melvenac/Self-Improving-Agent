@@ -29,7 +29,9 @@ const r2Reclaim = execSync("git show 3dfa2424:open-brain/src/shared/session-hook
   cwd: join(obRoot, ".."),
   encoding: "utf8",
 });
-const r2Match = r2Reclaim.match(/function reclaimStale\([\s\S]*?\n}\n\n\/\*\* Drop at most/);
+const r2Match = r2Reclaim.match(
+  /function reclaimStale\(path: string, ttlMs: number\):[\s\S]*?\n}\n\n\/\*\* Drop at most/,
+);
 if (!r2Match) {
   console.error("could not extract r2 reclaimStale");
   process.exit(1);
@@ -37,23 +39,27 @@ if (!r2Match) {
 const r2ReclaimFn = r2Match[0].replace(/\n\/\*\* Drop at most$/, "");
 
 if (mutant === "no-lock") {
-  patched = patched.replace(/function reclaimStale\([\s\S]*?\n}\n\n\/\*\* Drop at most/, `${r2ReclaimFn}\n\n/** Drop at most`);
+  patched = patched.replace(
+    /function reclaimStale\(path: string, ttlMs: number\):[\s\S]*?\n}\n\n\/\*\* Remove an expired claim/,
+    `${r2ReclaimFn}\n\n/** Remove an expired claim`,
+  );
 } else if (mutant === "skip-self") {
   patched = patched.replace("    if (p === keep) continue;\n", "");
 } else if (mutant === "sweep-stat-unlink") {
   patched = patched.replace(
-    /function tryAcquireReclaimLock\(lockPath: string\): boolean \{[\s\S]*?\n}\n\nfunction releaseReclaimLock/,
-    `function tryAcquireReclaimLock(lockPath: string): boolean {
-  if (tryCreateClaim(lockPath)) return true;
+    /function tryAcquireReclaimLock\(claimPath: string\): \{ ok: boolean; lockPath: string \} \{[\s\S]*?\n}\n\nfunction releaseReclaimLock/,
+    `function tryAcquireReclaimLock(claimPath: string): { ok: boolean; lockPath: string } {
+  const lockPath = reclaimLockPathForClaim(claimPath);
+  if (tryCreateClaim(lockPath)) return { ok: true, lockPath };
   try {
     if (existsSync(lockPath) && Date.now() - statSync(lockPath).mtimeMs > RECLAIM_LOCK_TTL_MS) {
       unlinkSync(lockPath);
-      return tryCreateClaim(lockPath);
+      return { ok: tryCreateClaim(lockPath), lockPath };
     }
   } catch (err) {
     if (errno(err) !== "ENOENT") throw err;
   }
-  return false;
+  return { ok: false, lockPath };
 }
 
 function releaseReclaimLock`,

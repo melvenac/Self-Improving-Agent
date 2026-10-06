@@ -1,12 +1,26 @@
-import { appendFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { detectIde } from "./active-session.js";
 
 /** T-235 P2-7: dual Cursor + Claude settings hooks can fire twice within milliseconds; legitimate resume is minutes later. */
 export const HOOK_CLAIM_TTL_MS = 120_000;
 
-/** Crashed reclaim / breaker locks older than this may be broken; live locks younger than this are never broken. */
+/** Crashed auxiliary lock files older than this may be rotated past; live locks younger than this are never broken. */
 export const RECLAIM_LOCK_TTL_MS = 60_000;
+
+/** When reclaim or sweep races another session, retry before returning duplicate (liveness). */
+export const CLAIM_RETRY_MS = 2_000;
 
 export type HookClaimEvent = "sessionStart" | "sessionEnd";
 
@@ -47,10 +61,6 @@ function errno(err: unknown): string | undefined {
   return (err as NodeJS.ErrnoException).code;
 }
 
-/**
- * Rename. ENOENT means the other process already moved the file.
- * Windows also returns EPERM while that rename is in progress; retry, then treat it as a loss.
- */
 function renameExclusive(from: string, to: string): "ok" | "lost" {
   for (let attempt = 0; attempt < 8; attempt++) {
     try {
@@ -81,29 +91,32 @@ function sameSnap(a: FileStatSnap, b: FileStatSnap): boolean {
   return a.ino === b.ino && a.mtimeMs === b.mtimeMs && a.size === b.size;
 }
 
-function reclaimLockPath(claimPath: string): string {
-  return `${claimPath}.reclaim`;
-}
-
-function reclaimBreakerPath(lockPath: string): string {
-  return `${lockPath}.breaker`;
+/** Reclaim wx lock is named by the stale claim generation (mtimeMs) so nothing breaks a live lock in the hot path. */
+function reclaimLockPathForClaim(claimPath: string): string {
+  const gen = snapStat(claimPath)?.mtimeMs ?? 0;
+  return `${claimPath}.reclaim.${gen}`;
 }
 
 function isReclaimLockEntry(name: string): boolean {
-  return name.endsWith(".reclaim");
+  return name.includes(".reclaim");
 }
 
-function isBreakerLockEntry(name: string): boolean {
-  return name.endsWith(".breaker");
+function isBreakerOrRotatedEntry(name: string): boolean {
+  return name.includes(".breaker") || name.includes(".rot.");
 }
 
 function isClaimFileEntry(name: string): boolean {
   return name.endsWith(".claim");
 }
 
-/** Test-only seam between stat and destructive act (unset in production hooks). */
+function isStaleTombstoneEntry(name: string): boolean {
+  return name.includes(".stale.") || name.includes(".swept.");
+}
+
+/** Test-only seams (unset in production hooks). */
 export type ClaimTestSeams = {
   breakerAfterStatBeforeBreak?: (lockPath: string) => void;
+  breakerAfterRestatBeforeUnlink?: (lockPath: string) => void;
   sweepAfterStatBeforeRemove?: (claimPath: string) => void;
 };
 
@@ -122,79 +135,77 @@ function unlinkQuiet(path: string): void {
   }
 }
 
-/**
- * Break an expired auxiliary wx file (breaker only). Reclaim locks are broken only under a held breaker wx lock.
- */
-function tryBreakStaleAuxLockFile(lockPath: string, ttlMs: number = RECLAIM_LOCK_TTL_MS): boolean {
-  const before = snapStat(lockPath);
-  if (!before) return false;
-  if (Date.now() - before.mtimeMs <= ttlMs) return false;
-  claimTestSeams?.breakerAfterStatBeforeBreak?.(lockPath);
-  const after = snapStat(lockPath);
-  if (!after || !sameSnap(before, after)) return false;
-  if (Date.now() - after.mtimeMs <= ttlMs) return false;
-  unlinkQuiet(lockPath);
-  return true;
+function releaseOwnedWxLock(lockPath: string): void {
+  try {
+    const row = readFileSync(lockPath, "utf8").trim();
+    const tab = row.indexOf("\t");
+    const pid = tab >= 0 ? Number(row.slice(tab + 1)) : NaN;
+    if (pid === process.pid) unlinkQuiet(lockPath);
+  } catch (err) {
+    if (errno(err) !== "ENOENT") throw err;
+  }
 }
 
 /**
- * While holding an exclusive wx on lockPath.breaker, remove a stale reclaim lock at lockPath.
- * Never unlink after stat alone without re-checking the same inode (r5 D1).
+ * Wx this path, or wx a rotated sibling if the base file is an abandoned stale wx lock (never stat→unlink in hot path).
  */
-function breakStaleReclaimLockWhileBreakerHeld(lockPath: string, ttlMs: number = RECLAIM_LOCK_TTL_MS): boolean {
+function tryWxFreshOrRotated(basePath: string, ttlMs: number): string | null {
+  if (tryCreateClaim(basePath)) return basePath;
+  const before = snapStat(basePath);
+  if (!before) return tryCreateClaim(basePath) ? basePath : null;
+  if (Date.now() - before.mtimeMs <= ttlMs) return null;
+  const rotated = `${basePath}.rot.${before.mtimeMs}`;
+  return tryCreateClaim(rotated) ? rotated : null;
+}
+
+function breakStaleWxLockWhileHolderHeld(lockPath: string, ttlMs: number = RECLAIM_LOCK_TTL_MS): boolean {
   const before = snapStat(lockPath);
   if (!before) return true;
   if (Date.now() - before.mtimeMs <= ttlMs) return false;
   claimTestSeams?.breakerAfterStatBeforeBreak?.(lockPath);
-  const after = snapStat(lockPath);
-  if (!after || !sameSnap(before, after)) return false;
-  if (Date.now() - after.mtimeMs <= ttlMs) return false;
+  const afterStat = snapStat(lockPath);
+  if (!afterStat || !sameSnap(before, afterStat)) return false;
+  if (Date.now() - afterStat.mtimeMs <= ttlMs) return false;
+  claimTestSeams?.breakerAfterRestatBeforeUnlink?.(lockPath);
+  const afterRestat = snapStat(lockPath);
+  if (!afterRestat || !sameSnap(before, afterRestat)) return false;
+  if (Date.now() - afterRestat.mtimeMs <= ttlMs) return false;
   unlinkQuiet(lockPath);
   return true;
 }
 
-function tryAcquireBreakerLock(breakerPath: string): boolean {
-  if (tryCreateClaim(breakerPath)) return true;
-  if (tryBreakStaleAuxLockFile(breakerPath) && tryCreateClaim(breakerPath)) return true;
-  return false;
-}
-
-function releaseBreakerLock(breakerPath: string): void {
-  unlinkQuiet(breakerPath);
-}
-
-function tryAcquireReclaimLock(lockPath: string): boolean {
-  if (tryCreateClaim(lockPath)) return true;
-  const breakerPath = reclaimBreakerPath(lockPath);
-  if (!tryAcquireBreakerLock(breakerPath)) return false;
+function tryAcquireReclaimLock(claimPath: string): { ok: boolean; lockPath: string } {
+  const lockPath = reclaimLockPathForClaim(claimPath);
+  if (tryCreateClaim(lockPath)) return { ok: true, lockPath };
+  const breakerBase = `${lockPath}.breaker`;
+  const breakerHeld = tryWxFreshOrRotated(breakerBase, RECLAIM_LOCK_TTL_MS);
+  if (!breakerHeld) return { ok: false, lockPath };
   try {
-    if (!breakStaleReclaimLockWhileBreakerHeld(lockPath)) return false;
+    if (!breakStaleWxLockWhileHolderHeld(lockPath)) return { ok: false, lockPath };
   } finally {
-    releaseBreakerLock(breakerPath);
+    releaseOwnedWxLock(breakerHeld);
   }
-  return tryCreateClaim(lockPath);
+  return { ok: tryCreateClaim(lockPath), lockPath };
 }
 
 function releaseReclaimLock(lockPath: string): void {
-  unlinkQuiet(lockPath);
+  releaseOwnedWxLock(lockPath);
 }
 
-/**
- * Reclaim a stale claim while holding an exclusive wx lock on claim.reclaim.
- * Stat and rename run under the lock, so no other process can wx-create or rename the claim in between.
- * There is no put-back onto the claim path (never overwrites an existing claim file).
- */
 function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
-  const lockPath = reclaimLockPath(path);
-  if (!tryAcquireReclaimLock(lockPath)) return "duplicate";
+  const { ok, lockPath } = tryAcquireReclaimLock(path);
+  if (!ok) return "duplicate";
   try {
+    let mtimeMs: number;
     try {
-      const mtime = statSync(path).mtimeMs;
-      if (Date.now() - mtime <= ttlMs) return "duplicate";
+      mtimeMs = statSync(path).mtimeMs;
     } catch (err) {
-      if (errno(err) === "ENOENT") return "duplicate";
+      const code = errno(err);
+      if (code === "ENOENT") return "reclaimed";
+      if (code === "EPERM" || code === "EBUSY") return "duplicate";
       throw err;
     }
+    if (Date.now() - mtimeMs <= ttlMs) return "duplicate";
     const aside = `${path}.stale.${process.pid}`;
     if (renameExclusive(path, aside) === "lost") return "duplicate";
     try {
@@ -204,6 +215,7 @@ function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
       }
     } catch (err) {
       if (errno(err) === "ENOENT") return "duplicate";
+      if (errno(err) === "EPERM" || errno(err) === "EBUSY") return "duplicate";
       throw err;
     }
     unlinkQuiet(aside);
@@ -213,21 +225,27 @@ function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
   }
 }
 
+/** Remove an expired claim without taking its reclaim wx lock (cross-session liveness). */
 function sweepRemoveExpiredClaimFile(claimPath: string, ttlMs: number): boolean {
-  const lockPath = reclaimLockPath(claimPath);
-  if (!tryAcquireReclaimLock(lockPath)) return false;
-  try {
-    const before = snapStat(claimPath);
-    if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
-    claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
-    const after = snapStat(claimPath);
-    if (!after || !sameSnap(before, after)) return false;
-    if (Date.now() - after.mtimeMs <= ttlMs) return false;
-    unlinkQuiet(claimPath);
-    return true;
-  } finally {
-    releaseReclaimLock(lockPath);
-  }
+  const before = snapStat(claimPath);
+  if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
+  claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
+  const after = snapStat(claimPath);
+  if (!after || !sameSnap(before, after)) return false;
+  if (Date.now() - after.mtimeMs <= ttlMs) return false;
+  const aside = `${claimPath}.swept.${process.pid}`;
+  if (renameExclusive(claimPath, aside) === "lost") return false;
+  unlinkQuiet(aside);
+  return true;
+}
+
+function sweepRemoveStaleTombstone(tombPath: string, ttlMs: number): boolean {
+  const before = snapStat(tombPath);
+  if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
+  const after = snapStat(tombPath);
+  if (!after || !sameSnap(before, after)) return false;
+  unlinkQuiet(tombPath);
+  return true;
 }
 
 /** Drop at most this many expired claim files per call, so a hook never walks an unbounded directory. */
@@ -242,11 +260,10 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
     if (errno(err) === "ENOENT") return;
     throw err;
   }
-  const now = Date.now();
   let removed = 0;
   for (const name of names) {
     if (removed >= SWEEP_CAP) break;
-    if (isReclaimLockEntry(name) || isBreakerLockEntry(name)) continue;
+    if (isReclaimLockEntry(name) || isBreakerOrRotatedEntry(name)) continue;
     const p = join(dir, name);
     if (p === keep) continue;
     try {
@@ -254,7 +271,12 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
         if (sweepRemoveExpiredClaimFile(p, ttlMs)) removed++;
         continue;
       }
-      if (now - statSync(p).mtimeMs <= ttlMs) continue;
+      if (isStaleTombstoneEntry(name)) {
+        if (sweepRemoveStaleTombstone(p, ttlMs)) removed++;
+        continue;
+      }
+      const snap = snapStat(p);
+      if (!snap || Date.now() - snap.mtimeMs <= ttlMs) continue;
       unlinkQuiet(p);
       removed++;
     } catch {
@@ -263,8 +285,15 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
   }
 }
 
+function sleepMs(ms: number): void {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    /* spin */
+  }
+}
+
 /**
- * Atomic exclusive claim (wx). A stale claim is reclaimed under a per-path wx reclaim lock, then wx.
+ * Atomic exclusive claim (wx). A stale claim is reclaimed under a per-generation wx reclaim lock, then wx.
  */
 export function tryClaimHookRun(
   home: string,
@@ -273,10 +302,16 @@ export function tryClaimHookRun(
   ttlMs: number = HOOK_CLAIM_TTL_MS,
 ): HookClaimResult {
   const path = claimPath(home, event, sessionId);
-  sweepExpiredClaims(home, ttlMs, path);
-  if (tryCreateClaim(path)) return "claimed";
-  if (reclaimStale(path, ttlMs) === "duplicate") return "duplicate";
-  return tryCreateClaim(path) ? "claimed" : "duplicate";
+  const deadline = Date.now() + CLAIM_RETRY_MS;
+  for (;;) {
+    sweepExpiredClaims(home, ttlMs, path);
+    if (tryCreateClaim(path)) return "claimed";
+    const reclaimed = reclaimStale(path, ttlMs);
+    if (reclaimed === "reclaimed" && tryCreateClaim(path)) return "claimed";
+    if (tryCreateClaim(path)) return "claimed";
+    if (Date.now() >= deadline) return "duplicate";
+    sleepMs(2);
+  }
 }
 
 export type HookMetricLine = {
@@ -304,46 +339,56 @@ export function sweepExpiredClaimsForTest(home: string, ttlMs: number, keep: str
   sweepExpiredClaims(home, ttlMs, keep);
 }
 
-/** Tests only — break a stale reclaim lock using production logic. */
+/** Tests only — break a stale reclaim lock using production breaker path. */
 export function tryBreakStaleReclaimLockForTest(lockPath: string, ttlMs?: number): boolean {
-  const breakerPath = reclaimBreakerPath(lockPath);
-  if (!tryAcquireBreakerLock(breakerPath)) return false;
+  const breakerBase = `${lockPath}.breaker`;
+  const breakerHeld = tryWxFreshOrRotated(breakerBase, ttlMs ?? RECLAIM_LOCK_TTL_MS);
+  if (!breakerHeld) return false;
   try {
-    return breakStaleReclaimLockWhileBreakerHeld(lockPath, ttlMs ?? RECLAIM_LOCK_TTL_MS);
+    return breakStaleWxLockWhileHolderHeld(lockPath, ttlMs ?? RECLAIM_LOCK_TTL_MS);
   } finally {
-    releaseBreakerLock(breakerPath);
+    releaseOwnedWxLock(breakerHeld);
   }
 }
 
-/**
- * Tests only — r4 rename-aside breaker (QA turn-57 D1 bug shape) for red/green interleave rows.
- */
-export function tryBreakStaleReclaimLockR4ShapeForTest(lockPath: string, ttlMs?: number): boolean {
+/** Tests only — r5 ba09e2c6 breaker shape (unlocked stat→re-stat→unlink) for red/green tables. */
+export function tryBreakStaleReclaimLockR5ShapeForTest(lockPath: string, ttlMs?: number): boolean {
   const ttl = ttlMs ?? RECLAIM_LOCK_TTL_MS;
   const before = snapStat(lockPath);
   if (!before) return false;
   if (Date.now() - before.mtimeMs <= ttl) return false;
-  const aside = `${lockPath}.stale-break.${process.pid}`;
-  if (renameExclusive(lockPath, aside) === "lost") return false;
-  const asideSnap = snapStat(aside);
-  if (!asideSnap || !sameSnap(before, asideSnap)) {
-    unlinkQuiet(aside);
-    return false;
-  }
-  unlinkQuiet(aside);
+  claimTestSeams?.breakerAfterStatBeforeBreak?.(lockPath);
+  const after = snapStat(lockPath);
+  if (!after || !sameSnap(before, after)) return false;
+  if (Date.now() - after.mtimeMs <= ttl) return false;
+  claimTestSeams?.breakerAfterRestatBeforeUnlink?.(lockPath);
+  unlinkQuiet(lockPath);
   return true;
 }
 
-/** Tests only — r4 sweep stat-then-unlink on a claim path (D2 bug shape). */
-export function sweepRemoveClaimR4ShapeForTest(claimPath: string, ttlMs: number): boolean {
+/** Tests only — r5 sweep under reclaim lock (zero-claim shape). */
+export function sweepRemoveClaimR5ShapeForTest(claimPath: string, ttlMs: number): boolean {
+  const lockPath = reclaimLockPathForClaim(claimPath);
+  const { ok } = tryAcquireReclaimLock(claimPath);
+  if (!ok) return false;
   try {
-    if (Date.now() - statSync(claimPath).mtimeMs <= ttlMs) return false;
+    const before = snapStat(claimPath);
+    if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
     claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
     unlinkQuiet(claimPath);
     return true;
-  } catch {
-    return false;
+  } finally {
+    releaseReclaimLock(lockPath);
   }
+}
+
+/** Tests only — stat-unlink sweep mutant shape. */
+export function sweepRemoveClaimStatUnlinkMutantForTest(claimPath: string, ttlMs: number): boolean {
+  const before = snapStat(claimPath);
+  if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
+  claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
+  unlinkQuiet(claimPath);
+  return true;
 }
 
 /** Tests only — remove claim files under an isolated HOME. */

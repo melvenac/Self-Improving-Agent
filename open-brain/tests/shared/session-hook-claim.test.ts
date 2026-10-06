@@ -164,6 +164,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     const r = await runClaimBarrierTrials(built, 2, 20, "fresh");
     expect(r.throws).toBe(0);
     expect(r.doubles).toBe(0);
+    expect(r.zeroClaims).toBe(0);
     expect(r.late).toBe(0);
     expect(r.exact).toBe(20);
   });
@@ -173,6 +174,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     expect(r.late, r.sample).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
+    expect(r.zeroClaims, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
@@ -181,6 +183,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     expect(r.late).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
+    expect(r.zeroClaims, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
@@ -189,6 +192,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     expect(r.late).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
+    expect(r.zeroClaims, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
@@ -197,6 +201,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     expect(r.late, r.sample).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
+    expect(r.zeroClaims, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
@@ -205,6 +210,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     expect(r.late).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
+    expect(r.zeroClaims, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
@@ -213,6 +219,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     expect(r.late, r.sample).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
+    expect(r.zeroClaims, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
@@ -221,6 +228,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     expect(r.late).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
+    expect(r.zeroClaims, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 
@@ -229,6 +237,7 @@ describe("session-hook-claim barrier on the built module", { timeout: 900_000 },
     expect(r.late).toBe(0);
     expect(r.throws, r.sample).toBe(0);
     expect(r.doubles, r.sample).toBe(0);
+    expect(r.zeroClaims, r.sample).toBe(0);
     expect(r.exact).toBe(100);
   });
 });

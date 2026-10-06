@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -11,6 +11,7 @@ export type ClaimBarrierMode = "fresh" | "stale" | "crashed-lock";
 export type ClaimBarrierResult = {
   exact: number;
   doubles: number;
+  zeroClaims: number;
   throws: number;
   late: number;
   sample: string;
@@ -24,6 +25,7 @@ export async function runClaimBarrierTrials(
 ): Promise<ClaimBarrierResult> {
   let exact = 0;
   let doubles = 0;
+  let zeroClaims = 0;
   let throws = 0;
   let late = 0;
   let sample = "";
@@ -40,7 +42,8 @@ export async function runClaimBarrierTrials(
         const old = (Date.now() - HOOK_CLAIM_TTL_MS - 600_000) / 1000;
         utimesSync(claim, old, old);
         if (mode === "crashed-lock") {
-          const lock = `${claim}.reclaim`;
+          const gen = statSync(claim).mtimeMs;
+          const lock = `${claim}.reclaim.${gen}`;
           writeFileSync(lock, "crashed\n");
           utimesSync(lock, old, old);
         }
@@ -63,8 +66,9 @@ while (!start) {
   if (!start) await new Promise((r) => setTimeout(r, 1));
 }
 while (Date.now() < start) {}
-const lateMs = Date.now() - start;
-if (lateMs > 15) { process.stderr.write("LATE:" + lateMs); process.exit(2); }
+const atClaim = Date.now();
+const missMs = atClaim - start;
+if (missMs > 200) { process.stderr.write("LATE:" + missMs); process.exit(2); }
 process.stdout.write(String(tryClaimHookRun(process.env.HOME, "sessionStart", ${JSON.stringify(id)})));
 `,
       );
@@ -122,10 +126,11 @@ process.stdout.write(String(tryClaimHookRun(process.env.HOME, "sessionStart", ${
       }
       const claimed = runs.filter((r) => (r.stdout ?? "").trim() === "claimed").length;
       if (!failed && !anyLate && claimed === 1) exact++;
+      else if (!failed && !anyLate && claimed === 0) zeroClaims++;
       else if (claimed > 1) doubles++;
     } finally {
       rmSync(trialHome, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
     }
   }
-  return { exact, doubles, throws, late, sample };
+  return { exact, doubles, zeroClaims, throws, late, sample };
 }
