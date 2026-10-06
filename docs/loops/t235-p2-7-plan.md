@@ -27,6 +27,8 @@
 
 Deterministic gates: `session-hook-claim-interleave.test.ts` (F1/F2, r6 doubles sweep-restat seam); mutants `claim-mutant-report.mts` (R7).
 
+**Known limits (advisory review, r7 — documented only):** **F3:** generation-lock / breaker exclusion holds only while no participant stalls past `RECLAIM_LOCK_TTL_MS`. **F5:** a crash while holding a generation reclaim lock can yield up to ~60 s of `duplicate` for that session until the lock is stale enough to break.
+
 ## Live counts (QA PC)
 
 | Metric | Before patch (plan s161) | After patch (this branch) |

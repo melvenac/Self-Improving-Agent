@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync, unlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { runF1DoublesGate } from "./claim-f1-doubles-gate.js";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync, unlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import {
   HOOK_CLAIM_TTL_MS,
@@ -64,12 +65,45 @@ describe("session-hook-claim interleave (T-235 P2-7 r6 D3)", () => {
 
     setClaimTestSeamsForTest({
       sweepAfterRestatBeforeRename: () => {
+        unlinkSync(race);
         writeFileSync(race, `${Date.now()}\t${process.pid}\n`, { flag: "wx" });
       },
     });
 
     sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, other);
     expect(existsSync(race)).toBe(true);
+    expect(tryClaimHookRun(home, "sessionStart", "race-sid")).toBe("duplicate");
+  });
+
+  it("F1 doubles gate GREEN on head (shared gate helper)", () => {
+    expect(runF1DoublesGate(home)).toBe(true);
+  });
+
+  it("F1 RED on 57d86689 src (subprocess gate)", async () => {
+    const script = join(__dirname, "../../scripts/claim-r7-gate-check.mts");
+    const { spawnAsync } = await import("../spawn-async.js");
+    const r = await spawnAsync(process.execPath, ["--import", "tsx", script, "f1", "57d86689"], {
+      cwd: join(__dirname, "../.."),
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout.trim()).toBe("RED");
+  }, 120_000);
+
+  it("F1 RED shape: stat-unlink sweep deletes wx reclaim planted in the gap", () => {
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const race = join(dir, "sessionStart-race-sid.claim");
+    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 600_000) / 1000;
+    writeFileSync(race, "old\n");
+    utimesSync(race, stale, stale);
+    setClaimTestSeamsForTest({
+      sweepAfterStatBeforeRemove: () => {
+        unlinkSync(race);
+        writeFileSync(race, `${Date.now()}\t${process.pid}\n`, { flag: "wx" });
+      },
+    });
+    expect(sweepRemoveClaimStatUnlinkMutantForTest(race, HOOK_CLAIM_TTL_MS)).toBe(true);
+    expect(existsSync(race)).toBe(false);
   });
 
   it("F1 gate r6: cross-session sweep interleave still lets victim claim", () => {
@@ -93,7 +127,7 @@ describe("session-hook-claim interleave (T-235 P2-7 r6 D3)", () => {
     expect(tryClaimHookRun(home, "sessionStart", "victim")).toBe("claimed");
   });
 
-  it("D3a ba09e2c6 shape: unlocked breaker gap destroys fresh lock (RED)", () => {
+  it("historical r5 breaker shape export only (not a production red/green gate)", () => {
     const dir = mkdtempSync(join(tmpdir(), "ob-claim-r5a-"));
     const lock = join(dir, "x.claim.reclaim.1");
     const stale = (Date.now() - RECLAIM_LOCK_TTL_MS - 60_000) / 1000;
@@ -113,9 +147,8 @@ describe("session-hook-claim interleave (T-235 P2-7 r6 D3)", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it("D3b ba09e2c6 shape: sweep under reclaim lock deletes fresh claim (RED)", () => {
-    const dir = join(tmpdir(), "ob-claim-r5b-");
-    mkdirSync(dir, { recursive: true });
+  it("historical r5 sweep-under-lock export only (not a production red/green gate)", () => {
+    const dir = mkdtempSync(join(tmpdir(), "ob-claim-r5b-"));
     const victim = join(dir, "sessionStart-v.claim");
     const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
     writeFileSync(victim, "old\n");
@@ -134,8 +167,7 @@ describe("session-hook-claim interleave (T-235 P2-7 r6 D3)", () => {
   });
 
   it("stat-unlink sweep mutant row goes red on fresh claim", () => {
-    const dir = join(tmpdir(), "ob-claim-mut-");
-    mkdirSync(dir, { recursive: true });
+    const dir = mkdtempSync(join(tmpdir(), "ob-claim-mut-"));
     const victim = join(dir, "sessionStart-m.claim");
     const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
     writeFileSync(victim, "old\n");

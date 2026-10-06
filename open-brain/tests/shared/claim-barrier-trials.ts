@@ -12,6 +12,8 @@ export type ClaimBarrierResult = {
   exact: number;
   doubles: number;
   zeroClaims: number;
+  /** Trials where a non-race-sid hook did not get claimed (liveness). */
+  otherZeroClaims?: number;
   throws: number;
   late: number;
   sample: string;
@@ -147,6 +149,7 @@ export async function runMixedCrossSessionTrials(
   let exact = 0;
   let doubles = 0;
   let zeroClaims = 0;
+  let otherZeroClaims = 0;
   let throws = 0;
   let late = 0;
   let sample = "";
@@ -242,13 +245,16 @@ process.stdout.write(String(tryClaimHookRun(process.env.HOME, "sessionStart", pr
         }
       }
       const raceRuns = runs.filter((r) => (r as { sessionId?: string }).sessionId === RACE_SID);
+      const otherRuns = runs.filter((r) => (r as { sessionId?: string }).sessionId !== RACE_SID);
       const raceClaimed = raceRuns.filter((r) => (r.stdout ?? "").trim() === "claimed").length;
+      const otherClaimed = otherRuns.filter((r) => (r.stdout ?? "").trim() === "claimed").length;
       if (!failed && !anyLate && raceClaimed === 1) exact++;
       else if (!failed && !anyLate && raceClaimed === 0) zeroClaims++;
       else if (raceClaimed > 1) doubles++;
+      if (!failed && !anyLate && otherRuns.length > 0 && otherClaimed < otherRuns.length) otherZeroClaims++;
     } finally {
       rmSync(trialHome, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
     }
   }
-  return { exact, doubles, zeroClaims, throws, late, sample };
+  return { exact, doubles, zeroClaims, otherZeroClaims, throws, late, sample };
 }

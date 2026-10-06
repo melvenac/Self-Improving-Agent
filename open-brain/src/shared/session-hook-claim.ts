@@ -1,6 +1,7 @@
 import {
   appendFileSync,
   existsSync,
+  linkSync,
   mkdirSync,
   readFileSync,
   readdirSync,
@@ -97,8 +98,8 @@ function reclaimLockPathForClaim(claimPath: string): string {
   return `${claimPath}.reclaim.${gen}`;
 }
 
-function isReclaimLockEntry(name: string): boolean {
-  return name.includes(".reclaim");
+function isGenerationReclaimLockEntry(name: string): boolean {
+  return name.includes(".reclaim") && !isBreakerOrRotatedEntry(name);
 }
 
 function isBreakerOrRotatedEntry(name: string): boolean {
@@ -119,6 +120,7 @@ export type ClaimTestSeams = {
   breakerAfterRestatBeforeUnlink?: (lockPath: string) => void;
   sweepAfterStatBeforeRemove?: (claimPath: string) => void;
   sweepAfterRestatBeforeRename?: (claimPath: string) => void;
+  sweepSkipBreakerAndRot?: boolean;
 };
 
 let claimTestSeams: ClaimTestSeams | undefined;
@@ -137,13 +139,19 @@ function unlinkQuiet(path: string): void {
 }
 
 function releaseOwnedWxLock(lockPath: string): void {
-  try {
-    const row = readFileSync(lockPath, "utf8").trim();
-    const tab = row.indexOf("\t");
-    const pid = tab >= 0 ? Number(row.slice(tab + 1)) : NaN;
-    if (pid === process.pid) unlinkQuiet(lockPath);
-  } catch (err) {
-    if (errno(err) !== "ENOENT") throw err;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      const row = readFileSync(lockPath, "utf8").trim();
+      const tab = row.indexOf("\t");
+      const pid = tab >= 0 ? Number(row.slice(tab + 1)) : NaN;
+      if (pid === process.pid) unlinkQuiet(lockPath);
+      return;
+    } catch (err) {
+      const code = errno(err);
+      if (code === "ENOENT") return;
+      if (code === "EPERM" || code === "EBUSY") continue;
+      throw err;
+    }
   }
 }
 
@@ -216,7 +224,11 @@ function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
     if (renameExclusive(path, aside) === "lost") return "duplicate";
     try {
       if (Date.now() - statSync(aside).mtimeMs <= ttlMs) {
-        unlinkQuiet(aside);
+        try {
+          linkSync(aside, path);
+        } catch (err) {
+          if (errno(err) !== "EEXIST") throw err;
+        }
         return "duplicate";
       }
     } catch (err) {
@@ -264,6 +276,19 @@ function sweepRemoveStaleTombstone(tombPath: string, ttlMs: number): boolean {
   return true;
 }
 
+function sweepRemoveAbandonedAuxWx(auxPath: string, ttlMs: number): boolean {
+  const before = snapStat(auxPath);
+  if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
+  const held = tryWxFreshOrRotated(auxPath, ttlMs);
+  if (!held) return false;
+  try {
+    if (!breakStaleWxLockWhileHolderHeld(auxPath, ttlMs)) return false;
+    return true;
+  } finally {
+    releaseOwnedWxLock(held);
+  }
+}
+
 /** Drop at most this many expired claim files per call, so a hook never walks an unbounded directory. */
 export const SWEEP_CAP = 32;
 
@@ -279,10 +304,16 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
   let removed = 0;
   for (const name of names) {
     if (removed >= SWEEP_CAP) break;
-    if (isReclaimLockEntry(name) || isBreakerOrRotatedEntry(name)) continue;
     const p = join(dir, name);
     if (p === keep) continue;
     try {
+      if (isGenerationReclaimLockEntry(name)) continue;
+      if (isBreakerOrRotatedEntry(name)) {
+        if (!claimTestSeams?.sweepSkipBreakerAndRot && sweepRemoveAbandonedAuxWx(p, HOOK_CLAIM_TTL_MS)) {
+          removed++;
+        }
+        continue;
+      }
       if (isClaimFileEntry(name)) {
         if (sweepRemoveExpiredClaimFile(p, ttlMs)) removed++;
         continue;

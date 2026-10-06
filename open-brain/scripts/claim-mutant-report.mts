@@ -46,25 +46,18 @@ if (mutant === "no-lock") {
 } else if (mutant === "skip-self") {
   patched = patched.replace("    if (p === keep) continue;\n", "");
 } else if (mutant === "sweep-stat-unlink") {
+  const sweepMutant = `function sweepRemoveExpiredClaimFile(claimPath: string, ttlMs: number): boolean {
+  const before = snapStat(claimPath);
+  if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
+  claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
+  unlinkQuiet(claimPath);
+  return true;
+}`;
   patched = patched.replace(
-    /function tryAcquireReclaimLock\(claimPath: string\): \{ ok: boolean; lockPath: string \} \{[\s\S]*?\n}\n\nfunction releaseReclaimLock/,
-    `function tryAcquireReclaimLock(claimPath: string): { ok: boolean; lockPath: string } {
-  const lockPath = reclaimLockPathForClaim(claimPath);
-  if (tryCreateClaim(lockPath)) return { ok: true, lockPath };
-  try {
-    if (existsSync(lockPath) && Date.now() - statSync(lockPath).mtimeMs > RECLAIM_LOCK_TTL_MS) {
-      unlinkSync(lockPath);
-      return { ok: tryCreateClaim(lockPath), lockPath };
-    }
-  } catch (err) {
-    if (errno(err) !== "ENOENT") throw err;
-  }
-  return { ok: false, lockPath };
-}
-
-function releaseReclaimLock`,
+    /\/\*\* Remove an expired claim only while holding that claim generation's reclaim wx lock\. \*\/\nfunction sweepRemoveExpiredClaimFile\(claimPath: string, ttlMs: number\): boolean \{[\s\S]*?\n\}/,
+    `/** Remove an expired claim only while holding that claim generation's reclaim wx lock. */
+${sweepMutant}`,
   );
-  patched = patched.replace("    if (isReclaimLockEntry(name)) continue;\n", "");
 } else {
   console.error(`unknown mutant: ${mutant}`);
   process.exit(1);
@@ -86,7 +79,18 @@ if (tscRun.status !== 0) {
 
 try {
   const r = await runClaimBarrierTrials(built, 8, trials, mode);
-  console.log(JSON.stringify({ mutant, mode, trials, doubles: r.doubles, exact: r.exact, throws: r.throws, late: r.late }));
+  console.log(
+    JSON.stringify({
+      mutant,
+      mode,
+      trials,
+      doubles: r.doubles,
+      zeroClaims: r.zeroClaims,
+      exact: r.exact,
+      throws: r.throws,
+      late: r.late,
+    }),
+  );
 } finally {
   writeFileSync(srcPath, original);
   await spawnAsync(process.execPath, [tsc, "-p", join(obRoot, "tsconfig.json")], { cwd: obRoot });
