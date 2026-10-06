@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { hubRoomGuardViolations, hubRoomSectionFromStart } from "../../../src/pipelines/sync/hub-room-guard.js";
 
 /**
  * T-228: relay's A2A Loop 13 contract for `hub-talk` exit codes (A2A-Hub master 8e59f58, docs/loops/loop-13-design-ruling.md).
@@ -58,11 +59,45 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     expect(read(".cursor/rules/hub-room.mdc")).toBe(read("project-template/.cursor/rules/hub-room.mdc"));
   });
 
-  it("hub-room.mdc does not instruct foreground hub-talk --wait (HUBROOM-TURN-END)", () => {
-    for (const rel of [".cursor/rules/hub-room.mdc", "project-template/.cursor/rules/hub-room.mdc"]) {
-      const t = read(rel);
-      expect(t).not.toMatch(/--wait --wait-timeout/);
-      expect(t).not.toMatch(/run the `talk` line with `--wait`/i);
+  const QA_REWORDINGS = {
+    R1: "After posting, run hub-talk --wait for the next atlas turn.",
+    R2: "When the post succeeds, run the `talk` line again with `--wait` and handle the next atlas turn in this run.",
+    R3: "Then keep listening: append the seat file's `wait` suffix to the talk line and act on what it prints before you end the turn.",
+    R4: "After posting, run the talk line with --wait --wait-timeout 3500.",
+  } as const;
+
+  const MDC_ANCHOR = "Post when the work is done, not a bare acknowledgement.";
+  const plantMdc = (mdc: string, line: string) => mdc.replace(MDC_ANCHOR, `${MDC_ANCHOR}\n\n${line}`);
+  const plantStartHub = (start: string, suffix: string) => {
+    const lines = start.split("\n");
+    const at = lines.findIndex((l) => l.trim() === "### Hub room");
+    expect(at).toBeGreaterThan(-1);
+    const hubLine = lines[at + 1];
+    lines[at + 1] = `${hubLine} ${suffix}`;
+    return lines.join("\n");
+  };
+
+  const guardTargets: { label: string; text: () => string }[] = [
+    { label: ".cursor/rules/hub-room.mdc", text: () => read(".cursor/rules/hub-room.mdc") },
+    { label: "project-template/.cursor/rules/hub-room.mdc", text: () => read("project-template/.cursor/rules/hub-room.mdc") },
+    {
+      label: "start.md Hub room section",
+      text: () => hubRoomSectionFromStart(read("project-template/.cursor/commands/start.md")),
+    },
+  ];
+
+  it("tracked hub copies pass the sentence guard (HUBROOM-GUARD)", () => {
+    for (const { label, text } of guardTargets) {
+      expect(hubRoomGuardViolations(text()), label).toEqual([]);
+    }
+  });
+
+  it("QA-281 rewordings R1–R4 fail the sentence guard in every copy (HUBROOM-GUARD G1)", () => {
+    for (const [id, line] of Object.entries(QA_REWORDINGS)) {
+      const mdc = read(".cursor/rules/hub-room.mdc");
+      const start = read("project-template/.cursor/commands/start.md");
+      expect(hubRoomGuardViolations(plantMdc(mdc, line)), `${id} mdc`).not.toEqual([]);
+      expect(hubRoomGuardViolations(hubRoomSectionFromStart(plantStartHub(start, line))), `${id} start`).not.toEqual([]);
     }
   });
 

@@ -3,7 +3,6 @@
   "hub_url": "http://100.124.212.87:4000",
   "talk": "HUB_URL={hub_url} node <A2A-Hub>/scripts/hub-talk.mjs --as {hub_name} --session {room}",
   "talk_tokens": "Substitute {hub_url}, {hub_name}, and {room} only. Replace <A2A-Hub> with the absolute path of the local checkout of https://github.com/melvenac/A2A-Hub that contains scripts/hub-talk.mjs. The angle-bracket token is not filled from this file.",
-  "wait": "--wait --wait-timeout 3500",
   "seats": {
     "planner": {
       "checkout": "sia-planner",
