@@ -7,7 +7,8 @@ import { fileURLToPath } from "node:url";
 
 export const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(HERE, "../../..");
-export const MIN_QA = 253;
+// QA 250 onward (atlas s162): every QA run with a report, up to the highest QA number that has a prompt on master.
+export const MIN_QA = 250;
 
 export function git(args, { allowFail = false } = {}) {
   try {
@@ -26,3 +27,16 @@ export function stable(value) {
   return `${JSON.stringify(sort(value), null, 2)}\n`;
 }
 export const writeJson = (name, value) => writeFileSync(join(HERE, name), stable(value));
+
+/** The git-backed reads resolve.mjs and collect.mjs take as `deps`. */
+export function gitDeps() {
+  const masterFiles = () =>
+    (git(["ls-tree", "--name-only", "origin/master", "docs/loops/"], { allowFail: true }) ?? "")
+      .split("\n").filter(Boolean).map((p) => p.slice("docs/loops/".length));
+  return {
+    masterFiles,
+    masterShow: (path) => git(["show", `origin/master:${path}`], { allowFail: true }),
+    refExists: (ref) => git(["rev-parse", "--verify", "--quiet", `${ref}^{commit}`], { allowFail: true }) !== null,
+    refShow: (ref, path) => git(["show", `${ref}:${path}`], { allowFail: true }),
+  };
+}

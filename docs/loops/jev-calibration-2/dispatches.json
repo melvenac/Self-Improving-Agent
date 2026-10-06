@@ -1,100 +1,882 @@
 [
   {
-    "case_id": "t209-t210",
+    "case_id": "qa250-t-221",
     "case_no": 1,
-    "dispatch_blob": "5bfc1a70de63d007ad13d6ab2a23d32436360bc0",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-253-t209-t210-dispatch.md"
+    "dispatch_blob": "995fe42166d7fcb2e8b933e748ae0920ef9aae8b",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "t208-t212",
+    "case_id": "qa250-t-222",
     "case_no": 2,
-    "dispatch_blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md"
+    "dispatch_blob": "995fe42166d7fcb2e8b933e748ae0920ef9aae8b",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-250-t221-t222-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "b1-start",
+    "case_id": "qa251-t-164",
     "case_no": 3,
-    "dispatch_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md"
+    "dispatch_blob": "0f833a7826f79f4e096e339a9ce7b79e4745b7b6",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "t203",
+    "case_id": "qa251-t-211",
     "case_no": 4,
-    "dispatch_blob": "dcc767c285144469f0539d360224df3c0a642205",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-266-t203-dispatch.md"
+    "dispatch_blob": "0f833a7826f79f4e096e339a9ce7b79e4745b7b6",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s160c",
+    "case_id": "qa253-t-209+t-210",
     "case_no": 5,
-    "dispatch_blob": "7431063d4ef8b2d3a4b411a02172b878b1cd18bb",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-268-s160c-dispatch.md"
+    "dispatch_blob": "5bfc1a70de63d007ad13d6ab2a23d32436360bc0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-253-t209-t210-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-253-t209-t210-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s160d",
+    "case_id": "qa254-t-208",
     "case_no": 6,
-    "dispatch_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md"
+    "dispatch_blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s160e",
+    "case_id": "qa254-t-212",
     "case_no": 7,
-    "dispatch_blob": "538059a1271a552b52f9d008e75a4d1324d49350",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md"
+    "dispatch_blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s160f",
+    "case_id": "qa255-pr287",
     "case_no": 8,
-    "dispatch_blob": "687200f90fe15927859568493c26fe622c894d39",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md"
+    "dispatch_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-255-b1-start-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s161a",
+    "case_id": "qa255-pr291",
     "case_no": 9,
-    "dispatch_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md"
+    "dispatch_blob": "3fd92b18e2d6d498cf073be2de54862acad76df4",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": null,
+    "plan": "plan",
+    "plan_path": "docs/loops/t183-greeting-brief.md",
+    "plan_source": "task-brief"
   },
   {
-    "case_id": "s161c",
+    "case_id": "qa255-pr297",
     "case_no": 10,
-    "dispatch_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md"
+    "dispatch_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-255-b1-start-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s161d",
+    "case_id": "qa255-pr312",
     "case_no": 11,
-    "dispatch_blob": "18ebc58b83113e9c18a5fd71fa9d45682708f8b9",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-276-s161d-dispatch.md"
+    "dispatch_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-255-b1-start-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s161e",
+    "case_id": "qa256-pr295",
     "case_no": 12,
-    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md"
+    "dispatch_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s161g",
+    "case_id": "qa256-pr298",
     "case_no": 13,
-    "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md"
+    "dispatch_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   },
   {
-    "case_id": "s162a",
+    "case_id": "qa256-pr300",
     "case_no": 14,
+    "dispatch_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa256-pr303",
+    "case_no": 15,
+    "dispatch_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa256-pr306",
+    "case_no": 16,
+    "dispatch_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa256-pr309",
+    "case_no": 17,
+    "dispatch_blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-256-b2-sync-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa257-pr301",
+    "case_no": 18,
+    "dispatch_blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa257-pr305",
+    "case_no": 19,
+    "dispatch_blob": "06c35f7f24e02902a93d3fca2fdb219117215ca4",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": null,
+    "plan": "plan",
+    "plan_path": "docs/loops/t152-brief.md",
+    "plan_source": "task-brief"
+  },
+  {
+    "case_id": "qa257-pr308",
+    "case_no": 20,
+    "dispatch_blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa257-pr313",
+    "case_no": 21,
+    "dispatch_blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa257-pr314",
+    "case_no": 22,
+    "dispatch_blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-257-b3-misc-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa258-pr289-r3",
+    "case_no": 23,
+    "dispatch_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa258-pr290",
+    "case_no": 24,
+    "dispatch_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa258-pr294",
+    "case_no": 25,
+    "dispatch_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa258-pr299",
+    "case_no": 26,
+    "dispatch_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa258-pr302",
+    "case_no": 27,
+    "dispatch_blob": "b4c0e3c37852b9cd5331d5f6a44ef4a92eb076c0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-258-b4-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa259-pr292",
+    "case_no": 28,
+    "dispatch_blob": "3167a3ed0416ebf461eaf5dfc9fe9d0a90acbe76",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-259-b5-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa259-pr293",
+    "case_no": 29,
+    "dispatch_blob": "3167a3ed0416ebf461eaf5dfc9fe9d0a90acbe76",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-259-b5-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa259-pr320",
+    "case_no": 30,
+    "dispatch_blob": "3167a3ed0416ebf461eaf5dfc9fe9d0a90acbe76",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-259-b5-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa260-pr295",
+    "case_no": 31,
+    "dispatch_blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-260-b2r2-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa260-pr298",
+    "case_no": 32,
+    "dispatch_blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-260-b2r2-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa260-pr306",
+    "case_no": 33,
+    "dispatch_blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-260-b2r2-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa260-pr309",
+    "case_no": 34,
+    "dispatch_blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-260-b2r2-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa261-pr302",
+    "case_no": 35,
+    "dispatch_blob": "6c19f7858a406e6f634335b45cf0b99401dbc11f",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-261-302r2-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-261-302r2-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa262-pr295",
+    "case_no": 36,
+    "dispatch_blob": "5b10142333d96b5a40a311b9e2ff0e0be1c184f2",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-262-r3-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-262-r3-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa262-pr298",
+    "case_no": 37,
+    "dispatch_blob": "5b10142333d96b5a40a311b9e2ff0e0be1c184f2",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-262-r3-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-262-r3-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa264-pr371",
+    "case_no": 38,
+    "dispatch_blob": "06c35f7f24e02902a93d3fca2fdb219117215ca4",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": null,
+    "plan": "plan",
+    "plan_path": "docs/loops/t152-brief.md",
+    "plan_source": "task-brief"
+  },
+  {
+    "case_id": "qa264-pr372",
+    "case_no": 39,
+    "dispatch_blob": "f70e8d56bf717ad1f0efb20e36d93e103ee82060",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-264-s159-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-264-s159-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa264-pr373",
+    "case_no": 40,
+    "dispatch_blob": "5c900f009d77ce681e052f7e2f97fa36fe4a9a02",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": null,
+    "plan": "plan",
+    "plan_path": "docs/loops/t234-brief.md",
+    "plan_source": "task-brief"
+  },
+  {
+    "case_id": "qa264-pr374",
+    "case_no": 41,
+    "dispatch_blob": "5c900f009d77ce681e052f7e2f97fa36fe4a9a02",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": null,
+    "plan": "plan",
+    "plan_path": "docs/loops/t234-brief.md",
+    "plan_source": "task-brief"
+  },
+  {
+    "case_id": "qa265-pr374-r2",
+    "case_no": 42,
+    "dispatch_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa265-pr377",
+    "case_no": 43,
+    "dispatch_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa265-pr378",
+    "case_no": 44,
+    "dispatch_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa265-pr379",
+    "case_no": 45,
+    "dispatch_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa265-pr382",
+    "case_no": 46,
+    "dispatch_blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-265-s159b-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa266-pr376",
+    "case_no": 47,
+    "dispatch_blob": "dcc767c285144469f0539d360224df3c0a642205",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-266-t203-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-266-t203-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa267-pr387",
+    "case_no": 48,
+    "dispatch_blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-267-s160-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa267-pr388",
+    "case_no": 49,
+    "dispatch_blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-267-s160-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa267-pr391",
+    "case_no": 50,
+    "dispatch_blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-267-s160-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa267-pr393",
+    "case_no": 51,
+    "dispatch_blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-267-s160-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa268-pr393-r2",
+    "case_no": 52,
+    "dispatch_blob": "22aef7c8bf6b8b9a41feb6deccc35af7a5f0ce10",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": null,
+    "plan": "plan",
+    "plan_path": "docs/loops/t236-brief.md",
+    "plan_source": "task-brief"
+  },
+  {
+    "case_id": "qa268-pr397",
+    "case_no": 53,
+    "dispatch_blob": "7431063d4ef8b2d3a4b411a02172b878b1cd18bb",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-268-s160c-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-268-s160c-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa269-pr397-r2",
+    "case_no": 54,
+    "dispatch_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-269-s160d-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa269-pr401",
+    "case_no": 55,
+    "dispatch_blob": "22aef7c8bf6b8b9a41feb6deccc35af7a5f0ce10",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": null,
+    "plan": "plan",
+    "plan_path": "docs/loops/t236-brief.md",
+    "plan_source": "task-brief"
+  },
+  {
+    "case_id": "qa269-pr402",
+    "case_no": 56,
+    "dispatch_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-269-s160d-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa269-pr404",
+    "case_no": 57,
+    "dispatch_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-269-s160d-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa270-pr412",
+    "case_no": 58,
+    "dispatch_blob": "538059a1271a552b52f9d008e75a4d1324d49350",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-270-s160e-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa270-pr413",
+    "case_no": 59,
+    "dispatch_blob": "538059a1271a552b52f9d008e75a4d1324d49350",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-270-s160e-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa272-pr415",
+    "case_no": 60,
+    "dispatch_blob": "687200f90fe15927859568493c26fe622c894d39",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-272-s160f-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa272-pr420",
+    "case_no": 61,
+    "dispatch_blob": "687200f90fe15927859568493c26fe622c894d39",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-272-s160f-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa272-pr421",
+    "case_no": 62,
+    "dispatch_blob": "687200f90fe15927859568493c26fe622c894d39",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-272-s160f-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa273-pr421-r2",
+    "case_no": 63,
+    "dispatch_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-273-s161a-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa273-pr424",
+    "case_no": 64,
+    "dispatch_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-273-s161a-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa273-pr425",
+    "case_no": 65,
+    "dispatch_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-273-s161a-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa273-pr427",
+    "case_no": 66,
+    "dispatch_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-273-s161a-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa275-pr421-r3",
+    "case_no": 67,
+    "dispatch_blob": "bb51c9db4dff81c5740594e2afaaa80e5c0bf395",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa275-pr424-r2",
+    "case_no": 68,
+    "dispatch_blob": "bb51c9db4dff81c5740594e2afaaa80e5c0bf395",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa275-pr427-r2",
+    "case_no": 69,
+    "dispatch_blob": "bb51c9db4dff81c5740594e2afaaa80e5c0bf395",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa275-pr434",
+    "case_no": 70,
+    "dispatch_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-275-s161c-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa275-pr436",
+    "case_no": 71,
+    "dispatch_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-275-s161c-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa275-pr437",
+    "case_no": 72,
+    "dispatch_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-275-s161c-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa277-pr427-r3",
+    "case_no": 73,
+    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa277-pr441",
+    "case_no": 74,
+    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa277-pr442",
+    "case_no": 75,
+    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa277-pr444",
+    "case_no": 76,
+    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa277-pr445",
+    "case_no": 77,
+    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa277-pr446",
+    "case_no": 78,
+    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa277-pr451",
+    "case_no": 79,
+    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-277-s161e-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa279-pr427-r4",
+    "case_no": 80,
+    "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa279-pr434-r2",
+    "case_no": 81,
+    "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa279-pr437-r2",
+    "case_no": 82,
+    "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa279-pr444-r3",
+    "case_no": 83,
+    "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa279-pr445-r2",
+    "case_no": 84,
+    "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-279-s161g-dispatch.md",
+    "plan_source": "qa-dispatch-section"
+  },
+  {
+    "case_id": "qa280-pr425",
+    "case_no": 85,
     "dispatch_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
-    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
-    "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md"
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-280-s162a-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa280-pr437-r3",
+    "case_no": 86,
+    "dispatch_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-280-s162a-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa280-pr445-r3",
+    "case_no": 87,
+    "dispatch_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-280-s162a-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
+  },
+  {
+    "case_id": "qa281-pr445-r4",
+    "case_no": 88,
+    "dispatch_blob": "803fe1f6304e23c6eb167520041aceb612fbf942",
+    "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+    "dispatch_path": "docs/loops/qa-281-s162b-dispatch.md",
+    "plan": "plan",
+    "plan_path": "docs/loops/qa-281-s162b-dispatch.md",
+    "plan_source": "qa-dispatch-whole"
   }
 ]

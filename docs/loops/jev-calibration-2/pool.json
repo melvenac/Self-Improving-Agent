@@ -1,12 +1,67 @@
 {
-  "ACCEPT": 3,
-  "REJECT": 9,
-  "checks_none": 14,
-  "checks_recorded": 0,
-  "headline_pool": 11,
-  "leak_group": 3,
+  "ACCEPT": 62,
+  "REJECT": 24,
+  "base_invariant_failures": 0,
+  "cal1_collected_unscored": 0,
+  "cal1_seen": 1,
+  "checks_by_test_job": {
+    "failure": 1,
+    "none": 3,
+    "success": 84
+  },
+  "checks_none": 3,
+  "checks_recorded": 85,
+  "conflicts": 1,
+  "diff_files": {
+    "max": 21,
+    "median": 7,
+    "min": 1,
+    "n": 88,
+    "p25": 4,
+    "p75": 9,
+    "p90": 15
+  },
+  "diff_lines": {
+    "max": 3052,
+    "median": 283,
+    "min": 4,
+    "n": 88,
+    "p25": 112,
+    "p75": 543,
+    "p90": 712
+  },
+  "headline_pool": 71,
+  "heads_unresolved": 0,
+  "held_out_candidates": {
+    "ACCEPT": 48,
+    "REJECT": 19,
+    "no_plan": 0,
+    "rule": "labelled ACCEPT or REJECT, not in the leak group, not cal1-seen, label not disputed",
+    "total": 67,
+    "with_plan": 67
+  },
+  "label_disputed": 1,
+  "leak_group": 17,
+  "max_qa": 282,
+  "min_qa": 250,
+  "no_plan": 0,
+  "pair_cases": 36,
+  "pair_prs": 15,
+  "pairs": 21,
+  "plan": 88,
+  "plan_by_source": {
+    "qa-dispatch-section": 14,
+    "qa-dispatch-whole": 67,
+    "task-brief": 7
+  },
+  "pr_files_checked": 81,
+  "pr_files_failed": 0,
+  "runs_considered": 32,
+  "runs_resolved": 31,
+  "runs_with_cases": 29,
   "runtime_built": 0,
-  "seat_built": 14,
-  "total": 14,
-  "unlabelled": 2
+  "seat_built": 88,
+  "total": 88,
+  "unlabelled": 2,
+  "unresolved": 9
 }
