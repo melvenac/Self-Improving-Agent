@@ -1,6 +1,6 @@
 /**
  * QA evidence: barrier trials after a named mutant (isolated build; checkout untouched).
- * Usage: npx tsx scripts/claim-mutant-report.mts <no-lock|skip-self|sweep-stat-unlink|m2-no-restat-snap> [trials] [mode]
+ * Usage: npx tsx scripts/claim-mutant-report.mts <no-lock|skip-self|sweep-stat-unlink|m2-no-restat-snap|drop-breaker-release> [trials] [mode]
  */
 import { execSync } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -20,7 +20,7 @@ const mode = (process.argv[4] ?? (mutant === "sweep-stat-unlink" ? "crashed-lock
 
 if (!mutant) {
   console.error(
-    "usage: claim-mutant-report.mts <no-lock|skip-self|sweep-stat-unlink|m2-no-restat-snap> [trials] [mode]",
+    "usage: claim-mutant-report.mts <no-lock|skip-self|sweep-stat-unlink|m2-no-restat-snap|drop-breaker-release> [trials] [mode]",
   );
   process.exit(1);
 }
@@ -120,8 +120,11 @@ try {
     late: r.late,
   };
   console.log(JSON.stringify(line));
-  if (r.throws > 0 || r.exact === 0) {
-    console.error(`mutant run invalid: throws=${r.throws} exact=${r.exact} sample=${r.sample}`);
+  const accounted = r.exact + r.zeroClaims + r.doubles;
+  if (r.throws > 0 || r.late > 0 || accounted !== trials) {
+    console.error(
+      `mutant run invalid: throws=${r.throws} late=${r.late} exact=${r.exact} zeroClaims=${r.zeroClaims} doubles=${r.doubles} trials=${trials} sample=${r.sample}`,
+    );
     process.exit(1);
   }
 } finally {

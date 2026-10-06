@@ -29,7 +29,11 @@ Deterministic gates: `session-hook-claim-interleave.test.ts` (F1/F2, r6 doubles 
 
 **Known limits (advisory review — documented only):** **F3:** generation-lock / breaker exclusion holds only while no participant stalls past `RECLAIM_LOCK_TTL_MS`. **F4 (r8):** a crashed generation reclaim lock plus crashed `.breaker` and `.rot.*` aux files can wedge reclaim until manual cleanup (needs three crashes in tight windows; r7 aux sweep was removed as unsafe). **F5:** a crash while holding a generation reclaim lock can yield up to ~60 s of `duplicate` for that session until the lock is stale enough to break.
 
-**r8 (r7 evidence cleanup, frozen pending CI):** Removed `sweepRemoveAbandonedAuxWx` and `sweepSkipBreakerAndRot`. F1 RED/GREEN uses **M2** mutant (post-restat snap removed) via isolated temp build (`claim-m2-f1-gate.mts`); no checkout mutation. F9 cross-session row is GREEN smoke only. `claim-r7-gate-check.mts` deleted. Production test-only shape exports removed from `session-hook-claim.ts`.
+**r8 (r7 evidence cleanup):** Removed `sweepRemoveAbandonedAuxWx` and `sweepSkipBreakerAndRot`. F1 RED/GREEN uses **M2** mutant via isolated temp build (`claim-m2-f1-gate.mts`); no checkout mutation. F9 cross-session row is GREEN smoke only. `claim-r7-gate-check.mts` deleted.
+
+**r9:** `claim-mutant-report` passes filesystem path (not URL); exits non-zero when `throws>0` or `exact==0`. M2 removes only post-restat snap (seam must fire once). `snapStat` / generation naming: ENOENT only absent; EPERM/EBUSY retry; no `.reclaim.0` fallback. `tryBreakStaleReclaimLockViaBreaker` shared by acquire + test; `drop-breaker-release` isolated mutant RED.
+
+**r10:** `tryClaimHookRun` catches non-ENOENT stat errors from the own-claim path and retries within `CLAIM_RETRY_MS`, then `duplicate` (no hook throw). `claim-mutant-report` invalid only when `throws>0`, `late>0`, or `exact+zeroClaims+doubles≠trials`. Seam rows: EPERM×8 then success → `claimed`; persistent EPERM → `duplicate` ~2s.
 
 ## Live counts (QA PC)
 

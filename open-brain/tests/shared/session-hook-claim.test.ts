@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { spawnAsync } from "../spawn-async.js";
 import { runClaimBarrierTrials } from "./claim-barrier-trials.js";
 import {
+  CLAIM_RETRY_MS,
   HOOK_CLAIM_TTL_MS,
   RECLAIM_LOCK_TTL_MS,
   SWEEP_CAP,
@@ -114,6 +115,65 @@ describe("session-hook-claim (T-235 P2-7)", () => {
     utimesSync(lock, stale, stale);
     sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, join(dir, "sessionStart-other.claim"));
     expect(existsSync(lock)).toBe(true);
+  });
+
+  it("r10: EPERM x8 on claim stat then success returns claimed without throwing", () => {
+    const id = "r10-eperm-then-ok";
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const claim = join(dir, `sessionStart-${id}.claim`);
+    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
+    writeFileSync(claim, "old\n");
+    utimesSync(claim, stale, stale);
+
+    let epermOnClaim = 0;
+    setClaimTestSeamsForTest({
+      snapStatInject: (p) => {
+        if (p !== claim) return;
+        epermOnClaim++;
+        if (epermOnClaim <= 8) {
+          const err = new Error("ep") as NodeJS.ErrnoException;
+          err.code = "EPERM";
+          throw err;
+        }
+      },
+    });
+
+    let outcome: ReturnType<typeof tryClaimHookRun>;
+    expect(() => {
+      outcome = tryClaimHookRun(home, "sessionStart", id);
+    }).not.toThrow();
+    expect(outcome!).toBe("claimed");
+    setClaimTestSeamsForTest(undefined);
+  });
+
+  it("r10: persistent EPERM on claim stat returns duplicate after CLAIM_RETRY_MS without throwing", () => {
+    const id = "r10-eperm-persist";
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const claim = join(dir, `sessionStart-${id}.claim`);
+    writeFileSync(claim, "live\n");
+
+    setClaimTestSeamsForTest({
+      snapStatInject: (p) => {
+        if (p === claim || p.startsWith(`${claim}.`)) {
+          const err = new Error("ep") as NodeJS.ErrnoException;
+          err.code = "EPERM";
+          throw err;
+        }
+      },
+    });
+
+    const t0 = Date.now();
+    let outcome: ReturnType<typeof tryClaimHookRun>;
+    expect(() => {
+      outcome = tryClaimHookRun(home, "sessionStart", id);
+    }).not.toThrow();
+    expect(outcome!).toBe("duplicate");
+    const elapsed = Date.now() - t0;
+    expect(elapsed).toBeGreaterThanOrEqual(CLAIM_RETRY_MS - 150);
+    expect(elapsed).toBeLessThan(CLAIM_RETRY_MS + 2_500);
+    setClaimTestSeamsForTest(undefined);
   });
 
   it("r9: EPERM on first generation stat does not create a .reclaim.0 lock", () => {

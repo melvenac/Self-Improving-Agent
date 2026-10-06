@@ -83,6 +83,7 @@ function snapStat(path: string): FileStatSnap | null {
   let lastErr: unknown;
   for (let attempt = 0; attempt < 8; attempt++) {
     try {
+      claimTestSeams?.snapStatInject?.(path);
       const s = statSync(path);
       return { ino: Number(s.ino), mtimeMs: s.mtimeMs, size: s.size };
     } catch (err) {
@@ -141,6 +142,8 @@ export type ClaimTestSeams = {
   sweepAfterRestatBeforeRename?: (claimPath: string) => void;
   /** Test seam: runs before each stat used to name a generation reclaim lock. */
   claimBeforeGenerationStat?: (claimPath: string) => void;
+  /** Test seam: throw EPERM/EBUSY (or other errno) to exercise snapStat / tryClaimHookRun retry paths. */
+  snapStatInject?: (path: string) => void;
 };
 
 let claimTestSeams: ClaimTestSeams | undefined;
@@ -345,6 +348,13 @@ function sleepMs(ms: number): void {
   }
 }
 
+/** Stat errors other than ENOENT on the hook claim path retry inside tryClaimHookRun (Windows EPERM/EBUSY bursts). */
+function isHookClaimStatRetryErr(err: unknown): boolean {
+  const code = errno(err);
+  if (code === "ENOENT") return false;
+  return true;
+}
+
 /**
  * Atomic exclusive claim (wx). A stale claim is reclaimed under a per-generation wx reclaim lock, then wx.
  */
@@ -357,12 +367,16 @@ export function tryClaimHookRun(
   const path = claimPath(home, event, sessionId);
   const deadline = Date.now() + CLAIM_RETRY_MS;
   for (;;) {
-    sweepExpiredClaims(home, ttlMs, path);
-    if (tryCreateClaim(path)) return "claimed";
-    const reclaimed = reclaimStale(path, ttlMs);
-    if (reclaimed === "reclaimed" && tryCreateClaim(path)) return "claimed";
-    if (reclaimed === "duplicate" && claimFileIsFresh(path, ttlMs)) return "duplicate";
-    if (tryCreateClaim(path)) return "claimed";
+    try {
+      sweepExpiredClaims(home, ttlMs, path);
+      if (tryCreateClaim(path)) return "claimed";
+      const reclaimed = reclaimStale(path, ttlMs);
+      if (reclaimed === "reclaimed" && tryCreateClaim(path)) return "claimed";
+      if (reclaimed === "duplicate" && claimFileIsFresh(path, ttlMs)) return "duplicate";
+      if (tryCreateClaim(path)) return "claimed";
+    } catch (err) {
+      if (!isHookClaimStatRetryErr(err)) throw err;
+    }
     if (Date.now() >= deadline) return "duplicate";
     sleepMs(2);
   }
