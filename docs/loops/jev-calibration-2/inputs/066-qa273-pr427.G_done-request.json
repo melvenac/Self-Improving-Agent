@@ -13,7 +13,9 @@
     "test_job": "success",
     "unit_exit": 0
   },
+  "diff_paths_excluded": [],
   "label": "REJECT",
+  "leak_details": [],
   "leak_hits": [],
   "merge_commit": "bda94d198da8ff99bb1b916434c8dd136200e31e",
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",

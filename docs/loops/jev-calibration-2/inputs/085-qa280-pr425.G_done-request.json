@@ -13,7 +13,100 @@
     "test_job": "success",
     "unit_exit": 0
   },
+  "diff_paths_excluded": [],
   "label": "ACCEPT",
+  "leak_details": [
+    {
+      "field": "request.state.requirement_rows[2].observable",
+      "phrase": "accepted",
+      "source": "diff"
+    },
+    {
+      "field": "request.state.requirement_rows[0].observable",
+      "phrase": "reject",
+      "source": "diff"
+    },
+    {
+      "field": "request.state.requirement_rows[1].observable",
+      "phrase": "reject",
+      "source": "diff"
+    },
+    {
+      "field": "request.questions.plan_row:T3.instructions",
+      "phrase": "accepted",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.acceptance[2].observable",
+      "phrase": "accepted",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.tasks[2]",
+      "phrase": "accepted",
+      "source": "plan"
+    },
+    {
+      "field": "request.questions.plan_row:T1.instructions",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "request.questions.plan_row:T2.instructions",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.acceptance[0].observable",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.acceptance[1].observable",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.tasks[0]",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.tasks[1]",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "plan.acceptance[2].observable",
+      "phrase": "accepted",
+      "source": "plan"
+    },
+    {
+      "field": "plan.tasks[2]",
+      "phrase": "accepted",
+      "source": "plan"
+    },
+    {
+      "field": "plan.acceptance[0].observable",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "plan.acceptance[1].observable",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "plan.tasks[0]",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "plan.tasks[1]",
+      "phrase": "reject",
+      "source": "plan"
+    }
+  ],
   "leak_hits": [
     "accepted",
     "reject"

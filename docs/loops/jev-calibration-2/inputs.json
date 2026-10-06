@@ -6,7 +6,7 @@
       "eligible": false,
       "file": "inputs/001-qa250-t-221.G_done-request.json",
       "label": "ACCEPT",
-      "leak_excluded": true
+      "leak_excluded": false
     },
     {
       "case_id": "qa250-t-222",
@@ -30,7 +30,7 @@
       "eligible": true,
       "file": "inputs/004-qa251-t-211.G_done-request.json",
       "label": "ACCEPT",
-      "leak_excluded": true
+      "leak_excluded": false
     },
     {
       "case_id": "qa253-t-209+t-210",
@@ -70,7 +70,7 @@
       "eligible": true,
       "file": "inputs/009-qa255-pr291.G_done-request.json",
       "label": "ACCEPT",
-      "leak_excluded": true
+      "leak_excluded": false
     },
     {
       "case_id": "qa255-pr297",
@@ -278,7 +278,7 @@
       "eligible": true,
       "file": "inputs/035-qa261-pr302.G_done-request.json",
       "label": "ACCEPT",
-      "leak_excluded": false
+      "leak_excluded": true
     },
     {
       "case_id": "qa262-pr295",
@@ -449,14 +449,6 @@
       "leak_excluded": false
     },
     {
-      "case_id": "qa269-pr404",
-      "case_no": 57,
-      "eligible": false,
-      "file": "inputs/057-qa269-pr404.G_done-request.json",
-      "label": null,
-      "leak_excluded": false
-    },
-    {
       "case_id": "qa270-pr412",
       "case_no": 58,
       "eligible": true,
@@ -470,7 +462,7 @@
       "eligible": true,
       "file": "inputs/059-qa270-pr413.G_done-request.json",
       "label": "ACCEPT",
-      "leak_excluded": true
+      "leak_excluded": false
     },
     {
       "case_id": "qa272-pr415",
@@ -574,7 +566,7 @@
       "eligible": true,
       "file": "inputs/072-qa275-pr437.G_done-request.json",
       "label": "REJECT",
-      "leak_excluded": false
+      "leak_excluded": true
     },
     {
       "case_id": "qa277-pr427-r3",
@@ -707,58 +699,640 @@
   ],
   "excluded_leak": [
     {
-      "case_id": "qa250-t-221",
-      "leak_hits": [
-        "accepted"
-      ]
-    },
-    {
       "case_id": "qa250-t-222",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[10].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[11].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[12].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[13].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[14].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[15].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[16].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[17].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[18].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[8].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[9].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[10].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[11].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[12].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[13].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[14].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[15].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[16].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[17].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[18].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[8].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[9].hunks[0]",
+          "phrase": "rejects",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
         "reject",
         "rejects"
       ]
     },
     {
-      "case_id": "qa251-t-211",
-      "leak_hits": [
-        "accepted"
-      ]
-    },
-    {
-      "case_id": "qa255-pr291",
-      "leak_hits": [
-        "rejects"
-      ]
-    },
-    {
       "case_id": "qa257-pr305",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
-        "accepts",
         "reject"
       ]
     },
     {
       "case_id": "qa258-pr289-r3",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[9].observable",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T10.instructions",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accept"
       ]
     },
     {
       "case_id": "qa258-pr290",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[9].observable",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T10.instructions",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
-        "accept",
-        "reject"
+        "accept"
       ]
     },
     {
       "case_id": "qa258-pr294",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[9].observable",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T10.instructions",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accept"
       ]
     },
     {
       "case_id": "qa258-pr299",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[9].observable",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[10].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[11].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[12].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[13].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[14].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[15].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[16].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[17].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[18].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[19].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[20].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[21].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[22].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[23].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[8].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[9].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[10].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[11].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[12].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[13].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[14].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[15].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[16].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[17].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[18].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[19].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[20].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[21].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[22].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[23].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[8].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[9].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T10.instructions",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accept",
         "rejected",
@@ -767,12 +1341,325 @@
     },
     {
       "case_id": "qa258-pr302",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[9].observable",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[10].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[11].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[12].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[13].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[14].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[15].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[16].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[17].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[18].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[19].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[20].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[21].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[22].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[23].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[8].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[9].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T10.instructions",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[9].observable",
+          "phrase": "accept",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[9]",
+          "phrase": "accept",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
-        "accept"
+        "accept",
+        "rejected"
+      ]
+    },
+    {
+      "case_id": "qa261-pr302",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[10].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[11].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[12].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[13].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[14].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[15].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[16].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[17].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[8].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[9].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        }
+      ],
+      "leak_hits": [
+        "rejected"
       ]
     },
     {
       "case_id": "qa262-pr295",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[4].observable",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[14].observable",
+          "phrase": "accepts",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T5.instructions",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[4].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[4]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.questions.plan_row:T15.instructions",
+          "phrase": "accepts",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[14].observable",
+          "phrase": "accepts",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[14]",
+          "phrase": "accepts",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[4].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[4]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[14].observable",
+          "phrase": "accepts",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[14]",
+          "phrase": "accepts",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accepted",
         "accepts"
@@ -780,6 +1667,68 @@
     },
     {
       "case_id": "qa262-pr298",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[4].observable",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[14].observable",
+          "phrase": "accepts",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T5.instructions",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[4].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[4]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.questions.plan_row:T15.instructions",
+          "phrase": "accepts",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[14].observable",
+          "phrase": "accepts",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[14]",
+          "phrase": "accepts",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[4].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[4]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[14].observable",
+          "phrase": "accepts",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[14]",
+          "phrase": "accepts",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accepted",
         "accepts"
@@ -787,114 +1736,742 @@
     },
     {
       "case_id": "qa264-pr371",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "rejection",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
         "rejection"
       ]
     },
     {
       "case_id": "qa265-pr374-r2",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[4].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T5.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "reject"
       ]
     },
     {
       "case_id": "qa265-pr377",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[4].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T5.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "reject"
       ]
     },
     {
       "case_id": "qa265-pr378",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[4].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T5.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "reject"
       ]
     },
     {
       "case_id": "qa265-pr379",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[4].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T5.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "reject"
       ]
     },
     {
       "case_id": "qa265-pr382",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[4].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T5.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[4].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[4]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "reject"
       ]
     },
     {
       "case_id": "qa267-pr391",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[10].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[5].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[6].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[7].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[8].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[9].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
         "rejected"
       ]
     },
     {
       "case_id": "qa268-pr397",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].observable",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[4].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T2.instructions",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[1].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[1]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[1].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[1]",
+          "phrase": "accepted",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accepted"
       ]
     },
     {
       "case_id": "qa269-pr397-r2",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "accepted",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
         "accepted"
       ]
     },
     {
-      "case_id": "qa270-pr413",
+      "case_id": "qa275-pr437",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "rejected",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
-        "accepted"
+        "rejected"
       ]
     },
     {
       "case_id": "qa277-pr442",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "accept",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
         "accept"
       ]
     },
     {
       "case_id": "qa277-pr446",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "reject",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
         "reject"
       ]
     },
     {
       "case_id": "qa277-pr451",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].hunks[0]",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].hunks[0]",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[2].hunks[0]",
+          "phrase": "accept",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[3].hunks[0]",
+          "phrase": "accept",
+          "source": "diff"
+        }
+      ],
       "leak_hits": [
         "accept"
       ]
     },
     {
       "case_id": "qa279-pr427-r4",
+      "leak_details": [
+        {
+          "field": "request.state.plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "rejected"
       ]
     },
     {
       "case_id": "qa279-pr434-r2",
+      "leak_details": [
+        {
+          "field": "request.state.plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "rejected"
       ]
     },
     {
       "case_id": "qa279-pr437-r2",
+      "leak_details": [
+        {
+          "field": "request.state.plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "rejected"
       ]
     },
     {
       "case_id": "qa279-pr444-r3",
+      "leak_details": [
+        {
+          "field": "request.state.plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "rejected"
       ]
     },
     {
       "case_id": "qa279-pr445-r2",
+      "leak_details": [
+        {
+          "field": "request.state.plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.new_capability",
+          "phrase": "rejected",
+          "source": "plan"
+        },
+        {
+          "field": "plan.objective",
+          "phrase": "rejected",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "rejected"
       ]
     },
     {
       "case_id": "qa280-pr425",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[2].observable",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[0].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T3.instructions",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[2].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[2]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.questions.plan_row:T1.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.questions.plan_row:T2.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[0].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[1].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[0]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[1]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[2].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[2]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[0].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[1].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[0]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[1]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accepted",
         "reject"
@@ -902,6 +2479,98 @@
     },
     {
       "case_id": "qa280-pr437-r3",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[2].observable",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[0].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T3.instructions",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[2].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[2]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.questions.plan_row:T1.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.questions.plan_row:T2.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[0].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[1].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[0]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[1]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[2].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[2]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[0].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[1].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[0]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[1]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accepted",
         "reject"
@@ -909,6 +2578,98 @@
     },
     {
       "case_id": "qa280-pr445-r3",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[2].observable",
+          "phrase": "accepted",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[0].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.state.requirement_rows[1].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T3.instructions",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[2].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[2]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "request.questions.plan_row:T1.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.questions.plan_row:T2.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[0].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[1].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[0]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[1]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[2].observable",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[2]",
+          "phrase": "accepted",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[0].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[1].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[0]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[1]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "accepted",
         "reject"
@@ -916,12 +2677,4201 @@
     },
     {
       "case_id": "qa281-pr445-r4",
+      "leak_details": [
+        {
+          "field": "request.state.requirement_rows[0].observable",
+          "phrase": "reject",
+          "source": "diff"
+        },
+        {
+          "field": "request.questions.plan_row:T1.instructions",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.acceptance[0].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "request.state.plan.tasks[0]",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.acceptance[0].observable",
+          "phrase": "reject",
+          "source": "plan"
+        },
+        {
+          "field": "plan.tasks[0]",
+          "phrase": "reject",
+          "source": "plan"
+        }
+      ],
       "leak_hits": [
         "reject"
       ]
     }
   ],
+  "leak_report": {
+    "after_work_diff_filter": {
+      "by_case": [
+        {
+          "case_id": "qa250-t-222",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa257-pr305",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr289-r3",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr290",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr294",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr299",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[19].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[20].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[21].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[22].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[23].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[19].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[20].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[21].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[22].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[23].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr302",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[19].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[20].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[21].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[22].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[23].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa261-pr302",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa262-pr295",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].observable",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T15.instructions",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[14].observable",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[14]",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[14].observable",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[14]",
+              "phrase": "accepts",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa262-pr298",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].observable",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T15.instructions",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[14].observable",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[14]",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[14].observable",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[14]",
+              "phrase": "accepts",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa264-pr371",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr374-r2",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr377",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr378",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr379",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr382",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa267-pr391",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa268-pr397",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T2.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[1].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[1]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[1].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[1]",
+              "phrase": "accepted",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa269-pr397-r2",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa275-pr437",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa277-pr442",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa277-pr446",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa277-pr451",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr427-r4",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr434-r2",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr437-r2",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr444-r3",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr445-r2",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa280-pr425",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[2].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T3.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T1.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T2.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa280-pr437-r3",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[2].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T3.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T1.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T2.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa280-pr445-r3",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[2].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T3.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T1.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T2.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa281-pr445-r4",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T1.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        }
+      ],
+      "excluded_case_count": 32
+    },
+    "before_work_diff_filter": {
+      "by_case": [
+        {
+          "case_id": "qa250-t-221",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa250-t-222",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa251-t-211",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[19].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[20].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[21].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[22].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[23].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa255-pr291",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejects",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa257-pr305",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr289-r3",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr290",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[19].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[20].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[21].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[22].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[23].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[19].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[20].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[21].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[22].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[23].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr294",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr299",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[19].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[20].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[21].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[22].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[23].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[11].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[12].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[13].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[15].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[16].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[17].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[18].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[19].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[20].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[21].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[22].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[23].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa258-pr302",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[9].observable",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T10.instructions",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[9].observable",
+              "phrase": "accept",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[9]",
+              "phrase": "accept",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa262-pr295",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].observable",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T15.instructions",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[14].observable",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[14]",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[14].observable",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[14]",
+              "phrase": "accepts",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa262-pr298",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[14].observable",
+              "phrase": "accepts",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T15.instructions",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[14].observable",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[14]",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[14].observable",
+              "phrase": "accepts",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[14]",
+              "phrase": "accepts",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa264-pr371",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejection",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr374-r2",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr377",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr378",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr379",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa265-pr382",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[4].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T5.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[4].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[4]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa267-pr391",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[10].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[5].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[6].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[7].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[8].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[9].hunks[0]",
+              "phrase": "rejected",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa268-pr397",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[4].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T2.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[1].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[1]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[1].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[1]",
+              "phrase": "accepted",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa269-pr397-r2",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa270-pr413",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accepted",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa277-pr442",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa277-pr446",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "reject",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa277-pr451",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[2].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[3].hunks[0]",
+              "phrase": "accept",
+              "source": "diff"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr427-r4",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr434-r2",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr437-r2",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr444-r3",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa279-pr445-r2",
+          "hits": [
+            {
+              "field": "request.state.plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.new_capability",
+              "phrase": "rejected",
+              "source": "plan"
+            },
+            {
+              "field": "plan.objective",
+              "phrase": "rejected",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa280-pr425",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[2].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T3.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T1.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T2.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa280-pr437-r3",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[2].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T3.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T1.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T2.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa280-pr445-r3",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[2].observable",
+              "phrase": "accepted",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[0].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.state.requirement_rows[1].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T3.instructions",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T1.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.questions.plan_row:T2.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[2].observable",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[2]",
+              "phrase": "accepted",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[1].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[1]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        },
+        {
+          "case_id": "qa281-pr445-r4",
+          "hits": [
+            {
+              "field": "request.state.requirement_rows[0].observable",
+              "phrase": "reject",
+              "source": "diff"
+            },
+            {
+              "field": "request.questions.plan_row:T1.instructions",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "request.state.plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.acceptance[0].observable",
+              "phrase": "reject",
+              "source": "plan"
+            },
+            {
+              "field": "plan.tasks[0]",
+              "phrase": "reject",
+              "source": "plan"
+            }
+          ]
+        }
+      ],
+      "excluded_case_count": 34
+    }
+  },
   "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
-  "refused": [],
+  "refused": [
+    {
+      "case_id": "qa269-pr404",
+      "reason": "empty-diff-after-filter"
+    }
+  ],
   "split_seed": "jev-cal-2-split-1"
 }

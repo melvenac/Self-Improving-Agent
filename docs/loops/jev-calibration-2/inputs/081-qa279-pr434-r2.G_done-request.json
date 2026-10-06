@@ -13,7 +13,30 @@
     "test_job": "success",
     "unit_exit": 0
   },
+  "diff_paths_excluded": [],
   "label": "ACCEPT",
+  "leak_details": [
+    {
+      "field": "request.state.plan.new_capability",
+      "phrase": "rejected",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.objective",
+      "phrase": "rejected",
+      "source": "plan"
+    },
+    {
+      "field": "plan.new_capability",
+      "phrase": "rejected",
+      "source": "plan"
+    },
+    {
+      "field": "plan.objective",
+      "phrase": "rejected",
+      "source": "plan"
+    }
+  ],
   "leak_hits": [
     "rejected"
   ],

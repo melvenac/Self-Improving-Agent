@@ -4,7 +4,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { HERE, REPO, readJson, sha256, writeJson } from "./lib.mjs";
-import { isEligibleCase, POLICY_REL } from "./inputs.mjs";
+import { assertNoLeakExcludedInRunlistEntries, isEligibleCase, POLICY_REL } from "./inputs.mjs";
 
 export function runManifest() {
   const split = JSON.parse(readFileSync(join(HERE, "../jev-calibration-2-split.json"), "utf-8"));
@@ -24,7 +24,6 @@ export function runManifest() {
       label: c.label,
       input: `docs/loops/jev-calibration-2/${b.file}`,
       policy: POLICY_REL,
-      leak_excluded: b.leak_excluded ?? false,
       merge_commit: c.merge_commit,
       scored_sha: c.candidate_sha,
       base_sha: c.base_sha,
@@ -33,23 +32,42 @@ export function runManifest() {
   }
 
   const heldSet = new Set(split.held_out.case_ids);
+  const runnable = (id) => {
+    const b = builtMap.get(id);
+    const c = byId.get(id);
+    return b && c && !b.leak_excluded;
+  };
   const devIds = split.development.case_ids.filter((id) => {
     const c = byId.get(id);
-    return c && isEligibleCase(c) && !heldSet.has(id);
+    return c && isEligibleCase(c) && !heldSet.has(id) && runnable(id);
   });
-  const heldout = split.held_out.case_ids.map((id) => entry(id, "heldout"));
+  const heldoutIds = split.held_out.case_ids.filter(runnable);
+  const heldout = heldoutIds.map((id) => entry(id, "heldout"));
   const dev = devIds.map((id) => entry(id, "dev"));
-  if (heldout.length !== split.held_out.case_ids.length) {
-    throw new Error(`runlist heldout: expected ${split.held_out.case_ids.length}, got ${heldout.length}`);
-  }
   for (const id of heldSet) {
     if (devIds.includes(id)) throw new Error(`held-out ${id} also in dev phase`);
   }
+  assertNoLeakExcludedInRunlistEntries([...dev, ...heldout]);
+
+  const countByLabel = (rows) => ({
+    total: rows.length,
+    ACCEPT: rows.filter((r) => r.label === "ACCEPT").length,
+    REJECT: rows.filter((r) => r.label === "REJECT").length,
+  });
 
   const runlist = { policy: POLICY_REL, phases: { dev, heldout } };
   writeJson("runlist.json", runlist);
 
-  const SCRIPTS = ["lib.mjs", "collect.mjs", "inputs.mjs", "manifest.mjs", "score.mjs", "dispatch-derive.mjs", "leak.mjs"];
+  const SCRIPTS = [
+    "lib.mjs",
+    "collect.mjs",
+    "inputs.mjs",
+    "manifest.mjs",
+    "score.mjs",
+    "dispatch-derive.mjs",
+    "leak.mjs",
+    "diff-filter.mjs",
+  ];
   const DATA = ["collect.json", "inputs.json", "runlist.json", "pool.json"];
   const fileHash = (rel) => sha256(readFileSync(join(HERE, rel)));
   const policyHash = sha256(readFileSync(join(REPO, POLICY_REL)));
@@ -72,8 +90,14 @@ export function runManifest() {
       inputs_built: inputs.built.length,
       inputs_refused: inputs.refused.length,
       inputs_leak_excluded: inputs.excluded_leak.length,
+      leak_excluded_before_work_diff_filter: inputs.leak_report?.before_work_diff_filter?.excluded_case_count ?? null,
+      leak_excluded_after_work_diff_filter: inputs.leak_report?.after_work_diff_filter?.excluded_case_count ?? null,
       phase_dev: dev.length,
       phase_heldout: heldout.length,
+      phase_dev_by_label: countByLabel(dev),
+      phase_heldout_by_label: countByLabel(heldout),
+      heldout_split_minus_leak: split.held_out.case_ids.length - heldout.length,
+      dev_eligible_minus_leak: split.development.eligible - dev.length,
     },
     hashes,
   });

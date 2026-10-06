@@ -5,7 +5,14 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { HERE, REPO, POLICY_REL, git, readJson, stable, writeJson } from "./lib.mjs";
 import { derivePlanFromDispatch } from "./dispatch-derive.mjs";
-import { leakHitsFromPlan, leakHitsFromRequest } from "./leak.mjs";
+import { filterPathList, filterUnifiedDiff } from "./diff-filter.mjs";
+import {
+  leakHitsDetailedFromPlan,
+  leakHitsDetailedFromRequest,
+  leakHitsFromPlan,
+  leakHitsFromRequest,
+  mergeLeakDetails,
+} from "./leak.mjs";
 import { validatePlan } from "../../../open-brain/src/harness/schema.ts";
 import { buildDoneGateQuestions, buildJevRequest } from "../../../open-brain/src/harness/gate.ts";
 import { committedPaths } from "../../../open-brain/src/harness/git.ts";
@@ -27,8 +34,10 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
   const candidate = c.candidate_sha;
   if (!base || !candidate) return { refuse: "missing-sha" };
   if (base === candidate) return { refuse: "empty-diff-range" };
-  const diff = gitFn(["diff", `${base}..${candidate}`, "-U3"], { allowFail: true }) ?? "";
-  if (diff.trim() === "") return { refuse: "empty-diff" };
+  const rawDiff = gitFn(["diff", `${base}..${candidate}`, "-U3"], { allowFail: true }) ?? "";
+  if (rawDiff.trim() === "") return { refuse: "empty-diff" };
+  const { diff, excluded_paths: diff_paths_excluded } = filterUnifiedDiff(rawDiff);
+  if (diff.trim() === "") return { refuse: "empty-diff-after-filter", diff_paths_excluded };
   const planText =
     (c.plan_blob ? gitFn(["cat-file", "-p", c.plan_blob], { allowFail: true }) : null) ??
     (c.plan_path && c.dispatch_commit ? gitFn(["show", `${c.dispatch_commit}:${c.plan_path}`], { allowFail: true }) : null);
@@ -52,7 +61,8 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
   };
   let diffstat;
   try {
-    diffstat = committedPaths(repoRoot, base, candidate);
+    const allPaths = committedPaths(repoRoot, base, candidate);
+    diffstat = filterPathList(allPaths).paths;
   } catch {
     return { refuse: "diffstat-failed" };
   }
@@ -85,10 +95,32 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
   const request = buildJevRequest(payload);
   const leak_hits = leakHitsFromRequest(request);
   const plan_leak_hits = leakHitsFromPlan(plan);
+  const leak_details = mergeLeakDetails(leakHitsDetailedFromRequest(request), leakHitsDetailedFromPlan(plan));
+
+  let leak_before_filter = null;
+  if (rawDiff !== diff) {
+    const fullHunks = rawDiff.slice(0, 16_000);
+    const fullRows = plan.acceptance.map((row) => ({
+      id: row.id,
+      observable: row.observable,
+      hunks: fullHunks ? [fullHunks] : [],
+    }));
+    const fullPayload = {
+      ...payload,
+      context: { ...payload.context, requirement_rows: fullRows },
+    };
+    const fullRequest = buildJevRequest(fullPayload);
+    leak_before_filter = mergeLeakDetails(leakHitsDetailedFromRequest(fullRequest), leakHitsDetailedFromPlan(plan));
+  } else {
+    leak_before_filter = leak_details;
+  }
+
   return {
     request,
     leak_hits,
     plan_leak_hits,
+    leak_details,
+    leak_before_filter,
     meta: {
       case_id: c.case_id,
       case_no: c.case_no,
@@ -98,6 +130,7 @@ export function buildGDoneRequestForCase(c, policy, { gitFn = git, repoRoot = RE
       merge_commit: c.merge_commit,
       policy: POLICY_REL,
       checks_hint: hint,
+      diff_paths_excluded,
     },
   };
 }
@@ -115,6 +148,8 @@ export function runInputs() {
   const built = [];
   const refused = [];
   const excluded_leak = [];
+  const leak_table_before = [];
+  const leak_table_after = [];
 
   for (const case_id of [...caseIds].sort()) {
     const c = byId.get(case_id);
@@ -128,9 +163,22 @@ export function runInputs() {
       continue;
     }
     const leak_hits = [...new Set([...(r.leak_hits ?? []), ...(r.plan_leak_hits ?? [])])].sort();
-    if (leak_hits.length > 0) excluded_leak.push({ case_id, leak_hits });
+    const beforeDetails = r.leak_before_filter ?? [];
+    const afterDetails = r.leak_details ?? [];
+    if (beforeDetails.length > 0) {
+      leak_table_before.push({ case_id, hits: beforeDetails });
+    }
+    if (afterDetails.length > 0) {
+      leak_table_after.push({ case_id, hits: afterDetails });
+      excluded_leak.push({ case_id, leak_hits, leak_details: afterDetails });
+    } else if (leak_hits.length > 0) {
+      excluded_leak.push({ case_id, leak_hits });
+    }
     const file = `${String(c.case_no).padStart(3, "0")}-${c.case_id}.G_done-request.json`;
-    writeFileSync(join(dir, file), stable({ ...r.meta, leak_hits, request: r.request }));
+    writeFileSync(
+      join(dir, file),
+      stable({ ...r.meta, leak_hits, leak_details: afterDetails, request: r.request }),
+    );
     built.push({
       case_id,
       case_no: c.case_no,
@@ -141,12 +189,30 @@ export function runInputs() {
     });
   }
   built.sort((a, b) => a.case_no - b.case_no);
-  const out = { built, refused, excluded_leak, policy: POLICY_REL, split_seed: split.seed };
+  const out = {
+    built,
+    refused,
+    excluded_leak,
+    leak_report: {
+      before_work_diff_filter: { excluded_case_count: leak_table_before.length, by_case: leak_table_before },
+      after_work_diff_filter: { excluded_case_count: leak_table_after.length, by_case: leak_table_after },
+    },
+    policy: POLICY_REL,
+    split_seed: split.seed,
+  };
   writeJson("inputs.json", out);
   console.log(
-    `inputs: ${built.length} built, ${refused.length} refused, ${excluded_leak.length} leak-excluded (split ${caseIds.size} case ids)`,
+    `inputs: ${built.length} built, ${refused.length} refused, leak-excluded before filter ${leak_table_before.length} after ${leak_table_after.length} (split ${caseIds.size} case ids)`,
   );
   return out;
+}
+
+/** @param {{ leak_excluded?: boolean }[]} built */
+export function assertNoLeakExcludedInRunlistEntries(entries) {
+  const bad = entries.filter((e) => e.leak_excluded);
+  if (bad.length > 0) {
+    throw new Error(`runlist includes ${bad.length} leak-excluded case(s): ${bad.map((e) => e.case_id).join(", ")}`);
+  }
 }
 
 const mainScript = [process.argv[1], process.argv[2]].find((a) => a?.endsWith("inputs.mjs"));

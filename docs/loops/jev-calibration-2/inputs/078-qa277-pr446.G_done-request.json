@@ -13,7 +13,30 @@
     "test_job": "success",
     "unit_exit": 0
   },
+  "diff_paths_excluded": [],
   "label": "ACCEPT",
+  "leak_details": [
+    {
+      "field": "request.state.requirement_rows[0].hunks[0]",
+      "phrase": "reject",
+      "source": "diff"
+    },
+    {
+      "field": "request.state.requirement_rows[1].hunks[0]",
+      "phrase": "reject",
+      "source": "diff"
+    },
+    {
+      "field": "request.state.requirement_rows[2].hunks[0]",
+      "phrase": "reject",
+      "source": "diff"
+    },
+    {
+      "field": "request.state.requirement_rows[3].hunks[0]",
+      "phrase": "reject",
+      "source": "diff"
+    }
+  ],
   "leak_hits": [
     "reject"
   ],

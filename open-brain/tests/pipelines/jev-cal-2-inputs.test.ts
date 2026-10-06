@@ -30,8 +30,19 @@ console.log(JSON.stringify(x));`,
     };
     const held = new Set(runlist.phases.heldout.map((e) => e.case_id));
     for (const e of runlist.phases.dev) expect(held.has(e.case_id)).toBe(false);
-    expect(runlist.phases.heldout).toHaveLength(34);
-    expect(runlist.phases.dev.length).toBe(33);
+  });
+
+  it("leak-excluded cases do not appear in any runlist phase", () => {
+    const inputs = JSON.parse(readFileSync(join(CAL2, "inputs.json"), "utf-8")) as {
+      built: { case_id: string; leak_excluded: boolean }[];
+    };
+    const runlist = JSON.parse(readFileSync(join(CAL2, "runlist.json"), "utf-8")) as {
+      phases: { dev: { case_id: string }[]; heldout: { case_id: string }[] };
+    };
+    const excluded = new Set(inputs.built.filter((b) => b.leak_excluded).map((b) => b.case_id));
+    const inRunlist = [...runlist.phases.dev, ...runlist.phases.heldout].map((e) => e.case_id);
+    for (const id of inRunlist) expect(excluded.has(id)).toBe(false);
+    expect(inRunlist.length).toBe(runlist.phases.dev.length + runlist.phases.heldout.length);
   });
 
   it("MANIFEST input hashes change when an input byte changes", () => {

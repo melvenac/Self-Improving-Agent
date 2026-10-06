@@ -13,7 +13,40 @@
     "test_job": "success",
     "unit_exit": 0
   },
+  "diff_paths_excluded": [],
   "label": "ACCEPT",
+  "leak_details": [
+    {
+      "field": "request.state.requirement_rows[4].observable",
+      "phrase": "reject",
+      "source": "diff"
+    },
+    {
+      "field": "request.questions.plan_row:T5.instructions",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.acceptance[4].observable",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "request.state.plan.tasks[4]",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "plan.acceptance[4].observable",
+      "phrase": "reject",
+      "source": "plan"
+    },
+    {
+      "field": "plan.tasks[4]",
+      "phrase": "reject",
+      "source": "plan"
+    }
+  ],
   "leak_hits": [
     "reject"
   ],
