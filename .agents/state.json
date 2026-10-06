@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 339,
+  "revision": 340,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "s161 batch landed: 9 PRs merged on Aaron's word (#421 #424 #436 #441 #442 #446 #427 #434 #444) plus #443. Left: #451 (T-187; checks.ts conflict, infra resolving), #437 (P2-7, QA 279 REJECT), #445 (T-156, QA 279 REJECT), #425 (after #437). Then close T-235.",
-    "since_session": 161
+    "text": "s162: Jev calibration 2 round 2 is live (QA 285 dev phase on the laptop); freeze the policy from its dev evidence, then QA 286 on the held-out 34. #437 r4 (forge) to QA 284 with #472 (guard r2); then #425 after #437. Waker restarts after any hub swap need planner-confirmed dlv until A2A T-104/T-113.",
+    "since_session": 162
   },
   "tasks": [
     {
@@ -83,13 +83,13 @@
       "id": "T-025",
       "title": "Reconcile the experience `type` field across three sources",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 48,
-      "closed_session": null,
+      "closed_session": 162,
       "supersedes": null,
-      "note": "`.agents/SYSTEM/ENTITIES.md` documents `type: gotcha | pattern | decision | fix | optimization`; `vault-writer.ts` emits no `type` at all except `writeFailure`'s hardcoded `type: failure`; live vault notes carry one. Deliberately left out of the v0.10.0 work so the inconsistency stayed visible rather than being buried inside a feature. Worth noting while fixing it: **all five documented types are events** — there is no state type, which is why state facts get written as experiences and never replaced. No `/sync` check validates experience frontmatter today, so whatever is decided should come with one. (Session 48) — Session 161: RULED B2: fact_kind is the taxonomy; frontmatter type is an optional one-token free label, neither retired nor enumerated. ENTITIES.md updated (#448 merged, docs/loops/t025-ruling.md). effectiveKind was removed in e05ad9a7 (Loop 10), so T-022's gate is only the count of recorded fact_kind labels; the schema cannot tell an explicit ob_store kind from another writer. REMAINING: the /sync frontmatter check (rows R1-R5 in the ruling doc), queued until #424 and #442 merge (sync checks.ts).",
+      "note": "`.agents/SYSTEM/ENTITIES.md` documents `type: gotcha | pattern | decision | fix | optimization`; `vault-writer.ts` emits no `type` at all except `writeFailure`'s hardcoded `type: failure`; live vault notes carry one. Deliberately left out of the v0.10.0 work so the inconsistency stayed visible rather than being buried inside a feature. Worth noting while fixing it: **all five documented types are events** — there is no state type, which is why state facts get written as experiences and never replaced. No `/sync` check validates experience frontmatter today, so whatever is decided should come with one. (Session 48) — Session 161: RULED B2: fact_kind is the taxonomy; frontmatter type is an optional one-token free label, neither retired nor enumerated. ENTITIES.md updated (#448 merged, docs/loops/t025-ruling.md). effectiveKind was removed in e05ad9a7 (Loop 10), so T-022's gate is only the count of recorded fact_kind labels; the schema cannot tell an explicit ob_store kind from another writer. REMAINING: the /sync frontmatter check (rows R1-R5 in the ruling doc), queued until #424 and #442 merge (sync checks.ts). — Session 162: the /sync experience-frontmatter check (ruling B2, Follow-up R1-R5) built by cursor-builder as #466; QA 282 REJECTED r1 (existsSync passed an unreadable vault), QA 283 ACCEPTED r2 b4ad38a3 (qa/s162d-report 29a398b3); merged on Aaron's word 2026-10-06 'Merge both': master b8ab0f04. Includes a deliberate vault-writer change: a BOM-prefixed note's frontmatter is now read.",
       "note_by": null,
-      "closed_rev": null
+      "closed_rev": 340
     },
     {
       "id": "T-031",
@@ -399,12 +399,13 @@
       "id": "T-156",
       "title": "A scan that matches the sentence forbidding a thing, as though it were the thing (G-040): every source-text scan in the harness tests must be validated against a known positive and a known negative in the same test, or replaced by a parser",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 64,
-      "closed_session": null,
+      "closed_session": 162,
       "supersedes": null,
-      "note": "From G-040 (opened session 65). The 'no git push in harness source' scan fired on the DENIED_SUBCOMMANDS constant; the 'no shell spawn' scan fired on a doc comment. Both were caught because the scan went red while someone was looking; the same flaw in the other direction — a pattern too narrow to match the real thing — is a green that means nothing. Same family as the command-names / command-tool-names checks in /sync. Acceptance: each such scan has a fixture that MUST match and one that MUST NOT, both asserted; or the scan is a parse over the module graph. Sits in slice two's plan unless Aaron sequences otherwise.",
-      "closed_rev": null
+      "note": "From G-040 (opened session 65). The 'no git push in harness source' scan fired on the DENIED_SUBCOMMANDS constant; the 'no shell spawn' scan fired on a doc comment. Both were caught because the scan went red while someone was looking; the same flaw in the other direction — a pattern too narrow to match the real thing — is a green that means nothing. Same family as the command-names / command-tool-names checks in /sync. Acceptance: each such scan has a fixture that MUST match and one that MUST NOT, both asserted; or the scan is a parse over the module graph. Sits in slice two's plan unless Aaron sequences otherwise. — Session 162: #445 r4 1e21deae ACCEPTED by QA 281 (qa/s162b-report ae2baca7) after QA 279/280 rejects; merged under Aaron's P2 rule (tests and docs only, path list posted on the PR): master ecbfb169.",
+      "note_by": null,
+      "closed_rev": 340
     },
     {
       "id": "T-157",
@@ -758,12 +759,13 @@
       "id": "T-187",
       "title": "/sync rebuilds the GitNexus index when it is behind (D-049): plain /sync runs analyze where a .gitnexus exists and the indexed SHA is not HEAD, then verifies the new SHA; sync --check stays read-only; a tree with no index stays SKIP (never PASS)",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 100,
-      "closed_session": null,
+      "closed_session": 162,
       "supersedes": null,
-      "note": "Session 100, Aaron's D-049. Build notes: T-055 (incremental analyze is unreliable here) and G-043 (gitnexus clean deletes nothing without --force) bear on the command used; .gitnexusrc noStats:true keeps tracked files clean; the check must prove it looked (the SHA read back after the rebuild). The main checkout's index is 98 commits behind its own HEAD, which is itself 111 behind master (T-172).",
-      "closed_rev": null
+      "note": "Session 100, Aaron's D-049. Build notes: T-055 (incremental analyze is unreliable here) and G-043 (gitnexus clean deletes nothing without --force) bear on the command used; .gitnexusrc noStats:true keeps tracked files clean; the check must prove it looked (the SHA read back after the rebuild). The main checkout's index is 98 commits behind its own HEAD, which is itself 111 behind master (T-172). — Session 162: #451 merged on Aaron's word (s161 'merge'; reconfirmed in the planner window 2026-10-05 'Yes, merge when green'), after infra's conflict merge cc14c5a7 read with --remerge-diff and update-branch b6e5200e, CI green: master 27dd1e77.",
+      "note_by": null,
+      "closed_rev": 340
     },
     {
       "id": "T-188",
@@ -1304,14 +1306,15 @@
     {
       "id": "T-225",
       "title": "Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text",
-      "priority": "P2",
+      "priority": "P1",
       "status": "open",
       "opened_session": 157,
       "closed_session": null,
       "supersedes": null,
-      "note": "From QA 252 (docs/loops/jev-calibration-1.md, Recommendation and Findings 1-2) and D-100. Calibration 1 measured that the done-gate as built cannot proceed on anything (diff_matches_plan_min 0.7 is above 0 of 36 ACCEPT answers) and that fitted cuts do not transfer (0.682 headline, 0.388 leak group). Next calibration needs: (1) G_qa requests that do not carry the E_t met/unmet status; (2) cases with real checks so (a) differs from (b); (3) a held-out set before any threshold is proposed for use; (4) score.mjs drivers() matching 'no deterministic checks were supplied' (T-222 F6 text). No policy or threshold change until then.",
+      "note": "From QA 252 (docs/loops/jev-calibration-1.md, Recommendation and Findings 1-2) and D-100. Calibration 1 measured that the done-gate as built cannot proceed on anything (diff_matches_plan_min 0.7 is above 0 of 36 ACCEPT answers) and that fitted cuts do not transfer (0.682 headline, 0.388 leak group). Next calibration needs: (1) G_qa requests that do not carry the E_t met/unmet status; (2) cases with real checks so (a) differs from (b); (3) a held-out set before any threshold is proposed for use; (4) score.mjs drivers() matching 'no deterministic checks were supplied' (T-222 F6 text). No policy or threshold change until then. — Session 162: calibration 2 under way on Aaron's 'Keep calibrating until jev is useful' (no call cap). Built: #463 (per-row question, G_qa without statuses), #465 (collector by Scout: 88 cases, base fixed, CI facts), #470 (inputs, record-path filter, verdict-form leak detector, runner sending the exact request). Split frozen 3b122586. QA 285 (development phase, 33 live calls, laptop) launched 06:16Z 2026-10-06. Next: planner freezes the policy from QA 285's dev evidence only, then QA 286 runs the held-out 34 once. #463/#465/#470 are stacked PRs, not merged.",
       "note_by": [
-        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff"
+        "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
+        "b8fa00fd-5821-40b3-b472-eec717bcf49a"
       ],
       "closed_rev": null
     },
@@ -1454,11 +1457,12 @@
       "opened_session": 159,
       "closed_session": null,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03). — Session 159 PHASE 0 PROGRESS: the seat is on the QA PC, not the desktop (brief corrected #353). Split agreed by clark with Relay: T-235 owns QA PC Cursor setup; Relay owns hub-talk, codes and rooms; the planner owns hub-partner-seats.json. setup.mjs failed on the QA PC ('Cannot find open-brain/': URL pathname kept the space in 'Aaron Melven' as %20); fixed by #354 (merge 842e4692, red-first test, Aaron's 'Merge #354' via clark). Clark moved the QA PC serving tree to 842e4692, rebuilt and reran setup; the planner read back by SSH: hooks.json sessionStart --ide cursor, mcp.json server path, 4 commands. Still to do: Aaron relaunches agent from PowerShell (Relay: Git Bash start triggers T-046); cursor-builder key move desktop->QA PC then --rotate-key (option A, chosen by the planner; the name already exists on the hub, so a code cannot be used), on Aaron's word to Relay. Aaron skipped renaming the QA PC profile, so further space bugs are fixed as found. — Session 159 RULING on Phase 1 (PR #358, 126ac04b + 082ddf01 rows A-D): NOT ACCEPTED, round 2 owed (hub turn 80). Rows 1 and 8 are live-measured. Rows 3, 4, 5, 6 and 9, and part of 2, were read from config (registered, not FIRED). Round 2 = one scratch-project experiment outside every checkout: a .cursor/hooks.json logger on every CLI event (event, pid/ppid, SHELL/ComSpec, payload keys only), then one shell command, one file read and one MCP call, with a normal exit (-p and interactive); the ::claude/::cursor slot before and after; the parent chains of the hook and of the MCP server (T-003); a scratch-project command resolving; setup.mjs twice under a scratch HOME (skip unless the real ~ is provably untouched). Same branch; post the new head. Builder's two untracked hub-copy files (hub-phase1-done.txt, hub-turn72-greeting.txt): delete. Phase 2 waits only on the planner's ruling (usage is GREEN; dev unparked by Aaron ~01:10 CDT). Standing: TASK: line on every work reply (turn 81). The seat's session was cleared and it asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9), so this note is the durable copy. Also seen: sia-forge (grok) had read nothing in its room since 2026-09-29, so its /start never ran the hub inbox step; that is an audit row candidate. — CORRECTION (session 159): the 'seat asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9)' line above is WRONG. That bridge was the OLD Claude Code sia-builder on the QA PC, being closed (clark). It is not the T-235 seat; the only T-235 seat is the Cursor one (hub cursor-builder). The planner sent the old seat a cancel; it changed nothing (tree read back by SSH), and Aaron's permission let the planner kill it over SSH (PID 7372, without SessionEnd). Its #270/#272 are merged. — Session 159: P2-1 #372 (sia-builder CC Sonnet on the QA PC, 4240a8be) MERGED as d26570bd on Aaron's word after QA 264: rows ACCEPT except 7c, which QA's permission layer refused. The planner ran row 7c on the desktop under a scratch HOME: PASS (docs/loops/qa-264-row7c-planner.md, #380). ACCEPTANCE STILL OPEN: the QA PC serving tree moves to master, setup.mjs is re-run there, and `cursor-agent -p` calling ob_stats must succeed. That is blocked today by the QA PC's cursor-agent stream failure (2026.10.01-e373342: 'Connection lost ... WritableIterable is closed'; the desktop's 2026.09.28 works; clark suspects a regression in that build). P2-2 (the hook-label re-measure) is blocked by the same failure. — Session 159 DEPLOY (clark, on Aaron's 'Clark runs it', ~05:1x CDT): the desktop and QA PC serving trees moved to 5a7bf167, rebuilt (build-info 5a7bf167) and re-ran setup.mjs. Cursor mcp.json now points at C:\\Program Files\\nodejs\\node.exe on both machines, and 1 stale sessionStart entry was upgraded on each. #372 NON-CURSOR ACCEPTANCE (QA PC, clark's read-back): the configured command is absolute, Node v22.23.3, and it loads open-brain's better-sqlite3 ('better-sqlite3 OK'). The planner accepts this for P2-1. The cursor-agent ob_stats check is deferred until a Cursor CLI connects on the QA PC (Aaron: no cursor agents available; the QA PC stream failure is machine-specific per clark). P2-2 is still blocked on the same. — Session 160: Cursor seats live on the QA PC (wakers, new rooms). cursor-builder measured P2-1 (ob_stats works from a Cursor MCP session; mcp.json uses absolute node) and P2-2 (all hook events fire labelled under cursor-agent; sessionEnd fires even on a failed -p exit; stop never fired): docs/loops/t235-p2-2-measure.md, #419 merged. OPEN Phase 2 per builder: P2-3 T-003 proven session id (M, dispatched to cursor-builder, plan first); P2-4 sessionEnd registration via setup.mjs (M, dispatched to forge); P2-5 recall trigger on postToolUse (M-L); P2-6 task/test/harness-audit Cursor commands (S, dispatched to cursor-infra); P2-7 dedupe Claude hooks under Cursor (M). — Session 161: merged on Aaron's word: P2-3 #427 r4 (bda94d19; walk from ppid, host matched by versions/<ver>/index.js, single CIM table that fails closed, forged-table env seam removed), P2-5 #436 (d4a54f0e; conflict with #424 resolved mechanically and read with remerge-diff), P2-6 #424 r2 (5869d9ba). OPEN: P2-7 #437 r2 3dfa2424 (QA 279 REJECT: the stale reclaim still double-claims at 8 concurrent claimers, 0/100 at 2 and 3) and P2-4 #425 9fcb97ca (accepted; it must merge AFTER #437 or every Cursor session runs cli-session-end twice). The classifier refused merging the rejected #437 and #445 on Aaron's 'All 13'; they are Aaron's to merge or fix.",
+      "note": "AUTHORITY: Aaron in the planner's window, session 159, 2026-10-03: 'We haven't focused on getting sia in cursor parity with cc. Let's have you do that, I have sia-builder open in cursor using composer 2.5.' This lifts the park for T-235 only. Brief: docs/loops/cursor-parity-brief.md. Seat: sia-builder (Composer 2.5, hub cursor-builder). Phase 1 = live-measured audit (docs-only PR), then a planner ruling; Phase 2 = ruled fixes under D-060 rules. Known at open: setup.mjs gives Cursor MCP + sessionStart + 4 commands only; no SessionEnd (cli-session-end.js) and no recall trigger for Cursor; the QA PC had no ~/.cursor wiring at all (planner SSH read, 2026-10-03). — Session 159 PHASE 0 PROGRESS: the seat is on the QA PC, not the desktop (brief corrected #353). Split agreed by clark with Relay: T-235 owns QA PC Cursor setup; Relay owns hub-talk, codes and rooms; the planner owns hub-partner-seats.json. setup.mjs failed on the QA PC ('Cannot find open-brain/': URL pathname kept the space in 'Aaron Melven' as %20); fixed by #354 (merge 842e4692, red-first test, Aaron's 'Merge #354' via clark). Clark moved the QA PC serving tree to 842e4692, rebuilt and reran setup; the planner read back by SSH: hooks.json sessionStart --ide cursor, mcp.json server path, 4 commands. Still to do: Aaron relaunches agent from PowerShell (Relay: Git Bash start triggers T-046); cursor-builder key move desktop->QA PC then --rotate-key (option A, chosen by the planner; the name already exists on the hub, so a code cannot be used), on Aaron's word to Relay. Aaron skipped renaming the QA PC profile, so further space bugs are fixed as found. — Session 159 RULING on Phase 1 (PR #358, 126ac04b + 082ddf01 rows A-D): NOT ACCEPTED, round 2 owed (hub turn 80). Rows 1 and 8 are live-measured. Rows 3, 4, 5, 6 and 9, and part of 2, were read from config (registered, not FIRED). Round 2 = one scratch-project experiment outside every checkout: a .cursor/hooks.json logger on every CLI event (event, pid/ppid, SHELL/ComSpec, payload keys only), then one shell command, one file read and one MCP call, with a normal exit (-p and interactive); the ::claude/::cursor slot before and after; the parent chains of the hook and of the MCP server (T-003); a scratch-project command resolving; setup.mjs twice under a scratch HOME (skip unless the real ~ is provably untouched). Same branch; post the new head. Builder's two untracked hub-copy files (hub-phase1-done.txt, hub-turn72-greeting.txt): delete. Phase 2 waits only on the planner's ruling (usage is GREEN; dev unparked by Aaron ~01:10 CDT). Standing: TASK: line on every work reply (turn 81). The seat's session was cleared and it asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9), so this note is the durable copy. Also seen: sia-forge (grok) had read nothing in its room since 2026-09-29, so its /start never ran the hub inbox step; that is an audit row candidate. — CORRECTION (session 159): the 'seat asked over a Claude bridge (bridge:session_01SnCWfePkByGExcdQePKaL9)' line above is WRONG. That bridge was the OLD Claude Code sia-builder on the QA PC, being closed (clark). It is not the T-235 seat; the only T-235 seat is the Cursor one (hub cursor-builder). The planner sent the old seat a cancel; it changed nothing (tree read back by SSH), and Aaron's permission let the planner kill it over SSH (PID 7372, without SessionEnd). Its #270/#272 are merged. — Session 159: P2-1 #372 (sia-builder CC Sonnet on the QA PC, 4240a8be) MERGED as d26570bd on Aaron's word after QA 264: rows ACCEPT except 7c, which QA's permission layer refused. The planner ran row 7c on the desktop under a scratch HOME: PASS (docs/loops/qa-264-row7c-planner.md, #380). ACCEPTANCE STILL OPEN: the QA PC serving tree moves to master, setup.mjs is re-run there, and `cursor-agent -p` calling ob_stats must succeed. That is blocked today by the QA PC's cursor-agent stream failure (2026.10.01-e373342: 'Connection lost ... WritableIterable is closed'; the desktop's 2026.09.28 works; clark suspects a regression in that build). P2-2 (the hook-label re-measure) is blocked by the same failure. — Session 159 DEPLOY (clark, on Aaron's 'Clark runs it', ~05:1x CDT): the desktop and QA PC serving trees moved to 5a7bf167, rebuilt (build-info 5a7bf167) and re-ran setup.mjs. Cursor mcp.json now points at C:\\Program Files\\nodejs\\node.exe on both machines, and 1 stale sessionStart entry was upgraded on each. #372 NON-CURSOR ACCEPTANCE (QA PC, clark's read-back): the configured command is absolute, Node v22.23.3, and it loads open-brain's better-sqlite3 ('better-sqlite3 OK'). The planner accepts this for P2-1. The cursor-agent ob_stats check is deferred until a Cursor CLI connects on the QA PC (Aaron: no cursor agents available; the QA PC stream failure is machine-specific per clark). P2-2 is still blocked on the same. — Session 160: Cursor seats live on the QA PC (wakers, new rooms). cursor-builder measured P2-1 (ob_stats works from a Cursor MCP session; mcp.json uses absolute node) and P2-2 (all hook events fire labelled under cursor-agent; sessionEnd fires even on a failed -p exit; stop never fired): docs/loops/t235-p2-2-measure.md, #419 merged. OPEN Phase 2 per builder: P2-3 T-003 proven session id (M, dispatched to cursor-builder, plan first); P2-4 sessionEnd registration via setup.mjs (M, dispatched to forge); P2-5 recall trigger on postToolUse (M-L); P2-6 task/test/harness-audit Cursor commands (S, dispatched to cursor-infra); P2-7 dedupe Claude hooks under Cursor (M). — Session 161: merged on Aaron's word: P2-3 #427 r4 (bda94d19; walk from ppid, host matched by versions/<ver>/index.js, single CIM table that fails closed, forged-table env seam removed), P2-5 #436 (d4a54f0e; conflict with #424 resolved mechanically and read with remerge-diff), P2-6 #424 r2 (5869d9ba). OPEN: P2-7 #437 r2 3dfa2424 (QA 279 REJECT: the stale reclaim still double-claims at 8 concurrent claimers, 0/100 at 2 and 3) and P2-4 #425 9fcb97ca (accepted; it must merge AFTER #437 or every Cursor session runs cli-session-end twice). The classifier refused merging the rejected #437 and #445 on Aaron's 'All 13'; they are Aaron's to merge or fix. — Session 162: P2-7 #437 rejected by QA 280 (crashed reclaim lock double-claims at N=8; its own N=8 rows could not fail). r4 dispatched to forge (turn 57) and a CONTINUE (turn 58) after its run idled about an hour and was stopped on Aaron's word; forge's reply not yet in at close. P2-4 #425 ACCEPTED by QA 280 at 1eea3cdb (conflict merge with master) and still merges only after a working #437 (on its own head a Cursor session end runs cli-session-end twice, 30/30). QA 284 is reserved for #437 r4 plus #472.",
       "note_by": [
         "e05907a8-86cf-436b-bee3-ce6f2214e02e",
         "766a2128-4c5f-4b3f-93b7-3f9a88c1e594",
-        "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1"
+        "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1",
+        "b8fa00fd-5821-40b3-b472-eec717bcf49a"
       ],
       "closed_rev": null,
       "assignee": "builder"
@@ -3361,7 +3365,7 @@
     {
       "id": "G-055",
       "what": "A cursor-agent --model flag on one launch PERSISTS as the machine's global Cursor default (~/.cursor/cli-config.json), and the seat wakers pass no --model. So one trial launch silently moved every SIA Cursor seat on the QA PC from composer-2.5 to grok-4.7-high at ~05:40 CDT 2026-10-04, and nothing in a seat's reply or a PR names the model. Built in that window, per clark: #427 r3 (a6d75b52), #441 (48bf4795), #442 (08fa9002), #444 r2 (a5f11819), #445 (d292747f), #446 (685b9fe9), #448 (merged, docs), plus the T-187 and T-166 work in progress. Builder != judge still holds (QA is Opus).",
-      "evidence": "clark [f0f395], session 161 (TOLD, one link): the trial launch at ~05:40 CDT, stopped 06:4x; restoring composer-2.5 was classifier-blocked and is with Aaron. Independently seen by Caliper QA-027: store.db modelName per turn = grok-4.7-high for cursor-builder, cursor-infra and forge. The planner did not read store.db.",
+      "evidence": "Original: s161. s162: clark restored composer-2.5 as the QA PC default at 15:03 CDT 10-04 on Aaron's word and read it back twice (backup cli-config.json.bak-2026-10-04T2003-grok). A2A D-046: every waker host pins composer-2.5 until T-102. Since v1.18.0 the waker rewrites cli-config.json on every wake (same values seen at 23:07:56Z, 23:14:50Z), so a per-seat model would race.",
       "recommended_update": "(1) Every waker launch passes an explicit --model (A2A T-096 'pinned waker model' is in round 3; check it covers this). (2) Every dev freeze reply and PR body names the model that built it, read from store.db, not assumed. (3) QA dispatches state the builder model, from that evidence. (4) Never pass --model to an interactive or trial cursor-agent on a seat machine without restoring the default afterwards.",
       "opened_session": 161
     },
@@ -3370,7 +3374,24 @@
       "what": "Two accepted fixes carry regression tests that cannot fail: QA 279 found #427 r4's forged-table row passes with the defect restored, and #434 r2's 'dispatch room deleted' row does not delete the key, so the r1 top-level-room fallback put back verbatim survives it. Both PRs merged on Aaron's word with the code correct but the guard vacuous.",
       "evidence": "origin/qa/s161g-report @ 8396ffbc, #427 F1 and #434 F1 (Medium); both merged session 161 (#427 bda94d19, #434 4da16370).",
       "recommended_update": "One small tests-only PR: make each row fail when its defect is restored, proven by that mutant red. Same class as G-040 and QA 275's #437 r1 race row.",
-      "opened_session": 161
+      "opened_session": 161,
+      "status": "closed",
+      "closed_session": 162,
+      "closed_rev": 340
+    },
+    {
+      "id": "G-057",
+      "what": "The 'model from store.db' instruction in every Cursor dispatch reports the chat's stored model, not the model the run used. Forge reported grok-4.7-high for #437 r3 while its waker had launched that exact resume with --model composer-2.5.",
+      "evidence": "clark's QA PC read 2026-10-05: waker-forge.log 'resume started pid=22276 model=composer-2.5 for turn 49' (22:57:52Z); cli-config.json composer-2.5; forge chat c81817c0 created during the 10-04 Grok period. Per-message model in store.db not read.",
+      "recommended_update": "Dispatches and QA reports take the builder model from the waker log's resume line for that turn, not from store.db; or read store.db's per-message model and prove it on a known run. Until then a store.db model is labelled chat metadata.",
+      "opened_session": 162
+    },
+    {
+      "id": "G-058",
+      "what": "A hub restart or burst knocks every QA PC waker out: since T-110 all wakers on one host share one per-source /health window, a 429 is read as authMode=warn, and the waker exits fail closed. Seen twice in s162 (03:52Z, and 06:11Z after the v1.19.0 swap).",
+      "evidence": "clark 2026-10-06: hub log 'refused route=health bucket=src:health:100.73.250.101'; 3 wakers exited at 03:52:14Z and all 5 at 06:11:35-40Z; runs in flight survived and their --say replies still land. Recovery needed a per-seat restart with a planner-confirmed dlv (T-104), or a stale turn replays.",
+      "recommended_update": "A2A T-113: treat a 429 as retry with backoff, never as a mode, and size or exempt /health for the wakers a host runs. Until it lands every hub restart is followed by a waker restart round, each dlv confirmed from the room by the planner.",
+      "opened_session": 162
     }
   ],
   "decisions": [
@@ -4273,6 +4294,30 @@
       "title": "Waker seats work only while answering a turn: every dispatch says 'keep working until FROZEN or BLOCKED', and a message without a TASK: line is information",
       "date": "2026-10-04",
       "note": "Planner rule, session 160, from clark's report (01:22 CDT) that all three SIA Cursor seats sat idle mid-task: a waker run ends when the seat replies or Composer stops, and an info-only turn can end it ('noted, no work now'; chisel stopped mid-t013 with 24 uncommitted files). RULE for every brief: keep working until the task is FROZEN (PR open, CI green, reported) or BLOCKED (reported with the blocker); a planner message without a 'TASK:' line is information to note while continuing; every work reply ends with 'TASK: <id> <state>'. When a seat goes idle with its task unfinished, the planner posts 'TASK: CONTINUE <id>'. Posted session 160 as turns 15 (cursor-builder, P2-3), 10 (forge, P2-4) and 11 (cursor-infra, the #421 fix and then P2-6). Also session 160: QA 272 merged #415 (7285c62e) and #420 (2eebaa6f) on Aaron's 'Merge both'; it REJECTED #421 (the gc.auto value is trimmed before matching) and passed #418's retro-check."
+    },
+    {
+      "id": "D-121",
+      "title": "Aaron's four process rules for running SIA, A2A and the dashboard in parallel (P1-P4), recorded for SIA",
+      "date": "2026-10-05",
+      "note": "Aaron, planner window 2026-10-05, answering 'Record all four like that?': 'Yes, all four as written'. Relayed first by clark from his 'yes, why not all 4?'. P1: the QA PC wakers start themselves at logon, but only once A2A's T-104 lands, so a restart cannot replay old messages (manual scheduled tasks A2A-Waker-<seat> exist since s162; no logon trigger until then). P2: questions for Aaron are batched at about 08:00 and 20:00 CDT, and the planner may merge without asking a PR whose every changed path is a test or a doc (checked by its file paths, not by a seat's say-so) once QA has accepted it. Used s162 for #445 (ecbfb169) and #464 (52359857), each with the path list and authority posted on the PR. P3: any change to the QA PC (Cursor settings, waker scripts or restarts, Cursor or Node versions, the lease) gets a notice and a GO from both planners first. P4: one project's QA never depends on another project's live seat."
+    },
+    {
+      "id": "D-122",
+      "title": "Jev calibration continues until the done-gate is useful, with no cap on live calls",
+      "date": "2026-10-05",
+      "note": "Aaron, planner window 2026-10-05: 'Keep calibrating until jev is useful' and 'No cap for jev is needed. The model is cheap, do as many calls as you need for calibration.' Useful is defined before any data in docs/loops/jev-calibration-2-brief.md: on a held-out set frozen before the run, balanced accuracy >= 0.75, false-accept <= 10%, driving-question Brier <= 0.20, and answers at p >= 0.9 right >= 90% over >= 10 answers. Rounds change one family (inputs, questions, policy); the held-out set is read once per round. A useful gate goes to ADVISORY only; any further role is Aaron's. Each round report states its call count. Brief #460, cap removed #461, split #469 (frozen 3b122586: held-out 34 = 22 ACCEPT / 12 REJECT, development 54)."
+    },
+    {
+      "id": "D-123",
+      "title": "A machine lease whose record has expired but whose owner pid is alive is still held",
+      "date": "2026-10-06",
+      "note": "Planner rule, s162, on forge's #437 r4 run: lease.json named forge with expires 04:18:46Z while owner pid 24928 was alive. Ruled held until the owner exits or releases; nothing else HEAVY on that machine meanwhile. When the owner pid is gone, an expired record is released. Applies to machine-lease.ps1 on the QA PC and the laptop until the script itself checks owner liveness."
+    },
+    {
+      "id": "D-124",
+      "title": "Jev leak ruling: only verdict-form wording is a leak; record files are cut from the diff Jev sees",
+      "date": "2026-10-06",
+      "note": "Planner ruling, s162, on the calibration-2 inputs (PR 470). A leak is wording that states or implies a QA verdict: upper-case ACCEPT, REJECT or INCOMPLETE, VERDICT, a QA run number next to accept or reject, or accepted, rejected or rejection said about a PR, round or candidate. A lower-case verb in code or tests is not a leak. In a DIFF a verdict-form hit excludes the case; in a PLAN the sentence is redacted (listed per case) and the case kept. The diff Jev sees excludes docs/loops/**, .agents/state.json, the four rendered views and CHANGELOG.md: Jev judges the work, not the record. The live path sends exactly each input file's request field under its runlist policy (harness shadow-done --request/--policy/--phase, s162 1e1ca342)."
     }
   ],
   "handoffs": [
@@ -4324,27 +4369,6 @@
       "session_uuid": "923463b3-8bee-4047-b415-c9de589a0c5d",
       "checkout": "sia-forge",
       "first_rev": 183
-    },
-    {
-      "seat": "developer",
-      "pick_up": "Builder seat (Claude Code, desktop) is being moved to the QA PC. Every branch below is pushed to origin and read back with ls-remote. T-201 (P0, /start names the seat's assignment; builds on T-200) is NEXT, NOT STARTED, brief pending from Atlas. T-199 moved to Forge (loop/t199-missing-handoff). DONE and pushed, none merged (except PR 222 which Atlas merges on CLEAN), none CI-run (D-061): T-194 r2b on loop/t194-planner-hook 0f69e041 (product 699789e1; mutants loop/t194-r2-mut-m1..m5, old loop/t194-planner-hook-mut-ph1..8); T-200 on loop/t200-record-from-master 5b9eab0a (product 92f9cc0f; mutants loop/t200-mut-m1..m6); T-164 on loop/t164-record-session-number 567657af (mutant loop/t164-record-session-number-mut-sc4 956755d6); TG-2 fixture fix on fix/tg2-fixture-record a4d540cf, PR 222 (mutant loop/tg2-mut-drop-scan b4bc641b); T-196+T-197 merge on loop/t196-t197-merge dde3cf5d, PR 220. Handoffs in docs/loops/t194-developer-handoff.md and docs/loops/t200-developer-handoff.md. This write is the SECOND attempt (session 152, on rev 183); the first, docs/forge-session-t200-handoff 611d1721 on rev 178, is kept only as its record.",
-      "watch_out": [
-        "T-200 and T-199 OVERLAP IN server.ts handleStart, in different hunks. T-199 (Forge) adds sessionUuid: proven.id to the renderState call and a function after renderHandoffs in state-render.ts. T-200 leaves that call's argument list alone (it rebinds sj upstream of it). git merge-tree of loop/t200-record-from-master against origin/loop/t199-missing-handoff, loop/t164-record-session-number and origin/master was clean; whoever merges second rebases. T-164 (567657af) also touches server.ts and the session-log path.",
-        "T-194 r2 needs a token to work at all on a keyring-only machine: this desktop's gh stores its token in the keyring, so the hook cannot read it and every docs merge stays grant-required until GH_TOKEN (fine-grained, Pull requests: Read, scoped to melvenac/Self-Improving-Agent only) is in the planner seat's env block. That is Aaron's hand, at hook registration.",
-        "THE FULL SUITE EXITS 1 ON THE OVERLOADED DESKTOP WITH ZERO FAILED TESTS OR ONLY 5000ms TIMEOUTS. Every full run showed 3 unhandled [vitest-worker] Timeout calling onTaskUpdate errors, and a moving set of 3-14 tests timing out at the 5000ms default (state-import-r6, t048-r3, repo-root V6, role-files, runSync); all pass alone. The last run, on fix/tg2-fixture-record, had 0 failed tests and exit 1. Read the exit code AND the failure list, and re-run a failing file alone before calling it a regression.",
-        "Bash ref:path is mangled by MSYS: git show origin/master:path fails in the Bash tool. Use PowerShell, or MSYS_NO_PATHCONV=1 with quotes. A node -e script written through a heredoc silently turned backslash-n into a real newline and backslash-d into d in three files; use the Edit tool for anything with a backslash.",
-        "A diff check written as git diff c8165f5 origin/master cannot equal a merge's diff (it contains the reversal of the candidate). Compare each side against the merge-base. Atlas recorded that error as its own.",
-        "THE SESSION-NUMBER COLLISION HAPPENED TWICE ON THIS HANDOFF: the local counter said Session #13 while the record's last was 150 (T-164), then the first attempt took 151 which Forge also took, so this one is 152. Take the number from the record on the branch you are writing to, immediately before the write, and re-read it after a fetch."
-      ],
-      "open_questions": [
-        "Atlas to rule: docs/idea-b-probe a77e73d9, docs/loop-13-developer-testimony e68abdce and loop/7-injection e865f488 are older sessions' work, local-only in the desktop's shared .git. Atlas said not to push or retire them; they stay named here until it decides.",
-        "Sequencing: the developer handoff at session 152 lands with PR 221 (fast-forwarded to this branch, docs/builder-handoff-qa-move); docs/forge-session-t200-handoff 611d1721 (rev 178) is superseded and is not to be merged."
-      ],
-      "session": 152,
-      "loop_state": null,
-      "session_uuid": "2e6ed7b8-17e4-4c4b-860e-5d9fd6432801",
-      "checkout": "sia-builder",
-      "first_rev": 184
     },
     {
       "seat": "planner",
@@ -4776,6 +4800,66 @@
       "session_uuid": "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1",
       "checkout": "sia-planner",
       "first_rev": 331
+    },
+    {
+      "seat": "planner",
+      "pick_up": "(1) QA 285 (Jev cal 2 DEV phase, 33 live calls, laptop, DISPATCH d6415f5f) reports to clark: read its report yourself, then freeze the policy from DEV evidence only (a policy file committed on a docs branch, its sha256 in the manifest), write QA 286 for the held-out 34 run once, and score against the four useful criteria in docs/loops/jev-calibration-2-brief.md. (2) Forge #437 r4: confirm its reply in room k571z4gh, give clark dlv 58 for the forge waker restart, then QA 284 = #437 r4 + #472 (infra guard r2 7248d9a3) on Plumb; #425 merges only after a working #437. (3) cursor-infra: give clark dlv 66 once run 66 ends (its #472 reply is in).",
+      "watch_out": [
+        "WAKER RESTARTS (until A2A T-104 and T-113): any hub swap knocks every QA PC waker out (429 on the shared /health window). A restart must use a dlv the planner confirmed from the room (the last atlas turn the seat's latest reply covers), or stale turns replay and seats redo frozen work. Builder dlv 83 is right; infra 66; forge 58 after its reply lands.",
+        "JEV CAL 2: never run a held-out row before the policy is frozen from dev evidence. Inputs are PR 470 head 1e1ca342; requests go out with harness shadow-done --request/--policy/--phase; a label lives only in input metadata, never in the request field. The stacked PRs #463 <- #465 <- #470 are unmerged and touch src, so they need QA and Aaron's word.",
+        "MERGES: P2 lets the planner merge a tests/docs-only PR after QA ACCEPT by path check (post the list and authority on the PR); anything touching src needs Aaron's word. Always: update-branch, CI, first parent = the QA'd head, --remerge-diff with zero conflicts, merge --match-head-commit, read back on origin/master.",
+        "PEERS: Aaron is in the planner window; ask him directly, one question at a time. clark (a fresh session since 05:5xZ) relays D-033/P3 notices and launches QA. Relay is relay-a2a; find peers with ListAgents, because pipe addresses go stale after a restart.",
+        "MODEL REPORTS: a seat's store.db model is chat metadata, not the model the run used; use the waker log's resume line (gap opened this session).",
+        "FUNNEL is ON, standing (03:54Z 10-06, Aaron's word via clark). SIA's HOLD was lifted after T-107 and T-110 gave tailnet callers their own windows. Residual: tcm-local callers share the public bucket."
+      ],
+      "open_questions": [
+        "None blocking. Aaron's word is needed to merge #437 r4 and #425 after QA 284, and the Jev stacked PRs after their QA."
+      ],
+      "session": 162,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#437",
+            "qa_status": "rejected",
+            "note": "T-235 P2-7 r3 8e751360 rejected by QA 280; r4 in progress by forge (turns 57/58); reserved for QA 284"
+          },
+          {
+            "ref": "#425",
+            "qa_status": "accepted",
+            "note": "T-235 P2-4 1eea3cdb, QA 280 ACCEPT; merges only after a working #437"
+          },
+          {
+            "ref": "#472",
+            "qa_status": "not_started",
+            "note": "HUBROOM-GUARD r2 7248d9a3 (infra), CI green; to QA 284"
+          },
+          {
+            "ref": "#463",
+            "qa_status": "not_started",
+            "note": "Jev cal 2 gate changes (builder), base master"
+          },
+          {
+            "ref": "#465",
+            "qa_status": "not_started",
+            "note": "Jev cal 2 collector a9d7ee42 (Scout), base loop/jev-cal-2"
+          },
+          {
+            "ref": "#470",
+            "qa_status": "in_progress",
+            "note": "Jev cal 2 inputs and runner 1e1ca342 (builder), base loop/jev-cal-2-collector; QA 285 runs from it"
+          }
+        ],
+        "frozen_sha": "1e1ca3423bac37bffb7ab04c24bb51ecf3c8624d",
+        "questions_for_aaron": [],
+        "rulings": [
+          "s162 merged on Aaron's word: #451 27dd1e77, #457 2f8e6489 (no QA; QA 281 retro FINDINGS, fixed by #468), #458 1671d005 (no QA; QA 281 HOLDS), #466 b8ab0f04, #468 5309fc2c; under P2: #445 ecbfb169, #464 52359857; docs-only: #459 #460 #461 #462 #467 #469 #471 #473.",
+          "QA 280 d8cb4652: #425 ACCEPT, #437 r3 REJECT, #445 r3 REJECT. QA 281 ae2baca7: #445 r4 ACCEPT. QA 282 5d0cbbd9: #464 ACCEPT, #466 REJECT. QA 283 29a398b3: #466 r2 ACCEPT, #468 ACCEPT (K1/K2 sent back as #472).",
+          "Hub changes GO'd for SIA: v1.18.0, v1.18.1 (T-107), T-110 SNAT off, Funnel standing, v1.19.0 (T-111, sign-in OFF)."
+        ]
+      },
+      "session_uuid": "b8fa00fd-5821-40b3-b472-eec717bcf49a",
+      "checkout": "sia-planner",
+      "first_rev": 340
     }
   ],
   "sessions": [
@@ -4794,14 +4878,6 @@
       "seat": "developer",
       "checkout": "sia-forge",
       "first_rev": 183
-    },
-    {
-      "n": 152,
-      "date": "2026-09-30",
-      "uuid": "2e6ed7b8-17e4-4c4b-860e-5d9fd6432801",
-      "seat": "developer",
-      "checkout": "sia-builder",
-      "first_rev": 184
     },
     {
       "n": 153,
@@ -4882,6 +4958,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 331
+    },
+    {
+      "n": 162,
+      "date": "2026-10-06",
+      "uuid": "b8fa00fd-5821-40b3-b472-eec717bcf49a",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 340
     }
   ]
 }
