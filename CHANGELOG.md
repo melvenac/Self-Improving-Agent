@@ -11,6 +11,10 @@
 
 ### Added
 
+- **`open-brain scrub-trigger-fires`** — explicit one-time rewrite of legacy `trigger_fires.command`
+  values to the program-only census form, then `VACUUM` and WAL truncate with on-disk verification.
+  After upgrading, stop the MCP server and run `open-brain scrub-trigger-fires` once.
+
 - **FOCUS and SEATS in the budgeted briefing (T-236 (c)).** Opt-in: `briefing_focus` in `.agents/SYSTEM/greeting.json`,
   effective only with `briefing_budget` (absent = off; A2A renders unchanged). A task gains an optional `assignee`, a seat
   of `hub-partner-seats.json`, set by the planner with `update_task`. FOCUS names this checkout's seat's assigned task (or

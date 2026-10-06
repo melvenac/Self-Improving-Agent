@@ -3,7 +3,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import Database from "better-sqlite3";
-import { initSchemaV2, openV2Database } from "../src/db-v2.js";
+import { initSchemaV2 } from "../src/db-v2.js";
+import { runScrubTriggerFires } from "../src/scrub-trigger-fires.js";
 
 const SESSION = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
 
@@ -14,8 +15,8 @@ afterEach(() => {
   tmpDirs = [];
 });
 
-describe("AUDIT-FIX A1 r5 — migrate trigger_fires.command on openV2Database", () => {
-  it("rewrites a master-shape raw row with Bearer token; second open is a no-op", () => {
+describe("AUDIT-FIX A1 r5 — scrub trigger_fires.command", () => {
+  it("rewrites a master-shape raw row with Bearer token; second scrub is a no-op", () => {
     const td = mkdtempSync(join(tmpdir(), "audit-r5-mig-"));
     tmpDirs.push(td);
     const dbPath = join(td, "knowledge-v2.db");
@@ -31,13 +32,16 @@ describe("AUDIT-FIX A1 r5 — migrate trigger_fires.command on openV2Database", 
       .run(SESSION, raw);
     seed.close();
 
-    const db1 = openV2Database(dbPath);
+    runScrubTriggerFires(dbPath);
+    const db1 = new Database(dbPath, { readonly: true });
     const afterFirst = db1.prepare("SELECT command FROM trigger_fires").get() as { command: string };
     expect(afterFirst.command).toBe("http");
     expect(afterFirst.command).not.toContain("eyJ");
     db1.close();
 
-    const db2 = openV2Database(dbPath);
+    const second = runScrubTriggerFires(dbPath);
+    expect(second.rowsRewritten).toBe(0);
+    const db2 = new Database(dbPath, { readonly: true });
     const afterSecond = db2.prepare("SELECT command FROM trigger_fires").get() as { command: string };
     expect(afterSecond.command).toBe("http");
     db2.close();
@@ -58,7 +62,8 @@ describe("AUDIT-FIX A1 r5 — migrate trigger_fires.command on openV2Database", 
       .run(SESSION, "echo correct-horse #deadbeef0000");
     seed.close();
 
-    const db = openV2Database(dbPath);
+    runScrubTriggerFires(dbPath);
+    const db = new Database(dbPath, { readonly: true });
     const row = db.prepare("SELECT command FROM trigger_fires").get() as { command: string };
     expect(row.command).toBe("echo");
     expect(row.command).not.toContain("correct");

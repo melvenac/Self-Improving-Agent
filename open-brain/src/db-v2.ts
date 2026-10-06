@@ -2,7 +2,6 @@ import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { canonicalizeProjectDir } from './shared/paths.js';
-import { runTriggerFireCommandMigration } from './trigger/fire-command-migration.js';
 import {
   type Maturity,
   type Rating,
@@ -41,9 +40,6 @@ export function migrateProjectDirToCanonical(db: Database.Database): number {
   }
   return updated;
 }
-
-/** @deprecated Use `migrateTriggerFireCommands` from `fire-command-migration.js` in tests. */
-export { migrateTriggerFireCommands } from './trigger/fire-command-migration.js';
 
 /**
  * The trigger's fire table, as its own statement.
@@ -232,10 +228,6 @@ export function initSchemaV2(db: Database.Database): void {
       VALUES (new.id, new.key, new.content, new.tags);
     END;
 
-    CREATE TABLE IF NOT EXISTS ob_store_meta (
-      key TEXT PRIMARY KEY NOT NULL,
-      value TEXT NOT NULL
-    );
   `);
 }
 
@@ -337,13 +329,11 @@ export function openV2Database(dbPath: string): Database.Database {
   // creates this directory. Recursive mkdir is a no-op once it exists.
   mkdirSync(dirname(dbPath), { recursive: true });
   const db = new Database(dbPath);
-  db.pragma('busy_timeout = 5000');
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   initSchemaV2(db);
   migrateAddedColumns(db);
   migrateProjectDirToCanonical(db);
-  runTriggerFireCommandMigration(db);
   // Stamp forward only: a newer build raises the version, an older one must
   // never lower it — the stamp is how an older writer learns it is behind.
   const stamped = Number(db.pragma('user_version', { simple: true })) || 0;

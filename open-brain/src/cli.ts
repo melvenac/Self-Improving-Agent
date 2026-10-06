@@ -266,6 +266,21 @@ if (command === "sync") {
   console.log(`\nApplied: ${result.knowledgeRows} entries, ${result.sessionRows} sessions, ${result.notesMoved} notes moved.`);
   for (const f of result.noteFailures) console.log(`  FAILED to move ${f.path}: ${f.reason}`);
   process.exit(result.noteFailures.length > 0 ? 1 : 0);
+} else if (command === "scrub-trigger-fires") {
+  const opts = parseOrRefuse(COMMAND_SPECS.scrubTriggerFires, args.slice(1));
+  const { runScrubTriggerFires, printScrubTriggerFiresResult } = await import(
+    "./scrub-trigger-fires.js"
+  );
+  const paths = resolvePaths(resolve("."));
+  const dbPath = opts.value("--db") ?? paths.knowledgeV2Db;
+  try {
+    const result = runScrubTriggerFires(dbPath, { dryRun: opts.has("--dry-run") });
+    printScrubTriggerFiresResult(result);
+    process.exit(0);
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
 } else if (command === "topics") {
   const opts = parseOrRefuse(COMMAND_SPECS.topics, args.slice(1));
   const { openV2Database } = await import("./db-v2.js");
@@ -643,6 +658,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  start                                     Start a session");
   console.log("  end [--dry-run]                            End a session");
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
+  console.log("  scrub-trigger-fires [--db <path>] [--dry-run]  One-time rewrite of trigger_fires.command + VACUUM");
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit [--accept-stale]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
