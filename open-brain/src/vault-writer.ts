@@ -1,5 +1,10 @@
 import { mkdirSync, writeFileSync, existsSync, renameSync } from "fs";
 import { join, dirname, relative, isAbsolute } from "path";
+import {
+  assertPathUnderDir,
+  joinUnderVaultDir,
+  safeVaultPathSegment,
+} from "./shared/vault-path-segment.js";
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -55,7 +60,9 @@ export { parseFrontmatter } from "./shared/parse-frontmatter.js";
  * the index also knows about it.
  */
 export function experiencePath(vaultDir: string, project: string, key: string): string {
-  return join(vaultDir, "Experiences", project, `${slugify(key)}.md`);
+  const projectSeg = safeVaultPathSegment("project", project);
+  const experiencesDir = join(vaultDir, "Experiences");
+  return joinUnderVaultDir(experiencesDir, projectSeg, `${slugify(key)}.md`);
 }
 
 /**
@@ -128,12 +135,9 @@ export function writeFailure(
   input: FailureInput
 ): string | null {
   const keySlug = slugify(input.key);
-  const filePath = join(
-    vaultDir,
-    "Experiences",
-    input.project,
-    `failure-${keySlug}.md`
-  );
+  const projectSeg = safeVaultPathSegment("project", input.project);
+  const experiencesDir = join(vaultDir, "Experiences");
+  const filePath = joinUnderVaultDir(experiencesDir, projectSeg, `failure-${keySlug}.md`);
 
   if (existsSync(filePath)) return null;
 
@@ -176,12 +180,9 @@ export function writeSummary(
   vaultDir: string,
   input: SummaryInput
 ): string | null {
-  const projectSlug = slugify(input.project);
-  const filePath = join(
-    vaultDir,
-    "Summaries",
-    `${input.date}-${projectSlug}.md`
-  );
+  const projectSlug = slugify(safeVaultPathSegment("project", input.project));
+  const summariesDir = join(vaultDir, "Summaries");
+  const filePath = joinUnderVaultDir(summariesDir, `${input.date}-${projectSlug}.md`);
 
   if (existsSync(filePath)) return null;
 
