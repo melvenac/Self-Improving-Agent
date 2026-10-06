@@ -57,8 +57,8 @@ export const WIRE_REQUEST_KEYS = new Set(["model", "state", "questions"]);
 
 /** Extract the raw JSON value bytes of the top-level `request` property (for byte-identical wire bodies). */
 export function sliceTopLevelRequestBytes(fileUtf8: string): Buffer {
-  const m = /"request"\s*:\s*/.exec(fileUtf8);
-  if (!m) throw new ShadowRunError('input file has no top-level "request" field', 2);
+  const m = fileUtf8.match(/"request"\s*:\s*/);
+  if (!m || m.index === undefined) throw new ShadowRunError('input file has no top-level "request" field', 2);
   let i = m.index + m[0].length;
   while (i < fileUtf8.length && /[\s\r\n]/.test(fileUtf8[i]!)) i += 1;
   const start = i;
