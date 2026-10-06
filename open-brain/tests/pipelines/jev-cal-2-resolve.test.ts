@@ -122,6 +122,13 @@ describe("jev-calibration-2/resolve.mjs and verdicts.mjs (JEV-CAL-2 r2)", () => 
       expect(p.rows[0].items).toEqual(["#20"]);
       expect(p.rows[0].sha_from).toBe("led-by-item");
     });
+    it("a table whose verdict column says Result is read (QA 281); a mutant table's Result column is not; a dash head is no head", () => {
+      const p = out.verdicts.result_column;
+      expect(p.rows.map((r) => [r.items[0], r.sha, r.label, r.head_note ?? null])).toEqual([
+        ["#30", "1111111aaaa", "ACCEPT", null],
+        ["#31", null, null, expect.stringMatching(/head column is empty/)],
+      ]);
+    });
     it("a report with no verdicts gives no rows", () => {
       expect(out.verdicts.empty.rows).toEqual([]);
     });

@@ -59,3 +59,31 @@ made one case per report, capped at QA 320, from QA 253.
 - **Same head in two runs** (a narrow re-run): the earliest verdict stands, the later run is listed, and a disagreement is flagged
   (QA 274's #427 ACCEPT on rows 1, 4 and 20 against QA 273's REJECT of the same head).
 - **No live Jev call, and no API key is read or printed by any file here.**
+
+## r3 (atlas s162 review of 1a3fc633): base commits, QA 281, CI checks, a disputed label
+
+Regenerated against origin/master `7d05732a` (QA 250 to 282); GitHub facts fetched 2026-10-06T04:40:59.173Z.
+
+- **F1, the base was the candidate for 66 of 88 cases (an empty diff).** For a merged PR r2 took the NEWEST commit of `head..master`, whose
+  parent descends from the head. The base is now the master side of the merge commit that brought the head in: the oldest merge
+  commit descending from the head whose first parent does not hold it and another parent does, then the merge-base of the head with
+  that first parent. An unmerged head uses its merge-base with origin/master. `collect.mjs` now **fails (exit 1) when any resolved
+  head has base == candidate or an empty base..candidate diff**, and a test asserts it for every case (mutant: base := candidate turns it red for
+  70 cases). Result: 0 failures. Diff size of base..candidate over 88 cases:
+  files (n 88, min 1, p25 4, median 7, p75 9, p90 15, max 21); changed lines (n 88, min 4, p25 112, median 283, p75 543, p90 712, max 3052). For 81 cases with a recorded PR file list, the diff
+  touches the PR's files in all but 0.
+- **F2, QA 281.** Its verdict column is headed "Result", which the table reader did not accept; the case came in only through a verdict line.
+  A "Result" column is now read when the table also names a pinned head and has no mutant column (QA 257 and QA 273 have mutant tables headed
+  "Result" that are not verdicts). #445 r4 is ACCEPT at `1e21deae`, and #445 r1 (QA 277), r2 (QA 279) and r3 (QA 280) each pair with it.
+  #457 and #458 have a dash for a pinned head and are listed unresolved, not given another row's head.
+- **F3, checks.** `gh-facts.mjs` (run locally, `gh` authenticated) records for each head the latest finished CI run's `test` job and steps, keyed by
+  the full SHA, into `gh-facts.json`; `collect.mjs` reads that file and never calls gh. 85 of 88 cases have a recorded CI
+  result (failure 1, none 3, success 84); a head without one stays `checks_none` with the reason.
+  A passing test job is build_exit 0 and unit_exit 0. The one failing run is #374 (QA 264's REJECT), whose unit step failed.
+- **Disputed label.** #427 `270b550b`: QA 273 REJECT, QA 274 ACCEPT on rows 1, 4 and 20. It is in `conflicts` (1) and the case is `label_disputed`,
+  out of the held-out candidates.
+
+### Counts now (88 cases from 29 of 32 QA runs)
+
+ACCEPT 62, REJECT 24, unlabelled 2; leak group 17; cal1-seen 1; pairs 21 over 15 PRs;
+unresolved 9. **Held-out candidates 67: ACCEPT 48, REJECT 19** (labelled ACCEPT or REJECT, not in the leak group, not cal1-seen, label not disputed).

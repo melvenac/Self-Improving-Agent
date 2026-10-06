@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { spawnSync } from "node:child_process";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const run = promisify(execFile);
 
 const ROOT = join(import.meta.dirname, "../../..");
 const CAL2 = join(ROOT, "docs/loops/jev-calibration-2");
@@ -9,15 +12,25 @@ const CAL2 = join(ROOT, "docs/loops/jev-calibration-2");
 type Pool = Record<string, number> & {
   plan_by_source: Record<string, number>;
   heads_unresolved: number;
+  base_invariant_failures: number;
+  diff_files: { n: number; min: number; median: number; max: number };
+  diff_lines: { n: number; min: number; median: number; max: number };
+  conflicts: number;
+  checks_recorded: number;
   held_out_candidates: { total: number; ACCEPT: number; REJECT: number; with_plan: number; no_plan: number };
 };
 type Case = {
   case_id: string; qa_no: number; label: string | null; candidate_sha: string; plan: string; plan_source: string | null;
   cal1_seen: boolean; leak_group: boolean; pair: string[]; provenance: string; head_resolved: boolean;
+  pr: number | null; merged: boolean; base_sha: string | null; base_how: string; label_disputed: boolean;
+  diff: { files: number; insertions: number; deletions: number; paths: string[] } | null;
+  pr_files_check: { checked: boolean; ok?: boolean; overlap?: number };
+  checks_hint: { checks: string; reason?: string; test_job?: string; ci_run_id?: number; build_exit: number | null; unit_exit: number | null };
 };
 type Collected = {
   cases: Case[];
   pairs: { rejected: string; fixed: string; rejected_qa: number; fixed_qa: number }[];
+  conflicts: { candidate_sha: string; case_id: string; kept: { qa_no: number; label: string | null }; other: { qa_no: number; label: string | null } }[];
   unresolved: { qa_no: number; scope: string; reason: string }[];
   runs: { qa_no: number; resolved: boolean }[];
   pool: Pool;
@@ -26,9 +39,10 @@ type Collected = {
 describe("jev-calibration-2/collect.mjs (JEV-CAL-2 r2: one case per PR verdict, QA 250 onward)", () => {
   let pool: Pool;
   let col: Collected;
-  beforeAll(() => {
-    const r = spawnSync(process.execPath, [join(CAL2, "collect.mjs")], { cwd: CAL2, encoding: "utf-8", timeout: 240_000 });
-    expect(r.status, r.stderr).toBe(0);
+  beforeAll(async () => {
+    // Asynchronous on purpose: a synchronous spawn blocks the worker for the whole run (about 70 s) and vitest reports
+    // `Timeout calling "onTaskUpdate"` as an unhandled error, which fails the run with every test green.
+    await run(process.execPath, [join(CAL2, "collect.mjs")], { cwd: CAL2, encoding: "utf-8", timeout: 240_000, maxBuffer: 1 << 26 });
     expect(existsSync(join(CAL2, "pool.json"))).toBe(true);
     pool = JSON.parse(readFileSync(join(CAL2, "pool.json"), "utf-8")) as Pool;
     col = JSON.parse(readFileSync(join(CAL2, "collect.json"), "utf-8")) as Collected;
@@ -88,7 +102,7 @@ describe("jev-calibration-2/collect.mjs (JEV-CAL-2 r2: one case per PR verdict, 
 
   it("tags calibration 1's cases as seen, and keeps them out of the held-out candidates", () => {
     expect(pool.cal1_seen).toBe(col.cases.filter((c) => c.cal1_seen).length);
-    const labelled = col.cases.filter((c) => !c.leak_group && !c.cal1_seen && c.label !== null);
+    const labelled = col.cases.filter((c) => !c.leak_group && !c.cal1_seen && !c.label_disputed && c.label !== null);
     expect(pool.held_out_candidates.total).toBe(labelled.length);
   });
 
@@ -105,5 +119,66 @@ describe("jev-calibration-2/collect.mjs (JEV-CAL-2 r2: one case per PR verdict, 
     expect(col.pairs.some((p) => /pr437/.test(p.rejected) || /pr437/.test(p.fixed))).toBe(false);
     // #427 r2 (QA 275, REJECT) was fixed in r3 (QA 277, ACCEPT)
     expect(col.pairs.some((p) => p.rejected === "qa275-pr427-r2" && p.fixed === "qa277-pr427-r3")).toBe(true);
+  });
+
+  it("F1: every resolved head has a base that is not the head, and base..head holds a diff", () => {
+    // r2 took the newest commit of head..master for a merged PR, so base == candidate for 66 of 88 cases: an empty diff.
+    expect(pool.base_invariant_failures).toBe(0);
+    const resolved = col.cases.filter((c) => c.head_resolved);
+    expect(resolved.length).toBeGreaterThan(0);
+    for (const c of resolved) {
+      expect(c.base_sha, c.case_id).not.toBeNull();
+      expect(c.base_sha, `${c.case_id}: base equals candidate (${c.base_how})`).not.toBe(c.candidate_sha);
+      expect(c.diff?.files ?? 0, `${c.case_id}: empty base..candidate diff`).toBeGreaterThan(0);
+    }
+    // and the diff touches the PR's files wherever the PR's file list is recorded
+    for (const c of resolved.filter((x) => x.pr_files_check.checked)) expect(c.pr_files_check.ok, c.case_id).toBe(true);
+    expect(pool.diff_files.min).toBeGreaterThan(0);
+    expect(pool.diff_lines.n).toBe(resolved.length);
+  });
+
+  it("F1: a merged PR's base is the master side of its merge commit; an unmerged PR's is its merge-base with master", () => {
+    const merged = col.cases.filter((c) => c.head_resolved && c.merged);
+    expect(merged.length).toBeGreaterThan(0);
+    for (const c of merged) expect(c.base_how, c.case_id).toMatch(/^(merge-commit first parent|no merge commit)/);
+    for (const c of col.cases.filter((x) => x.head_resolved && !x.merged)) expect(c.base_how, c.case_id).toMatch(/not merged/);
+  });
+
+  it("F2: QA 281's table (its verdict column says Result) gives #445 r4 ACCEPT, and the three rejected rounds pair with it", () => {
+    const r4 = col.cases.find((c) => c.case_id === "qa281-pr445-r4");
+    expect(r4?.label).toBe("ACCEPT");
+    expect(col.pairs.filter((p) => p.fixed === "qa281-pr445-r4").map((p) => p.rejected).sort()).toEqual(["qa277-pr445", "qa279-pr445-r2", "qa280-pr445-r3"]);
+    // #457 and #458 have no pinned head in that table and are listed, not given someone else's head
+    expect(col.unresolved.some((u) => u.qa_no === 281 && /#457/.test(JSON.stringify(u)))).toBe(true);
+  });
+
+  it("F3: the CI test job is recorded per head from gh-facts.json, and a head without a CI run says why", () => {
+    const facts = JSON.parse(readFileSync(join(CAL2, "gh-facts.json"), "utf-8")) as { checks: Record<string, { none?: boolean; test_job?: string }> };
+    const recorded = Object.values(facts.checks).filter((c) => !c.none);
+    expect(recorded.length).toBeGreaterThanOrEqual(80);
+    expect(pool.checks_recorded + pool.checks_none).toBe(pool.total);
+    for (const c of col.cases) {
+      if (c.checks_hint.checks === "recorded") {
+        expect(["success", "failure"]).toContain(c.checks_hint.test_job);
+        expect(c.checks_hint.ci_run_id).toBeGreaterThan(0);
+        expect(c.checks_hint.build_exit === 0 || c.checks_hint.build_exit === 1 || c.checks_hint.build_exit === null).toBe(true);
+      } else {
+        expect((c.checks_hint.reason ?? "").length, c.case_id).toBeGreaterThan(10);
+      }
+    }
+    // a head whose CI test job passed has build_exit 0 and unit_exit 0, so gate-as-built and Jev-alone can differ
+    for (const c of col.cases.filter((x) => x.checks_hint.test_job === "success")) expect([c.checks_hint.build_exit, c.checks_hint.unit_exit]).toEqual([0, 0]);
+  });
+
+  it("the QA 273 / QA 274 disagreement on #427 270b550b is a conflict and the case stays out of the held-out candidates", () => {
+    const k = col.conflicts.find((x) => x.candidate_sha.startsWith("270b550b"));
+    expect(k).toBeDefined();
+    expect([k?.kept.label, k?.other.label]).toEqual(["REJECT", "ACCEPT"]);
+    const c = col.cases.find((x) => x.case_id === k?.case_id);
+    expect(c?.label_disputed).toBe(true);
+    const heldOut = col.cases.filter((x) => !x.leak_group && !x.cal1_seen && !x.label_disputed && x.label !== null);
+    expect(heldOut.some((x) => x.case_id === k?.case_id)).toBe(false);
+    expect(pool.held_out_candidates.total).toBe(heldOut.length);
+    expect(pool.conflicts).toBe(col.conflicts.length);
   });
 });

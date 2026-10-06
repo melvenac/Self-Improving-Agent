@@ -62,7 +62,16 @@ const SHALESS = [
   "- #20: **ACCEPT**", "- `#20 r2`: **ACCEPT** at `9999999abcdef0123456789`",
 ].join("\n");
 
+const RESULT = [
+  "| PR | Task | Pinned head | Result | Deciding rows |", "|---|---|---|---|---|",
+  "| #30 | T-9 r4 | `1111111aaaa` | **ACCEPT** | Rows 1-6 pass. |",
+  "| #31 | HUBROOM | — | **FINDINGS** | no pinned head |",
+  "", "| PR | Developer's mutant | Result | QA mutant | Result |", "|---|---|---|---|---|",
+  "| #30 | m1 | killed | q1 | killed |",
+].join("\n");
+
 const verdicts = {
+  result_column: parseVerdicts(RESULT),
   table: parseVerdicts(TABLE),
   lines: parseVerdicts(LINES),
   shared_head: parseVerdicts(SHARED_HEAD),

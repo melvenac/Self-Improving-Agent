@@ -55,7 +55,10 @@ function fromTables(lines) {
   for (let i = 0; i + 1 < lines.length; i++) {
     if (!/^\s*\|/.test(lines[i]) || !RULE.test(lines[i + 1])) continue;
     const head = splitRow(lines[i]).map((h) => strip(h).toLowerCase());
-    const vi = head.findIndex((h) => /^verdict\b/.test(h));
+    // "Verdict", or "Result" only in a table that also names a pinned head and no mutant (QA 281's verdict table says
+    // "Result"; the mutant tables of QA 257 and QA 273 say it too and are not verdicts).
+    let vi = head.findIndex((h) => /^verdict\b/.test(h));
+    if (vi < 0 && head.some((h) => /\bhead\b|^pinned\b/.test(h)) && !head.some((h) => /mutant/.test(h))) vi = head.findIndex((h) => /^result\b/.test(h));
     const pi = head.findIndex((h) => /^(pr|item|case)\b/.test(h));
     if (vi < 0 || pi < 0) continue;
     let hi = head.findIndex((h) => /^(pinned( new)? )?head( \(full sha\))?$|^pinned\b/.test(h));
@@ -68,8 +71,11 @@ function fromTables(lines) {
       const id = itemOf(`${cells[pi]} ${ti >= 0 ? cells[ti] ?? "" : ""}`);
       if (!id) { skipped.push({ line: strip(lines[j]).slice(0, 120), why: "no PR or task id in the row" }); continue; }
       const cellHexes = hi >= 0 ? hexes(cells[hi] ?? "") : hexes(cells.filter((_, k) => k !== vi).join(" | "));
+      // A head column whose cell holds no hash (a dash) says the row has no pinned head; no other place may supply one.
+      const headCellEmpty = hi >= 0 && cellHexes.length === 0;
       rows.push({
         ...id,
+        head_cell_empty: headCellEmpty,
         sha: cellHexes[0] ?? null,
         sha_from: cellHexes[0] ? "verdict-table" : null,
         label: labelOf(cells[vi]),
@@ -196,6 +202,7 @@ export function parseVerdicts(text) {
   const resolved = picked.rows.map((r0) => {
     const r = r0.task === null && r0.kind === "pr" ? { ...r0, task: taskLedBy(lines, r0.item) } : r0;
     if (r.sha) return { ...r };
+    if (r.head_cell_empty) return { ...r, head_note: `the report's head column is empty for ${r.item} (no pinned head)` };
     const led = distinct(headsLedBy(lines, r.item));
     if (led.length === 1) return { ...r, sha: led[0], sha_from: "led-by-item" };
     if (cand.length === 1 && led.length === 0) return { ...r, sha: cand[0], sha_from: "candidate-field" };
