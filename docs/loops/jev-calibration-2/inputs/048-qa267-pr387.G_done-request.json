@@ -1,0 +1,274 @@
+{
+  "base_sha": "60abf0146d9d1214f602dd3a238e89fee726bd31",
+  "candidate_sha": "9d1ed0c55751f07dd5fb1a184cfc999c9c43023d",
+  "case_id": "qa267-pr387",
+  "case_no": 48,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37117818217,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "label": "ACCEPT",
+  "leak_hits": [],
+  "merge_commit": "74eb29d3b9fba319f3f56933b0c47347a1301843",
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files each PR changes beyond origin/master. Flag any file outside the task. The planner's counts are 1 / 1 / 8 / 16 files, from git diff --name-only origin/master...<head> at a68d0393.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (#393 caps (flag on, in a scratch fixture). set_handoff refuses four watch-outs, a watch-out longer than 200 characters or spanning more than one line, and a pick_up longer than 400 characters, naming every violation. An expired watch-out is dropped and counted. WAITING ON AARON lists only unresolved owner: aaron questions. NEXT appears only when the objective names task ids. The worst-case budget fits 30 lines and 4,096 characters, and the overflow prints +N more: <pointer>.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (A2A safety. Every new schema field is optional. The A2A fixture still parses with master's schema, and renderBriefing over it with every flag absent matches the golden.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts. #387 and #388 are pins on product code that is already correct, so for them the red evidence is the product mutant in row 3. Do not report a red run on master for those two.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Write one product mutant of your own and re-run one of the developer's named in the PR body. Each must turn a row red. Run tsc --noEmit on every mutant before counting it, and confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). Run gh pr checks <n> and record the test result and run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (Flag OFF is byte-identical. Both PRs claim that with greeting.json absent or set to false, output is byte-identical to master's renderer. Check this on the A2A fixture and on SIA's fixture. For #393, confirm that the golden a2a-1c200b41-render.golden.txt was committed in f5512b6a before any product change: git show --stat that commit, and run the golden test at that commit against master's src.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (The A2A fixture is the ruled one. open-brain/tests/fixtures-state/a2a-state-1c200b41.json must be 260,229 bytes, have sha256 8892464b6608a82c38fa63e878b2458412fbbd12a15471c0d6aea94f21004549 and blob 3cc195a5…, and be identical in both PRs.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (One flag reader. greeting-flags.ts and the .gitignore allowlist line must be byte-identical in #391 and #393 (the planner measured 6168e07e and 143ad2bb in both). No other file may parse greeting.json; check with git grep greeting.json -- open-brain/src at the merged tree.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (The flag values ruled for SIA. #391's greeting.json sets role_docs_by_sha: true; #393's sets briefing_budget: true and handoff_caps: false. The handoff caps stay off until the D-110 split.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (#391 records a read only after printing it. Show that recordRoleReads is called only from handleStart after the full text is in the output, and that describeRoleFiles and composeGreeting (the greeting-size check) never record. Re-run the developer's M3 or M4.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "9d1ed0c55751f07dd5fb1a184cfc999c9c43023d",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/server.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files each PR changes beyond origin/master. Flag any file outside the task. The planner's counts are 1 / 1 / 8 / 16 files, from git diff --name-only origin/master...<head> at a68d0393.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts. #387 and #388 are pins on product code that is already correct, so for them the red evidence is the product mutant in row 3. Do not report a red run on master for those two.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Write one product mutant of your own and re-run one of the developer's named in the PR body. Each must turn a row red. Run tsc --noEmit on every mutant before counting it, and confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). Run gh pr checks <n> and record the test result and run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "Flag OFF is byte-identical. Both PRs claim that with greeting.json absent or set to false, output is byte-identical to master's renderer. Check this on the A2A fixture and on SIA's fixture. For #393, confirm that the golden a2a-1c200b41-render.golden.txt was committed in f5512b6a before any product change: git show --stat that commit, and run the golden test at that commit against master's src.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "The A2A fixture is the ruled one. open-brain/tests/fixtures-state/a2a-state-1c200b41.json must be 260,229 bytes, have sha256 8892464b6608a82c38fa63e878b2458412fbbd12a15471c0d6aea94f21004549 and blob 3cc195a5…, and be identical in both PRs.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "One flag reader. greeting-flags.ts and the .gitignore allowlist line must be byte-identical in #391 and #393 (the planner measured 6168e07e and 143ad2bb in both). No other file may parse greeting.json; check with git grep greeting.json -- open-brain/src at the merged tree.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The flag values ruled for SIA. #391's greeting.json sets role_docs_by_sha: true; #393's sets briefing_budget: true and handoff_caps: false. The handoff caps stay off until the D-110 split.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "#391 records a read only after printing it. Show that recordRoleReads is called only from handleStart after the full text is in the output, and that describeRoleFiles and composeGreeting (the greeting-size check) never record. Re-run the developer's M3 or M4.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "#393 caps (flag on, in a scratch fixture). set_handoff refuses four watch-outs, a watch-out longer than 200 characters or spanning more than one line, and a pick_up longer than 400 characters, naming every violation. An expired watch-out is dropped and counted. WAITING ON AARON lists only unresolved owner: aaron questions. NEXT appears only when the objective names task ids. The worst-case budget fits 30 lines and 4,096 characters, and the overflow prints +N more: <pointer>.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "A2A safety. Every new schema field is optional. The A2A fixture still parses with master's schema, and renderBriefing over it with every flag absent matches the golden.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "48-qa267-pr387",
+        "new_capability": "QA 267, session-160 batch: #387, #388, #391, #393",
+        "objective": "QA 267, session-160 batch: #387, #388, #391, #393",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "18be9771d91e0ab5f94db1bbb1bca11bce69e632",
+          "path": "docs/loops/qa-267-s160-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files each PR changes beyond origin/master. Flag any file outside the task. The planner's counts are 1 / 1 / 8 / 16 files, from git diff --name-only origin/master...<head> at a68d0393.",
+          "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts. #387 and #388 are pins on product code that is already correct, so for them the red evidence is the product mutant in row 3. Do not report a red run on master for those two.",
+          "Mutants. Write one product mutant of your own and re-run one of the developer's named in the PR body. Each must turn a row red. Run tsc --noEmit on every mutant before counting it, and confirm the edit landed.",
+          "CI (read only). Run gh pr checks <n> and record the test result and run id.",
+          "Flag OFF is byte-identical. Both PRs claim that with greeting.json absent or set to false, output is byte-identical to master's renderer. Check this on the A2A fixture and on SIA's fixture. For #393, confirm that the golden a2a-1c200b41-render.golden.txt was committed in f5512b6a before any product change: git show --stat that commit, and run the golden test at that commit against master's src.",
+          "The A2A fixture is the ruled one. open-brain/tests/fixtures-state/a2a-state-1c200b41.json must be 260,229 bytes, have sha256 8892464b6608a82c38fa63e878b2458412fbbd12a15471c0d6aea94f21004549 and blob 3cc195a5…, and be identical in both PRs.",
+          "One flag reader. greeting-flags.ts and the .gitignore allowlist line must be byte-identical in #391 and #393 (the planner measured 6168e07e and 143ad2bb in both). No other file may parse greeting.json; check with git grep greeting.json -- open-brain/src at the merged tree.",
+          "The flag values ruled for SIA. #391's greeting.json sets role_docs_by_sha: true; #393's sets briefing_budget: true and handoff_caps: false. The handoff caps stay off until the D-110 split.",
+          "#391 records a read only after printing it. Show that recordRoleReads is called only from handleStart after the full text is in the output, and that describeRoleFiles and composeGreeting (the greeting-size check) never record. Re-run the developer's M3 or M4.",
+          "#393 caps (flag on, in a scratch fixture). set_handoff refuses four watch-outs, a watch-out longer than 200 characters or spanning more than one line, and a pick_up longer than 400 characters, naming every violation. An expired watch-out is dropped and counted. WAITING ON AARON lists only unresolved owner: aaron questions. NEXT appears only when the objective names task ids. The worst-case budget fits 30 lines and 4,096 characters, and the overflow prints +N more: <pointer>.",
+          "A2A safety. Every new schema field is optional. The A2A fixture still parses with master's schema, and renderBriefing over it with every flag absent matches the golden."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files each PR changes beyond origin/master. Flag any file outside the task. The planner's counts are 1 / 1 / 8 / 16 files, from git diff --name-only origin/master...<head> at a68d0393."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts. #387 and #388 are pins on product code that is already correct, so for them the red evidence is the product mutant in row 3. Do not report a red run on master for those two."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Write one product mutant of your own and re-run one of the developer's named in the PR body. Each must turn a row red. Run tsc --noEmit on every mutant before counting it, and confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). Run gh pr checks <n> and record the test result and run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T5",
+          "observable": "Flag OFF is byte-identical. Both PRs claim that with greeting.json absent or set to false, output is byte-identical to master's renderer. Check this on the A2A fixture and on SIA's fixture. For #393, confirm that the golden a2a-1c200b41-render.golden.txt was committed in f5512b6a before any product change: git show --stat that commit, and run the golden test at that commit against master's src."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T6",
+          "observable": "The A2A fixture is the ruled one. open-brain/tests/fixtures-state/a2a-state-1c200b41.json must be 260,229 bytes, have sha256 8892464b6608a82c38fa63e878b2458412fbbd12a15471c0d6aea94f21004549 and blob 3cc195a5…, and be identical in both PRs."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T7",
+          "observable": "One flag reader. greeting-flags.ts and the .gitignore allowlist line must be byte-identical in #391 and #393 (the planner measured 6168e07e and 143ad2bb in both). No other file may parse greeting.json; check with git grep greeting.json -- open-brain/src at the merged tree."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T8",
+          "observable": "The flag values ruled for SIA. #391's greeting.json sets role_docs_by_sha: true; #393's sets briefing_budget: true and handoff_caps: false. The handoff caps stay off until the D-110 split."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T9",
+          "observable": "#391 records a read only after printing it. Show that recordRoleReads is called only from handleStart after the full text is in the output, and that describeRoleFiles and composeGreeting (the greeting-size check) never record. Re-run the developer's M3 or M4."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T10",
+          "observable": "#393 caps (flag on, in a scratch fixture). set_handoff refuses four watch-outs, a watch-out longer than 200 characters or spanning more than one line, and a pick_up longer than 400 characters, naming every violation. An expired watch-out is dropped and counted. WAITING ON AARON lists only unresolved owner: aaron questions. NEXT appears only when the objective names task ids. The worst-case budget fits 30 lines and 4,096 characters, and the overflow prints +N more: <pointer>."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex fb749333..bd9f52c0 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -394,6 +394,8 @@ describe(\"server handlers\", () => {\n         return out;\n       };\n       const perId = /retention KEPT done task/g;\n+      // QA 265 (#382): the summary is ONE line per write; a writer that printed it twice passed every assertion above.\n+      const summaryLines = (out: string) => out.split(\"\\n\").filter((l) => l.startsWith(\"KEPT despite retention\")).length;\n       // Fixture done tasks were closed before v3, so the THIRD keyed session to write puts them past retention.\n       expect((await write(\"t232-a\", 61)).match(perId)).toBeNull();\n       expect((await write(\"t232-b\", 62)).match(perId)).toBeNull();\n@@ -401,9 +403,11 @@ describe(\"server handlers\", () => {\n       expect(crossing.match(perId)).toHaveLength(2);\n       expect(crossing).toContain(\"NOTE: retention KEPT done task T-001: cited in 1 tracked file(s) — closeout.md\");\n       expect(crossing).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(crossing)).toBe(1);\n       // Retention changes nothing here: the summary line only, no per-id detail.\n       const noop = await write(\"t232-d\", 64);\n       expect(noop).toContain(\"KEPT despite retention (id cited in the tracked tree): 2 — T-001, T-002\");\n+      expect(summaryLines(noop)).toBe(1);\n       expect(noop.match(perId)).toBeNull();\n     });\n \n"
+          ],
+          "id": "T11",
+          "observable": "A2A safety. Every new schema field is optional. The A2A fixture still parses with master's schema, and renderBriefing over it with every flag absent matches the golden."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "60abf0146d9d1214f602dd3a238e89fee726bd31",
+        "merge_commit": "74eb29d3b9fba319f3f56933b0c47347a1301843",
+        "pr": 387,
+        "scored_sha": "9d1ed0c55751f07dd5fb1a184cfc999c9c43023d"
+      }
+    }
+  }
+}

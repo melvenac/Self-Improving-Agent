@@ -1,0 +1,344 @@
+{
+  "base_sha": "1a54588cba116b204d3bab42381fd630c5fb4213",
+  "candidate_sha": "b24ea6a0a43b9b92188e130ec814f502e457ae4b",
+  "case_id": "qa265-pr378",
+  "case_no": 44,
+  "checks_hint": {
+    "build_exit": 0,
+    "checks": "recorded",
+    "ci_event": "pull_request",
+    "ci_run_id": 37113792954,
+    "runs_found": 1,
+    "source": "ci",
+    "test_job": "success",
+    "unit_exit": 0
+  },
+  "label": "ACCEPT",
+  "leak_hits": [
+    "reject"
+  ],
+  "merge_commit": "c954336ee3207444ce17d0539751f8f33ea87ac8",
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. Files each PR's own commits touch beyond origin/master. Flag anything outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Re-run QA 264's six QA-263 mutants are NOT required again unless the range-diff touches their rows.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (#377. Confirm each of the three call sites passes readRecalledFile into resolveRecalledIdsObserved, and that the resolver catches a thrown read (so the SessionEnd hook and the MCP handler cannot crash). Only ENOENT is absent.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (#378. The row forces both scans to run; QA 261's mutant (delete lines.push(...formatScanCounts(...)) in handleStart) turns it red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (#379. Every one of the 12 container rows' pinned fragments is asserted; an ABSENT container stays normal; with nothing else checkable the result is SKIP; QA's earlier mutant B (unreadable settings note) is red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (#382. A no-op-retention write prints exactly one summary line and no per-id NOTE; a write where a task crosses the boundary prints the per-id NOTE(s) plus the summary. Every fixture write asserts \"applied\".), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (Batch merge order. Scratch branch from origin/master; merge #374, #377, #378, #379, #382. Report any conflict (#377, #378 and #382 all touch server.ts / server.test.ts). Then tsc --noEmit, npm run typecheck:tests (exit 0), and the touched test files one per invocation.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. New/changed test files against master's source (fail) and the head (pass). Quote counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus re-run one of the developer's (named in the PR body). Each turns a row red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head (read only). gh pr checks <n>: test result and run id. A pre-#371 head will not have run typecheck:tests in CI: run npm run typecheck:tests at the head yourself and quote the exit code.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#374 r2 (narrow). Only what changed since QA 264's REJECT at 7e0509e1:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (start-parity.test.ts T-226 row: green at the head; the grab now matches brief.md; threshold still 3. Apply the mutant \"delete the brief.md sentence from ONE template copy\": the row must go red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (SERVED_PATHS includes project-template: a commit touching only project-template/... counts as a CODE commit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Usage at sevenDayPct >= 98 prints band word STOP whatever the file's level; at 97 the file's own band stays.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (git range-diff 1115ee19..7e0509e1 <merge-base>..40105c1f (or equivalent): report anything that changed beyond these three items and the master merge.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "b24ea6a0a43b9b92188e130ec814f502e457ae4b",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/server.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. Files each PR's own commits touch beyond origin/master. Flag anything outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. New/changed test files against master's source (fail) and the head (pass). Quote counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus re-run one of the developer's (named in the PR body). Each turns a row red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head (read only). gh pr checks <n>: test result and run id. A pre-#371 head will not have run typecheck:tests in CI: run npm run typecheck:tests at the head yourself and quote the exit code.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#374 r2 (narrow). Only what changed since QA 264's REJECT at 7e0509e1:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "start-parity.test.ts T-226 row: green at the head; the grab now matches brief.md; threshold still 3. Apply the mutant \"delete the brief.md sentence from ONE template copy\": the row must go red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "SERVED_PATHS includes project-template: a commit touching only project-template/... counts as a CODE commit.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Usage at sevenDayPct >= 98 prints band word STOP whatever the file's level; at 97 the file's own band stays.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "git range-diff 1115ee19..7e0509e1 <merge-base>..40105c1f (or equivalent): report anything that changed beyond these three items and the master merge.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Re-run QA 264's six QA-263 mutants are NOT required again unless the range-diff touches their rows.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "#377. Confirm each of the three call sites passes readRecalledFile into resolveRecalledIdsObserved, and that the resolver catches a thrown read (so the SessionEnd hook and the MCP handler cannot crash). Only ENOENT is absent.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "#378. The row forces both scans to run; QA 261's mutant (delete lines.push(...formatScanCounts(...)) in handleStart) turns it red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "#379. Every one of the 12 container rows' pinned fragments is asserted; an ABSENT container stays normal; with nothing else checkable the result is SKIP; QA's earlier mutant B (unreadable settings note) is red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "#382. A no-op-retention write prints exactly one summary line and no per-id NOTE; a write where a task crosses the boundary prints the per-id NOTE(s) plus the summary. Every fixture write asserts \"applied\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "Batch merge order. Scratch branch from origin/master; merge #374, #377, #378, #379, #382. Report any conflict (#377, #378 and #382 all touch server.ts / server.test.ts). Then tsc --noEmit, npm run typecheck:tests (exit 0), and the touched test files one per invocation.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "44-qa265-pr378",
+        "new_capability": "QA 265, session-159 batch 2: #374 r2 (narrow), #377, #378, #379, #382",
+        "objective": "QA 265, session-159 batch 2: #374 r2 (narrow), #377, #378, #379, #382",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "bc7669aef7b8fa43aeb462ba22224a490591948b",
+          "path": "docs/loops/qa-265-s159b-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. Files each PR's own commits touch beyond origin/master. Flag anything outside the task.",
+          "Red then green. New/changed test files against master's source (fail) and the head (pass). Quote counts.",
+          "One mutant of your own, plus re-run one of the developer's (named in the PR body). Each turns a row red.",
+          "CI on the head (read only). gh pr checks <n>: test result and run id. A pre-#371 head will not have run typecheck:tests in CI: run npm run typecheck:tests at the head yourself and quote the exit code.",
+          "#374 r2 (narrow). Only what changed since QA 264's REJECT at 7e0509e1:",
+          "start-parity.test.ts T-226 row: green at the head; the grab now matches brief.md; threshold still 3. Apply the mutant \"delete the brief.md sentence from ONE template copy\": the row must go red.",
+          "SERVED_PATHS includes project-template: a commit touching only project-template/... counts as a CODE commit.",
+          "Usage at sevenDayPct >= 98 prints band word STOP whatever the file's level; at 97 the file's own band stays.",
+          "git range-diff 1115ee19..7e0509e1 <merge-base>..40105c1f (or equivalent): report anything that changed beyond these three items and the master merge.",
+          "Re-run QA 264's six QA-263 mutants are NOT required again unless the range-diff touches their rows.",
+          "#377. Confirm each of the three call sites passes readRecalledFile into resolveRecalledIdsObserved, and that the resolver catches a thrown read (so the SessionEnd hook and the MCP handler cannot crash). Only ENOENT is absent.",
+          "#378. The row forces both scans to run; QA 261's mutant (delete lines.push(...formatScanCounts(...)) in handleStart) turns it red.",
+          "#379. Every one of the 12 container rows' pinned fragments is asserted; an ABSENT container stays normal; with nothing else checkable the result is SKIP; QA's earlier mutant B (unreadable settings note) is red.",
+          "#382. A no-op-retention write prints exactly one summary line and no per-id NOTE; a write where a task crosses the boundary prints the per-id NOTE(s) plus the summary. Every fixture write asserts \"applied\".",
+          "Batch merge order. Scratch branch from origin/master; merge #374, #377, #378, #379, #382. Report any conflict (#377, #378 and #382 all touch server.ts / server.test.ts). Then tsc --noEmit, npm run typecheck:tests (exit 0), and the touched test files one per invocation."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T1",
+          "observable": "Confined. Files each PR's own commits touch beyond origin/master. Flag anything outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. New/changed test files against master's source (fail) and the head (pass). Quote counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus re-run one of the developer's (named in the PR body). Each turns a row red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T4",
+          "observable": "CI on the head (read only). gh pr checks <n>: test result and run id. A pre-#371 head will not have run typecheck:tests in CI: run npm run typecheck:tests at the head yourself and quote the exit code."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T5",
+          "observable": "#374 r2 (narrow). Only what changed since QA 264's REJECT at 7e0509e1:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T6",
+          "observable": "start-parity.test.ts T-226 row: green at the head; the grab now matches brief.md; threshold still 3. Apply the mutant \"delete the brief.md sentence from ONE template copy\": the row must go red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T7",
+          "observable": "SERVED_PATHS includes project-template: a commit touching only project-template/... counts as a CODE commit."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T8",
+          "observable": "Usage at sevenDayPct >= 98 prints band word STOP whatever the file's level; at 97 the file's own band stays."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T9",
+          "observable": "git range-diff 1115ee19..7e0509e1 <merge-base>..40105c1f (or equivalent): report anything that changed beyond these three items and the master merge."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T10",
+          "observable": "Re-run QA 264's six QA-263 mutants are NOT required again unless the range-diff touches their rows."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T11",
+          "observable": "#377. Confirm each of the three call sites passes readRecalledFile into resolveRecalledIdsObserved, and that the resolver catches a thrown read (so the SessionEnd hook and the MCP handler cannot crash). Only ENOENT is absent."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T12",
+          "observable": "#378. The row forces both scans to run; QA 261's mutant (delete lines.push(...formatScanCounts(...)) in handleStart) turns it red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T13",
+          "observable": "#379. Every one of the 12 container rows' pinned fragments is asserted; an ABSENT container stays normal; with nothing else checkable the result is SKIP; QA's earlier mutant B (unreadable settings note) is red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T14",
+          "observable": "#382. A no-op-retention write prints exactly one summary line and no per-id NOTE; a write where a task crosses the boundary prints the per-id NOTE(s) plus the summary. Every fixture write asserts \"applied\"."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/server.test.ts b/open-brain/tests/server.test.ts\nindex d921f33c..38ce9d90 100644\n--- a/open-brain/tests/server.test.ts\n+++ b/open-brain/tests/server.test.ts\n@@ -86,6 +86,34 @@ describe(\"server handlers\", () => {\n       expect(text).toContain(\"v2.0.0\");\n     });\n \n+    /**\n+     * T-230 (QA 261's surviving mutant Q1): formatScanCounts is pinned on its own in\n+     * t048-zero-case, but nothing pinned that handleStart PRINTS it. Both scans are made\n+     * to run here (a proven session id with .agents/SESSIONS, and a home that has\n+     * .claude/projects), so each line must say 0 rather than \"not searched/scanned\".\n+     */\n+    it(\"prints both T-048 scan counts at zero when both scans ran and found nothing unreadable\", async () => {\n+      proseProject(tmp);\n+      const home = mkdtempSync(join(tmpdir(), \"t230-home-\"));\n+      mkdirSync(join(home, \".claude\", \"projects\", \"some-project\"), { recursive: true });\n+      const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };\n+      process.env.HOME = home;\n+      process.env.USERPROFILE = home;\n+      try {\n+        proveOwn(\"t230-uuid\");\n+        await handleSetSession({ session_id: \"t230-uuid\", project_dir: tmp });\n+        const text = getText(await handleStart({ project_root: tmp }));\n+        expect(text).toContain(\"\\nSession logs unreadable: 0\\n\");\n+        expect(text).toContain(\"\\nTranscript directories unreadable: 0\\n\");\n+      } finally {\n+        for (const [k, v] of Object.entries(saved)) {\n+          if (v === undefined) delete process.env[k];\n+          else process.env[k] = v;\n+        }\n+        rmSync(home, { recursive: true, force: true });\n+      }\n+    });\n+\n     /**\n      * Loop 1 (ADR-023): ob_start used to compute the state and then report\n      * \"SUMMARY loaded\" — the content never left the pipeline. This pins the\n"
+          ],
+          "id": "T15",
+          "observable": "Batch merge order. Scratch branch from origin/master; merge #374, #377, #378, #379, #382. Report any conflict (#377, #378 and #382 all touch server.ts / server.test.ts). Then tsc --noEmit, npm run typecheck:tests (exit 0), and the touched test files one per invocation."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "1a54588cba116b204d3bab42381fd630c5fb4213",
+        "merge_commit": "c954336ee3207444ce17d0539751f8f33ea87ac8",
+        "pr": 378,
+        "scored_sha": "b24ea6a0a43b9b92188e130ec814f502e457ae4b"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "gate": "developer-done",
+  "plan_match": "requirement_rows",
+  "requirement_row_min_noul": 0.7,
+  "diff_matches_plan_min": 0.7,
+  "touches_out_of_scope_max": 0.3,
+  "local_tests_support_claim_min": 0.6,
+  "stuck_repeating_prior_failure_max": 0.6,
+  "risk_of_regression_rollback_at_or_above": 1.5,
+  "hand_to_qa_requires_green_checks": true
+}
