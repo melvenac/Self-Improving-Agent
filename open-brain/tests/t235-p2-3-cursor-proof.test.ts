@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import {
   byPidDir,
@@ -266,32 +266,56 @@ describe("T-235 P2-3 cursor session proof", () => {
     if (r.id === null) expect(r.reason).toMatch(/Win32 process table/);
   });
 
-  it("r4 OPEN_BRAIN_PROCESS_TABLE json naming a foreign pid writes no proof for it", () => {
-    const foreign = 2147483001;
-    const forged = JSON.stringify([
-      { ProcessId: process.pid, ParentProcessId: foreign, CommandLine: "node.exe vitest" },
-      { ProcessId: foreign, ParentProcessId: 1, CommandLine: HOST_CMD },
-    ]);
+  it("r4 OPEN_BRAIN_PROCESS_TABLE json naming a live foreign pid writes no proof for it", () => {
+    // G-056 (QA 279 #427 F1): the first version of this row was vacuous. Its forged pid was not alive, so no
+    // start time could be read, and its chain started at the vitest pid while the hook walks from its own
+    // ppid. Here the hook is launched by `node --import tsx`, which runs in this process's child directly, so
+    // the hook's ppid IS process.pid and the forged chain starts where the walk starts. The foreign pid is a
+    // live process, so a proof for it WOULD be written if the forged table were read.
+    const foreignProc = spawn(process.execPath, ["-e", "setTimeout(() => {}, 120000)"], { stdio: "ignore" });
+    const foreign = foreignProc.pid as number;
     const home = mkdtempSync(join(tmpdir(), "t235-r4-home-"));
     const cwd = mkdtempSync(join(tmpdir(), "t235-r4-cwd-"));
-    const slot = join(home, "active-session.json");
-    const r = spawnSync(process.execPath, [TSX_CLI, BOOT, "--ide", "cursor"], {
-      input: JSON.stringify({ cwd, session_id: SELF, cursor_version: "1", workspace_roots: [cwd] }),
-      encoding: "utf-8",
-      env: {
-        ...process.env,
-        HOME: home,
-        USERPROFILE: home,
-        OPEN_BRAIN_ACTIVE_SESSION: slot,
-        OPEN_BRAIN_PROCESS_TABLE: `json:${forged}`,
-      },
-    });
-    const foreignProof = join(byPidDir(slot), `${foreign}.json`);
-    const wroteForeign = existsSync(foreignProof);
-    rmSync(home, { recursive: true, force: true });
-    rmSync(cwd, { recursive: true, force: true });
-    expect(r.status).toBe(0);
-    expect(wroteForeign).toBe(false);
-    expect(r.stdout ?? "").not.toContain(`cursor-agent host process ${foreign}`);
+    try {
+      // Premise: the foreign pid is alive and its start time is readable, or the row proves nothing.
+      expect(Number.isInteger(foreign)).toBe(true);
+      expect(processStartTime(foreign)).not.toBeNull();
+      const forged = JSON.stringify([
+        { ProcessId: process.pid, ParentProcessId: foreign, CommandLine: "node.exe vitest" },
+        { ProcessId: foreign, ParentProcessId: 1, CommandLine: HOST_CMD },
+      ]);
+      const slot = join(home, "active-session.json");
+      const r = spawnSync(process.execPath, ["--import", "tsx", BOOT, "--ide", "cursor"], {
+        cwd: resolve(import.meta.dirname, ".."),
+        input: JSON.stringify({ cwd, session_id: SELF, cursor_version: "1", workspace_roots: [cwd] }),
+        encoding: "utf-8",
+        timeout: 60_000,
+        env: {
+          ...process.env,
+          HOME: home,
+          USERPROFILE: home,
+          OPEN_BRAIN_ACTIVE_SESSION: slot,
+          OPEN_BRAIN_PROCESS_TABLE: `json:${forged}`,
+        },
+      });
+      expect(r.status).toBe(0);
+      // The hook reached the proof step and refused: it did not crash before looking.
+      expect(r.stdout ?? "").toContain("Session proof NOT written");
+      expect(r.stdout ?? "").not.toContain(`cursor-agent host process ${foreign}`);
+      expect(existsSync(join(byPidDir(slot), `${foreign}.json`))).toBe(false);
+    } finally {
+      foreignProc.kill();
+      rmSync(home, { recursive: true, force: true });
+      rmSync(cwd, { recursive: true, force: true });
+    }
+  });
+
+  it("r4 process-session.ts reads no process.env and names no OPEN_BRAIN_PROCESS_TABLE", () => {
+    // A static pin beside the behavioural row above: the seam cannot return in any shape without
+    // one of these two strings, whatever platform the suite runs on.
+    const src = readFileSync(resolve(import.meta.dirname, "../src/shared/process-session.ts"), "utf-8");
+    expect(src.length).toBeGreaterThan(1000);
+    expect(src).not.toContain("OPEN_BRAIN_PROCESS_TABLE");
+    expect(src).not.toMatch(/process\.env/);
   });
 });
