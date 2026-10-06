@@ -96,7 +96,13 @@ describe("T-048 round 2b", () => {
       details: { invocationLog: "ran" },
     })).not.toContain("invocation log:");
     const cli = readFileSync(join(import.meta.dirname, "../src/cli.ts"), "utf8");
-    expect(cli, "sync --score uses that printer").toContain("formatScoreCategoryLine");
+    const namesPrinter = (src: string) => src.split("\n").some((line) => {
+      const trimmed = line.trim();
+      return !trimmed.startsWith("//") && trimmed.includes("formatScoreCategoryLine");
+    });
+    expect(namesPrinter("formatScoreCategoryLine(row);")).toBe(true);
+    expect(namesPrinter("// formatScoreCategoryLine is not called")).toBe(false);
+    expect(namesPrinter(cli), "sync --score uses that printer").toBe(true);
   });
 
   it("D2: a readable db with no session_meta holds no session", () => {
@@ -191,7 +197,18 @@ describe("T-048 round 2b", () => {
       "utf8",
     );
     const helper = src.slice(src.indexOf("function unusableLog"), src.indexOf("export function readLastInvocationTs"));
-    expect(helper).not.toContain("string | null");
+    const badReturn = (text: string) => text.split("\n").some((line) => {
+      const trimmed = line.trim();
+      return trimmed.length > 0
+        && !trimmed.startsWith("//")
+        && !trimmed.startsWith("*")
+        && !trimmed.startsWith("/*")
+        && trimmed.includes("string | null");
+    });
+    expect(badReturn("function unusableLog(): string | null {")).toBe(true);
+    expect(badReturn("// string | null was the old return of unusableLog")).toBe(false);
+    expect(badReturn("/* string | null is not this helper's return */")).toBe(false);
+    expect(badReturn(helper)).toBe(false);
     expect(helper).not.toContain("One mutant");
     const docStart = src.lastIndexOf("/**", src.indexOf("export function readLastInvocationTs"));
     const doc = src.slice(docStart, src.indexOf("export function readLastInvocationTs"));
