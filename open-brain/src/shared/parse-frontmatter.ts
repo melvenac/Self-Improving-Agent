@@ -1,6 +1,11 @@
+/** Strip a leading UTF-8 BOM so `---` frontmatter still parses. */
+function stripLeadingBom(raw: string): string {
+  return raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
+}
+
 /** Minimal YAML-like frontmatter reader for vault notes (line-based `key: value`). */
 export function parseFrontmatter(raw: string): Record<string, unknown> {
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const match = stripLeadingBom(raw).match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return {};
 
   const result: Record<string, unknown> = {};

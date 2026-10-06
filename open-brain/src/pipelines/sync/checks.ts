@@ -393,14 +393,20 @@ export interface ExperienceFrontmatterScan {
   notes: string[];
   findings: { path: string; reason: string }[];
   unreadable: string[];
+  /** Experiences/ missing (ENOENT on root stat). */
+  experiencesAbsent?: boolean;
+  /** readdir succeeded on Experiences/ root at least once. */
+  experiencesListed?: boolean;
 }
 
 type ReadDir = (path: string, options: { withFileTypes: true }) => import("node:fs").Dirent[];
 type ReadFile = (path: string) => string;
+type StatPath = (path: string) => import("node:fs").Stats;
 
 export interface ExperienceFrontmatterDeps {
   readDir?: ReadDir;
   readFile?: ReadFile;
+  stat?: StatPath;
 }
 
 export function scanExperienceFrontmatter(
@@ -409,9 +415,20 @@ export function scanExperienceFrontmatter(
 ): ExperienceFrontmatterScan {
   const readDir = deps.readDir ?? (readdirSync as unknown as ReadDir);
   const readFile = deps.readFile ?? ((p: string) => readFileSync(p, "utf8"));
+  const statPath = deps.stat ?? statSync;
   const scan: ExperienceFrontmatterScan = { notes: [], findings: [], unreadable: [] };
   const expRoot = join(vaultDir, "Experiences");
-  if (!existsSync(expRoot)) return scan;
+  try {
+    statPath(expRoot);
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") {
+      scan.experiencesAbsent = true;
+      return scan;
+    }
+    scan.unreadable.push(`Experiences (${code ?? "error"})`);
+    return scan;
+  }
 
   const walk = (abs: string, rel: string): void => {
     let entries: import("node:fs").Dirent[];
@@ -421,12 +438,16 @@ export function scanExperienceFrontmatter(
       scan.unreadable.push(`${rel || "Experiences"} (${(err as NodeJS.ErrnoException).code ?? "error"})`);
       return;
     }
+    if (rel === "") scan.experiencesListed = true;
     for (const ent of entries) {
       if (ent.name.startsWith(".")) continue;
       const childRel = rel ? `${rel}/${ent.name}` : ent.name;
       const childAbs = join(abs, ent.name);
       if (ent.isDirectory()) walk(childAbs, childRel);
-      else if (ent.isFile() && ent.name.toLowerCase().endsWith(".md")) {
+      else if (
+        (ent.isFile() || ent.isSymbolicLink()) &&
+        ent.name.toLowerCase().endsWith(".md")
+      ) {
         const vaultRel = `Experiences/${childRel}`.replace(/\\/g, "/");
         let text: string;
         try {
@@ -455,6 +476,22 @@ export function experienceFrontmatterResultFromScan(scan: ExperienceFrontmatterS
       report: true,
       severity: "issue",
       message: `${scan.unreadable.length} path(s) under Experiences/ could not be read, so a bad type there cannot be ruled out: ${scan.unreadable.slice(0, 5).join(", ")}. Walked ${scan.notes.length} readable note(s). This is not a pass. ${EXPERIENCE_FRONTMATTER_LIMIT}`,
+    };
+  }
+  if (scan.experiencesAbsent) {
+    return {
+      name,
+      report: true,
+      severity: "skip",
+      message: `not checked: Experiences/ is absent (ENOENT), so experience frontmatter was not read. This is not a pass. ${EXPERIENCE_FRONTMATTER_LIMIT}`,
+    };
+  }
+  if (!scan.experiencesListed) {
+    return {
+      name,
+      report: true,
+      severity: "issue",
+      message: `Experiences/ could not be listed, so a clean pass cannot be reported. Walked ${scan.notes.length} readable note(s). This is not a pass. ${EXPERIENCE_FRONTMATTER_LIMIT}`,
     };
   }
   if (scan.findings.length > 0) {

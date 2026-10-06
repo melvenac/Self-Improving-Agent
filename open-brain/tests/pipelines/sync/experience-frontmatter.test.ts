@@ -125,4 +125,69 @@ body`,
     expect(scan.unreadable.length).toBe(1);
     expect(experienceFrontmatterResultFromScan(scan).severity).toBe("issue");
   });
+
+  it("refuses when Experiences/ exists but cannot be stat'd (EACCES or EPERM)", () => {
+    const v = vault();
+    mkdirSync(join(v, "Experiences"), { recursive: true });
+    put(v, "Experiences/p/two.md", "---\ntype: foo bar\n---\n");
+    const deny = (code: "EACCES" | "EPERM") => {
+      const r = checkExperienceFrontmatter("/unused", v, {
+        stat: (p) => {
+          if (String(p).replace(/\\/g, "/").endsWith("/Experiences")) {
+            throw Object.assign(new Error(code), { code });
+          }
+          throw Object.assign(new Error("unexpected stat"), { code: "EINVAL" });
+        },
+      });
+      expect(r.severity).toBe("issue");
+      expect(r.message).toContain(code);
+      expect(r.message).toContain("This is not a pass");
+      expect(r.message).not.toMatch(/Walked 0 experience note\(s\); all type labels/);
+    };
+    deny("EACCES");
+    deny("EPERM");
+  });
+
+  it("skips when the vault path is absent (ENOENT)", () => {
+    const missing = join(tmpdir(), `t025-no-vault-${Date.now()}`);
+    const r = checkExperienceFrontmatter("/unused", missing);
+    expect(r.severity).toBe("skip");
+    expect(r.message).toContain("ENOENT");
+    expect(r.message).toContain("This is not a pass");
+  });
+
+  it("skips when Experiences/ is absent (ENOENT), not a Walked 0 pass", () => {
+    const v = vault();
+    put(v, "Summaries/x.md", "---\ntype: foo bar\n---\n");
+    const r = checkExperienceFrontmatter("/unused", v);
+    expect(r.severity).toBe("skip");
+    expect(r.message).toContain("Experiences/ is absent (ENOENT)");
+  });
+
+  it("passes with Walked 0 when Experiences/ is readable and empty", () => {
+    const v = vault();
+    mkdirSync(join(v, "Experiences"), { recursive: true });
+    const r = checkExperienceFrontmatter("/unused", v);
+    expect(r.severity).toBe("pass");
+    expect(r.message).toContain("Walked 0 experience note(s)");
+  });
+
+  it("reports non-string type values as issues", () => {
+    const v = vault();
+    put(v, "Experiences/p/num.md", "---\ntype: 42\n---\n");
+    put(v, "Experiences/p/list.md", "---\ntype: [a, b]\n---\n");
+    const r = checkExperienceFrontmatter("/unused", v);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("2 experience note(s)");
+    expect(r.message).toContain("type is not a string");
+  });
+
+  it("reads type from a BOM-prefixed note (invalid multi-token type is an issue)", () => {
+    const v = vault();
+    const body = "\uFEFF---\ntype: foo bar\nproject: p\n---\nbody";
+    put(v, "Experiences/p/bom.md", body);
+    const r = checkExperienceFrontmatter("/unused", v);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("one token");
+  });
 });
