@@ -1,56 +1,44 @@
-<!-- generated from .agents/state.json rev 339 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 340 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 161)_
+## planner [sia-planner] _(written session 162)_
 
 ### Pick up here
 
-(1) #451: infra is resolving its checks.ts conflict by merging master into the branch. Read the resolution with git show --remerge-diff (only the conflict hunks, mechanical), wait for CI, merge pinned; it is QA-accepted (QA 277) and Aaron said merge. (2) #437 r2 (QA 279 REJECT: stale reclaim double-claims at 8 claimers) and #445 r2 (REJECT: CC-19 unpaired, 5 doc readers unlisted): Aaron chose 'All 13, now', but the classifier refused merging rejected PRs, so ask Aaron (via clark) whether to fix and re-QA (forge #437 r3, builder #445 r3) or merge as-is himself. #425 merges only after #437. (3) Then T-168's follow-up (wire the owner resolver to #427's findCursorAgentHostPid, plus QA's different-owner row), G-056 (two vacuous regression tests), T-025's /sync frontmatter check (now buildable: #424 and #442 merged), and close T-235.
+(1) QA 285 (Jev cal 2 DEV phase, 33 live calls, laptop, DISPATCH d6415f5f) reports to clark: read its report yourself, then freeze the policy from DEV evidence only (a policy file committed on a docs branch, its sha256 in the manifest), write QA 286 for the held-out 34 run once, and score against the four useful criteria in docs/loops/jev-calibration-2-brief.md. (2) Forge #437 r4: confirm its reply in room k571z4gh, give clark dlv 58 for the forge waker restart, then QA 284 = #437 r4 + #472 (infra guard r2 7248d9a3) on Plumb; #425 merges only after a working #437. (3) cursor-infra: give clark dlv 66 once run 66 ends (its #472 reply is in).
 
 ### Watch out
 
-- QUESTIONS GO TO CLARK (Aaron's 'ask clark', s161): routing, sequencing and record calls go to clark by SendMessage. Acts needing Aaron's own word go to clark, who asks once and relays his words; proceed only on his quoted words. D-121 is NOT committed (classifier: instruction poisoning); it needs Aaron's own word in the planner's window.
-- CLASSIFIER (s161): merging a QA-REJECTED PR is refused as CI bypass even on Aaron's explicit word; re-run the batch without the flagged items and leave those to Aaron. Committing a peer-relayed standing rule is refused as instruction poisoning.
-- MERGE MECHANICS (s161): update-branch, then wait for CI; GitHub's mergeStateStatus can read BEHIND or UNKNOWN for a while after the update, so re-read before giving up. Check first parent = the frozen head and an equal PR patch-id; a conflict goes back to its seat, which merges master into the branch, and the resolution is read with git show --remerge-diff (the patch-id then legitimately differs). Script: the s161 scratchpad mergeall.sh.
-- CURSOR SEATS on the QA PC, one room each: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. hub-talk.mjs --as atlas --session <room> --say / --wait --wait-timeout 3500 (background; it replays unread backlog first, so check the TASK line). A --say with backticks, dollar signs, pipes or double quotes can arrive truncated.
-- G-055: the QA PC's Cursor default model is grok-4.7-high since ~05:40 CDT s161 (restoring composer-2.5 is with Aaron). Every freeze names its model from store.db; builder != judge holds (QA is Opus).
-- QA LAUNCH: Plumb first; real-Windows rows on the laptop (machine-lease with -File); never the desktop (D-065). clark launches, or Aaron by hand when clark's classifier blocks. A claude -p job writes its log only at exit, and can die on the session limit; clark relaunches after the reset.
-- MACHINE LEASE: HEAVY runs on the QA PC and laptop take machine-lease.ps1 -File with the D-119 owner, and release right after; a seat holding it idle blocks other projects.
-- FROZEN MEANS CI GREEN: read gh pr checks yourself. Seats push nothing to a frozen PR.
-- QA DISPATCHES: DISPATCH_SHA contains every file (cat-file); Write prompts, Edit helpers, refusals tested with exit codes read unpiped; check every sed-derived prompt's wording.
-- VERIFY BEFORE RULING; seats repeat stale note text. Production code carries no test seams that feed attribution (s161 #427).
-- GITNEXUS (T-166): impact() misses calls through nullable or optional receivers on 1.6.12 and can say 'exact'; grep the method name too. The CLAUDE.md paragraph waits on Aaron. T-146 BLOCKED (desktop corpus). T-241 frogger: no remote; reset 05ec972 plus the residue's reflection-queue.json.
+- WAKER RESTARTS (until A2A T-104 and T-113): any hub swap knocks every QA PC waker out (429 on the shared /health window). A restart must use a dlv the planner confirmed from the room (the last atlas turn the seat's latest reply covers), or stale turns replay and seats redo frozen work. Builder dlv 83 is right; infra 66; forge 58 after its reply lands.
+- JEV CAL 2: never run a held-out row before the policy is frozen from dev evidence. Inputs are PR 470 head 1e1ca342; requests go out with harness shadow-done --request/--policy/--phase; a label lives only in input metadata, never in the request field. The stacked PRs #463 <- #465 <- #470 are unmerged and touch src, so they need QA and Aaron's word.
+- MERGES: P2 lets the planner merge a tests/docs-only PR after QA ACCEPT by path check (post the list and authority on the PR); anything touching src needs Aaron's word. Always: update-branch, CI, first parent = the QA'd head, --remerge-diff with zero conflicts, merge --match-head-commit, read back on origin/master.
+- PEERS: Aaron is in the planner window; ask him directly, one question at a time. clark (a fresh session since 05:5xZ) relays D-033/P3 notices and launches QA. Relay is relay-a2a; find peers with ListAgents, because pipe addresses go stale after a restart.
+- MODEL REPORTS: a seat's store.db model is chat metadata, not the model the run used; use the waker log's resume line (gap opened this session).
+- FUNNEL is ON, standing (03:54Z 10-06, Aaron's word via clark). SIA's HOLD was lifted after T-107 and T-110 gave tailnet callers their own windows. Residual: tcm-local callers share the public bucket.
 
 ### Open questions
 
-- #437 and #445 (QA-rejected): fix and re-QA, or merge as-is by Aaron's own hand?
-- D-121 in Aaron's own words in the planner's window.
-- CLAUDE.md GitNexus paragraph (T-166): yes or no.
-- T-146: still wanted, and where does it run?
-- Restore composer-2.5 as the QA PC's Cursor default (G-055).
+- None blocking. Aaron's word is needed to merge #437 r4 and #425 after QA 284, and the Jev stacked PRs after their QA.
 
 ### Loop state
 
 **Open PRs:** 
-- #451 — QA: accepted — T-187 1e8cba7c (QA 277); checks.ts conflict after #442, infra resolving; Aaron said merge
-- #437 — QA: rejected — T-235 P2-7 r2 3dfa2424; QA 279: stale reclaim double-claims at 8 claimers
-- #445 — QA: rejected — T-156 r2 43ed65a9; QA 279: CC-19 unpaired, 5 doc readers unlisted
-- #425 — QA: accepted — T-235 P2-4 9fcb97ca; merges only after #437
+- #437 — QA: rejected — T-235 P2-7 r3 8e751360 rejected by QA 280; r4 in progress by forge (turns 57/58); reserved for QA 284
+- #425 — QA: accepted — T-235 P2-4 1eea3cdb, QA 280 ACCEPT; merges only after a working #437
+- #472 — QA: not_started — HUBROOM-GUARD r2 7248d9a3 (infra), CI green; to QA 284
+- #463 — QA: not_started — Jev cal 2 gate changes (builder), base master
+- #465 — QA: not_started — Jev cal 2 collector a9d7ee42 (Scout), base loop/jev-cal-2
+- #470 — QA: in_progress — Jev cal 2 inputs and runner 1e1ca342 (builder), base loop/jev-cal-2-collector; QA 285 runs from it
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `1e1ca3423bac37bffb7ab04c24bb51ecf3c8624d`
 
-**Questions pending for Aaron:** 
-- #437/#445: fix and re-QA, or merge as-is
-- D-121 own word
-- CLAUDE.md GitNexus paragraph
-- T-146
-- composer-2.5 (G-055)
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s161 merged on Aaron's 'merge any open prs': #421 315e116f, #424 5869d9ba, #436 d4a54f0e, #441 a6024d4e, #442 7723f592, #446 ef97fb61, #427 bda94d19, #434 4da16370, #444 59eb1c9d; earlier #443 1d45222c
-- QA 279 (8396ffbc): #427 #434 #444 ACCEPT; #437 #445 REJECT
-- Closed s161: G-050 G-052 G-053 G-054, T-055 T-173 T-240; opened T-240 T-241 G-055 G-056
+- s162 merged on Aaron's word: #451 27dd1e77, #457 2f8e6489 (no QA; QA 281 retro FINDINGS, fixed by #468), #458 1671d005 (no QA; QA 281 HOLDS), #466 b8ab0f04, #468 5309fc2c; under P2: #445 ecbfb169, #464 52359857; docs-only: #459 #460 #461 #462 #467 #469 #471 #473.
+- QA 280 d8cb4652: #425 ACCEPT, #437 r3 REJECT, #445 r3 REJECT. QA 281 ae2baca7: #445 r4 ACCEPT. QA 282 5d0cbbd9: #464 ACCEPT, #466 REJECT. QA 283 29a398b3: #466 r2 ACCEPT, #468 ACCEPT (K1/K2 sent back as #472).
+- Hub changes GO'd for SIA: v1.18.0, v1.18.1 (T-107), T-110 SNAT off, Funnel standing, v1.19.0 (T-111, sign-in OFF).
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -126,4 +114,4 @@ _9 older handoff(s), superseded within their seat and checkout, are in state.jso
 
 ## Last session
 
-Session 161 — 2026-10-04 — planner [sia-planner] — `9a3bc5a9-fd23-444f-a45e-3bc75c455cd1` (13 writing session(s) in the record)
+Session 162 — 2026-10-06 — planner [sia-planner] — `b8fa00fd-5821-40b3-b472-eec717bcf49a` (13 writing session(s) in the record)
