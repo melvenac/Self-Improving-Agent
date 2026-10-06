@@ -3,21 +3,32 @@
  */
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { spawnAsync } from "../tests/spawn-async.js";
 
-export type ClaimIsolatedMutant = "none" | "m2-no-restat-snap";
+export type ClaimIsolatedMutant = "none" | "m2-no-restat-snap" | "drop-breaker-release";
 
 const obRoot = join(import.meta.dirname, "..");
 const srcShared = join(obRoot, "src/shared");
 
 export function applyM2PatchFromSource(source: string): string {
   const block =
-    /    claimTestSeams\?\.sweepAfterRestatBeforeRename\?\.\(claimPath\);\n    const afterSeam = snapStat\(claimPath\);\n    if \(!afterSeam \|\| !sameSnap\(before, afterSeam\)\) return false;\n    if \(Date\.now\(\) - afterSeam\.mtimeMs <= ttlMs\) return false;\n/;
+    /    const afterSeam = snapStat\(claimPath\);\n    if \(!afterSeam \|\| !sameSnap\(before, afterSeam\)\) return false;\n    if \(Date\.now\(\) - afterSeam\.mtimeMs <= ttlMs\) return false;\n/;
   const patched = source.replace(block, "");
   if (patched === source) {
     throw new Error("M2 mutant patch did not apply");
+  }
+  return patched;
+}
+
+export function applyDropBreakerReleasePatch(source: string): string {
+  const patched = source.replace(
+    /(\} finally \{\n)    releaseOwnedWxLock\(breakerHeld\);\n(  \}\n\}\n\nfunction tryAcquireReclaimLock)/,
+    "$1$2",
+  );
+  if (patched === source) {
+    throw new Error("drop-breaker-release patch did not apply");
   }
   return patched;
 }
@@ -39,6 +50,8 @@ export async function buildIsolatedClaimModule(mutant: ClaimIsolatedMutant): Pro
   let claimSrc = readFileSync(join(srcShared, "session-hook-claim.ts"), "utf8");
   if (mutant === "m2-no-restat-snap") {
     claimSrc = applyM2Patch(claimSrc);
+  } else if (mutant === "drop-breaker-release") {
+    claimSrc = applyDropBreakerReleasePatch(claimSrc);
   }
   writeFileSync(join(inDir, "session-hook-claim.ts"), claimSrc);
   cpSync(join(srcShared, "active-session.ts"), join(inDir, "active-session.ts"));

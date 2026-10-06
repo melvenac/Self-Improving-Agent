@@ -87,6 +87,26 @@ describe("session-hook-claim interleave (T-235 P2-7 r6 D3)", () => {
     expect(r.stdout.trim()).toBe("RED");
   }, 120_000);
 
+  it("F2 breaker drop-release mutant RED (isolated gate)", async () => {
+    const script = join(__dirname, "../../scripts/claim-breaker-mutant-gate.mts");
+    const { spawnAsync } = await import("../spawn-async.js");
+    const r = await spawnAsync(process.execPath, ["--import", "tsx", script, "red"], {
+      cwd: join(__dirname, "../.."),
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout.trim()).toBe("RED");
+  }, 120_000);
+
+  it("F2 breaker drop-release GREEN on head (isolated gate)", async () => {
+    const script = join(__dirname, "../../scripts/claim-breaker-mutant-gate.mts");
+    const { spawnAsync } = await import("../spawn-async.js");
+    const r = await spawnAsync(process.execPath, ["--import", "tsx", script, "green"], {
+      cwd: join(__dirname, "../.."),
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout.trim()).toBe("GREEN");
+  }, 120_000);
+
   it("F1 M2 no-restat-snap GREEN on head (isolated gate)", async () => {
     const script = join(__dirname, "../../scripts/claim-m2-f1-gate.mts");
     const { spawnAsync } = await import("../spawn-async.js");

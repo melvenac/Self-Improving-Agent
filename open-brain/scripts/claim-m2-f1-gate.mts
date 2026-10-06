@@ -35,15 +35,20 @@ try {
     writeFileSync(other, "keep\n");
     utimesSync(race, stale, stale);
 
+    let seamFires = 0;
     setClaimTestSeamsForTest({
       sweepAfterRestatBeforeRename: () => {
+        seamFires++;
         unlinkSync(race);
         writeFileSync(race, `${Date.now()}\t${process.pid}\n`, { flag: "wx" });
       },
     });
 
     sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, other);
-    const ok = existsSync(race) && tryClaimHookRun(home, "sessionStart", "race-sid") === "duplicate";
+    const ok =
+      seamFires === 1 &&
+      existsSync(race) &&
+      tryClaimHookRun(home, "sessionStart", "race-sid") === "duplicate";
     console.log(ok ? "GREEN" : "RED");
   } finally {
     rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });

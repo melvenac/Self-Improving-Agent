@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach } from "vitest";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnAsync } from "../spawn-async.js";
@@ -10,6 +10,7 @@ import {
   SWEEP_CAP,
   clearHookClaimsForTest,
   dedupeCursorHookRuns,
+  setClaimTestSeamsForTest,
   sweepExpiredClaimsForTest,
   tryBreakStaleReclaimLockForTest,
   tryClaimHookRun,
@@ -113,6 +114,35 @@ describe("session-hook-claim (T-235 P2-7)", () => {
     utimesSync(lock, stale, stale);
     sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, join(dir, "sessionStart-other.claim"));
     expect(existsSync(lock)).toBe(true);
+  });
+
+  it("r9: EPERM on first generation stat does not create a .reclaim.0 lock", () => {
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const id = "eperm-gen";
+    const claim = join(dir, `sessionStart-${id}.claim`);
+    const stale = (Date.now() - HOOK_CLAIM_TTL_MS - 60_000) / 1000;
+    writeFileSync(claim, "old\n");
+    utimesSync(claim, stale, stale);
+    const gen = statSync(claim).mtimeMs;
+    const genLock = `${claim}.reclaim.${gen}`;
+    writeFileSync(genLock, `${Date.now()}\t999\n`);
+
+    let statCalls = 0;
+    setClaimTestSeamsForTest({
+      claimBeforeGenerationStat: () => {
+        statCalls++;
+        if (statCalls === 1) {
+          const err = new Error("ep") as NodeJS.ErrnoException;
+          err.code = "EPERM";
+          throw err;
+        }
+      },
+    });
+
+    expect(tryClaimHookRun(home, "sessionStart", id)).toBe("duplicate");
+    expect(existsSync(`${claim}.reclaim.0`)).toBe(false);
+    setClaimTestSeamsForTest(undefined);
   });
 
   it("a live reclaim lock inside TTL is not broken by the stale-lock breaker", () => {

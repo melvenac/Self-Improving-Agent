@@ -6,10 +6,9 @@ import { execSync } from "node:child_process";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { pathToFileURL } from "node:url";
 import { spawnAsync } from "../tests/spawn-async.js";
 import { runClaimBarrierTrials } from "../tests/shared/claim-barrier-trials.js";
-import { applyM2PatchFromSource } from "./claim-isolated-build.mts";
+import { applyDropBreakerReleasePatch, applyM2PatchFromSource } from "./claim-isolated-build.mts";
 
 const obRoot = join(import.meta.dirname, "..");
 const srcPath = join(obRoot, "src/shared/session-hook-claim.ts");
@@ -64,6 +63,8 @@ ${sweepMutant}`,
   );
 } else if (mutant === "m2-no-restat-snap") {
   patched = applyM2PatchFromSource(patched);
+} else if (mutant === "drop-breaker-release") {
+  patched = applyDropBreakerReleasePatch(patched);
 } else {
   console.error(`unknown mutant: ${mutant}`);
   process.exit(1);
@@ -107,19 +108,22 @@ if (tscRun.status !== 0) {
 
 const built = join(outDir, "session-hook-claim.js");
 try {
-  const r = await runClaimBarrierTrials(pathToFileURL(built).href, 8, trials, mode);
-  console.log(
-    JSON.stringify({
-      mutant,
-      mode,
-      trials,
-      doubles: r.doubles,
-      zeroClaims: r.zeroClaims,
-      exact: r.exact,
-      throws: r.throws,
-      late: r.late,
-    }),
-  );
+  const r = await runClaimBarrierTrials(built, 8, trials, mode);
+  const line = {
+    mutant,
+    mode,
+    trials,
+    doubles: r.doubles,
+    zeroClaims: r.zeroClaims,
+    exact: r.exact,
+    throws: r.throws,
+    late: r.late,
+  };
+  console.log(JSON.stringify(line));
+  if (r.throws > 0 || r.exact === 0) {
+    console.error(`mutant run invalid: throws=${r.throws} exact=${r.exact} sample=${r.sample}`);
+    process.exit(1);
+  }
 } finally {
   rmSync(work, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
 }

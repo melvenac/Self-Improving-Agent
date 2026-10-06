@@ -80,12 +80,20 @@ function renameExclusive(from: string, to: string): "ok" | "lost" {
 type FileStatSnap = { ino: number; mtimeMs: number; size: number };
 
 function snapStat(path: string): FileStatSnap | null {
-  try {
-    const s = statSync(path);
-    return { ino: Number(s.ino), mtimeMs: s.mtimeMs, size: s.size };
-  } catch {
-    return null;
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      const s = statSync(path);
+      return { ino: Number(s.ino), mtimeMs: s.mtimeMs, size: s.size };
+    } catch (err) {
+      lastErr = err;
+      const code = errno(err);
+      if (code === "ENOENT") return null;
+      if (code === "EPERM" || code === "EBUSY") continue;
+      throw err;
+    }
   }
+  throw lastErr;
 }
 
 function sameSnap(a: FileStatSnap, b: FileStatSnap): boolean {
@@ -93,9 +101,20 @@ function sameSnap(a: FileStatSnap, b: FileStatSnap): boolean {
 }
 
 /** Reclaim wx lock is named by the stale claim generation (mtimeMs) so nothing breaks a live lock in the hot path. */
-function reclaimLockPathForClaim(claimPath: string): string {
-  const gen = snapStat(claimPath)?.mtimeMs ?? 0;
-  return `${claimPath}.reclaim.${gen}`;
+function reclaimLockPathForClaim(claimPath: string): string | undefined {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      claimTestSeams?.claimBeforeGenerationStat?.(claimPath);
+      const mtimeMs = statSync(claimPath).mtimeMs;
+      return `${claimPath}.reclaim.${mtimeMs}`;
+    } catch (err) {
+      const code = errno(err);
+      if (code === "ENOENT") return undefined;
+      if (code === "EPERM" || code === "EBUSY") continue;
+      throw err;
+    }
+  }
+  return undefined;
 }
 
 function isReclaimLockEntry(name: string): boolean {
@@ -120,6 +139,8 @@ export type ClaimTestSeams = {
   breakerAfterRestatBeforeUnlink?: (lockPath: string) => void;
   sweepAfterStatBeforeRemove?: (claimPath: string) => void;
   sweepAfterRestatBeforeRename?: (claimPath: string) => void;
+  /** Test seam: runs before each stat used to name a generation reclaim lock. */
+  claimBeforeGenerationStat?: (claimPath: string) => void;
 };
 
 let claimTestSeams: ClaimTestSeams | undefined;
@@ -182,17 +203,22 @@ function breakStaleWxLockWhileHolderHeld(lockPath: string, ttlMs: number = RECLA
   return true;
 }
 
-function tryAcquireReclaimLock(claimPath: string): { ok: boolean; lockPath: string } {
-  const lockPath = reclaimLockPathForClaim(claimPath);
-  if (tryCreateClaim(lockPath)) return { ok: true, lockPath };
+function tryBreakStaleReclaimLockViaBreaker(lockPath: string, ttlMs: number = RECLAIM_LOCK_TTL_MS): boolean {
   const breakerBase = `${lockPath}.breaker`;
-  const breakerHeld = tryWxFreshOrRotated(breakerBase, RECLAIM_LOCK_TTL_MS);
-  if (!breakerHeld) return { ok: false, lockPath };
+  const breakerHeld = tryWxFreshOrRotated(breakerBase, ttlMs);
+  if (!breakerHeld) return false;
   try {
-    if (!breakStaleWxLockWhileHolderHeld(lockPath)) return { ok: false, lockPath };
+    return breakStaleWxLockWhileHolderHeld(lockPath, ttlMs);
   } finally {
     releaseOwnedWxLock(breakerHeld);
   }
+}
+
+function tryAcquireReclaimLock(claimPath: string): { ok: boolean; lockPath: string } {
+  const lockPath = reclaimLockPathForClaim(claimPath);
+  if (!lockPath) return { ok: false, lockPath: `${claimPath}.reclaim.?` };
+  if (tryCreateClaim(lockPath)) return { ok: true, lockPath };
+  if (!tryBreakStaleReclaimLockViaBreaker(lockPath, RECLAIM_LOCK_TTL_MS)) return { ok: false, lockPath };
   return { ok: tryCreateClaim(lockPath), lockPath };
 }
 
@@ -369,14 +395,7 @@ export function sweepExpiredClaimsForTest(home: string, ttlMs: number, keep: str
 
 /** Tests only — break a stale reclaim lock using production breaker path. */
 export function tryBreakStaleReclaimLockForTest(lockPath: string, ttlMs?: number): boolean {
-  const breakerBase = `${lockPath}.breaker`;
-  const breakerHeld = tryWxFreshOrRotated(breakerBase, ttlMs ?? RECLAIM_LOCK_TTL_MS);
-  if (!breakerHeld) return false;
-  try {
-    return breakStaleWxLockWhileHolderHeld(lockPath, ttlMs ?? RECLAIM_LOCK_TTL_MS);
-  } finally {
-    releaseOwnedWxLock(breakerHeld);
-  }
+  return tryBreakStaleReclaimLockViaBreaker(lockPath, ttlMs ?? RECLAIM_LOCK_TTL_MS);
 }
 
 /** Tests only — remove claim files under an isolated HOME. */
