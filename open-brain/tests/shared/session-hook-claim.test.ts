@@ -48,7 +48,7 @@ describe("session-hook-claim (T-235 P2-7)", () => {
   it("R4: after TTL a stale claim allows a full re-run", () => {
     const id = "ttl-session-1";
     expect(tryClaimHookRun(home, "sessionStart", id, 50)).toBe("claimed");
-    expect(tryClaimHookRun(home, "sessionStart", id, 50)).toBe("duplicate");
+    expect(tryClaimHookRun(home, "sessionStart", id, HOOK_CLAIM_TTL_MS)).toBe("duplicate");
     const claimPath = join(home, ".claude", "open-brain", "hook-claims", `sessionStart-${id}.claim`);
     const stale = Date.now() - HOOK_CLAIM_TTL_MS - 5_000;
     utimesSync(claimPath, stale / 1000, stale / 1000);

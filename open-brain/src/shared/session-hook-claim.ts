@@ -192,6 +192,11 @@ function releaseReclaimLock(lockPath: string): void {
   releaseOwnedWxLock(lockPath);
 }
 
+function claimFileIsFresh(path: string, ttlMs: number): boolean {
+  const snap = snapStat(path);
+  return snap !== null && Date.now() - snap.mtimeMs <= ttlMs;
+}
+
 function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
   const { ok, lockPath } = tryAcquireReclaimLock(path);
   if (!ok) return "duplicate";
@@ -308,6 +313,7 @@ export function tryClaimHookRun(
     if (tryCreateClaim(path)) return "claimed";
     const reclaimed = reclaimStale(path, ttlMs);
     if (reclaimed === "reclaimed" && tryCreateClaim(path)) return "claimed";
+    if (reclaimed === "duplicate" && claimFileIsFresh(path, ttlMs)) return "duplicate";
     if (tryCreateClaim(path)) return "claimed";
     if (Date.now() >= deadline) return "duplicate";
     sleepMs(2);
