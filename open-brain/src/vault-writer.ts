@@ -5,6 +5,7 @@ import {
   joinUnderVaultDir,
   safeVaultPathSegment,
 } from "./shared/vault-path-segment.js";
+import { yamlInlineArray, yamlScalar } from "./shared/yaml-frontmatter.js";
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -105,18 +106,17 @@ export function writeExperience(
 
   if (existsSync(filePath)) return null;
 
-  const tagsInline = input.tags.join(", ");
   const frontmatter = [
     "---",
-    `key: ${input.key}`,
-    `tags: [${tagsInline}]`,
-    `created: ${input.created}`,
-    `maturity: ${input.maturity}`,
+    `key: ${yamlScalar(input.key)}`,
+    `tags: ${yamlInlineArray(input.tags)}`,
+    `created: ${yamlScalar(input.created)}`,
+    `maturity: ${yamlScalar(input.maturity)}`,
     `helpful: ${input.helpful}`,
     `harmful: ${input.harmful}`,
     `neutral: ${input.neutral}`,
-    `project: ${input.project}`,
-    `source: ${input.source}`,
+    `project: ${yamlScalar(input.project)}`,
+    `source: ${yamlScalar(input.source)}`,
     "---",
   ].join("\n");
 
@@ -141,14 +141,13 @@ export function writeFailure(
 
   if (existsSync(filePath)) return null;
 
-  const tagsInline = input.tags.join(", ");
   const frontmatter = [
     "---",
-    `key: ${input.key}`,
+    `key: ${yamlScalar(input.key)}`,
     `type: failure`,
-    `tags: [${tagsInline}]`,
-    `created: ${input.created}`,
-    `project: ${input.project}`,
+    `tags: ${yamlInlineArray(input.tags)}`,
+    `created: ${yamlScalar(input.created)}`,
+    `project: ${yamlScalar(input.project)}`,
     "---",
   ].join("\n");
 
@@ -197,10 +196,10 @@ export function writeSummary(
 
   const frontmatter = [
     "---",
-    `sessionId: ${input.sessionId}`,
-    `project: ${input.project}`,
-    `date: ${input.date}`,
-    `tags: [${tags.join(", ")}]`,
+    `sessionId: ${yamlScalar(input.sessionId)}`,
+    `project: ${yamlScalar(input.project)}`,
+    `date: ${yamlScalar(input.date)}`,
+    `tags: ${yamlInlineArray(tags)}`,
     "---",
   ].join("\n");
 

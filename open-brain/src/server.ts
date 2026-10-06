@@ -1110,17 +1110,25 @@ server.tool(
     // re-storing an existing key raised "UNIQUE constraint failed" — and
     // re-storing an existing key is precisely what a `state` fact does.
     const { store } = await import("./pipelines/store/index.js");
-    const result = store({
-      db: v2db,
-      vaultDir: v2VaultDir(),
-      key: effectiveKey,
-      tags: tags || [],
-      content,
-      project: projectName,
-      projectDir: effectiveProject,
-      source: source || "manual",
-      factKind: kind ?? null,
-    });
+    let result;
+    try {
+      result = store({
+        db: v2db,
+        vaultDir: v2VaultDir(),
+        key: effectiveKey,
+        tags: tags || [],
+        content,
+        project: projectName,
+        projectDir: effectiveProject,
+        source: source || "manual",
+        factKind: kind ?? null,
+      });
+    } catch (err) {
+      if (err instanceof VaultPathRefusal) {
+        return { content: [{ type: "text" as const, text: `ob_store refused: ${err.message}` }], isError: true };
+      }
+      throw err;
+    }
 
     const scopeLabel = effectiveProject ? ` [project: ${effectiveProject}]` : " [global]";
 

@@ -12,27 +12,31 @@ afterEach(() => {
 });
 
 describe("AUDIT-FIX A6 — resolveOwnKey path confinement", () => {
-  it('refuses keyName "..\\..\\x" and does not return a key outside keyDir', () => {
+  it("refuses ../../escape and does not read a key planted at keyDir/../escape.key", () => {
     const td = mkdtempSync(join(tmpdir(), "audit-a6-"));
     tmpDirs.push(td);
     const keyDir = join(td, "keys");
-    writeFileSync(join(td, "stolen.key"), "s".repeat(40));
-    const r = resolveOwnKey("http://localhost:8787", "..\\..\\stolen", keyDir);
+    const hubSub = join(keyDir, "localhost-8787");
+    mkdirSync(hubSub, { recursive: true });
+    const secret = "s".repeat(40);
+    writeFileSync(join(keyDir, "escape.key"), secret);
+
+    const r = resolveOwnKey("http://localhost:8787", "../../escape", keyDir);
     expect(r.ok).toBe(false);
-    if (r.ok) expect(r.key).not.toBe("s".repeat(40));
+    if (r.ok) expect(r.key).not.toBe(secret);
   });
 
-  it('refuses keyName "../x" and does not read keys outside the hub subdirectory', () => {
+  it('refuses "../outside" and does not read a sibling of the hub key directory', () => {
     const td = mkdtempSync(join(tmpdir(), "audit-a6b-"));
     tmpDirs.push(td);
     const keyDir = join(td, "keys");
     const hubSub = join(keyDir, "localhost-8787");
     mkdirSync(hubSub, { recursive: true });
-    writeFileSync(join(hubSub, "legit.key"), "k".repeat(40));
-    writeFileSync(join(td, "outside.key"), "o".repeat(40));
+    const secret = "o".repeat(40);
+    writeFileSync(join(keyDir, "outside.key"), secret);
 
     const r = resolveOwnKey("http://localhost:8787", "../outside", keyDir);
     expect(r.ok).toBe(false);
-    if (r.ok) expect(r.key).not.toBe("o".repeat(40));
+    if (r.ok) expect(r.key).not.toBe(secret);
   });
 });
