@@ -1,0 +1,7 @@
+manifest hashes: 101 match, 0 mismatch 
+input files on disk 87, in manifest 87, same set: true
+heldout runlist 34 v split 34; equal in order: true
+dev rows 33; dev rows that are held-out ids: 0
+dev labels: ACCEPT 26, REJECT 7
+policies named: open-brain/src/harness/policies/developer-done-cal2-r2.json
+case_no unique over 67 rows: true

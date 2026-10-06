@@ -1,0 +1,20 @@
+[
+  {
+    "i": 0,
+    "case_id": "qa250-t-222",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 877,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 27405,
+      "output_tokens": 454
+    },
+    "verdict": "reject",
+    "record": "cal2-qa250-t-222.G_done.2026-10-06T09-51-03.943Z.json"
+  }
+]

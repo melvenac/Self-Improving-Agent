@@ -1,0 +1,12 @@
+key: loaded from HKCU\Environment; fingerprint 728B667EFF matches 728B667EFF
+1 qa251-t-164 [ACCEPT] a1: answered exit 0 810ms verdict reject 
+2 qa254-t-212 [ACCEPT] a1: answered exit 0 721ms verdict reject 
+3 qa255-pr291 [ACCEPT] a1: answered exit 0 619ms verdict reject 
+4 qa255-pr297 [ACCEPT] a1: answered exit 0 617ms verdict reject 
+5 qa255-pr312 [ACCEPT] a1: answered exit 0 745ms verdict reject 
+6 qa256-pr298 [REJECT] a1: answered exit 0 780ms verdict reject 
+7 qa256-pr300 [ACCEPT] a1: answered exit 0 746ms verdict reject 
+8 qa256-pr306 [REJECT] a1: answered exit 0 701ms verdict reject 
+9 qa257-pr301 [ACCEPT] a1: answered exit 0 689ms verdict reject 
+10 qa257-pr313 [ACCEPT] a1: answered exit 0 595ms verdict reject 
+11 qa259-pr292 [ACCEPT] a1: answered exit 0 664ms verdict reject 

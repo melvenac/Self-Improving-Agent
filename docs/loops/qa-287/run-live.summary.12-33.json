@@ -1,0 +1,380 @@
+[
+  {
+    "i": 12,
+    "case_id": "qa259-pr320",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 692,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 23981,
+      "output_tokens": 534
+    },
+    "verdict": "reject",
+    "record": "cal2-qa259-pr320.G_done.2026-10-06T09-51-17.928Z.json"
+  },
+  {
+    "i": 13,
+    "case_id": "qa260-pr298",
+    "label": "REJECT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 714,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 23709,
+      "output_tokens": 354
+    },
+    "verdict": "reject",
+    "record": "cal2-qa260-pr298.G_done.2026-10-06T09-51-18.641Z.json"
+  },
+  {
+    "i": 14,
+    "case_id": "qa260-pr306",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 787,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 26343,
+      "output_tokens": 354
+    },
+    "verdict": "reject",
+    "record": "cal2-qa260-pr306.G_done.2026-10-06T09-51-19.336Z.json"
+  },
+  {
+    "i": 15,
+    "case_id": "qa261-pr302",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 687,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 26189,
+      "output_tokens": 434
+    },
+    "verdict": "reject",
+    "record": "cal2-qa261-pr302.G_done.2026-10-06T09-51-20.133Z.json"
+  },
+  {
+    "i": 16,
+    "case_id": "qa264-pr371",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 626,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 14142,
+      "output_tokens": 235
+    },
+    "verdict": "reject",
+    "record": "cal2-qa264-pr371.G_done.2026-10-06T09-51-20.853Z.json"
+  },
+  {
+    "i": 17,
+    "case_id": "qa264-pr373",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 708,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 24152,
+      "output_tokens": 274
+    },
+    "verdict": "reject",
+    "record": "cal2-qa264-pr373.G_done.2026-10-06T09-51-21.464Z.json"
+  },
+  {
+    "i": 18,
+    "case_id": "qa267-pr388",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 644,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 18190,
+      "output_tokens": 294
+    },
+    "verdict": "reject",
+    "record": "cal2-qa267-pr388.G_done.2026-10-06T09-51-22.188Z.json"
+  },
+  {
+    "i": 19,
+    "case_id": "qa267-pr391",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 737,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 26548,
+      "output_tokens": 294
+    },
+    "verdict": "reject",
+    "record": "cal2-qa267-pr391.G_done.2026-10-06T09-51-22.805Z.json"
+  },
+  {
+    "i": 20,
+    "case_id": "qa267-pr393",
+    "label": "REJECT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 671,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 25874,
+      "output_tokens": 294
+    },
+    "verdict": "reject",
+    "record": "cal2-qa267-pr393.G_done.2026-10-06T09-51-23.538Z.json"
+  },
+  {
+    "i": 21,
+    "case_id": "qa268-pr393-r2",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 682,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 26476,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa268-pr393-r2.G_done.2026-10-06T09-51-24.227Z.json"
+  },
+  {
+    "i": 22,
+    "case_id": "qa269-pr397-r2",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 513,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 8771,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa269-pr397-r2.G_done.2026-10-06T09-51-24.907Z.json"
+  },
+  {
+    "i": 23,
+    "case_id": "qa270-pr412",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 528,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 10080,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa270-pr412.G_done.2026-10-06T09-51-25.416Z.json"
+  },
+  {
+    "i": 24,
+    "case_id": "qa270-pr413",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 579,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 12907,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa270-pr413.G_done.2026-10-06T09-51-25.962Z.json"
+  },
+  {
+    "i": 25,
+    "case_id": "qa272-pr415",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 579,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 12876,
+      "output_tokens": 178
+    },
+    "verdict": "reject",
+    "record": "cal2-qa272-pr415.G_done.2026-10-06T09-51-26.538Z.json"
+  },
+  {
+    "i": 26,
+    "case_id": "qa273-pr424",
+    "label": "REJECT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 512,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 6861,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa273-pr424.G_done.2026-10-06T09-51-27.101Z.json"
+  },
+  {
+    "i": 27,
+    "case_id": "qa275-pr424-r2",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 564,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 11158,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa275-pr424-r2.G_done.2026-10-06T09-51-27.631Z.json"
+  },
+  {
+    "i": 28,
+    "case_id": "qa275-pr437",
+    "label": "REJECT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 575,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 8832,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa275-pr437.G_done.2026-10-06T09-51-28.203Z.json"
+  },
+  {
+    "i": 29,
+    "case_id": "qa277-pr441",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 504,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 5355,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa277-pr441.G_done.2026-10-06T09-51-28.771Z.json"
+  },
+  {
+    "i": 30,
+    "case_id": "qa277-pr442",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 552,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 11639,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa277-pr442.G_done.2026-10-06T09-51-29.282Z.json"
+  },
+  {
+    "i": 31,
+    "case_id": "qa277-pr451",
+    "label": "ACCEPT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 580,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 14973,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa277-pr451.G_done.2026-10-06T09-51-29.831Z.json"
+  },
+  {
+    "i": 32,
+    "case_id": "qa279-pr437-r2",
+    "label": "REJECT",
+    "attempt": 1,
+    "exit": 0,
+    "ms": 552,
+    "outcome_class": "answered",
+    "sent": true,
+    "note": "",
+    "model_resolved": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 9070,
+      "output_tokens": 159
+    },
+    "verdict": "reject",
+    "record": "cal2-qa279-pr437-r2.G_done.2026-10-06T09-51-30.418Z.json"
+  }
+]

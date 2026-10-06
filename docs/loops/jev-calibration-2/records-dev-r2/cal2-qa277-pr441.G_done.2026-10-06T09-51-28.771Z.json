@@ -1,0 +1,247 @@
+{
+  "gate": "developer-done",
+  "loop": "74-qa277-pr441",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T09:51:28.771Z",
+  "answered_at": "2026-10-06T09:51:29.075Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. Flag any file outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. New or changed test files against master's source (red) and the head (green); quote counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). The test result and run id above, for the pinned head.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "48bf479562296a0f4c717fb91cc0fec92f11ed86",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/pipelines/sync/vault-pollution.test.ts",
+        "open-brain/tests/shared/paths.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. Flag any file outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. New or changed test files against master's source (red) and the head (green); quote counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). The test result and run id above, for the pinned head.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "74-qa277-pr441",
+        "new_capability": "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)",
+        "objective": "QA 277, session-161 batch e: seven PRs (QA 278 = #427 r3's real-Windows rows)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+          "path": "docs/loops/qa-277-s161e-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. Flag any file outside the task.",
+          "Red then green. New or changed test files against master's source (red) and the head (green); quote counts.",
+          "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed.",
+          "CI (read only). The test result and run id above, for the pinned head."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex 73c45b7d..0573d439 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -57,6 +57,31 @@ describe(\"resolvePaths\", () => {\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n+\n+  // G-052 / QA 257: pins the default when KNOWLEDGE_V2_DB is unset so a repoint mutant goes red.\n+  it(\"defaults knowledgeV2Db under home when KNOWLEDGE_V2_DB is unset\", () => {\n+    const home = mkdtempSync(join(tmpdir(), \"ob-g052-home-\"));\n+    const saved = {\n+      HOME: process.env.HOME,\n+      USERPROFILE: process.env.USERPROFILE,\n+      KNOWLEDGE_V2_DB: process.env.KNOWLEDGE_V2_DB,\n+    };\n+    process.env.HOME = home;\n+    process.env.USERPROFILE = home;\n+    delete process.env.KNOWLEDGE_V2_DB;\n+    try {\n+      const paths = resolvePaths(process.cwd());\n+      expect(paths.knowledgeV2Db).toBe(join(home, \".claude\", \"open-brain\", \"knowledge-v2.db\"));\n+    } finally {\n+      if (saved.HOME === undefined) delete process.env.HOME;\n+      else process.env.HOME = saved.HOME;\n+      if (saved.USERPROFILE === undefined) delete process.env.USERPROFILE;\n+      else process.env.USERPROFILE = saved.USERPROFILE;\n+      if (saved.KNOWLEDGE_V2_DB === undefined) delete process.env.KNOWLEDGE_V2_DB;\n+      else process.env.KNOWLEDGE_V2_DB = saved.KNOWLEDGE_V2_DB;\n+      rmSync(home, { recursive: true, force: true });\n+    }\n+  });\n });\n \n describe(\"obsidianVaultDir\", () => {\n"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. Flag any file outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nindex f089109e..53080009 100644\n--- a/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -80,4 +80,44 @@ describe(\"checkVaultPollution — T-042\", () => {\n     put(v, \"ob-server-folder/readme.md\");\n     expect(checkVaultPollution(\"/unused\", v).severity).toBe(\"pass\");\n   });\n+\n+  // G-052 / QA 257: no vaultDir arg — default obsidianVaultDir() under an injected home.\n+  it(\"VP-6: resolves the default vault under home when vaultDir is omitted\", () => {\n+    const home = mkdtempSync(join(tmpdir(), \"t042-g052-home-\"));\n+    made.push(home);\n+    const defaultVault = join(home, \"Obsidian Vault v2\");\n+    mkdirSync(defaultVault, { recursive: true });\n+    put(defaultVault, \"Summaries/2026-08-31-ob-server-default.md\");\n+    const saved = {\n+      HOME: process.env.HOME,\n+      USERPROFILE: process.env.USERPROFILE,\n+      OPEN_BRAIN_VAULT_DIR: process.env.OPEN_BRAIN_VAULT_DIR,\n+      VITEST: process.env.VITEST,\n+      VITEST_WORKER_ID: process.env.VITEST_WORKER_ID,\n+    };\n+    process.env.HOME = home;\n+    process.env.USERPROFILE = home;\n+    delete process.env.OPEN_BRAIN_VAULT_DIR;\n+    // obsidianVaultDir()'s real-vault guard compares default resolution to homedir(); with an\n+    // injected home those paths match and the guard fires. Lift it for this row only.\n+    delete process.env.VITEST;\n+    delete process.env.VITEST_WORKER_ID;\n+    try {\n+      const r = checkVaultPollution(\"/unused\");\n+      expect(r.severity).toBe(\"warn\");\n+      expect(r.message).toContain(\"1 ob-server-* file(s) in the vault\");\n+      expect(r.message).toContain(\"Summaries/2026-08-31-ob-server-default.md\");\n+    } finally {\n+      if (saved.HOME === undefined) delete process.env.HOME;\n+      else process.env.HOME = saved.HOME;\n+      if (saved.USERPROFILE === undefined) delete process.env.USERPROFILE;\n+      else process.env.USERPROFILE = saved.USERPROFILE;\n+      if (saved.OPEN_BRAIN_VAULT_DIR === undefined) delete process.env.OPEN_BRAIN_VAULT_DIR;\n+      else process.env.OPEN_BRAIN_VAULT_DIR = saved.OPEN_BRAIN_VAULT_DIR;\n+      if (saved.VITEST === undefined) delete process.env.VITEST;\n+      else process.env.VITEST = saved.VITEST;\n+      if (saved.VITEST_WORKER_ID === undefined) delete process.env.VITEST_WORKER_ID;\n+      else process.env.VITEST_WORKER_ID = saved.VITEST_WORKER_ID;\n+    }\n+  });\n });",
+            "diff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex 73c45b7d..0573d439 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -57,6 +57,31 @@ describe(\"resolvePaths\", () => {\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n+\n+  // G-052 / QA 257: pins the default when KNOWLEDGE_V2_DB is unset so a repoint mutant goes red.\n+  it(\"defaults knowledgeV2Db under home when KNOWLEDGE_V2_DB is unset\", () => {\n+    const home = mkdtempSync(join(tmpdir(), \"ob-g052-home-\"));\n+    const saved = {\n+      HOME: process.env.HOME,\n+      USERPROFILE: process.env.USERPROFILE,\n+      KNOWLEDGE_V2_DB: process.env.KNOWLEDGE_V2_DB,\n+    };\n+    process.env.HOME = home;\n+    process.env.USERPROFILE = home;\n+    delete process.env.KNOWLEDGE_V2_DB;\n+    try {\n+      const paths = resolvePaths(process.cwd());\n+      expect(paths.knowledgeV2Db).toBe(join(home, \".claude\", \"open-brain\", \"knowledge-v2.db\"));\n+    } finally {\n+      if (saved.HOME === undefined) delete process.env.HOME;\n+      else process.env.HOME = saved.HOME;\n+      if (saved.USERPROFILE === undefined) delete process.env.USERPROFILE;\n+      else process.env.USERPROFILE = saved.USERPROFILE;\n+      if (saved.KNOWLEDGE_V2_DB === undefined) delete process.env.KNOWLEDGE_V2_DB;\n+      else process.env.KNOWLEDGE_V2_DB = saved.KNOWLEDGE_V2_DB;\n+      rmSync(home, { recursive: true, force: true });\n+    }\n+  });\n });\n \n describe(\"obsidianVaultDir\", () => {\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. New or changed test files against master's source (red) and the head (green); quote counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex 73c45b7d..0573d439 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -57,6 +57,31 @@ describe(\"resolvePaths\", () => {\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n+\n+  // G-052 / QA 257: pins the default when KNOWLEDGE_V2_DB is unset so a repoint mutant goes red.\n+  it(\"defaults knowledgeV2Db under home when KNOWLEDGE_V2_DB is unset\", () => {\n+    const home = mkdtempSync(join(tmpdir(), \"ob-g052-home-\"));\n+    const saved = {\n+      HOME: process.env.HOME,\n+      USERPROFILE: process.env.USERPROFILE,\n+      KNOWLEDGE_V2_DB: process.env.KNOWLEDGE_V2_DB,\n+    };\n+    process.env.HOME = home;\n+    process.env.USERPROFILE = home;\n+    delete process.env.KNOWLEDGE_V2_DB;\n+    try {\n+      const paths = resolvePaths(process.cwd());\n+      expect(paths.knowledgeV2Db).toBe(join(home, \".claude\", \"open-brain\", \"knowledge-v2.db\"));\n+    } finally {\n+      if (saved.HOME === undefined) delete process.env.HOME;\n+      else process.env.HOME = saved.HOME;\n+      if (saved.USERPROFILE === undefined) delete process.env.USERPROFILE;\n+      else process.env.USERPROFILE = saved.USERPROFILE;\n+      if (saved.KNOWLEDGE_V2_DB === undefined) delete process.env.KNOWLEDGE_V2_DB;\n+      else process.env.KNOWLEDGE_V2_DB = saved.KNOWLEDGE_V2_DB;\n+      rmSync(home, { recursive: true, force: true });\n+    }\n+  });\n });\n \n describe(\"obsidianVaultDir\", () => {\n"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. tsc --noEmit on each; confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/vault-pollution.test.ts b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\nindex f089109e..53080009 100644\n--- a/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n+++ b/open-brain/tests/pipelines/sync/vault-pollution.test.ts\n@@ -80,4 +80,44 @@ describe(\"checkVaultPollution — T-042\", () => {\n     put(v, \"ob-server-folder/readme.md\");\n     expect(checkVaultPollution(\"/unused\", v).severity).toBe(\"pass\");\n   });\n+\n+  // G-052 / QA 257: no vaultDir arg — default obsidianVaultDir() under an injected home.\n+  it(\"VP-6: resolves the default vault under home when vaultDir is omitted\", () => {\n+    const home = mkdtempSync(join(tmpdir(), \"t042-g052-home-\"));\n+    made.push(home);\n+    const defaultVault = join(home, \"Obsidian Vault v2\");\n+    mkdirSync(defaultVault, { recursive: true });\n+    put(defaultVault, \"Summaries/2026-08-31-ob-server-default.md\");\n+    const saved = {\n+      HOME: process.env.HOME,\n+      USERPROFILE: process.env.USERPROFILE,\n+      OPEN_BRAIN_VAULT_DIR: process.env.OPEN_BRAIN_VAULT_DIR,\n+      VITEST: process.env.VITEST,\n+      VITEST_WORKER_ID: process.env.VITEST_WORKER_ID,\n+    };\n+    process.env.HOME = home;\n+    process.env.USERPROFILE = home;\n+    delete process.env.OPEN_BRAIN_VAULT_DIR;\n+    // obsidianVaultDir()'s real-vault guard compares default resolution to homedir(); with an\n+    // injected home those paths match and the guard fires. Lift it for this row only.\n+    delete process.env.VITEST;\n+    delete process.env.VITEST_WORKER_ID;\n+    try {\n+      const r = checkVaultPollution(\"/unused\");\n+      expect(r.severity).toBe(\"warn\");\n+      expect(r.message).toContain(\"1 ob-server-* file(s) in the vault\");\n+      expect(r.message).toContain(\"Summaries/2026-08-31-ob-server-default.md\");\n+    } finally {\n+      if (saved.HOME === undefined) delete process.env.HOME;\n+      else process.env.HOME = saved.HOME;\n+      if (saved.USERPROFILE === undefined) delete process.env.USERPROFILE;\n+      else process.env.USERPROFILE = saved.USERPROFILE;\n+      if (saved.OPEN_BRAIN_VAULT_DIR === undefined) delete process.env.OPEN_BRAIN_VAULT_DIR;\n+      else process.env.OPEN_BRAIN_VAULT_DIR = saved.OPEN_BRAIN_VAULT_DIR;\n+      if (saved.VITEST === undefined) delete process.env.VITEST;\n+      else process.env.VITEST = saved.VITEST;\n+      if (saved.VITEST_WORKER_ID === undefined) delete process.env.VITEST_WORKER_ID;\n+      else process.env.VITEST_WORKER_ID = saved.VITEST_WORKER_ID;\n+    }\n+  });\n });",
+            "diff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex 73c45b7d..0573d439 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -57,6 +57,31 @@ describe(\"resolvePaths\", () => {\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n+\n+  // G-052 / QA 257: pins the default when KNOWLEDGE_V2_DB is unset so a repoint mutant goes red.\n+  it(\"defaults knowledgeV2Db under home when KNOWLEDGE_V2_DB is unset\", () => {\n+    const home = mkdtempSync(join(tmpdir(), \"ob-g052-home-\"));\n+    const saved = {\n+      HOME: process.env.HOME,\n+      USERPROFILE: process.env.USERPROFILE,\n+      KNOWLEDGE_V2_DB: process.env.KNOWLEDGE_V2_DB,\n+    };\n+    process.env.HOME = home;\n+    process.env.USERPROFILE = home;\n+    delete process.env.KNOWLEDGE_V2_DB;\n+    try {\n+      const paths = resolvePaths(process.cwd());\n+      expect(paths.knowledgeV2Db).toBe(join(home, \".claude\", \"open-brain\", \"knowledge-v2.db\"));\n+    } finally {\n+      if (saved.HOME === undefined) delete process.env.HOME;\n+      else process.env.HOME = saved.HOME;\n+      if (saved.USERPROFILE === undefined) delete process.env.USERPROFILE;\n+      else process.env.USERPROFILE = saved.USERPROFILE;\n+      if (saved.KNOWLEDGE_V2_DB === undefined) delete process.env.KNOWLEDGE_V2_DB;\n+      else process.env.KNOWLEDGE_V2_DB = saved.KNOWLEDGE_V2_DB;\n+      rmSync(home, { recursive: true, force: true });\n+    }\n+  });\n });\n \n describe(\"obsidianVaultDir\", () => {\n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). The test result and run id above, for the pinned head."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "bbea9698417a70344ea777c6e15283cdd6ec7ad7",
+        "merge_commit": "a6024d4e035a50082b15666e821f243aabe7eb5e",
+        "pr": 441,
+        "scored_sha": "48bf479562296a0f4c717fb91cc0fec92f11ed86"
+      }
+    }
+  },
+  "answer": {
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.58
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.01,
+      "confidence": 0.98,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.99,
+        "1": 0.01,
+        "2": 0
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.17
+    },
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.73
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.65
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.66
+    }
+  },
+  "usage": {
+    "input_tokens": 5355,
+    "output_tokens": 159
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.65 is below the required 0.7",
+      "plan_row:T2 0.66 is below the required 0.7",
+      "plan_row:T3 0.25 is below the required 0.7",
+      "plan_row:T4 0.58 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "9151fc6b-1dba-4f75-9121-6551111b454f",
+  "subject": {
+    "gate": "developer-done",
+    "key": "48bf479562296a0f4c717fb91cc0fec92f11ed86",
+    "blob": "abbe1d85525733fe3ad9bea71847192ae2892f03cca48a895ce52848098f11ac"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T09:51:28.771Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 441,
+  "merge_commit": "a6024d4e035a50082b15666e821f243aabe7eb5e",
+  "scored_sha": "48bf479562296a0f4c717fb91cc0fec92f11ed86",
+  "base_sha": "bbea9698417a70344ea777c6e15283cdd6ec7ad7",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/074-qa277-pr441.G_done-request.json",
+    "blob": "ffe67dc741d8144f07f7f2e624ba187e2f607dbe"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/tests/pipelines/sync/vault-pollution.test.ts",
+    "open-brain/tests/shared/paths.test.ts"
+  ],
+  "cal2_case_id": "qa277-pr441"
+}

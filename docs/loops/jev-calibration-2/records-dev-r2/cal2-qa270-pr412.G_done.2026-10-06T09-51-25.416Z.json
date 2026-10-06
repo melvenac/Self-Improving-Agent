@@ -1,0 +1,245 @@
+{
+  "gate": "developer-done",
+  "loop": "58-qa270-pr412",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T09:51:25.416Z",
+  "answered_at": "2026-10-06T09:51:25.744Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. The planner counts 3 for #412 and 10 for #413. Flag anything outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the new test files against master's source (they should fail) and against the head (they should pass), and quote the counts. #412's file fails to load at base (its function is missing), so its behaviour is pinned by the mutants. Say so, and do not count it as red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run two of the developer's mutants named in the PR body, and write one of your own. Each must turn a row red. Run tsc --noEmit on every mutant and confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). Run gh pr checks <n> and record the test result and run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "f918de5844a89d38f03d4d4e23173e4540c9f814",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/shared/state-schema.ts",
+        "open-brain/tests/shared/state-keyorder.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. The planner counts 3 for #412 and 10 for #413. Flag anything outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the new test files against master's source (they should fail) and against the head (they should pass), and quote the counts. #412's file fails to load at base (its function is missing), so its behaviour is pinned by the mutants. Say so, and do not count it as red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run two of the developer's mutants named in the PR body, and write one of your own. Each must turn a row red. Run tsc --noEmit on every mutant and confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). Run gh pr checks <n> and record the test result and run id.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "58-qa270-pr412",
+        "new_capability": "QA 270, session-160 batch e: #412 (T-238), #413 (T-239)",
+        "objective": "QA 270, session-160 batch e: #412 (T-238), #413 (T-239)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "538059a1271a552b52f9d008e75a4d1324d49350",
+          "path": "docs/loops/qa-270-s160e-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. The planner counts 3 for #412 and 10 for #413. Flag anything outside the task.",
+          "Red then green. Run the new test files against master's source (they should fail) and against the head (they should pass), and quote the counts. #412's file fails to load at base (its function is missing), so its behaviour is pinned by the mutants. Say so, and do not count it as red.",
+          "Mutants. Re-run two of the developer's mutants named in the PR body, and write one of your own. Each must turn a row red. Run tsc --noEmit on every mutant and confirm the edit landed.",
+          "CI (read only). Run gh pr checks <n> and record the test result and run id."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/state-keyorder.test.ts b/open-brain/tests/shared/state-keyorder.test.ts\nnew file mode 100644\nindex 00000000..da402fef\n--- /dev/null\n+++ b/open-brain/tests/shared/state-keyorder.test.ts\n@@ -0,0 +1,118 @@\n+import { describe, it, expect } from \"vitest\";\n+import { readFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { z } from \"zod\";\n+import { KEY_ORDER, assertKeyOrder, keyOrderGaps, parseState, schemaObjectSlots, serializeState, type State } from \"../../src/shared/state-schema.js\";\n+\n+/**\n+ * T-238. serializeState writes ONLY the keys KEY_ORDER lists for a slot, so a schema field missing from KEY_ORDER validated,\n+ * applied, printed \"applied\" and vanished from disk (tasks[].assignee, #401). Every row here is DERIVED from the zod schemas\n+ * (`schemaObjectSlots` walks StateSchema), not from a hand-written list of slots or fields.\n+ */\n+const fixture = readFileSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), \"utf-8\");\n+const valid = (): State => {\n+  const r = parseState(fixture);\n+  if (!r.ok) throw new Error(r.error);\n+  return r.data;\n+};\n+\n+const slots = schemaObjectSlots();\n+/** The slots with an object entry in KEY_ORDER: everything except the string-or-object union variants. */\n+const ordered = [...slots].filter(([slot]) => KEY_ORDER[slot] !== undefined);\n+const sorted = (xs: readonly string[]): string[] => [...xs].sort();\n+\n+describe(\"T-238 row 1: for every slot, KEY_ORDER[slot] and the schema's shape keys are EQUAL SETS\", () => {\n+  it(\"the walker saw the real schema: at least the thirteen slots known at 2026-10-03, and the root\", () => {\n+    // Assert the count of what was walked: a walker that finds nothing must not read as 'no gaps'.\n+    expect(slots.size).toBeGreaterThanOrEqual(13);\n+    expect(slots.has(\"$\")).toBe(true);\n+    for (const known of [\"tasks\", \"handoffs\", \"sessions\", \"gaps\", \"open_prs\", \"loop_state\"]) expect(slots.has(known), known).toBe(true);\n+  });\n+\n+  it.each(ordered.map(([slot, shapes]) => [slot, shapes] as const))(\"slot %s: KEY_ORDER lists exactly the schema's keys\", (slot, shapes) => {\n+    expect(shapes).toHaveLength(1);\n+    expect(sorted(KEY_ORDER[slot]!)).toEqual(shapes[0]);\n+  });\n+\n+  it(\"every slot of the schema has an entry, except the string-or-object union variants\", () => {\n+    const without = [...slots.keys()].filter((s) => KEY_ORDER[s] === undefined);\n+    expect(sorted(without)).toEqual([\"open_questions\", \"watch_out\"]);\n+  });\n+\n+  it(\"KEY_ORDER names no slot the schema does not have\", () => {\n+    for (const slot of Object.keys(KEY_ORDER)) expect(slots.has(slot), slot).toBe(true);\n+  });\n+\n+  it(\"keyOrderGaps() is empty and assertKeyOrder() does not throw, on the live schema\", () => {\n+    expect(keyOrderGaps()).toEqual([]);\n+    expect(() => assertKeyOrder()).not.toThrow();\n+  });\n+});\n+\n+describe(\"T-238: the guard is shown a known positive before a negative is trusted\", () => {\n+  const without = (slot: string, key: string): Record<string, string[]> => ({\n+    ...Object.fromEntries(Object.entries(KEY_ORDER).map(([k, v]) => [k, [...v]])),\n+    [slot]: KEY_ORDER[slot]!.filter((k) => k !== key),\n+  });\n+\n+  it(\"a KEY_ORDER entry that lost a key is reported, naming the slot and the field, and says the field would be dropped\", () => {\n+    const gaps = keyOrderGaps(without(\"tasks\", \"assignee\"));\n+    expect(gaps).toEqual([`slot \"tasks\": schema field \"assignee\" is not in KEY_ORDER, so serializeState would drop it from disk`]);\n+    expect(() => assertKeyOrder(without(\"tasks\", \"assignee\"))).toThrow(/serializeState refused.*lose data.*\"assignee\"/);\n+  });\n+\n+  it(\"a KEY_ORDER entry with an extra key, a duplicate, a missing slot and an unknown slot are each reported\", () => {\n+    const base = Object.fromEntries(Object.entries(KEY_ORDER).map(([k, v]) => [k, [...v]]));\n+    expect(keyOrderGaps({ ...base, tasks: [...base.tasks!, \"ghost\"] })).toEqual([`slot \"tasks\": KEY_ORDER lists \"ghost\", which no schema object in that slot has`]);\n+    expect(keyOrderGaps({ ...base, tasks: [...base.tasks!, \"id\"] })).toEqual([`slot \"tasks\": KEY_ORDER lists a key twice`]);\n+    const { sessions: _dropped, ...noSessions } = base;\n+    expect(keyOrderGaps(noSessions)).toEqual([`slot \"sessions\" has no KEY_ORDER entry, so serializeState would order its keys by chance`]);\n+    expect(keyOrderGaps({ ...base, phantom: [\"a\"] })).toEqual([`KEY_ORDER has an entry for \"phantom\", which is not a slot of StateSchema`]);\n+  });\n+\n+  it(\"the walker finds a nested slot behind array, nullable, optional and union wrappers\", () => {\n+    const probe = z.strictObject({\n+      a: z.array(z.strictObject({ b: z.string() })).nullable(),\n+      c: z.strictObject({ d: z.number() }).optional(),\n+      e: z.union([z.string(), z.strictObject({ f: z.string() })]),\n+    });\n+    const found = schemaObjectSlots(probe);\n+    expect([...found.keys()].sort()).toEqual([\"$\", \"a\", \"c\", \"e\"]);\n+    expect(found.get(\"a\")).toEqual([[\"b\"]]);\n+    expect(found.get(\"e\")).toEqual([[\"f\"]]);\n+  });\n+\n+  it(\"the walker REFUSES a zod type it cannot see through, instead of reporting a clean result\", () => {\n+    expect(() => schemaObjectSlots(z.strictObject({ r: z.record(z.string(), z.string()) }))).toThrow(/cannot see through zod type \"record\" at slot \"r\"/);\n+  });\n+});\n+\n+describe(\"T-238 row 3: serializeState loses no field, and refuses rather than lose one\", () => {\n+  it(\"every field of the fixture survives serialize then parse (nothing vanishes from disk)\", () => {\n+    const before = valid();\n+    const after = parseState(serializeState(before));\n+    expect(after.ok).toBe(true);\n+    if (after.ok) expect(after.data).toEqual(before);\n+  });\n+\n+  it(\"a drifted KEY_ORDER REFUSES the write, naming the field, and the next write is fine once it is restored\", () => {\n+    const order = KEY_ORDER as unknown as Record<string, string[]>;\n+    const original = order.tasks!;\n+    const s = valid();\n+    s.tasks[0] = { ...s.tasks[0]!, assignee: \"builder\" };\n+    try {\n+      order.tasks = original.filter((k) => k !== \"assignee\");\n+      expect(() => serializeState(s)).toThrow(/serializeState refused.*\"assignee\" is not in KEY_ORDER/);\n+    } finally {\n+      order.tasks = original;\n+    }\n+    expect(JSON.parse(serializeState(s)).tasks[0].assignee).toBe(\"builder\");\n+  });\n+\n+  it(\"a task's assignee, the field that vanished in #401, survives the write\", () => {\n+    const s = valid();\n+    s.tasks[0] = { ...s.tasks[0]!, assignee: \"builder\" };\n+    const written = JSON.parse(serializeState(s)) as State;\n+    expect(written.tasks[0]!.assignee).toBe(\"builder\");\n+  });\n+});\n"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. The planner counts 3 for #412 and 10 for #413. Flag anything outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/state-keyorder.test.ts b/open-brain/tests/shared/state-keyorder.test.ts\nnew file mode 100644\nindex 00000000..da402fef\n--- /dev/null\n+++ b/open-brain/tests/shared/state-keyorder.test.ts\n@@ -0,0 +1,118 @@\n+import { describe, it, expect } from \"vitest\";\n+import { readFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { z } from \"zod\";\n+import { KEY_ORDER, assertKeyOrder, keyOrderGaps, parseState, schemaObjectSlots, serializeState, type State } from \"../../src/shared/state-schema.js\";\n+\n+/**\n+ * T-238. serializeState writes ONLY the keys KEY_ORDER lists for a slot, so a schema field missing from KEY_ORDER validated,\n+ * applied, printed \"applied\" and vanished from disk (tasks[].assignee, #401). Every row here is DERIVED from the zod schemas\n+ * (`schemaObjectSlots` walks StateSchema), not from a hand-written list of slots or fields.\n+ */\n+const fixture = readFileSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), \"utf-8\");\n+const valid = (): State => {\n+  const r = parseState(fixture);\n+  if (!r.ok) throw new Error(r.error);\n+  return r.data;\n+};\n+\n+const slots = schemaObjectSlots();\n+/** The slots with an object entry in KEY_ORDER: everything except the string-or-object union variants. */\n+const ordered = [...slots].filter(([slot]) => KEY_ORDER[slot] !== undefined);\n+const sorted = (xs: readonly string[]): string[] => [...xs].sort();\n+\n+describe(\"T-238 row 1: for every slot, KEY_ORDER[slot] and the schema's shape keys are EQUAL SETS\", () => {\n+  it(\"the walker saw the real schema: at least the thirteen slots known at 2026-10-03, and the root\", () => {\n+    // Assert the count of what was walked: a walker that finds nothing must not read as 'no gaps'.\n+    expect(slots.size).toBeGreaterThanOrEqual(13);\n+    expect(slots.has(\"$\")).toBe(true);\n+    for (const known of [\"tasks\", \"handoffs\", \"sessions\", \"gaps\", \"open_prs\", \"loop_state\"]) expect(slots.has(known), known).toBe(true);\n+  });\n+\n+  it.each(ordered.map(([slot, shapes]) => [slot, shapes] as const))(\"slot %s: KEY_ORDER lists exactly the schema's keys\", (slot, shapes) => {\n+    expect(shapes).toHaveLength(1);\n+    expect(sorted(KEY_ORDER[slot]!)).toEqual(shapes[0]);\n+  });\n+\n+  it(\"every slot of the schema has an entry, except the string-or-object union variants\", () => {\n+    const without = [...slots.keys()].filter((s) => KEY_ORDER[s] === undefined);\n+    expect(sorted(without)).toEqual([\"open_questions\", \"watch_out\"]);\n+  });\n+\n+  it(\"KEY_ORDER names no slot the schema does not have\", () => {\n+    for (const slot of Object.keys(KEY_ORDER)) expect(slots.has(slot), slot).toBe(true);\n+  });\n+\n+  it(\"keyOrderGaps() is empty and assertKeyOrder() does not throw, on the live schema\", () => {\n+    expect(keyOrderGaps()).toEqual([]);\n+    expect(() => assertKeyOrder()).not.toThrow();\n+  });\n+});\n+\n+describe(\"T-238: the guard is shown a known positive before a negative is trusted\", () => {\n+  const without = (slot: string, key: string): Record<string, string[]> => ({\n+    ...Object.fromEntries(Object.entries(KEY_ORDER).map(([k, v]) => [k, [...v]])),\n+    [slot]: KEY_ORDER[slot]!.filter((k) => k !== key),\n+  });\n+\n+  it(\"a KEY_ORDER entry that lost a key is reported, naming the slot and the field, and says the field would be dropped\", () => {\n+    const gaps = keyOrderGaps(without(\"tasks\", \"assignee\"));\n+    expect(gaps).toEqual([`slot \"tasks\": schema field \"assignee\" is not in KEY_ORDER, so serializeState would drop it from disk`]);\n+    expect(() => assertKeyOrder(without(\"tasks\", \"assignee\"))).toThrow(/serializeState refused.*lose data.*\"assignee\"/);\n+  });\n+\n+  it(\"a KEY_ORDER entry with an extra key, a duplicate, a missing slot and an unknown slot are each reported\", () => {\n+    const base = Object.fromEntries(Object.entries(KEY_ORDER).map(([k, v]) => [k, [...v]]));\n+    expect(keyOrderGaps({ ...base, tasks: [...base.tasks!, \"ghost\"] })).toEqual([`slot \"tasks\": KEY_ORDER lists \"ghost\", which no schema object in that slot has`]);\n+    expect(keyOrderGaps({ ...base, tasks: [...base.tasks!, \"id\"] })).toEqual([`slot \"tasks\": KEY_ORDER lists a key twice`]);\n+    const { sessions: _dropped, ...noSessions } = base;\n+    expect(keyOrderGaps(noSessions)).toEqual([`slot \"sessions\" has no KEY_ORDER entry, so serializeState would order its keys by chance`]);\n+    expect(keyOrderGaps({ ...base, phantom: [\"a\"] })).toEqual([`KEY_ORDER has an entry for \"phantom\", which is not a slot of StateSchema`]);\n+  });\n+\n+  it(\"the walker finds a nested slot behind array, nullable, optional and union wrappers\", () => {\n+    const probe = z.strictObject({\n+      a: z.array(z.strictObject({ b: z.string() })).nullable(),\n+      c: z.strictObject({ d: z.number() }).optional(),\n+      e: z.union([z.string(), z.strictObject({ f: z.string() })]),\n+    });\n+    const found = schemaObjectSlots(probe);\n+    expect([...found.keys()].sort()).toEqual([\"$\", \"a\", \"c\", \"e\"]);\n+    expect(found.get(\"a\")).toEqual([[\"b\"]]);\n+    expect(found.get(\"e\")).toEqual([[\"f\"]]);\n+  });\n+\n+  it(\"the walker REFUSES a zod type it cannot see through, instead of reporting a clean result\", () => {\n+    expect(() => schemaObjectSlots(z.strictObject({ r: z.record(z.string(), z.string()) }))).toThrow(/cannot see through zod type \"record\" at slot \"r\"/);\n+  });\n+});\n+\n+describe(\"T-238 row 3: serializeState loses no field, and refuses rather than lose one\", () => {\n+  it(\"every field of the fixture survives serialize then parse (nothing vanishes from disk)\", () => {\n+    const before = valid();\n+    const after = parseState(serializeState(before));\n+    expect(after.ok).toBe(true);\n+    if (after.ok) expect(after.data).toEqual(before);\n+  });\n+\n+  it(\"a drifted KEY_ORDER REFUSES the write, naming the field, and the next write is fine once it is restored\", () => {\n+    const order = KEY_ORDER as unknown as Record<string, string[]>;\n+    const original = order.tasks!;\n+    const s = valid();\n+    s.tasks[0] = { ...s.tasks[0]!, assignee: \"builder\" };\n+    try {\n+      order.tasks = original.filter((k) => k !== \"assignee\");\n+      expect(() => serializeState(s)).toThrow(/serializeState refused.*\"assignee\" is not in KEY_ORDER/);\n+    } finally {\n+      order.tasks = original;\n+    }\n+    expect(JSON.parse(serializeState(s)).tasks[0].assignee).toBe(\"builder\");\n+  });\n+\n+  it(\"a task's assignee, the field that vanished in #401, survives the write\", () => {\n+    const s = valid();\n+    s.tasks[0] = { ...s.tasks[0]!, assignee: \"builder\" };\n+    const written = JSON.parse(serializeState(s)) as State;\n+    expect(written.tasks[0]!.assignee).toBe(\"builder\");\n+  });\n+});\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the new test files against master's source (they should fail) and against the head (they should pass), and quote the counts. #412's file fails to load at base (its function is missing), so its behaviour is pinned by the mutants. Say so, and do not count it as red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/state-keyorder.test.ts b/open-brain/tests/shared/state-keyorder.test.ts\nnew file mode 100644\nindex 00000000..da402fef\n--- /dev/null\n+++ b/open-brain/tests/shared/state-keyorder.test.ts\n@@ -0,0 +1,118 @@\n+import { describe, it, expect } from \"vitest\";\n+import { readFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { z } from \"zod\";\n+import { KEY_ORDER, assertKeyOrder, keyOrderGaps, parseState, schemaObjectSlots, serializeState, type State } from \"../../src/shared/state-schema.js\";\n+\n+/**\n+ * T-238. serializeState writes ONLY the keys KEY_ORDER lists for a slot, so a schema field missing from KEY_ORDER validated,\n+ * applied, printed \"applied\" and vanished from disk (tasks[].assignee, #401). Every row here is DERIVED from the zod schemas\n+ * (`schemaObjectSlots` walks StateSchema), not from a hand-written list of slots or fields.\n+ */\n+const fixture = readFileSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), \"utf-8\");\n+const valid = (): State => {\n+  const r = parseState(fixture);\n+  if (!r.ok) throw new Error(r.error);\n+  return r.data;\n+};\n+\n+const slots = schemaObjectSlots();\n+/** The slots with an object entry in KEY_ORDER: everything except the string-or-object union variants. */\n+const ordered = [...slots].filter(([slot]) => KEY_ORDER[slot] !== undefined);\n+const sorted = (xs: readonly string[]): string[] => [...xs].sort();\n+\n+describe(\"T-238 row 1: for every slot, KEY_ORDER[slot] and the schema's shape keys are EQUAL SETS\", () => {\n+  it(\"the walker saw the real schema: at least the thirteen slots known at 2026-10-03, and the root\", () => {\n+    // Assert the count of what was walked: a walker that finds nothing must not read as 'no gaps'.\n+    expect(slots.size).toBeGreaterThanOrEqual(13);\n+    expect(slots.has(\"$\")).toBe(true);\n+    for (const known of [\"tasks\", \"handoffs\", \"sessions\", \"gaps\", \"open_prs\", \"loop_state\"]) expect(slots.has(known), known).toBe(true);\n+  });\n+\n+  it.each(ordered.map(([slot, shapes]) => [slot, shapes] as const))(\"slot %s: KEY_ORDER lists exactly the schema's keys\", (slot, shapes) => {\n+    expect(shapes).toHaveLength(1);\n+    expect(sorted(KEY_ORDER[slot]!)).toEqual(shapes[0]);\n+  });\n+\n+  it(\"every slot of the schema has an entry, except the string-or-object union variants\", () => {\n+    const without = [...slots.keys()].filter((s) => KEY_ORDER[s] === undefined);\n+    expect(sorted(without)).toEqual([\"open_questions\", \"watch_out\"]);\n+  });\n+\n+  it(\"KEY_ORDER names no slot the schema does not have\", () => {\n+    for (const slot of Object.keys(KEY_ORDER)) expect(slots.has(slot), slot).toBe(true);\n+  });\n+\n+  it(\"keyOrderGaps() is empty and assertKeyOrder() does not throw, on the live schema\", () => {\n+    expect(keyOrderGaps()).toEqual([]);\n+    expect(() => assertKeyOrder()).not.toThrow();\n+  });\n+});\n+\n+describe(\"T-238: the guard is shown a known positive before a negative is trusted\", () => {\n+  const without = (slot: string, key: string): Record<string, string[]> => ({\n+    ...Object.fromEntries(Object.entries(KEY_ORDER).map(([k, v]) => [k, [...v]])),\n+    [slot]: KEY_ORDER[slot]!.filter((k) => k !== key),\n+  });\n+\n+  it(\"a KEY_ORDER entry that lost a key is reported, naming the slot and the field, and says the field would be dropped\", () => {\n+    const gaps = keyOrderGaps(without(\"tasks\", \"assignee\"));\n+    expect(gaps).toEqual([`slot \"tasks\": schema field \"assignee\" is not in KEY_ORDER, so serializeState would drop it from disk`]);\n+    expect(() => assertKeyOrder(without(\"tasks\", \"assignee\"))).toThrow(/serializeState refused.*lose data.*\"assignee\"/);\n+  });\n+\n+  it(\"a KEY_ORDER entry with an extra key, a duplicate, a missing slot and an unknown slot are each reported\", () => {\n+    const base = Object.fromEntries(Object.entries(KEY_ORDER).map(([k, v]) => [k, [...v]]));\n+    expect(keyOrderGaps({ ...base, tasks: [...base.tasks!, \"ghost\"] })).toEqual([`slot \"tasks\": KEY_ORDER lists \"ghost\", which no schema object in that slot has`]);\n+    expect(keyOrderGaps({ ...base, tasks: [...base.tasks!, \"id\"] })).toEqual([`slot \"tasks\": KEY_ORDER lists a key twice`]);\n+    const { sessions: _dropped, ...noSessions } = base;\n+    expect(keyOrderGaps(noSessions)).toEqual([`slot \"sessions\" has no KEY_ORDER entry, so serializeState would order its keys by chance`]);\n+    expect(keyOrderGaps({ ...base, phantom: [\"a\"] })).toEqual([`KEY_ORDER has an entry for \"phantom\", which is not a slot of StateSchema`]);\n+  });\n+\n+  it(\"the walker finds a nested slot behind array, nullable, optional and union wrappers\", () => {\n+    const probe = z.strictObject({\n+      a: z.array(z.strictObject({ b: z.string() })).nullable(),\n+      c: z.strictObject({ d: z.number() }).optional(),\n+      e: z.union([z.string(), z.strictObject({ f: z.string() })]),\n+    });\n+    const found = schemaObjectSlots(probe);\n+    expect([...found.keys()].sort()).toEqual([\"$\", \"a\", \"c\", \"e\"]);\n+    expect(found.get(\"a\")).toEqual([[\"b\"]]);\n+    expect(found.get(\"e\")).toEqual([[\"f\"]]);\n+  });\n+\n+  it(\"the walker REFUSES a zod type it cannot see through, instead of reporting a clean result\", () => {\n+    expect(() => schemaObjectSlots(z.strictObject({ r: z.record(z.string(), z.string()) }))).toThrow(/cannot see through zod type \"record\" at slot \"r\"/);\n+  });\n+});\n+\n+describe(\"T-238 row 3: serializeState loses no field, and refuses rather than lose one\", () => {\n+  it(\"every field of the fixture survives serialize then parse (nothing vanishes from disk)\", () => {\n+    const before = valid();\n+    const after = parseState(serializeState(before));\n+    expect(after.ok).toBe(true);\n+    if (after.ok) expect(after.data).toEqual(before);\n+  });\n+\n+  it(\"a drifted KEY_ORDER REFUSES the write, naming the field, and the next write is fine once it is restored\", () => {\n+    const order = KEY_ORDER as unknown as Record<string, string[]>;\n+    const original = order.tasks!;\n+    const s = valid();\n+    s.tasks[0] = { ...s.tasks[0]!, assignee: \"builder\" };\n+    try {\n+      order.tasks = original.filter((k) => k !== \"assignee\");\n+      expect(() => serializeState(s)).toThrow(/serializeState refused.*\"assignee\" is not in KEY_ORDER/);\n+    } finally {\n+      order.tasks = original;\n+    }\n+    expect(JSON.parse(serializeState(s)).tasks[0].assignee).toBe(\"builder\");\n+  });\n+\n+  it(\"a task's assignee, the field that vanished in #401, survives the write\", () => {\n+    const s = valid();\n+    s.tasks[0] = { ...s.tasks[0]!, assignee: \"builder\" };\n+    const written = JSON.parse(serializeState(s)) as State;\n+    expect(written.tasks[0]!.assignee).toBe(\"builder\");\n+  });\n+});\n"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run two of the developer's mutants named in the PR body, and write one of your own. Each must turn a row red. Run tsc --noEmit on every mutant and confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/state-keyorder.test.ts b/open-brain/tests/shared/state-keyorder.test.ts\nnew file mode 100644\nindex 00000000..da402fef\n--- /dev/null\n+++ b/open-brain/tests/shared/state-keyorder.test.ts\n@@ -0,0 +1,118 @@\n+import { describe, it, expect } from \"vitest\";\n+import { readFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { z } from \"zod\";\n+import { KEY_ORDER, assertKeyOrder, keyOrderGaps, parseState, schemaObjectSlots, serializeState, type State } from \"../../src/shared/state-schema.js\";\n+\n+/**\n+ * T-238. serializeState writes ONLY the keys KEY_ORDER lists for a slot, so a schema field missing from KEY_ORDER validated,\n+ * applied, printed \"applied\" and vanished from disk (tasks[].assignee, #401). Every row here is DERIVED from the zod schemas\n+ * (`schemaObjectSlots` walks StateSchema), not from a hand-written list of slots or fields.\n+ */\n+const fixture = readFileSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), \"utf-8\");\n+const valid = (): State => {\n+  const r = parseState(fixture);\n+  if (!r.ok) throw new Error(r.error);\n+  return r.data;\n+};\n+\n+const slots = schemaObjectSlots();\n+/** The slots with an object entry in KEY_ORDER: everything except the string-or-object union variants. */\n+const ordered = [...slots].filter(([slot]) => KEY_ORDER[slot] !== undefined);\n+const sorted = (xs: readonly string[]): string[] => [...xs].sort();\n+\n+describe(\"T-238 row 1: for every slot, KEY_ORDER[slot] and the schema's shape keys are EQUAL SETS\", () => {\n+  it(\"the walker saw the real schema: at least the thirteen slots known at 2026-10-03, and the root\", () => {\n+    // Assert the count of what was walked: a walker that finds nothing must not read as 'no gaps'.\n+    expect(slots.size).toBeGreaterThanOrEqual(13);\n+    expect(slots.has(\"$\")).toBe(true);\n+    for (const known of [\"tasks\", \"handoffs\", \"sessions\", \"gaps\", \"open_prs\", \"loop_state\"]) expect(slots.has(known), known).toBe(true);\n+  });\n+\n+  it.each(ordered.map(([slot, shapes]) => [slot, shapes] as const))(\"slot %s: KEY_ORDER lists exactly the schema's keys\", (slot, shapes) => {\n+    expect(shapes).toHaveLength(1);\n+    expect(sorted(KEY_ORDER[slot]!)).toEqual(shapes[0]);\n+  });\n+\n+  it(\"every slot of the schema has an entry, except the string-or-object union variants\", () => {\n+    const without = [...slots.keys()].filter((s) => KEY_ORDER[s] === undefined);\n+    expect(sorted(without)).toEqual([\"open_questions\", \"watch_out\"]);\n+  });\n+\n+  it(\"KEY_ORDER names no slot the schema does not have\", () => {\n+    for (const slot of Object.keys(KEY_ORDER)) expect(slots.has(slot), slot).toBe(true);\n+  });\n+\n+  it(\"keyOrderGaps() is empty and assertKeyOrder() does not throw, on the live schema\", () => {\n+    expect(keyOrderGaps()).toEqual([]);\n+    expect(() => assertKeyOrder()).not.toThrow();\n+  });\n+});\n+\n+describe(\"T-238: the guard is shown a known positive before a negative is trusted\", () => {\n+  const without = (slot: string, key: string): Record<string, string[]> => ({\n+    ...Object.fromEntries(Object.entries(KEY_ORDER).map(([k, v]) => [k, [...v]])),\n+    [slot]: KEY_ORDER[slot]!.filter((k) => k !== key),\n+  });\n+\n+  it(\"a KEY_ORDER entry that lost a key is reported, naming the slot and the field, and says the field would be dropped\", () => {\n+    const gaps = keyOrderGaps(without(\"tasks\", \"assignee\"));\n+    expect(gaps).toEqual([`slot \"tasks\": schema field \"assignee\" is not in KEY_ORDER, so serializeState would drop it from disk`]);\n+    expect(() => assertKeyOrder(without(\"tasks\", \"assignee\"))).toThrow(/serializeState refused.*lose data.*\"assignee\"/);\n+  });\n+\n+  it(\"a KEY_ORDER entry with an extra key, a duplicate, a missing slot and an unknown slot are each reported\", () => {\n+    const base = Object.fromEntries(Object.entries(KEY_ORDER).map(([k, v]) => [k, [...v]]));\n+    expect(keyOrderGaps({ ...base, tasks: [...base.tasks!, \"ghost\"] })).toEqual([`slot \"tasks\": KEY_ORDER lists \"ghost\", which no schema object in that slot has`]);\n+    expect(keyOrderGaps({ ...base, tasks: [...base.tasks!, \"id\"] })).toEqual([`slot \"tasks\": KEY_ORDER lists a key twice`]);\n+    const { sessions: _dropped, ...noSessions } = base;\n+    expect(keyOrderGaps(noSessions)).toEqual([`slot \"sessions\" has no KEY_ORDER entry, so serializeState would order its keys by chance`]);\n+    expect(keyOrderGaps({ ...base, phantom: [\"a\"] })).toEqual([`KEY_ORDER has an entry for \"phantom\", which is not a slot of StateSchema`]);\n+  });\n+\n+  it(\"the walker finds a nested slot behind array, nullable, optional and union wrappers\", () => {\n+    const probe = z.strictObject({\n+      a: z.array(z.strictObject({ b: z.string() })).nullable(),\n+      c: z.strictObject({ d: z.number() }).optional(),\n+      e: z.union([z.string(), z.strictObject({ f: z.string() })]),\n+    });\n+    const found = schemaObjectSlots(probe);\n+    expect([...found.keys()].sort()).toEqual([\"$\", \"a\", \"c\", \"e\"]);\n+    expect(found.get(\"a\")).toEqual([[\"b\"]]);\n+    expect(found.get(\"e\")).toEqual([[\"f\"]]);\n+  });\n+\n+  it(\"the walker REFUSES a zod type it cannot see through, instead of reporting a clean result\", () => {\n+    expect(() => schemaObjectSlots(z.strictObject({ r: z.record(z.string(), z.string()) }))).toThrow(/cannot see through zod type \"record\" at slot \"r\"/);\n+  });\n+});\n+\n+describe(\"T-238 row 3: serializeState loses no field, and refuses rather than lose one\", () => {\n+  it(\"every field of the fixture survives serialize then parse (nothing vanishes from disk)\", () => {\n+    const before = valid();\n+    const after = parseState(serializeState(before));\n+    expect(after.ok).toBe(true);\n+    if (after.ok) expect(after.data).toEqual(before);\n+  });\n+\n+  it(\"a drifted KEY_ORDER REFUSES the write, naming the field, and the next write is fine once it is restored\", () => {\n+    const order = KEY_ORDER as unknown as Record<string, string[]>;\n+    const original = order.tasks!;\n+    const s = valid();\n+    s.tasks[0] = { ...s.tasks[0]!, assignee: \"builder\" };\n+    try {\n+      order.tasks = original.filter((k) => k !== \"assignee\");\n+      expect(() => serializeState(s)).toThrow(/serializeState refused.*\"assignee\" is not in KEY_ORDER/);\n+    } finally {\n+      order.tasks = original;\n+    }\n+    expect(JSON.parse(serializeState(s)).tasks[0].assignee).toBe(\"builder\");\n+  });\n+\n+  it(\"a task's assignee, the field that vanished in #401, survives the write\", () => {\n+    const s = valid();\n+    s.tasks[0] = { ...s.tasks[0]!, assignee: \"builder\" };\n+    const written = JSON.parse(serializeState(s)) as State;\n+    expect(written.tasks[0]!.assignee).toBe(\"builder\");\n+  });\n+});\n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). Run gh pr checks <n> and record the test result and run id."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "be9132757ad040b7ab944e0adfaa19f3d3400eeb",
+        "merge_commit": "97bba315f2c976643e924fbfd4c8f80b91628184",
+        "pr": 412,
+        "scored_sha": "f918de5844a89d38f03d4d4e23173e4540c9f814"
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.83
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.33
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.38
+    },
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.15
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.15,
+      "confidence": 0.77,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.85,
+        "1": 0.15,
+        "2": 0
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.18
+    }
+  },
+  "usage": {
+    "input_tokens": 10080,
+    "output_tokens": 159
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.33 is below the required 0.7",
+      "plan_row:T2 0.38 is below the required 0.7",
+      "plan_row:T3 0.15 is below the required 0.7",
+      "plan_row:T4 0.18 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "19076823-1688-41aa-9bb3-d9f9843ce5af",
+  "subject": {
+    "gate": "developer-done",
+    "key": "f918de5844a89d38f03d4d4e23173e4540c9f814",
+    "blob": "1b5d75a4b2e440d2967a5a84a17cf6169083cd0fd0a05307244e0db8573305b1"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T09:51:25.416Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 412,
+  "merge_commit": "97bba315f2c976643e924fbfd4c8f80b91628184",
+  "scored_sha": "f918de5844a89d38f03d4d4e23173e4540c9f814",
+  "base_sha": "be9132757ad040b7ab944e0adfaa19f3d3400eeb",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/058-qa270-pr412.G_done-request.json",
+    "blob": "6617814ef77e7cb1ad157e20662c131161ea9b7e"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/src/shared/state-schema.ts",
+    "open-brain/tests/shared/state-keyorder.test.ts"
+  ],
+  "cal2_case_id": "qa270-pr412"
+}

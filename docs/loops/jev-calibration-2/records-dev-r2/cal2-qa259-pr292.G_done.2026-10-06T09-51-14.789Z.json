@@ -1,0 +1,663 @@
+{
+  "gate": "developer-done",
+  "loop": "28-qa259-pr292",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T09:51:14.789Z",
+  "answered_at": "2026-10-06T09:51:15.248Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files each PR's own commits touch beyond master.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (The template example, read at test time, gives status_to is an unfilled placeholder (<agent-name>).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (#293.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (On master, ci.yml's groups are ci-pr-<number>, ci-push-<sha> and ci-dispatch-<run_id>. Show that the new row asserts exactly these strings.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (The same digits used as a PR number, a SHA and a run id give three distinct groups.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (Apply each mutant to ci.yml in your tree only, then restore it. Mutant M1: the PR group loses pr-. Mutant M2: the push group gains pr-. Each must turn the new row red while #310's own T-227 row stays green.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (#320.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (Every copy that carries the hub-talk wait sentence states rc 0 to 3 as relay's table gives them. Find the copies with git grep -n \"wait-timeout 3500\".), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (rc 3's text includes the stderr line [hub-talk] retry status=<code|network> retry-after=<seconds|unknown>, the retry-after wait, the 5 s doubling to 60 s backoff, and the stop after 5 consecutive rc 3 over 2 minutes with no retry-after.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (The two hub-room.mdc files are byte-identical.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (start-parity, command-parity, mirror-parity and hub-seats pass.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the new or changed test files against master's source (they fail) and against the head (they pass). Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (The cursor-start-differences.json change only replaces the hub-room entry.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #293, #292, #320.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (Report any conflict.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (Run the touched test files one per invocation, and run tsc --noEmit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head (read only). Run gh pr checks <n> and quote the test result and the run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#292.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (At the head, read cat -A of PLACEHOLDER in agent-identity.ts. It must read /<[^<>\\s]+>/.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (These values count as placeholders: <status>, <seat>, <sia-status-recipient>.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (The prose a < b > c does not count as a placeholder.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (An absent key still says \"missing\".), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "c77dce55677a71a4ede59bbab933adf3270f2c22",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/pipelines/session-start/agent-identity.ts",
+        "open-brain/tests/pipelines/session-start/standing-cron.test.ts",
+        "project-template/.agents/AGENT.md"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files each PR's own commits touch beyond master.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the new or changed test files against master's source (they fail) and against the head (they pass). Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head (read only). Run gh pr checks <n> and quote the test result and the run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#292.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "At the head, read cat -A of PLACEHOLDER in agent-identity.ts. It must read /<[^<>\\s]+>/.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "These values count as placeholders: <status>, <seat>, <sia-status-recipient>.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "The prose a < b > c does not count as a placeholder.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "An absent key still says \"missing\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "The template example, read at test time, gives status_to is an unfilled placeholder (<agent-name>).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "#293.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "On master, ci.yml's groups are ci-pr-<number>, ci-push-<sha> and ci-dispatch-<run_id>. Show that the new row asserts exactly these strings.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "The same digits used as a PR number, a SHA and a run id give three distinct groups.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Apply each mutant to ci.yml in your tree only, then restore it. Mutant M1: the PR group loses pr-. Mutant M2: the push group gains pr-. Each must turn the new row red while #310's own T-227 row stays green.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "#320.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Every copy that carries the hub-talk wait sentence states rc 0 to 3 as relay's table gives them. Find the copies with git grep -n \"wait-timeout 3500\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "rc 3's text includes the stderr line [hub-talk] retry status=<code|network> retry-after=<seconds|unknown>, the retry-after wait, the 5 s doubling to 60 s backoff, and the stop after 5 consecutive rc 3 over 2 minutes with no retry-after.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "The two hub-room.mdc files are byte-identical.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "start-parity, command-parity, mirror-parity and hub-seats pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "The cursor-start-differences.json change only replaces the hub-room entry.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #293, #292, #320.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "Report any conflict.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "Run the touched test files one per invocation, and run tsc --noEmit.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "28-qa259-pr292",
+        "new_capability": "QA 259, batch B5: placeholder reason, CI group pin, hub-talk exit codes (#292, #293, #320)",
+        "objective": "QA 259, batch B5: placeholder reason, CI group pin, hub-talk exit codes (#292, #293, #320)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "3167a3ed0416ebf461eaf5dfc9fe9d0a90acbe76",
+          "path": "docs/loops/qa-259-b5-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files each PR's own commits touch beyond master.",
+          "Red then green. Run the new or changed test files against master's source (they fail) and against the head (they pass). Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head (read only). Run gh pr checks <n> and quote the test result and the run id.",
+          "#292.",
+          "At the head, read cat -A of PLACEHOLDER in agent-identity.ts. It must read /<[^<>\\s]+>/.",
+          "These values count as placeholders: <status>, <seat>, <sia-status-recipient>.",
+          "The prose a < b > c does not count as a placeholder.",
+          "An absent key still says \"missing\".",
+          "The template example, read at test time, gives status_to is an unfilled placeholder (<agent-name>).",
+          "#293.",
+          "On master, ci.yml's groups are ci-pr-<number>, ci-push-<sha> and ci-dispatch-<run_id>. Show that the new row asserts exactly these strings.",
+          "The same digits used as a PR number, a SHA and a run id give three distinct groups.",
+          "Apply each mutant to ci.yml in your tree only, then restore it. Mutant M1: the PR group loses pr-. Mutant M2: the push group gains pr-. Each must turn the new row red while #310's own T-227 row stays green.",
+          "#320.",
+          "Every copy that carries the hub-talk wait sentence states rc 0 to 3 as relay's table gives them. Find the copies with git grep -n \"wait-timeout 3500\".",
+          "rc 3's text includes the stderr line [hub-talk] retry status=<code|network> retry-after=<seconds|unknown>, the retry-after wait, the 5 s doubling to 60 s backoff, and the stop after 5 consecutive rc 3 over 2 minutes with no retry-after.",
+          "The two hub-room.mdc files are byte-identical.",
+          "start-parity, command-parity, mirror-parity and hub-seats pass.",
+          "The cursor-start-differences.json change only replaces the hub-room entry.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #293, #292, #320.",
+          "Report any conflict.",
+          "Run the touched test files one per invocation, and run tsc --noEmit."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files each PR's own commits touch beyond master."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the new or changed test files against master's source (they fail) and against the head (they pass). Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts\nindex 5216bbff..66fbc989 100644\n--- a/open-brain/src/pipelines/session-start/agent-identity.ts\n+++ b/open-brain/src/pipelines/session-start/agent-identity.ts\n@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {\n \n type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };\n \n-function readStatusKeys(path: string): StatusKeys | null {\n+/**\n+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside\n+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was\n+ * instead of \"missing\".\n+ */\n+const PLACEHOLDER = /<[^<>\\s]+>/;\n+\n+type Keys = StatusKeys;\n+type Placeholders = Partial<Record<keyof StatusKeys, string>>;\n+\n+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {\n   if (!existsSync(path)) return null;\n   const match = readFileSync(path, \"utf8\").match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---/);\n   if (!match) return null;\n   const out: StatusKeys = {};\n+  const placeholders: Placeholders = {};\n   for (const line of match[1]!.split(/\\r?\\n/)) {\n     const m = line.match(/^(status_cron|status_to|status_rule)\\s*:\\s*(.*)$/);\n     if (!m) continue;\n@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {\n     if (value.length >= 2 && ((value.startsWith('\"') && value.endsWith('\"')) || (value.startsWith(\"'\") && value.endsWith(\"'\")))) {\n       value = value.slice(1, -1).trim();\n     }\n-    if (value === \"\" || value.startsWith(\"<\")) continue;\n+    if (value === \"\") continue;\n+    const ph = PLACEHOLDER.exec(value);\n+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }\n     out[m[1] as keyof StatusKeys] = value;\n   }\n-  return Object.keys(out).length === 0 ? null : out;\n+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };\n }\n \n /**\n@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {\n  */\n export function readStandingCron(cwd: string): string {\n   for (const file of [\"AGENT.local.md\", \"AGENT.md\"]) {\n-    const keys = readStatusKeys(join(cwd, \".agents\", file));\n-    if (keys === null) continue;\n+    const read = readStatusKeys(join(cwd, \".agents\", file));\n+    if (read === null) continue;\n+    const { keys, placeholders } = read;\n     const where = `.agents/${file}`;\n     for (const key of [\"status_cron\", \"status_to\", \"status_rule\"] as const) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head (read only). Run gh pr checks <n> and quote the test result and the run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/project-template/.agents/AGENT.md b/project-template/.agents/AGENT.md\nindex 3a73d1b1..f06b4ea9 100644\n--- a/project-template/.agents/AGENT.md\n+++ b/project-template/.agents/AGENT.md\n@@ -29,6 +29,6 @@ status_to: <agent-name>\n status_rule: .agents/roles/<role>.md\n ```\n \n-`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`.\n+`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`. Replace every `<…>` value with a real one before use: `ob_start` counts an unfilled one as unset and says so, for example `status_to is an unfilled placeholder (<agent-name>)`.\n \n `ob_start` prints one `Standing cron:` line right after the `Seat:` line: the cron, the recipient and the rule, or `none in seat data`, or `INVALID in <file>: <why>` for a malformed cron or a missing key. `/start` then creates the cron with `CronCreate`. A file that carries any of the three keys is the whole answer; `AGENT.local.md` is read before this file.\n"
+          ],
+          "id": "T5",
+          "observable": "#292."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts\nindex 5216bbff..66fbc989 100644\n--- a/open-brain/src/pipelines/session-start/agent-identity.ts\n+++ b/open-brain/src/pipelines/session-start/agent-identity.ts\n@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {\n \n type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };\n \n-function readStatusKeys(path: string): StatusKeys | null {\n+/**\n+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside\n+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was\n+ * instead of \"missing\".\n+ */\n+const PLACEHOLDER = /<[^<>\\s]+>/;\n+\n+type Keys = StatusKeys;\n+type Placeholders = Partial<Record<keyof StatusKeys, string>>;\n+\n+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {\n   if (!existsSync(path)) return null;\n   const match = readFileSync(path, \"utf8\").match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---/);\n   if (!match) return null;\n   const out: StatusKeys = {};\n+  const placeholders: Placeholders = {};\n   for (const line of match[1]!.split(/\\r?\\n/)) {\n     const m = line.match(/^(status_cron|status_to|status_rule)\\s*:\\s*(.*)$/);\n     if (!m) continue;\n@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {\n     if (value.length >= 2 && ((value.startsWith('\"') && value.endsWith('\"')) || (value.startsWith(\"'\") && value.endsWith(\"'\")))) {\n       value = value.slice(1, -1).trim();\n     }\n-    if (value === \"\" || value.startsWith(\"<\")) continue;\n+    if (value === \"\") continue;\n+    const ph = PLACEHOLDER.exec(value);\n+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }\n     out[m[1] as keyof StatusKeys] = value;\n   }\n-  return Object.keys(out).length === 0 ? null : out;\n+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };\n }\n \n /**\n@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {\n  */\n export function readStandingCron(cwd: string): string {\n   for (const file of [\"AGENT.local.md\", \"AGENT.md\"]) {\n-    const keys = readStatusKeys(join(cwd, \".agents\", file));\n-    if (keys === null) continue;\n+    const read = readStatusKeys(join(cwd, \".agents\", file));\n+    if (read === null) continue;\n+    const { keys, placeholders } = read;\n     const where = `.agents/${file}`;\n     for (const key of [\"status_cron\", \"status_to\", \"status_rule\"] as const) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "At the head, read cat -A of PLACEHOLDER in agent-identity.ts. It must read /<[^<>\\s]+>/."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "These values count as placeholders: <status>, <seat>, <sia-status-recipient>."
+        },
+        {
+          "hunks": [
+            "diff --git a/project-template/.agents/AGENT.md b/project-template/.agents/AGENT.md\nindex 3a73d1b1..f06b4ea9 100644\n--- a/project-template/.agents/AGENT.md\n+++ b/project-template/.agents/AGENT.md\n@@ -29,6 +29,6 @@ status_to: <agent-name>\n status_rule: .agents/roles/<role>.md\n ```\n \n-`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`.\n+`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`. Replace every `<…>` value with a real one before use: `ob_start` counts an unfilled one as unset and says so, for example `status_to is an unfilled placeholder (<agent-name>)`.\n \n `ob_start` prints one `Standing cron:` line right after the `Seat:` line: the cron, the recipient and the rule, or `none in seat data`, or `INVALID in <file>: <why>` for a malformed cron or a missing key. `/start` then creates the cron with `CronCreate`. A file that carries any of the three keys is the whole answer; `AGENT.local.md` is read before this file.\n"
+          ],
+          "id": "T8",
+          "observable": "The prose a < b > c does not count as a placeholder."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts\nindex 5216bbff..66fbc989 100644\n--- a/open-brain/src/pipelines/session-start/agent-identity.ts\n+++ b/open-brain/src/pipelines/session-start/agent-identity.ts\n@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {\n \n type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };\n \n-function readStatusKeys(path: string): StatusKeys | null {\n+/**\n+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside\n+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was\n+ * instead of \"missing\".\n+ */\n+const PLACEHOLDER = /<[^<>\\s]+>/;\n+\n+type Keys = StatusKeys;\n+type Placeholders = Partial<Record<keyof StatusKeys, string>>;\n+\n+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {\n   if (!existsSync(path)) return null;\n   const match = readFileSync(path, \"utf8\").match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---/);\n   if (!match) return null;\n   const out: StatusKeys = {};\n+  const placeholders: Placeholders = {};\n   for (const line of match[1]!.split(/\\r?\\n/)) {\n     const m = line.match(/^(status_cron|status_to|status_rule)\\s*:\\s*(.*)$/);\n     if (!m) continue;\n@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {\n     if (value.length >= 2 && ((value.startsWith('\"') && value.endsWith('\"')) || (value.startsWith(\"'\") && value.endsWith(\"'\")))) {\n       value = value.slice(1, -1).trim();\n     }\n-    if (value === \"\" || value.startsWith(\"<\")) continue;\n+    if (value === \"\") continue;\n+    const ph = PLACEHOLDER.exec(value);\n+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }\n     out[m[1] as keyof StatusKeys] = value;\n   }\n-  return Object.keys(out).length === 0 ? null : out;\n+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };\n }\n \n /**\n@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {\n  */\n export function readStandingCron(cwd: string): string {\n   for (const file of [\"AGENT.local.md\", \"AGENT.md\"]) {\n-    const keys = readStatusKeys(join(cwd, \".agents\", file));\n-    if (keys === null) continue;\n+    const read = readStatusKeys(join(cwd, \".agents\", file));\n+    if (read === null) continue;\n+    const { keys, placeholders } = read;\n     const where = `.agents/${file}`;\n     for (const key of [\"status_cron\", \"status_to\", \"status_rule\"] as const) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "An absent key still says \"missing\"."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]",
+            "diff --git a/project-template/.agents/AGENT.md b/project-template/.agents/AGENT.md\nindex 3a73d1b1..f06b4ea9 100644\n--- a/project-template/.agents/AGENT.md\n+++ b/project-template/.agents/AGENT.md\n@@ -29,6 +29,6 @@ status_to: <agent-name>\n status_rule: .agents/roles/<role>.md\n ```\n \n-`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`.\n+`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`. Replace every `<…>` value with a real one before use: `ob_start` counts an unfilled one as unset and says so, for example `status_to is an unfilled placeholder (<agent-name>)`.\n \n `ob_start` prints one `Standing cron:` line right after the `Seat:` line: the cron, the recipient and the rule, or `none in seat data`, or `INVALID in <file>: <why>` for a malformed cron or a missing key. `/start` then creates the cron with `CronCreate`. A file that carries any of the three keys is the whole answer; `AGENT.local.md` is read before this file.\n"
+          ],
+          "id": "T10",
+          "observable": "The template example, read at test time, gives status_to is an unfilled placeholder (<agent-name>)."
+        },
+        {
+          "hunks": [
+            "diff --git a/project-template/.agents/AGENT.md b/project-template/.agents/AGENT.md\nindex 3a73d1b1..f06b4ea9 100644\n--- a/project-template/.agents/AGENT.md\n+++ b/project-template/.agents/AGENT.md\n@@ -29,6 +29,6 @@ status_to: <agent-name>\n status_rule: .agents/roles/<role>.md\n ```\n \n-`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`.\n+`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`. Replace every `<…>` value with a real one before use: `ob_start` counts an unfilled one as unset and says so, for example `status_to is an unfilled placeholder (<agent-name>)`.\n \n `ob_start` prints one `Standing cron:` line right after the `Seat:` line: the cron, the recipient and the rule, or `none in seat data`, or `INVALID in <file>: <why>` for a malformed cron or a missing key. `/start` then creates the cron with `CronCreate`. A file that carries any of the three keys is the whole answer; `AGENT.local.md` is read before this file.\n"
+          ],
+          "id": "T11",
+          "observable": "#293."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts\nindex 5216bbff..66fbc989 100644\n--- a/open-brain/src/pipelines/session-start/agent-identity.ts\n+++ b/open-brain/src/pipelines/session-start/agent-identity.ts\n@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {\n \n type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };\n \n-function readStatusKeys(path: string): StatusKeys | null {\n+/**\n+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside\n+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was\n+ * instead of \"missing\".\n+ */\n+const PLACEHOLDER = /<[^<>\\s]+>/;\n+\n+type Keys = StatusKeys;\n+type Placeholders = Partial<Record<keyof StatusKeys, string>>;\n+\n+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {\n   if (!existsSync(path)) return null;\n   const match = readFileSync(path, \"utf8\").match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---/);\n   if (!match) return null;\n   const out: StatusKeys = {};\n+  const placeholders: Placeholders = {};\n   for (const line of match[1]!.split(/\\r?\\n/)) {\n     const m = line.match(/^(status_cron|status_to|status_rule)\\s*:\\s*(.*)$/);\n     if (!m) continue;\n@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {\n     if (value.length >= 2 && ((value.startsWith('\"') && value.endsWith('\"')) || (value.startsWith(\"'\") && value.endsWith(\"'\")))) {\n       value = value.slice(1, -1).trim();\n     }\n-    if (value === \"\" || value.startsWith(\"<\")) continue;\n+    if (value === \"\") continue;\n+    const ph = PLACEHOLDER.exec(value);\n+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }\n     out[m[1] as keyof StatusKeys] = value;\n   }\n-  return Object.keys(out).length === 0 ? null : out;\n+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };\n }\n \n /**\n@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {\n  */\n export function readStandingCron(cwd: string): string {\n   for (const file of [\"AGENT.local.md\", \"AGENT.md\"]) {\n-    const keys = readStatusKeys(join(cwd, \".agents\", file));\n-    if (keys === null) continue;\n+    const read = readStatusKeys(join(cwd, \".agents\", file));\n+    if (read === null) continue;\n+    const { keys, placeholders } = read;\n     const where = `.agents/${file}`;\n     for (const key of [\"status_cron\", \"status_to\", \"status_rule\"] as const) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "On master, ci.yml's groups are ci-pr-<number>, ci-push-<sha> and ci-dispatch-<run_id>. Show that the new row asserts exactly these strings."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "The same digits used as a PR number, a SHA and a run id give three distinct groups."
+        },
+        {
+          "hunks": [
+            "diff --git a/project-template/.agents/AGENT.md b/project-template/.agents/AGENT.md\nindex 3a73d1b1..f06b4ea9 100644\n--- a/project-template/.agents/AGENT.md\n+++ b/project-template/.agents/AGENT.md\n@@ -29,6 +29,6 @@ status_to: <agent-name>\n status_rule: .agents/roles/<role>.md\n ```\n \n-`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`.\n+`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`. Replace every `<…>` value with a real one before use: `ob_start` counts an unfilled one as unset and says so, for example `status_to is an unfilled placeholder (<agent-name>)`.\n \n `ob_start` prints one `Standing cron:` line right after the `Seat:` line: the cron, the recipient and the rule, or `none in seat data`, or `INVALID in <file>: <why>` for a malformed cron or a missing key. `/start` then creates the cron with `CronCreate`. A file that carries any of the three keys is the whole answer; `AGENT.local.md` is read before this file.\n"
+          ],
+          "id": "T14",
+          "observable": "Apply each mutant to ci.yml in your tree only, then restore it. Mutant M1: the PR group loses pr-. Mutant M2: the push group gains pr-. Each must turn the new row red while #310's own T-227 row stays green."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts\nindex 5216bbff..66fbc989 100644\n--- a/open-brain/src/pipelines/session-start/agent-identity.ts\n+++ b/open-brain/src/pipelines/session-start/agent-identity.ts\n@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {\n \n type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };\n \n-function readStatusKeys(path: string): StatusKeys | null {\n+/**\n+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside\n+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was\n+ * instead of \"missing\".\n+ */\n+const PLACEHOLDER = /<[^<>\\s]+>/;\n+\n+type Keys = StatusKeys;\n+type Placeholders = Partial<Record<keyof StatusKeys, string>>;\n+\n+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {\n   if (!existsSync(path)) return null;\n   const match = readFileSync(path, \"utf8\").match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---/);\n   if (!match) return null;\n   const out: StatusKeys = {};\n+  const placeholders: Placeholders = {};\n   for (const line of match[1]!.split(/\\r?\\n/)) {\n     const m = line.match(/^(status_cron|status_to|status_rule)\\s*:\\s*(.*)$/);\n     if (!m) continue;\n@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {\n     if (value.length >= 2 && ((value.startsWith('\"') && value.endsWith('\"')) || (value.startsWith(\"'\") && value.endsWith(\"'\")))) {\n       value = value.slice(1, -1).trim();\n     }\n-    if (value === \"\" || value.startsWith(\"<\")) continue;\n+    if (value === \"\") continue;\n+    const ph = PLACEHOLDER.exec(value);\n+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }\n     out[m[1] as keyof StatusKeys] = value;\n   }\n-  return Object.keys(out).length === 0 ? null : out;\n+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };\n }\n \n /**\n@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {\n  */\n export function readStandingCron(cwd: string): string {\n   for (const file of [\"AGENT.local.md\", \"AGENT.md\"]) {\n-    const keys = readStatusKeys(join(cwd, \".agents\", file));\n-    if (keys === null) continue;\n+    const read = readStatusKeys(join(cwd, \".agents\", file));\n+    if (read === null) continue;\n+    const { keys, placeholders } = read;\n     const where = `.agents/${file}`;\n     for (const key of [\"status_cron\", \"status_to\", \"status_rule\"] as const) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "#320."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "Every copy that carries the hub-talk wait sentence states rc 0 to 3 as relay's table gives them. Find the copies with git grep -n \"wait-timeout 3500\"."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts\nindex 5216bbff..66fbc989 100644\n--- a/open-brain/src/pipelines/session-start/agent-identity.ts\n+++ b/open-brain/src/pipelines/session-start/agent-identity.ts\n@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {\n \n type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };\n \n-function readStatusKeys(path: string): StatusKeys | null {\n+/**\n+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside\n+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was\n+ * instead of \"missing\".\n+ */\n+const PLACEHOLDER = /<[^<>\\s]+>/;\n+\n+type Keys = StatusKeys;\n+type Placeholders = Partial<Record<keyof StatusKeys, string>>;\n+\n+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {\n   if (!existsSync(path)) return null;\n   const match = readFileSync(path, \"utf8\").match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---/);\n   if (!match) return null;\n   const out: StatusKeys = {};\n+  const placeholders: Placeholders = {};\n   for (const line of match[1]!.split(/\\r?\\n/)) {\n     const m = line.match(/^(status_cron|status_to|status_rule)\\s*:\\s*(.*)$/);\n     if (!m) continue;\n@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {\n     if (value.length >= 2 && ((value.startsWith('\"') && value.endsWith('\"')) || (value.startsWith(\"'\") && value.endsWith(\"'\")))) {\n       value = value.slice(1, -1).trim();\n     }\n-    if (value === \"\" || value.startsWith(\"<\")) continue;\n+    if (value === \"\") continue;\n+    const ph = PLACEHOLDER.exec(value);\n+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }\n     out[m[1] as keyof StatusKeys] = value;\n   }\n-  return Object.keys(out).length === 0 ? null : out;\n+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };\n }\n \n /**\n@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {\n  */\n export function readStandingCron(cwd: string): string {\n   for (const file of [\"AGENT.local.md\", \"AGENT.md\"]) {\n-    const keys = readStatusKeys(join(cwd, \".agents\", file));\n-    if (keys === null) continue;\n+    const read = readStatusKeys(join(cwd, \".agents\", file));\n+    if (read === null) continue;\n+    const { keys, placeholders } = read;\n     const where = `.agents/${file}`;\n     for (const key of [\"status_cron\", \"status_to\", \"status_rule\"] as const) {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "rc 3's text includes the stderr line [hub-talk] retry status=<code|network> retry-after=<seconds|unknown>, the retry-after wait, the 5 s doubling to 60 s backoff, and the stop after 5 consecutive rc 3 over 2 minutes with no retry-after."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts\nindex 5216bbff..66fbc989 100644\n--- a/open-brain/src/pipelines/session-start/agent-identity.ts\n+++ b/open-brain/src/pipelines/session-start/agent-identity.ts\n@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {\n \n type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };\n \n-function readStatusKeys(path: string): StatusKeys | null {\n+/**\n+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside\n+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was\n+ * instead of \"missing\".\n+ */\n+const PLACEHOLDER = /<[^<>\\s]+>/;\n+\n+type Keys = StatusKeys;\n+type Placeholders = Partial<Record<keyof StatusKeys, string>>;\n+\n+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {\n   if (!existsSync(path)) return null;\n   const match = readFileSync(path, \"utf8\").match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---/);\n   if (!match) return null;\n   const out: StatusKeys = {};\n+  const placeholders: Placeholders = {};\n   for (const line of match[1]!.split(/\\r?\\n/)) {\n     const m = line.match(/^(status_cron|status_to|status_rule)\\s*:\\s*(.*)$/);\n     if (!m) continue;\n@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {\n     if (value.length >= 2 && ((value.startsWith('\"') && value.endsWith('\"')) || (value.startsWith(\"'\") && value.endsWith(\"'\")))) {\n       value = value.slice(1, -1).trim();\n     }\n-    if (value === \"\" || value.startsWith(\"<\")) continue;\n+    if (value === \"\") continue;\n+    const ph = PLACEHOLDER.exec(value);\n+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }\n     out[m[1] as keyof StatusKeys] = value;\n   }\n-  return Object.keys(out).length === 0 ? null : out;\n+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };\n }\n \n /**\n@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {\n  */\n export function readStandingCron(cwd: string): string {\n   for (const file of [\"AGENT.local.md\", \"AGENT.md\"]) {\n-    const keys = readStatusKeys(join(cwd, \".agents\", file));\n-    if (keys === null) continue;\n+    const read = readStatusKeys(join(cwd, \".agents\", file));\n+    if (read === null) continue;\n+    const { keys, placeholders } = read;\n     const where = `.agents/${file}`;\n     for (const key of [\"status_cron\", \"status_to\", \"status_rule\"] as const) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "The two hub-room.mdc files are byte-identical."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "start-parity, command-parity, mirror-parity and hub-seats pass."
+        },
+        {
+          "hunks": [
+            "diff --git a/project-template/.agents/AGENT.md b/project-template/.agents/AGENT.md\nindex 3a73d1b1..f06b4ea9 100644\n--- a/project-template/.agents/AGENT.md\n+++ b/project-template/.agents/AGENT.md\n@@ -29,6 +29,6 @@ status_to: <agent-name>\n status_rule: .agents/roles/<role>.md\n ```\n \n-`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`.\n+`status_cron` is a 5-field cron in local time, `status_to` is the agent the status goes to, and `status_rule` is a repo-relative path to the rule text. Write each value alone on its line: the reader does not strip a trailing `# comment`. Replace every `<…>` value with a real one before use: `ob_start` counts an unfilled one as unset and says so, for example `status_to is an unfilled placeholder (<agent-name>)`.\n \n `ob_start` prints one `Standing cron:` line right after the `Seat:` line: the cron, the recipient and the rule, or `none in seat data`, or `INVALID in <file>: <why>` for a malformed cron or a missing key. `/start` then creates the cron with `CronCreate`. A file that carries any of the three keys is the whole answer; `AGENT.local.md` is read before this file.\n"
+          ],
+          "id": "T20",
+          "observable": "The cursor-start-differences.json change only replaces the hub-room entry."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/session-start/agent-identity.ts b/open-brain/src/pipelines/session-start/agent-identity.ts\nindex 5216bbff..66fbc989 100644\n--- a/open-brain/src/pipelines/session-start/agent-identity.ts\n+++ b/open-brain/src/pipelines/session-start/agent-identity.ts\n@@ -113,11 +113,22 @@ export function cronProblem(cron: string): string | null {\n \n type StatusKeys = { status_cron?: string; status_to?: string; status_rule?: string };\n \n-function readStatusKeys(path: string): StatusKeys | null {\n+/**\n+ * T-224: a value with an unfilled `<placeholder>` in it (the template's `<agent-name>`, or the `<role>` inside\n+ * `.agents/roles/<role>.md`). It counts as UNSET, as before, but the reader is told which placeholder it was\n+ * instead of \"missing\".\n+ */\n+const PLACEHOLDER = /<[^<>\\s]+>/;\n+\n+type Keys = StatusKeys;\n+type Placeholders = Partial<Record<keyof StatusKeys, string>>;\n+\n+function readStatusKeys(path: string): { keys: Keys; placeholders: Placeholders } | null {\n   if (!existsSync(path)) return null;\n   const match = readFileSync(path, \"utf8\").match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---/);\n   if (!match) return null;\n   const out: StatusKeys = {};\n+  const placeholders: Placeholders = {};\n   for (const line of match[1]!.split(/\\r?\\n/)) {\n     const m = line.match(/^(status_cron|status_to|status_rule)\\s*:\\s*(.*)$/);\n     if (!m) continue;\n@@ -125,10 +136,12 @@ function readStatusKeys(path: string): StatusKeys | null {\n     if (value.length >= 2 && ((value.startsWith('\"') && value.endsWith('\"')) || (value.startsWith(\"'\") && value.endsWith(\"'\")))) {\n       value = value.slice(1, -1).trim();\n     }\n-    if (value === \"\" || value.startsWith(\"<\")) continue;\n+    if (value === \"\") continue;\n+    const ph = PLACEHOLDER.exec(value);\n+    if (ph) { placeholders[m[1] as keyof StatusKeys] = ph[0]; continue; }\n     out[m[1] as keyof StatusKeys] = value;\n   }\n-  return Object.keys(out).length === 0 ? null : out;\n+  return Object.keys(out).length === 0 ? null : { keys: out, placeholders };\n }\n \n /**\n@@ -137,11 +150,15 @@ function readStatusKeys(path: string): StatusKeys | null {\n  */\n export function readStandingCron(cwd: string): string {\n   for (const file of [\"AGENT.local.md\", \"AGENT.md\"]) {\n-    const keys = readStatusKeys(join(cwd, \".agents\", file));\n-    if (keys === null) continue;\n+    const read = readStatusKeys(join(cwd, \".agents\", file));\n+    if (read === null) continue;\n+    const { keys, placeholders } = read;\n     const where = `.agents/${file}`;\n     for (const key of [\"status_cron\", \"status_to\", \"status_rule\"] as const) {\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #293, #292, #320."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T22",
+          "observable": "Report any conflict."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/standing-cron.test.ts b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\nindex d1b91d4f..ca5b779a 100644\n--- a/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n+++ b/open-brain/tests/pipelines/session-start/standing-cron.test.ts\n@@ -117,6 +117,46 @@ describe(\"T-211 standing cron in seat data\", { timeout: 120_000 }, () => {\n     );\n   });\n \n+  const templateExample = (): string[] => {\n+    const template = readFileSync(join(import.meta.dirname, \"../../../../project-template/.agents/AGENT.md\"), \"utf-8\");\n+    const block = template.match(/```\\n(status_cron:[\\s\\S]*?)```/);\n+    expect(block, \"the template documents the three keys in a fenced block\").not.toBeNull();\n+    return block![1]!.split(\"\\n\").filter((l) => l.trim() !== \"\");\n+  };\n+\n+  it(\"SR-8 T-224: the template example copied VERBATIM names the unfilled placeholder, not 'missing'\", () => {\n+    const example = templateExample();\n+    expect(example).toHaveLength(3);\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (<agent-name>)\");\n+  });\n+\n+  it(\"SR-8b T-224: a placeholder left INSIDE a value (the rule path) is named too, once the recipient is filled\", () => {\n+    const example = templateExample().map((l) => l.replace(\"<agent-name>\", \"clark\"));\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, ...example]);\n+    expect(readStandingCron(root)).toBe(\"Standing cron: INVALID in .agents/AGENT.local.md: status_rule is an unfilled placeholder (<role>)\");\n+  });\n+\n+  it(\"SR-8d T-224: a placeholder whose name contains 's' or spaces-free letters like <status> is named too (the character class must exclude whitespace, not the letter s)\", () => {\n+    for (const ph of [\"<status>\", \"<agent-name>\", \"<seat>\", \"<sia-status-recipient>\"]) {\n+      seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', `status_to: ${ph}`, \"status_rule: .agents/roles/planner.md\"]);\n+      expect(readStandingCron(root), ph).toBe(`Standing cron: INVALID in .agents/AGENT.local.md: status_to is an unfilled placeholder (${ph})`);\n+    }\n+    // a value with a space inside angle brackets is prose, not a placeholder\n+    seatFile(root, \"AGENT.local.md\", [...IDENTITY, 'status_cron: \"*/20 * * * *\"', \"status_to: a < b > c\", \"status_rule: .agents/roles/planner.md\"]);\n+    expect(readStandingCron(root)).toContain(\"→ status to a < b > c\");\n+  });\n+\n+  it(\"SR-8c T-224: a placeholder still counts as unset; a truly absent or empty key still says missing\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T23",
+          "observable": "Run the touched test files one per invocation, and run tsc --noEmit."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "8b7aa9520b343b96470222ecd41a4fc49d3a982a",
+        "merge_commit": "1008b52b1b6c6119c94e5913b659b806e422195b",
+        "pr": 292,
+        "scored_sha": "c77dce55677a71a4ede59bbab933adf3270f2c22"
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.87
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.47
+    },
+    "plan_row:T10": {
+      "type": "noul",
+      "noul": 0.88
+    },
+    "plan_row:T11": {
+      "type": "noul",
+      "noul": 0.44
+    },
+    "plan_row:T12": {
+      "type": "noul",
+      "noul": 0.16
+    },
+    "plan_row:T13": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "plan_row:T14": {
+      "type": "noul",
+      "noul": 0.16
+    },
+    "plan_row:T15": {
+      "type": "noul",
+      "noul": 0.29
+    },
+    "plan_row:T16": {
+      "type": "noul",
+      "noul": 0.29
+    },
+    "plan_row:T17": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "plan_row:T18": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "plan_row:T19": {
+      "type": "noul",
+      "noul": 0.32
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.44
+    },
+    "plan_row:T20": {
+      "type": "noul",
+      "noul": 0.33
+    },
+    "plan_row:T21": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "plan_row:T22": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "plan_row:T23": {
+      "type": "noul",
+      "noul": 0.46
+    },
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.25
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "plan_row:T5": {
+      "type": "noul",
+      "noul": 0.69
+    },
+    "plan_row:T6": {
+      "type": "noul",
+      "noul": 0.9
+    },
+    "plan_row:T7": {
+      "type": "noul",
+      "noul": 0.81
+    },
+    "plan_row:T8": {
+      "type": "noul",
+      "noul": 0.77
+    },
+    "plan_row:T9": {
+      "type": "noul",
+      "noul": 0.69
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.09,
+      "confidence": 0.87,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.92,
+        "1": 0.08,
+        "2": 0
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.16
+    }
+  },
+  "usage": {
+    "input_tokens": 23174,
+    "output_tokens": 534
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.47 is below the required 0.7",
+      "plan_row:T2 0.44 is below the required 0.7",
+      "plan_row:T3 0.25 is below the required 0.7",
+      "plan_row:T4 0.19 is below the required 0.7",
+      "plan_row:T5 0.69 is below the required 0.7",
+      "plan_row:T9 0.69 is below the required 0.7",
+      "plan_row:T11 0.44 is below the required 0.7",
+      "plan_row:T12 0.16 is below the required 0.7",
+      "plan_row:T13 0.26 is below the required 0.7",
+      "plan_row:T14 0.16 is below the required 0.7",
+      "plan_row:T15 0.29 is below the required 0.7",
+      "plan_row:T16 0.29 is below the required 0.7",
+      "plan_row:T17 0.26 is below the required 0.7",
+      "plan_row:T18 0.26 is below the required 0.7",
+      "plan_row:T19 0.32 is below the required 0.7",
+      "plan_row:T20 0.33 is below the required 0.7",
+      "plan_row:T21 0.24 is below the required 0.7",
+      "plan_row:T22 0.26 is below the required 0.7",
+      "plan_row:T23 0.46 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "58794afe-bc31-4e3e-94c2-1946858e314f",
+  "subject": {
+    "gate": "developer-done",
+    "key": "c77dce55677a71a4ede59bbab933adf3270f2c22",
+    "blob": "b9ee705c3ee0f9fb5e181a2efa3f79efb158f03b1b5367da66cbdb582ffa9edb"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T09:51:14.789Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 292,
+  "merge_commit": "1008b52b1b6c6119c94e5913b659b806e422195b",
+  "scored_sha": "c77dce55677a71a4ede59bbab933adf3270f2c22",
+  "base_sha": "8b7aa9520b343b96470222ecd41a4fc49d3a982a",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/028-qa259-pr292.G_done-request.json",
+    "blob": "0707d759362a50a27b62a68764bb92fa763d2fe1"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/src/pipelines/session-start/agent-identity.ts",
+    "open-brain/tests/pipelines/session-start/standing-cron.test.ts",
+    "project-template/.agents/AGENT.md"
+  ],
+  "cal2_case_id": "qa259-pr292"
+}

@@ -1,0 +1,683 @@
+{
+  "gate": "developer-done",
+  "loop": "18-qa257-pr301",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T09:51:13.504Z",
+  "answered_at": "2026-10-06T09:51:13.986Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files each PR's own commits touch beyond master.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (git diff master...84e75618 -- open-brain/src is empty.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (policies.test.ts still has a hasPriorFailures: true case.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" ((a) no BOM: the output is byte-identical to master's;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" ((b) a BOM and markers;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" ((c) a BOM and no markers: the region lands after the title, and the BOM stays first.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (#314.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (Seed a temp vault with ob-server-x.md: the check warns with the count and path.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (A clean vault passes.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (An absent vault is \"not checked\".), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head (read only). gh pr checks <n>.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#301. Its fixture runs the REAL writer:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (seat B's close-out cannot remove seat A's handoff or session;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (the seat-keyed mutant goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Run the record-erasure check on a scratch copy of this repo and quote its line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (#305, test-only.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "11c183e478e513dc4e026d8ea47b19de37e47515",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/tests/shared/closeout-append.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files each PR's own commits touch beyond master.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head (read only). gh pr checks <n>.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#301. Its fixture runs the REAL writer:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "seat B's close-out cannot remove seat A's handoff or session;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "the seat-keyed mutant goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Run the record-erasure check on a scratch copy of this repo and quote its line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "#305, test-only.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "git diff master...84e75618 -- open-brain/src is empty.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "policies.test.ts still has a hasPriorFailures: true case.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "(a) no BOM: the output is byte-identical to master's;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "(b) a BOM and markers;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "(c) a BOM and no markers: the region lands after the title, and the BOM stays first.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "#314.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "Seed a temp vault with ob-server-x.md: the check warns with the count and path.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "A clean vault passes.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "An absent vault is \"not checked\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4).",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "18-qa257-pr301",
+        "new_capability": "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)",
+        "objective": "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+          "path": "docs/loops/qa-257-b3-misc-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files each PR's own commits touch beyond master.",
+          "Red then green. Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head (read only). gh pr checks <n>.",
+          "#301. Its fixture runs the REAL writer:",
+          "seat B's close-out cannot remove seat A's handoff or session;",
+          "the seat-keyed mutant goes red.",
+          "Run the record-erasure check on a scratch copy of this repo and quote its line.",
+          "#305, test-only.",
+          "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.",
+          "git diff master...84e75618 -- open-brain/src is empty.",
+          "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.",
+          "policies.test.ts still has a hasPriorFailures: true case.",
+          "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:",
+          "(a) no BOM: the output is byte-identical to master's;",
+          "(b) a BOM and markers;",
+          "(c) a BOM and no markers: the region lands after the title, and the BOM stays first.",
+          "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.",
+          "#314.",
+          "Seed a temp vault with ob-server-x.md: the check warns with the count and path.",
+          "A clean vault passes.",
+          "An absent vault is \"not checked\".",
+          "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4)."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files each PR's own commits touch beyond master."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head (read only). gh pr checks <n>."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "#301. Its fixture runs the REAL writer:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "seat B's close-out cannot remove seat A's handoff or session;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "the seat-keyed mutant goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "Run the record-erasure check on a scratch copy of this repo and quote its line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "#305, test-only."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "git diff master...84e75618 -- open-brain/src is empty."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "policies.test.ts still has a hasPriorFailures: true case."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "(a) no BOM: the output is byte-identical to master's;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "(b) a BOM and markers;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "(c) a BOM and no markers: the region lands after the title, and the BOM stays first."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T18",
+          "observable": "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "#314."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T20",
+          "observable": "Seed a temp vault with ob-server-x.md: the check warns with the count and path."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T21",
+          "observable": "A clean vault passes."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T22",
+          "observable": "An absent vault is \"not checked\"."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T23",
+          "observable": "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/shared/closeout-append.test.ts b/open-brain/tests/shared/closeout-append.test.ts\nnew file mode 100644\nindex 00000000..de815211\n--- /dev/null\n+++ b/open-brain/tests/shared/closeout-append.test.ts\n@@ -0,0 +1,53 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { applyStateOps } from \"../../src/shared/state-writer.js\";\n+\n+/**\n+ * T-163 (1): a close-out can only append or update ITS OWN entry. Two developer checkouts share a\n+ * seat NAME, which is how v2's seat-keyed slot let one erase the other (record 118); here the\n+ * second writes after the first, even claiming the first's session number, and the first's\n+ * handoff and session uuid must survive in state.json AND in the rendered next-session.md.\n+ */\n+describe(\"close-outs append, they do not overwrite (T-163)\", () => {\n+  let dir: string;\n+  const A = \"aaaaaaaa-0000-4000-8000-00000000000a\";\n+  const B = \"bbbbbbbb-0000-4000-8000-00000000000b\";\n+  const read = () => JSON.parse(readFileSync(join(dir, \".agents\", \"state.json\"), \"utf8\"));\n+\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t163-append-\"));\n+    for (const d of [\"TASKS\", \"SESSIONS\", \"SYSTEM\"]) mkdirSync(join(dir, \".agents\", d), { recursive: true });\n+    writeFileSync(join(dir, \".agents\", \"SYSTEM\", \"SUMMARY.md\"), \"# Summary\\n\");\n+    writeFileSync(join(dir, \"package.json\"), '{\"version\":\"1.0.0\"}');\n+    cpSync(join(import.meta.dirname, \"../fixtures-state/state.json\"), join(dir, \".agents\", \"state.json\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  function closeOut(session: number, uuid: string, checkout: string, text: string): void {\n+    const r = applyStateOps(dir, {\n+      session, expected_revision: read().revision, session_uuid: uuid, checkout, render: true,\n+      ops: [{ op: \"set_handoff\", seat: \"developer\", pick_up: text, watch_out: [], open_questions: [] }],\n+    });\n+    if (!r.ok) throw new Error(r.error);\n+  }\n+\n+  it(\"a second developer's set_handoff, even under the first's session number, leaves the first's handoff and session uuid in place\", () => {\n+    closeOut(200, A, \"sia-builder\", \"A's handoff text\");\n+    closeOut(201, B, \"sia-forge\", \"B's first handoff\");\n+    closeOut(200, B, \"sia-forge\", \"B's second handoff, claiming A's number\");\n+\n+    const s = read();\n+    const handoffs = s.handoffs.map((h: { session_uuid: string; pick_up: string }) => [h.session_uuid, h.pick_up]);\n…[cal2 diff truncated]"
+          ],
+          "id": "T24",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4)."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+        "merge_commit": "06cdf81e0ebf0f83a33910f30d5bc9a11ef3d855",
+        "pr": 301,
+        "scored_sha": "11c183e478e513dc4e026d8ea47b19de37e47515"
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.73
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.44
+    },
+    "plan_row:T10": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "plan_row:T11": {
+      "type": "noul",
+      "noul": 0.48
+    },
+    "plan_row:T12": {
+      "type": "noul",
+      "noul": 0.15
+    },
+    "plan_row:T13": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "plan_row:T14": {
+      "type": "noul",
+      "noul": 0.13
+    },
+    "plan_row:T15": {
+      "type": "noul",
+      "noul": 0.16
+    },
+    "plan_row:T16": {
+      "type": "noul",
+      "noul": 0.17
+    },
+    "plan_row:T17": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "plan_row:T18": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "plan_row:T19": {
+      "type": "noul",
+      "noul": 0.15
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "plan_row:T20": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "plan_row:T21": {
+      "type": "noul",
+      "noul": 0.21
+    },
+    "plan_row:T22": {
+      "type": "noul",
+      "noul": 0.2
+    },
+    "plan_row:T23": {
+      "type": "noul",
+      "noul": 0.14
+    },
+    "plan_row:T24": {
+      "type": "noul",
+      "noul": 0.13
+    },
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.16
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "plan_row:T5": {
+      "type": "noul",
+      "noul": 0.69
+    },
+    "plan_row:T6": {
+      "type": "noul",
+      "noul": 0.65
+    },
+    "plan_row:T7": {
+      "type": "noul",
+      "noul": 0.34
+    },
+    "plan_row:T8": {
+      "type": "noul",
+      "noul": 0.12
+    },
+    "plan_row:T9": {
+      "type": "noul",
+      "noul": 0.34
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.01,
+      "confidence": 0.98,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.99,
+        "1": 0.01,
+        "2": 0
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.15
+    }
+  },
+  "usage": {
+    "input_tokens": 26357,
+    "output_tokens": 554
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.44 is below the required 0.7",
+      "plan_row:T2 0.23 is below the required 0.7",
+      "plan_row:T3 0.16 is below the required 0.7",
+      "plan_row:T4 0.26 is below the required 0.7",
+      "plan_row:T5 0.69 is below the required 0.7",
+      "plan_row:T6 0.65 is below the required 0.7",
+      "plan_row:T7 0.34 is below the required 0.7",
+      "plan_row:T8 0.12 is below the required 0.7",
+      "plan_row:T9 0.34 is below the required 0.7",
+      "plan_row:T10 0.24 is below the required 0.7",
+      "plan_row:T11 0.48 is below the required 0.7",
+      "plan_row:T12 0.15 is below the required 0.7",
+      "plan_row:T13 0.24 is below the required 0.7",
+      "plan_row:T14 0.13 is below the required 0.7",
+      "plan_row:T15 0.16 is below the required 0.7",
+      "plan_row:T16 0.17 is below the required 0.7",
+      "plan_row:T17 0.19 is below the required 0.7",
+      "plan_row:T18 0.19 is below the required 0.7",
+      "plan_row:T19 0.15 is below the required 0.7",
+      "plan_row:T20 0.18 is below the required 0.7",
+      "plan_row:T21 0.21 is below the required 0.7",
+      "plan_row:T22 0.2 is below the required 0.7",
+      "plan_row:T23 0.14 is below the required 0.7",
+      "plan_row:T24 0.13 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "1daae8d5-a876-49ef-a11f-667e263c2fdd",
+  "subject": {
+    "gate": "developer-done",
+    "key": "11c183e478e513dc4e026d8ea47b19de37e47515",
+    "blob": "f0aa59d1ec5eaa1afd4e981d48913d42212ca50a1e3e48c79d4653ff4c1852e5"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T09:51:13.504Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 301,
+  "merge_commit": "06cdf81e0ebf0f83a33910f30d5bc9a11ef3d855",
+  "scored_sha": "11c183e478e513dc4e026d8ea47b19de37e47515",
+  "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/018-qa257-pr301.G_done-request.json",
+    "blob": "d9c5c92cb0fa12a7cf2fa7cdceb886e99eed8030"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/tests/shared/closeout-append.test.ts"
+  ],
+  "cal2_case_id": "qa257-pr301"
+}

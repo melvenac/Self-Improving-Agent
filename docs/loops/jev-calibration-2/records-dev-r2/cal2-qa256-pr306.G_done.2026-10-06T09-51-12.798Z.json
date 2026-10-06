@@ -1,0 +1,603 @@
+{
+  "gate": "developer-done",
+  "loop": "16-qa256-pr306",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T09:51:12.798Z",
+  "answered_at": "2026-10-06T09:51:13.297Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files each PR's own commits touch beyond its base.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (Confirm the layout on a real install, read-only.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (Report whether ${CLAUDE_PLUGIN_ROOT} is resolved, and how.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (#309, real settings. Run hook-configs read-only against this machine's ~/.claude/settings.json. Quote the counts line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (Then add sh -c \"…\" and node \"C:\\path with spaces\\x.js\" entries to a fixture.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (The sh -c entry must be not-checked. The quoted path with spaces must be stat'ed as one path.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" (#303. Fixture repos for the four cases: at HEAD, behind, ahead (warn) and diverged (issue, naming both counts and the merge-base).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" (Batch merge order. On a scratch branch from origin/master, merge the heads in order: #295, #298, #300, #303, #306, #309.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" (Known conflict: #295 and #309 both edit the node:path import line in checks.ts. Report every conflict.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (Resolve ONLY that import-line conflict, by taking the union of the imported names, and say so. Stop on any other conflict.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (On the merged result, run every touched sync test file, one per invocation, plus tsc --noEmit. Then run node open-brain/build/cli.js sync --check after npm run build, in the scratch tree only, and quote every new check's line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. The PR's new or changed test files fail against its base's source and pass on its head. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own on the core change, and report which row catches it. Re-run one of the developer's stated mutants from docs/loops/t0xx/mutants/.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head (read only). gh pr checks <n>, quoting the test conclusion and the run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (\"Not checked\" is never a pass.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (For #295, #298, #303, #306 and #309, feed each check an input it cannot read: absent config, unreadable file, an unknown SHA, an unparseable command.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (Its result must be skip or warn, stating \"not checked\", and never pass.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Quote each one.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (#298, the plugin layout. Its fixture follows enabledPlugins, then installed_plugins.json, then .claude-plugin/plugin.json or .mcp.json.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "d8dc12db5da04aabb66ec9e30433aee0ed637aab",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/tests/pipelines/sync/checks.test.ts",
+        "open-brain/tests/pipelines/sync/hook-registration.test.ts",
+        "open-brain/tests/pipelines/sync/mirror-parity.test.ts",
+        "open-brain/tests/pipelines/sync/t048-counts-parity.test.ts",
+        "open-brain/tests/pipelines/sync/t048-counts.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files each PR's own commits touch beyond its base.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. The PR's new or changed test files fail against its base's source and pass on its head. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own on the core change, and report which row catches it. Re-run one of the developer's stated mutants from docs/loops/t0xx/mutants/.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head (read only). gh pr checks <n>, quoting the test conclusion and the run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "\"Not checked\" is never a pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "For #295, #298, #303, #306 and #309, feed each check an input it cannot read: absent config, unreadable file, an unknown SHA, an unparseable command.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "Its result must be skip or warn, stating \"not checked\", and never pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Quote each one.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "#298, the plugin layout. Its fixture follows enabledPlugins, then installed_plugins.json, then .claude-plugin/plugin.json or .mcp.json.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "Confirm the layout on a real install, read-only.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Report whether ${CLAUDE_PLUGIN_ROOT} is resolved, and how.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "#309, real settings. Run hook-configs read-only against this machine's ~/.claude/settings.json. Quote the counts line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "Then add sh -c \"…\" and node \"C:\\path with spaces\\x.js\" entries to a fixture.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "The sh -c entry must be not-checked. The quoted path with spaces must be stat'ed as one path.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "#303. Fixture repos for the four cases: at HEAD, behind, ahead (warn) and diverged (issue, naming both counts and the merge-base).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge the heads in order: #295, #298, #300, #303, #306, #309.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "Known conflict: #295 and #309 both edit the node:path import line in checks.ts. Report every conflict.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "Resolve ONLY that import-line conflict, by taking the union of the imported names, and say so. Stop on any other conflict.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "On the merged result, run every touched sync test file, one per invocation, plus tsc --noEmit. Then run node open-brain/build/cli.js sync --check after npm run build, in the scratch tree only, and quote every new check's line.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "16-qa256-pr306",
+        "new_capability": "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)",
+        "objective": "QA 256, batch B2: /sync checks (#295, #298, #300, #303, #306, #309)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "014eb21b487eea204e010e80f55108b909d5ab07",
+          "path": "docs/loops/qa-256-b2-sync-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files each PR's own commits touch beyond its base.",
+          "Red then green. The PR's new or changed test files fail against its base's source and pass on its head. Quote the counts.",
+          "One mutant of your own on the core change, and report which row catches it. Re-run one of the developer's stated mutants from docs/loops/t0xx/mutants/.",
+          "CI on the head (read only). gh pr checks <n>, quoting the test conclusion and the run id.",
+          "\"Not checked\" is never a pass.",
+          "For #295, #298, #303, #306 and #309, feed each check an input it cannot read: absent config, unreadable file, an unknown SHA, an unparseable command.",
+          "Its result must be skip or warn, stating \"not checked\", and never pass.",
+          "Quote each one.",
+          "#298, the plugin layout. Its fixture follows enabledPlugins, then installed_plugins.json, then .claude-plugin/plugin.json or .mcp.json.",
+          "Confirm the layout on a real install, read-only.",
+          "Report whether ${CLAUDE_PLUGIN_ROOT} is resolved, and how.",
+          "#309, real settings. Run hook-configs read-only against this machine's ~/.claude/settings.json. Quote the counts line.",
+          "Then add sh -c \"…\" and node \"C:\\path with spaces\\x.js\" entries to a fixture.",
+          "The sh -c entry must be not-checked. The quoted path with spaces must be stat'ed as one path.",
+          "#303. Fixture repos for the four cases: at HEAD, behind, ahead (warn) and diverged (issue, naming both counts and the merge-base).",
+          "Batch merge order. On a scratch branch from origin/master, merge the heads in order: #295, #298, #300, #303, #306, #309.",
+          "Known conflict: #295 and #309 both edit the node:path import line in checks.ts. Report every conflict.",
+          "Resolve ONLY that import-line conflict, by taking the union of the imported names, and say so. Stop on any other conflict.",
+          "On the merged result, run every touched sync test file, one per invocation, plus tsc --noEmit. Then run node open-brain/build/cli.js sync --check after npm run build, in the scratch tree only, and quote every new check's line."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files each PR's own commits touch beyond its base."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/hook-registration.test.ts b/open-brain/tests/pipelines/sync/hook-registration.test.ts\nindex 540bdbce..f614f2ce 100644\n--- a/open-brain/tests/pipelines/sync/hook-registration.test.ts\n+++ b/open-brain/tests/pipelines/sync/hook-registration.test.ts\n@@ -73,7 +73,10 @@ describe(\"checkHookRegistration\", () => {\n     expect(checkHookRegistration(join(dir, \"nope.json\")).severity).toBe(\"warn\");\n   });\n \n-  it(\"handles settings with no hooks block\", () => {\n-    expect(checkHookRegistration(settings({})).severity).toBe(\"pass\");\n+  it(\"is 'not checked', not a pass, with no hooks block (T-048: zero counted is not 'no duplicates')\", () => {\n+    const r = checkHookRegistration(settings({}));\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toContain(\"not checked\");\n+    expect(r.message).toContain(\"0 script registration(s) counted\");\n   });\n });",
+            "diff --git a/open-brain/tests/pipelines/sync/mirror-parity.test.ts b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\nindex f79bb384..c2c80870 100644\n--- a/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n+++ b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n@@ -113,7 +113,10 @@ describe(\"checkMirrorParity\", () => {\n     write(tmplCmds(), \"bootstrap.md\", \"# /bootstrap\\n\");\n \n     const result = checkMirrorParity(root, home);\n-    expect(result.severity).toBe(\"pass\");\n+    // T-048: only exceptions were present, so NOTHING was compared; that is \"not checked\", not a pass.\n+    expect(result.severity).toBe(\"skip\");\n+    expect(result.message).toContain(\"0 file comparison(s)\");\n+    expect(result.message).toContain(\"2 excepted\");\n   });\n \n   it(\"does not fail when the live user directories are absent\", () => {",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\nnew file mode 100644\nindex 00000000..ed866753\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\n@@ -0,0 +1,134 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import {\n+  checkMirrorParity,\n+  checkCommandParity,\n+  checkCommandToolNames,\n+  checkCommandNames,\n+  checkModuleBoundary,\n+  checkRetirements,\n+} from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks, part 2): the exception lists and the dropped imports. Every row names the\n+ * count it expects; before the change each of these printed a pass that said nothing about what\n+ * it had left out.\n+ */\n+describe(\"T-048 sync counts: parity checks and the boundary graph\", () => {\n+  let root: string;\n+  let home: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t048-par-root-\"));\n+    home = mkdtempSync(join(tmpdir(), \"t048-par-home-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  function write(dir: string, file: string, body = \"x\\n\"): void {\n+    mkdirSync(dir, { recursive: true });\n+    writeFileSync(join(dir, file), body, \"utf-8\");\n+  }\n+  const repoCmds = () => join(root, \".claude\", \"commands\");\n+  const tmplCmds = () => join(root, \"project-template\", \".claude\", \"commands\");\n+\n+  describe(\"mirror-parity\", () => {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts.test.ts b/open-brain/tests/pipelines/sync/t048-counts.test.ts\nnew file mode 100644\nindex 00000000..1229dbd4\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts.test.ts\n@@ -0,0 +1,95 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkHookConfigs, checkHookRegistration } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to\n+ * print an unqualified pass whatever number of entries it actually read, so zero read looked\n+ * the same as everything read. Every row names the count it expects.\n+ */\n+describe(\"T-048 sync counts\", () => {\n+  let dir: string;\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t048-counts-\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  const settings = (obj: unknown): string => {\n+    const p = join(dir, \"settings.json\");\n+    writeFileSync(p, JSON.stringify(obj), \"utf-8\");\n+    return p;\n+  };\n+\n+  describe(\"hook-configs\", () => {\n+    it(\"the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'\", () => {\n+      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: \"command\", command: \"node /x/cli-bootstrap.js\" }] }], SessionEnd: [{ hooks: [{ command: \"node /x/end.js\" }] }] } });\n+      const r = checkHookConfigs(p);\n+      expect(r.severity).toBe(\"skip\");\n+      expect(r.message).toContain(\"not checked\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "Red then green. The PR's new or changed test files fail against its base's source and pass on its head. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/mirror-parity.test.ts b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\nindex f79bb384..c2c80870 100644\n--- a/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n+++ b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n@@ -113,7 +113,10 @@ describe(\"checkMirrorParity\", () => {\n     write(tmplCmds(), \"bootstrap.md\", \"# /bootstrap\\n\");\n \n     const result = checkMirrorParity(root, home);\n-    expect(result.severity).toBe(\"pass\");\n+    // T-048: only exceptions were present, so NOTHING was compared; that is \"not checked\", not a pass.\n+    expect(result.severity).toBe(\"skip\");\n+    expect(result.message).toContain(\"0 file comparison(s)\");\n+    expect(result.message).toContain(\"2 excepted\");\n   });\n \n   it(\"does not fail when the live user directories are absent\", () => {"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own on the core change, and report which row catches it. Re-run one of the developer's stated mutants from docs/loops/t0xx/mutants/."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..3f976448 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -162,23 +162,52 @@ export function checkHookConfigs(settingsPath: string): CheckResult {\n     }\n   }\n   const missing: string[] = [];\n+  // T-048: every entry that is not stat'ed is counted by WHY, and the verdict says how many were\n+  // read. A zero here used to print \"All hook command files exist\".\n+  let checked = 0;\n+  const skipped = { notAnObject: 0, noCommand: 0, notNodeOrTsx: 0, noFilePath: 0 };\n   for (const hook of hooks) {\n-    if (!hook || typeof hook !== \"object\") continue;\n+    if (!hook || typeof hook !== \"object\") {\n+      skipped.notAnObject++;\n+      continue;\n+    }\n     const h = hook as Record<string, unknown>;\n-    const cmd: string = typeof h.command === \"string\" ? h.command : \"\";\n-    if (!cmd.includes(\"node \") && !cmd.includes(\"npx tsx \")) continue;\n+    if (typeof h.command !== \"string\") {\n+      skipped.noCommand++;\n+      continue;\n+    }\n+    const cmd: string = h.command;\n+    if (!cmd.includes(\"node \") && !cmd.includes(\"npx tsx \")) {\n+      skipped.notNodeOrTsx++;\n+      continue;\n+    }\n     // Extract file path: word after \"node\" or \"npx tsx\"\n     const fileMatch = cmd.match(/(?:node|npx tsx)\\s+([^\\s]+)/);\n-    if (!fileMatch) continue;\n+    if (!fileMatch) {\n+      skipped.noFilePath++;\n+      continue;\n+    }\n     const filePath = fileMatch[1];\n+    checked++;\n     if (!existsSync(filePath)) {\n       missing.push(filePath);\n     }\n   }\n+  const skippedCount = skipped.notAnObject + skipped.noCommand + skipped.notNodeOrTsx + skipped.noFilePath;\n+  const why = [\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/hook-registration.test.ts b/open-brain/tests/pipelines/sync/hook-registration.test.ts\nindex 540bdbce..f614f2ce 100644\n--- a/open-brain/tests/pipelines/sync/hook-registration.test.ts\n+++ b/open-brain/tests/pipelines/sync/hook-registration.test.ts\n@@ -73,7 +73,10 @@ describe(\"checkHookRegistration\", () => {\n     expect(checkHookRegistration(join(dir, \"nope.json\")).severity).toBe(\"warn\");\n   });\n \n-  it(\"handles settings with no hooks block\", () => {\n-    expect(checkHookRegistration(settings({})).severity).toBe(\"pass\");\n+  it(\"is 'not checked', not a pass, with no hooks block (T-048: zero counted is not 'no duplicates')\", () => {\n+    const r = checkHookRegistration(settings({}));\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toContain(\"not checked\");\n+    expect(r.message).toContain(\"0 script registration(s) counted\");\n   });\n });",
+            "diff --git a/open-brain/tests/pipelines/sync/mirror-parity.test.ts b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\nindex f79bb384..c2c80870 100644\n--- a/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n+++ b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n@@ -113,7 +113,10 @@ describe(\"checkMirrorParity\", () => {\n     write(tmplCmds(), \"bootstrap.md\", \"# /bootstrap\\n\");\n \n     const result = checkMirrorParity(root, home);\n-    expect(result.severity).toBe(\"pass\");\n+    // T-048: only exceptions were present, so NOTHING was compared; that is \"not checked\", not a pass.\n+    expect(result.severity).toBe(\"skip\");\n+    expect(result.message).toContain(\"0 file comparison(s)\");\n+    expect(result.message).toContain(\"2 excepted\");\n   });\n \n   it(\"does not fail when the live user directories are absent\", () => {",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\nnew file mode 100644\nindex 00000000..ed866753\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\n@@ -0,0 +1,134 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import {\n+  checkMirrorParity,\n+  checkCommandParity,\n+  checkCommandToolNames,\n+  checkCommandNames,\n+  checkModuleBoundary,\n+  checkRetirements,\n+} from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks, part 2): the exception lists and the dropped imports. Every row names the\n+ * count it expects; before the change each of these printed a pass that said nothing about what\n+ * it had left out.\n+ */\n+describe(\"T-048 sync counts: parity checks and the boundary graph\", () => {\n+  let root: string;\n+  let home: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t048-par-root-\"));\n+    home = mkdtempSync(join(tmpdir(), \"t048-par-home-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  function write(dir: string, file: string, body = \"x\\n\"): void {\n+    mkdirSync(dir, { recursive: true });\n+    writeFileSync(join(dir, file), body, \"utf-8\");\n+  }\n+  const repoCmds = () => join(root, \".claude\", \"commands\");\n+  const tmplCmds = () => join(root, \"project-template\", \".claude\", \"commands\");\n+\n+  describe(\"mirror-parity\", () => {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts.test.ts b/open-brain/tests/pipelines/sync/t048-counts.test.ts\nnew file mode 100644\nindex 00000000..1229dbd4\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts.test.ts\n@@ -0,0 +1,95 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkHookConfigs, checkHookRegistration } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to\n+ * print an unqualified pass whatever number of entries it actually read, so zero read looked\n+ * the same as everything read. Every row names the count it expects.\n+ */\n+describe(\"T-048 sync counts\", () => {\n+  let dir: string;\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t048-counts-\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  const settings = (obj: unknown): string => {\n+    const p = join(dir, \"settings.json\");\n+    writeFileSync(p, JSON.stringify(obj), \"utf-8\");\n+    return p;\n+  };\n+\n+  describe(\"hook-configs\", () => {\n+    it(\"the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'\", () => {\n+      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: \"command\", command: \"node /x/cli-bootstrap.js\" }] }], SessionEnd: [{ hooks: [{ command: \"node /x/end.js\" }] }] } });\n+      const r = checkHookConfigs(p);\n+      expect(r.severity).toBe(\"skip\");\n+      expect(r.message).toContain(\"not checked\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T4",
+          "observable": "CI on the head (read only). gh pr checks <n>, quoting the test conclusion and the run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts.test.ts b/open-brain/tests/pipelines/sync/t048-counts.test.ts\nnew file mode 100644\nindex 00000000..1229dbd4\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts.test.ts\n@@ -0,0 +1,95 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkHookConfigs, checkHookRegistration } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to\n+ * print an unqualified pass whatever number of entries it actually read, so zero read looked\n+ * the same as everything read. Every row names the count it expects.\n+ */\n+describe(\"T-048 sync counts\", () => {\n+  let dir: string;\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t048-counts-\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  const settings = (obj: unknown): string => {\n+    const p = join(dir, \"settings.json\");\n+    writeFileSync(p, JSON.stringify(obj), \"utf-8\");\n+    return p;\n+  };\n+\n+  describe(\"hook-configs\", () => {\n+    it(\"the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'\", () => {\n+      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: \"command\", command: \"node /x/cli-bootstrap.js\" }] }], SessionEnd: [{ hooks: [{ command: \"node /x/end.js\" }] }] } });\n+      const r = checkHookConfigs(p);\n+      expect(r.severity).toBe(\"skip\");\n+      expect(r.message).toContain(\"not checked\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "\"Not checked\" is never a pass."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..3f976448 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -162,23 +162,52 @@ export function checkHookConfigs(settingsPath: string): CheckResult {\n     }\n   }\n   const missing: string[] = [];\n+  // T-048: every entry that is not stat'ed is counted by WHY, and the verdict says how many were\n+  // read. A zero here used to print \"All hook command files exist\".\n+  let checked = 0;\n+  const skipped = { notAnObject: 0, noCommand: 0, notNodeOrTsx: 0, noFilePath: 0 };\n   for (const hook of hooks) {\n-    if (!hook || typeof hook !== \"object\") continue;\n+    if (!hook || typeof hook !== \"object\") {\n+      skipped.notAnObject++;\n+      continue;\n+    }\n     const h = hook as Record<string, unknown>;\n-    const cmd: string = typeof h.command === \"string\" ? h.command : \"\";\n-    if (!cmd.includes(\"node \") && !cmd.includes(\"npx tsx \")) continue;\n+    if (typeof h.command !== \"string\") {\n+      skipped.noCommand++;\n+      continue;\n+    }\n+    const cmd: string = h.command;\n+    if (!cmd.includes(\"node \") && !cmd.includes(\"npx tsx \")) {\n+      skipped.notNodeOrTsx++;\n+      continue;\n+    }\n     // Extract file path: word after \"node\" or \"npx tsx\"\n     const fileMatch = cmd.match(/(?:node|npx tsx)\\s+([^\\s]+)/);\n-    if (!fileMatch) continue;\n+    if (!fileMatch) {\n+      skipped.noFilePath++;\n+      continue;\n+    }\n     const filePath = fileMatch[1];\n+    checked++;\n     if (!existsSync(filePath)) {\n       missing.push(filePath);\n     }\n   }\n+  const skippedCount = skipped.notAnObject + skipped.noCommand + skipped.notNodeOrTsx + skipped.noFilePath;\n+  const why = [\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "For #295, #298, #303, #306 and #309, feed each check an input it cannot read: absent config, unreadable file, an unknown SHA, an unparseable command."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]"
+          ],
+          "id": "T7",
+          "observable": "Its result must be skip or warn, stating \"not checked\", and never pass."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/hook-registration.test.ts b/open-brain/tests/pipelines/sync/hook-registration.test.ts\nindex 540bdbce..f614f2ce 100644\n--- a/open-brain/tests/pipelines/sync/hook-registration.test.ts\n+++ b/open-brain/tests/pipelines/sync/hook-registration.test.ts\n@@ -73,7 +73,10 @@ describe(\"checkHookRegistration\", () => {\n     expect(checkHookRegistration(join(dir, \"nope.json\")).severity).toBe(\"warn\");\n   });\n \n-  it(\"handles settings with no hooks block\", () => {\n-    expect(checkHookRegistration(settings({})).severity).toBe(\"pass\");\n+  it(\"is 'not checked', not a pass, with no hooks block (T-048: zero counted is not 'no duplicates')\", () => {\n+    const r = checkHookRegistration(settings({}));\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toContain(\"not checked\");\n+    expect(r.message).toContain(\"0 script registration(s) counted\");\n   });\n });"
+          ],
+          "id": "T8",
+          "observable": "Quote each one."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/mirror-parity.test.ts b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\nindex f79bb384..c2c80870 100644\n--- a/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n+++ b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n@@ -113,7 +113,10 @@ describe(\"checkMirrorParity\", () => {\n     write(tmplCmds(), \"bootstrap.md\", \"# /bootstrap\\n\");\n \n     const result = checkMirrorParity(root, home);\n-    expect(result.severity).toBe(\"pass\");\n+    // T-048: only exceptions were present, so NOTHING was compared; that is \"not checked\", not a pass.\n+    expect(result.severity).toBe(\"skip\");\n+    expect(result.message).toContain(\"0 file comparison(s)\");\n+    expect(result.message).toContain(\"2 excepted\");\n   });\n \n   it(\"does not fail when the live user directories are absent\", () => {"
+          ],
+          "id": "T9",
+          "observable": "#298, the plugin layout. Its fixture follows enabledPlugins, then installed_plugins.json, then .claude-plugin/plugin.json or .mcp.json."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "Confirm the layout on a real install, read-only."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/hook-registration.test.ts b/open-brain/tests/pipelines/sync/hook-registration.test.ts\nindex 540bdbce..f614f2ce 100644\n--- a/open-brain/tests/pipelines/sync/hook-registration.test.ts\n+++ b/open-brain/tests/pipelines/sync/hook-registration.test.ts\n@@ -73,7 +73,10 @@ describe(\"checkHookRegistration\", () => {\n     expect(checkHookRegistration(join(dir, \"nope.json\")).severity).toBe(\"warn\");\n   });\n \n-  it(\"handles settings with no hooks block\", () => {\n-    expect(checkHookRegistration(settings({})).severity).toBe(\"pass\");\n+  it(\"is 'not checked', not a pass, with no hooks block (T-048: zero counted is not 'no duplicates')\", () => {\n+    const r = checkHookRegistration(settings({}));\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toContain(\"not checked\");\n+    expect(r.message).toContain(\"0 script registration(s) counted\");\n   });\n });"
+          ],
+          "id": "T11",
+          "observable": "Report whether ${CLAUDE_PLUGIN_ROOT} is resolved, and how."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\nnew file mode 100644\nindex 00000000..ed866753\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\n@@ -0,0 +1,134 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import {\n+  checkMirrorParity,\n+  checkCommandParity,\n+  checkCommandToolNames,\n+  checkCommandNames,\n+  checkModuleBoundary,\n+  checkRetirements,\n+} from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks, part 2): the exception lists and the dropped imports. Every row names the\n+ * count it expects; before the change each of these printed a pass that said nothing about what\n+ * it had left out.\n+ */\n+describe(\"T-048 sync counts: parity checks and the boundary graph\", () => {\n+  let root: string;\n+  let home: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t048-par-root-\"));\n+    home = mkdtempSync(join(tmpdir(), \"t048-par-home-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  function write(dir: string, file: string, body = \"x\\n\"): void {\n+    mkdirSync(dir, { recursive: true });\n+    writeFileSync(join(dir, file), body, \"utf-8\");\n+  }\n+  const repoCmds = () => join(root, \".claude\", \"commands\");\n+  const tmplCmds = () => join(root, \"project-template\", \".claude\", \"commands\");\n+\n+  describe(\"mirror-parity\", () => {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts.test.ts b/open-brain/tests/pipelines/sync/t048-counts.test.ts\nnew file mode 100644\nindex 00000000..1229dbd4\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts.test.ts\n@@ -0,0 +1,95 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkHookConfigs, checkHookRegistration } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to\n+ * print an unqualified pass whatever number of entries it actually read, so zero read looked\n+ * the same as everything read. Every row names the count it expects.\n+ */\n+describe(\"T-048 sync counts\", () => {\n+  let dir: string;\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t048-counts-\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  const settings = (obj: unknown): string => {\n+    const p = join(dir, \"settings.json\");\n+    writeFileSync(p, JSON.stringify(obj), \"utf-8\");\n+    return p;\n+  };\n+\n+  describe(\"hook-configs\", () => {\n+    it(\"the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'\", () => {\n+      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: \"command\", command: \"node /x/cli-bootstrap.js\" }] }], SessionEnd: [{ hooks: [{ command: \"node /x/end.js\" }] }] } });\n+      const r = checkHookConfigs(p);\n+      expect(r.severity).toBe(\"skip\");\n+      expect(r.message).toContain(\"not checked\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "#309, real settings. Run hook-configs read-only against this machine's ~/.claude/settings.json. Quote the counts line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\nnew file mode 100644\nindex 00000000..ed866753\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\n@@ -0,0 +1,134 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import {\n+  checkMirrorParity,\n+  checkCommandParity,\n+  checkCommandToolNames,\n+  checkCommandNames,\n+  checkModuleBoundary,\n+  checkRetirements,\n+} from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks, part 2): the exception lists and the dropped imports. Every row names the\n+ * count it expects; before the change each of these printed a pass that said nothing about what\n+ * it had left out.\n+ */\n+describe(\"T-048 sync counts: parity checks and the boundary graph\", () => {\n+  let root: string;\n+  let home: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t048-par-root-\"));\n+    home = mkdtempSync(join(tmpdir(), \"t048-par-home-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  function write(dir: string, file: string, body = \"x\\n\"): void {\n+    mkdirSync(dir, { recursive: true });\n+    writeFileSync(join(dir, file), body, \"utf-8\");\n+  }\n+  const repoCmds = () => join(root, \".claude\", \"commands\");\n+  const tmplCmds = () => join(root, \"project-template\", \".claude\", \"commands\");\n+\n+  describe(\"mirror-parity\", () => {\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "Then add sh -c \"…\" and node \"C:\\path with spaces\\x.js\" entries to a fixture."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts.test.ts b/open-brain/tests/pipelines/sync/t048-counts.test.ts\nnew file mode 100644\nindex 00000000..1229dbd4\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts.test.ts\n@@ -0,0 +1,95 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkHookConfigs, checkHookRegistration } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to\n+ * print an unqualified pass whatever number of entries it actually read, so zero read looked\n+ * the same as everything read. Every row names the count it expects.\n+ */\n+describe(\"T-048 sync counts\", () => {\n+  let dir: string;\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t048-counts-\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  const settings = (obj: unknown): string => {\n+    const p = join(dir, \"settings.json\");\n+    writeFileSync(p, JSON.stringify(obj), \"utf-8\");\n+    return p;\n+  };\n+\n+  describe(\"hook-configs\", () => {\n+    it(\"the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'\", () => {\n+      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: \"command\", command: \"node /x/cli-bootstrap.js\" }] }], SessionEnd: [{ hooks: [{ command: \"node /x/end.js\" }] }] } });\n+      const r = checkHookConfigs(p);\n+      expect(r.severity).toBe(\"skip\");\n+      expect(r.message).toContain(\"not checked\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "The sh -c entry must be not-checked. The quoted path with spaces must be stat'ed as one path."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\nnew file mode 100644\nindex 00000000..ed866753\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\n@@ -0,0 +1,134 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import {\n+  checkMirrorParity,\n+  checkCommandParity,\n+  checkCommandToolNames,\n+  checkCommandNames,\n+  checkModuleBoundary,\n+  checkRetirements,\n+} from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks, part 2): the exception lists and the dropped imports. Every row names the\n+ * count it expects; before the change each of these printed a pass that said nothing about what\n+ * it had left out.\n+ */\n+describe(\"T-048 sync counts: parity checks and the boundary graph\", () => {\n+  let root: string;\n+  let home: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t048-par-root-\"));\n+    home = mkdtempSync(join(tmpdir(), \"t048-par-home-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  function write(dir: string, file: string, body = \"x\\n\"): void {\n+    mkdirSync(dir, { recursive: true });\n+    writeFileSync(join(dir, file), body, \"utf-8\");\n+  }\n+  const repoCmds = () => join(root, \".claude\", \"commands\");\n+  const tmplCmds = () => join(root, \"project-template\", \".claude\", \"commands\");\n+\n+  describe(\"mirror-parity\", () => {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts.test.ts b/open-brain/tests/pipelines/sync/t048-counts.test.ts\nnew file mode 100644\nindex 00000000..1229dbd4\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts.test.ts\n@@ -0,0 +1,95 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkHookConfigs, checkHookRegistration } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to\n+ * print an unqualified pass whatever number of entries it actually read, so zero read looked\n+ * the same as everything read. Every row names the count it expects.\n+ */\n+describe(\"T-048 sync counts\", () => {\n+  let dir: string;\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t048-counts-\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  const settings = (obj: unknown): string => {\n+    const p = join(dir, \"settings.json\");\n+    writeFileSync(p, JSON.stringify(obj), \"utf-8\");\n+    return p;\n+  };\n+\n+  describe(\"hook-configs\", () => {\n+    it(\"the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'\", () => {\n+      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: \"command\", command: \"node /x/cli-bootstrap.js\" }] }], SessionEnd: [{ hooks: [{ command: \"node /x/end.js\" }] }] } });\n+      const r = checkHookConfigs(p);\n+      expect(r.severity).toBe(\"skip\");\n+      expect(r.message).toContain(\"not checked\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T15",
+          "observable": "#303. Fixture repos for the four cases: at HEAD, behind, ahead (warn) and diverged (issue, naming both counts and the merge-base)."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]"
+          ],
+          "id": "T16",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge the heads in order: #295, #298, #300, #303, #306, #309."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..3f976448 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -162,23 +162,52 @@ export function checkHookConfigs(settingsPath: string): CheckResult {\n     }\n   }\n   const missing: string[] = [];\n+  // T-048: every entry that is not stat'ed is counted by WHY, and the verdict says how many were\n+  // read. A zero here used to print \"All hook command files exist\".\n+  let checked = 0;\n+  const skipped = { notAnObject: 0, noCommand: 0, notNodeOrTsx: 0, noFilePath: 0 };\n   for (const hook of hooks) {\n-    if (!hook || typeof hook !== \"object\") continue;\n+    if (!hook || typeof hook !== \"object\") {\n+      skipped.notAnObject++;\n+      continue;\n+    }\n     const h = hook as Record<string, unknown>;\n-    const cmd: string = typeof h.command === \"string\" ? h.command : \"\";\n-    if (!cmd.includes(\"node \") && !cmd.includes(\"npx tsx \")) continue;\n+    if (typeof h.command !== \"string\") {\n+      skipped.noCommand++;\n+      continue;\n+    }\n+    const cmd: string = h.command;\n+    if (!cmd.includes(\"node \") && !cmd.includes(\"npx tsx \")) {\n+      skipped.notNodeOrTsx++;\n+      continue;\n+    }\n     // Extract file path: word after \"node\" or \"npx tsx\"\n     const fileMatch = cmd.match(/(?:node|npx tsx)\\s+([^\\s]+)/);\n-    if (!fileMatch) continue;\n+    if (!fileMatch) {\n+      skipped.noFilePath++;\n+      continue;\n+    }\n     const filePath = fileMatch[1];\n+    checked++;\n     if (!existsSync(filePath)) {\n       missing.push(filePath);\n     }\n   }\n+  const skippedCount = skipped.notAnObject + skipped.noCommand + skipped.notNodeOrTsx + skipped.noFilePath;\n+  const why = [\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/hook-registration.test.ts b/open-brain/tests/pipelines/sync/hook-registration.test.ts\nindex 540bdbce..f614f2ce 100644\n--- a/open-brain/tests/pipelines/sync/hook-registration.test.ts\n+++ b/open-brain/tests/pipelines/sync/hook-registration.test.ts\n@@ -73,7 +73,10 @@ describe(\"checkHookRegistration\", () => {\n     expect(checkHookRegistration(join(dir, \"nope.json\")).severity).toBe(\"warn\");\n   });\n \n-  it(\"handles settings with no hooks block\", () => {\n-    expect(checkHookRegistration(settings({})).severity).toBe(\"pass\");\n+  it(\"is 'not checked', not a pass, with no hooks block (T-048: zero counted is not 'no duplicates')\", () => {\n+    const r = checkHookRegistration(settings({}));\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toContain(\"not checked\");\n+    expect(r.message).toContain(\"0 script registration(s) counted\");\n   });\n });",
+            "diff --git a/open-brain/tests/pipelines/sync/mirror-parity.test.ts b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\nindex f79bb384..c2c80870 100644\n--- a/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n+++ b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n@@ -113,7 +113,10 @@ describe(\"checkMirrorParity\", () => {\n     write(tmplCmds(), \"bootstrap.md\", \"# /bootstrap\\n\");\n \n     const result = checkMirrorParity(root, home);\n-    expect(result.severity).toBe(\"pass\");\n+    // T-048: only exceptions were present, so NOTHING was compared; that is \"not checked\", not a pass.\n+    expect(result.severity).toBe(\"skip\");\n+    expect(result.message).toContain(\"0 file comparison(s)\");\n+    expect(result.message).toContain(\"2 excepted\");\n   });\n \n   it(\"does not fail when the live user directories are absent\", () => {",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\nnew file mode 100644\nindex 00000000..ed866753\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\n@@ -0,0 +1,134 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import {\n+  checkMirrorParity,\n+  checkCommandParity,\n+  checkCommandToolNames,\n+  checkCommandNames,\n+  checkModuleBoundary,\n+  checkRetirements,\n+} from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks, part 2): the exception lists and the dropped imports. Every row names the\n+ * count it expects; before the change each of these printed a pass that said nothing about what\n+ * it had left out.\n+ */\n+describe(\"T-048 sync counts: parity checks and the boundary graph\", () => {\n+  let root: string;\n+  let home: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t048-par-root-\"));\n+    home = mkdtempSync(join(tmpdir(), \"t048-par-home-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  function write(dir: string, file: string, body = \"x\\n\"): void {\n+    mkdirSync(dir, { recursive: true });\n+    writeFileSync(join(dir, file), body, \"utf-8\");\n+  }\n+  const repoCmds = () => join(root, \".claude\", \"commands\");\n+  const tmplCmds = () => join(root, \"project-template\", \".claude\", \"commands\");\n+\n+  describe(\"mirror-parity\", () => {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts.test.ts b/open-brain/tests/pipelines/sync/t048-counts.test.ts\nnew file mode 100644\nindex 00000000..1229dbd4\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts.test.ts\n@@ -0,0 +1,95 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkHookConfigs, checkHookRegistration } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to\n+ * print an unqualified pass whatever number of entries it actually read, so zero read looked\n+ * the same as everything read. Every row names the count it expects.\n+ */\n+describe(\"T-048 sync counts\", () => {\n+  let dir: string;\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t048-counts-\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  const settings = (obj: unknown): string => {\n+    const p = join(dir, \"settings.json\");\n+    writeFileSync(p, JSON.stringify(obj), \"utf-8\");\n+    return p;\n+  };\n+\n+  describe(\"hook-configs\", () => {\n+    it(\"the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'\", () => {\n+      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: \"command\", command: \"node /x/cli-bootstrap.js\" }] }], SessionEnd: [{ hooks: [{ command: \"node /x/end.js\" }] }] } });\n+      const r = checkHookConfigs(p);\n+      expect(r.severity).toBe(\"skip\");\n+      expect(r.message).toContain(\"not checked\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T17",
+          "observable": "Known conflict: #295 and #309 both edit the node:path import line in checks.ts. Report every conflict."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/mirror-parity.test.ts b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\nindex f79bb384..c2c80870 100644\n--- a/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n+++ b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n@@ -113,7 +113,10 @@ describe(\"checkMirrorParity\", () => {\n     write(tmplCmds(), \"bootstrap.md\", \"# /bootstrap\\n\");\n \n     const result = checkMirrorParity(root, home);\n-    expect(result.severity).toBe(\"pass\");\n+    // T-048: only exceptions were present, so NOTHING was compared; that is \"not checked\", not a pass.\n+    expect(result.severity).toBe(\"skip\");\n+    expect(result.message).toContain(\"0 file comparison(s)\");\n+    expect(result.message).toContain(\"2 excepted\");\n   });\n \n   it(\"does not fail when the live user directories are absent\", () => {"
+          ],
+          "id": "T18",
+          "observable": "Resolve ONLY that import-line conflict, by taking the union of the imported names, and say so. Stop on any other conflict."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 7d75af1e..3f976448 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -162,23 +162,52 @@ export function checkHookConfigs(settingsPath: string): CheckResult {\n     }\n   }\n   const missing: string[] = [];\n+  // T-048: every entry that is not stat'ed is counted by WHY, and the verdict says how many were\n+  // read. A zero here used to print \"All hook command files exist\".\n+  let checked = 0;\n+  const skipped = { notAnObject: 0, noCommand: 0, notNodeOrTsx: 0, noFilePath: 0 };\n   for (const hook of hooks) {\n-    if (!hook || typeof hook !== \"object\") continue;\n+    if (!hook || typeof hook !== \"object\") {\n+      skipped.notAnObject++;\n+      continue;\n+    }\n     const h = hook as Record<string, unknown>;\n-    const cmd: string = typeof h.command === \"string\" ? h.command : \"\";\n-    if (!cmd.includes(\"node \") && !cmd.includes(\"npx tsx \")) continue;\n+    if (typeof h.command !== \"string\") {\n+      skipped.noCommand++;\n+      continue;\n+    }\n+    const cmd: string = h.command;\n+    if (!cmd.includes(\"node \") && !cmd.includes(\"npx tsx \")) {\n+      skipped.notNodeOrTsx++;\n+      continue;\n+    }\n     // Extract file path: word after \"node\" or \"npx tsx\"\n     const fileMatch = cmd.match(/(?:node|npx tsx)\\s+([^\\s]+)/);\n-    if (!fileMatch) continue;\n+    if (!fileMatch) {\n+      skipped.noFilePath++;\n+      continue;\n+    }\n     const filePath = fileMatch[1];\n+    checked++;\n     if (!existsSync(filePath)) {\n       missing.push(filePath);\n     }\n   }\n+  const skippedCount = skipped.notAnObject + skipped.noCommand + skipped.notNodeOrTsx + skipped.noFilePath;\n+  const why = [\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/checks.test.ts b/open-brain/tests/pipelines/sync/checks.test.ts\nindex 0663ef02..402d2d40 100644\n--- a/open-brain/tests/pipelines/sync/checks.test.ts\n+++ b/open-brain/tests/pipelines/sync/checks.test.ts\n@@ -284,11 +284,13 @@ describe(\"validation checks\", () => {\n   });\n \n   describe(\"checkHookConfigs\", () => {\n-    it(\"passes when settings.json has no hooks\", () => {\n+    it(\"is 'not checked', not a pass, when settings.json has no hooks (T-048: zero read is not 'all exist')\", () => {\n       const settingsPath = join(tempDir, \"settings.json\");\n       writeFileSync(settingsPath, JSON.stringify({ hooks: {} }));\n       const result = checkHookConfigs(settingsPath);\n-      expect(result.severity).toBe(\"pass\");\n+      expect(result.severity).toBe(\"skip\");\n+      expect(result.message).toContain(\"not checked\");\n+      expect(result.message).toContain(\"0 hook command file(s) checked\");\n     });\n \n     it(\"issues when a hook references a missing file\", () => {\n@@ -455,7 +457,14 @@ describe(\"validation checks\", () => {\n       writeDoc(tempDir, \"project-template/CHANGELOG.md\", \"Exported to `Obsidian Vault/Checkpoints/` in v1.\");\n       writeDoc(tempDir, \"scripts/tests/fixture.md\", \"Path: ~/Obsidian Vault/Experiences\");\n       writeDoc(tempDir, \"project-template/superpowers/plans/2026-03-26-x.md\", \"Write to ~/Obsidian Vault/Sessions/\");\n-      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"pass\");\n+      // T-048: with every file exempt NOTHING was scanned, which is not a pass; a clean file makes it one, and the counts name the exemptions.\n+      expect(checkVaultPathRefs(tempDir, home).severity).toBe(\"skip\");\n+      writeDoc(tempDir, \"project-template/README.md\", \"clean\");\n+      const r = checkVaultPathRefs(tempDir, home);\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/hook-registration.test.ts b/open-brain/tests/pipelines/sync/hook-registration.test.ts\nindex 540bdbce..f614f2ce 100644\n--- a/open-brain/tests/pipelines/sync/hook-registration.test.ts\n+++ b/open-brain/tests/pipelines/sync/hook-registration.test.ts\n@@ -73,7 +73,10 @@ describe(\"checkHookRegistration\", () => {\n     expect(checkHookRegistration(join(dir, \"nope.json\")).severity).toBe(\"warn\");\n   });\n \n-  it(\"handles settings with no hooks block\", () => {\n-    expect(checkHookRegistration(settings({})).severity).toBe(\"pass\");\n+  it(\"is 'not checked', not a pass, with no hooks block (T-048: zero counted is not 'no duplicates')\", () => {\n+    const r = checkHookRegistration(settings({}));\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toContain(\"not checked\");\n+    expect(r.message).toContain(\"0 script registration(s) counted\");\n   });\n });",
+            "diff --git a/open-brain/tests/pipelines/sync/mirror-parity.test.ts b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\nindex f79bb384..c2c80870 100644\n--- a/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n+++ b/open-brain/tests/pipelines/sync/mirror-parity.test.ts\n@@ -113,7 +113,10 @@ describe(\"checkMirrorParity\", () => {\n     write(tmplCmds(), \"bootstrap.md\", \"# /bootstrap\\n\");\n \n     const result = checkMirrorParity(root, home);\n-    expect(result.severity).toBe(\"pass\");\n+    // T-048: only exceptions were present, so NOTHING was compared; that is \"not checked\", not a pass.\n+    expect(result.severity).toBe(\"skip\");\n+    expect(result.message).toContain(\"0 file comparison(s)\");\n+    expect(result.message).toContain(\"2 excepted\");\n   });\n \n   it(\"does not fail when the live user directories are absent\", () => {",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\nnew file mode 100644\nindex 00000000..ed866753\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts-parity.test.ts\n@@ -0,0 +1,134 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import {\n+  checkMirrorParity,\n+  checkCommandParity,\n+  checkCommandToolNames,\n+  checkCommandNames,\n+  checkModuleBoundary,\n+  checkRetirements,\n+} from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks, part 2): the exception lists and the dropped imports. Every row names the\n+ * count it expects; before the change each of these printed a pass that said nothing about what\n+ * it had left out.\n+ */\n+describe(\"T-048 sync counts: parity checks and the boundary graph\", () => {\n+  let root: string;\n+  let home: string;\n+  beforeEach(() => {\n+    root = mkdtempSync(join(tmpdir(), \"t048-par-root-\"));\n+    home = mkdtempSync(join(tmpdir(), \"t048-par-home-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(root, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  function write(dir: string, file: string, body = \"x\\n\"): void {\n+    mkdirSync(dir, { recursive: true });\n+    writeFileSync(join(dir, file), body, \"utf-8\");\n+  }\n+  const repoCmds = () => join(root, \".claude\", \"commands\");\n+  const tmplCmds = () => join(root, \"project-template\", \".claude\", \"commands\");\n+\n+  describe(\"mirror-parity\", () => {\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/tests/pipelines/sync/t048-counts.test.ts b/open-brain/tests/pipelines/sync/t048-counts.test.ts\nnew file mode 100644\nindex 00000000..1229dbd4\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/t048-counts.test.ts\n@@ -0,0 +1,95 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkHookConfigs, checkHookRegistration } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-048 (sync checks): a filter that drops rows must say how many. Each check below used to\n+ * print an unqualified pass whatever number of entries it actually read, so zero read looked\n+ * the same as everything read. Every row names the count it expects.\n+ */\n+describe(\"T-048 sync counts\", () => {\n+  let dir: string;\n+  beforeEach(() => {\n+    dir = mkdtempSync(join(tmpdir(), \"t048-counts-\"));\n+  });\n+  afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));\n+\n+  const settings = (obj: unknown): string => {\n+    const p = join(dir, \"settings.json\");\n+    writeFileSync(p, JSON.stringify(obj), \"utf-8\");\n+    return p;\n+  };\n+\n+  describe(\"hook-configs\", () => {\n+    it(\"the real settings.json shape (matcher groups holding hooks[]) reads ZERO entries and says so, instead of 'All hook command files exist'\", () => {\n+      const p = settings({ hooks: { SessionStart: [{ hooks: [{ type: \"command\", command: \"node /x/cli-bootstrap.js\" }] }], SessionEnd: [{ hooks: [{ command: \"node /x/end.js\" }] }] } });\n+      const r = checkHookConfigs(p);\n+      expect(r.severity).toBe(\"skip\");\n+      expect(r.message).toContain(\"not checked\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T19",
+          "observable": "On the merged result, run every touched sync test file, one per invocation, plus tsc --noEmit. Then run node open-brain/build/cli.js sync --check after npm run build, in the scratch tree only, and quote every new check's line."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+        "merge_commit": "d8dc12db5da04aabb66ec9e30433aee0ed637aab",
+        "pr": 306,
+        "scored_sha": "d8dc12db5da04aabb66ec9e30433aee0ed637aab"
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.82
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.46
+    },
+    "plan_row:T10": {
+      "type": "noul",
+      "noul": 0.1
+    },
+    "plan_row:T11": {
+      "type": "noul",
+      "noul": 0.13
+    },
+    "plan_row:T12": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "plan_row:T13": {
+      "type": "noul",
+      "noul": 0.44
+    },
+    "plan_row:T14": {
+      "type": "noul",
+      "noul": 0.41
+    },
+    "plan_row:T15": {
+      "type": "noul",
+      "noul": 0.33
+    },
+    "plan_row:T16": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "plan_row:T17": {
+      "type": "noul",
+      "noul": 0.2
+    },
+    "plan_row:T18": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "plan_row:T19": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.52
+    },
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.14
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.17
+    },
+    "plan_row:T5": {
+      "type": "noul",
+      "noul": 0.82
+    },
+    "plan_row:T6": {
+      "type": "noul",
+      "noul": 0.29
+    },
+    "plan_row:T7": {
+      "type": "noul",
+      "noul": 0.71
+    },
+    "plan_row:T8": {
+      "type": "noul",
+      "noul": 0.34
+    },
+    "plan_row:T9": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.08,
+      "confidence": 0.87,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.92,
+        "1": 0.08,
+        "2": 0
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.16
+    }
+  },
+  "usage": {
+    "input_tokens": 25027,
+    "output_tokens": 454
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.46 is below the required 0.7",
+      "plan_row:T2 0.52 is below the required 0.7",
+      "plan_row:T3 0.14 is below the required 0.7",
+      "plan_row:T4 0.17 is below the required 0.7",
+      "plan_row:T6 0.29 is below the required 0.7",
+      "plan_row:T8 0.34 is below the required 0.7",
+      "plan_row:T9 0.19 is below the required 0.7",
+      "plan_row:T10 0.1 is below the required 0.7",
+      "plan_row:T11 0.13 is below the required 0.7",
+      "plan_row:T12 0.19 is below the required 0.7",
+      "plan_row:T13 0.44 is below the required 0.7",
+      "plan_row:T14 0.41 is below the required 0.7",
+      "plan_row:T15 0.33 is below the required 0.7",
+      "plan_row:T16 0.18 is below the required 0.7",
+      "plan_row:T17 0.2 is below the required 0.7",
+      "plan_row:T18 0.19 is below the required 0.7",
+      "plan_row:T19 0.19 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "c8933c65-7d44-45b0-b3e2-147e86675859",
+  "subject": {
+    "gate": "developer-done",
+    "key": "d8dc12db5da04aabb66ec9e30433aee0ed637aab",
+    "blob": "d8e3a3f728ddedde349845de21e0f9d81e8f7e4d30bef27b56f6cd42fe09a464"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T09:51:12.798Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 306,
+  "merge_commit": "d8dc12db5da04aabb66ec9e30433aee0ed637aab",
+  "scored_sha": "d8dc12db5da04aabb66ec9e30433aee0ed637aab",
+  "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/016-qa256-pr306.G_done-request.json",
+    "blob": "af628398c368958b86ce5ce42b0927ccb534db35"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/src/pipelines/sync/checks.ts",
+    "open-brain/tests/pipelines/sync/checks.test.ts",
+    "open-brain/tests/pipelines/sync/hook-registration.test.ts",
+    "open-brain/tests/pipelines/sync/mirror-parity.test.ts",
+    "open-brain/tests/pipelines/sync/t048-counts-parity.test.ts",
+    "open-brain/tests/pipelines/sync/t048-counts.test.ts"
+  ],
+  "cal2_case_id": "qa256-pr306"
+}

@@ -1,0 +1,7 @@
+HTTP 401: outcome_class auth; exit 1; note "auth (HTTP 401): developer-done: HTTP 401 — key rejected or forbidden; not retried"; response_detail 20 chars "{"detail":"bad key"}"
+HTTP 403: outcome_class auth; exit 1; note "auth (HTTP 403): developer-done: HTTP 403 — key rejected or forbidden; not retried"; response_detail 9 chars "forbidden"
+HTTP 400: outcome_class request-invalid; exit 1; note "request-invalid (HTTP 400): developer-done: HTTP 400 max_tokens_exceeded — request too large for the API; not retried"; response_detail 47 chars "{"detail":{"error_type":"max_tokens_exceeded"}}"
+HTTP 429: outcome_class rate-limited; exit 1; note "rate-limited (HTTP 429): developer-done: HTTP 429 — rate limited"; response_detail 9 chars "slow down"
+HTTP 529: outcome_class overloaded; exit 1; note "overloaded (HTTP 529): developer-done: HTTP 529 — overloaded"; response_detail 10 chars "overloaded"
+HTTP 503: outcome_class transport; exit 1; note "transport (HTTP 503): developer-done: HTTP 503 — server error"; response_detail 2000 chars
+HTTP 418: outcome_class unexpected-status; exit 1; note "unexpected-status (HTTP 418): developer-done: HTTP 418"; response_detail 6 chars "teapot"

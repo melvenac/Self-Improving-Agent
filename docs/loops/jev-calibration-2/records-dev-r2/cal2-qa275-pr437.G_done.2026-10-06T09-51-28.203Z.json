@@ -1,0 +1,257 @@
+{
+  "gate": "developer-done",
+  "loop": "72-qa275-pr437",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T09:51:28.203Z",
+  "answered_at": "2026-10-06T09:51:28.579Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. Flag any file outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). Record the test result and run id above, and confirm it is the pinned head's run.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/cli-bootstrap.ts",
+        "open-brain/src/cli-session-end.ts",
+        "open-brain/src/shared/session-hook-claim.ts",
+        "open-brain/tests/cli-bootstrap.test.ts",
+        "open-brain/tests/cli-session-end-dedupe.test.ts",
+        "open-brain/tests/shared/session-hook-claim.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. Flag any file outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). Record the test result and run id above, and confirm it is the pinned head's run.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "72-qa275-pr437",
+        "new_capability": "QA 275, session-161 batch c: #434 (T-240), #436 (T-235 P2-5), #437 (T-235 P2-7)",
+        "objective": "QA 275, session-161 batch c: #434 (T-240), #436 (T-235 P2-5), #437 (T-235 P2-7)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+          "path": "docs/loops/qa-275-s161c-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. Flag any file outside the task.",
+          "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.",
+          "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.",
+          "CI (read only). Record the test result and run id above, and confirm it is the pinned head's run."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/cli-session-end.ts b/open-brain/src/cli-session-end.ts\nindex 5dfa9491..ce42c9da 100644\n--- a/open-brain/src/cli-session-end.ts\n+++ b/open-brain/src/cli-session-end.ts\n@@ -18,7 +18,8 @@ import { formatSessionEndLines, sessionEndV2 } from \"./pipelines/session-end/ind\n import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from \"./pipelines/session-end/recalled-ids.js\";\n import { obsidianVaultDir } from \"./shared/paths.js\";\n import { resolveHookProjectDir } from \"./shared/repo-root.js\";\n-import { resolveSessionId } from \"./shared/active-session.js\";\n+import { currentIde, detectIde, resolveSessionId } from \"./shared/active-session.js\";\n+import { appendHookMetric, dedupeCursorHookRuns, tryClaimHookRun } from \"./shared/session-hook-claim.js\";\n import { byPidDir, removeProcessSession } from \"./shared/process-session.js\";\n import { resolvePaths } from \"./shared/paths.js\";\n import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from \"./shared/handoff-guard.js\";\n@@ -51,6 +52,24 @@ try {\n   if (raw) hookPayload = JSON.parse(raw);\n } catch { /* stdin unavailable — fall back to the environment below */ }\n \n+const home = process.env.HOME || process.env.USERPROFILE || \"\";\n+const registeredAs = currentIde();\n+const sessionForClaim = resolveSessionId(hookPayload)?.uuid;\n+if (sessionForClaim && dedupeCursorHookRuns(hookPayload, registeredAs)) {\n+  const claim = tryClaimHookRun(home, \"sessionEnd\", sessionForClaim);\n+  appendHookMetric(home, {\n+    t: new Date().toISOString(),\n+    event: \"sessionEnd\",\n+    session_id: sessionForClaim,\n+    outcome: claim,\n+    script: \"session-end\",\n+  });\n+  if (claim === \"duplicate\") {\n+    console.log(`SESSION_END_SKIPPED: duplicate hook for session ${sessionForClaim}`);\n+    process.exit(0);\n+  }\n+}\n+\n // T-003: remove THIS session's proof first, before anything slow or anything\n // that can exit early. SessionEnd fires on /clear as well as on exit, so if the\n // next session's SessionStart then fails, the server finds NO proof and refuses"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. Flag any file outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/cli-bootstrap.test.ts b/open-brain/tests/cli-bootstrap.test.ts\nindex 757b7a54..ff677430 100644\n--- a/open-brain/tests/cli-bootstrap.test.ts\n+++ b/open-brain/tests/cli-bootstrap.test.ts\n@@ -244,3 +244,53 @@ describe(\"cli-bootstrap SESSION_UUID contract\", { timeout: 30_000 }, () => {\n     expect(r.stdout).toMatch(/SESSION_UUID: real-1234/);\n   });\n });\n+\n+describe(\"cli-bootstrap T-235 P2-7 cursor dedupe\", { timeout: 30_000 }, () => {\n+  const script = resolve(__dirname, \"../src/cli-bootstrap.ts\");\n+  let cwd: string;\n+  let home: string;\n+\n+  beforeEach(() => {\n+    cwd = mkdtempSync(join(tmpdir(), \"ob-boot-p27-cwd-\"));\n+    home = mkdtempSync(join(tmpdir(), \"ob-boot-p27-home-\"));\n+    mkdirSync(join(cwd, \".agents\"), { recursive: true });\n+  });\n+\n+  afterEach(() => {\n+    rmSync(cwd, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  async function runCursorStart(sessionId: string): Promise<{ status: number | null; stdout: string }> {\n+    const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+    const payload = { cwd, session_id: sessionId, cursor_version: \"1.0\" };\n+    const r = await spawnAsync(process.execPath, [TSX_CLI, script], {\n+      input: JSON.stringify(payload),\n+      env: { ...process.env, HOME: home, USERPROFILE: home },\n+    });\n+    return { status: r.status, stdout: r.stdout ?? \"\" };\n+  }\n+\n+  it(\"R1: second cursor SessionStart with the same session_id is skipped\", async () => {\n+    const id = \"dup-cursor-1111\";\n+    const first = await runCursorStart(id);\n+    const second = await runCursorStart(id);\n+    expect(first.stdout).toMatch(/SESSION_UUID/);\n+    expect(second.stdout).toMatch(/SESSION_START_SKIPPED/);\n+    expect(second.stdout).not.toMatch(/SESSION_UUID/);\n+  });\n+\n+  it(\"R3: Claude Code payload without cursor_version is never suppressed\", async () => {\n+    const id = \"cc-only-2222\";\n+    const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+    const payload = { cwd, session_id: id };\n+    const env = { ...process.env, HOME: home, USERPROFILE: home };\n+    const runOnce = () =>\n+      spawnAsync(process.execPath, [TSX_CLI, script], { input: JSON.stringify(payload), env });\n+    const a = await runOnce();\n+    const b = await runOnce();\n+    expect(a.stdout).toMatch(/SESSION_UUID/);\n+    expect(b.stdout).toMatch(/SESSION_UUID/);\n+    expect(b.stdout).not.toMatch(/SESSION_START_SKIPPED/);\n+  });\n+});",
+            "diff --git a/open-brain/tests/cli-session-end-dedupe.test.ts b/open-brain/tests/cli-session-end-dedupe.test.ts\nnew file mode 100644\nindex 00000000..0ec1a9a0\n--- /dev/null\n+++ b/open-brain/tests/cli-session-end-dedupe.test.ts\n@@ -0,0 +1,38 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"./spawn-async.js\";\n+\n+describe(\"cli-session-end T-235 P2-7 cursor dedupe\", { timeout: 30_000 }, () => {\n+  const script = resolve(__dirname, \"../src/cli-session-end.ts\");\n+  const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+  let home: string;\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"ob-end-p27-home-\"));\n+    mkdirSync(join(home, \".claude\", \"open-brain\"), { recursive: true });\n+  });\n+\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  async function runEnd(sessionId: string): Promise<string> {\n+    const payload = { session_id: sessionId, cursor_version: \"1.0\" };\n+    const r = await spawnAsync(process.execPath, [TSX_CLI, script], {\n+      input: JSON.stringify(payload),\n+      env: { ...process.env, HOME: home, USERPROFILE: home },\n+    });\n+    return r.stdout ?? \"\";\n+  }\n+\n+  it(\"second cursor SessionEnd with the same session_id is skipped before the pipeline\", async () => {\n+    const id = \"end-dup-cursor-1\";\n+    const first = await runEnd(id);\n+    const second = await runEnd(id);\n+    expect(first).not.toMatch(/SESSION_END_SKIPPED/);\n+    expect(second).toMatch(/SESSION_END_SKIPPED/);\n+  });\n+});",
+            "diff --git a/open-brain/tests/shared/session-hook-claim.test.ts b/open-brain/tests/shared/session-hook-claim.test.ts\nnew file mode 100644\nindex 00000000..4bf19e1c\n--- /dev/null\n+++ b/open-brain/tests/shared/session-hook-claim.test.ts\n@@ -0,0 +1,80 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, utimesSync, writeFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { pathToFileURL } from \"node:url\";\n+import { spawnAsync } from \"../spawn-async.js\";\n+import {\n+  HOOK_CLAIM_TTL_MS,\n+  clearHookClaimsForTest,\n+  dedupeCursorHookRuns,\n+  tryClaimHookRun,\n+} from \"../../src/shared/session-hook-claim.js\";\n+\n+describe(\"session-hook-claim (T-235 P2-7)\", () => {\n+  let home: string;\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"ob-claim-home-\"));\n+    clearHookClaimsForTest(home);\n+  });\n+\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  it(\"R1: second sessionStart claim for the same cursor session is duplicate\", () => {\n+    const id = \"11111111-2222-3333-4444-555555555555\";\n+    expect(tryClaimHookRun(home, \"sessionStart\", id)).toBe(\"claimed\");\n+    expect(tryClaimHookRun(home, \"sessionStart\", id)).toBe(\"duplicate\");\n+  });\n+\n+  it(\"R2: different session ids each claim sessionStart\", () => {\n+    expect(tryClaimHookRun(home, \"sessionStart\", \"aaaa\")).toBe(\"claimed\");\n+    expect(tryClaimHookRun(home, \"sessionStart\", \"bbbb\")).toBe(\"claimed\");\n+  });\n+\n+  it(\"R3: dedupe applies only when cursor_version is present (Claude-shaped payload skips guard)\", () => {\n+    const cc = { session_id: \"cc-1\" };\n+    const cursor = { session_id: \"cur-1\", cursor_version: \"1.0\" };\n+    expect(dedupeCursorHookRuns(cc, \"claude\")).toBe(false);\n+    expect(dedupeCursorHookRuns(cursor, \"claude\")).toBe(true);\n+  });\n+\n+  it(\"R4: after TTL a stale claim allows a full re-run\", () => {\n+    const id = \"ttl-session-1\";\n+    expect(tryClaimHookRun(home, \"sessionStart\", id, 50)).toBe(\"claimed\");\n+    expect(tryClaimHookRun(home, \"sessionStart\", id, 50)).toBe(\"duplicate\");\n+    const claimPath = join(home, \".claude\", \"open-brain\", \"hook-claims\", `sessionStart-${id}.claim`);\n+    const stale = Date.now() - HOOK_CLAIM_TTL_MS - 5_000;\n+    utimesSync(claimPath, stale / 1000, stale / 1000);\n+    expect(tryClaimHookRun(home, \"sessionStart\", id, HOOK_CLAIM_TTL_MS)).toBe(\"claimed\");\n+  });\n+\n+  it(\"race: two concurrent sessionStart claims — exactly one wins\", async () => {\n+    const id = \"race-session-1\";\n+    const claimMod = pathToFileURL(join(__dirname, \"../../src/shared/session-hook-claim.ts\")).href;\n+    const scriptPath = join(home, \"race.mjs\");\n+    writeFileSync(\n+      scriptPath,\n+      `import { tryClaimHookRun } from \"${claimMod}\";\n+const r = tryClaimHookRun(process.env.HOME, \"sessionStart\", ${JSON.stringify(id)});\n+console.log(r);`,\n+    );\n+    const env = { ...process.env, HOME: home, USERPROFILE: home };\n+    const { createRequire } = await import(\"node:module\");\n+    const tsxCli = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+    const runOne = () => spawnAsync(process.execPath, [tsxCli, scriptPath], { env });\n+    const [r1, r2] = await Promise.all([runOne(), runOne()]);\n+    if (r1.status !== 0) throw new Error(r1.stderr || \"race child 1 failed\");\n+    if (r2.status !== 0) throw new Error(r2.stderr || \"race child 2 failed\");\n+    const outcomes = [r1.stdout.trim(), r2.stdout.trim()].sort();\n+    expect(outcomes).toEqual([\"claimed\", \"duplicate\"]);\n+  });\n+\n+  it(\"sessionEnd: duplicate claim is rejected like sessionStart\", () => {\n+    const id = \"end-1\";\n+    expect(tryClaimHookRun(home, \"sessionEnd\", id)).toBe(\"claimed\");\n+    expect(tryClaimHookRun(home, \"sessionEnd\", id)).toBe(\"duplicate\");\n+  });\n+});\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/cli-bootstrap.test.ts b/open-brain/tests/cli-bootstrap.test.ts\nindex 757b7a54..ff677430 100644\n--- a/open-brain/tests/cli-bootstrap.test.ts\n+++ b/open-brain/tests/cli-bootstrap.test.ts\n@@ -244,3 +244,53 @@ describe(\"cli-bootstrap SESSION_UUID contract\", { timeout: 30_000 }, () => {\n     expect(r.stdout).toMatch(/SESSION_UUID: real-1234/);\n   });\n });\n+\n+describe(\"cli-bootstrap T-235 P2-7 cursor dedupe\", { timeout: 30_000 }, () => {\n+  const script = resolve(__dirname, \"../src/cli-bootstrap.ts\");\n+  let cwd: string;\n+  let home: string;\n+\n+  beforeEach(() => {\n+    cwd = mkdtempSync(join(tmpdir(), \"ob-boot-p27-cwd-\"));\n+    home = mkdtempSync(join(tmpdir(), \"ob-boot-p27-home-\"));\n+    mkdirSync(join(cwd, \".agents\"), { recursive: true });\n+  });\n+\n+  afterEach(() => {\n+    rmSync(cwd, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  async function runCursorStart(sessionId: string): Promise<{ status: number | null; stdout: string }> {\n+    const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+    const payload = { cwd, session_id: sessionId, cursor_version: \"1.0\" };\n+    const r = await spawnAsync(process.execPath, [TSX_CLI, script], {\n+      input: JSON.stringify(payload),\n+      env: { ...process.env, HOME: home, USERPROFILE: home },\n+    });\n+    return { status: r.status, stdout: r.stdout ?? \"\" };\n+  }\n+\n+  it(\"R1: second cursor SessionStart with the same session_id is skipped\", async () => {\n+    const id = \"dup-cursor-1111\";\n+    const first = await runCursorStart(id);\n+    const second = await runCursorStart(id);\n+    expect(first.stdout).toMatch(/SESSION_UUID/);\n+    expect(second.stdout).toMatch(/SESSION_START_SKIPPED/);\n+    expect(second.stdout).not.toMatch(/SESSION_UUID/);\n+  });\n+\n+  it(\"R3: Claude Code payload without cursor_version is never suppressed\", async () => {\n+    const id = \"cc-only-2222\";\n+    const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+    const payload = { cwd, session_id: id };\n+    const env = { ...process.env, HOME: home, USERPROFILE: home };\n+    const runOnce = () =>\n+      spawnAsync(process.execPath, [TSX_CLI, script], { input: JSON.stringify(payload), env });\n+    const a = await runOnce();\n+    const b = await runOnce();\n+    expect(a.stdout).toMatch(/SESSION_UUID/);\n+    expect(b.stdout).toMatch(/SESSION_UUID/);\n+    expect(b.stdout).not.toMatch(/SESSION_START_SKIPPED/);\n+  });\n+});"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/cli-bootstrap.test.ts b/open-brain/tests/cli-bootstrap.test.ts\nindex 757b7a54..ff677430 100644\n--- a/open-brain/tests/cli-bootstrap.test.ts\n+++ b/open-brain/tests/cli-bootstrap.test.ts\n@@ -244,3 +244,53 @@ describe(\"cli-bootstrap SESSION_UUID contract\", { timeout: 30_000 }, () => {\n     expect(r.stdout).toMatch(/SESSION_UUID: real-1234/);\n   });\n });\n+\n+describe(\"cli-bootstrap T-235 P2-7 cursor dedupe\", { timeout: 30_000 }, () => {\n+  const script = resolve(__dirname, \"../src/cli-bootstrap.ts\");\n+  let cwd: string;\n+  let home: string;\n+\n+  beforeEach(() => {\n+    cwd = mkdtempSync(join(tmpdir(), \"ob-boot-p27-cwd-\"));\n+    home = mkdtempSync(join(tmpdir(), \"ob-boot-p27-home-\"));\n+    mkdirSync(join(cwd, \".agents\"), { recursive: true });\n+  });\n+\n+  afterEach(() => {\n+    rmSync(cwd, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  async function runCursorStart(sessionId: string): Promise<{ status: number | null; stdout: string }> {\n+    const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+    const payload = { cwd, session_id: sessionId, cursor_version: \"1.0\" };\n+    const r = await spawnAsync(process.execPath, [TSX_CLI, script], {\n+      input: JSON.stringify(payload),\n+      env: { ...process.env, HOME: home, USERPROFILE: home },\n+    });\n+    return { status: r.status, stdout: r.stdout ?? \"\" };\n+  }\n+\n+  it(\"R1: second cursor SessionStart with the same session_id is skipped\", async () => {\n+    const id = \"dup-cursor-1111\";\n+    const first = await runCursorStart(id);\n+    const second = await runCursorStart(id);\n+    expect(first.stdout).toMatch(/SESSION_UUID/);\n+    expect(second.stdout).toMatch(/SESSION_START_SKIPPED/);\n+    expect(second.stdout).not.toMatch(/SESSION_UUID/);\n+  });\n+\n+  it(\"R3: Claude Code payload without cursor_version is never suppressed\", async () => {\n+    const id = \"cc-only-2222\";\n+    const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+    const payload = { cwd, session_id: id };\n+    const env = { ...process.env, HOME: home, USERPROFILE: home };\n+    const runOnce = () =>\n+      spawnAsync(process.execPath, [TSX_CLI, script], { input: JSON.stringify(payload), env });\n+    const a = await runOnce();\n+    const b = await runOnce();\n+    expect(a.stdout).toMatch(/SESSION_UUID/);\n+    expect(b.stdout).toMatch(/SESSION_UUID/);\n+    expect(b.stdout).not.toMatch(/SESSION_START_SKIPPED/);\n+  });\n+});",
+            "diff --git a/open-brain/tests/cli-session-end-dedupe.test.ts b/open-brain/tests/cli-session-end-dedupe.test.ts\nnew file mode 100644\nindex 00000000..0ec1a9a0\n--- /dev/null\n+++ b/open-brain/tests/cli-session-end-dedupe.test.ts\n@@ -0,0 +1,38 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, rmSync } from \"node:fs\";\n+import { join, resolve } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { createRequire } from \"node:module\";\n+import { spawnAsync } from \"./spawn-async.js\";\n+\n+describe(\"cli-session-end T-235 P2-7 cursor dedupe\", { timeout: 30_000 }, () => {\n+  const script = resolve(__dirname, \"../src/cli-session-end.ts\");\n+  const TSX_CLI = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+  let home: string;\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"ob-end-p27-home-\"));\n+    mkdirSync(join(home, \".claude\", \"open-brain\"), { recursive: true });\n+  });\n+\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  async function runEnd(sessionId: string): Promise<string> {\n+    const payload = { session_id: sessionId, cursor_version: \"1.0\" };\n+    const r = await spawnAsync(process.execPath, [TSX_CLI, script], {\n+      input: JSON.stringify(payload),\n+      env: { ...process.env, HOME: home, USERPROFILE: home },\n+    });\n+    return r.stdout ?? \"\";\n+  }\n+\n+  it(\"second cursor SessionEnd with the same session_id is skipped before the pipeline\", async () => {\n+    const id = \"end-dup-cursor-1\";\n+    const first = await runEnd(id);\n+    const second = await runEnd(id);\n+    expect(first).not.toMatch(/SESSION_END_SKIPPED/);\n+    expect(second).toMatch(/SESSION_END_SKIPPED/);\n+  });\n+});",
+            "diff --git a/open-brain/tests/shared/session-hook-claim.test.ts b/open-brain/tests/shared/session-hook-claim.test.ts\nnew file mode 100644\nindex 00000000..4bf19e1c\n--- /dev/null\n+++ b/open-brain/tests/shared/session-hook-claim.test.ts\n@@ -0,0 +1,80 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, rmSync, utimesSync, writeFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { pathToFileURL } from \"node:url\";\n+import { spawnAsync } from \"../spawn-async.js\";\n+import {\n+  HOOK_CLAIM_TTL_MS,\n+  clearHookClaimsForTest,\n+  dedupeCursorHookRuns,\n+  tryClaimHookRun,\n+} from \"../../src/shared/session-hook-claim.js\";\n+\n+describe(\"session-hook-claim (T-235 P2-7)\", () => {\n+  let home: string;\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"ob-claim-home-\"));\n+    clearHookClaimsForTest(home);\n+  });\n+\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  it(\"R1: second sessionStart claim for the same cursor session is duplicate\", () => {\n+    const id = \"11111111-2222-3333-4444-555555555555\";\n+    expect(tryClaimHookRun(home, \"sessionStart\", id)).toBe(\"claimed\");\n+    expect(tryClaimHookRun(home, \"sessionStart\", id)).toBe(\"duplicate\");\n+  });\n+\n+  it(\"R2: different session ids each claim sessionStart\", () => {\n+    expect(tryClaimHookRun(home, \"sessionStart\", \"aaaa\")).toBe(\"claimed\");\n+    expect(tryClaimHookRun(home, \"sessionStart\", \"bbbb\")).toBe(\"claimed\");\n+  });\n+\n+  it(\"R3: dedupe applies only when cursor_version is present (Claude-shaped payload skips guard)\", () => {\n+    const cc = { session_id: \"cc-1\" };\n+    const cursor = { session_id: \"cur-1\", cursor_version: \"1.0\" };\n+    expect(dedupeCursorHookRuns(cc, \"claude\")).toBe(false);\n+    expect(dedupeCursorHookRuns(cursor, \"claude\")).toBe(true);\n+  });\n+\n+  it(\"R4: after TTL a stale claim allows a full re-run\", () => {\n+    const id = \"ttl-session-1\";\n+    expect(tryClaimHookRun(home, \"sessionStart\", id, 50)).toBe(\"claimed\");\n+    expect(tryClaimHookRun(home, \"sessionStart\", id, 50)).toBe(\"duplicate\");\n+    const claimPath = join(home, \".claude\", \"open-brain\", \"hook-claims\", `sessionStart-${id}.claim`);\n+    const stale = Date.now() - HOOK_CLAIM_TTL_MS - 5_000;\n+    utimesSync(claimPath, stale / 1000, stale / 1000);\n+    expect(tryClaimHookRun(home, \"sessionStart\", id, HOOK_CLAIM_TTL_MS)).toBe(\"claimed\");\n+  });\n+\n+  it(\"race: two concurrent sessionStart claims — exactly one wins\", async () => {\n+    const id = \"race-session-1\";\n+    const claimMod = pathToFileURL(join(__dirname, \"../../src/shared/session-hook-claim.ts\")).href;\n+    const scriptPath = join(home, \"race.mjs\");\n+    writeFileSync(\n+      scriptPath,\n+      `import { tryClaimHookRun } from \"${claimMod}\";\n+const r = tryClaimHookRun(process.env.HOME, \"sessionStart\", ${JSON.stringify(id)});\n+console.log(r);`,\n+    );\n+    const env = { ...process.env, HOME: home, USERPROFILE: home };\n+    const { createRequire } = await import(\"node:module\");\n+    const tsxCli = createRequire(import.meta.url).resolve(\"tsx/cli\");\n+    const runOne = () => spawnAsync(process.execPath, [tsxCli, scriptPath], { env });\n+    const [r1, r2] = await Promise.all([runOne(), runOne()]);\n+    if (r1.status !== 0) throw new Error(r1.stderr || \"race child 1 failed\");\n+    if (r2.status !== 0) throw new Error(r2.stderr || \"race child 2 failed\");\n+    const outcomes = [r1.stdout.trim(), r2.stdout.trim()].sort();\n+    expect(outcomes).toEqual([\"claimed\", \"duplicate\"]);\n+  });\n+\n+  it(\"sessionEnd: duplicate claim is rejected like sessionStart\", () => {\n+    const id = \"end-1\";\n+    expect(tryClaimHookRun(home, \"sessionEnd\", id)).toBe(\"claimed\");\n+    expect(tryClaimHookRun(home, \"sessionEnd\", id)).toBe(\"duplicate\");\n+  });\n+});\n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). Record the test result and run id above, and confirm it is the pinned head's run."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+        "merge_commit": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+        "pr": 437,
+        "scored_sha": "23d46156a5fa34873ef1bee0ab723e52d1b33858"
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.85
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.56
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.29
+    },
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.27
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.11,
+      "confidence": 0.83,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.89,
+        "1": 0.1,
+        "2": 0.01
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.18
+    }
+  },
+  "usage": {
+    "input_tokens": 8832,
+    "output_tokens": 159
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.56 is below the required 0.7",
+      "plan_row:T2 0.29 is below the required 0.7",
+      "plan_row:T3 0.18 is below the required 0.7",
+      "plan_row:T4 0.27 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "a55b08c5-0b3a-47f1-971b-3643fabb2c36",
+  "subject": {
+    "gate": "developer-done",
+    "key": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+    "blob": "24e98c4282388e504a59d7b74fe6c5520916075781b36edbbd36b19515ae21d5"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T09:51:28.203Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 437,
+  "merge_commit": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+  "scored_sha": "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+  "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/072-qa275-pr437.G_done-request.json",
+    "blob": "e975545bc6d9aa4bbe3fecfe35eff2a3c3bdadb4"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/src/cli-bootstrap.ts",
+    "open-brain/src/cli-session-end.ts",
+    "open-brain/src/shared/session-hook-claim.ts",
+    "open-brain/tests/cli-bootstrap.test.ts",
+    "open-brain/tests/cli-session-end-dedupe.test.ts",
+    "open-brain/tests/shared/session-hook-claim.test.ts"
+  ],
+  "cal2_case_id": "qa275-pr437"
+}

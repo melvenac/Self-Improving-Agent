@@ -1,0 +1,267 @@
+{
+  "gate": "developer-done",
+  "loop": "60-qa272-pr415",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T09:51:26.538Z",
+  "answered_at": "2026-10-06T09:51:26.919Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files beyond origin/master. Flag any file outside the task.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI (read only). Record the test result and run id.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (In master's .agents/SYSTEM/hub-partner-seats.json, confirm: - infra = cursor-infra / k57d92gqtjm9wpfs74ekbx9rns8fmy2f; - builder = cursor-builder / k575sfwr9wcx3r8fw83g3bc00x8fmar3; - forge = forge / k571z4ghp7nbp34djhecwnsk3n8fmhsf; - the atlas reader pairs match these rooms in both directions; - \"grok\" and the three old room ids appear nowhere in the file. Run seat-map, hub-presence, hub-seats and focus one file per run. Report any finding as a fix-forward item.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "dc092840af38f86dfe18af060564fe181988f159",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/pipelines/session-start/state-render.ts",
+        "open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files beyond origin/master. Flag any file outside the task.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI (read only). Record the test result and run id.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "In master's .agents/SYSTEM/hub-partner-seats.json, confirm: - infra = cursor-infra / k57d92gqtjm9wpfs74ekbx9rns8fmy2f; - builder = cursor-builder / k575sfwr9wcx3r8fw83g3bc00x8fmar3; - forge = forge / k571z4ghp7nbp34djhecwnsk3n8fmhsf; - the atlas reader pairs match these rooms in both directions; - \"grok\" and the three old room ids appear nowhere in the file. Run seat-map, hub-presence, hub-seats and focus one file per run. Report any finding as a fix-forward item.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "60-qa272-pr415",
+        "new_capability": "QA 272, session-160 batch f: #415, #420, #421, plus a retro-check of the merged #418",
+        "objective": "QA 272, session-160 batch f: #415, #420, #421, plus a retro-check of the merged #418",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "687200f90fe15927859568493c26fe622c894d39",
+          "path": "docs/loops/qa-272-s160f-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files beyond origin/master. Flag any file outside the task.",
+          "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts.",
+          "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed.",
+          "CI (read only). Record the test result and run id.",
+          "In master's .agents/SYSTEM/hub-partner-seats.json, confirm: - infra = cursor-infra / k57d92gqtjm9wpfs74ekbx9rns8fmy2f; - builder = cursor-builder / k575sfwr9wcx3r8fw83g3bc00x8fmar3; - forge = forge / k571z4ghp7nbp34djhecwnsk3n8fmhsf; - the atlas reader pairs match these rooms in both directions; - \"grok\" and the three old room ids appear nowhere in the file. Run seat-map, hub-presence, hub-seats and focus one file per run. Report any finding as a fix-forward item."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\nindex 6e581e35..b62f218c 100644\n--- a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n+++ b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n@@ -1,11 +1,14 @@\n-import { describe, it, expect, afterEach } from \"vitest\";\n-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { describe, it, expect, afterEach, beforeEach, vi } from \"vitest\";\n+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n import { parseState, checkoutOf, ownHandoff, type State } from \"../../../src/shared/state-schema.js\";\n import { renderBriefing, type BriefingInput } from \"../../../src/pipelines/session-start/briefing.js\";\n import { renderState } from \"../../../src/pipelines/session-start/state-render.js\";\n import { handoffCheckout } from \"../../../src/pipelines/session-start/greeting-flags.js\";\n+import { checkMissingHandoff } from \"../../../src/pipelines/session-start/state-render.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n+import { handleStart } from \"../../../src/server.js\";\n import { readFileSync } from \"node:fs\";\n \n /**\n@@ -184,3 +187,87 @@ describe(\"R7: checkoutOf is one derivation for the writer and the reader\", () =>\n     expect(checkoutOf(join(tmpdir(), \"Worktrees\", \"sia-infra\") + \"/\")).toBe(\"sia-infra\");\n   });\n });\n+\n+describe(\"R8 (QA 270 row 3): ob_start itself hands the checkout to BOTH renderers when the flag is on\", () => {\n+  // The selector and the renderers are pinned above; this pins the one production path that reads the flag and passes\n+  // `ownCheckout` on. QA 270's mutant (server.ts stops passing it to renderBriefing) survived every other row.\n+  const parents: string[] = [];\n+  const saved = { HUB_URL: process.env.HUB_URL, A2A_KEY_DIR: process.env.A2A_KEY_DIR };\n+  beforeEach(() => {\n+    // No network: the presence block's fetch fails and says so; nothing here depends on it.\n+    vi.spyOn(globalThis, \"fetch\").mockRejectedValue(new Error(\"no network in this test\"));\n+  });\n+  afterEach(() => {\n+    vi.restoreAllMocks();\n+    for (const [k, v] of Object.entries(saved)) {\n+      if (v === undefined) delete process.env[k];\n+      else process.env[k] = v;\n+    }\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true });\n+  });\n+\n+  async function start(greeting: Record<string, boolean>): Promise<string> {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r8-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    for (const d of [\"SYSTEM\", \"TASKS\", \"SESSIONS\"]) mkdirSync(join(root, \".agents\", d), { recursive: true });\n+    writeFileSync(join(root, \"package.json\"), JSON.stringify({ version: \"1.0.0\" }));\n+    writeFileSync(join(root, \".agents\", \"SESSIONS\", \"SESSION_TEMPLATE.md\"), \"# Session N\\n\");\n+    writeFileSync(join(root, \".agents\", \"AGENT.local.md\"), \"---\\nname: Infra\\nrole: developer\\npartner: Atlas\\n---\\n\");\n+    writeFileSync(join(root, \".agents\", \"SYSTEM\", \"greeting.json\"), JSON.stringify(greeting));\n+    const raw = structuredClone(SIA);\n+    raw.handoffs = [{ ...raw.handoffs[0], seat: \"developer\", checkout: \"sia-builder\", session_uuid: \"u-builder\", first_rev: 5, pick_up: \"builder's pick-up\", watch_out: [\"builder's watch\"] }];\n+    writeFileSync(join(root, \".agents\", \"state.json\"), JSON.stringify(raw, null, 2));\n+    return (await handleStart({ project_root: root })).content[0].text;\n+  }\n+\n+  for (const budget of [true, false]) {\n+    it(`flag on (briefing_budget ${budget}): the Briefing and the State block both say none recorded for THIS checkout`, async () => {\n+      const text = await start({ briefing_budget: budget, handoff_by_checkout: true });\n+      const briefing = text.slice(text.indexOf(\"## Briefing\"));\n+      expect(briefing, \"renderBriefing got ownCheckout\").toMatch(/\\nPICK UP HERE\\nnone recorded for this checkout \\(developer, sia-infra\\)\\n/);\n+      expect(briefing).not.toContain(\"builder's pick-up\");\n+      const state = text.slice(0, text.indexOf(\"## Briefing\"));\n+      expect(state, \"renderState got ownCheckout\").toContain(\"no handoff recorded for this checkout (developer, sia-infra)\");\n+      expect(state).not.toContain(\"Your handoff\");\n+    });\n+  }\n+\n+  it(\"flag off: the role-wide pick-up, as before (the row reads the flag, not a constant)\", async () => {\n+    const text = await start({ briefing_budget: true });\n+    expect(text.slice(text.indexOf(\"## Briefing\"))).toMatch(/\\nPICK UP HERE\\nbuilder's pick-up\\n/);\n+  });\n+});\n+\n+describe(\"R9: checkMissingHandoff and the writer use ONE derivation of the checkout\", () => {\n+  // The writer stamps `sessions[].checkout` with checkoutOf(root); checkMissingHandoff must find that session from the same\n+  // checkout however its root is spelled. An inline derivation that drifts (no resolve, a raw path, a case fold on one side\n+  // only) stops matching on some spelling, and this row names which.\n+  const parents: string[] = [];\n+  afterEach(() => {\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  it(\"a session the real writer stamped (no handoff) is found as missing from every spelling of its root\", () => {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r9-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    mkdirSync(root);\n+    cpSync(join(import.meta.dirname, \"../../fixtures\"), root, { recursive: true });\n+    cpSync(join(FIXTURES, \"state.json\"), join(root, \".agents\", \"state.json\"));\n+    const uuid = \"cccccccc-3333-4333-8333-000000000239\";\n+    const before = JSON.parse(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\")).revision as number;\n+    const w = applyStateOps(root, { session: 999, expected_revision: before, session_uuid: uuid, ops: [{ op: \"set_objective\", text: \"R9\" }] } as Parameters<typeof applyStateOps>[1]);\n+    if (!w.ok) throw new Error(w.error);\n+    const parsed = parseState(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\"));\n+    if (!parsed.ok) throw new Error(parsed.error);\n+    const stamped = parsed.data.sessions.find((x) => x.uuid === uuid);\n+    expect(stamped?.checkout, \"the writer stamps checkoutOf(root)\").toBe(checkoutOf(root));\n+    const spellings = [root, `${root}/`, `${root}//`, join(root, \".\"), `${root}/sub/..`];\n+    for (const spelling of spellings) {\n+      expect(checkoutOf(spelling), spelling).toBe(\"sia-infra\");\n+      const c = checkMissingHandoff(parsed.data, { projectRoot: spelling, sessionUuid: \"someone-else\", seat: \"developer\" });\n+      expect(c.kind, `checkMissingHandoff from ${JSON.stringify(spelling)}`).toBe(\"missing\");\n+    }\n+  });\n+});\n"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files beyond origin/master. Flag any file outside the task."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\nindex 6e581e35..b62f218c 100644\n--- a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n+++ b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n@@ -1,11 +1,14 @@\n-import { describe, it, expect, afterEach } from \"vitest\";\n-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { describe, it, expect, afterEach, beforeEach, vi } from \"vitest\";\n+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n import { parseState, checkoutOf, ownHandoff, type State } from \"../../../src/shared/state-schema.js\";\n import { renderBriefing, type BriefingInput } from \"../../../src/pipelines/session-start/briefing.js\";\n import { renderState } from \"../../../src/pipelines/session-start/state-render.js\";\n import { handoffCheckout } from \"../../../src/pipelines/session-start/greeting-flags.js\";\n+import { checkMissingHandoff } from \"../../../src/pipelines/session-start/state-render.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n+import { handleStart } from \"../../../src/server.js\";\n import { readFileSync } from \"node:fs\";\n \n /**\n@@ -184,3 +187,87 @@ describe(\"R7: checkoutOf is one derivation for the writer and the reader\", () =>\n     expect(checkoutOf(join(tmpdir(), \"Worktrees\", \"sia-infra\") + \"/\")).toBe(\"sia-infra\");\n   });\n });\n+\n+describe(\"R8 (QA 270 row 3): ob_start itself hands the checkout to BOTH renderers when the flag is on\", () => {\n+  // The selector and the renderers are pinned above; this pins the one production path that reads the flag and passes\n+  // `ownCheckout` on. QA 270's mutant (server.ts stops passing it to renderBriefing) survived every other row.\n+  const parents: string[] = [];\n+  const saved = { HUB_URL: process.env.HUB_URL, A2A_KEY_DIR: process.env.A2A_KEY_DIR };\n+  beforeEach(() => {\n+    // No network: the presence block's fetch fails and says so; nothing here depends on it.\n+    vi.spyOn(globalThis, \"fetch\").mockRejectedValue(new Error(\"no network in this test\"));\n+  });\n+  afterEach(() => {\n+    vi.restoreAllMocks();\n+    for (const [k, v] of Object.entries(saved)) {\n+      if (v === undefined) delete process.env[k];\n+      else process.env[k] = v;\n+    }\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true });\n+  });\n+\n+  async function start(greeting: Record<string, boolean>): Promise<string> {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r8-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    for (const d of [\"SYSTEM\", \"TASKS\", \"SESSIONS\"]) mkdirSync(join(root, \".agents\", d), { recursive: true });\n+    writeFileSync(join(root, \"package.json\"), JSON.stringify({ version: \"1.0.0\" }));\n+    writeFileSync(join(root, \".agents\", \"SESSIONS\", \"SESSION_TEMPLATE.md\"), \"# Session N\\n\");\n+    writeFileSync(join(root, \".agents\", \"AGENT.local.md\"), \"---\\nname: Infra\\nrole: developer\\npartner: Atlas\\n---\\n\");\n+    writeFileSync(join(root, \".agents\", \"SYSTEM\", \"greeting.json\"), JSON.stringify(greeting));\n+    const raw = structuredClone(SIA);\n+    raw.handoffs = [{ ...raw.handoffs[0], seat: \"developer\", checkout: \"sia-builder\", session_uuid: \"u-builder\", first_rev: 5, pick_up: \"builder's pick-up\", watch_out: [\"builder's watch\"] }];\n+    writeFileSync(join(root, \".agents\", \"state.json\"), JSON.stringify(raw, null, 2));\n+    return (await handleStart({ project_root: root })).content[0].text;\n+  }\n+\n+  for (const budget of [true, false]) {\n+    it(`flag on (briefing_budget ${budget}): the Briefing and the State block both say none recorded for THIS checkout`, async () => {\n+      const text = await start({ briefing_budget: budget, handoff_by_checkout: true });\n+      const briefing = text.slice(text.indexOf(\"## Briefing\"));\n+      expect(briefing, \"renderBriefing got ownCheckout\").toMatch(/\\nPICK UP HERE\\nnone recorded for this checkout \\(developer, sia-infra\\)\\n/);\n+      expect(briefing).not.toContain(\"builder's pick-up\");\n+      const state = text.slice(0, text.indexOf(\"## Briefing\"));\n+      expect(state, \"renderState got ownCheckout\").toContain(\"no handoff recorded for this checkout (developer, sia-infra)\");\n+      expect(state).not.toContain(\"Your handoff\");\n+    });\n+  }\n+\n+  it(\"flag off: the role-wide pick-up, as before (the row reads the flag, not a constant)\", async () => {\n+    const text = await start({ briefing_budget: true });\n+    expect(text.slice(text.indexOf(\"## Briefing\"))).toMatch(/\\nPICK UP HERE\\nbuilder's pick-up\\n/);\n+  });\n+});\n+\n+describe(\"R9: checkMissingHandoff and the writer use ONE derivation of the checkout\", () => {\n+  // The writer stamps `sessions[].checkout` with checkoutOf(root); checkMissingHandoff must find that session from the same\n+  // checkout however its root is spelled. An inline derivation that drifts (no resolve, a raw path, a case fold on one side\n+  // only) stops matching on some spelling, and this row names which.\n+  const parents: string[] = [];\n+  afterEach(() => {\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  it(\"a session the real writer stamped (no handoff) is found as missing from every spelling of its root\", () => {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r9-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    mkdirSync(root);\n+    cpSync(join(import.meta.dirname, \"../../fixtures\"), root, { recursive: true });\n+    cpSync(join(FIXTURES, \"state.json\"), join(root, \".agents\", \"state.json\"));\n+    const uuid = \"cccccccc-3333-4333-8333-000000000239\";\n+    const before = JSON.parse(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\")).revision as number;\n+    const w = applyStateOps(root, { session: 999, expected_revision: before, session_uuid: uuid, ops: [{ op: \"set_objective\", text: \"R9\" }] } as Parameters<typeof applyStateOps>[1]);\n+    if (!w.ok) throw new Error(w.error);\n+    const parsed = parseState(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\"));\n+    if (!parsed.ok) throw new Error(parsed.error);\n+    const stamped = parsed.data.sessions.find((x) => x.uuid === uuid);\n+    expect(stamped?.checkout, \"the writer stamps checkoutOf(root)\").toBe(checkoutOf(root));\n+    const spellings = [root, `${root}/`, `${root}//`, join(root, \".\"), `${root}/sub/..`];\n+    for (const spelling of spellings) {\n+      expect(checkoutOf(spelling), spelling).toBe(\"sia-infra\");\n+      const c = checkMissingHandoff(parsed.data, { projectRoot: spelling, sessionUuid: \"someone-else\", seat: \"developer\" });\n+      expect(c.kind, `checkMissingHandoff from ${JSON.stringify(spelling)}`).toBe(\"missing\");\n+    }\n+  });\n+});\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Run the new or changed test files against master's source (they should fail) and against the head (they should pass), and quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\nindex 6e581e35..b62f218c 100644\n--- a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n+++ b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n@@ -1,11 +1,14 @@\n-import { describe, it, expect, afterEach } from \"vitest\";\n-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { describe, it, expect, afterEach, beforeEach, vi } from \"vitest\";\n+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n import { parseState, checkoutOf, ownHandoff, type State } from \"../../../src/shared/state-schema.js\";\n import { renderBriefing, type BriefingInput } from \"../../../src/pipelines/session-start/briefing.js\";\n import { renderState } from \"../../../src/pipelines/session-start/state-render.js\";\n import { handoffCheckout } from \"../../../src/pipelines/session-start/greeting-flags.js\";\n+import { checkMissingHandoff } from \"../../../src/pipelines/session-start/state-render.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n+import { handleStart } from \"../../../src/server.js\";\n import { readFileSync } from \"node:fs\";\n \n /**\n@@ -184,3 +187,87 @@ describe(\"R7: checkoutOf is one derivation for the writer and the reader\", () =>\n     expect(checkoutOf(join(tmpdir(), \"Worktrees\", \"sia-infra\") + \"/\")).toBe(\"sia-infra\");\n   });\n });\n+\n+describe(\"R8 (QA 270 row 3): ob_start itself hands the checkout to BOTH renderers when the flag is on\", () => {\n+  // The selector and the renderers are pinned above; this pins the one production path that reads the flag and passes\n+  // `ownCheckout` on. QA 270's mutant (server.ts stops passing it to renderBriefing) survived every other row.\n+  const parents: string[] = [];\n+  const saved = { HUB_URL: process.env.HUB_URL, A2A_KEY_DIR: process.env.A2A_KEY_DIR };\n+  beforeEach(() => {\n+    // No network: the presence block's fetch fails and says so; nothing here depends on it.\n+    vi.spyOn(globalThis, \"fetch\").mockRejectedValue(new Error(\"no network in this test\"));\n+  });\n+  afterEach(() => {\n+    vi.restoreAllMocks();\n+    for (const [k, v] of Object.entries(saved)) {\n+      if (v === undefined) delete process.env[k];\n+      else process.env[k] = v;\n+    }\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true });\n+  });\n+\n+  async function start(greeting: Record<string, boolean>): Promise<string> {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r8-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    for (const d of [\"SYSTEM\", \"TASKS\", \"SESSIONS\"]) mkdirSync(join(root, \".agents\", d), { recursive: true });\n+    writeFileSync(join(root, \"package.json\"), JSON.stringify({ version: \"1.0.0\" }));\n+    writeFileSync(join(root, \".agents\", \"SESSIONS\", \"SESSION_TEMPLATE.md\"), \"# Session N\\n\");\n+    writeFileSync(join(root, \".agents\", \"AGENT.local.md\"), \"---\\nname: Infra\\nrole: developer\\npartner: Atlas\\n---\\n\");\n+    writeFileSync(join(root, \".agents\", \"SYSTEM\", \"greeting.json\"), JSON.stringify(greeting));\n+    const raw = structuredClone(SIA);\n+    raw.handoffs = [{ ...raw.handoffs[0], seat: \"developer\", checkout: \"sia-builder\", session_uuid: \"u-builder\", first_rev: 5, pick_up: \"builder's pick-up\", watch_out: [\"builder's watch\"] }];\n+    writeFileSync(join(root, \".agents\", \"state.json\"), JSON.stringify(raw, null, 2));\n+    return (await handleStart({ project_root: root })).content[0].text;\n+  }\n+\n+  for (const budget of [true, false]) {\n+    it(`flag on (briefing_budget ${budget}): the Briefing and the State block both say none recorded for THIS checkout`, async () => {\n+      const text = await start({ briefing_budget: budget, handoff_by_checkout: true });\n+      const briefing = text.slice(text.indexOf(\"## Briefing\"));\n+      expect(briefing, \"renderBriefing got ownCheckout\").toMatch(/\\nPICK UP HERE\\nnone recorded for this checkout \\(developer, sia-infra\\)\\n/);\n+      expect(briefing).not.toContain(\"builder's pick-up\");\n+      const state = text.slice(0, text.indexOf(\"## Briefing\"));\n+      expect(state, \"renderState got ownCheckout\").toContain(\"no handoff recorded for this checkout (developer, sia-infra)\");\n+      expect(state).not.toContain(\"Your handoff\");\n+    });\n+  }\n+\n+  it(\"flag off: the role-wide pick-up, as before (the row reads the flag, not a constant)\", async () => {\n+    const text = await start({ briefing_budget: true });\n+    expect(text.slice(text.indexOf(\"## Briefing\"))).toMatch(/\\nPICK UP HERE\\nbuilder's pick-up\\n/);\n+  });\n+});\n+\n+describe(\"R9: checkMissingHandoff and the writer use ONE derivation of the checkout\", () => {\n+  // The writer stamps `sessions[].checkout` with checkoutOf(root); checkMissingHandoff must find that session from the same\n+  // checkout however its root is spelled. An inline derivation that drifts (no resolve, a raw path, a case fold on one side\n+  // only) stops matching on some spelling, and this row names which.\n+  const parents: string[] = [];\n+  afterEach(() => {\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  it(\"a session the real writer stamped (no handoff) is found as missing from every spelling of its root\", () => {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r9-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    mkdirSync(root);\n+    cpSync(join(import.meta.dirname, \"../../fixtures\"), root, { recursive: true });\n+    cpSync(join(FIXTURES, \"state.json\"), join(root, \".agents\", \"state.json\"));\n+    const uuid = \"cccccccc-3333-4333-8333-000000000239\";\n+    const before = JSON.parse(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\")).revision as number;\n+    const w = applyStateOps(root, { session: 999, expected_revision: before, session_uuid: uuid, ops: [{ op: \"set_objective\", text: \"R9\" }] } as Parameters<typeof applyStateOps>[1]);\n+    if (!w.ok) throw new Error(w.error);\n+    const parsed = parseState(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\"));\n+    if (!parsed.ok) throw new Error(parsed.error);\n+    const stamped = parsed.data.sessions.find((x) => x.uuid === uuid);\n+    expect(stamped?.checkout, \"the writer stamps checkoutOf(root)\").toBe(checkoutOf(root));\n+    const spellings = [root, `${root}/`, `${root}//`, join(root, \".\"), `${root}/sub/..`];\n+    for (const spelling of spellings) {\n+      expect(checkoutOf(spelling), spelling).toBe(\"sia-infra\");\n+      const c = checkMissingHandoff(parsed.data, { projectRoot: spelling, sessionUuid: \"someone-else\", seat: \"developer\" });\n+      expect(c.kind, `checkMissingHandoff from ${JSON.stringify(spelling)}`).toBe(\"missing\");\n+    }\n+  });\n+});\n"
+          ],
+          "id": "T3",
+          "observable": "Mutants. Re-run one of the developer's mutants and write one of your own. Run tsc --noEmit on each, and confirm the edit landed."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\nindex 6e581e35..b62f218c 100644\n--- a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n+++ b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n@@ -1,11 +1,14 @@\n-import { describe, it, expect, afterEach } from \"vitest\";\n-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { describe, it, expect, afterEach, beforeEach, vi } from \"vitest\";\n+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n import { parseState, checkoutOf, ownHandoff, type State } from \"../../../src/shared/state-schema.js\";\n import { renderBriefing, type BriefingInput } from \"../../../src/pipelines/session-start/briefing.js\";\n import { renderState } from \"../../../src/pipelines/session-start/state-render.js\";\n import { handoffCheckout } from \"../../../src/pipelines/session-start/greeting-flags.js\";\n+import { checkMissingHandoff } from \"../../../src/pipelines/session-start/state-render.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n+import { handleStart } from \"../../../src/server.js\";\n import { readFileSync } from \"node:fs\";\n \n /**\n@@ -184,3 +187,87 @@ describe(\"R7: checkoutOf is one derivation for the writer and the reader\", () =>\n     expect(checkoutOf(join(tmpdir(), \"Worktrees\", \"sia-infra\") + \"/\")).toBe(\"sia-infra\");\n   });\n });\n+\n+describe(\"R8 (QA 270 row 3): ob_start itself hands the checkout to BOTH renderers when the flag is on\", () => {\n+  // The selector and the renderers are pinned above; this pins the one production path that reads the flag and passes\n+  // `ownCheckout` on. QA 270's mutant (server.ts stops passing it to renderBriefing) survived every other row.\n+  const parents: string[] = [];\n+  const saved = { HUB_URL: process.env.HUB_URL, A2A_KEY_DIR: process.env.A2A_KEY_DIR };\n+  beforeEach(() => {\n+    // No network: the presence block's fetch fails and says so; nothing here depends on it.\n+    vi.spyOn(globalThis, \"fetch\").mockRejectedValue(new Error(\"no network in this test\"));\n+  });\n+  afterEach(() => {\n+    vi.restoreAllMocks();\n+    for (const [k, v] of Object.entries(saved)) {\n+      if (v === undefined) delete process.env[k];\n+      else process.env[k] = v;\n+    }\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true });\n+  });\n+\n+  async function start(greeting: Record<string, boolean>): Promise<string> {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r8-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    for (const d of [\"SYSTEM\", \"TASKS\", \"SESSIONS\"]) mkdirSync(join(root, \".agents\", d), { recursive: true });\n+    writeFileSync(join(root, \"package.json\"), JSON.stringify({ version: \"1.0.0\" }));\n+    writeFileSync(join(root, \".agents\", \"SESSIONS\", \"SESSION_TEMPLATE.md\"), \"# Session N\\n\");\n+    writeFileSync(join(root, \".agents\", \"AGENT.local.md\"), \"---\\nname: Infra\\nrole: developer\\npartner: Atlas\\n---\\n\");\n+    writeFileSync(join(root, \".agents\", \"SYSTEM\", \"greeting.json\"), JSON.stringify(greeting));\n+    const raw = structuredClone(SIA);\n+    raw.handoffs = [{ ...raw.handoffs[0], seat: \"developer\", checkout: \"sia-builder\", session_uuid: \"u-builder\", first_rev: 5, pick_up: \"builder's pick-up\", watch_out: [\"builder's watch\"] }];\n+    writeFileSync(join(root, \".agents\", \"state.json\"), JSON.stringify(raw, null, 2));\n+    return (await handleStart({ project_root: root })).content[0].text;\n+  }\n+\n+  for (const budget of [true, false]) {\n+    it(`flag on (briefing_budget ${budget}): the Briefing and the State block both say none recorded for THIS checkout`, async () => {\n+      const text = await start({ briefing_budget: budget, handoff_by_checkout: true });\n+      const briefing = text.slice(text.indexOf(\"## Briefing\"));\n+      expect(briefing, \"renderBriefing got ownCheckout\").toMatch(/\\nPICK UP HERE\\nnone recorded for this checkout \\(developer, sia-infra\\)\\n/);\n+      expect(briefing).not.toContain(\"builder's pick-up\");\n+      const state = text.slice(0, text.indexOf(\"## Briefing\"));\n+      expect(state, \"renderState got ownCheckout\").toContain(\"no handoff recorded for this checkout (developer, sia-infra)\");\n+      expect(state).not.toContain(\"Your handoff\");\n+    });\n+  }\n+\n+  it(\"flag off: the role-wide pick-up, as before (the row reads the flag, not a constant)\", async () => {\n+    const text = await start({ briefing_budget: true });\n+    expect(text.slice(text.indexOf(\"## Briefing\"))).toMatch(/\\nPICK UP HERE\\nbuilder's pick-up\\n/);\n+  });\n+});\n+\n+describe(\"R9: checkMissingHandoff and the writer use ONE derivation of the checkout\", () => {\n+  // The writer stamps `sessions[].checkout` with checkoutOf(root); checkMissingHandoff must find that session from the same\n+  // checkout however its root is spelled. An inline derivation that drifts (no resolve, a raw path, a case fold on one side\n+  // only) stops matching on some spelling, and this row names which.\n+  const parents: string[] = [];\n+  afterEach(() => {\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  it(\"a session the real writer stamped (no handoff) is found as missing from every spelling of its root\", () => {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r9-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    mkdirSync(root);\n+    cpSync(join(import.meta.dirname, \"../../fixtures\"), root, { recursive: true });\n+    cpSync(join(FIXTURES, \"state.json\"), join(root, \".agents\", \"state.json\"));\n+    const uuid = \"cccccccc-3333-4333-8333-000000000239\";\n+    const before = JSON.parse(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\")).revision as number;\n+    const w = applyStateOps(root, { session: 999, expected_revision: before, session_uuid: uuid, ops: [{ op: \"set_objective\", text: \"R9\" }] } as Parameters<typeof applyStateOps>[1]);\n+    if (!w.ok) throw new Error(w.error);\n+    const parsed = parseState(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\"));\n+    if (!parsed.ok) throw new Error(parsed.error);\n+    const stamped = parsed.data.sessions.find((x) => x.uuid === uuid);\n+    expect(stamped?.checkout, \"the writer stamps checkoutOf(root)\").toBe(checkoutOf(root));\n+    const spellings = [root, `${root}/`, `${root}//`, join(root, \".\"), `${root}/sub/..`];\n+    for (const spelling of spellings) {\n+      expect(checkoutOf(spelling), spelling).toBe(\"sia-infra\");\n+      const c = checkMissingHandoff(parsed.data, { projectRoot: spelling, sessionUuid: \"someone-else\", seat: \"developer\" });\n+      expect(c.kind, `checkMissingHandoff from ${JSON.stringify(spelling)}`).toBe(\"missing\");\n+    }\n+  });\n+});\n"
+          ],
+          "id": "T4",
+          "observable": "CI (read only). Record the test result and run id."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\nindex 6e581e35..b62f218c 100644\n--- a/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n+++ b/open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts\n@@ -1,11 +1,14 @@\n-import { describe, it, expect, afterEach } from \"vitest\";\n-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n+import { describe, it, expect, afterEach, beforeEach, vi } from \"vitest\";\n+import { cpSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n import { parseState, checkoutOf, ownHandoff, type State } from \"../../../src/shared/state-schema.js\";\n import { renderBriefing, type BriefingInput } from \"../../../src/pipelines/session-start/briefing.js\";\n import { renderState } from \"../../../src/pipelines/session-start/state-render.js\";\n import { handoffCheckout } from \"../../../src/pipelines/session-start/greeting-flags.js\";\n+import { checkMissingHandoff } from \"../../../src/pipelines/session-start/state-render.js\";\n+import { applyStateOps } from \"../../../src/shared/state-writer.js\";\n+import { handleStart } from \"../../../src/server.js\";\n import { readFileSync } from \"node:fs\";\n \n /**\n@@ -184,3 +187,87 @@ describe(\"R7: checkoutOf is one derivation for the writer and the reader\", () =>\n     expect(checkoutOf(join(tmpdir(), \"Worktrees\", \"sia-infra\") + \"/\")).toBe(\"sia-infra\");\n   });\n });\n+\n+describe(\"R8 (QA 270 row 3): ob_start itself hands the checkout to BOTH renderers when the flag is on\", () => {\n+  // The selector and the renderers are pinned above; this pins the one production path that reads the flag and passes\n+  // `ownCheckout` on. QA 270's mutant (server.ts stops passing it to renderBriefing) survived every other row.\n+  const parents: string[] = [];\n+  const saved = { HUB_URL: process.env.HUB_URL, A2A_KEY_DIR: process.env.A2A_KEY_DIR };\n+  beforeEach(() => {\n+    // No network: the presence block's fetch fails and says so; nothing here depends on it.\n+    vi.spyOn(globalThis, \"fetch\").mockRejectedValue(new Error(\"no network in this test\"));\n+  });\n+  afterEach(() => {\n+    vi.restoreAllMocks();\n+    for (const [k, v] of Object.entries(saved)) {\n+      if (v === undefined) delete process.env[k];\n+      else process.env[k] = v;\n+    }\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true });\n+  });\n+\n+  async function start(greeting: Record<string, boolean>): Promise<string> {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r8-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    for (const d of [\"SYSTEM\", \"TASKS\", \"SESSIONS\"]) mkdirSync(join(root, \".agents\", d), { recursive: true });\n+    writeFileSync(join(root, \"package.json\"), JSON.stringify({ version: \"1.0.0\" }));\n+    writeFileSync(join(root, \".agents\", \"SESSIONS\", \"SESSION_TEMPLATE.md\"), \"# Session N\\n\");\n+    writeFileSync(join(root, \".agents\", \"AGENT.local.md\"), \"---\\nname: Infra\\nrole: developer\\npartner: Atlas\\n---\\n\");\n+    writeFileSync(join(root, \".agents\", \"SYSTEM\", \"greeting.json\"), JSON.stringify(greeting));\n+    const raw = structuredClone(SIA);\n+    raw.handoffs = [{ ...raw.handoffs[0], seat: \"developer\", checkout: \"sia-builder\", session_uuid: \"u-builder\", first_rev: 5, pick_up: \"builder's pick-up\", watch_out: [\"builder's watch\"] }];\n+    writeFileSync(join(root, \".agents\", \"state.json\"), JSON.stringify(raw, null, 2));\n+    return (await handleStart({ project_root: root })).content[0].text;\n+  }\n+\n+  for (const budget of [true, false]) {\n+    it(`flag on (briefing_budget ${budget}): the Briefing and the State block both say none recorded for THIS checkout`, async () => {\n+      const text = await start({ briefing_budget: budget, handoff_by_checkout: true });\n+      const briefing = text.slice(text.indexOf(\"## Briefing\"));\n+      expect(briefing, \"renderBriefing got ownCheckout\").toMatch(/\\nPICK UP HERE\\nnone recorded for this checkout \\(developer, sia-infra\\)\\n/);\n+      expect(briefing).not.toContain(\"builder's pick-up\");\n+      const state = text.slice(0, text.indexOf(\"## Briefing\"));\n+      expect(state, \"renderState got ownCheckout\").toContain(\"no handoff recorded for this checkout (developer, sia-infra)\");\n+      expect(state).not.toContain(\"Your handoff\");\n+    });\n+  }\n+\n+  it(\"flag off: the role-wide pick-up, as before (the row reads the flag, not a constant)\", async () => {\n+    const text = await start({ briefing_budget: true });\n+    expect(text.slice(text.indexOf(\"## Briefing\"))).toMatch(/\\nPICK UP HERE\\nbuilder's pick-up\\n/);\n+  });\n+});\n+\n+describe(\"R9: checkMissingHandoff and the writer use ONE derivation of the checkout\", () => {\n+  // The writer stamps `sessions[].checkout` with checkoutOf(root); checkMissingHandoff must find that session from the same\n+  // checkout however its root is spelled. An inline derivation that drifts (no resolve, a raw path, a case fold on one side\n+  // only) stops matching on some spelling, and this row names which.\n+  const parents: string[] = [];\n+  afterEach(() => {\n+    for (const p of parents.splice(0)) rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });\n+  });\n+\n+  it(\"a session the real writer stamped (no handoff) is found as missing from every spelling of its root\", () => {\n+    const parent = mkdtempSync(join(tmpdir(), \"t239-r9-\"));\n+    parents.push(parent);\n+    const root = join(parent, \"sia-infra\");\n+    mkdirSync(root);\n+    cpSync(join(import.meta.dirname, \"../../fixtures\"), root, { recursive: true });\n+    cpSync(join(FIXTURES, \"state.json\"), join(root, \".agents\", \"state.json\"));\n+    const uuid = \"cccccccc-3333-4333-8333-000000000239\";\n+    const before = JSON.parse(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\")).revision as number;\n+    const w = applyStateOps(root, { session: 999, expected_revision: before, session_uuid: uuid, ops: [{ op: \"set_objective\", text: \"R9\" }] } as Parameters<typeof applyStateOps>[1]);\n+    if (!w.ok) throw new Error(w.error);\n+    const parsed = parseState(readFileSync(join(root, \".agents\", \"state.json\"), \"utf8\"));\n+    if (!parsed.ok) throw new Error(parsed.error);\n+    const stamped = parsed.data.sessions.find((x) => x.uuid === uuid);\n+    expect(stamped?.checkout, \"the writer stamps checkoutOf(root)\").toBe(checkoutOf(root));\n+    const spellings = [root, `${root}/`, `${root}//`, join(root, \".\"), `${root}/sub/..`];\n+    for (const spelling of spellings) {\n+      expect(checkoutOf(spelling), spelling).toBe(\"sia-infra\");\n+      const c = checkMissingHandoff(parsed.data, { projectRoot: spelling, sessionUuid: \"someone-else\", seat: \"developer\" });\n+      expect(c.kind, `checkMissingHandoff from ${JSON.stringify(spelling)}`).toBe(\"missing\");\n+    }\n+  });\n+});\n"
+          ],
+          "id": "T5",
+          "observable": "In master's .agents/SYSTEM/hub-partner-seats.json, confirm: - infra = cursor-infra / k57d92gqtjm9wpfs74ekbx9rns8fmy2f; - builder = cursor-builder / k575sfwr9wcx3r8fw83g3bc00x8fmar3; - forge = forge / k571z4ghp7nbp34djhecwnsk3n8fmhsf; - the atlas reader pairs match these rooms in both directions; - \"grok\" and the three old room ids appear nowhere in the file. Run seat-map, hub-presence, hub-seats and focus one file per run. Report any finding as a fix-forward item."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "8f14ca91d5ddfb5986bc025566c853af8d45e042",
+        "merge_commit": "906412025053fba298523cf146ed0dbd30d5c554",
+        "pr": 415,
+        "scored_sha": "dc092840af38f86dfe18af060564fe181988f159"
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.78
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.55
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.31
+    },
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.16
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "plan_row:T5": {
+      "type": "noul",
+      "noul": 0.1
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.09,
+      "confidence": 0.86,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.91,
+        "1": 0.09,
+        "2": 0
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.18
+    }
+  },
+  "usage": {
+    "input_tokens": 12876,
+    "output_tokens": 178
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.55 is below the required 0.7",
+      "plan_row:T2 0.31 is below the required 0.7",
+      "plan_row:T3 0.16 is below the required 0.7",
+      "plan_row:T4 0.23 is below the required 0.7",
+      "plan_row:T5 0.1 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "101e80ec-361d-4ba7-a2bc-dac4184c19f8",
+  "subject": {
+    "gate": "developer-done",
+    "key": "dc092840af38f86dfe18af060564fe181988f159",
+    "blob": "9d63645f681975b6583fa891cbfc3edfe050021284b1781b468cd2d0e3aa2598"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T09:51:26.538Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 415,
+  "merge_commit": "906412025053fba298523cf146ed0dbd30d5c554",
+  "scored_sha": "dc092840af38f86dfe18af060564fe181988f159",
+  "base_sha": "8f14ca91d5ddfb5986bc025566c853af8d45e042",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/060-qa272-pr415.G_done-request.json",
+    "blob": "dd5f8e163cf894fbe78ef094e5cdfe05fe3cc2da"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/src/pipelines/session-start/state-render.ts",
+    "open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts"
+  ],
+  "cal2_case_id": "qa272-pr415"
+}

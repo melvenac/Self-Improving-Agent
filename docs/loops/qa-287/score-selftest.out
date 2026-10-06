@@ -1,0 +1,12 @@
+ok   (a) rejects every case, as the gate was built
+ok   (b) recomputed with checks true proceeds on both
+ok   false-accept rate under (b) is 1
+ok   two confident misses on driving questions (plan_row + touches), case c2 only
+ok   the unanswered case is listed, not scored
+ok   spend is summed
+ok   balanced accuracy is the mean of the class rates (b: ACCEPT proceeds 1/1, REJECT rejects 0/1 -> 0.5)
+ok   source_kind split is present and sums to the scored cases
+ok   drivers() counts T-222 F6 checks text on a known positive
+ok   all-questions calibration lists every answer key, not only driving ids
+ok   buildRowsFromRunlist joins on dt.path, not pr
+selftest exit=0

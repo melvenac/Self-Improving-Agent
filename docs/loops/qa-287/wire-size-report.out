@@ -1,0 +1,21 @@
+{
+  "ceiling_bytes": 90000,
+  "dev": {
+    "phase": "dev",
+    "n": 33,
+    "min": 17655,
+    "max": 89784,
+    "median": 70888,
+    "over_hint": 0,
+    "over_90kb": 0
+  },
+  "heldout": {
+    "phase": "heldout",
+    "n": 34,
+    "min": 13820,
+    "max": 89971,
+    "median": 69768,
+    "over_hint": 0,
+    "over_90kb": 0
+  }
+}

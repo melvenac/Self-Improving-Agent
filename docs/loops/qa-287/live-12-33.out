@@ -1,0 +1,22 @@
+key: loaded from HKCU\Environment; fingerprint 728B667EFF matches 728B667EFF
+12 qa259-pr320 [ACCEPT] a1: answered exit 0 692ms verdict reject 
+13 qa260-pr298 [REJECT] a1: answered exit 0 714ms verdict reject 
+14 qa260-pr306 [ACCEPT] a1: answered exit 0 787ms verdict reject 
+15 qa261-pr302 [ACCEPT] a1: answered exit 0 687ms verdict reject 
+16 qa264-pr371 [ACCEPT] a1: answered exit 0 626ms verdict reject 
+17 qa264-pr373 [ACCEPT] a1: answered exit 0 708ms verdict reject 
+18 qa267-pr388 [ACCEPT] a1: answered exit 0 644ms verdict reject 
+19 qa267-pr391 [ACCEPT] a1: answered exit 0 737ms verdict reject 
+20 qa267-pr393 [REJECT] a1: answered exit 0 671ms verdict reject 
+21 qa268-pr393-r2 [ACCEPT] a1: answered exit 0 682ms verdict reject 
+22 qa269-pr397-r2 [ACCEPT] a1: answered exit 0 513ms verdict reject 
+23 qa270-pr412 [ACCEPT] a1: answered exit 0 528ms verdict reject 
+24 qa270-pr413 [ACCEPT] a1: answered exit 0 579ms verdict reject 
+25 qa272-pr415 [ACCEPT] a1: answered exit 0 579ms verdict reject 
+26 qa273-pr424 [REJECT] a1: answered exit 0 512ms verdict reject 
+27 qa275-pr424-r2 [ACCEPT] a1: answered exit 0 564ms verdict reject 
+28 qa275-pr437 [REJECT] a1: answered exit 0 575ms verdict reject 
+29 qa277-pr441 [ACCEPT] a1: answered exit 0 504ms verdict reject 
+30 qa277-pr442 [ACCEPT] a1: answered exit 0 552ms verdict reject 
+31 qa277-pr451 [ACCEPT] a1: answered exit 0 580ms verdict reject 
+32 qa279-pr437-r2 [REJECT] a1: answered exit 0 552ms verdict reject 

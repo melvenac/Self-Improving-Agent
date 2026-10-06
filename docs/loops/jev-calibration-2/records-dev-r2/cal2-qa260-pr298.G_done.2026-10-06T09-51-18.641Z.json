@@ -1,0 +1,469 @@
+{
+  "gate": "developer-done",
+  "loop": "32-qa260-pr298",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T09:51:18.641Z",
+  "answered_at": "2026-10-06T09:51:19.147Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (QA 256's failing fixtures, re-run on the new heads. For each one, give the PR, the fixture and the result.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (CI on each head (read only). Quote gh pr checks <n>.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (Real config, read-only. Run hook-configs and mcp-command-paths against this machine's real files and quote the result lines. Counts, names and paths only, never values.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #295, #298, #306, #309.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (#295 and #309 both edit the node:path import line. Resolve ONLY that conflict, by taking the union of the imports, and say so.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (Then run each touched sync test, one file per invocation, and tsc --noEmit.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (#295 mixed ${...} plus a good command → WARN; non-string command plus a good one → WARN.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (#298 G: an unparseable settings.json → WARN settings unreadable, plugins not examined.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (#298 J: a garbled plugin.json plus a good root .mcp.json → WARN.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#306: vault-path-refs with one unreadable file plus a clean one → WARN.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (#306: hook-configs with an unparseable settings.json → ISSUE, and no throw.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (The named-skip side. A url server, an absent settings.json, a bare echo, and a type:\"prompt\" hook, each beside a good entry, all give PASS, with the skip named in the message. A typed-hook mutant that warns again goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Red then green. Run each PR's changed test file against the previous round's source. The previous heads are cc285738, 7b09c5b7, d8dc12db and eb721dec. They must fail; on the new heads they must pass.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (One mutant of your own on each PR, plus one of the developer's (diffs under docs/loops/t008/mutants and t048/mutants).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "7afd7f1bbb31ff1ba54c924b386384be45f261a0",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/pipelines/sync/checks.ts",
+        "open-brain/src/pipelines/sync/index.ts",
+        "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "QA 256's failing fixtures, re-run on the new heads. For each one, give the PR, the fixture and the result.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "#295 mixed ${...} plus a good command → WARN; non-string command plus a good one → WARN.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "#298 G: an unparseable settings.json → WARN settings unreadable, plugins not examined.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "#298 J: a garbled plugin.json plus a good root .mcp.json → WARN.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#306: vault-path-refs with one unreadable file plus a clean one → WARN.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "#306: hook-configs with an unparseable settings.json → ISSUE, and no throw.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "The named-skip side. A url server, an absent settings.json, a bare echo, and a type:\"prompt\" hook, each beside a good entry, all give PASS, with the skip named in the message. A typed-hook mutant that warns again goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Red then green. Run each PR's changed test file against the previous round's source. The previous heads are cc285738, 7b09c5b7, d8dc12db and eb721dec. They must fail; on the new heads they must pass.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "One mutant of your own on each PR, plus one of the developer's (diffs under docs/loops/t008/mutants and t048/mutants).",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "CI on each head (read only). Quote gh pr checks <n>.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "Real config, read-only. Run hook-configs and mcp-command-paths against this machine's real files and quote the result lines. Counts, names and paths only, never values.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #295, #298, #306, #309.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "#295 and #309 both edit the node:path import line. Resolve ONLY that conflict, by taking the union of the imports, and say so.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "Then run each touched sync test, one file per invocation, and tsc --noEmit.",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "32-qa260-pr298",
+        "new_capability": "QA 260, B2 round 2: /sync checks re-check (#295, #298, #306, #309)",
+        "objective": "QA 260, B2 round 2: /sync checks re-check (#295, #298, #306, #309)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "fa2f58b7200965b31780a6419d6ea8c22bed8cc0",
+          "path": "docs/loops/qa-260-b2r2-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "QA 256's failing fixtures, re-run on the new heads. For each one, give the PR, the fixture and the result.",
+          "#295 mixed ${...} plus a good command → WARN; non-string command plus a good one → WARN.",
+          "#298 G: an unparseable settings.json → WARN settings unreadable, plugins not examined.",
+          "#298 J: a garbled plugin.json plus a good root .mcp.json → WARN.",
+          "#306: vault-path-refs with one unreadable file plus a clean one → WARN.",
+          "#306: hook-configs with an unparseable settings.json → ISSUE, and no throw.",
+          "The named-skip side. A url server, an absent settings.json, a bare echo, and a type:\"prompt\" hook, each beside a good entry, all give PASS, with the skip named in the message. A typed-hook mutant that warns again goes red.",
+          "Red then green. Run each PR's changed test file against the previous round's source. The previous heads are cc285738, 7b09c5b7, d8dc12db and eb721dec. They must fail; on the new heads they must pass.",
+          "One mutant of your own on each PR, plus one of the developer's (diffs under docs/loops/t008/mutants and t048/mutants).",
+          "CI on each head (read only). Quote gh pr checks <n>.",
+          "Real config, read-only. Run hook-configs and mcp-command-paths against this machine's real files and quote the result lines. Counts, names and paths only, never values.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #295, #298, #306, #309.",
+          "#295 and #309 both edit the node:path import line. Resolve ONLY that conflict, by taking the union of the imports, and say so.",
+          "Then run each touched sync test, one file per invocation, and tsc --noEmit."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex afaa7912..b87c5565 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -10,6 +10,7 @@ import {\n   checkReadmeRefs,\n   checkHookConfigs,\n   checkHookRegistration,\n+  checkMcpCommandPaths,\n   checkSummary,\n   checkClaudeMd,\n   checkObsidianVault,\n@@ -64,6 +65,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkReadmeRefs(options.projectRoot));\n   checks.push(checkHookConfigs(paths.settingsJson));\n   checks.push(checkHookRegistration(paths.settingsJson));\n+  checks.push(checkMcpCommandPaths(home, {}, options.projectRoot));\n   checks.push(checkSummary(version, options.projectRoot, options.checkOnly));\n   checks.push(checkClaudeMd(options.projectRoot));\n   checks.push(checkObsidianVault(paths.obsidianVault));"
+          ],
+          "id": "T1",
+          "observable": "QA 256's failing fixtures, re-run on the new heads. For each one, give the PR, the fixture and the result."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\nnew file mode 100644\nindex 00000000..e6921021\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\n@@ -0,0 +1,295 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, chmodSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkMcpCommandPaths, resolveMcpCommand } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-008: every MCP server `command` in ~/.claude.json must exist. Fixture config files and an\n+ * injected PATH only; the machine's real ~/.claude.json and PATH are never read here.\n+ */\n+describe(\"checkMcpCommandPaths (T-008)\", () => {\n+  let home: string;\n+  let bin: string;\n+  const win = process.platform === \"win32\";\n+  const env = () => ({ pathEnv: bin, pathExt: \".CMD;.EXE\" });\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"t008-home-\"));\n+    bin = mkdtempSync(join(tmpdir(), \"t008-bin-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true });\n+    rmSync(bin, { recursive: true, force: true });\n+  });\n+\n+  function config(c: unknown): void {\n+    writeFileSync(join(home, \".claude.json\"), JSON.stringify(c));\n+  }\n+  /** An executable on the injected PATH: `name.cmd` on Windows, `name` (mode 755) elsewhere. */\n+  function onPath(name: string): string {\n+    const file = join(bin, win ? `${name}.cmd` : name);\n+    writeFileSync(file, win ? \"@echo off\\r\\n\" : \"#!/bin/sh\\n\");\n+    chmodSync(file, 0o755);\n+    return file;\n+  }\n+\n+  it(\"row 1: the GitNexus case, an absolute path that does not exist, is an ISSUE naming the server and the path\", () => {\n+    const missing = win ? \"C:\\\\Program Files\\\\nodejs\\\\gitnexus.cmd\" : \"/usr/local/nowhere/gitnexus.cmd\";\n+    config({ mcpServers: { gitnexus: { type: \"stdio\", command: missing, args: [\"mcp\"] } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"gitnexus\");\n+    expect(r.message).toContain(missing);\n+  });\n+\n+  it(\"an absolute path that exists passes\", () => {\n+    const real = onPath(\"realserver\");\n+    config({ mcpServers: { real: { command: real } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"1 MCP server command(s) resolve\");\n+  });\n+\n+  it(\"row 2: a bare name present on PATH passes (on Windows through PATHEXT)\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { good: { command: \"goodserver\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+  });\n+\n+  it(\"row 3: a bare name absent from PATH is an ISSUE naming the server and the command\", () => {\n+    config({ mcpServers: { ghost: { command: \"no-such-server-anywhere\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"ghost: no-such-server-anywhere not found\");\n+  });\n+\n+  it(\"row 4: a url server is skipped with its reason, and does not hide a missing command next to it\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, good: { command: \"goodserver\" } } });\n+    const ok = checkMcpCommandPaths(home, env());\n+    expect(ok.severity, ok.message).toBe(\"pass\");\n+    expect(ok.message).toContain(\"remote (global): url server, no command to stat\");\n+\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, ghost: { command: \"no-such-server-anywhere\" } } });\n+    const bad = checkMcpCommandPaths(home, env());\n+    expect(bad.severity).toBe(\"issue\");\n+    expect(bad.message).toContain(\"remote (global): url server\");\n+  });\n+\n+  it(\"a config with only url servers is SKIPPED, not passed\", () => {\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: no mcpServers entry with a command/);\n+  });\n+\n+  it(\"row 5: a missing config is 'not checked', never a pass\", () => {\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: .*\\.claude\\.json does not exist\\. This is not a pass\\./);\n+  });\n+\n+  it(\"an unreadable config (invalid JSON) is 'not checked' with the cause\", () => {\n+    writeFileSync(join(home, \".claude.json\"), \"{ not json\");\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T2",
+          "observable": "#295 mixed ${...} plus a good command → WARN; non-string command plus a good one → WARN."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 75bdac47..85db489c 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -1,5 +1,5 @@\n-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, accessSync, constants as fsConstants } from \"node:fs\";\n+import { join, posix as pathPosix, win32 as pathWin32 } from \"node:path\";\n import { homedir } from \"node:os\";\n import { execSync, execFileSync } from \"node:child_process\";\n import type { CheckResult, SyncRuntime } from \"./types.js\";\n@@ -603,6 +603,201 @@ export function checkHookRegistration(settingsPath: string): CheckResult {\n   return { name: \"hook-registration\", severity: \"pass\", message: \"No duplicate hook registrations\" };\n }\n \n+/** How a command is looked up; injectable so tests never depend on the machine's PATH. */\n+export interface McpResolveEnv {\n+  /** The PATH value. Defaults to `process.env.PATH`. */\n+  pathEnv?: string;\n+  /** Windows only: the PATHEXT value. Defaults to `process.env.PATHEXT`, then `.COM;.EXE;.BAT;.CMD`. */\n+  pathExt?: string;\n+  /** Defaults to `process.platform`. */\n+  platform?: NodeJS.Platform;\n+}\n+\n+/**\n+ * Resolve an MCP server `command` the way a process spawn would: a path (absolute,\n+ * or any name with a separator) is stat'ed as it is; a bare name is searched on\n+ * PATH, and on Windows each PATHEXT extension is tried too (`npx` is `npx.cmd`).\n+ * Returns the file found, or null.\n+ */\n+export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): string | null {\n+  const platform = env.platform ?? process.platform;\n+  const win = platform === \"win32\";\n+  const p = win ? pathWin32 : pathPosix;\n+  const exts = win ? (env.pathExt ?? process.env.PATHEXT ?? \".COM;.EXE;.BAT;.CMD\").split(\";\").filter(Boolean) : [];\n+  const isFile = (f: string): boolean => {\n+    try {\n+      if (!statSync(f).isFile()) return false;\n+      if (!win) accessSync(f, fsConstants.X_OK);\n+      return true;\n+    } catch {\n+      return false;\n+    }\n+  };\n+  const candidates = (base: string): string[] => [base, ...exts.map((e) => base + e)];\n+  const hasSeparator = command.includes(\"/\") || (win && command.includes(\"\\\\\"));\n+  if (p.isAbsolute(command) || hasSeparator) {\n+    return candidates(command).find(isFile) ?? null;\n+  }\n+  const dirs = (env.pathEnv ?? process.env.PATH ?? \"\").split(win ? \";\" : \":\").filter(Boolean);\n+  for (const dir of dirs) {\n+    const hit = candidates(p.join(dir.replace(/^\"|\"$/g, \"\"), command)).find(isFile);\n+    if (hit) return hit;\n+  }\n+  return null;\n+}\n+\n+type McpServerDef = { command?: unknown; url?: unknown; type?: unknown };\n+type McpSource = { scope: string; servers: Record<string, McpServerDef>; pluginRoot?: string };\n+\n+const asMcpServers = (v: unknown): Record<string, McpServerDef> =>\n+  v && typeof v === \"object\" && !Array.isArray(v) ? (v as Record<string, McpServerDef>) : {};\n+\n+function readJsonFile(path: string): { ok: true; value: unknown } | { ok: false; cause: string } {\n+  try {\n+    return { ok: true, value: JSON.parse(readFileSync(path, \"utf-8\").replace(/^\\uFEFF/, \"\")) };\n+  } catch (e) {\n+    const code = (e as NodeJS.ErrnoException).code;\n+    return { ok: false, cause: code === \"ENOENT\" ? `${path} does not exist` : `${path} could not be read as JSON (${(e as Error).message.split(\"\\n\")[0]})` };\n+  }\n+}\n+\n+/**\n+ * Every `command` Claude Code would try to start, from every place it reads MCP\n+ * registrations (T-008, T-008b), must exist:\n+ *   - `global` and `project <path>`: `mcpServers` in `~/.claude.json`;\n+ *   - `.mcp.json`: the repo-root file of the checkout /sync runs in;\n+ *   - `plugin <name>`: each plugin enabled in `~/.claude/settings.json`, located through\n+ *     `~/.claude/plugins/installed_plugins.json`, declaring servers inline in\n+ *     `.claude-plugin/plugin.json` (`mcpServers`, an object or a path) or in a root `.mcp.json`.\n+ * GitNexus sat disconnected for an unknown period because its registration pointed at\n+ * `C:\\Program Files\\nodejs\\gitnexus.cmd`, which did not exist; nothing reported it, the\n+ * tools were simply absent, and the CLI kept working. A missing command is an ISSUE naming\n+ * the server, its source and the path. A server with a `url` has no command to stat and is\n+ * listed as skipped, with that reason. A source that exists but cannot be read is listed\n+ * as \"not checked: <cause>\" and makes the result at best a WARN, never a pass; with nothing\n+ * checkable at all the result is SKIP. A disabled plugin is not looked at.\n+ */\n+export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, projectRoot?: string): CheckResult {\n+  const name = \"mcp-command-paths\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T3",
+          "observable": "#298 G: an unparseable settings.json → WARN settings unreadable, plugins not examined."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex afaa7912..b87c5565 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -10,6 +10,7 @@ import {\n   checkReadmeRefs,\n   checkHookConfigs,\n   checkHookRegistration,\n+  checkMcpCommandPaths,\n   checkSummary,\n   checkClaudeMd,\n   checkObsidianVault,\n@@ -64,6 +65,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkReadmeRefs(options.projectRoot));\n   checks.push(checkHookConfigs(paths.settingsJson));\n   checks.push(checkHookRegistration(paths.settingsJson));\n+  checks.push(checkMcpCommandPaths(home, {}, options.projectRoot));\n   checks.push(checkSummary(version, options.projectRoot, options.checkOnly));\n   checks.push(checkClaudeMd(options.projectRoot));\n   checks.push(checkObsidianVault(paths.obsidianVault));"
+          ],
+          "id": "T4",
+          "observable": "#298 J: a garbled plugin.json plus a good root .mcp.json → WARN."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\nnew file mode 100644\nindex 00000000..e6921021\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\n@@ -0,0 +1,295 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, chmodSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkMcpCommandPaths, resolveMcpCommand } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-008: every MCP server `command` in ~/.claude.json must exist. Fixture config files and an\n+ * injected PATH only; the machine's real ~/.claude.json and PATH are never read here.\n+ */\n+describe(\"checkMcpCommandPaths (T-008)\", () => {\n+  let home: string;\n+  let bin: string;\n+  const win = process.platform === \"win32\";\n+  const env = () => ({ pathEnv: bin, pathExt: \".CMD;.EXE\" });\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"t008-home-\"));\n+    bin = mkdtempSync(join(tmpdir(), \"t008-bin-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true });\n+    rmSync(bin, { recursive: true, force: true });\n+  });\n+\n+  function config(c: unknown): void {\n+    writeFileSync(join(home, \".claude.json\"), JSON.stringify(c));\n+  }\n+  /** An executable on the injected PATH: `name.cmd` on Windows, `name` (mode 755) elsewhere. */\n+  function onPath(name: string): string {\n+    const file = join(bin, win ? `${name}.cmd` : name);\n+    writeFileSync(file, win ? \"@echo off\\r\\n\" : \"#!/bin/sh\\n\");\n+    chmodSync(file, 0o755);\n+    return file;\n+  }\n+\n+  it(\"row 1: the GitNexus case, an absolute path that does not exist, is an ISSUE naming the server and the path\", () => {\n+    const missing = win ? \"C:\\\\Program Files\\\\nodejs\\\\gitnexus.cmd\" : \"/usr/local/nowhere/gitnexus.cmd\";\n+    config({ mcpServers: { gitnexus: { type: \"stdio\", command: missing, args: [\"mcp\"] } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"gitnexus\");\n+    expect(r.message).toContain(missing);\n+  });\n+\n+  it(\"an absolute path that exists passes\", () => {\n+    const real = onPath(\"realserver\");\n+    config({ mcpServers: { real: { command: real } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"1 MCP server command(s) resolve\");\n+  });\n+\n+  it(\"row 2: a bare name present on PATH passes (on Windows through PATHEXT)\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { good: { command: \"goodserver\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+  });\n+\n+  it(\"row 3: a bare name absent from PATH is an ISSUE naming the server and the command\", () => {\n+    config({ mcpServers: { ghost: { command: \"no-such-server-anywhere\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"ghost: no-such-server-anywhere not found\");\n+  });\n+\n+  it(\"row 4: a url server is skipped with its reason, and does not hide a missing command next to it\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, good: { command: \"goodserver\" } } });\n+    const ok = checkMcpCommandPaths(home, env());\n+    expect(ok.severity, ok.message).toBe(\"pass\");\n+    expect(ok.message).toContain(\"remote (global): url server, no command to stat\");\n+\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, ghost: { command: \"no-such-server-anywhere\" } } });\n+    const bad = checkMcpCommandPaths(home, env());\n+    expect(bad.severity).toBe(\"issue\");\n+    expect(bad.message).toContain(\"remote (global): url server\");\n+  });\n+\n+  it(\"a config with only url servers is SKIPPED, not passed\", () => {\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: no mcpServers entry with a command/);\n+  });\n+\n+  it(\"row 5: a missing config is 'not checked', never a pass\", () => {\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: .*\\.claude\\.json does not exist\\. This is not a pass\\./);\n+  });\n+\n+  it(\"an unreadable config (invalid JSON) is 'not checked' with the cause\", () => {\n+    writeFileSync(join(home, \".claude.json\"), \"{ not json\");\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T5",
+          "observable": "#306: vault-path-refs with one unreadable file plus a clean one → WARN."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 75bdac47..85db489c 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -1,5 +1,5 @@\n-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, accessSync, constants as fsConstants } from \"node:fs\";\n+import { join, posix as pathPosix, win32 as pathWin32 } from \"node:path\";\n import { homedir } from \"node:os\";\n import { execSync, execFileSync } from \"node:child_process\";\n import type { CheckResult, SyncRuntime } from \"./types.js\";\n@@ -603,6 +603,201 @@ export function checkHookRegistration(settingsPath: string): CheckResult {\n   return { name: \"hook-registration\", severity: \"pass\", message: \"No duplicate hook registrations\" };\n }\n \n+/** How a command is looked up; injectable so tests never depend on the machine's PATH. */\n+export interface McpResolveEnv {\n+  /** The PATH value. Defaults to `process.env.PATH`. */\n+  pathEnv?: string;\n+  /** Windows only: the PATHEXT value. Defaults to `process.env.PATHEXT`, then `.COM;.EXE;.BAT;.CMD`. */\n+  pathExt?: string;\n+  /** Defaults to `process.platform`. */\n+  platform?: NodeJS.Platform;\n+}\n+\n+/**\n+ * Resolve an MCP server `command` the way a process spawn would: a path (absolute,\n+ * or any name with a separator) is stat'ed as it is; a bare name is searched on\n+ * PATH, and on Windows each PATHEXT extension is tried too (`npx` is `npx.cmd`).\n+ * Returns the file found, or null.\n+ */\n+export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): string | null {\n+  const platform = env.platform ?? process.platform;\n+  const win = platform === \"win32\";\n+  const p = win ? pathWin32 : pathPosix;\n+  const exts = win ? (env.pathExt ?? process.env.PATHEXT ?? \".COM;.EXE;.BAT;.CMD\").split(\";\").filter(Boolean) : [];\n+  const isFile = (f: string): boolean => {\n+    try {\n+      if (!statSync(f).isFile()) return false;\n+      if (!win) accessSync(f, fsConstants.X_OK);\n+      return true;\n+    } catch {\n+      return false;\n+    }\n+  };\n+  const candidates = (base: string): string[] => [base, ...exts.map((e) => base + e)];\n+  const hasSeparator = command.includes(\"/\") || (win && command.includes(\"\\\\\"));\n+  if (p.isAbsolute(command) || hasSeparator) {\n+    return candidates(command).find(isFile) ?? null;\n+  }\n+  const dirs = (env.pathEnv ?? process.env.PATH ?? \"\").split(win ? \";\" : \":\").filter(Boolean);\n+  for (const dir of dirs) {\n+    const hit = candidates(p.join(dir.replace(/^\"|\"$/g, \"\"), command)).find(isFile);\n+    if (hit) return hit;\n+  }\n+  return null;\n+}\n+\n+type McpServerDef = { command?: unknown; url?: unknown; type?: unknown };\n+type McpSource = { scope: string; servers: Record<string, McpServerDef>; pluginRoot?: string };\n+\n+const asMcpServers = (v: unknown): Record<string, McpServerDef> =>\n+  v && typeof v === \"object\" && !Array.isArray(v) ? (v as Record<string, McpServerDef>) : {};\n+\n+function readJsonFile(path: string): { ok: true; value: unknown } | { ok: false; cause: string } {\n+  try {\n+    return { ok: true, value: JSON.parse(readFileSync(path, \"utf-8\").replace(/^\\uFEFF/, \"\")) };\n+  } catch (e) {\n+    const code = (e as NodeJS.ErrnoException).code;\n+    return { ok: false, cause: code === \"ENOENT\" ? `${path} does not exist` : `${path} could not be read as JSON (${(e as Error).message.split(\"\\n\")[0]})` };\n+  }\n+}\n+\n+/**\n+ * Every `command` Claude Code would try to start, from every place it reads MCP\n+ * registrations (T-008, T-008b), must exist:\n+ *   - `global` and `project <path>`: `mcpServers` in `~/.claude.json`;\n+ *   - `.mcp.json`: the repo-root file of the checkout /sync runs in;\n+ *   - `plugin <name>`: each plugin enabled in `~/.claude/settings.json`, located through\n+ *     `~/.claude/plugins/installed_plugins.json`, declaring servers inline in\n+ *     `.claude-plugin/plugin.json` (`mcpServers`, an object or a path) or in a root `.mcp.json`.\n+ * GitNexus sat disconnected for an unknown period because its registration pointed at\n+ * `C:\\Program Files\\nodejs\\gitnexus.cmd`, which did not exist; nothing reported it, the\n+ * tools were simply absent, and the CLI kept working. A missing command is an ISSUE naming\n+ * the server, its source and the path. A server with a `url` has no command to stat and is\n+ * listed as skipped, with that reason. A source that exists but cannot be read is listed\n+ * as \"not checked: <cause>\" and makes the result at best a WARN, never a pass; with nothing\n+ * checkable at all the result is SKIP. A disabled plugin is not looked at.\n+ */\n+export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, projectRoot?: string): CheckResult {\n+  const name = \"mcp-command-paths\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T6",
+          "observable": "#306: hook-configs with an unparseable settings.json → ISSUE, and no throw."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex afaa7912..b87c5565 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -10,6 +10,7 @@ import {\n   checkReadmeRefs,\n   checkHookConfigs,\n   checkHookRegistration,\n+  checkMcpCommandPaths,\n   checkSummary,\n   checkClaudeMd,\n   checkObsidianVault,\n@@ -64,6 +65,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkReadmeRefs(options.projectRoot));\n   checks.push(checkHookConfigs(paths.settingsJson));\n   checks.push(checkHookRegistration(paths.settingsJson));\n+  checks.push(checkMcpCommandPaths(home, {}, options.projectRoot));\n   checks.push(checkSummary(version, options.projectRoot, options.checkOnly));\n   checks.push(checkClaudeMd(options.projectRoot));\n   checks.push(checkObsidianVault(paths.obsidianVault));"
+          ],
+          "id": "T7",
+          "observable": "The named-skip side. A url server, an absent settings.json, a bare echo, and a type:\"prompt\" hook, each beside a good entry, all give PASS, with the skip named in the message. A typed-hook mutant that warns again goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\nnew file mode 100644\nindex 00000000..e6921021\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\n@@ -0,0 +1,295 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, chmodSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkMcpCommandPaths, resolveMcpCommand } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-008: every MCP server `command` in ~/.claude.json must exist. Fixture config files and an\n+ * injected PATH only; the machine's real ~/.claude.json and PATH are never read here.\n+ */\n+describe(\"checkMcpCommandPaths (T-008)\", () => {\n+  let home: string;\n+  let bin: string;\n+  const win = process.platform === \"win32\";\n+  const env = () => ({ pathEnv: bin, pathExt: \".CMD;.EXE\" });\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"t008-home-\"));\n+    bin = mkdtempSync(join(tmpdir(), \"t008-bin-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true });\n+    rmSync(bin, { recursive: true, force: true });\n+  });\n+\n+  function config(c: unknown): void {\n+    writeFileSync(join(home, \".claude.json\"), JSON.stringify(c));\n+  }\n+  /** An executable on the injected PATH: `name.cmd` on Windows, `name` (mode 755) elsewhere. */\n+  function onPath(name: string): string {\n+    const file = join(bin, win ? `${name}.cmd` : name);\n+    writeFileSync(file, win ? \"@echo off\\r\\n\" : \"#!/bin/sh\\n\");\n+    chmodSync(file, 0o755);\n+    return file;\n+  }\n+\n+  it(\"row 1: the GitNexus case, an absolute path that does not exist, is an ISSUE naming the server and the path\", () => {\n+    const missing = win ? \"C:\\\\Program Files\\\\nodejs\\\\gitnexus.cmd\" : \"/usr/local/nowhere/gitnexus.cmd\";\n+    config({ mcpServers: { gitnexus: { type: \"stdio\", command: missing, args: [\"mcp\"] } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"gitnexus\");\n+    expect(r.message).toContain(missing);\n+  });\n+\n+  it(\"an absolute path that exists passes\", () => {\n+    const real = onPath(\"realserver\");\n+    config({ mcpServers: { real: { command: real } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"1 MCP server command(s) resolve\");\n+  });\n+\n+  it(\"row 2: a bare name present on PATH passes (on Windows through PATHEXT)\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { good: { command: \"goodserver\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+  });\n+\n+  it(\"row 3: a bare name absent from PATH is an ISSUE naming the server and the command\", () => {\n+    config({ mcpServers: { ghost: { command: \"no-such-server-anywhere\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"ghost: no-such-server-anywhere not found\");\n+  });\n+\n+  it(\"row 4: a url server is skipped with its reason, and does not hide a missing command next to it\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, good: { command: \"goodserver\" } } });\n+    const ok = checkMcpCommandPaths(home, env());\n+    expect(ok.severity, ok.message).toBe(\"pass\");\n+    expect(ok.message).toContain(\"remote (global): url server, no command to stat\");\n+\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, ghost: { command: \"no-such-server-anywhere\" } } });\n+    const bad = checkMcpCommandPaths(home, env());\n+    expect(bad.severity).toBe(\"issue\");\n+    expect(bad.message).toContain(\"remote (global): url server\");\n+  });\n+\n+  it(\"a config with only url servers is SKIPPED, not passed\", () => {\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: no mcpServers entry with a command/);\n+  });\n+\n+  it(\"row 5: a missing config is 'not checked', never a pass\", () => {\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: .*\\.claude\\.json does not exist\\. This is not a pass\\./);\n+  });\n+\n+  it(\"an unreadable config (invalid JSON) is 'not checked' with the cause\", () => {\n+    writeFileSync(join(home, \".claude.json\"), \"{ not json\");\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T8",
+          "observable": "Red then green. Run each PR's changed test file against the previous round's source. The previous heads are cc285738, 7b09c5b7, d8dc12db and eb721dec. They must fail; on the new heads they must pass."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 75bdac47..85db489c 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -1,5 +1,5 @@\n-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, accessSync, constants as fsConstants } from \"node:fs\";\n+import { join, posix as pathPosix, win32 as pathWin32 } from \"node:path\";\n import { homedir } from \"node:os\";\n import { execSync, execFileSync } from \"node:child_process\";\n import type { CheckResult, SyncRuntime } from \"./types.js\";\n@@ -603,6 +603,201 @@ export function checkHookRegistration(settingsPath: string): CheckResult {\n   return { name: \"hook-registration\", severity: \"pass\", message: \"No duplicate hook registrations\" };\n }\n \n+/** How a command is looked up; injectable so tests never depend on the machine's PATH. */\n+export interface McpResolveEnv {\n+  /** The PATH value. Defaults to `process.env.PATH`. */\n+  pathEnv?: string;\n+  /** Windows only: the PATHEXT value. Defaults to `process.env.PATHEXT`, then `.COM;.EXE;.BAT;.CMD`. */\n+  pathExt?: string;\n+  /** Defaults to `process.platform`. */\n+  platform?: NodeJS.Platform;\n+}\n+\n+/**\n+ * Resolve an MCP server `command` the way a process spawn would: a path (absolute,\n+ * or any name with a separator) is stat'ed as it is; a bare name is searched on\n+ * PATH, and on Windows each PATHEXT extension is tried too (`npx` is `npx.cmd`).\n+ * Returns the file found, or null.\n+ */\n+export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): string | null {\n+  const platform = env.platform ?? process.platform;\n+  const win = platform === \"win32\";\n+  const p = win ? pathWin32 : pathPosix;\n+  const exts = win ? (env.pathExt ?? process.env.PATHEXT ?? \".COM;.EXE;.BAT;.CMD\").split(\";\").filter(Boolean) : [];\n+  const isFile = (f: string): boolean => {\n+    try {\n+      if (!statSync(f).isFile()) return false;\n+      if (!win) accessSync(f, fsConstants.X_OK);\n+      return true;\n+    } catch {\n+      return false;\n+    }\n+  };\n+  const candidates = (base: string): string[] => [base, ...exts.map((e) => base + e)];\n+  const hasSeparator = command.includes(\"/\") || (win && command.includes(\"\\\\\"));\n+  if (p.isAbsolute(command) || hasSeparator) {\n+    return candidates(command).find(isFile) ?? null;\n+  }\n+  const dirs = (env.pathEnv ?? process.env.PATH ?? \"\").split(win ? \";\" : \":\").filter(Boolean);\n+  for (const dir of dirs) {\n+    const hit = candidates(p.join(dir.replace(/^\"|\"$/g, \"\"), command)).find(isFile);\n+    if (hit) return hit;\n+  }\n+  return null;\n+}\n+\n+type McpServerDef = { command?: unknown; url?: unknown; type?: unknown };\n+type McpSource = { scope: string; servers: Record<string, McpServerDef>; pluginRoot?: string };\n+\n+const asMcpServers = (v: unknown): Record<string, McpServerDef> =>\n+  v && typeof v === \"object\" && !Array.isArray(v) ? (v as Record<string, McpServerDef>) : {};\n+\n+function readJsonFile(path: string): { ok: true; value: unknown } | { ok: false; cause: string } {\n+  try {\n+    return { ok: true, value: JSON.parse(readFileSync(path, \"utf-8\").replace(/^\\uFEFF/, \"\")) };\n+  } catch (e) {\n+    const code = (e as NodeJS.ErrnoException).code;\n+    return { ok: false, cause: code === \"ENOENT\" ? `${path} does not exist` : `${path} could not be read as JSON (${(e as Error).message.split(\"\\n\")[0]})` };\n+  }\n+}\n+\n+/**\n+ * Every `command` Claude Code would try to start, from every place it reads MCP\n+ * registrations (T-008, T-008b), must exist:\n+ *   - `global` and `project <path>`: `mcpServers` in `~/.claude.json`;\n+ *   - `.mcp.json`: the repo-root file of the checkout /sync runs in;\n+ *   - `plugin <name>`: each plugin enabled in `~/.claude/settings.json`, located through\n+ *     `~/.claude/plugins/installed_plugins.json`, declaring servers inline in\n+ *     `.claude-plugin/plugin.json` (`mcpServers`, an object or a path) or in a root `.mcp.json`.\n+ * GitNexus sat disconnected for an unknown period because its registration pointed at\n+ * `C:\\Program Files\\nodejs\\gitnexus.cmd`, which did not exist; nothing reported it, the\n+ * tools were simply absent, and the CLI kept working. A missing command is an ISSUE naming\n+ * the server, its source and the path. A server with a `url` has no command to stat and is\n+ * listed as skipped, with that reason. A source that exists but cannot be read is listed\n+ * as \"not checked: <cause>\" and makes the result at best a WARN, never a pass; with nothing\n+ * checkable at all the result is SKIP. A disabled plugin is not looked at.\n+ */\n+export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, projectRoot?: string): CheckResult {\n+  const name = \"mcp-command-paths\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T9",
+          "observable": "One mutant of your own on each PR, plus one of the developer's (diffs under docs/loops/t008/mutants and t048/mutants)."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 75bdac47..85db489c 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -1,5 +1,5 @@\n-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, accessSync, constants as fsConstants } from \"node:fs\";\n+import { join, posix as pathPosix, win32 as pathWin32 } from \"node:path\";\n import { homedir } from \"node:os\";\n import { execSync, execFileSync } from \"node:child_process\";\n import type { CheckResult, SyncRuntime } from \"./types.js\";\n@@ -603,6 +603,201 @@ export function checkHookRegistration(settingsPath: string): CheckResult {\n   return { name: \"hook-registration\", severity: \"pass\", message: \"No duplicate hook registrations\" };\n }\n \n+/** How a command is looked up; injectable so tests never depend on the machine's PATH. */\n+export interface McpResolveEnv {\n+  /** The PATH value. Defaults to `process.env.PATH`. */\n+  pathEnv?: string;\n+  /** Windows only: the PATHEXT value. Defaults to `process.env.PATHEXT`, then `.COM;.EXE;.BAT;.CMD`. */\n+  pathExt?: string;\n+  /** Defaults to `process.platform`. */\n+  platform?: NodeJS.Platform;\n+}\n+\n+/**\n+ * Resolve an MCP server `command` the way a process spawn would: a path (absolute,\n+ * or any name with a separator) is stat'ed as it is; a bare name is searched on\n+ * PATH, and on Windows each PATHEXT extension is tried too (`npx` is `npx.cmd`).\n+ * Returns the file found, or null.\n+ */\n+export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): string | null {\n+  const platform = env.platform ?? process.platform;\n+  const win = platform === \"win32\";\n+  const p = win ? pathWin32 : pathPosix;\n+  const exts = win ? (env.pathExt ?? process.env.PATHEXT ?? \".COM;.EXE;.BAT;.CMD\").split(\";\").filter(Boolean) : [];\n+  const isFile = (f: string): boolean => {\n+    try {\n+      if (!statSync(f).isFile()) return false;\n+      if (!win) accessSync(f, fsConstants.X_OK);\n+      return true;\n+    } catch {\n+      return false;\n+    }\n+  };\n+  const candidates = (base: string): string[] => [base, ...exts.map((e) => base + e)];\n+  const hasSeparator = command.includes(\"/\") || (win && command.includes(\"\\\\\"));\n+  if (p.isAbsolute(command) || hasSeparator) {\n+    return candidates(command).find(isFile) ?? null;\n+  }\n+  const dirs = (env.pathEnv ?? process.env.PATH ?? \"\").split(win ? \";\" : \":\").filter(Boolean);\n+  for (const dir of dirs) {\n+    const hit = candidates(p.join(dir.replace(/^\"|\"$/g, \"\"), command)).find(isFile);\n+    if (hit) return hit;\n+  }\n+  return null;\n+}\n+\n+type McpServerDef = { command?: unknown; url?: unknown; type?: unknown };\n+type McpSource = { scope: string; servers: Record<string, McpServerDef>; pluginRoot?: string };\n+\n+const asMcpServers = (v: unknown): Record<string, McpServerDef> =>\n+  v && typeof v === \"object\" && !Array.isArray(v) ? (v as Record<string, McpServerDef>) : {};\n+\n+function readJsonFile(path: string): { ok: true; value: unknown } | { ok: false; cause: string } {\n+  try {\n+    return { ok: true, value: JSON.parse(readFileSync(path, \"utf-8\").replace(/^\\uFEFF/, \"\")) };\n+  } catch (e) {\n+    const code = (e as NodeJS.ErrnoException).code;\n+    return { ok: false, cause: code === \"ENOENT\" ? `${path} does not exist` : `${path} could not be read as JSON (${(e as Error).message.split(\"\\n\")[0]})` };\n+  }\n+}\n+\n+/**\n+ * Every `command` Claude Code would try to start, from every place it reads MCP\n+ * registrations (T-008, T-008b), must exist:\n+ *   - `global` and `project <path>`: `mcpServers` in `~/.claude.json`;\n+ *   - `.mcp.json`: the repo-root file of the checkout /sync runs in;\n+ *   - `plugin <name>`: each plugin enabled in `~/.claude/settings.json`, located through\n+ *     `~/.claude/plugins/installed_plugins.json`, declaring servers inline in\n+ *     `.claude-plugin/plugin.json` (`mcpServers`, an object or a path) or in a root `.mcp.json`.\n+ * GitNexus sat disconnected for an unknown period because its registration pointed at\n+ * `C:\\Program Files\\nodejs\\gitnexus.cmd`, which did not exist; nothing reported it, the\n+ * tools were simply absent, and the CLI kept working. A missing command is an ISSUE naming\n+ * the server, its source and the path. A server with a `url` has no command to stat and is\n+ * listed as skipped, with that reason. A source that exists but cannot be read is listed\n+ * as \"not checked: <cause>\" and makes the result at best a WARN, never a pass; with nothing\n+ * checkable at all the result is SKIP. A disabled plugin is not looked at.\n+ */\n+export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, projectRoot?: string): CheckResult {\n+  const name = \"mcp-command-paths\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T10",
+          "observable": "CI on each head (read only). Quote gh pr checks <n>."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\nnew file mode 100644\nindex 00000000..e6921021\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\n@@ -0,0 +1,295 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, chmodSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkMcpCommandPaths, resolveMcpCommand } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-008: every MCP server `command` in ~/.claude.json must exist. Fixture config files and an\n+ * injected PATH only; the machine's real ~/.claude.json and PATH are never read here.\n+ */\n+describe(\"checkMcpCommandPaths (T-008)\", () => {\n+  let home: string;\n+  let bin: string;\n+  const win = process.platform === \"win32\";\n+  const env = () => ({ pathEnv: bin, pathExt: \".CMD;.EXE\" });\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"t008-home-\"));\n+    bin = mkdtempSync(join(tmpdir(), \"t008-bin-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true });\n+    rmSync(bin, { recursive: true, force: true });\n+  });\n+\n+  function config(c: unknown): void {\n+    writeFileSync(join(home, \".claude.json\"), JSON.stringify(c));\n+  }\n+  /** An executable on the injected PATH: `name.cmd` on Windows, `name` (mode 755) elsewhere. */\n+  function onPath(name: string): string {\n+    const file = join(bin, win ? `${name}.cmd` : name);\n+    writeFileSync(file, win ? \"@echo off\\r\\n\" : \"#!/bin/sh\\n\");\n+    chmodSync(file, 0o755);\n+    return file;\n+  }\n+\n+  it(\"row 1: the GitNexus case, an absolute path that does not exist, is an ISSUE naming the server and the path\", () => {\n+    const missing = win ? \"C:\\\\Program Files\\\\nodejs\\\\gitnexus.cmd\" : \"/usr/local/nowhere/gitnexus.cmd\";\n+    config({ mcpServers: { gitnexus: { type: \"stdio\", command: missing, args: [\"mcp\"] } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"gitnexus\");\n+    expect(r.message).toContain(missing);\n+  });\n+\n+  it(\"an absolute path that exists passes\", () => {\n+    const real = onPath(\"realserver\");\n+    config({ mcpServers: { real: { command: real } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"1 MCP server command(s) resolve\");\n+  });\n+\n+  it(\"row 2: a bare name present on PATH passes (on Windows through PATHEXT)\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { good: { command: \"goodserver\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+  });\n+\n+  it(\"row 3: a bare name absent from PATH is an ISSUE naming the server and the command\", () => {\n+    config({ mcpServers: { ghost: { command: \"no-such-server-anywhere\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"ghost: no-such-server-anywhere not found\");\n+  });\n+\n+  it(\"row 4: a url server is skipped with its reason, and does not hide a missing command next to it\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, good: { command: \"goodserver\" } } });\n+    const ok = checkMcpCommandPaths(home, env());\n+    expect(ok.severity, ok.message).toBe(\"pass\");\n+    expect(ok.message).toContain(\"remote (global): url server, no command to stat\");\n+\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, ghost: { command: \"no-such-server-anywhere\" } } });\n+    const bad = checkMcpCommandPaths(home, env());\n+    expect(bad.severity).toBe(\"issue\");\n+    expect(bad.message).toContain(\"remote (global): url server\");\n+  });\n+\n+  it(\"a config with only url servers is SKIPPED, not passed\", () => {\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: no mcpServers entry with a command/);\n+  });\n+\n+  it(\"row 5: a missing config is 'not checked', never a pass\", () => {\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: .*\\.claude\\.json does not exist\\. This is not a pass\\./);\n+  });\n+\n+  it(\"an unreadable config (invalid JSON) is 'not checked' with the cause\", () => {\n+    writeFileSync(join(home, \".claude.json\"), \"{ not json\");\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T11",
+          "observable": "Real config, read-only. Run hook-configs and mcp-command-paths against this machine's real files and quote the result lines. Counts, names and paths only, never values."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 75bdac47..85db489c 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -1,5 +1,5 @@\n-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, accessSync, constants as fsConstants } from \"node:fs\";\n+import { join, posix as pathPosix, win32 as pathWin32 } from \"node:path\";\n import { homedir } from \"node:os\";\n import { execSync, execFileSync } from \"node:child_process\";\n import type { CheckResult, SyncRuntime } from \"./types.js\";\n@@ -603,6 +603,201 @@ export function checkHookRegistration(settingsPath: string): CheckResult {\n   return { name: \"hook-registration\", severity: \"pass\", message: \"No duplicate hook registrations\" };\n }\n \n+/** How a command is looked up; injectable so tests never depend on the machine's PATH. */\n+export interface McpResolveEnv {\n+  /** The PATH value. Defaults to `process.env.PATH`. */\n+  pathEnv?: string;\n+  /** Windows only: the PATHEXT value. Defaults to `process.env.PATHEXT`, then `.COM;.EXE;.BAT;.CMD`. */\n+  pathExt?: string;\n+  /** Defaults to `process.platform`. */\n+  platform?: NodeJS.Platform;\n+}\n+\n+/**\n+ * Resolve an MCP server `command` the way a process spawn would: a path (absolute,\n+ * or any name with a separator) is stat'ed as it is; a bare name is searched on\n+ * PATH, and on Windows each PATHEXT extension is tried too (`npx` is `npx.cmd`).\n+ * Returns the file found, or null.\n+ */\n+export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): string | null {\n+  const platform = env.platform ?? process.platform;\n+  const win = platform === \"win32\";\n+  const p = win ? pathWin32 : pathPosix;\n+  const exts = win ? (env.pathExt ?? process.env.PATHEXT ?? \".COM;.EXE;.BAT;.CMD\").split(\";\").filter(Boolean) : [];\n+  const isFile = (f: string): boolean => {\n+    try {\n+      if (!statSync(f).isFile()) return false;\n+      if (!win) accessSync(f, fsConstants.X_OK);\n+      return true;\n+    } catch {\n+      return false;\n+    }\n+  };\n+  const candidates = (base: string): string[] => [base, ...exts.map((e) => base + e)];\n+  const hasSeparator = command.includes(\"/\") || (win && command.includes(\"\\\\\"));\n+  if (p.isAbsolute(command) || hasSeparator) {\n+    return candidates(command).find(isFile) ?? null;\n+  }\n+  const dirs = (env.pathEnv ?? process.env.PATH ?? \"\").split(win ? \";\" : \":\").filter(Boolean);\n+  for (const dir of dirs) {\n+    const hit = candidates(p.join(dir.replace(/^\"|\"$/g, \"\"), command)).find(isFile);\n+    if (hit) return hit;\n+  }\n+  return null;\n+}\n+\n+type McpServerDef = { command?: unknown; url?: unknown; type?: unknown };\n+type McpSource = { scope: string; servers: Record<string, McpServerDef>; pluginRoot?: string };\n+\n+const asMcpServers = (v: unknown): Record<string, McpServerDef> =>\n+  v && typeof v === \"object\" && !Array.isArray(v) ? (v as Record<string, McpServerDef>) : {};\n+\n+function readJsonFile(path: string): { ok: true; value: unknown } | { ok: false; cause: string } {\n+  try {\n+    return { ok: true, value: JSON.parse(readFileSync(path, \"utf-8\").replace(/^\\uFEFF/, \"\")) };\n+  } catch (e) {\n+    const code = (e as NodeJS.ErrnoException).code;\n+    return { ok: false, cause: code === \"ENOENT\" ? `${path} does not exist` : `${path} could not be read as JSON (${(e as Error).message.split(\"\\n\")[0]})` };\n+  }\n+}\n+\n+/**\n+ * Every `command` Claude Code would try to start, from every place it reads MCP\n+ * registrations (T-008, T-008b), must exist:\n+ *   - `global` and `project <path>`: `mcpServers` in `~/.claude.json`;\n+ *   - `.mcp.json`: the repo-root file of the checkout /sync runs in;\n+ *   - `plugin <name>`: each plugin enabled in `~/.claude/settings.json`, located through\n+ *     `~/.claude/plugins/installed_plugins.json`, declaring servers inline in\n+ *     `.claude-plugin/plugin.json` (`mcpServers`, an object or a path) or in a root `.mcp.json`.\n+ * GitNexus sat disconnected for an unknown period because its registration pointed at\n+ * `C:\\Program Files\\nodejs\\gitnexus.cmd`, which did not exist; nothing reported it, the\n+ * tools were simply absent, and the CLI kept working. A missing command is an ISSUE naming\n+ * the server, its source and the path. A server with a `url` has no command to stat and is\n+ * listed as skipped, with that reason. A source that exists but cannot be read is listed\n+ * as \"not checked: <cause>\" and makes the result at best a WARN, never a pass; with nothing\n+ * checkable at all the result is SKIP. A disabled plugin is not looked at.\n+ */\n+export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, projectRoot?: string): CheckResult {\n+  const name = \"mcp-command-paths\";\n…[cal2 diff truncated]"
+          ],
+          "id": "T12",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #295, #298, #306, #309."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\nnew file mode 100644\nindex 00000000..e6921021\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\n@@ -0,0 +1,295 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, chmodSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkMcpCommandPaths, resolveMcpCommand } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-008: every MCP server `command` in ~/.claude.json must exist. Fixture config files and an\n+ * injected PATH only; the machine's real ~/.claude.json and PATH are never read here.\n+ */\n+describe(\"checkMcpCommandPaths (T-008)\", () => {\n+  let home: string;\n+  let bin: string;\n+  const win = process.platform === \"win32\";\n+  const env = () => ({ pathEnv: bin, pathExt: \".CMD;.EXE\" });\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"t008-home-\"));\n+    bin = mkdtempSync(join(tmpdir(), \"t008-bin-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true });\n+    rmSync(bin, { recursive: true, force: true });\n+  });\n+\n+  function config(c: unknown): void {\n+    writeFileSync(join(home, \".claude.json\"), JSON.stringify(c));\n+  }\n+  /** An executable on the injected PATH: `name.cmd` on Windows, `name` (mode 755) elsewhere. */\n+  function onPath(name: string): string {\n+    const file = join(bin, win ? `${name}.cmd` : name);\n+    writeFileSync(file, win ? \"@echo off\\r\\n\" : \"#!/bin/sh\\n\");\n+    chmodSync(file, 0o755);\n+    return file;\n+  }\n+\n+  it(\"row 1: the GitNexus case, an absolute path that does not exist, is an ISSUE naming the server and the path\", () => {\n+    const missing = win ? \"C:\\\\Program Files\\\\nodejs\\\\gitnexus.cmd\" : \"/usr/local/nowhere/gitnexus.cmd\";\n+    config({ mcpServers: { gitnexus: { type: \"stdio\", command: missing, args: [\"mcp\"] } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"gitnexus\");\n+    expect(r.message).toContain(missing);\n+  });\n+\n+  it(\"an absolute path that exists passes\", () => {\n+    const real = onPath(\"realserver\");\n+    config({ mcpServers: { real: { command: real } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"1 MCP server command(s) resolve\");\n+  });\n+\n+  it(\"row 2: a bare name present on PATH passes (on Windows through PATHEXT)\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { good: { command: \"goodserver\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+  });\n+\n+  it(\"row 3: a bare name absent from PATH is an ISSUE naming the server and the command\", () => {\n+    config({ mcpServers: { ghost: { command: \"no-such-server-anywhere\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"ghost: no-such-server-anywhere not found\");\n+  });\n+\n+  it(\"row 4: a url server is skipped with its reason, and does not hide a missing command next to it\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, good: { command: \"goodserver\" } } });\n+    const ok = checkMcpCommandPaths(home, env());\n+    expect(ok.severity, ok.message).toBe(\"pass\");\n+    expect(ok.message).toContain(\"remote (global): url server, no command to stat\");\n+\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, ghost: { command: \"no-such-server-anywhere\" } } });\n+    const bad = checkMcpCommandPaths(home, env());\n+    expect(bad.severity).toBe(\"issue\");\n+    expect(bad.message).toContain(\"remote (global): url server\");\n+  });\n+\n+  it(\"a config with only url servers is SKIPPED, not passed\", () => {\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: no mcpServers entry with a command/);\n+  });\n+\n+  it(\"row 5: a missing config is 'not checked', never a pass\", () => {\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: .*\\.claude\\.json does not exist\\. This is not a pass\\./);\n+  });\n+\n+  it(\"an unreadable config (invalid JSON) is 'not checked' with the cause\", () => {\n+    writeFileSync(join(home, \".claude.json\"), \"{ not json\");\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T13",
+          "observable": "#295 and #309 both edit the node:path import line. Resolve ONLY that conflict, by taking the union of the imports, and say so."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/pipelines/sync/checks.ts b/open-brain/src/pipelines/sync/checks.ts\nindex 75bdac47..85db489c 100644\n--- a/open-brain/src/pipelines/sync/checks.ts\n+++ b/open-brain/src/pipelines/sync/checks.ts\n@@ -1,5 +1,5 @@\n-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from \"node:fs\";\n-import { join } from \"node:path\";\n+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, accessSync, constants as fsConstants } from \"node:fs\";\n+import { join, posix as pathPosix, win32 as pathWin32 } from \"node:path\";\n import { homedir } from \"node:os\";\n import { execSync, execFileSync } from \"node:child_process\";\n import type { CheckResult, SyncRuntime } from \"./types.js\";\n@@ -603,6 +603,201 @@ export function checkHookRegistration(settingsPath: string): CheckResult {\n   return { name: \"hook-registration\", severity: \"pass\", message: \"No duplicate hook registrations\" };\n }\n \n+/** How a command is looked up; injectable so tests never depend on the machine's PATH. */\n+export interface McpResolveEnv {\n+  /** The PATH value. Defaults to `process.env.PATH`. */\n+  pathEnv?: string;\n+  /** Windows only: the PATHEXT value. Defaults to `process.env.PATHEXT`, then `.COM;.EXE;.BAT;.CMD`. */\n+  pathExt?: string;\n+  /** Defaults to `process.platform`. */\n+  platform?: NodeJS.Platform;\n+}\n+\n+/**\n+ * Resolve an MCP server `command` the way a process spawn would: a path (absolute,\n+ * or any name with a separator) is stat'ed as it is; a bare name is searched on\n+ * PATH, and on Windows each PATHEXT extension is tried too (`npx` is `npx.cmd`).\n+ * Returns the file found, or null.\n+ */\n+export function resolveMcpCommand(command: string, env: McpResolveEnv = {}): string | null {\n+  const platform = env.platform ?? process.platform;\n+  const win = platform === \"win32\";\n+  const p = win ? pathWin32 : pathPosix;\n+  const exts = win ? (env.pathExt ?? process.env.PATHEXT ?? \".COM;.EXE;.BAT;.CMD\").split(\";\").filter(Boolean) : [];\n+  const isFile = (f: string): boolean => {\n+    try {\n+      if (!statSync(f).isFile()) return false;\n+      if (!win) accessSync(f, fsConstants.X_OK);\n+      return true;\n+    } catch {\n+      return false;\n+    }\n+  };\n+  const candidates = (base: string): string[] => [base, ...exts.map((e) => base + e)];\n+  const hasSeparator = command.includes(\"/\") || (win && command.includes(\"\\\\\"));\n+  if (p.isAbsolute(command) || hasSeparator) {\n+    return candidates(command).find(isFile) ?? null;\n+  }\n+  const dirs = (env.pathEnv ?? process.env.PATH ?? \"\").split(win ? \";\" : \":\").filter(Boolean);\n+  for (const dir of dirs) {\n+    const hit = candidates(p.join(dir.replace(/^\"|\"$/g, \"\"), command)).find(isFile);\n+    if (hit) return hit;\n+  }\n+  return null;\n+}\n+\n+type McpServerDef = { command?: unknown; url?: unknown; type?: unknown };\n+type McpSource = { scope: string; servers: Record<string, McpServerDef>; pluginRoot?: string };\n+\n+const asMcpServers = (v: unknown): Record<string, McpServerDef> =>\n+  v && typeof v === \"object\" && !Array.isArray(v) ? (v as Record<string, McpServerDef>) : {};\n+\n+function readJsonFile(path: string): { ok: true; value: unknown } | { ok: false; cause: string } {\n+  try {\n+    return { ok: true, value: JSON.parse(readFileSync(path, \"utf-8\").replace(/^\\uFEFF/, \"\")) };\n+  } catch (e) {\n+    const code = (e as NodeJS.ErrnoException).code;\n+    return { ok: false, cause: code === \"ENOENT\" ? `${path} does not exist` : `${path} could not be read as JSON (${(e as Error).message.split(\"\\n\")[0]})` };\n+  }\n+}\n+\n+/**\n+ * Every `command` Claude Code would try to start, from every place it reads MCP\n+ * registrations (T-008, T-008b), must exist:\n+ *   - `global` and `project <path>`: `mcpServers` in `~/.claude.json`;\n+ *   - `.mcp.json`: the repo-root file of the checkout /sync runs in;\n+ *   - `plugin <name>`: each plugin enabled in `~/.claude/settings.json`, located through\n+ *     `~/.claude/plugins/installed_plugins.json`, declaring servers inline in\n+ *     `.claude-plugin/plugin.json` (`mcpServers`, an object or a path) or in a root `.mcp.json`.\n+ * GitNexus sat disconnected for an unknown period because its registration pointed at\n+ * `C:\\Program Files\\nodejs\\gitnexus.cmd`, which did not exist; nothing reported it, the\n+ * tools were simply absent, and the CLI kept working. A missing command is an ISSUE naming\n+ * the server, its source and the path. A server with a `url` has no command to stat and is\n+ * listed as skipped, with that reason. A source that exists but cannot be read is listed\n+ * as \"not checked: <cause>\" and makes the result at best a WARN, never a pass; with nothing\n+ * checkable at all the result is SKIP. A disabled plugin is not looked at.\n+ */\n+export function checkMcpCommandPaths(home = homedir(), env: McpResolveEnv = {}, projectRoot?: string): CheckResult {\n+  const name = \"mcp-command-paths\";\n…[cal2 diff truncated]",
+            "diff --git a/open-brain/src/pipelines/sync/index.ts b/open-brain/src/pipelines/sync/index.ts\nindex afaa7912..b87c5565 100644\n--- a/open-brain/src/pipelines/sync/index.ts\n+++ b/open-brain/src/pipelines/sync/index.ts\n@@ -10,6 +10,7 @@ import {\n   checkReadmeRefs,\n   checkHookConfigs,\n   checkHookRegistration,\n+  checkMcpCommandPaths,\n   checkSummary,\n   checkClaudeMd,\n   checkObsidianVault,\n@@ -64,6 +65,7 @@ export function runSync(input: SyncOptions): SyncResult {\n   checks.push(checkReadmeRefs(options.projectRoot));\n   checks.push(checkHookConfigs(paths.settingsJson));\n   checks.push(checkHookRegistration(paths.settingsJson));\n+  checks.push(checkMcpCommandPaths(home, {}, options.projectRoot));\n   checks.push(checkSummary(version, options.projectRoot, options.checkOnly));\n   checks.push(checkClaudeMd(options.projectRoot));\n   checks.push(checkObsidianVault(paths.obsidianVault));",
+            "diff --git a/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\nnew file mode 100644\nindex 00000000..e6921021\n--- /dev/null\n+++ b/open-brain/tests/pipelines/sync/mcp-command-paths.test.ts\n@@ -0,0 +1,295 @@\n+import { describe, it, expect, beforeEach, afterEach } from \"vitest\";\n+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, chmodSync, rmSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+import { tmpdir } from \"node:os\";\n+import { checkMcpCommandPaths, resolveMcpCommand } from \"../../../src/pipelines/sync/checks.js\";\n+\n+/**\n+ * T-008: every MCP server `command` in ~/.claude.json must exist. Fixture config files and an\n+ * injected PATH only; the machine's real ~/.claude.json and PATH are never read here.\n+ */\n+describe(\"checkMcpCommandPaths (T-008)\", () => {\n+  let home: string;\n+  let bin: string;\n+  const win = process.platform === \"win32\";\n+  const env = () => ({ pathEnv: bin, pathExt: \".CMD;.EXE\" });\n+\n+  beforeEach(() => {\n+    home = mkdtempSync(join(tmpdir(), \"t008-home-\"));\n+    bin = mkdtempSync(join(tmpdir(), \"t008-bin-\"));\n+  });\n+  afterEach(() => {\n+    rmSync(home, { recursive: true, force: true });\n+    rmSync(bin, { recursive: true, force: true });\n+  });\n+\n+  function config(c: unknown): void {\n+    writeFileSync(join(home, \".claude.json\"), JSON.stringify(c));\n+  }\n+  /** An executable on the injected PATH: `name.cmd` on Windows, `name` (mode 755) elsewhere. */\n+  function onPath(name: string): string {\n+    const file = join(bin, win ? `${name}.cmd` : name);\n+    writeFileSync(file, win ? \"@echo off\\r\\n\" : \"#!/bin/sh\\n\");\n+    chmodSync(file, 0o755);\n+    return file;\n+  }\n+\n+  it(\"row 1: the GitNexus case, an absolute path that does not exist, is an ISSUE naming the server and the path\", () => {\n+    const missing = win ? \"C:\\\\Program Files\\\\nodejs\\\\gitnexus.cmd\" : \"/usr/local/nowhere/gitnexus.cmd\";\n+    config({ mcpServers: { gitnexus: { type: \"stdio\", command: missing, args: [\"mcp\"] } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"gitnexus\");\n+    expect(r.message).toContain(missing);\n+  });\n+\n+  it(\"an absolute path that exists passes\", () => {\n+    const real = onPath(\"realserver\");\n+    config({ mcpServers: { real: { command: real } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+    expect(r.message).toContain(\"1 MCP server command(s) resolve\");\n+  });\n+\n+  it(\"row 2: a bare name present on PATH passes (on Windows through PATHEXT)\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { good: { command: \"goodserver\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity, r.message).toBe(\"pass\");\n+  });\n+\n+  it(\"row 3: a bare name absent from PATH is an ISSUE naming the server and the command\", () => {\n+    config({ mcpServers: { ghost: { command: \"no-such-server-anywhere\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"issue\");\n+    expect(r.message).toContain(\"ghost: no-such-server-anywhere not found\");\n+  });\n+\n+  it(\"row 4: a url server is skipped with its reason, and does not hide a missing command next to it\", () => {\n+    onPath(\"goodserver\");\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, good: { command: \"goodserver\" } } });\n+    const ok = checkMcpCommandPaths(home, env());\n+    expect(ok.severity, ok.message).toBe(\"pass\");\n+    expect(ok.message).toContain(\"remote (global): url server, no command to stat\");\n+\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" }, ghost: { command: \"no-such-server-anywhere\" } } });\n+    const bad = checkMcpCommandPaths(home, env());\n+    expect(bad.severity).toBe(\"issue\");\n+    expect(bad.message).toContain(\"remote (global): url server\");\n+  });\n+\n+  it(\"a config with only url servers is SKIPPED, not passed\", () => {\n+    config({ mcpServers: { remote: { type: \"http\", url: \"https://example.invalid/mcp\" } } });\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: no mcpServers entry with a command/);\n+  });\n+\n+  it(\"row 5: a missing config is 'not checked', never a pass\", () => {\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n+    expect(r.message).toMatch(/^not checked: .*\\.claude\\.json does not exist\\. This is not a pass\\./);\n+  });\n+\n+  it(\"an unreadable config (invalid JSON) is 'not checked' with the cause\", () => {\n+    writeFileSync(join(home, \".claude.json\"), \"{ not json\");\n+    const r = checkMcpCommandPaths(home, env());\n+    expect(r.severity).toBe(\"skip\");\n…[cal2 diff truncated]"
+          ],
+          "id": "T14",
+          "observable": "Then run each touched sync test, one file per invocation, and tsc --noEmit."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "22ae3597abff2bed5ab42e1210d92ebc451dd0f2",
+        "merge_commit": "7afd7f1bbb31ff1ba54c924b386384be45f261a0",
+        "pr": 298,
+        "scored_sha": "7afd7f1bbb31ff1ba54c924b386384be45f261a0"
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.83
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.23
+    },
+    "plan_row:T10": {
+      "type": "noul",
+      "noul": 0.11
+    },
+    "plan_row:T11": {
+      "type": "noul",
+      "noul": 0.3
+    },
+    "plan_row:T12": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "plan_row:T13": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "plan_row:T14": {
+      "type": "noul",
+      "noul": 0.41
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.33
+    },
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.57
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.54
+    },
+    "plan_row:T5": {
+      "type": "noul",
+      "noul": 0.29
+    },
+    "plan_row:T6": {
+      "type": "noul",
+      "noul": 0.42
+    },
+    "plan_row:T7": {
+      "type": "noul",
+      "noul": 0.38
+    },
+    "plan_row:T8": {
+      "type": "noul",
+      "noul": 0.36
+    },
+    "plan_row:T9": {
+      "type": "noul",
+      "noul": 0.17
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.09,
+      "confidence": 0.86,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.91,
+        "1": 0.09,
+        "2": 0
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.18
+    }
+  },
+  "usage": {
+    "input_tokens": 23709,
+    "output_tokens": 354
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.23 is below the required 0.7",
+      "plan_row:T2 0.33 is below the required 0.7",
+      "plan_row:T3 0.57 is below the required 0.7",
+      "plan_row:T4 0.54 is below the required 0.7",
+      "plan_row:T5 0.29 is below the required 0.7",
+      "plan_row:T6 0.42 is below the required 0.7",
+      "plan_row:T7 0.38 is below the required 0.7",
+      "plan_row:T8 0.36 is below the required 0.7",
+      "plan_row:T9 0.17 is below the required 0.7",
+      "plan_row:T10 0.11 is below the required 0.7",
+      "plan_row:T11 0.3 is below the required 0.7",
+      "plan_row:T12 0.26 is below the required 0.7",
+      "plan_row:T13 0.26 is below the required 0.7",
+      "plan_row:T14 0.41 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "5664e50c-8c70-46e7-9d5e-ef4f868f8fbc",
+  "subject": {
+    "gate": "developer-done",
+    "key": "7afd7f1bbb31ff1ba54c924b386384be45f261a0",
+    "blob": "d5d35bad07391a07f682dc85861c69f2ca953cd9abb3afb259c0fefa1e619e9c"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T09:51:18.641Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 298,
+  "merge_commit": "7afd7f1bbb31ff1ba54c924b386384be45f261a0",
+  "scored_sha": "7afd7f1bbb31ff1ba54c924b386384be45f261a0",
+  "base_sha": "22ae3597abff2bed5ab42e1210d92ebc451dd0f2",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/032-qa260-pr298.G_done-request.json",
+    "blob": "359cc5b71838178d061e1c5c621e9cc2a07bd053"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/src/pipelines/sync/checks.ts",
+    "open-brain/src/pipelines/sync/index.ts",
+    "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
+  ],
+  "cal2_case_id": "qa260-pr298"
+}
