@@ -21,7 +21,8 @@ describe("JEV-CAL-2 DEV r2 SIZE — runlist wire bodies under ceiling", () => {
         bodies.push(wireBody.length);
       }
     }
-    expect(bodies.length).toBe(67);
+    const expected = runlist.phases.dev.length + runlist.phases.heldout.length;
+    expect(bodies.length).toBe(expected);
   });
 
   it("wire-size-report.mjs reports zero over 90 KB for dev and heldout", () => {
