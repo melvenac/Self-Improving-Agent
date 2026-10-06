@@ -1,4 +1,5 @@
 {
+  "$rehash_note": "G-050: allowed_referrers carry line_hashes[] (SHA-256 of each trimmed line matching the retirement pattern at allowlist time). checkRetirements and /sync only READ them. To add or refresh hashes after editing an obituary line, run: open-brain sync --retirements-rehash (prints per-path diff) and open-brain sync --retirements-rehash --write (writes .agents/retirements.json). Automatic rehash inside the check is forbidden — it would bless new live mentions.",
   "$schema_note": "Loop 12 C3. The Component Log in .agents/LIFECYCLE.md, made into data so a check can read it. A retirement is any event that ends a name: a component cut, a module renamed, an identifier prefix retired, a flag or subcommand removed, a dependency dropped, a schema field removed. Entries are GLOBAL — one per retired name, not one per referent class — because a class with no registry would otherwise have no entry at all and the record would under-cover silently. allowed_referrers is captured AT RETIREMENT TIME, which is the only moment anyone knows which mentions are deliberate; a correct obituary written then is in the set by construction, a dangling reference appearing later is not.",
   "historical": [
     "CHANGELOG.md",
@@ -36,12 +37,20 @@
         {
           "path": "open-brain/tests/pipelines/sync/checks.test.ts",
           "class": "test",
-          "why": "command-names regression test uses it as the known-dead name"
+          "why": "command-names regression test uses it as the known-dead name",
+          "line_hashes": [
+            "5196428ed9f2b53acbda69c2ab3ff3a71fb17e4ad4d2bad7ec35f802c360e6c7"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/sync/checks.ts",
           "class": "prose",
-          "why": "obituary — the retirements check cites /recall as the case for the record existing at all"
+          "why": "obituary — the retirements check cites /recall as the case for the record existing at all",
+          "line_hashes": [
+            "dd37259bb3cf3f02d7e034e8ba00761dd7f7e379de96aae7afa2e5e366b934d7",
+            "c1db549c8a75281c2a9b739cf7aefbb641222a0b9d6d472ea3ef8245e05a10c5",
+            "0b82139bf3fa4e664c6ea0d74f132961e85973e34ddbe2ae9a128ad841d752ca"
+          ]
         }
       ]
     },
@@ -66,82 +75,140 @@
         {
           "path": ".agents/SYSTEM/RUNBOOK.md",
           "class": "prose",
-          "why": "obituary — 'the skill-scan runner and its test were cut in Loop 10'"
+          "why": "obituary — 'the skill-scan runner and its test were cut in Loop 10'",
+          "line_hashes": [
+            "b71b2197a124410e8e1194da34de6a1526e8ce2767101a6fe8e14692b9da92d3"
+          ]
         },
         {
           "path": ".agents/SYSTEM/domains.json",
           "class": "prose",
-          "why": "obituary — records that this consumer was cut, after the stale description nearly became a false finding"
+          "why": "obituary — records that this consumer was cut, after the stale description nearly became a false finding",
+          "line_hashes": [
+            "496fc2ff27651c90e6c029161ac384ce29fc95d7de77620589b2f3cf741beaf6"
+          ]
         },
         {
           "path": ".agents/skills/self-improving-agent-guide/SKILL.md",
           "class": "prose",
-          "why": "obituary — 'Skill-scan clustering was cut in Loop 10'"
+          "why": "obituary — 'Skill-scan clustering was cut in Loop 10'",
+          "line_hashes": [
+            "3e54575e7a62441e568e28e8d1a5bbd25a392d49da25bd0a6b8abe4cb14e0315"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/store/index.ts",
           "class": "prose",
-          "why": "rationale comment explaining a historical vault-indexing constraint"
+          "why": "rationale comment explaining a historical vault-indexing constraint",
+          "line_hashes": [
+            "255238cd8a1d0ed0daca51b77af61397172bc4f791a8d7818c02a31b3fddcc17"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/sync/checks.ts",
           "class": "prose",
-          "why": "command-names and this check both cite it as their worked example"
+          "why": "command-names and this check both cite it as their worked example",
+          "line_hashes": [
+            "71d77e060e4d30a88a9a4bfd28fd1df15a9b20ad6d20f34000fb466cb94b4676",
+            "840efdf4f443353abb3480d0b8fb8f6f0c88aeccade6fee7fc703e8e55f22b93",
+            "f0f2557377e9bc53e3d6c795f0f7374f36b861fc9b2ad77adff3aaeeeeec9dbf",
+            "aaf9a6c12ca6b27e82b54e0830ccbcb70c1ad15b64e00cdbd1c570b1d986248f"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/topics/index.ts",
           "class": "prose",
-          "why": "rationale comment on what does and does not affect retrieval"
+          "why": "rationale comment on what does and does not affect retrieval",
+          "line_hashes": [
+            "cf211b093851db703d52d1d394b1e7c82324bd87ba61e6ce3a060165f4f1d962"
+          ]
         },
         {
           "path": "open-brain/src/server.ts",
           "class": "prose",
-          "why": "rationale comment on vault duplicate counting"
+          "why": "rationale comment on vault duplicate counting",
+          "line_hashes": [
+            "d38f9cbcbde978ffa6bc92e9a1c69df27a57e8af7fd99a2500c6735b58a7531e"
+          ]
         },
         {
           "path": "open-brain/src/shared/paths.ts",
           "class": "prose",
-          "why": "rationale comment on why path canonicalisation mattered"
+          "why": "rationale comment on why path canonicalisation mattered",
+          "line_hashes": [
+            "aa59b94fadb88d0aa92b6fa33b76e40fb5caa7b6c05bd56e793bf8c41fd5c39f"
+          ]
         },
         {
           "path": "open-brain/src/vault-writer.ts",
           "class": "prose",
-          "why": "rationale comment citing the v0.12.0 audit"
+          "why": "rationale comment citing the v0.12.0 audit",
+          "line_hashes": [
+            "23abd73c5142de48acd86083361c4c4b60e2b6cb69ba781e51cbcae49c2c7bf8"
+          ]
         },
         {
           "path": "scripts/setup.mjs",
           "class": "prose",
-          "why": "rationale comment on a missing skill index"
+          "why": "rationale comment on a missing skill index",
+          "line_hashes": [
+            "ec7e989dd77ee6cd08ce058f96659a8f2863d10d2d96e7cf9ca0e04baaf0266d"
+          ]
         },
         {
           "path": "open-brain/tests/setup-env.ts",
           "class": "test",
-          "why": "names the cut suites the env shim used to serve"
+          "why": "names the cut suites the env shim used to serve",
+          "line_hashes": [
+            "36302025613aa92d9d11a94d732b73082e61b0aa76a8feef96d96e2c3288ca63"
+          ]
         },
         {
           "path": "open-brain/tests/vault-archive.test.ts",
           "class": "test",
-          "why": "rationale comment on recursive vault reads"
+          "why": "rationale comment on recursive vault reads",
+          "line_hashes": [
+            "4000dbcf570be558aaa0aa280448b0562b86238fdac06dc24f9448eb85ead362"
+          ]
         },
         {
           "path": "open-brain/tests/pipelines/session-end/index-v2.test.ts",
           "class": "test",
-          "why": "pins that the cut stage stays absent"
+          "why": "pins that the cut stage stays absent",
+          "line_hashes": [
+            "d70289d2cace30fc89b758abfa20d5659ed42366beef8c3d1920455a6c78188e",
+            "14c1bee4a3e72c71ec103bcf5b931e8f5d8772743107a2157e1b6dfa279667cd",
+            "c0a55e3c7eab1532e885888f8c41d266b45e7706d4e99b0e07a49e5120fc6966"
+          ]
         },
         {
           "path": "open-brain/tests/pipelines/sync/checks.test.ts",
           "class": "test",
-          "why": "command-names regression test uses it as the known-dead name"
+          "why": "command-names regression test uses it as the known-dead name",
+          "line_hashes": [
+            "b275aa106d12b0d3a932b336dd72c30b9e1735b016905dfd555352226b31b985",
+            "cb42f375e7190bfc6eb02c59e1c8eb8ee06f91238130fa2b05c2f57511cc65f3",
+            "40258d243c060a9c15c8f8e4d844e0711eb11ae497831df3b135f1357912ef9e",
+            "c6988df5054d1d6775ebdc7fd2381cfbe87a5e2139ccd293840eec85ddd46272",
+            "5e64735b1eb4fd0b44f32658f4e5e55df04f08f610b5179261dfc9de0c75c69c"
+          ]
         },
         {
           "path": "open-brain/tests/pipelines/sync/mirror-parity.test.ts",
           "class": "test",
-          "why": "fixture proving an unexpected mirror copy is reported"
+          "why": "fixture proving an unexpected mirror copy is reported",
+          "line_hashes": [
+            "7088a814f83fad6ba6390f8ef58cfce8fd6d37ad8f4d16d8eced6e4f5a772102",
+            "a94a5e7c031fa41c029d8b4002260960bf67f1164b2cdfca41c2a651d1acfd59"
+          ]
         },
         {
           "path": ".agents/SYSTEM/PRD.md",
           "class": "prose",
-          "why": "obituary — the PRD's 'Not in this product' list names the cut component"
+          "why": "obituary — the PRD's 'Not in this product' list names the cut component",
+          "line_hashes": [
+            "bf1b42edd06a484ba16bfcb253d56c6a6a6884544157ea452261a7c1860c0446"
+          ]
         }
       ],
       "coverage_gap": "FOUND IN QA AT a3bcf2f, RECORDED RATHER THAN FIXED. The pattern `skill[-_]?scan` does not match \"the skill scan\" with a SPACE — verified: skill-scan, skill_scan and skillscan match; \"the skill scan\" does not. cli-session-end.ts:8 uses exactly that spelling, written by this loop's own C3 repair, so it PASSES BY SPELLING RATHER THAN BY RULE. The outcome is still correct — the file is an allowed referrer under the reflection-queue retirement — but a genuinely dangling \"the skill scan\" would pass too. THE FIX IS MEASURED AND CHEAP: widening the pattern to accept a space adds exactly two new referrers needing entries, open-brain/src/pipelines/session-end/index-v2.ts and open-brain/src/cli-session-end.ts, both obituaries; tests/fixtures-import is already historical and index-v2.test.ts is already listed. NOT APPLIED HERE because it changes shipped matching behaviour after sign-off, and a behaviour change after QA needs re-QA rather than a quiet amend."
@@ -163,12 +230,19 @@
         {
           "path": "open-brain/src/pipelines/sync/checks.ts",
           "class": "prose",
-          "why": "rationale comment on why v1 paths appear in fixtures"
+          "why": "rationale comment on why v1 paths appear in fixtures",
+          "line_hashes": [
+            "5c9f6cc9c8e4ecff3f64e98d22df5bfd764e41917e7365e7d0f87d2d7d57c647"
+          ]
         },
         {
           "path": ".agents/skills/self-improving-agent-guide/SKILL.md",
           "class": "prose",
-          "why": "version-history line recording when dream was wired to the CLI"
+          "why": "version-history line recording when dream was wired to the CLI",
+          "line_hashes": [
+            "2d328ebf4070a5934bc7e552c667c0ef47ab1dd4444923c88b753efaa0479f9f",
+            "3c62bc28fd7311bc8ae5a6cc6a0e4fa6363a32e50995daceec410c8245fb5ac4"
+          ]
         }
       ],
       "ignore_case": true
@@ -190,37 +264,61 @@
         {
           "path": "open-brain/src/db-v2.ts",
           "class": "prose",
-          "why": "obituary in the schema — 'Loop 10 C2: reflection_log is CUT'"
+          "why": "obituary in the schema — 'Loop 10 C2: reflection_log is CUT'",
+          "line_hashes": [
+            "d5863bc67f552ba7a5d62f95631b5f91c300b373f38d1d936eab99c94df875c7"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/session-end/index-v2.ts",
           "class": "prose",
-          "why": "obituary at the point in the pipeline where the stage used to run"
+          "why": "obituary at the point in the pipeline where the stage used to run",
+          "line_hashes": [
+            "4d0c5eaaaa27e2623d17b8875d1542687a8dd8d74bfa9090ae81e5dcfce8fea6"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/sync/checks.ts",
           "class": "prose",
-          "why": "command-tool-names cites the false ob_end description as its limitation"
+          "why": "command-tool-names cites the false ob_end description as its limitation",
+          "line_hashes": [
+            "cc824b3c6f6047803b2f81c939dd8d899fde605a16a074d07e89498a7cbe6bfe"
+          ]
         },
         {
           "path": "open-brain/src/server.ts",
           "class": "prose",
-          "why": "obituary inside ob_end's own description, repaired in Loop 11 after the description falsely claimed it still flags reflection clusters"
+          "why": "obituary inside ob_end's own description, repaired in Loop 11 after the description falsely claimed it still flags reflection clusters",
+          "line_hashes": [
+            "456ed0c2fec363526a4fbdf6768e54dc460edf4d98c6ef79c0f1376bc5dbe4c1"
+          ]
         },
         {
           "path": "open-brain/tests/db-v2.test.ts",
           "class": "test",
-          "why": "asserts a new database does NOT declare reflection_log — the cut, pinned"
+          "why": "asserts a new database does NOT declare reflection_log — the cut, pinned",
+          "line_hashes": [
+            "4917330c7599ad7d436be1ef4f4f56b289f8f9344d5631daefa7e1fff9aadad1",
+            "9960c6d765007ddec4379fbda3790874df2fcee594842c1ba084ea289cb4bd66",
+            "3b11878cd148117a29243cc2af94238733a404cc8fde380132971e2e18a590c1",
+            "2fef6479769f92cbc473d1eca80c3a5e6a72b985bf761186c6374d15b2ee414c"
+          ]
         },
         {
           "path": "open-brain/src/cli-session-end.ts",
           "class": "prose",
-          "why": "obituary in the pipeline header explaining why the stage numbering skips 5 and 6"
+          "why": "obituary in the pipeline header explaining why the stage numbering skips 5 and 6",
+          "line_hashes": [
+            "529ad4779aaaa09b2f5a3ce0ba52be6ceaaea7dfea74fc9934909c8819191f90"
+          ]
         },
         {
           "path": ".agents/SYSTEM/PRD.md",
           "class": "prose",
-          "why": "obituary — the PRD's 'Not in this product' list names the cut component"
+          "why": "obituary — the PRD's 'Not in this product' list names the cut component",
+          "line_hashes": [
+            "934ccb5f8ada0cde8f420fcfa566354cbab0cd01fa032dfd85e2032646edee3f"
+          ]
         }
       ]
     },
@@ -239,17 +337,30 @@
         {
           "path": "open-brain/src/pipelines/sync/checks.ts",
           "class": "prose",
-          "why": "command-tool-names treats any kb_* survivor as a dead call, and says so"
+          "why": "command-tool-names treats any kb_* survivor as a dead call, and says so",
+          "line_hashes": [
+            "4a419a5dfef7eaaaff9a3caaeb4a336145cd6deb57b0cd44cf2c5e70d5316a82",
+            "26f8ef7d8117159c190c5df2545feb3cd779f2af414273faff4038a90dd335ed"
+          ]
         },
         {
           "path": "open-brain/tests/pipelines/sync/checks.test.ts",
           "class": "test",
-          "why": "asserts the retired prefix fails even though the name looks plausible"
+          "why": "asserts the retired prefix fails even though the name looks plausible",
+          "line_hashes": [
+            "77b16207ec6dd50ebf758f28ab1ef617af70c51a65c0b072bfeb8399679b148f",
+            "27b85dc936138254e5eac61d18163bc49775af82ac674be598e3e22d611125ef",
+            "30fc48cbb4d9c08fefe3d0547a49ed352cfb643e0c71ee19e1921f4c90290ae5",
+            "9e1a2963ae92b0e4e59f702e2cf6d9233e7e8d297578320f5c830fcbe70d8a5a"
+          ]
         },
         {
           "path": ".agents/SYSTEM/TESTING.md",
           "class": "prose",
-          "why": "obituary listing the retired prefix among things that no longer exist"
+          "why": "obituary listing the retired prefix among things that no longer exist",
+          "line_hashes": [
+            "7ade6c5a139cadcff20c73bd18d783c6af7cd20c15cf0702355924bc09f2814e"
+          ]
         }
       ]
     },
@@ -270,32 +381,51 @@
         {
           "path": ".agents/SYSTEM/TESTING.md",
           "class": "prose",
-          "why": "obituary naming the rename explicitly"
+          "why": "obituary naming the rename explicitly",
+          "line_hashes": [
+            "7ade6c5a139cadcff20c73bd18d783c6af7cd20c15cf0702355924bc09f2814e"
+          ]
         },
         {
           "path": ".agents/skills/self-improving-agent-gotchas/SKILL.md",
           "class": "prose",
-          "why": "obituary — a stale-build gotcha about the directory that no longer exists"
+          "why": "obituary — a stale-build gotcha about the directory that no longer exists",
+          "line_hashes": [
+            "3fe848dfc0e384dcf1619715e6730632609a2568072749fe72c2df59a18ac6a4"
+          ]
         },
         {
           "path": "open-brain/src/shared/paths.ts",
           "class": "prose",
-          "why": "comment marking the v1 path as deliberately NOT used"
+          "why": "comment marking the v1 path as deliberately NOT used",
+          "line_hashes": [
+            "a6e0b10ccb89e49660b131d789b4cbb9976d4cdda16fda12f4232c2be25c2952"
+          ]
         },
         {
           "path": "scripts/setup.mjs",
           "class": "code",
-          "why": "migration code that removes stale knowledge-mcp hook entries — it must name the old value to erase it"
+          "why": "migration code that removes stale knowledge-mcp hook entries — it must name the old value to erase it",
+          "line_hashes": [
+            "e82db6023164c46c23fa73bb4a8a2cbae1876250ec1a9b2ad9be8d68c694fa60"
+          ]
         },
         {
           "path": "scripts/setup-hooks.mjs",
           "class": "code",
-          "why": "the same hook migration, moved out of setup.mjs in T-179 round 2 (R179-5) — it must name the old value to erase it"
+          "why": "the same hook migration, moved out of setup.mjs in T-179 round 2 (R179-5) — it must name the old value to erase it",
+          "line_hashes": [
+            "b7f1de3227c6da6af5286d7dab8b07688aa558d882d795bda63921d654e8448c"
+          ]
         },
         {
           "path": "open-brain/tests/setup-hooks.test.ts",
           "class": "code",
-          "why": "the test row proving the retired knowledge-mcp SessionEnd hook is removed — a fixture must carry the value it asserts is erased"
+          "why": "the test row proving the retired knowledge-mcp SessionEnd hook is removed — a fixture must carry the value it asserts is erased",
+          "line_hashes": [
+            "8b3f5a085ab90d3bec5a58c8368dd314fd612b82a96075d99abbea6b50301437",
+            "8c23a50ddd907f4df26b207c2bbf29daa0cbee179f91d9ec89c09337231faea7"
+          ]
         }
       ]
     },
@@ -315,32 +445,52 @@
         {
           "path": "open-brain/src/shared/state-schema.ts",
           "class": "code",
-          "why": "the strictObject that makes a survivor fail to parse"
+          "why": "the strictObject that makes a survivor fail to parse",
+          "line_hashes": [
+            "c75cd4cf0c1c13f0463a9df44ba55fa5b0d255c13ef88d79cce360f7da4271dc"
+          ]
         },
         {
           "path": "open-brain/src/shared/state-writer.ts",
           "class": "prose",
-          "why": "records that the field is gone"
+          "why": "records that the field is gone",
+          "line_hashes": [
+            "9131610a20c666eda31061ccb501f046d2cfb76c0457e29b6f9df3780ca6d2ae"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/state-import/index.ts",
           "class": "prose",
-          "why": "import path notes the removed field"
+          "why": "import path notes the removed field",
+          "line_hashes": [
+            "be7e5a1a53079102553312951258313ee38d22c05fc782fc6a4f7632f8c81ffd"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/sync/checks.ts",
           "class": "prose",
-          "why": "version checks note the field no longer exists"
+          "why": "version checks note the field no longer exists",
+          "line_hashes": [
+            "87b00921bb5d862939f692fc277aafefe621b1857f0c7f898daca8a98fdeb8f5"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/sync/checks-state.ts",
           "class": "prose",
-          "why": "same, on the state side"
+          "why": "same, on the state side",
+          "line_hashes": [
+            "b1e60ea60a3ab5f1fe978adddc8636e1ceb9c704c606b4b2e05e4f772fa1ee17"
+          ]
         },
         {
           "path": "open-brain/tests/pipelines/sync/checks.test.ts",
           "class": "test",
-          "why": "pins that a file still carrying the field is rejected — the guarantee the migration rests on"
+          "why": "pins that a file still carrying the field is rejected — the guarantee the migration rests on",
+          "line_hashes": [
+            "6be973b2b845ac524930e86095ed8181f43f4fd992850dda8decc641c0bad342",
+            "fd577c5fec05da548d3909ad3c05171313a34859ba887ea61f2064d2f543807d",
+            "e1dd7cc14ed699ccbf51dc87531b6b0e21a4a6124149c15a128fe1300aaf2b67"
+          ]
         }
       ]
     },
@@ -361,7 +511,10 @@
         {
           "path": "open-brain/tests/pipelines/sync/scorer-integration.test.ts",
           "class": "prose",
-          "why": "obituary explaining what the test used to be fed from"
+          "why": "obituary explaining what the test used to be fed from",
+          "line_hashes": [
+            "561e05a27b3a9fcb28a307f878a7112dbc4b331f259a17d2e2f8339d0b84941f"
+          ]
         }
       ]
     },
@@ -386,32 +539,51 @@
         {
           "path": "CLAUDE.md",
           "class": "prose",
-          "why": "obituary naming where the retired channel’s records were preserved"
+          "why": "obituary naming where the retired channel’s records were preserved",
+          "line_hashes": [
+            "9ece2a969224935db9ec039e330f8758bd982433835d088436192547f5bab4be",
+            "2e45d39e022826a04c2ff5d45a4b97d464be4f0bc4e692ef87bc392a16b61082"
+          ]
         },
         {
           "path": ".agents/SYSTEM/RUNBOOK.md",
           "class": "prose",
-          "why": "obituary — the hook no longer emits the mailbox line"
+          "why": "obituary — the hook no longer emits the mailbox line",
+          "line_hashes": [
+            "ff0c644a748c76a6c63ff2f72b1287ca0b487ae6e4aa408feef54a7774dcba14"
+          ]
         },
         {
           "path": ".claude/commands/start.md",
           "class": "prose",
-          "why": "obituary — \"there is no mailbox step\", replacing the step that read it"
+          "why": "obituary — \"there is no mailbox step\", replacing the step that read it",
+          "line_hashes": [
+            "4749e7ca6be67023f549b3634fb082704f377d2df80114efb200735747a5d0c9"
+          ]
         },
         {
           "path": "project-template/.claude/commands/start.md",
           "class": "prose",
-          "why": "same obituary, shipped copy"
+          "why": "same obituary, shipped copy",
+          "line_hashes": [
+            "4749e7ca6be67023f549b3634fb082704f377d2df80114efb200735747a5d0c9"
+          ]
         },
         {
           "path": "project-template/.cursor/commands/start.md",
           "class": "prose",
-          "why": "same obituary, Cursor copy"
+          "why": "same obituary, Cursor copy",
+          "line_hashes": [
+            "4749e7ca6be67023f549b3634fb082704f377d2df80114efb200735747a5d0c9"
+          ]
         },
         {
           "path": "open-brain/src/cli-bootstrap.ts",
           "class": "prose",
-          "why": "comment marking where the mailbox block stood and why it is gone"
+          "why": "comment marking where the mailbox block stood and why it is gone",
+          "line_hashes": [
+            "8924a8e565f72d329f2404e892e8cefd0f67fbafd8fda9f352aeb9c085584784"
+          ]
         }
       ],
       "out_of_repo_referrers": [
@@ -440,12 +612,18 @@
         {
           "path": "open-brain/src/cli-session-end.ts",
           "class": "prose",
-          "why": "obituary — records that the arm produced zero rows, which is why the uuid bug was invisible"
+          "why": "obituary — records that the arm produced zero rows, which is why the uuid bug was invisible",
+          "line_hashes": [
+            "802efb5d98f28566fc8b82bb5c2dbd21a257c7b744f764221e8189c58295b9f8"
+          ]
         },
         {
           "path": "open-brain/tests/pipelines/session-end/index-v2.test.ts",
           "class": "test",
-          "why": "the describe block that pinned the gate now pins the cut"
+          "why": "the describe block that pinned the gate now pins the cut",
+          "line_hashes": [
+            "fb35cc214d298acf5fa123434bc390d1b5365b87f0ce2d9f1909c5c057d9c440"
+          ]
         }
       ]
     },
@@ -467,122 +645,247 @@
         {
           "path": ".agents/SYSTEM/PRD.md",
           "class": "prose",
-          "why": "obituary — the PRD's 'Not in this product' list names the cut lifecycle"
+          "why": "obituary — the PRD's 'Not in this product' list names the cut lifecycle",
+          "line_hashes": [
+            "8824c41e61e17809f84688b297c8a5c72b8dfd30fe636ba041284cd253623318",
+            "b3db4c039e7eb90f7fda3812499cb968c502c8a79db58ba8932fc9649e66b878"
+          ]
         },
         {
           "path": ".agents/skills/self-improving-agent-guide/SKILL.md",
           "class": "prose",
-          "why": "Lines 75-81 say the lifecycle and apoptosis were cut in Loop 10 and the columns are inert, and line 188 is the v0.4.0 history entry annotated as cut; the two lines that presented maturity as a live ranking input (59, 196) were rewritten in T-169 r2."
+          "why": "Lines 75-81 say the lifecycle and apoptosis were cut in Loop 10 and the columns are inert, and line 188 is the v0.4.0 history entry annotated as cut; the two lines that presented maturity as a live ranking input (59, 196) were rewritten in T-169 r2.",
+          "line_hashes": [
+            "a9b90e797f36d13b6dffed908488490e317c94c3cb7bf1b7045c333552ccef1e",
+            "30027963a962889a590f723c2facb2fcadc2a99c7dad6f4f00172e9160200dff",
+            "950453596793b709dfe619a794ffd1b896a24a19d6d3d436906afbf4f356a658",
+            "3786e6c5d577f6bf05e50a10f70ed8fd3b389a55381d2f1a14d820ba3d6dbb09"
+          ]
         },
         {
           "path": "open-brain/scripts/shadow-backfill.mjs",
           "class": "code",
-          "why": "Line 14 is the \"REPAIRED IN LOOP 6\" comment recording that maturity/success_rate used to be read as-of-today; a record of a past repair. (Its `coverage` branch at 80-86 reads a ReplayCoverage that no longer exists and is dead, but is not matched by the pattern.)"
+          "why": "Line 14 is the \"REPAIRED IN LOOP 6\" comment recording that maturity/success_rate used to be read as-of-today; a record of a past repair. (Its `coverage` branch at 80-86 reads a ReplayCoverage that no longer exists and is dead, but is not matched by the pattern.)",
+          "line_hashes": [
+            "ea613bd97bd5b79565a1c0954c4fadc4e6581bd5d0c7a5ea69c3e6eaf0b9369c"
+          ]
         },
         {
           "path": "open-brain/src/db-v2.ts",
           "class": "prose",
-          "why": "Obituaries and the retained label. The two present-tense comments (the trigger table at 66-67, the archive helper at 526) were rewritten in T-215. Lines 19, 131-134, 426, 500-512, 528, 630-631, 869-872, 970 say what was cut and when; 127 and 445 are the retained maturity label default and CHECK; 400 is the optional `success_rate` field on the index input type, ignored by the insert."
+          "why": "Obituaries and the retained label. The two present-tense comments (the trigger table at 66-67, the archive helper at 526) were rewritten in T-215. Lines 19, 131-134, 426, 500-512, 528, 630-631, 869-872, 970 say what was cut and when; 127 and 445 are the retained maturity label default and CHECK; 400 is the optional `success_rate` field on the index input type, ignored by the insert.",
+          "line_hashes": [
+            "b42e269278a0c6a9cc49da51b4a7fa17919497bba6b18e6b1ac96b258eea5250",
+            "ae3a676febed4395cce187b579c628c95b93a34f5252c18872c10a54819a69f8",
+            "8ccaafdc30b453ee98de4594eb4f1b7e014ccc54b61788d00e22232c8929a766",
+            "a8f99a0c728e9efaf2c6c72649d3ed702fffd9eece71da80d1af3bbc6ae11ced",
+            "1206d213d6faabaa9eb40a35585df9ad31869aef580b0a670f71c3267f85b2fd",
+            "5bbbcb352172c41e0024eaf3aaac164c29ec7271c76f03f96237d0d8879bd87f",
+            "391d017d9ec278b7047d08f72e7bce2d9552ce9c4f7decbcea642023f9acb159",
+            "38cfde0d6f515e21ce7de0b2d404f3cc5f6998c6feb9b43bb651974fbd66e3c6",
+            "1d9a7337384feed8ad77477287cccdc956a15e164f0fc8b1ce81fedd59008ecd",
+            "f3daf7054165cdd44cabf846419c8586962c4d55202e5e38a0109b9a796ddb4c",
+            "0cd07c532032a67113825bbc428567be63849d0010aeee9c23128c6e6e591a39",
+            "b76ec31765b956a72609d3582cb0274c51b3832ed550c866de610184a65ab792",
+            "dac1594dab3d247713e976a7456db02e26dc48cd6cca5e73723a7648186ce2ef",
+            "56833b7cfd6c17fe64acb82d5d8b2e1e6a769df3ce305bfb749f960804d2e5e1",
+            "9601c9836da7c6a853ee5237bfc938778efde7d18b0733f4a2da242d4d78c36e"
+          ]
         },
         {
           "path": "open-brain/src/lifecycle.ts",
           "class": "prose",
-          "why": "The header block at 4-34 is the Loop 10 C2 obituary (apoptosis never fired, success_rate cannot discriminate, boosts already 1.0) with the reviving observation and the recovery SHA; 56 and 60 name the retained `Maturity` type and the cut `success_rate` while stating nothing computes them."
+          "why": "The header block at 4-34 is the Loop 10 C2 obituary (apoptosis never fired, success_rate cannot discriminate, boosts already 1.0) with the reviving observation and the recovery SHA; 56 and 60 name the retained `Maturity` type and the cut `success_rate` while stating nothing computes them.",
+          "line_hashes": [
+            "f368fbe4275a4532800fcfe6fb4eb19bfb00f257ea3548c3dacb8cfc4c6c8f27",
+            "7711b2985b79f520a78182ae8bd27c762b2156f1b13de2db635351a5b8dbca1b",
+            "2bc2aa17008dde9d4eee81e7b8c14d480ff995870839ae366520b46686ba9cf5",
+            "380ef9ea51e509a7f4ead6c86d4236c4fc94e14b71c7a7c7bfcecb634ba94307",
+            "ff31cf698937b7393f3c7b59d591678378b86eb8eec66192b33cc37ef390d570",
+            "8e945a71f03ff78e12e9cd203be2f9fc753ccd70738b226262905163b6ca8394",
+            "c393b4468b052a8b81478f70a3bcafa41aae7953d16fca9b6d0407a9249210bd"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/session-end/index-v2.ts",
           "class": "prose",
-          "why": "Line 33 explains, in the past tense, that the heuristic rating arm cut in R-010 left `harmful` unreachable and made the apoptosis threshold unsatisfiable; line 114 records that the pre-feedback lifecycle capture is gone because ranking no longer reads maturity or success_rate."
+          "why": "Line 33 explains, in the past tense, that the heuristic rating arm cut in R-010 left `harmful` unreachable and made the apoptosis threshold unsatisfiable; line 114 records that the pre-feedback lifecycle capture is gone because ranking no longer reads maturity or success_rate.",
+          "line_hashes": [
+            "57216328ad489d22419e29290374d644c0d3572f11d4631751190966e855766e",
+            "41ab62a7018d8adee7e0a41cd7ac64cefe5a7310d08176902112478bade5422d"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/session-end/recalled-ids.ts",
           "class": "prose",
-          "why": "Line 14 and the doc at 152-154 name the cut success_rate, apoptosis and apoptosis review queue in the past tense; the present-tense header and the dangling `formatApoptosisQueue` pointer were rewritten in T-215."
+          "why": "Line 14 and the doc at 152-154 name the cut success_rate, apoptosis and apoptosis review queue in the past tense; the present-tense header and the dangling `formatApoptosisQueue` pointer were rewritten in T-215.",
+          "line_hashes": [
+            "8878b9e88046aa59d749ad37bb46b6206975ca0a2a09dd0e51a8c67166c58650",
+            "b0b72d1396fd235f4142d2e5d918b8a83cb32f03b4e16127b302a50d406def66"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/shadow/evaluate.ts",
           "class": "prose",
-          "why": "Lines 106-111 record that the lifecycle-snapshot substitution (E9b) that JOINed maturity and success_rate overrides is gone because `recallRankExpr` no longer reads either column."
+          "why": "Lines 106-111 record that the lifecycle-snapshot substitution (E9b) that JOINed maturity and success_rate overrides is gone because `recallRankExpr` no longer reads either column.",
+          "line_hashes": [
+            "39a123969c944daaaa52b540844a390cd51a3b2baf00aba90ca82f7a904fac4d"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/shadow/index.ts",
           "class": "prose",
-          "why": "Lines 145-149 record that the `snapshot` input of lifecycle values is gone because ranking no longer reads maturity or success_rate, and name the trigger that would restore it."
+          "why": "Lines 145-149 record that the `snapshot` input of lifecycle values is gone because ranking no longer reads maturity or success_rate, and name the trigger that would restore it.",
+          "line_hashes": [
+            "a0ea7e2a5392ae444e402490dd53bece6257a483177b7fa633e10fa375625b72"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/store/index.ts",
           "class": "prose",
-          "why": "Line 66 stamps the constant label `maturity: 'progenitor'` on a new entry's frontmatter; that is the retained stored label R-011's note deliberately did not retire (nothing computes or promotes it), not the cut lifecycle behaviour."
+          "why": "Line 66 stamps the constant label `maturity: 'progenitor'` on a new entry's frontmatter; that is the retained stored label R-011's note deliberately did not retire (nothing computes or promotes it), not the cut lifecycle behaviour.",
+          "line_hashes": [
+            "81fd875794e2af6d3a3f06c097443be248a5475fa6208e4a3d0bb8fa2fb8cf8b"
+          ]
         },
         {
           "path": "open-brain/src/pipelines/sync/checks.ts",
           "class": "prose",
-          "why": "Lines 827-828 cite Loop 11's finding that `ob_feedback` was falsely described as driving maturity promotion and apoptosis after the Loop 10 cuts, as the worked example of what the check cannot catch."
+          "why": "Lines 827-828 cite Loop 11's finding that `ob_feedback` was falsely described as driving maturity promotion and apoptosis after the Loop 10 cuts, as the worked example of what the check cannot catch.",
+          "line_hashes": [
+            "cc824b3c6f6047803b2f81c939dd8d899fde605a16a074d07e89498a7cbe6bfe"
+          ]
         },
         {
           "path": "open-brain/src/server.ts",
           "class": "prose",
-          "why": "Obituaries and the retained label. The two present-tense comments (the vault_path select in ob_feedback, the supplied x harmful census) were rewritten in T-215, as comment lines only. Lines 574, 1072, 1084, 1100, 1124, 1273, 1316-1317 record what was cut; 1229 and 1467 read and write the retained maturity label."
+          "why": "Obituaries and the retained label. The two present-tense comments (the vault_path select in ob_feedback, the supplied x harmful census) were rewritten in T-215, as comment lines only. Lines 574, 1072, 1084, 1100, 1124, 1273, 1316-1317 record what was cut; 1229 and 1467 read and write the retained maturity label.",
+          "line_hashes": [
+            "77175e41669ce44ad4a9cd181dcc299aa5fe40bdfd618c10a0bb8ef23b3e5504",
+            "eab276869e79e08ca1b94f2f8cc8c0f208ae79b20ccdf106e47988eef75539b7",
+            "dd5cf43fb445bca18211c8552ad8ef3b4169820b75041d4f7b7b872429a6581f",
+            "edb259d4db7480493fcbccfdb280d2cdda5598477056140b92a2966d2960b82d",
+            "7f95baa880539a95ea691a978d6e684940cc818f4ec885f4fa98fc8af688a726",
+            "b47d0b42ce33c91ce7eb934d97d1c8a3db955607db8379c9eceb21bb75962066",
+            "baad384a5b88920a7104f225035f95b742c3a64b5e21f9c73432ce91cd8b9771",
+            "4ee0e7027bf8d519cadaf4ef159029eb13702cd2970d9a844b730406b3aa23f5",
+            "a24a05991e3204c49fbd18ffb6d001eaa3017bdd2601c0ed5b44191781296f7f",
+            "ce3d86b58af408c2695d263fe9a6d9b7e0be5d5c27f82614274d9fa49374f9c8"
+          ]
         },
         {
           "path": "open-brain/src/vault-writer.ts",
           "class": "prose",
-          "why": "Line 108 names apoptosis in the past tense as a former caller of the archive helper (rewritten in T-215); line 11 is the retained maturity label in the frontmatter type."
+          "why": "Line 108 names apoptosis in the past tense as a former caller of the archive helper (rewritten in T-215); line 11 is the retained maturity label in the frontmatter type.",
+          "line_hashes": [
+            "5c904ecd86252acee6fee15a96dc334e52fd7cfb7eee12d1fe64f94148cb3a7d",
+            "c45acae8815c1ab9b66970ba3613e83256e70ef544371669466ec4126606db3b"
+          ]
         },
         {
           "path": "open-brain/tests/db-v2.test.ts",
           "class": "test",
-          "why": "Line 146 asserts the stored maturity column still defaults to 'progenitor', pinning the retained label value R-011 deliberately kept."
+          "why": "Line 146 asserts the stored maturity column still defaults to 'progenitor', pinning the retained label value R-011 deliberately kept.",
+          "line_hashes": [
+            "caee0b9f19c036f257a3662517f9db3b586d719934b490b33f9525fcdee06609"
+          ]
         },
         {
           "path": "open-brain/tests/index-upsert.test.ts",
           "class": "test",
-          "why": "Lines 96-99 and 134 assert that the cut `success_rate` column is absent from the stored row (T-215 replaced the two undefined === undefined comparisons with these)."
+          "why": "Lines 96-99 and 134 assert that the cut `success_rate` column is absent from the stored row (T-215 replaced the two undefined === undefined comparisons with these).",
+          "line_hashes": [
+            "d1009cb9a3805ec0b7e918bc06781d4117fcf4f412d0f2bf3cba808ff09a5333",
+            "cbe77dc389fe7ec8b57ec3b2e67e9c8fa21d8e331224c81f736c0ff11dee4b52",
+            "346f549ae50e62ae7098d12f7d514f27dbc948d734051ee04ee25edc3c398f78",
+            "346f549ae50e62ae7098d12f7d514f27dbc948d734051ee04ee25edc3c398f78"
+          ]
         },
         {
           "path": "open-brain/tests/pipelines/session-end/index-v2.test.ts",
           "class": "test",
-          "why": "Lines 152-157 are the \"Loop 7 R2\" comment recording why the heuristic-arm tests were written (a success_rate corpus mean of 0.311 against a 0.3 apoptosis threshold), above a describe block already titled \"CUT in Loop 12 (R-010)\"."
+          "why": "Lines 152-157 are the \"Loop 7 R2\" comment recording why the heuristic-arm tests were written (a success_rate corpus mean of 0.311 against a 0.3 apoptosis threshold), above a describe block already titled \"CUT in Loop 12 (R-010)\".",
+          "line_hashes": [
+            "3c26d09aa827396bca454725f3834914bb8822adbff75263317babaeeeb1ef5e",
+            "ea31bcc44a4d5174c791bfa4759797c09ac8da17e238d4f238cc41b8c24aac57"
+          ]
         },
         {
           "path": "open-brain/tests/pipelines/sync/scorer-integration.test.ts",
           "class": "test",
-          "why": "Lines 78-84 assert `getStalenessStats().lowSuccessCount` is 0 because success_rate no longer exists, so a reinstatement has to argue with a failing test."
+          "why": "Lines 78-84 assert `getStalenessStats().lowSuccessCount` is 0 because success_rate no longer exists, so a reinstatement has to argue with a failing test.",
+          "line_hashes": [
+            "82d9875c65c5be6e0f0b68e1fe571fc6e792b8f47b4550c82933346a867c634a"
+          ]
         },
         {
           "path": "open-brain/tests/ranking.test.ts",
           "class": "test",
-          "why": "Pins that maturity and success_rate are not ranking inputs: the maturity exact-tie rows (79-119) and the SQL absence pin (149-160), which is the success_rate contract. T-152 deleted the success-rate tie row: its fixture passed a successRate the input type no longer has, and indexKnowledge never stored it. Line 31 and the progenitor fixtures use the retained stored label."
+          "why": "Pins that maturity and success_rate are not ranking inputs: the maturity exact-tie rows (79-119) and the SQL absence pin (149-160), which is the success_rate contract. T-152 deleted the success-rate tie row: its fixture passed a successRate the input type no longer has, and indexKnowledge never stored it. Line 31 and the progenitor fixtures use the retained stored label.",
+          "line_hashes": [
+            "70293a0e704a5a0f2d03849775f7fb116c56633d301febd7a1c532056b5837b5",
+            "6a62c5270be5b83024102719121529492546ef013ad86c62bd8ab146dcd2bef2",
+            "72b98befb229ffb4c7701f03e878701ee6aa153461559d6151f6002c46e0fa29",
+            "852efc8dbde9ea19e8073f74d599c6d158dce3586b7e962948d2ef2e2e11e706",
+            "5f18cda123119d4ee26576cb1f31787ed60cef2a9b0eb760da589015aa6b78b3",
+            "852efc8dbde9ea19e8073f74d599c6d158dce3586b7e962948d2ef2e2e11e706",
+            "e46ac1fea9d422426e9ab518f25660bf25bd5a6a144e81848d4f095dda474ae9",
+            "852efc8dbde9ea19e8073f74d599c6d158dce3586b7e962948d2ef2e2e11e706",
+            "aa62eedd3a182f6d709716308efa28817d3911e5e6ba663233012f957775c620",
+            "e087d48c1bda44b50370f1c649652c9109c1723f6f97e4455a3c943d68b46ac5",
+            "24615249237d825a4bb05824ab34c8248f03e29e82621d6137b475170dd5a53d"
+          ]
         },
         {
           "path": "open-brain/tests/server.test.ts",
           "class": "test",
-          "why": "Line 192 is a task-title fixture string (\"Choose an apoptosis threshold with a defensible gate\") asserted in ob_start blocked-task output; it is a title from the state record, not a claim about behaviour."
+          "why": "Line 192 is a task-title fixture string (\"Choose an apoptosis threshold with a defensible gate\") asserted in ob_start blocked-task output; it is a title from the state record, not a claim about behaviour.",
+          "line_hashes": [
+            "387d99e407f738b068b32ea080b1ebfc48e82ce4f76cee3cd06be723fba54221"
+          ]
         },
         {
           "path": "open-brain/tests/setup-env.ts",
           "class": "test",
-          "why": "Line 49 names an \"apoptosis-reachability\" suite in a comment recording which suites reset OPEN_BRAIN_VAULT_DIR on 2026-08-31; the suite no longer exists and the line records that incident."
+          "why": "Line 49 names an \"apoptosis-reachability\" suite in a comment recording which suites reset OPEN_BRAIN_VAULT_DIR on 2026-08-31; the suite no longer exists and the line records that incident.",
+          "line_hashes": [
+            "36302025613aa92d9d11a94d732b73082e61b0aa76a8feef96d96e2c3288ca63"
+          ]
         },
         {
           "path": "open-brain/tests/shadow-strategies.test.ts",
           "class": "test",
-          "why": "Lines 79-98 assert that two entries differing only in maturity score identically and no override can change that (maturity is not a ranking input); 32, 80 and 81 are the retained-label fixture values that test uses."
+          "why": "Lines 79-98 assert that two entries differing only in maturity score identically and no override can change that (maturity is not a ranking input); 32, 80 and 81 are the retained-label fixture values that test uses.",
+          "line_hashes": [
+            "70293a0e704a5a0f2d03849775f7fb116c56633d301febd7a1c532056b5837b5",
+            "1814197b3780a037d86dba178ac617b4e49d531589a86f3734539163346bf4c2"
+          ]
         },
         {
           "path": "open-brain/tests/trigger/fires.test.ts",
           "class": "test",
-          "why": "Lines 125-126 name success_rate and apoptosis in the past tense as ratings once moved by the rated set (rewritten in T-215)."
+          "why": "Lines 125-126 name success_rate and apoptosis in the past tense as ratings once moved by the rated set (rewritten in T-215).",
+          "line_hashes": [
+            "b0db0a80f9fd03188fc6d75c1ff0cde8d2a58d5cf3367f0cb00c78696696e47d",
+            "41dc7f2ce3203b9ccead1867a6b0063ebff7068b87829937b323bee1b12d1f35"
+          ]
         },
         {
           "path": "open-brain/tests/vault-archive.test.ts",
           "class": "test",
-          "why": "Line 78 is a fixture object whose `maturity: \"progenitor\"` fills the retained stored label required by the frontmatter type; it exercises archiving, not the lifecycle."
+          "why": "Line 78 is a fixture object whose `maturity: \"progenitor\"` fills the retained stored label required by the frontmatter type; it exercises archiving, not the lifecycle.",
+          "line_hashes": [
+            "2d8ffff0df4bbf943ec16720f9f0332bbc805addabc432df9e72bf7928c76a51"
+          ]
         },
         {
           "path": "open-brain/tests/vault-writer.test.ts",
           "class": "test",
-          "why": "Lines 66 and 117 are fixture objects whose `maturity: \"progenitor\"` fills the retained stored label required by the frontmatter type; they exercise note writing, not the lifecycle."
+          "why": "Lines 66 and 117 are fixture objects whose `maturity: \"progenitor\"` fills the retained stored label required by the frontmatter type; they exercise note writing, not the lifecycle.",
+          "line_hashes": [
+            "fd185df78102bdba8b91359cab93b291f5bf61a98d673dbdacfc0678ebafdf84",
+            "fd185df78102bdba8b91359cab93b291f5bf61a98d673dbdacfc0678ebafdf84"
+          ]
         }
       ]
     }

@@ -302,7 +302,7 @@ describe("greeting-size — T-198 presence bound", () => {
     expect(without.parts.presence).toBe(0);
     // QA 268 F1 (T-237): the longest form is the no-recorded-poll one, not "since 99d".
     for (const label of ["forge", "cursor-infra", "cursor-builder"]) {
-      expect(withBlock.text).toContain(`  ${label}: listener not polling, 999 unread, no listener poll recorded`);
+      expect(withBlock.text).toMatch(new RegExp(`  ${label}: (state:unknown\\([^)]+\\)|hub listener: not polling, 999 unread)`));
     }
     expect(withBlock.parts.presence).toBeGreaterThan(150);
     expect(withBlock.text.length - without.text.length).toBeGreaterThanOrEqual(withBlock.parts.presence);
@@ -321,11 +321,23 @@ describe("greeting-size — T-198 presence bound", () => {
     expect(bound).toHaveLength(partners.length);
     const ages = [undefined, null, -1, 0, 59_000, 3_599_000, 86_399_000, 99 * 86_400_000];
     partners.forEach((p, n) => {
-      const forms: string[] = [formatPartnerLine(p, null), formatPartnerLine(p, []), formatPartnerLine(p, [{ name: p.hub_as, rooms: [] }])];
+      const seatRow = Object.values(map.seats as Record<string, { hub_name?: string; runtime?: string }>).find(
+        (s) => s.hub_name === p.hub_as,
+      );
+      const runtime = seatRow?.runtime === "cursor" || seatRow?.runtime === "claude-code" ? seatRow.runtime : "claude-code";
+      const forms: string[] = [
+        formatPartnerLine(p, null, runtime),
+        formatPartnerLine(p, [], runtime),
+        formatPartnerLine(p, [{ name: p.hub_as, rooms: [] }], runtime),
+        formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "owes_reply" }, rooms: [] }], "cursor"),
+        formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "mystery" }, rooms: [] }], "cursor"),
+      ];
       for (const pollingNow of [true, false]) {
         for (const unread of [0, 999]) {
           for (const pollAgeMs of ages) {
-            forms.push(formatPartnerLine(p, [{ name: p.hub_as, rooms: [{ sessionId: p.session_id, unread, pollingNow, pollAgeMs }] }]));
+            forms.push(
+              formatPartnerLine(p, [{ name: p.hub_as, rooms: [{ sessionId: p.session_id, unread, pollingNow, pollAgeMs }] }], "claude-code"),
+            );
           }
         }
       }

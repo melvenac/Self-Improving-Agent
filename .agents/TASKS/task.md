@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 335 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 339 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-QA 273 (Plumb: #421 r2, #424, #425, #427) and QA 274 (laptop, Windows rows of #425/#427) dispatched at 0565c51f, launched by Aaron by hand (clark's classifier blocks remote launches). QA 275 (#434 T-240, #436 P2-5, #437 P2-7) dispatched; launches on Plumb after 273 reports. #425 merges only after #437. All three dev seats frozen and idle. _(since session 161)_
+s161 batch landed: 9 PRs merged on Aaron's word (#421 #424 #436 #441 #442 #446 #427 #434 #444) plus #443. Left: #451 (T-187; checks.ts conflict, infra resolving), #437 (P2-7, QA 279 REJECT), #445 (T-156, QA 279 REJECT), #425 (after #437). Then close T-235. _(since session 161)_
 
 ## Top tasks
 

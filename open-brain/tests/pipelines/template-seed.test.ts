@@ -40,6 +40,23 @@ describe("project-template/.agents", () => {
     for (const r of rules) expect(rootLines).toContain(r);
   });
 
+  it("root and template gitignore ignore A2A-Hub waker runtime files only under .cursor/", () => {
+    const wakerRules = [
+      "/.cursor/wake.lock",
+      "/.cursor/waker.pid",
+      "/.cursor/wake-prompt-*.txt",
+      "/.cursor/hub-reply-*.txt",
+    ];
+    const templateText = readFileSync(join(templateDir, "gitignore"), "utf-8");
+    const rootText = readFileSync(join(templateDir, "..", ".gitignore"), "utf-8");
+    for (const r of wakerRules) {
+      expect(templateText).toContain(r);
+      expect(rootText).toContain(r);
+    }
+    expect(rootText).toContain("!/.claude/commands/");
+    expect(rootText).not.toMatch(/^\/\.cursor\/\*$/m);
+  });
+
   it("the template's gitattributes (shipped without the dot) keeps .agents/ LF", () => {
     const lines = readFileSync(join(templateDir, "gitattributes"), "utf-8").split(/\r?\n/).filter((l) => l && !l.startsWith("#"));
     expect(lines).toEqual(["/.agents/** text eol=lf"]);

@@ -11,6 +11,14 @@ const READERS = {
   },
 };
 
+const DISPATCH_CC = { via: "session", name: "infra", host: "qa-pc" };
+const DISPATCH_CURSOR = {
+  via: "hub-room",
+  hub_name: "cursor-infra",
+  room: "k5702788wctxj75begyt4x2k5x8f6mav",
+  waker: "cursor-infra-waker",
+};
+
 describe("checkHubSeats", () => {
   let root: string;
   const dir = () => join(root, ".agents", "SYSTEM");
@@ -39,36 +47,133 @@ describe("checkHubSeats", () => {
   it("is red when the file ob_start reads has no readers map", () => {
     writeHub({
       talk: TALK,
-      seats: { infra: { hub_name: "cursor-infra", cursor: true, room: "k1" } },
+      seats: {
+        infra: {
+          hub_name: "cursor-infra",
+          runtime: "cursor",
+          host: "qa-pc",
+          model: "composer-2.5",
+          dispatch: { cursor: DISPATCH_CURSOR, claude_code: DISPATCH_CC },
+        },
+      },
     });
     const result = checkHubSeats(root);
     expect(result.severity).toBe("issue");
     expect(result.message).toContain("readers");
   });
 
+  it("is red when runtime is missing", () => {
+    writeHub({
+      talk: TALK,
+      readers: READERS,
+      seats: { infra: { hub_name: "cursor-infra", host: "qa-pc", model: "x", dispatch: { cursor: DISPATCH_CURSOR, claude_code: DISPATCH_CC } } },
+    });
+    expect(checkHubSeats(root).message).toContain("no runtime");
+  });
+
   it("is red when the file names a seat worktree-seats.json does not have", () => {
-    writeHub({ talk: TALK, readers: READERS, seats: { stranger: { hub_name: "x", cursor: true, room: "k1" } } });
+    writeHub({
+      talk: TALK,
+      readers: READERS,
+      seats: {
+        stranger: {
+          hub_name: "x",
+          runtime: "cursor",
+          host: "h",
+          model: "m",
+          dispatch: { cursor: { ...DISPATCH_CURSOR, hub_name: "x", room: "k1" }, claude_code: DISPATCH_CC },
+        },
+      },
+    });
     const result = checkHubSeats(root);
     expect(result.severity).toBe("issue");
     expect(result.message).toContain("stranger");
     expect(result.message).toContain("worktree-seats.json");
   });
 
-  it("is red when a Cursor seat has no room", () => {
-    writeHub({ talk: TALK, readers: READERS, seats: { infra: { hub_name: "cursor-infra", cursor: true } } });
+  it("is red when a cursor runtime seat has no room", () => {
+    writeHub({
+      talk: TALK,
+      readers: READERS,
+      seats: {
+        infra: {
+          hub_name: "cursor-infra",
+          runtime: "cursor",
+          host: "qa-pc",
+          model: "composer-2.5",
+          dispatch: { cursor: { ...DISPATCH_CURSOR, room: "" }, claude_code: DISPATCH_CC },
+        },
+      },
+    });
     const result = checkHubSeats(root);
     expect(result.severity).toBe("issue");
     expect(result.message).toContain("infra");
     expect(result.message).toContain("no room");
   });
 
-  it("is green when every Cursor seat has a room and every name is a worktree seat", () => {
+  it("dispatch room deleted, top-level kept is an issue", () => {
     writeHub({
       talk: TALK,
       readers: READERS,
       seats: {
-        planner: { hub_name: "atlas", cursor: false },
-        infra: { hub_name: "cursor-infra", cursor: true, room: "k5702788wctxj75begyt4x2k5x8f6mav" },
+        infra: {
+          hub_name: "cursor-infra",
+          runtime: "cursor",
+          host: "qa-pc",
+          model: "composer-2.5",
+          room: DISPATCH_CURSOR.room,
+          dispatch: { cursor: { ...DISPATCH_CURSOR, room: "" }, claude_code: DISPATCH_CC },
+        },
+      },
+    });
+    const result = checkHubSeats(root);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("no room");
+    expect(result.message).toContain("not a fallback");
+  });
+
+  it("the two differ is an issue", () => {
+    writeHub({
+      talk: TALK,
+      readers: READERS,
+      seats: {
+        infra: {
+          hub_name: "cursor-infra",
+          runtime: "cursor",
+          host: "qa-pc",
+          model: "composer-2.5",
+          room: "k-other-room-not-the-dispatch-one",
+          dispatch: { cursor: DISPATCH_CURSOR, claude_code: DISPATCH_CC },
+        },
+      },
+    });
+    const result = checkHubSeats(root);
+    expect(result.severity).toBe("issue");
+    expect(result.message).toContain("differs from dispatch.cursor.room");
+  });
+
+  it("is green when every cursor runtime seat has a room and every name is a worktree seat", () => {
+    writeHub({
+      talk: TALK,
+      readers: READERS,
+      seats: {
+        planner: {
+          hub_name: "atlas",
+          runtime: "claude-code",
+          host: "desktop",
+          model: "sonnet",
+          dispatch: {
+            cursor: { via: "hub-room", hub_name: "atlas", room: "", waker: "atlas-waker" },
+            claude_code: { via: "session", name: "atlas", host: "desktop" },
+          },
+        },
+        infra: {
+          hub_name: "cursor-infra",
+          runtime: "cursor",
+          host: "qa-pc",
+          model: "composer-2.5",
+          dispatch: { cursor: DISPATCH_CURSOR, claude_code: DISPATCH_CC },
+        },
       },
     });
     expect(checkHubSeats(root).severity).toBe("pass");
