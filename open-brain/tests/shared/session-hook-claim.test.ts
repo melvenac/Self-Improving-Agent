@@ -6,6 +6,7 @@ import { spawnAsync } from "../spawn-async.js";
 import { runClaimBarrierTrials } from "./claim-barrier-trials.js";
 import {
   HOOK_CLAIM_TTL_MS,
+  RECLAIM_LOCK_TTL_MS,
   SWEEP_CAP,
   clearHookClaimsForTest,
   dedupeCursorHookRuns,
@@ -101,6 +102,17 @@ describe("session-hook-claim (T-235 P2-7)", () => {
     expect(tryClaimHookRun(home, "sessionStart", "sweep-cap")).toBe("claimed");
     const remainingStale = readdirSync(dir).filter((n) => n.startsWith("sessionStart-sweepold-") && n.endsWith(".claim"));
     expect(remainingStale.length).toBe(40 - SWEEP_CAP);
+  });
+
+  it("sweep never removes a .breaker lock file even when it is past TTL", () => {
+    const dir = join(home, ".claude", "open-brain", "hook-claims");
+    mkdirSync(dir, { recursive: true });
+    const breaker = join(dir, "sessionStart-target.claim.reclaim.breaker");
+    const stale = (Date.now() - RECLAIM_LOCK_TTL_MS - 5_000) / 1000;
+    writeFileSync(breaker, "breaker\n");
+    utimesSync(breaker, stale, stale);
+    sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, join(dir, "sessionStart-other.claim"));
+    expect(existsSync(breaker)).toBe(true);
   });
 
   it("sweep never removes a .reclaim lock file even when it is past TTL", () => {

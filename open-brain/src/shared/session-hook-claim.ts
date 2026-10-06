@@ -5,7 +5,7 @@ import { detectIde } from "./active-session.js";
 /** T-235 P2-7: dual Cursor + Claude settings hooks can fire twice within milliseconds; legitimate resume is minutes later. */
 export const HOOK_CLAIM_TTL_MS = 120_000;
 
-/** Crashed reclaim locks older than this may be broken; live locks younger than this are never unlinked after stat alone. */
+/** Crashed reclaim / breaker locks older than this may be broken; live locks younger than this are never broken. */
 export const RECLAIM_LOCK_TTL_MS = 60_000;
 
 export type HookClaimEvent = "sessionStart" | "sessionEnd";
@@ -85,53 +85,98 @@ function reclaimLockPath(claimPath: string): string {
   return `${claimPath}.reclaim`;
 }
 
+function reclaimBreakerPath(lockPath: string): string {
+  return `${lockPath}.breaker`;
+}
+
 function isReclaimLockEntry(name: string): boolean {
   return name.endsWith(".reclaim");
 }
 
-/**
- * Break an expired lock by rename-aside, then verify the aside is still the file we inspected.
- * Never unlink a path we only stat'd once (QA 280 F1 / r3 row 5).
- */
-function tryBreakStaleLockFile(lockPath: string, ttlMs: number = RECLAIM_LOCK_TTL_MS): boolean {
-  const before = snapStat(lockPath);
-  if (!before) return false;
-  if (Date.now() - before.mtimeMs <= ttlMs) return false;
-
-  const aside = `${lockPath}.stale-break.${process.pid}`;
-  if (renameExclusive(lockPath, aside) === "lost") return false;
-
-  const asideSnap = snapStat(aside);
-  if (!asideSnap || !sameSnap(before, asideSnap)) {
-    try {
-      unlinkSync(aside);
-    } catch (err) {
-      if (errno(err) !== "ENOENT" && errno(err) !== "EPERM") throw err;
-    }
-    return false;
-  }
-
-  try {
-    unlinkSync(aside);
-  } catch (err) {
-    if (errno(err) !== "ENOENT" && errno(err) !== "EPERM") throw err;
-  }
-  return true;
+function isBreakerLockEntry(name: string): boolean {
+  return name.endsWith(".breaker");
 }
 
-function tryAcquireReclaimLock(lockPath: string): boolean {
-  if (tryCreateClaim(lockPath)) return true;
-  if (tryBreakStaleLockFile(lockPath) && tryCreateClaim(lockPath)) return true;
-  return false;
+function isClaimFileEntry(name: string): boolean {
+  return name.endsWith(".claim");
 }
 
-function releaseReclaimLock(lockPath: string): void {
+/** Test-only seam between stat and destructive act (unset in production hooks). */
+export type ClaimTestSeams = {
+  breakerAfterStatBeforeBreak?: (lockPath: string) => void;
+  sweepAfterStatBeforeRemove?: (claimPath: string) => void;
+};
+
+let claimTestSeams: ClaimTestSeams | undefined;
+
+export function setClaimTestSeamsForTest(seams: ClaimTestSeams | undefined): void {
+  claimTestSeams = seams;
+}
+
+function unlinkQuiet(path: string): void {
   try {
-    unlinkSync(lockPath);
+    unlinkSync(path);
   } catch (err) {
     const code = errno(err);
     if (code !== "ENOENT" && code !== "EPERM" && code !== "EBUSY") throw err;
   }
+}
+
+/**
+ * Break an expired auxiliary wx file (breaker only). Reclaim locks are broken only under a held breaker wx lock.
+ */
+function tryBreakStaleAuxLockFile(lockPath: string, ttlMs: number = RECLAIM_LOCK_TTL_MS): boolean {
+  const before = snapStat(lockPath);
+  if (!before) return false;
+  if (Date.now() - before.mtimeMs <= ttlMs) return false;
+  claimTestSeams?.breakerAfterStatBeforeBreak?.(lockPath);
+  const after = snapStat(lockPath);
+  if (!after || !sameSnap(before, after)) return false;
+  if (Date.now() - after.mtimeMs <= ttlMs) return false;
+  unlinkQuiet(lockPath);
+  return true;
+}
+
+/**
+ * While holding an exclusive wx on lockPath.breaker, remove a stale reclaim lock at lockPath.
+ * Never unlink after stat alone without re-checking the same inode (r5 D1).
+ */
+function breakStaleReclaimLockWhileBreakerHeld(lockPath: string, ttlMs: number = RECLAIM_LOCK_TTL_MS): boolean {
+  const before = snapStat(lockPath);
+  if (!before) return true;
+  if (Date.now() - before.mtimeMs <= ttlMs) return false;
+  claimTestSeams?.breakerAfterStatBeforeBreak?.(lockPath);
+  const after = snapStat(lockPath);
+  if (!after || !sameSnap(before, after)) return false;
+  if (Date.now() - after.mtimeMs <= ttlMs) return false;
+  unlinkQuiet(lockPath);
+  return true;
+}
+
+function tryAcquireBreakerLock(breakerPath: string): boolean {
+  if (tryCreateClaim(breakerPath)) return true;
+  if (tryBreakStaleAuxLockFile(breakerPath) && tryCreateClaim(breakerPath)) return true;
+  return false;
+}
+
+function releaseBreakerLock(breakerPath: string): void {
+  unlinkQuiet(breakerPath);
+}
+
+function tryAcquireReclaimLock(lockPath: string): boolean {
+  if (tryCreateClaim(lockPath)) return true;
+  const breakerPath = reclaimBreakerPath(lockPath);
+  if (!tryAcquireBreakerLock(breakerPath)) return false;
+  try {
+    if (!breakStaleReclaimLockWhileBreakerHeld(lockPath)) return false;
+  } finally {
+    releaseBreakerLock(breakerPath);
+  }
+  return tryCreateClaim(lockPath);
+}
+
+function releaseReclaimLock(lockPath: string): void {
+  unlinkQuiet(lockPath);
 }
 
 /**
@@ -154,23 +199,32 @@ function reclaimStale(path: string, ttlMs: number): "reclaimed" | "duplicate" {
     if (renameExclusive(path, aside) === "lost") return "duplicate";
     try {
       if (Date.now() - statSync(aside).mtimeMs <= ttlMs) {
-        try {
-          unlinkSync(aside);
-        } catch (cleanupErr) {
-          if (errno(cleanupErr) !== "ENOENT" && errno(cleanupErr) !== "EPERM") throw cleanupErr;
-        }
+        unlinkQuiet(aside);
         return "duplicate";
       }
     } catch (err) {
       if (errno(err) === "ENOENT") return "duplicate";
       throw err;
     }
-    try {
-      unlinkSync(aside);
-    } catch (err) {
-      if (errno(err) !== "ENOENT" && errno(err) !== "EPERM") throw err;
-    }
+    unlinkQuiet(aside);
     return "reclaimed";
+  } finally {
+    releaseReclaimLock(lockPath);
+  }
+}
+
+function sweepRemoveExpiredClaimFile(claimPath: string, ttlMs: number): boolean {
+  const lockPath = reclaimLockPath(claimPath);
+  if (!tryAcquireReclaimLock(lockPath)) return false;
+  try {
+    const before = snapStat(claimPath);
+    if (!before || Date.now() - before.mtimeMs <= ttlMs) return false;
+    claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
+    const after = snapStat(claimPath);
+    if (!after || !sameSnap(before, after)) return false;
+    if (Date.now() - after.mtimeMs <= ttlMs) return false;
+    unlinkQuiet(claimPath);
+    return true;
   } finally {
     releaseReclaimLock(lockPath);
   }
@@ -192,12 +246,16 @@ function sweepExpiredClaims(home: string, ttlMs: number, keep: string): void {
   let removed = 0;
   for (const name of names) {
     if (removed >= SWEEP_CAP) break;
-    if (isReclaimLockEntry(name)) continue;
+    if (isReclaimLockEntry(name) || isBreakerLockEntry(name)) continue;
     const p = join(dir, name);
     if (p === keep) continue;
     try {
+      if (isClaimFileEntry(name)) {
+        if (sweepRemoveExpiredClaimFile(p, ttlMs)) removed++;
+        continue;
+      }
       if (now - statSync(p).mtimeMs <= ttlMs) continue;
-      unlinkSync(p);
+      unlinkQuiet(p);
       removed++;
     } catch {
       continue;
@@ -248,7 +306,44 @@ export function sweepExpiredClaimsForTest(home: string, ttlMs: number, keep: str
 
 /** Tests only — break a stale reclaim lock using production logic. */
 export function tryBreakStaleReclaimLockForTest(lockPath: string, ttlMs?: number): boolean {
-  return tryBreakStaleLockFile(lockPath, ttlMs ?? RECLAIM_LOCK_TTL_MS);
+  const breakerPath = reclaimBreakerPath(lockPath);
+  if (!tryAcquireBreakerLock(breakerPath)) return false;
+  try {
+    return breakStaleReclaimLockWhileBreakerHeld(lockPath, ttlMs ?? RECLAIM_LOCK_TTL_MS);
+  } finally {
+    releaseBreakerLock(breakerPath);
+  }
+}
+
+/**
+ * Tests only — r4 rename-aside breaker (QA turn-57 D1 bug shape) for red/green interleave rows.
+ */
+export function tryBreakStaleReclaimLockR4ShapeForTest(lockPath: string, ttlMs?: number): boolean {
+  const ttl = ttlMs ?? RECLAIM_LOCK_TTL_MS;
+  const before = snapStat(lockPath);
+  if (!before) return false;
+  if (Date.now() - before.mtimeMs <= ttl) return false;
+  const aside = `${lockPath}.stale-break.${process.pid}`;
+  if (renameExclusive(lockPath, aside) === "lost") return false;
+  const asideSnap = snapStat(aside);
+  if (!asideSnap || !sameSnap(before, asideSnap)) {
+    unlinkQuiet(aside);
+    return false;
+  }
+  unlinkQuiet(aside);
+  return true;
+}
+
+/** Tests only — r4 sweep stat-then-unlink on a claim path (D2 bug shape). */
+export function sweepRemoveClaimR4ShapeForTest(claimPath: string, ttlMs: number): boolean {
+  try {
+    if (Date.now() - statSync(claimPath).mtimeMs <= ttlMs) return false;
+    claimTestSeams?.sweepAfterStatBeforeRemove?.(claimPath);
+    unlinkQuiet(claimPath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Tests only — remove claim files under an isolated HOME. */
