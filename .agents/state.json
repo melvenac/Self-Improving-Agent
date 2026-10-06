@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 343,
+  "revision": 344,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4336,6 +4336,12 @@
       "title": "Grok bots get read-only GitHub tokens; first-pass results arrive as hub turns and the planner commits them verbatim; Node 22 on the VM",
       "date": "2026-10-06",
       "note": "Planner, s163, on Argus's report relayed by clark (told). A fine-grained token cannot be limited to qa/* branches: contents write reaches master unless a ruleset protects everything else. Least privilege wins over convenience, as A2A D-053 ruled. This amends D-125/D-126: grok-qa-sia and grok-sia-review hold READ-ONLY tokens. grok-qa-sia posts its full first-pass report as hub turns in [atlas, grok-qa-sia]. The planner commits that text VERBATIM to a qa/* branch, plus a header naming the room, the turn numbers and the bot. Opus QA reads that committed file, so the report it reads is the bot's own words, not a planner summary. Rooms have no waker identity: each bot wakes on its own cron. Runtime: SIA is tested on Node 22, and the VM has Node 20.19. The bot runs Node 22 (nvm or a user-local install, no root needed) and states `node --version` in every report; a row run on another major is reported but is not first-pass evidence. The VM has no Docker and no Windows, which matches D-125's MAY NOT list. Revisit the push only if Aaron adds a ruleset protecting everything except qa/**."
+    },
+    {
+      "id": "D-128",
+      "title": "Jev cal 2: QA 286 held; round 2 goes back to the development phase for tool fixes F1-F4 and inputs under Jev's size limit",
+      "date": "2026-10-06",
+      "note": "AUTHORITY: Aaron, planner window s163, 2026-10-06: 'hold QA 286 and send Jev calibration 2 back for the tool fixes and smaller inputs'. Evidence: QA 285 (edad72ab, qa/jev-cal-2-dev-report). 16 of 33 dev requests were refused for size (HTTP 400 max_tokens_exceeded), including 4 of 7 REJECTs; on the 17 answered cases the gate rejected all 17 (BA 0.50, Brier 0.4402 against 0.25, per-row AUC 0.24); and the frozen tools failed: F1 the CLI cannot send live, F2 score.mjs joins on the PR number, F3 the score.mjs CLI crashes in markdown(), F4 every non-2xx is filed as transport with the body dropped. A held-out run now would spend the set on a known failure and lose about half of it to size. The held-out 34 stay UNREAD. Round 2 stays round 2: the brief lets the development set be retried as often as needed, and no policy is frozen until a dev rerun answers every dev case. The builder fixes F1-F4 with tests, plus F6, and makes every input fit (per-row hunks only, with a deterministic pre-send byte ceiling below the observed 97,530-byte answered maximum that refuses an oversize input instead of sending it). Held-out inputs may be checked for SIZE ONLY (no label, no answer). QA then reruns all 33 dev rows live; the planner then freezes the policy from that evidence and writes QA 286."
     }
   ],
   "handoffs": [
