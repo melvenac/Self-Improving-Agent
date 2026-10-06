@@ -6,6 +6,7 @@
   "checks_none": 88,
   "checks_recorded": 0,
   "headline_pool": 71,
+  "heads_unresolved": 0,
   "held_out_candidates": {
     "ACCEPT": 48,
     "REJECT": 20,

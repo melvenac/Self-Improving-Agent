@@ -8,11 +8,12 @@ const CAL2 = join(ROOT, "docs/loops/jev-calibration-2");
 
 type Pool = Record<string, number> & {
   plan_by_source: Record<string, number>;
+  heads_unresolved: number;
   held_out_candidates: { total: number; ACCEPT: number; REJECT: number; with_plan: number; no_plan: number };
 };
 type Case = {
   case_id: string; qa_no: number; label: string | null; candidate_sha: string; plan: string; plan_source: string | null;
-  cal1_seen: boolean; leak_group: boolean; pair: string[]; provenance: string;
+  cal1_seen: boolean; leak_group: boolean; pair: string[]; provenance: string; head_resolved: boolean;
 };
 type Collected = {
   cases: Case[];
@@ -60,6 +61,13 @@ describe("jev-calibration-2/collect.mjs (JEV-CAL-2 r2: one case per PR verdict, 
     expect(col.cases.filter((c) => c.qa_no === 258)).toHaveLength(5);
     const heads = col.cases.map((c) => c.candidate_sha);
     expect(new Set(heads).size).toBe(heads.length);
+  });
+
+  it("a head this checkout does not hold is kept and flagged, so the counts do not depend on the object store", () => {
+    // CI's clone lacks some PR heads that a developer's checkout has; a case dropped for that would change every count.
+    expect(pool.heads_unresolved).toBe(col.cases.filter((c) => !c.head_resolved).length);
+    for (const c of col.cases) expect(c.candidate_sha).toMatch(/^[0-9a-f]{7,40}$/);
+    for (const c of col.cases.filter((x) => x.head_resolved)) expect(c.candidate_sha).toHaveLength(40);
   });
 
   it("the pool is big enough to fill a held-out set of 30 with 12 per verdict (the reason for this round)", () => {

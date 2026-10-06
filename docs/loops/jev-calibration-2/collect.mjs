@@ -181,14 +181,16 @@ export function collectCases(deps, opts = {}) {
     const usable = [];
     for (const row of rows) {
       if (!row.sha) { unresolved.push({ qa_no: n, scope: "case", item: row.items.join("+"), reason: row.head_note ?? "no head named" }); continue; }
-      const sha = commitOf(row.sha);
-      if (sha === null) { unresolved.push({ qa_no: n, scope: "case", item: row.items.join("+"), reason: `head ${row.sha} (${row.sha_from}) is not a commit in this repository` }); continue; }
-      usable.push({ row, sha });
+      // A head this checkout does not hold (a deleted PR branch, a shallow clone) is still the report's verdict on that head:
+      // the case is kept with the head as the report wrote it and `head_resolved: false`, so the pool counts do not
+      // depend on which objects the checkout has. Whoever builds inputs from a case needs the commit and filters on the flag.
+      const full = commitOf(row.sha);
+      usable.push({ row, sha: full ?? row.sha, head_resolved: full !== null });
     }
-    for (const { row, sha } of usable) {
+    for (const { row, sha, head_resolved } of usable) {
       const plan = planFor(row, run, usable.length, deps);
       const leak_hits = plan.derived ? leakHitsFromPlan(plan.derived) : [];
-      raw.push({ qa_no: n, run, row, sha, plan, leak_hits, report: text, skipped_in_report: skipped.length });
+      raw.push({ qa_no: n, run, row, sha, head_resolved, plan, leak_hits, report: text, skipped_in_report: skipped.length });
       entry.cases++;
     }
   }
@@ -218,6 +220,7 @@ export function collectCases(deps, opts = {}) {
       task: r.row.task,
       round: r.row.round,
       candidate_sha: r.sha,
+      head_resolved: r.head_resolved,
       head_from: r.row.sha_from,
       label: r.row.label,
       verdict_text: r.row.verdict_text,
@@ -247,6 +250,7 @@ export function collectCases(deps, opts = {}) {
 
   const isAncestor = (a, b) => git(["merge-base", "--is-ancestor", a, b], { allowFail: true }) !== null;
   for (const c of cases) {
+    if (!c.head_resolved) { c.merged = false; c.merge_commit = null; c.base_sha = null; c.base_how = "head not in this checkout"; continue; }
     const onMaster = isAncestor(c.candidate_sha, "origin/master");
     const merge = onMaster ? git(["rev-list", "-n", "1", "--first-parent", `${c.candidate_sha}..origin/master`], { allowFail: true })?.trim() ?? null : null;
     c.merged = merge !== null && merge !== "";
@@ -277,6 +281,7 @@ export function collectCases(deps, opts = {}) {
     plan: count((c) => c.plan === "plan"),
     no_plan: count((c) => c.plan === "no-plan"),
     plan_by_source: Object.fromEntries(["qa-dispatch-section", "qa-dispatch-whole", "task-brief"].map((s) => [s, count((c) => c.plan_source === s)])),
+    heads_unresolved: count((c) => !c.head_resolved),
     cal1_seen: count((c) => c.cal1_seen),
     cal1_collected_unscored: count((c) => c.cal1_collected_unscored),
     pairs: pairs.length,

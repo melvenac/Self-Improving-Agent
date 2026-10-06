@@ -53,6 +53,7 @@ made one case per report, capped at QA 320, from QA 253.
   before the QA verdict and not before the work; 7 cases have the task's own brief (a brief whose file name starts with the task number, when exactly one does).
 - **The leak group is computed on that plan text**, so a shared dispatch that quotes verdict wording puts every PR of its run in the leak group.
 - **Provenance is read from the report's text** ("runtime-built"); no report says it, so every case is seat-built. It is not the builder's identity.
+- **A head the checkout does not hold** (a deleted PR branch, a shallow clone such as CI's) is kept with the head as the report wrote it and `head_resolved: false`, so the counts do not depend on the object store (checked: with every head unresolvable the counts are identical). Anything that builds inputs from a case needs the commit and filters on that flag; `heads_unresolved` in `pool.json` counts them.
 - **Pairs** group by PR number. A task-level row (a report that names no PR) joins a PR only when its task id belongs to exactly one PR
   across the pool, or a heading the PR leads names that task. Several REJECTs of one PR each pair with the first later ACCEPT.
 - **Same head in two runs** (a narrow re-run): the earliest verdict stands, the later run is listed, and a disagreement is flagged
