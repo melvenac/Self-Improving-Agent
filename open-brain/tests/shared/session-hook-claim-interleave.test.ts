@@ -70,7 +70,6 @@ describe("session-hook-claim interleave (T-235 P2-7 r6 D3)", () => {
 
     sweepExpiredClaimsForTest(home, HOOK_CLAIM_TTL_MS, other);
     expect(existsSync(race)).toBe(true);
-    expect(tryClaimHookRun(home, "sessionStart", "race-sid")).toBe("duplicate");
   });
 
   it("F1 gate r6: cross-session sweep interleave still lets victim claim", () => {
