@@ -1,0 +1,126 @@
+{
+  "calls": 8,
+  "retries": 0,
+  "usage": {
+    "input_tokens": 22469,
+    "output_tokens": 198
+  },
+  "stopReason": null,
+  "summary": [
+    {
+      "case_id": "qa250-t-222",
+      "case_no": 2,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa250-t-222.G_done.2026-10-06T06-20-49.235Z.json",
+      "outcome": "transport",
+      "http": 400,
+      "note": "transport (HTTP 400): developer-done: HTTP 400",
+      "verdict": null,
+      "usage": null,
+      "bytes": 332918
+    },
+    {
+      "case_id": "qa251-t-164",
+      "case_no": 3,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa251-t-164.G_done.2026-10-06T06-20-50.679Z.json",
+      "outcome": "transport",
+      "http": 400,
+      "note": "transport (HTTP 400): developer-done: HTTP 400",
+      "verdict": null,
+      "usage": null,
+      "bytes": 416784
+    },
+    {
+      "case_id": "qa254-t-212",
+      "case_no": 7,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa254-t-212.G_done.2026-10-06T06-20-51.881Z.json",
+      "outcome": "transport",
+      "http": 400,
+      "note": "transport (HTTP 400): developer-done: HTTP 400",
+      "verdict": null,
+      "usage": null,
+      "bytes": 413453
+    },
+    {
+      "case_id": "qa255-pr291",
+      "case_no": 9,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa255-pr291.G_done.2026-10-06T06-20-53.071Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 22469,
+        "output_tokens": 198
+      },
+      "bytes": 68848
+    },
+    {
+      "case_id": "qa255-pr297",
+      "case_no": 10,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa255-pr297.G_done.2026-10-06T06-20-54.198Z.json",
+      "outcome": "transport",
+      "http": 400,
+      "note": "transport (HTTP 400): developer-done: HTTP 400",
+      "verdict": null,
+      "usage": null,
+      "bytes": 184525
+    },
+    {
+      "case_id": "qa255-pr312",
+      "case_no": 11,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa255-pr312.G_done.2026-10-06T06-20-55.259Z.json",
+      "outcome": "transport",
+      "http": 400,
+      "note": "transport (HTTP 400): developer-done: HTTP 400",
+      "verdict": null,
+      "usage": null,
+      "bytes": 134044
+    },
+    {
+      "case_id": "qa256-pr298",
+      "case_no": 13,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa256-pr298.G_done.2026-10-06T06-20-56.321Z.json",
+      "outcome": "transport",
+      "http": 400,
+      "note": "transport (HTTP 400): developer-done: HTTP 400",
+      "verdict": null,
+      "usage": null,
+      "bytes": 329328
+    },
+    {
+      "case_id": "qa256-pr300",
+      "case_no": 14,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa256-pr300.G_done.2026-10-06T06-20-57.522Z.json",
+      "outcome": "transport",
+      "http": 400,
+      "note": "transport (HTTP 400): developer-done: HTTP 400",
+      "verdict": null,
+      "usage": null,
+      "bytes": 239342
+    }
+  ]
+}

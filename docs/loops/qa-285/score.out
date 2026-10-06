@@ -1,0 +1,13 @@
+file:///C:/qa-scratch/qa285-run/docs/loops/jev-calibration-2/score.mjs:267
+  for (const [name, g] of [["Headline set", s.headline], ["Leak-wording group", s.leak_group], ["All scored", s.all_scored], ...Object.entries(s.by_source_kind).map(([k, g]) => [`Source kind: ${k}`, g])]) {
+                                                                                                                                       ^
+
+TypeError: Cannot convert undefined or null to object
+    at Function.entries (<anonymous>)
+    at markdown (file:///C:/qa-scratch/qa285-run/docs/loops/jev-calibration-2/score.mjs:267:136)
+    at file:///C:/qa-scratch/qa285-run/docs/loops/jev-calibration-2/score.mjs:343:44
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.23.2

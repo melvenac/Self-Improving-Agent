@@ -1,0 +1,556 @@
+{
+  "note": "Per-phase scores for calibration 2 round 2 (development vs held-out). Leak-tagged runlist rows are omitted from the four usefulness criteria.",
+  "phases": {
+    "dev": {
+      "summary": {
+        "a_gate_as_built": {
+          "accept_class_rate": null,
+          "accept_proceed": 0,
+          "accept_reject": 0,
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "false_accept_rate": null,
+          "false_reject_rate": null,
+          "n": 0,
+          "other": 0,
+          "reject_class_rate": null,
+          "reject_proceed": 0,
+          "reject_reject": 0
+        },
+        "b_jev_alone_COUNTERFACTUAL": {
+          "accept_class_rate": null,
+          "accept_proceed": 0,
+          "accept_reject": 0,
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "false_accept_rate": null,
+          "false_reject_rate": null,
+          "n": 0,
+          "other": 0,
+          "reject_class_rate": null,
+          "reject_proceed": 0,
+          "reject_reject": 0
+        },
+        "calibration_all_questions": {
+          "bands": [
+            {
+              "band": "<0.7",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            },
+            {
+              "band": "0.7-0.9",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            },
+            {
+              "band": ">=0.9",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            }
+          ],
+          "brier": null,
+          "confident_misses": [],
+          "n": 0
+        },
+        "calibration_driving_questions": {
+          "bands": [
+            {
+              "band": "<0.7",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            },
+            {
+              "band": "0.7-0.9",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            },
+            {
+              "band": ">=0.9",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            }
+          ],
+          "brier": null,
+          "confident_misses": [],
+          "n": 0
+        },
+        "drivers_a": {},
+        "drivers_b": {},
+        "n": 0
+      },
+      "unscored": [
+        {
+          "case_id": "qa250-t-222",
+          "outcome_classes": [
+            "unavailable",
+            "transport"
+          ],
+          "records": 2
+        },
+        {
+          "case_id": "qa251-t-164",
+          "outcome_classes": [
+            "transport"
+          ],
+          "records": 1
+        },
+        {
+          "case_id": "qa254-t-212",
+          "outcome_classes": [
+            "transport"
+          ],
+          "records": 1
+        },
+        {
+          "case_id": "qa255-pr291",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa255-pr297",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa255-pr312",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa256-pr298",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa256-pr300",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa256-pr306",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa257-pr301",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa257-pr313",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa259-pr292",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa259-pr320",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa260-pr298",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa260-pr306",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa261-pr302",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa264-pr371",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa264-pr373",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa267-pr388",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa267-pr391",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa267-pr393",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa268-pr393-r2",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa269-pr397-r2",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa270-pr412",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa270-pr413",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa272-pr415",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa273-pr424",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa275-pr424-r2",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa275-pr437",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa277-pr441",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa277-pr442",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa277-pr451",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa279-pr437-r2",
+          "outcome_classes": [],
+          "records": 0
+        }
+      ],
+      "usefulness": {
+        "balanced_accuracy": null,
+        "brier": null,
+        "brier_baseline": 0.25,
+        "criteria": {
+          "balanced_accuracy_ge_0_75": false,
+          "brier_le_0_20": false,
+          "false_accept_le_0_10": false,
+          "high_conf_ge_0_90_over_10": false
+        },
+        "false_accept_rate": null,
+        "high_conf_fraction_correct": null,
+        "high_conf_n": 0,
+        "useful": false
+      }
+    },
+    "heldout": {
+      "summary": {
+        "a_gate_as_built": {
+          "accept_class_rate": null,
+          "accept_proceed": 0,
+          "accept_reject": 0,
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "false_accept_rate": null,
+          "false_reject_rate": null,
+          "n": 0,
+          "other": 0,
+          "reject_class_rate": null,
+          "reject_proceed": 0,
+          "reject_reject": 0
+        },
+        "b_jev_alone_COUNTERFACTUAL": {
+          "accept_class_rate": null,
+          "accept_proceed": 0,
+          "accept_reject": 0,
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "false_accept_rate": null,
+          "false_reject_rate": null,
+          "n": 0,
+          "other": 0,
+          "reject_class_rate": null,
+          "reject_proceed": 0,
+          "reject_reject": 0
+        },
+        "calibration_all_questions": {
+          "bands": [
+            {
+              "band": "<0.7",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            },
+            {
+              "band": "0.7-0.9",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            },
+            {
+              "band": ">=0.9",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            }
+          ],
+          "brier": null,
+          "confident_misses": [],
+          "n": 0
+        },
+        "calibration_driving_questions": {
+          "bands": [
+            {
+              "band": "<0.7",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            },
+            {
+              "band": "0.7-0.9",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            },
+            {
+              "band": ">=0.9",
+              "correct": 0,
+              "fraction_correct": null,
+              "n": 0
+            }
+          ],
+          "brier": null,
+          "confident_misses": [],
+          "n": 0
+        },
+        "drivers_a": {},
+        "drivers_b": {},
+        "n": 0
+      },
+      "unscored": [
+        {
+          "case_id": "qa251-t-211",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa253-t-209+t-210",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa254-t-208",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa255-pr287",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa256-pr295",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa256-pr303",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa256-pr309",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa257-pr305",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa257-pr308",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa257-pr314",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa259-pr293",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa260-pr295",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa260-pr309",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa264-pr374",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa266-pr376",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa267-pr387",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa269-pr401",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa269-pr402",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa272-pr420",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa272-pr421",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa273-pr421-r2",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa273-pr425",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa275-pr421-r3",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa275-pr427-r2",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa275-pr434",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa275-pr436",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa277-pr427-r3",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa277-pr444",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa277-pr445",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa277-pr446",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa279-pr427-r4",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa279-pr434-r2",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa279-pr444-r3",
+          "outcome_classes": [],
+          "records": 0
+        },
+        {
+          "case_id": "qa279-pr445-r2",
+          "outcome_classes": [],
+          "records": 0
+        }
+      ],
+      "usefulness": {
+        "balanced_accuracy": null,
+        "brier": null,
+        "brier_baseline": 0.25,
+        "criteria": {
+          "balanced_accuracy_ge_0_75": false,
+          "brier_le_0_20": false,
+          "false_accept_le_0_10": false,
+          "high_conf_ge_0_90_over_10": false
+        },
+        "false_accept_rate": null,
+        "high_conf_fraction_correct": null,
+        "high_conf_n": 0,
+        "useful": false
+      }
+    }
+  },
+  "policy": "open-brain/src/harness/policies/developer-done-cal2-r2.json",
+  "spend": {
+    "input_tokens": 351446,
+    "output_tokens": 3762
+  }
+}

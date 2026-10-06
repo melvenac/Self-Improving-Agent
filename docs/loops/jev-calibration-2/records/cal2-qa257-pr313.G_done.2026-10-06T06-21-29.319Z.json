@@ -1,0 +1,684 @@
+{
+  "gate": "developer-done",
+  "loop": "21-qa257-pr313",
+  "mode": "live",
+  "sent": true,
+  "requested_at": "2026-10-06T06:21:29.319Z",
+  "answered_at": "2026-10-06T06:21:29.777Z",
+  "model_requested": "jev-latest",
+  "model_resolved": "jev-1.13.0",
+  "request": {
+    "model": "jev-latest",
+    "questions": {
+      "local_tests_support_claim": {
+        "instructions": "Do the tests in this diff exercise the change it makes, or would they hold whether or not the change is correct? `checks` already carries the exit codes; this question is about what the tests cover, not about their result.",
+        "type": "noul"
+      },
+      "plan_row:T1": {
+        "instructions": "Does the diff meet plan acceptance row \"T1\" (Confined. List the files each PR's own commits touch beyond master.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T10": {
+        "instructions": "Does the diff meet plan acceptance row \"T10\" (npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T11": {
+        "instructions": "Does the diff meet plan acceptance row \"T11\" (git diff master...84e75618 -- open-brain/src is empty.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T12": {
+        "instructions": "Does the diff meet plan acceptance row \"T12\" (Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T13": {
+        "instructions": "Does the diff meet plan acceptance row \"T13\" (policies.test.ts still has a hasPriorFailures: true case.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T14": {
+        "instructions": "Does the diff meet plan acceptance row \"T14\" (#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T15": {
+        "instructions": "Does the diff meet plan acceptance row \"T15\" ((a) no BOM: the output is byte-identical to master's;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T16": {
+        "instructions": "Does the diff meet plan acceptance row \"T16\" ((b) a BOM and markers;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T17": {
+        "instructions": "Does the diff meet plan acceptance row \"T17\" ((c) a BOM and no markers: the region lands after the title, and the BOM stays first.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T18": {
+        "instructions": "Does the diff meet plan acceptance row \"T18\" (#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T19": {
+        "instructions": "Does the diff meet plan acceptance row \"T19\" (#314.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T2": {
+        "instructions": "Does the diff meet plan acceptance row \"T2\" (Red then green. Quote the counts.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T20": {
+        "instructions": "Does the diff meet plan acceptance row \"T20\" (Seed a temp vault with ob-server-x.md: the check warns with the count and path.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T21": {
+        "instructions": "Does the diff meet plan acceptance row \"T21\" (A clean vault passes.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T22": {
+        "instructions": "Does the diff meet plan acceptance row \"T22\" (An absent vault is \"not checked\".), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T23": {
+        "instructions": "Does the diff meet plan acceptance row \"T23\" (It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T24": {
+        "instructions": "Does the diff meet plan acceptance row \"T24\" (Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4).), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T3": {
+        "instructions": "Does the diff meet plan acceptance row \"T3\" (One mutant of your own, plus one of the developer's.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T4": {
+        "instructions": "Does the diff meet plan acceptance row \"T4\" (CI on the head (read only). gh pr checks <n>.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T5": {
+        "instructions": "Does the diff meet plan acceptance row \"T5\" (#301. Its fixture runs the REAL writer:), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T6": {
+        "instructions": "Does the diff meet plan acceptance row \"T6\" (seat B's close-out cannot remove seat A's handoff or session;), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T7": {
+        "instructions": "Does the diff meet plan acceptance row \"T7\" (the seat-keyed mutant goes red.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T8": {
+        "instructions": "Does the diff meet plan acceptance row \"T8\" (Run the record-erasure check on a scratch copy of this repo and quote its line.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "plan_row:T9": {
+        "instructions": "Does the diff meet plan acceptance row \"T9\" (#305, test-only.), using the hunks shown for that row, rather than only adjacent work?",
+        "type": "noul"
+      },
+      "risk_of_regression": {
+        "criteria": [
+          "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+          "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+          "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+        ],
+        "instructions": "How likely is this diff to break a behaviour listed in `plan.preserve`? The order of the levels is the scale.",
+        "type": "score"
+      },
+      "stuck_repeating_prior_failure": {
+        "instructions": "Is this attempt repeating an approach that is listed in `prior_failures` as already tried and failed?",
+        "type": "noul"
+      },
+      "touches_out_of_scope": {
+        "instructions": "Does the diff change anything the plan's `out_of_scope` list excludes?",
+        "type": "noul"
+      }
+    },
+    "state": {
+      "candidate": "1c865761d7feb33cd95dc449c4e57742b1c38bd9",
+      "checks": {
+        "build": {
+          "exit_code": 0
+        },
+        "source": "ci",
+        "unit": {
+          "exit_code": 0
+        }
+      },
+      "diffstat": [
+        "open-brain/src/shared/paths.ts",
+        "open-brain/tests/shared/paths.test.ts"
+      ],
+      "plan": {
+        "acceptance": [
+          {
+            "id": "T1",
+            "observable": "Confined. List the files each PR's own commits touch beyond master.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T2",
+            "observable": "Red then green. Quote the counts.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T3",
+            "observable": "One mutant of your own, plus one of the developer's.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T4",
+            "observable": "CI on the head (read only). gh pr checks <n>.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T5",
+            "observable": "#301. Its fixture runs the REAL writer:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T6",
+            "observable": "seat B's close-out cannot remove seat A's handoff or session;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T7",
+            "observable": "the seat-keyed mutant goes red.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T8",
+            "observable": "Run the record-erasure check on a scratch copy of this repo and quote its line.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T9",
+            "observable": "#305, test-only.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T10",
+            "observable": "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T11",
+            "observable": "git diff master...84e75618 -- open-brain/src is empty.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T12",
+            "observable": "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T13",
+            "observable": "policies.test.ts still has a hasPriorFailures: true case.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T14",
+            "observable": "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:",
+            "type": "blackbox"
+          },
+          {
+            "id": "T15",
+            "observable": "(a) no BOM: the output is byte-identical to master's;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T16",
+            "observable": "(b) a BOM and markers;",
+            "type": "blackbox"
+          },
+          {
+            "id": "T17",
+            "observable": "(c) a BOM and no markers: the region lands after the title, and the BOM stays first.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T18",
+            "observable": "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T19",
+            "observable": "#314.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T20",
+            "observable": "Seed a temp vault with ob-server-x.md: the check warns with the count and path.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T21",
+            "observable": "A clean vault passes.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T22",
+            "observable": "An absent vault is \"not checked\".",
+            "type": "blackbox"
+          },
+          {
+            "id": "T23",
+            "observable": "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.",
+            "type": "blackbox"
+          },
+          {
+            "id": "T24",
+            "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4).",
+            "type": "blackbox"
+          }
+        ],
+        "loop": "21-qa257-pr313",
+        "new_capability": "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)",
+        "objective": "QA 257, batch B3: records, typecheck and small fixes (#301, #305, #308, #313, #314)",
+        "out_of_scope": [],
+        "preserve": [],
+        "reconstructed_by": "jev-calibration-2/dispatch-derive.mjs",
+        "reconstructed_from": {
+          "blob": "afdeb681b142b8824104bebee4109e4871755cf7",
+          "path": "docs/loops/qa-257-b3-misc-dispatch.md"
+        },
+        "repair_targets": [],
+        "tasks": [
+          "Confined. List the files each PR's own commits touch beyond master.",
+          "Red then green. Quote the counts.",
+          "One mutant of your own, plus one of the developer's.",
+          "CI on the head (read only). gh pr checks <n>.",
+          "#301. Its fixture runs the REAL writer:",
+          "seat B's close-out cannot remove seat A's handoff or session;",
+          "the seat-keyed mutant goes red.",
+          "Run the record-erasure check on a scratch copy of this repo and quote its line.",
+          "#305, test-only.",
+          "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names.",
+          "git diff master...84e75618 -- open-brain/src is empty.",
+          "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each.",
+          "policies.test.ts still has a hasPriorFailures: true case.",
+          "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:",
+          "(a) no BOM: the output is byte-identical to master's;",
+          "(b) a BOM and markers;",
+          "(c) a BOM and no markers: the region lands after the title, and the BOM stays first.",
+          "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it.",
+          "#314.",
+          "Seed a temp vault with ob-server-x.md: the check warns with the count and path.",
+          "A clean vault passes.",
+          "An absent vault is \"not checked\".",
+          "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call.",
+          "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4)."
+        ]
+      },
+      "prior_failures": [],
+      "requirement_rows": [
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T1",
+          "observable": "Confined. List the files each PR's own commits touch beyond master."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T2",
+          "observable": "Red then green. Quote the counts."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T3",
+          "observable": "One mutant of your own, plus one of the developer's."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T4",
+          "observable": "CI on the head (read only). gh pr checks <n>."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T5",
+          "observable": "#301. Its fixture runs the REAL writer:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T6",
+          "observable": "seat B's close-out cannot remove seat A's handoff or session;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T7",
+          "observable": "the seat-keyed mutant goes red."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T8",
+          "observable": "Run the record-erasure check on a scratch copy of this repo and quote its line."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T9",
+          "observable": "#305, test-only."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T10",
+          "observable": "npm run typecheck:tests reports exactly 4 errors, all category B, at the files the handoff names."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T11",
+          "observable": "git diff master...84e75618 -- open-brain/src is empty."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T12",
+          "observable": "Pick 5 of the 18 changed test files and confirm each change is type-only, with no assertion weakened. Quote each."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T13",
+          "observable": "policies.test.ts still has a hasPriorFailures: true case."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T14",
+          "observable": "#308, HIGH impact. On a scratch copy of the repo, run ob_state render-only (an empty ops list with render: true, via the CLI if the MCP is unavailable) against a SUMMARY.md that has:"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T15",
+          "observable": "(a) no BOM: the output is byte-identical to master's;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T16",
+          "observable": "(b) a BOM and markers;"
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T17",
+          "observable": "(c) a BOM and no markers: the region lands after the title, and the BOM stays first."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T18",
+          "observable": "#313. git grep -n knowledgeDb over open-brain/src, open-brain/tests, open-brain/scripts, scripts/ and .claude/ is empty (fixtures-import excluded). Quote it."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T19",
+          "observable": "#314."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T20",
+          "observable": "Seed a temp vault with ob-server-x.md: the check warns with the count and path."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T21",
+          "observable": "A clean vault passes."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T22",
+          "observable": "An absent vault is \"not checked\"."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T23",
+          "observable": "It resolves through obsidianVaultDir() (v2), not the retired v1 vault. Show the call."
+        },
+        {
+          "hunks": [
+            "diff --git a/open-brain/src/shared/paths.ts b/open-brain/src/shared/paths.ts\nindex f676b8c8..9f502a36 100644\n--- a/open-brain/src/shared/paths.ts\n+++ b/open-brain/src/shared/paths.ts\n@@ -89,7 +89,6 @@ export interface ResolvedPaths {\n   claudeMd: string;\n   settingsJson: string;\n   obsidianVault: string;\n-  knowledgeDb: string;\n   knowledgeV2Db: string;\n   scoreHistory: string;\n   shadowLog: string;\n@@ -107,11 +106,6 @@ export function resolvePaths(projectRoot: string): ResolvedPaths {\n     claudeMd: join(projectRoot, \"CLAUDE.md\"),\n     settingsJson: join(home, \".claude\", \"settings.json\"),\n     obsidianVault: obsidianVaultDir(home),\n-    // NOTE: this is the legacy v1 knowledge.db, still read by the cli.ts scoring\n-    // path. The MCP server scores against knowledge-v2.db. Porting cli.ts to v2\n-    // is tracked separately — do not repoint this without migrating that caller,\n-    // which expects the v1 schema via createDb().\n-    knowledgeDb: join(home, \".claude\", \"context-mode\", \"knowledge.db\"),\n     // The live v2 database. Both the MCP server and the CLI score against this;\n     // they previously read different databases and reported different scores.\n     knowledgeV2Db: process.env.KNOWLEDGE_V2_DB\ndiff --git a/open-brain/tests/shared/paths.test.ts b/open-brain/tests/shared/paths.test.ts\nindex bba49ae0..73c45b7d 100644\n--- a/open-brain/tests/shared/paths.test.ts\n+++ b/open-brain/tests/shared/paths.test.ts\n@@ -51,7 +51,9 @@ describe(\"resolvePaths\", () => {\n \n   it(\"resolves home-relative paths\", () => {\n     const paths = resolvePaths(process.cwd());\n-    expect(paths.knowledgeDb).toContain(\"knowledge.db\");\n+    // T-065: the retired v1 database has no path in the resolved set; the live one is knowledgeV2Db.\n+    expect(Object.keys(paths)).not.toContain(\"know\" + \"ledgeDb\");\n+    expect(paths.knowledgeV2Db).toContain(\"knowledge-v2.db\");\n     expect(paths.scoreHistory).toContain(\"score-history.jsonl\");\n     expect(paths.settingsJson).toContain(\"settings.json\");\n   });\n"
+          ],
+          "id": "T24",
+          "observable": "Batch merge order. On a scratch branch from origin/master, merge in this order: #308, #301, #313, #314, #305. - Report every conflict, and stop on one. - On the merged result, run the touched test files one per invocation, tsc --noEmit and typecheck:tests (still 4)."
+        }
+      ],
+      "scored_diff": {
+        "base_sha": "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
+        "merge_commit": "55d7f18f56d7a0a331364c1dc779cabf001a5e49",
+        "pr": 313,
+        "scored_sha": "1c865761d7feb33cd95dc449c4e57742b1c38bd9"
+      }
+    }
+  },
+  "answer": {
+    "local_tests_support_claim": {
+      "type": "noul",
+      "noul": 0.85
+    },
+    "plan_row:T1": {
+      "type": "noul",
+      "noul": 0.61
+    },
+    "plan_row:T10": {
+      "type": "noul",
+      "noul": 0.29
+    },
+    "plan_row:T11": {
+      "type": "noul",
+      "noul": 0.43
+    },
+    "plan_row:T12": {
+      "type": "noul",
+      "noul": 0.15
+    },
+    "plan_row:T13": {
+      "type": "noul",
+      "noul": 0.22
+    },
+    "plan_row:T14": {
+      "type": "noul",
+      "noul": 0.15
+    },
+    "plan_row:T15": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "plan_row:T16": {
+      "type": "noul",
+      "noul": 0.17
+    },
+    "plan_row:T17": {
+      "type": "noul",
+      "noul": 0.17
+    },
+    "plan_row:T18": {
+      "type": "noul",
+      "noul": 0.52
+    },
+    "plan_row:T19": {
+      "type": "noul",
+      "noul": 0.24
+    },
+    "plan_row:T2": {
+      "type": "noul",
+      "noul": 0.36
+    },
+    "plan_row:T20": {
+      "type": "noul",
+      "noul": 0.21
+    },
+    "plan_row:T21": {
+      "type": "noul",
+      "noul": 0.29
+    },
+    "plan_row:T22": {
+      "type": "noul",
+      "noul": 0.2
+    },
+    "plan_row:T23": {
+      "type": "noul",
+      "noul": 0.52
+    },
+    "plan_row:T24": {
+      "type": "noul",
+      "noul": 0.15
+    },
+    "plan_row:T3": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "plan_row:T4": {
+      "type": "noul",
+      "noul": 0.41
+    },
+    "plan_row:T5": {
+      "type": "noul",
+      "noul": 0.19
+    },
+    "plan_row:T6": {
+      "type": "noul",
+      "noul": 0.11
+    },
+    "plan_row:T7": {
+      "type": "noul",
+      "noul": 0.18
+    },
+    "plan_row:T8": {
+      "type": "noul",
+      "noul": 0.17
+    },
+    "plan_row:T9": {
+      "type": "noul",
+      "noul": 0.46
+    },
+    "risk_of_regression": {
+      "type": "score",
+      "score": 0.11,
+      "confidence": 0.84,
+      "legend": {
+        "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+        "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+        "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+      },
+      "probabilities": {
+        "0": 0.91,
+        "1": 0.07,
+        "2": 0.02
+      }
+    },
+    "stuck_repeating_prior_failure": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "touches_out_of_scope": {
+      "type": "noul",
+      "noul": 0.13
+    }
+  },
+  "usage": {
+    "input_tokens": 20119,
+    "output_tokens": 554
+  },
+  "decision": {
+    "gate": "developer-done",
+    "verdict": "reject",
+    "reasons": [
+      "plan_row:T1 0.61 is below the required 0.7",
+      "plan_row:T2 0.36 is below the required 0.7",
+      "plan_row:T3 0.18 is below the required 0.7",
+      "plan_row:T4 0.41 is below the required 0.7",
+      "plan_row:T5 0.19 is below the required 0.7",
+      "plan_row:T6 0.11 is below the required 0.7",
+      "plan_row:T7 0.18 is below the required 0.7",
+      "plan_row:T8 0.17 is below the required 0.7",
+      "plan_row:T9 0.46 is below the required 0.7",
+      "plan_row:T10 0.29 is below the required 0.7",
+      "plan_row:T11 0.43 is below the required 0.7",
+      "plan_row:T12 0.15 is below the required 0.7",
+      "plan_row:T13 0.22 is below the required 0.7",
+      "plan_row:T14 0.15 is below the required 0.7",
+      "plan_row:T15 0.18 is below the required 0.7",
+      "plan_row:T16 0.17 is below the required 0.7",
+      "plan_row:T17 0.17 is below the required 0.7",
+      "plan_row:T18 0.52 is below the required 0.7",
+      "plan_row:T19 0.24 is below the required 0.7",
+      "plan_row:T20 0.21 is below the required 0.7",
+      "plan_row:T21 0.29 is below the required 0.7",
+      "plan_row:T22 0.2 is below the required 0.7",
+      "plan_row:T23 0.52 is below the required 0.7",
+      "plan_row:T24 0.15 is below the required 0.7"
+    ],
+    "applied": {
+      "diff_matches_plan_min": 0.7,
+      "touches_out_of_scope_max": 0.3,
+      "local_tests_support_claim_min": 0.6,
+      "stuck_repeating_prior_failure_max": 0.6,
+      "risk_of_regression_rollback_at_or_above": 1.5,
+      "hand_to_qa_requires_green_checks": true
+    },
+    "missing": [],
+    "notApplicable": []
+  },
+  "runtime_action": "shadow: recorded only; no outcome was changed",
+  "note": "",
+  "source": "seat",
+  "plan_provenance": "written-before",
+  "attempt_id": "70e568c0-e723-461b-b73d-ec12a64459e5",
+  "subject": {
+    "gate": "developer-done",
+    "key": "1c865761d7feb33cd95dc449c4e57742b1c38bd9",
+    "blob": "2fd43f4933e1f6652f7ce596a5f93b33a15c08403c2410913bb58311828c478c"
+  },
+  "attempt": 1,
+  "retry_of": null,
+  "outcome_class": "answered",
+  "attempted_at": "2026-10-06T06:21:29.319Z",
+  "policy_hash": "d632dd9b4c7d252b8fb3862316c29d7a893ab32fcc139cf4c94fbedd7a8d7c53",
+  "pr": 313,
+  "merge_commit": "55d7f18f56d7a0a331364c1dc779cabf001a5e49",
+  "scored_sha": "1c865761d7feb33cd95dc449c4e57742b1c38bd9",
+  "base_sha": "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
+  "dt": {
+    "path": "docs/loops/jev-calibration-2/inputs/021-qa257-pr313.G_done-request.json",
+    "blob": "d5feeed8b217e5b353101ce8518ed7c7d4c8b17c"
+  },
+  "checks_source": "ci",
+  "checks_passed": true,
+  "diffstat": [
+    "open-brain/src/shared/paths.ts",
+    "open-brain/tests/shared/paths.test.ts"
+  ]
+}

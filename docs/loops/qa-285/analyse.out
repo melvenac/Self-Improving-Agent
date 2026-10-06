@@ -1,0 +1,474 @@
+{
+ "as_committed": {
+  "dev_n": 0,
+  "dev_unscored": 33,
+  "heldout_n": 0
+ },
+ "usefulness": {
+  "balanced_accuracy": 0.5,
+  "false_accept_rate": 0,
+  "brier": 0.4402,
+  "brier_baseline": 0.25,
+  "high_conf_n": 10,
+  "high_conf_fraction_correct": 0.5,
+  "criteria": {
+   "balanced_accuracy_ge_0_75": false,
+   "false_accept_le_0_10": true,
+   "brier_le_0_20": false,
+   "high_conf_ge_0_90_over_10": false
+  },
+  "useful": false
+ },
+ "a": {
+  "n": 17,
+  "accept_proceed": 0,
+  "accept_reject": 14,
+  "reject_proceed": 0,
+  "reject_reject": 3,
+  "other": 0,
+  "accuracy": 0.1765,
+  "accept_class_rate": 0,
+  "reject_class_rate": 1,
+  "balanced_accuracy": 0.5,
+  "false_accept_rate": 0,
+  "false_reject_rate": 1
+ },
+ "b": {
+  "n": 17,
+  "accept_proceed": 0,
+  "accept_reject": 14,
+  "reject_proceed": 0,
+  "reject_reject": 3,
+  "other": 0,
+  "accuracy": 0.1765,
+  "accept_class_rate": 0,
+  "reject_class_rate": 1,
+  "balanced_accuracy": 0.5,
+  "false_accept_rate": 0,
+  "false_reject_rate": 1
+ },
+ "cal_driving": {
+  "n": 138,
+  "brier": 0.4402,
+  "bands": [
+   {
+    "band": "<0.7",
+    "n": 40,
+    "correct": 17,
+    "fraction_correct": 0.425
+   },
+   {
+    "band": "0.7-0.9",
+    "n": 88,
+    "correct": 24,
+    "fraction_correct": 0.2727
+   },
+   {
+    "band": ">=0.9",
+    "n": 10,
+    "correct": 5,
+    "fraction_correct": 0.5
+   }
+  ],
+  "confident_misses": [
+   {
+    "case_id": "qa264-pr371",
+    "question": "plan_row:T4",
+    "p": 0.07,
+    "stance": "REJECT",
+    "label": "ACCEPT"
+   },
+   {
+    "case_id": "qa267-pr388",
+    "question": "plan_row:T10",
+    "p": 0.06,
+    "stance": "REJECT",
+    "label": "ACCEPT"
+   },
+   {
+    "case_id": "qa267-pr388",
+    "question": "plan_row:T9",
+    "p": 0.07,
+    "stance": "REJECT",
+    "label": "ACCEPT"
+   },
+   {
+    "case_id": "qa275-pr424-r2",
+    "question": "plan_row:T2",
+    "p": 0.09,
+    "stance": "REJECT",
+    "label": "ACCEPT"
+   },
+   {
+    "case_id": "qa275-pr424-r2",
+    "question": "plan_row:T3",
+    "p": 0.09,
+    "stance": "REJECT",
+    "label": "ACCEPT"
+   }
+  ]
+ },
+ "cal_all": {
+  "n": 138,
+  "brier": 0.4402,
+  "bands": [
+   {
+    "band": "<0.7",
+    "n": 40,
+    "correct": 17,
+    "fraction_correct": 0.425
+   },
+   {
+    "band": "0.7-0.9",
+    "n": 88,
+    "correct": 24,
+    "fraction_correct": 0.2727
+   },
+   {
+    "band": ">=0.9",
+    "n": 10,
+    "correct": 5,
+    "fraction_correct": 0.5
+   }
+  ],
+  "cm": 5
+ },
+ "drivers_a": {
+  "plan_row:T183-1": 1,
+  "plan_row:T183-2": 1,
+  "plan_row:T183-3": 1,
+  "plan_row:T183-4": 1,
+  "plan_row:T1": 13,
+  "plan_row:T2": 14,
+  "plan_row:T3": 14,
+  "plan_row:T4": 15,
+  "plan_row:T7": 4,
+  "plan_row:T8": 4,
+  "plan_row:T9": 3,
+  "plan_row:T10": 3,
+  "plan_row:T11": 3,
+  "plan_row:T12": 2,
+  "plan_row:T13": 2,
+  "plan_row:T14": 2,
+  "plan_row:T15": 2,
+  "plan_row:T16": 2,
+  "plan_row:T17": 2,
+  "plan_row:T18": 2,
+  "plan_row:T19": 2,
+  "plan_row:T20": 2,
+  "plan_row:T21": 2,
+  "plan_row:T22": 2,
+  "plan_row:T23": 2,
+  "plan_row:T24": 2,
+  "plan_row:T5": 3,
+  "plan_row:T6": 3,
+  "local_tests_support_claim": 1
+ },
+ "drivers_b": {
+  "plan_row:T183-1": 1,
+  "plan_row:T183-2": 1,
+  "plan_row:T183-3": 1,
+  "plan_row:T183-4": 1,
+  "plan_row:T1": 13,
+  "plan_row:T2": 14,
+  "plan_row:T3": 14,
+  "plan_row:T4": 15,
+  "plan_row:T7": 4,
+  "plan_row:T8": 4,
+  "plan_row:T9": 3,
+  "plan_row:T10": 3,
+  "plan_row:T11": 3,
+  "plan_row:T12": 2,
+  "plan_row:T13": 2,
+  "plan_row:T14": 2,
+  "plan_row:T15": 2,
+  "plan_row:T16": 2,
+  "plan_row:T17": 2,
+  "plan_row:T18": 2,
+  "plan_row:T19": 2,
+  "plan_row:T20": 2,
+  "plan_row:T21": 2,
+  "plan_row:T22": 2,
+  "plan_row:T23": 2,
+  "plan_row:T24": 2,
+  "plan_row:T5": 3,
+  "plan_row:T6": 3,
+  "local_tests_support_claim": 1
+ },
+ "unscored": [
+  {
+   "case_id": "qa250-t-222",
+   "records": 2,
+   "outcome_classes": [
+    "unavailable",
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa251-t-164",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa254-t-212",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa255-pr297",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa255-pr312",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa256-pr298",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa256-pr300",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa256-pr306",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa259-pr292",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa259-pr320",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa260-pr298",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa260-pr306",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa261-pr302",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa264-pr373",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa267-pr391",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  },
+  {
+   "case_id": "qa267-pr393",
+   "records": 1,
+   "outcome_classes": [
+    "transport"
+   ]
+  }
+ ],
+ "spend": {
+  "input_tokens": 351446,
+  "output_tokens": 3762
+ },
+ "per_row": {
+  "ACCEPT": {
+   "n": 109,
+   "min": 0.06,
+   "p25": 0.16,
+   "median": 0.22,
+   "p75": 0.45,
+   "max": 0.94,
+   "mean": 0.3239,
+   "lt_0_5": 85,
+   "0_5_to_0_7": 14,
+   "ge_0_7": 10
+  },
+  "REJECT": {
+   "n": 12,
+   "min": 0.12,
+   "p25": 0.21,
+   "median": 0.31,
+   "p75": 0.63,
+   "max": 0.89,
+   "mean": 0.4317,
+   "lt_0_5": 8,
+   "0_5_to_0_7": 2,
+   "ge_0_7": 2
+  }
+ },
+ "auc": {
+  "combined_row_min": 0.2381,
+  "combined_row_mean": 0.3333,
+  "per_row_pooled": 0.3467,
+  "touches_inverted": 0.2143,
+  "n_accept": 14,
+  "n_reject": 3
+ },
+ "fitted": {
+  "parameter": "requirement_row_min_noul (other terms frozen)",
+  "a_gate_as_built": {
+   "max_ba": 0.5357,
+   "cuts": [
+    {
+     "t": 0.45,
+     "ba": 0.5357,
+     "accept_proceed": 1,
+     "n_accept": 14,
+     "reject_reject": 3,
+     "n_reject": 3,
+     "far": 0
+    },
+    {
+     "t": 0.55,
+     "ba": 0.5357,
+     "accept_proceed": 1,
+     "n_accept": 14,
+     "reject_reject": 3,
+     "n_reject": 3,
+     "far": 0
+    }
+   ]
+  },
+  "b_jev_alone_COUNTERFACTUAL": {
+   "max_ba": 0.5357,
+   "cuts": [
+    {
+     "t": 0.45,
+     "ba": 0.5357,
+     "accept_proceed": 1,
+     "n_accept": 14,
+     "reject_reject": 3,
+     "n_reject": 3,
+     "far": 0
+    },
+    {
+     "t": 0.55,
+     "ba": 0.5357,
+     "accept_proceed": 1,
+     "n_accept": 14,
+     "reject_reject": 3,
+     "n_reject": 3,
+     "far": 0
+    }
+   ]
+  },
+  "frozen_value": 0.7,
+  "row_min_alone": {
+   "max_ba": 0.5357,
+   "cuts": [
+    {
+     "t": 0.45,
+     "ba": 0.5357,
+     "accept_proceed": 1,
+     "n_accept": 14,
+     "reject_reject": 3,
+     "n_reject": 3,
+     "far": 0
+    },
+    {
+     "t": 0.55,
+     "ba": 0.5357,
+     "accept_proceed": 1,
+     "n_accept": 14,
+     "reject_reject": 3,
+     "n_reject": 3,
+     "far": 0
+    }
+   ]
+  }
+ }
+}
+qa250-t-222 ACCEPT UNANSWERED bytes 332918 no fetch implementation for live frozen request | transport (HTTP 400): developer-done: HTTP 400
+qa251-t-164 ACCEPT UNANSWERED bytes 416784 transport (HTTP 400): developer-done: HTTP 400
+qa254-t-212 ACCEPT UNANSWERED bytes 413453 transport (HTTP 400): developer-done: HTTP 400
+qa255-pr291 ACCEPT checks ci/true rows [0.35,0.52,0.51,0.17,0.92] min 0.17 touches 0.21 tests 0.88 stuck 0.04 risk 0.11 built reject
+qa255-pr297 ACCEPT UNANSWERED bytes 184525 transport (HTTP 400): developer-done: HTTP 400
+qa255-pr312 ACCEPT UNANSWERED bytes 134044 transport (HTTP 400): developer-done: HTTP 400
+qa256-pr298 REJECT UNANSWERED bytes 329328 transport (HTTP 400): developer-done: HTTP 400
+qa256-pr300 ACCEPT UNANSWERED bytes 239342 transport (HTTP 400): developer-done: HTTP 400
+qa256-pr306 REJECT UNANSWERED bytes 330476 transport (HTTP 400): developer-done: HTTP 400
+qa257-pr301 ACCEPT checks ci/true rows [0.43,0.26,0.14,0.25,0.7,0.83,0.32,0.12,0.36,0.22,0.52,0.12,0.18,0.13,0.16,0.14,0.14,0.17,0.15,0.16,0.16,0.18,0.11,0.12] min 0.11 touches 0.13 tests 0.76 stuck 0.05 risk 0.01 built reject
+qa257-pr313 ACCEPT checks ci/true rows [0.61,0.36,0.18,0.41,0.19,0.11,0.18,0.17,0.46,0.29,0.43,0.15,0.22,0.15,0.18,0.17,0.17,0.52,0.24,0.21,0.29,0.2,0.52,0.15] min 0.11 touches 0.13 tests 0.85 stuck 0.05 risk 0.11 built reject
+qa259-pr292 ACCEPT UNANSWERED bytes 205526 transport (HTTP 400): developer-done: HTTP 400
+qa259-pr320 ACCEPT UNANSWERED bytes 206169 transport (HTTP 400): developer-done: HTTP 400
+qa260-pr298 REJECT UNANSWERED bytes 243434 transport (HTTP 400): developer-done: HTTP 400
+qa260-pr306 ACCEPT UNANSWERED bytes 244775 transport (HTTP 400): developer-done: HTTP 400
+qa261-pr302 ACCEPT UNANSWERED bytes 315343 transport (HTTP 400): developer-done: HTTP 400
+qa264-pr371 ACCEPT checks ci/true rows [0.28,0.9,0.94,0.07,0.92,0.4,0.36,0.2] min 0.07 touches 0.2 tests 0.64 stuck 0.04 risk 0.01 built reject
+qa264-pr373 ACCEPT UNANSWERED bytes 177367 transport (HTTP 400): developer-done: HTTP 400
+qa267-pr388 ACCEPT checks ci/true rows [0.54,0.32,0.13,0.19,0.12,0.16,0.16,0.12,0.07,0.06,0.17] min 0.06 touches 0.17 tests 0.77 stuck 0.05 risk 0.01 built reject
+qa267-pr391 ACCEPT UNANSWERED bytes 197866 transport (HTTP 400): developer-done: HTTP 400
+qa267-pr393 REJECT UNANSWERED bytes 197952 transport (HTTP 400): developer-done: HTTP 400
+qa268-pr393-r2 ACCEPT checks ci/true rows [0.55,0.77,0.9,0.64] min 0.55 touches 0.19 tests 0.71 stuck 0.05 risk 0.13 built reject
+qa269-pr397-r2 ACCEPT checks ci/true rows [0.67,0.34,0.17,0.21] min 0.17 touches 0.19 tests 0.88 stuck 0.04 risk 0.09 built reject
+qa270-pr412 ACCEPT checks ci/true rows [0.45,0.43,0.21,0.25] min 0.21 touches 0.17 tests 0.88 stuck 0.04 risk 0.16 built reject
+qa270-pr413 ACCEPT checks ci/true rows [0.47,0.32,0.15,0.19] min 0.15 touches 0.2 tests 0.64 stuck 0.04 risk 0.08 built reject
+qa272-pr415 ACCEPT checks ci/true rows [0.65,0.35,0.22,0.29,0.11] min 0.11 touches 0.15 tests 0.86 stuck 0.04 risk 0.14 built reject
+qa273-pr424 REJECT checks ci/true rows [0.63,0.31,0.26,0.25] min 0.25 touches 0.16 tests 0.87 stuck 0.04 risk 0.08 built reject
+qa275-pr424-r2 ACCEPT checks ci/true rows [0.19,0.09,0.09,0.11] min 0.09 touches 0.17 tests 0.81 stuck 0.04 risk 0.03 built reject
+qa275-pr437 REJECT checks ci/true rows [0.75,0.21,0.12,0.21] min 0.12 touches 0.16 tests 0.85 stuck 0.04 risk 0.12 built reject
+qa277-pr441 ACCEPT checks ci/true rows [0.75,0.63,0.22,0.5] min 0.22 touches 0.19 tests 0.73 stuck 0.04 risk 0.01 built reject
+qa277-pr442 ACCEPT checks ci/true rows [0.49,0.34,0.13,0.32] min 0.13 touches 0.2 tests 0.59 stuck 0.05 risk 0.06 built reject
+qa277-pr451 ACCEPT checks ci/true rows [0.76,0.55,0.16,0.43] min 0.16 touches 0.2 tests 0.8 stuck 0.04 risk 0.12 built reject
+qa279-pr437-r2 REJECT checks ci/true rows [0.45,0.65,0.45,0.89] min 0.45 touches 0.16 tests 0.74 stuck 0.05 risk 0.05 built reject
+(b) qa255-pr291 ACCEPT: plan_row:T183-1 0.35 is below the required 0.7 ; plan_row:T183-2 0.52 is below the required 0.7 ; plan_row:T183-3 0.51 is below the required 0.7 ; plan_row:T183-4 0.17 is below the required 0.7
+(b) qa257-pr301 ACCEPT: plan_row:T1 0.43 is below the required 0.7 ; plan_row:T2 0.26 is below the required 0.7 ; plan_row:T3 0.14 is below the required 0.7 ; plan_row:T4 0.25 is below the required 0.7 ; plan_row:T7 0.32 is below the required 0.7 ; plan_row:T8 0.12 is below the required 0.7 ; plan_row:T9 0.36 is below the required 0.7 ; plan_row:T10 0.22 is below the required 0.7 ; plan_row:T11 0.52 is below the required 0.7 ; plan_row:T12 0.12 is below the required 0.7 ; plan_row:T13 0.18 is below the required 0.7 ; plan_row:T14 0.13 is below the required 0.7 ; plan_row:T15 0.16 is below the required 0.7 ; plan_row:T16 0.14 is below the required 0.7 ; plan_row:T17 0.14 is below the required 0.7 ; plan_row:T18 0.17 is below the required 0.7 ; plan_row:T19 0.15 is below the required 0.7 ; plan_row:T20 0.16 is below the required 0.7 ; plan_row:T21 0.16 is below the required 0.7 ; plan_row:T22 0.18 is below the required 0.7 ; plan_row:T23 0.11 is below the required 0.7 ; plan_row:T24 0.12 is below the required 0.7
+(b) qa257-pr313 ACCEPT: plan_row:T1 0.61 is below the required 0.7 ; plan_row:T2 0.36 is below the required 0.7 ; plan_row:T3 0.18 is below the required 0.7 ; plan_row:T4 0.41 is below the required 0.7 ; plan_row:T5 0.19 is below the required 0.7 ; plan_row:T6 0.11 is below the required 0.7 ; plan_row:T7 0.18 is below the required 0.7 ; plan_row:T8 0.17 is below the required 0.7 ; plan_row:T9 0.46 is below the required 0.7 ; plan_row:T10 0.29 is below the required 0.7 ; plan_row:T11 0.43 is below the required 0.7 ; plan_row:T12 0.15 is below the required 0.7 ; plan_row:T13 0.22 is below the required 0.7 ; plan_row:T14 0.15 is below the required 0.7 ; plan_row:T15 0.18 is below the required 0.7 ; plan_row:T16 0.17 is below the required 0.7 ; plan_row:T17 0.17 is below the required 0.7 ; plan_row:T18 0.52 is below the required 0.7 ; plan_row:T19 0.24 is below the required 0.7 ; plan_row:T20 0.21 is below the required 0.7 ; plan_row:T21 0.29 is below the required 0.7 ; plan_row:T22 0.2 is below the required 0.7 ; plan_row:T23 0.52 is below the required 0.7 ; plan_row:T24 0.15 is below the required 0.7
+(b) qa264-pr371 ACCEPT: plan_row:T1 0.28 is below the required 0.7 ; plan_row:T4 0.07 is below the required 0.7 ; plan_row:T6 0.4 is below the required 0.7 ; plan_row:T7 0.36 is below the required 0.7 ; plan_row:T8 0.2 is below the required 0.7
+(b) qa267-pr388 ACCEPT: plan_row:T1 0.54 is below the required 0.7 ; plan_row:T2 0.32 is below the required 0.7 ; plan_row:T3 0.13 is below the required 0.7 ; plan_row:T4 0.19 is below the required 0.7 ; plan_row:T5 0.12 is below the required 0.7 ; plan_row:T6 0.16 is below the required 0.7 ; plan_row:T7 0.16 is below the required 0.7 ; plan_row:T8 0.12 is below the required 0.7 ; plan_row:T9 0.07 is below the required 0.7 ; plan_row:T10 0.06 is below the required 0.7 ; plan_row:T11 0.17 is below the required 0.7
+(b) qa268-pr393-r2 ACCEPT: plan_row:T1 0.55 is below the required 0.7 ; plan_row:T4 0.64 is below the required 0.7
+(b) qa269-pr397-r2 ACCEPT: plan_row:T1 0.67 is below the required 0.7 ; plan_row:T2 0.34 is below the required 0.7 ; plan_row:T3 0.17 is below the required 0.7 ; plan_row:T4 0.21 is below the required 0.7
+(b) qa270-pr412 ACCEPT: plan_row:T1 0.45 is below the required 0.7 ; plan_row:T2 0.43 is below the required 0.7 ; plan_row:T3 0.21 is below the required 0.7 ; plan_row:T4 0.25 is below the required 0.7
+(b) qa270-pr413 ACCEPT: plan_row:T1 0.47 is below the required 0.7 ; plan_row:T2 0.32 is below the required 0.7 ; plan_row:T3 0.15 is below the required 0.7 ; plan_row:T4 0.19 is below the required 0.7
+(b) qa272-pr415 ACCEPT: plan_row:T1 0.65 is below the required 0.7 ; plan_row:T2 0.35 is below the required 0.7 ; plan_row:T3 0.22 is below the required 0.7 ; plan_row:T4 0.29 is below the required 0.7 ; plan_row:T5 0.11 is below the required 0.7
+(b) qa273-pr424 REJECT: plan_row:T1 0.63 is below the required 0.7 ; plan_row:T2 0.31 is below the required 0.7 ; plan_row:T3 0.26 is below the required 0.7 ; plan_row:T4 0.25 is below the required 0.7
+(b) qa275-pr424-r2 ACCEPT: plan_row:T1 0.19 is below the required 0.7 ; plan_row:T2 0.09 is below the required 0.7 ; plan_row:T3 0.09 is below the required 0.7 ; plan_row:T4 0.11 is below the required 0.7
+(b) qa275-pr437 REJECT: plan_row:T2 0.21 is below the required 0.7 ; plan_row:T3 0.12 is below the required 0.7 ; plan_row:T4 0.21 is below the required 0.7
+(b) qa277-pr441 ACCEPT: plan_row:T2 0.63 is below the required 0.7 ; plan_row:T3 0.22 is below the required 0.7 ; plan_row:T4 0.5 is below the required 0.7
+(b) qa277-pr442 ACCEPT: plan_row:T1 0.49 is below the required 0.7 ; plan_row:T2 0.34 is below the required 0.7 ; plan_row:T3 0.13 is below the required 0.7 ; plan_row:T4 0.32 is below the required 0.7 ; local_tests_support_claim 0.59 is below the required 0.6
+(b) qa277-pr451 ACCEPT: plan_row:T2 0.55 is below the required 0.7 ; plan_row:T3 0.16 is below the required 0.7 ; plan_row:T4 0.43 is below the required 0.7
+(b) qa279-pr437-r2 REJECT: plan_row:T1 0.45 is below the required 0.7 ; plan_row:T2 0.65 is below the required 0.7 ; plan_row:T3 0.45 is below the required 0.7

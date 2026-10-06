@@ -1,0 +1,229 @@
+{
+  "calls": 13,
+  "retries": 0,
+  "usage": {
+    "input_tokens": 236097,
+    "output_tokens": 1927
+  },
+  "stopReason": null,
+  "summary": [
+    {
+      "case_id": "qa267-pr393",
+      "case_no": 51,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa267-pr393.G_done.2026-10-06T06-21-44.671Z.json",
+      "outcome": "transport",
+      "http": 400,
+      "note": "transport (HTTP 400): developer-done: HTTP 400",
+      "verdict": null,
+      "usage": null,
+      "bytes": 197952
+    },
+    {
+      "case_id": "qa268-pr393-r2",
+      "case_no": 52,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa268-pr393-r2.G_done.2026-10-06T06-21-45.723Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 22675,
+        "output_tokens": 159
+      },
+      "bytes": 73049
+    },
+    {
+      "case_id": "qa269-pr397-r2",
+      "case_no": 54,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa269-pr397-r2.G_done.2026-10-06T06-21-46.853Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 16064,
+        "output_tokens": 159
+      },
+      "bytes": 50950
+    },
+    {
+      "case_id": "qa270-pr412",
+      "case_no": 58,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa270-pr412.G_done.2026-10-06T06-21-47.897Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 16532,
+        "output_tokens": 159
+      },
+      "bytes": 56591
+    },
+    {
+      "case_id": "qa270-pr413",
+      "case_no": 59,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa270-pr413.G_done.2026-10-06T06-21-48.900Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 21934,
+        "output_tokens": 159
+      },
+      "bytes": 71803
+    },
+    {
+      "case_id": "qa272-pr415",
+      "case_no": 60,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa272-pr415.G_done.2026-10-06T06-21-49.926Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 15546,
+        "output_tokens": 178
+      },
+      "bytes": 51809
+    },
+    {
+      "case_id": "qa273-pr424",
+      "case_no": 64,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa273-pr424.G_done.2026-10-06T06-21-50.946Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 21182,
+        "output_tokens": 159
+      },
+      "bytes": 71064
+    },
+    {
+      "case_id": "qa275-pr424-r2",
+      "case_no": 68,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa275-pr424-r2.G_done.2026-10-06T06-21-51.996Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 21886,
+        "output_tokens": 159
+      },
+      "bytes": 74101
+    },
+    {
+      "case_id": "qa275-pr437",
+      "case_no": 72,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa275-pr437.G_done.2026-10-06T06-21-53.093Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 21996,
+        "output_tokens": 159
+      },
+      "bytes": 69106
+    },
+    {
+      "case_id": "qa277-pr441",
+      "case_no": 74,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa277-pr441.G_done.2026-10-06T06-21-54.112Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 6935,
+        "output_tokens": 159
+      },
+      "bytes": 21452
+    },
+    {
+      "case_id": "qa277-pr442",
+      "case_no": 75,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa277-pr442.G_done.2026-10-06T06-21-55.051Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 26220,
+        "output_tokens": 159
+      },
+      "bytes": 72848
+    },
+    {
+      "case_id": "qa277-pr451",
+      "case_no": 79,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa277-pr451.G_done.2026-10-06T06-21-56.123Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 22465,
+        "output_tokens": 159
+      },
+      "bytes": 71324
+    },
+    {
+      "case_id": "qa279-pr437-r2",
+      "case_no": 82,
+      "attempt": 1,
+      "kind": "answered",
+      "status": 0,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa279-pr437-r2.G_done.2026-10-06T06-21-57.183Z.json",
+      "outcome": "answered",
+      "http": null,
+      "note": "",
+      "verdict": "reject",
+      "usage": {
+        "input_tokens": 22662,
+        "output_tokens": 159
+      },
+      "bytes": 71715
+    }
+  ]
+}

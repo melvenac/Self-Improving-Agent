@@ -1,0 +1,25 @@
+{
+  "calls": 1,
+  "retries": 0,
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "stopReason": null,
+  "summary": [
+    {
+      "case_id": "qa250-t-222",
+      "case_no": 2,
+      "attempt": 1,
+      "kind": "final-failure",
+      "status": 1,
+      "recordPath": "C:\\qa-scratch\\qa285-run\\docs\\loops\\jev-calibration-2\\records\\cal2-qa250-t-222.G_done.2026-10-06T06-19-56.631Z.json",
+      "outcome": "unavailable",
+      "http": null,
+      "note": "no fetch implementation for live frozen request",
+      "verdict": null,
+      "usage": null,
+      "bytes": 332918
+    }
+  ]
+}

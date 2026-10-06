@@ -1,0 +1,39 @@
+attempts: 33
+retries: 0
+answered: 17
+incomplete: 0
+files scanned: ledger lines 34, records 34
+  docs/loops/jev-calibration-2/records/cal2-qa250-t-222.G_done.2026-10-06T06-20-49.235Z.json [developer-done 7b42ed6fe22539efd48f4ceaa774a0b33e3236c9] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa251-t-164.G_done.2026-10-06T06-20-50.679Z.json [developer-done 892f7644b48cb49b56dc821406f35a84ca28369a] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa254-t-212.G_done.2026-10-06T06-20-51.881Z.json [developer-done 626f7d1347d3080ae2dd15022391f4f402a6d495] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa255-pr291.G_done.2026-10-06T06-20-53.071Z.json [developer-done f76392d2963ad549defee2e52fecc5ba8eee20b6] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa255-pr297.G_done.2026-10-06T06-20-54.198Z.json [developer-done fc71d9696527f97f28ac6a7c4cd8ee572e0fa1f0] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa255-pr312.G_done.2026-10-06T06-20-55.259Z.json [developer-done 19714baa42a002d306f118f6b5c4403617bdaf34] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa256-pr298.G_done.2026-10-06T06-20-56.321Z.json [developer-done 7b09c5b7ce3aa661f4e2acfc6d4235e09239cebf] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa256-pr300.G_done.2026-10-06T06-20-57.522Z.json [developer-done 5ae7f9f28bed80d58cbdb34056e87d620faecaed] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa256-pr306.G_done.2026-10-06T06-21-27.009Z.json [developer-done d8dc12db5da04aabb66ec9e30433aee0ed637aab] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa257-pr301.G_done.2026-10-06T06-21-28.122Z.json [developer-done 11c183e478e513dc4e026d8ea47b19de37e47515] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa257-pr313.G_done.2026-10-06T06-21-29.319Z.json [developer-done 1c865761d7feb33cd95dc449c4e57742b1c38bd9] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa259-pr292.G_done.2026-10-06T06-21-30.452Z.json [developer-done c77dce55677a71a4ede59bbab933adf3270f2c22] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa259-pr320.G_done.2026-10-06T06-21-31.533Z.json [developer-done c9b5e7571d0b02c822372d78ed102281e7415c8e] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa260-pr298.G_done.2026-10-06T06-21-32.566Z.json [developer-done 7afd7f1bbb31ff1ba54c924b386384be45f261a0] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa260-pr306.G_done.2026-10-06T06-21-33.590Z.json [developer-done 3f30e8258cdc1537a85b0b9eb3f5d3c81664a184] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa261-pr302.G_done.2026-10-06T06-21-34.895Z.json [developer-done 7e92b6f641ad776d886037e54139cb0e6fd4b617] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa264-pr371.G_done.2026-10-06T06-21-36.011Z.json [developer-done ef3fbd2394bf57f519fa488f8f735b1f272904f7] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa264-pr373.G_done.2026-10-06T06-21-37.147Z.json [developer-done 1115ee190059ef6cb7e35ac34bc8d5de5d7b3e96] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa267-pr388.G_done.2026-10-06T06-21-38.246Z.json [developer-done 913a5a436c1d45fce1793b2d0454efbbf0a1111a] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa267-pr391.G_done.2026-10-06T06-21-39.305Z.json [developer-done b2096051d207344e150e275648a5b6806c2b2aea] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa267-pr393.G_done.2026-10-06T06-21-44.671Z.json [developer-done 4020a42bdd0b20e1299342af3b353e0eb84a90a6] attempt 1 transport
+  docs/loops/jev-calibration-2/records/cal2-qa268-pr393-r2.G_done.2026-10-06T06-21-45.723Z.json [developer-done 6f145faf9d1bba962d281e16285fcb59b14b68c7] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa269-pr397-r2.G_done.2026-10-06T06-21-46.853Z.json [developer-done 9ea9f54a6e81ad3f465f56bf92243f3f129ceeba] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa270-pr412.G_done.2026-10-06T06-21-47.897Z.json [developer-done f918de5844a89d38f03d4d4e23173e4540c9f814] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa270-pr413.G_done.2026-10-06T06-21-48.900Z.json [developer-done e00c0d5aae7ad902a589d09b60a672d0700ae78c] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa272-pr415.G_done.2026-10-06T06-21-49.926Z.json [developer-done dc092840af38f86dfe18af060564fe181988f159] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa273-pr424.G_done.2026-10-06T06-21-50.946Z.json [developer-done 12c289264e433bb306f55e212193a7a2448c2eca] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa275-pr424-r2.G_done.2026-10-06T06-21-51.996Z.json [developer-done b9026d71d1fbfa2ba42de465fac4d54feae702cd] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa275-pr437.G_done.2026-10-06T06-21-53.093Z.json [developer-done 23d46156a5fa34873ef1bee0ab723e52d1b33858] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa277-pr441.G_done.2026-10-06T06-21-54.112Z.json [developer-done 48bf479562296a0f4c717fb91cc0fec92f11ed86] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa277-pr442.G_done.2026-10-06T06-21-55.051Z.json [developer-done 08fa900211547aade6538792c88feab037ba23f8] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa277-pr451.G_done.2026-10-06T06-21-56.123Z.json [developer-done 1e8cba7c92d3639a17691e03700cd32a84b6711f] attempt 1 answered
+  docs/loops/jev-calibration-2/records/cal2-qa279-pr437-r2.G_done.2026-10-06T06-21-57.183Z.json [developer-done 3dfa24245cd1b3b99344cd2d675735bc608d04c8] attempt 1 answered
+VIOLATION: 33 live attempts; the ceiling is 20

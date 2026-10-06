@@ -1,0 +1,2567 @@
+{
+  "as_committed": {
+    "dev_n": 0,
+    "dev_unscored": 33,
+    "heldout_n": 0
+  },
+  "joined_by_input": {
+    "dev": {
+      "summary": {
+        "n": 17,
+        "a_gate_as_built": {
+          "n": 17,
+          "accept_proceed": 0,
+          "accept_reject": 14,
+          "reject_proceed": 0,
+          "reject_reject": 3,
+          "other": 0,
+          "accuracy": 0.1765,
+          "accept_class_rate": 0,
+          "reject_class_rate": 1,
+          "balanced_accuracy": 0.5,
+          "false_accept_rate": 0,
+          "false_reject_rate": 1
+        },
+        "b_jev_alone_COUNTERFACTUAL": {
+          "n": 17,
+          "accept_proceed": 0,
+          "accept_reject": 14,
+          "reject_proceed": 0,
+          "reject_reject": 3,
+          "other": 0,
+          "accuracy": 0.1765,
+          "accept_class_rate": 0,
+          "reject_class_rate": 1,
+          "balanced_accuracy": 0.5,
+          "false_accept_rate": 0,
+          "false_reject_rate": 1
+        },
+        "calibration_driving_questions": {
+          "n": 138,
+          "bands": [
+            {
+              "band": "<0.7",
+              "n": 40,
+              "correct": 17,
+              "fraction_correct": 0.425
+            },
+            {
+              "band": "0.7-0.9",
+              "n": 88,
+              "correct": 24,
+              "fraction_correct": 0.2727
+            },
+            {
+              "band": ">=0.9",
+              "n": 10,
+              "correct": 5,
+              "fraction_correct": 0.5
+            }
+          ],
+          "brier": 0.4402,
+          "confident_misses": [
+            {
+              "case_id": "qa264-pr371",
+              "question": "plan_row:T4",
+              "p": 0.07,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            },
+            {
+              "case_id": "qa267-pr388",
+              "question": "plan_row:T10",
+              "p": 0.06,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            },
+            {
+              "case_id": "qa267-pr388",
+              "question": "plan_row:T9",
+              "p": 0.07,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            },
+            {
+              "case_id": "qa275-pr424-r2",
+              "question": "plan_row:T2",
+              "p": 0.09,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            },
+            {
+              "case_id": "qa275-pr424-r2",
+              "question": "plan_row:T3",
+              "p": 0.09,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            }
+          ]
+        },
+        "calibration_all_questions": {
+          "n": 138,
+          "bands": [
+            {
+              "band": "<0.7",
+              "n": 40,
+              "correct": 17,
+              "fraction_correct": 0.425
+            },
+            {
+              "band": "0.7-0.9",
+              "n": 88,
+              "correct": 24,
+              "fraction_correct": 0.2727
+            },
+            {
+              "band": ">=0.9",
+              "n": 10,
+              "correct": 5,
+              "fraction_correct": 0.5
+            }
+          ],
+          "brier": 0.4402,
+          "confident_misses": [
+            {
+              "case_id": "qa264-pr371",
+              "question": "plan_row:T4",
+              "p": 0.07,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            },
+            {
+              "case_id": "qa267-pr388",
+              "question": "plan_row:T10",
+              "p": 0.06,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            },
+            {
+              "case_id": "qa267-pr388",
+              "question": "plan_row:T9",
+              "p": 0.07,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            },
+            {
+              "case_id": "qa275-pr424-r2",
+              "question": "plan_row:T2",
+              "p": 0.09,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            },
+            {
+              "case_id": "qa275-pr424-r2",
+              "question": "plan_row:T3",
+              "p": 0.09,
+              "stance": "REJECT",
+              "label": "ACCEPT"
+            }
+          ]
+        },
+        "drivers_a": {
+          "plan_row:T183-1": 1,
+          "plan_row:T183-2": 1,
+          "plan_row:T183-3": 1,
+          "plan_row:T183-4": 1,
+          "plan_row:T1": 13,
+          "plan_row:T2": 14,
+          "plan_row:T3": 14,
+          "plan_row:T4": 15,
+          "plan_row:T7": 4,
+          "plan_row:T8": 4,
+          "plan_row:T9": 3,
+          "plan_row:T10": 3,
+          "plan_row:T11": 3,
+          "plan_row:T12": 2,
+          "plan_row:T13": 2,
+          "plan_row:T14": 2,
+          "plan_row:T15": 2,
+          "plan_row:T16": 2,
+          "plan_row:T17": 2,
+          "plan_row:T18": 2,
+          "plan_row:T19": 2,
+          "plan_row:T20": 2,
+          "plan_row:T21": 2,
+          "plan_row:T22": 2,
+          "plan_row:T23": 2,
+          "plan_row:T24": 2,
+          "plan_row:T5": 3,
+          "plan_row:T6": 3,
+          "local_tests_support_claim": 1
+        },
+        "drivers_b": {
+          "plan_row:T183-1": 1,
+          "plan_row:T183-2": 1,
+          "plan_row:T183-3": 1,
+          "plan_row:T183-4": 1,
+          "plan_row:T1": 13,
+          "plan_row:T2": 14,
+          "plan_row:T3": 14,
+          "plan_row:T4": 15,
+          "plan_row:T7": 4,
+          "plan_row:T8": 4,
+          "plan_row:T9": 3,
+          "plan_row:T10": 3,
+          "plan_row:T11": 3,
+          "plan_row:T12": 2,
+          "plan_row:T13": 2,
+          "plan_row:T14": 2,
+          "plan_row:T15": 2,
+          "plan_row:T16": 2,
+          "plan_row:T17": 2,
+          "plan_row:T18": 2,
+          "plan_row:T19": 2,
+          "plan_row:T20": 2,
+          "plan_row:T21": 2,
+          "plan_row:T22": 2,
+          "plan_row:T23": 2,
+          "plan_row:T24": 2,
+          "plan_row:T5": 3,
+          "plan_row:T6": 3,
+          "local_tests_support_claim": 1
+        }
+      },
+      "unscored": [
+        {
+          "case_id": "qa250-t-222",
+          "records": 2,
+          "outcome_classes": [
+            "unavailable",
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa251-t-164",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa254-t-212",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa255-pr297",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa255-pr312",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa256-pr298",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa256-pr300",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa256-pr306",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa259-pr292",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa259-pr320",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa260-pr298",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa260-pr306",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa261-pr302",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa264-pr373",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa267-pr391",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        },
+        {
+          "case_id": "qa267-pr393",
+          "records": 1,
+          "outcome_classes": [
+            "transport"
+          ]
+        }
+      ],
+      "usefulness": {
+        "balanced_accuracy": 0.5,
+        "false_accept_rate": 0,
+        "brier": 0.4402,
+        "brier_baseline": 0.25,
+        "high_conf_n": 10,
+        "high_conf_fraction_correct": 0.5,
+        "criteria": {
+          "balanced_accuracy_ge_0_75": false,
+          "false_accept_le_0_10": true,
+          "brier_le_0_20": false,
+          "high_conf_ge_0_90_over_10": false
+        },
+        "useful": false
+      }
+    },
+    "heldout_n": 0,
+    "spend": {
+      "input_tokens": 351446,
+      "output_tokens": 3762
+    }
+  },
+  "cases": [
+    {
+      "case_id": "qa250-t-222",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 332918,
+      "note": "no fetch implementation for live frozen request | transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa251-t-164",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 416784,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa254-t-212",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 413453,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa255-pr291",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 68848,
+      "usage": {
+        "input_tokens": 22469,
+        "output_tokens": 198
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.35,
+        0.52,
+        0.51,
+        0.17,
+        0.92
+      ],
+      "row_min": 0.17,
+      "row_mean": 0.49399999999999994,
+      "touches": 0.21,
+      "tests": 0.88,
+      "stuck": 0.04,
+      "risk": 0.11,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T183-1 0.35 is below the required 0.7",
+        "plan_row:T183-2 0.52 is below the required 0.7",
+        "plan_row:T183-3 0.51 is below the required 0.7",
+        "plan_row:T183-4 0.17 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T183-1",
+        "T183-2",
+        "T183-3",
+        "T183-4",
+        "T183-5"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.88
+        },
+        "plan_row:T183-1": {
+          "type": "noul",
+          "noul": 0.35
+        },
+        "plan_row:T183-2": {
+          "type": "noul",
+          "noul": 0.52
+        },
+        "plan_row:T183-3": {
+          "type": "noul",
+          "noul": 0.51
+        },
+        "plan_row:T183-4": {
+          "type": "noul",
+          "noul": 0.17
+        },
+        "plan_row:T183-5": {
+          "type": "noul",
+          "noul": 0.92
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.11,
+          "confidence": 0.83,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.89,
+            "1": 0.1,
+            "2": 0.01
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.21
+        }
+      }
+    },
+    {
+      "case_id": "qa255-pr297",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 184525,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa255-pr312",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 134044,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa256-pr298",
+      "label": "REJECT",
+      "answered": false,
+      "bytes": 329328,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa256-pr300",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 239342,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa256-pr306",
+      "label": "REJECT",
+      "answered": false,
+      "bytes": 330476,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa257-pr301",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 97530,
+      "usage": {
+        "input_tokens": 31085,
+        "output_tokens": 554
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.43,
+        0.26,
+        0.14,
+        0.25,
+        0.7,
+        0.83,
+        0.32,
+        0.12,
+        0.36,
+        0.22,
+        0.52,
+        0.12,
+        0.18,
+        0.13,
+        0.16,
+        0.14,
+        0.14,
+        0.17,
+        0.15,
+        0.16,
+        0.16,
+        0.18,
+        0.11,
+        0.12
+      ],
+      "row_min": 0.11,
+      "row_mean": 0.2529166666666667,
+      "touches": 0.13,
+      "tests": 0.76,
+      "stuck": 0.05,
+      "risk": 0.01,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.43 is below the required 0.7",
+        "plan_row:T2 0.26 is below the required 0.7",
+        "plan_row:T3 0.14 is below the required 0.7",
+        "plan_row:T4 0.25 is below the required 0.7",
+        "plan_row:T7 0.32 is below the required 0.7",
+        "plan_row:T8 0.12 is below the required 0.7",
+        "plan_row:T9 0.36 is below the required 0.7",
+        "plan_row:T10 0.22 is below the required 0.7",
+        "plan_row:T11 0.52 is below the required 0.7",
+        "plan_row:T12 0.12 is below the required 0.7",
+        "plan_row:T13 0.18 is below the required 0.7",
+        "plan_row:T14 0.13 is below the required 0.7",
+        "plan_row:T15 0.16 is below the required 0.7",
+        "plan_row:T16 0.14 is below the required 0.7",
+        "plan_row:T17 0.14 is below the required 0.7",
+        "plan_row:T18 0.17 is below the required 0.7",
+        "plan_row:T19 0.15 is below the required 0.7",
+        "plan_row:T20 0.16 is below the required 0.7",
+        "plan_row:T21 0.16 is below the required 0.7",
+        "plan_row:T22 0.18 is below the required 0.7",
+        "plan_row:T23 0.11 is below the required 0.7",
+        "plan_row:T24 0.12 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T17",
+        "T18",
+        "T19",
+        "T20",
+        "T21",
+        "T22",
+        "T23",
+        "T24"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.76
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.43
+        },
+        "plan_row:T10": {
+          "type": "noul",
+          "noul": 0.22
+        },
+        "plan_row:T11": {
+          "type": "noul",
+          "noul": 0.52
+        },
+        "plan_row:T12": {
+          "type": "noul",
+          "noul": 0.12
+        },
+        "plan_row:T13": {
+          "type": "noul",
+          "noul": 0.18
+        },
+        "plan_row:T14": {
+          "type": "noul",
+          "noul": 0.13
+        },
+        "plan_row:T15": {
+          "type": "noul",
+          "noul": 0.16
+        },
+        "plan_row:T16": {
+          "type": "noul",
+          "noul": 0.14
+        },
+        "plan_row:T17": {
+          "type": "noul",
+          "noul": 0.14
+        },
+        "plan_row:T18": {
+          "type": "noul",
+          "noul": 0.17
+        },
+        "plan_row:T19": {
+          "type": "noul",
+          "noul": 0.15
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.26
+        },
+        "plan_row:T20": {
+          "type": "noul",
+          "noul": 0.16
+        },
+        "plan_row:T21": {
+          "type": "noul",
+          "noul": 0.16
+        },
+        "plan_row:T22": {
+          "type": "noul",
+          "noul": 0.18
+        },
+        "plan_row:T23": {
+          "type": "noul",
+          "noul": 0.11
+        },
+        "plan_row:T24": {
+          "type": "noul",
+          "noul": 0.12
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.14
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.25
+        },
+        "plan_row:T5": {
+          "type": "noul",
+          "noul": 0.7
+        },
+        "plan_row:T6": {
+          "type": "noul",
+          "noul": 0.83
+        },
+        "plan_row:T7": {
+          "type": "noul",
+          "noul": 0.32
+        },
+        "plan_row:T8": {
+          "type": "noul",
+          "noul": 0.12
+        },
+        "plan_row:T9": {
+          "type": "noul",
+          "noul": 0.36
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.01,
+          "confidence": 0.98,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.99,
+            "1": 0.01,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.05
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.13
+        }
+      }
+    },
+    {
+      "case_id": "qa257-pr313",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 64937,
+      "usage": {
+        "input_tokens": 20119,
+        "output_tokens": 554
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.61,
+        0.36,
+        0.18,
+        0.41,
+        0.19,
+        0.11,
+        0.18,
+        0.17,
+        0.46,
+        0.29,
+        0.43,
+        0.15,
+        0.22,
+        0.15,
+        0.18,
+        0.17,
+        0.17,
+        0.52,
+        0.24,
+        0.21,
+        0.29,
+        0.2,
+        0.52,
+        0.15
+      ],
+      "row_min": 0.11,
+      "row_mean": 0.2733333333333334,
+      "touches": 0.13,
+      "tests": 0.85,
+      "stuck": 0.05,
+      "risk": 0.11,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.61 is below the required 0.7",
+        "plan_row:T2 0.36 is below the required 0.7",
+        "plan_row:T3 0.18 is below the required 0.7",
+        "plan_row:T4 0.41 is below the required 0.7",
+        "plan_row:T5 0.19 is below the required 0.7",
+        "plan_row:T6 0.11 is below the required 0.7",
+        "plan_row:T7 0.18 is below the required 0.7",
+        "plan_row:T8 0.17 is below the required 0.7",
+        "plan_row:T9 0.46 is below the required 0.7",
+        "plan_row:T10 0.29 is below the required 0.7",
+        "plan_row:T11 0.43 is below the required 0.7",
+        "plan_row:T12 0.15 is below the required 0.7",
+        "plan_row:T13 0.22 is below the required 0.7",
+        "plan_row:T14 0.15 is below the required 0.7",
+        "plan_row:T15 0.18 is below the required 0.7",
+        "plan_row:T16 0.17 is below the required 0.7",
+        "plan_row:T17 0.17 is below the required 0.7",
+        "plan_row:T18 0.52 is below the required 0.7",
+        "plan_row:T19 0.24 is below the required 0.7",
+        "plan_row:T20 0.21 is below the required 0.7",
+        "plan_row:T21 0.29 is below the required 0.7",
+        "plan_row:T22 0.2 is below the required 0.7",
+        "plan_row:T23 0.52 is below the required 0.7",
+        "plan_row:T24 0.15 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14",
+        "T15",
+        "T16",
+        "T17",
+        "T18",
+        "T19",
+        "T20",
+        "T21",
+        "T22",
+        "T23",
+        "T24"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.85
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.61
+        },
+        "plan_row:T10": {
+          "type": "noul",
+          "noul": 0.29
+        },
+        "plan_row:T11": {
+          "type": "noul",
+          "noul": 0.43
+        },
+        "plan_row:T12": {
+          "type": "noul",
+          "noul": 0.15
+        },
+        "plan_row:T13": {
+          "type": "noul",
+          "noul": 0.22
+        },
+        "plan_row:T14": {
+          "type": "noul",
+          "noul": 0.15
+        },
+        "plan_row:T15": {
+          "type": "noul",
+          "noul": 0.18
+        },
+        "plan_row:T16": {
+          "type": "noul",
+          "noul": 0.17
+        },
+        "plan_row:T17": {
+          "type": "noul",
+          "noul": 0.17
+        },
+        "plan_row:T18": {
+          "type": "noul",
+          "noul": 0.52
+        },
+        "plan_row:T19": {
+          "type": "noul",
+          "noul": 0.24
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.36
+        },
+        "plan_row:T20": {
+          "type": "noul",
+          "noul": 0.21
+        },
+        "plan_row:T21": {
+          "type": "noul",
+          "noul": 0.29
+        },
+        "plan_row:T22": {
+          "type": "noul",
+          "noul": 0.2
+        },
+        "plan_row:T23": {
+          "type": "noul",
+          "noul": 0.52
+        },
+        "plan_row:T24": {
+          "type": "noul",
+          "noul": 0.15
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.18
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.41
+        },
+        "plan_row:T5": {
+          "type": "noul",
+          "noul": 0.19
+        },
+        "plan_row:T6": {
+          "type": "noul",
+          "noul": 0.11
+        },
+        "plan_row:T7": {
+          "type": "noul",
+          "noul": 0.18
+        },
+        "plan_row:T8": {
+          "type": "noul",
+          "noul": 0.17
+        },
+        "plan_row:T9": {
+          "type": "noul",
+          "noul": 0.46
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.11,
+          "confidence": 0.84,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.91,
+            "1": 0.07,
+            "2": 0.02
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.05
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.13
+        }
+      }
+    },
+    {
+      "case_id": "qa259-pr292",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 205526,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa259-pr320",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 206169,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa260-pr298",
+      "label": "REJECT",
+      "answered": false,
+      "bytes": 243434,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa260-pr306",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 244775,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa261-pr302",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 315343,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa264-pr371",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 74820,
+      "usage": {
+        "input_tokens": 23486,
+        "output_tokens": 235
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.28,
+        0.9,
+        0.94,
+        0.07,
+        0.92,
+        0.4,
+        0.36,
+        0.2
+      ],
+      "row_min": 0.07,
+      "row_mean": 0.5087499999999999,
+      "touches": 0.2,
+      "tests": 0.64,
+      "stuck": 0.04,
+      "risk": 0.01,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.28 is below the required 0.7",
+        "plan_row:T4 0.07 is below the required 0.7",
+        "plan_row:T6 0.4 is below the required 0.7",
+        "plan_row:T7 0.36 is below the required 0.7",
+        "plan_row:T8 0.2 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8"
+      ],
+      "answer": {
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.01,
+          "confidence": 0.98,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.99,
+            "1": 0.01,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.9
+        },
+        "plan_row:T5": {
+          "type": "noul",
+          "noul": 0.92
+        },
+        "plan_row:T7": {
+          "type": "noul",
+          "noul": 0.36
+        },
+        "plan_row:T8": {
+          "type": "noul",
+          "noul": 0.2
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.2
+        },
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.64
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.28
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.94
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.07
+        },
+        "plan_row:T6": {
+          "type": "noul",
+          "noul": 0.4
+        }
+      }
+    },
+    {
+      "case_id": "qa264-pr373",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 177367,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa267-pr388",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 56300,
+      "usage": {
+        "input_tokens": 18190,
+        "output_tokens": 294
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.54,
+        0.32,
+        0.13,
+        0.19,
+        0.12,
+        0.16,
+        0.16,
+        0.12,
+        0.07,
+        0.06,
+        0.17
+      ],
+      "row_min": 0.06,
+      "row_mean": 0.1854545454545455,
+      "touches": 0.17,
+      "tests": 0.77,
+      "stuck": 0.05,
+      "risk": 0.01,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.54 is below the required 0.7",
+        "plan_row:T2 0.32 is below the required 0.7",
+        "plan_row:T3 0.13 is below the required 0.7",
+        "plan_row:T4 0.19 is below the required 0.7",
+        "plan_row:T5 0.12 is below the required 0.7",
+        "plan_row:T6 0.16 is below the required 0.7",
+        "plan_row:T7 0.16 is below the required 0.7",
+        "plan_row:T8 0.12 is below the required 0.7",
+        "plan_row:T9 0.07 is below the required 0.7",
+        "plan_row:T10 0.06 is below the required 0.7",
+        "plan_row:T11 0.17 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9",
+        "T10",
+        "T11"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.77
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.54
+        },
+        "plan_row:T10": {
+          "type": "noul",
+          "noul": 0.06
+        },
+        "plan_row:T11": {
+          "type": "noul",
+          "noul": 0.17
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.32
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.13
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.19
+        },
+        "plan_row:T5": {
+          "type": "noul",
+          "noul": 0.12
+        },
+        "plan_row:T6": {
+          "type": "noul",
+          "noul": 0.16
+        },
+        "plan_row:T7": {
+          "type": "noul",
+          "noul": 0.16
+        },
+        "plan_row:T8": {
+          "type": "noul",
+          "noul": 0.12
+        },
+        "plan_row:T9": {
+          "type": "noul",
+          "noul": 0.07
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.01,
+          "confidence": 0.99,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.99,
+            "1": 0.01,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.05
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.17
+        }
+      }
+    },
+    {
+      "case_id": "qa267-pr391",
+      "label": "ACCEPT",
+      "answered": false,
+      "bytes": 197866,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa267-pr393",
+      "label": "REJECT",
+      "answered": false,
+      "bytes": 197952,
+      "note": "transport (HTTP 400): developer-done: HTTP 400"
+    },
+    {
+      "case_id": "qa268-pr393-r2",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 73049,
+      "usage": {
+        "input_tokens": 22675,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.55,
+        0.77,
+        0.9,
+        0.64
+      ],
+      "row_min": 0.55,
+      "row_mean": 0.7150000000000001,
+      "touches": 0.19,
+      "tests": 0.71,
+      "stuck": 0.05,
+      "risk": 0.13,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.55 is below the required 0.7",
+        "plan_row:T4 0.64 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.55
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.77
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.9
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.64
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.13,
+          "confidence": 0.81,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.88,
+            "1": 0.11,
+            "2": 0.01
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.05
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.19
+        },
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.71
+        }
+      }
+    },
+    {
+      "case_id": "qa269-pr397-r2",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 50950,
+      "usage": {
+        "input_tokens": 16064,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.67,
+        0.34,
+        0.17,
+        0.21
+      ],
+      "row_min": 0.17,
+      "row_mean": 0.3475,
+      "touches": 0.19,
+      "tests": 0.88,
+      "stuck": 0.04,
+      "risk": 0.09,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.67 is below the required 0.7",
+        "plan_row:T2 0.34 is below the required 0.7",
+        "plan_row:T3 0.17 is below the required 0.7",
+        "plan_row:T4 0.21 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.88
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.67
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.34
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.17
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.21
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.09,
+          "confidence": 0.86,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.91,
+            "1": 0.09,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.19
+        }
+      }
+    },
+    {
+      "case_id": "qa270-pr412",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 56591,
+      "usage": {
+        "input_tokens": 16532,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.45,
+        0.43,
+        0.21,
+        0.25
+      ],
+      "row_min": 0.21,
+      "row_mean": 0.335,
+      "touches": 0.17,
+      "tests": 0.88,
+      "stuck": 0.04,
+      "risk": 0.16,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.45 is below the required 0.7",
+        "plan_row:T2 0.43 is below the required 0.7",
+        "plan_row:T3 0.21 is below the required 0.7",
+        "plan_row:T4 0.25 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.88
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.45
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.43
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.21
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.25
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.16,
+          "confidence": 0.76,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.84,
+            "1": 0.15,
+            "2": 0.01
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.17
+        }
+      }
+    },
+    {
+      "case_id": "qa270-pr413",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 71803,
+      "usage": {
+        "input_tokens": 21934,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.47,
+        0.32,
+        0.15,
+        0.19
+      ],
+      "row_min": 0.15,
+      "row_mean": 0.28250000000000003,
+      "touches": 0.2,
+      "tests": 0.64,
+      "stuck": 0.04,
+      "risk": 0.08,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.47 is below the required 0.7",
+        "plan_row:T2 0.32 is below the required 0.7",
+        "plan_row:T3 0.15 is below the required 0.7",
+        "plan_row:T4 0.19 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.64
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.47
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.32
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.15
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.19
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.08,
+          "confidence": 0.88,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.93,
+            "1": 0.06,
+            "2": 0.01
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.2
+        }
+      }
+    },
+    {
+      "case_id": "qa272-pr415",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 51809,
+      "usage": {
+        "input_tokens": 15546,
+        "output_tokens": 178
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.65,
+        0.35,
+        0.22,
+        0.29,
+        0.11
+      ],
+      "row_min": 0.11,
+      "row_mean": 0.324,
+      "touches": 0.15,
+      "tests": 0.86,
+      "stuck": 0.04,
+      "risk": 0.14,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.65 is below the required 0.7",
+        "plan_row:T2 0.35 is below the required 0.7",
+        "plan_row:T3 0.22 is below the required 0.7",
+        "plan_row:T4 0.29 is below the required 0.7",
+        "plan_row:T5 0.11 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.86
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.65
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.35
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.22
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.29
+        },
+        "plan_row:T5": {
+          "type": "noul",
+          "noul": 0.11
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.14,
+          "confidence": 0.79,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.87,
+            "1": 0.13,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.15
+        }
+      }
+    },
+    {
+      "case_id": "qa273-pr424",
+      "label": "REJECT",
+      "answered": true,
+      "bytes": 71064,
+      "usage": {
+        "input_tokens": 21182,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.63,
+        0.31,
+        0.26,
+        0.25
+      ],
+      "row_min": 0.25,
+      "row_mean": 0.3625,
+      "touches": 0.16,
+      "tests": 0.87,
+      "stuck": 0.04,
+      "risk": 0.08,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.63 is below the required 0.7",
+        "plan_row:T2 0.31 is below the required 0.7",
+        "plan_row:T3 0.26 is below the required 0.7",
+        "plan_row:T4 0.25 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.87
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.63
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.31
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.26
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.25
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.08,
+          "confidence": 0.87,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.92,
+            "1": 0.08,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.16
+        }
+      }
+    },
+    {
+      "case_id": "qa275-pr424-r2",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 74101,
+      "usage": {
+        "input_tokens": 21886,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.19,
+        0.09,
+        0.09,
+        0.11
+      ],
+      "row_min": 0.09,
+      "row_mean": 0.12,
+      "touches": 0.17,
+      "tests": 0.81,
+      "stuck": 0.04,
+      "risk": 0.03,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.19 is below the required 0.7",
+        "plan_row:T2 0.09 is below the required 0.7",
+        "plan_row:T3 0.09 is below the required 0.7",
+        "plan_row:T4 0.11 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.81
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.19
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.09
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.09
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.11
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.03,
+          "confidence": 0.95,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.97,
+            "1": 0.03,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.17
+        }
+      }
+    },
+    {
+      "case_id": "qa275-pr437",
+      "label": "REJECT",
+      "answered": true,
+      "bytes": 69106,
+      "usage": {
+        "input_tokens": 21996,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.75,
+        0.21,
+        0.12,
+        0.21
+      ],
+      "row_min": 0.12,
+      "row_mean": 0.3225,
+      "touches": 0.16,
+      "tests": 0.85,
+      "stuck": 0.04,
+      "risk": 0.12,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T2 0.21 is below the required 0.7",
+        "plan_row:T3 0.12 is below the required 0.7",
+        "plan_row:T4 0.21 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.85
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.75
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.21
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.12
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.21
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.12,
+          "confidence": 0.82,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.88,
+            "1": 0.11,
+            "2": 0.01
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.16
+        }
+      }
+    },
+    {
+      "case_id": "qa277-pr441",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 21452,
+      "usage": {
+        "input_tokens": 6935,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.75,
+        0.63,
+        0.22,
+        0.5
+      ],
+      "row_min": 0.22,
+      "row_mean": 0.5249999999999999,
+      "touches": 0.19,
+      "tests": 0.73,
+      "stuck": 0.04,
+      "risk": 0.01,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T2 0.63 is below the required 0.7",
+        "plan_row:T3 0.22 is below the required 0.7",
+        "plan_row:T4 0.5 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.73
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.75
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.63
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.22
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.5
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.01,
+          "confidence": 0.98,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.99,
+            "1": 0.01,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.19
+        }
+      }
+    },
+    {
+      "case_id": "qa277-pr442",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 72848,
+      "usage": {
+        "input_tokens": 26220,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.49,
+        0.34,
+        0.13,
+        0.32
+      ],
+      "row_min": 0.13,
+      "row_mean": 0.32,
+      "touches": 0.2,
+      "tests": 0.59,
+      "stuck": 0.05,
+      "risk": 0.06,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.49 is below the required 0.7",
+        "plan_row:T2 0.34 is below the required 0.7",
+        "plan_row:T3 0.13 is below the required 0.7",
+        "plan_row:T4 0.32 is below the required 0.7",
+        "local_tests_support_claim 0.59 is below the required 0.6"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.59
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.49
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.34
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.13
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.32
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.06,
+          "confidence": 0.91,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.95,
+            "1": 0.05,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.05
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.2
+        }
+      }
+    },
+    {
+      "case_id": "qa277-pr451",
+      "label": "ACCEPT",
+      "answered": true,
+      "bytes": 71324,
+      "usage": {
+        "input_tokens": 22465,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.76,
+        0.55,
+        0.16,
+        0.43
+      ],
+      "row_min": 0.16,
+      "row_mean": 0.475,
+      "touches": 0.2,
+      "tests": 0.8,
+      "stuck": 0.04,
+      "risk": 0.12,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T2 0.55 is below the required 0.7",
+        "plan_row:T3 0.16 is below the required 0.7",
+        "plan_row:T4 0.43 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.8
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.76
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.55
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.16
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.43
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.12,
+          "confidence": 0.82,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.89,
+            "1": 0.1,
+            "2": 0.01
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.04
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.2
+        }
+      }
+    },
+    {
+      "case_id": "qa279-pr437-r2",
+      "label": "REJECT",
+      "answered": true,
+      "bytes": 71715,
+      "usage": {
+        "input_tokens": 22662,
+        "output_tokens": 159
+      },
+      "checks_source": "ci",
+      "checks_passed": true,
+      "rows": [
+        0.45,
+        0.65,
+        0.45,
+        0.89
+      ],
+      "row_min": 0.45,
+      "row_mean": 0.61,
+      "touches": 0.16,
+      "tests": 0.74,
+      "stuck": 0.05,
+      "risk": 0.05,
+      "built": "reject",
+      "built_reasons": [
+        "plan_row:T1 0.45 is below the required 0.7",
+        "plan_row:T2 0.65 is below the required 0.7",
+        "plan_row:T3 0.45 is below the required 0.7"
+      ],
+      "model": "jev-1.13.0",
+      "ids": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ],
+      "answer": {
+        "local_tests_support_claim": {
+          "type": "noul",
+          "noul": 0.74
+        },
+        "plan_row:T1": {
+          "type": "noul",
+          "noul": 0.45
+        },
+        "plan_row:T2": {
+          "type": "noul",
+          "noul": 0.65
+        },
+        "plan_row:T3": {
+          "type": "noul",
+          "noul": 0.45
+        },
+        "plan_row:T4": {
+          "type": "noul",
+          "noul": 0.89
+        },
+        "risk_of_regression": {
+          "type": "score",
+          "score": 0.05,
+          "confidence": 0.92,
+          "legend": {
+            "0": "Validated behaviour untouched: the diff does not reach the code those behaviours depend on.",
+            "1": "Adjacent: the diff touches shared code, but the preserved behaviours have direct coverage.",
+            "2": "Likely breakage: the diff changes code a preserved behaviour depends on, with no coverage of it."
+          },
+          "probabilities": {
+            "0": 0.96,
+            "1": 0.04,
+            "2": 0
+          }
+        },
+        "stuck_repeating_prior_failure": {
+          "type": "noul",
+          "noul": 0.05
+        },
+        "touches_out_of_scope": {
+          "type": "noul",
+          "noul": 0.16
+        }
+      }
+    }
+  ],
+  "per_row_by_verdict": {
+    "ACCEPT": {
+      "n": 109,
+      "min": 0.06,
+      "p25": 0.16,
+      "median": 0.22,
+      "p75": 0.45,
+      "max": 0.94,
+      "mean": 0.3239,
+      "lt_0_5": 85,
+      "0_5_to_0_7": 14,
+      "ge_0_7": 10
+    },
+    "REJECT": {
+      "n": 12,
+      "min": 0.12,
+      "p25": 0.21,
+      "median": 0.31,
+      "p75": 0.63,
+      "max": 0.89,
+      "mean": 0.4317,
+      "lt_0_5": 8,
+      "0_5_to_0_7": 2,
+      "ge_0_7": 2
+    }
+  },
+  "auc": {
+    "combined_row_min": 0.2381,
+    "combined_row_mean": 0.3333,
+    "per_row_pooled": 0.3467,
+    "touches_inverted": 0.2143,
+    "n_accept": 14,
+    "n_reject": 3
+  },
+  "fitted_cut_FITTED_TO_THE_DEVELOPMENT_SET": {
+    "parameter": "requirement_row_min_noul (other terms frozen)",
+    "a_gate_as_built": {
+      "max_ba": 0.5357,
+      "cuts": [
+        {
+          "t": 0.45,
+          "ba": 0.5357,
+          "accept_proceed": 1,
+          "n_accept": 14,
+          "reject_reject": 3,
+          "n_reject": 3,
+          "far": 0
+        },
+        {
+          "t": 0.55,
+          "ba": 0.5357,
+          "accept_proceed": 1,
+          "n_accept": 14,
+          "reject_reject": 3,
+          "n_reject": 3,
+          "far": 0
+        }
+      ]
+    },
+    "b_jev_alone_COUNTERFACTUAL": {
+      "max_ba": 0.5357,
+      "cuts": [
+        {
+          "t": 0.45,
+          "ba": 0.5357,
+          "accept_proceed": 1,
+          "n_accept": 14,
+          "reject_reject": 3,
+          "n_reject": 3,
+          "far": 0
+        },
+        {
+          "t": 0.55,
+          "ba": 0.5357,
+          "accept_proceed": 1,
+          "n_accept": 14,
+          "reject_reject": 3,
+          "n_reject": 3,
+          "far": 0
+        }
+      ]
+    },
+    "frozen_value": 0.7,
+    "row_min_alone": {
+      "max_ba": 0.5357,
+      "cuts": [
+        {
+          "t": 0.45,
+          "ba": 0.5357,
+          "accept_proceed": 1,
+          "n_accept": 14,
+          "reject_reject": 3,
+          "n_reject": 3,
+          "far": 0
+        },
+        {
+          "t": 0.55,
+          "ba": 0.5357,
+          "accept_proceed": 1,
+          "n_accept": 14,
+          "reject_reject": 3,
+          "n_reject": 3,
+          "far": 0
+        }
+      ]
+    }
+  },
+  "reasons_b": [
+    {
+      "case_id": "qa255-pr291",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T183-1 0.35 is below the required 0.7",
+        "plan_row:T183-2 0.52 is below the required 0.7",
+        "plan_row:T183-3 0.51 is below the required 0.7",
+        "plan_row:T183-4 0.17 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa257-pr301",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.43 is below the required 0.7",
+        "plan_row:T2 0.26 is below the required 0.7",
+        "plan_row:T3 0.14 is below the required 0.7",
+        "plan_row:T4 0.25 is below the required 0.7",
+        "plan_row:T7 0.32 is below the required 0.7",
+        "plan_row:T8 0.12 is below the required 0.7",
+        "plan_row:T9 0.36 is below the required 0.7",
+        "plan_row:T10 0.22 is below the required 0.7",
+        "plan_row:T11 0.52 is below the required 0.7",
+        "plan_row:T12 0.12 is below the required 0.7",
+        "plan_row:T13 0.18 is below the required 0.7",
+        "plan_row:T14 0.13 is below the required 0.7",
+        "plan_row:T15 0.16 is below the required 0.7",
+        "plan_row:T16 0.14 is below the required 0.7",
+        "plan_row:T17 0.14 is below the required 0.7",
+        "plan_row:T18 0.17 is below the required 0.7",
+        "plan_row:T19 0.15 is below the required 0.7",
+        "plan_row:T20 0.16 is below the required 0.7",
+        "plan_row:T21 0.16 is below the required 0.7",
+        "plan_row:T22 0.18 is below the required 0.7",
+        "plan_row:T23 0.11 is below the required 0.7",
+        "plan_row:T24 0.12 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa257-pr313",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.61 is below the required 0.7",
+        "plan_row:T2 0.36 is below the required 0.7",
+        "plan_row:T3 0.18 is below the required 0.7",
+        "plan_row:T4 0.41 is below the required 0.7",
+        "plan_row:T5 0.19 is below the required 0.7",
+        "plan_row:T6 0.11 is below the required 0.7",
+        "plan_row:T7 0.18 is below the required 0.7",
+        "plan_row:T8 0.17 is below the required 0.7",
+        "plan_row:T9 0.46 is below the required 0.7",
+        "plan_row:T10 0.29 is below the required 0.7",
+        "plan_row:T11 0.43 is below the required 0.7",
+        "plan_row:T12 0.15 is below the required 0.7",
+        "plan_row:T13 0.22 is below the required 0.7",
+        "plan_row:T14 0.15 is below the required 0.7",
+        "plan_row:T15 0.18 is below the required 0.7",
+        "plan_row:T16 0.17 is below the required 0.7",
+        "plan_row:T17 0.17 is below the required 0.7",
+        "plan_row:T18 0.52 is below the required 0.7",
+        "plan_row:T19 0.24 is below the required 0.7",
+        "plan_row:T20 0.21 is below the required 0.7",
+        "plan_row:T21 0.29 is below the required 0.7",
+        "plan_row:T22 0.2 is below the required 0.7",
+        "plan_row:T23 0.52 is below the required 0.7",
+        "plan_row:T24 0.15 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa264-pr371",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.28 is below the required 0.7",
+        "plan_row:T4 0.07 is below the required 0.7",
+        "plan_row:T6 0.4 is below the required 0.7",
+        "plan_row:T7 0.36 is below the required 0.7",
+        "plan_row:T8 0.2 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa267-pr388",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.54 is below the required 0.7",
+        "plan_row:T2 0.32 is below the required 0.7",
+        "plan_row:T3 0.13 is below the required 0.7",
+        "plan_row:T4 0.19 is below the required 0.7",
+        "plan_row:T5 0.12 is below the required 0.7",
+        "plan_row:T6 0.16 is below the required 0.7",
+        "plan_row:T7 0.16 is below the required 0.7",
+        "plan_row:T8 0.12 is below the required 0.7",
+        "plan_row:T9 0.07 is below the required 0.7",
+        "plan_row:T10 0.06 is below the required 0.7",
+        "plan_row:T11 0.17 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa268-pr393-r2",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.55 is below the required 0.7",
+        "plan_row:T4 0.64 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa269-pr397-r2",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.67 is below the required 0.7",
+        "plan_row:T2 0.34 is below the required 0.7",
+        "plan_row:T3 0.17 is below the required 0.7",
+        "plan_row:T4 0.21 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa270-pr412",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.45 is below the required 0.7",
+        "plan_row:T2 0.43 is below the required 0.7",
+        "plan_row:T3 0.21 is below the required 0.7",
+        "plan_row:T4 0.25 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa270-pr413",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.47 is below the required 0.7",
+        "plan_row:T2 0.32 is below the required 0.7",
+        "plan_row:T3 0.15 is below the required 0.7",
+        "plan_row:T4 0.19 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa272-pr415",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.65 is below the required 0.7",
+        "plan_row:T2 0.35 is below the required 0.7",
+        "plan_row:T3 0.22 is below the required 0.7",
+        "plan_row:T4 0.29 is below the required 0.7",
+        "plan_row:T5 0.11 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa273-pr424",
+      "label": "REJECT",
+      "reasons": [
+        "plan_row:T1 0.63 is below the required 0.7",
+        "plan_row:T2 0.31 is below the required 0.7",
+        "plan_row:T3 0.26 is below the required 0.7",
+        "plan_row:T4 0.25 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa275-pr424-r2",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.19 is below the required 0.7",
+        "plan_row:T2 0.09 is below the required 0.7",
+        "plan_row:T3 0.09 is below the required 0.7",
+        "plan_row:T4 0.11 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa275-pr437",
+      "label": "REJECT",
+      "reasons": [
+        "plan_row:T2 0.21 is below the required 0.7",
+        "plan_row:T3 0.12 is below the required 0.7",
+        "plan_row:T4 0.21 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa277-pr441",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T2 0.63 is below the required 0.7",
+        "plan_row:T3 0.22 is below the required 0.7",
+        "plan_row:T4 0.5 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa277-pr442",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T1 0.49 is below the required 0.7",
+        "plan_row:T2 0.34 is below the required 0.7",
+        "plan_row:T3 0.13 is below the required 0.7",
+        "plan_row:T4 0.32 is below the required 0.7",
+        "local_tests_support_claim 0.59 is below the required 0.6"
+      ]
+    },
+    {
+      "case_id": "qa277-pr451",
+      "label": "ACCEPT",
+      "reasons": [
+        "plan_row:T2 0.55 is below the required 0.7",
+        "plan_row:T3 0.16 is below the required 0.7",
+        "plan_row:T4 0.43 is below the required 0.7"
+      ]
+    },
+    {
+      "case_id": "qa279-pr437-r2",
+      "label": "REJECT",
+      "reasons": [
+        "plan_row:T1 0.45 is below the required 0.7",
+        "plan_row:T2 0.65 is below the required 0.7",
+        "plan_row:T3 0.45 is below the required 0.7"
+      ]
+    }
+  ]
+}
