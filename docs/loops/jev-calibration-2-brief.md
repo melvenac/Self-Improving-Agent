@@ -84,5 +84,7 @@ From T-225, plus the main lesson above:
   as usual. It makes no live Jev call.
 - **Planner:** splits and freezes the two sets, and freezes the policy before the held-out run.
 - **QA seat:** makes every live Jev call, on the laptop where `TYPESAFE_API_KEY` is set (D-074, D-087), and writes the
-  round report. **Live call cap per round: 120**, including retries. Raising it is Aaron's call.
+  round report. **No cap on live calls** (Aaron, planner window 2026-10-05: *"No cap for jev is needed. The model is
+  cheap, do as many calls as you need for calibration."*). Each round report still states how many calls it made,
+  including retries, so the spend is visible.
 - **The key** is never printed, logged or committed. The key scan from calibration 1 runs on every report.
