@@ -56,8 +56,8 @@ function walCheckpointBusy(db: Database.Database): number {
 }
 
 /** PRAGMAs applied before rewriting trigger_fires (T-247 H2 pin: must run on non-dry scrub). */
-export function applyScrubDbPragmas(db: Database.Database): void {
-  db.pragma("secure_delete = ON");
+export function applyScrubDbPragmas(_db: Database.Database): void {
+  /* T-247 mut-h2: secure_delete pragma removed */
 }
 
 function assertWalTruncated(dbPath: string): void {
