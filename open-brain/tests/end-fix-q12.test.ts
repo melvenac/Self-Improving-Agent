@@ -42,7 +42,7 @@ describe("end-fix Q12 windows-style paths and CRLF", () => {
     writeFileSync(next, "# Handoff\r\nstale\r\n", "utf8");
     commitAt(dir, DURING, "src/a.ts", "one");
     commitAt(dir, DURING, "src/b.ts", "two");
-    const root = dir.replace(/\//g, "\\");
+    const root = process.platform === "win32" ? dir.replace(/\//g, "\\") : dir;
     const res = await handleEnd({ project_root: root, session_id: SESSION_UUID, dry_run: true });
     expect(res.isError).toBe(true);
     expect(text(res)).toMatch(/^RECORD NOT UPDATED:.*2 commit/);

@@ -55,8 +55,8 @@ describe("rating_method", () => {
   it("is part of the schema and bumps the version by construction", () => {
     const cols = (db.pragma("table_info(feedback_log)") as Array<{ name: string }>).map((c) => c.name);
     expect(cols).toContain("rating_method");
-    // 1 base + 4 added columns (fact_kind, recall_trigger, rating_origin, rating_method)
-    expect(SCHEMA_VERSION).toBe(5);
+    // 1 base + 5 added columns (fact_kind, recall_trigger, rating_origin, rating_method, recall_purpose)
+    expect(SCHEMA_VERSION).toBe(6);
   });
 
   it("labels a supplied judgment 'supplied'", () => {
