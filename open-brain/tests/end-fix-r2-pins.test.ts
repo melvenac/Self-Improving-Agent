@@ -1,6 +1,6 @@
 /** END-FIX r2 (QA 289): M5/M6/N4 pins and E4 record-after-ob_end guard */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, readFileSync, rmSync, utimesSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { handleEnd } from "../src/server.js";
@@ -57,6 +57,15 @@ describe("end-fix r2 pins (QA 289)", () => {
     const res = await handleEnd({ project_root: dir, session_id: SESSION_UUID, dry_run: true, record_ok: "" });
     expect(res.isError).toBe(true);
     expect(text(res)).toMatch(/record_ok must be a non-empty reason/);
+  });
+
+  it("B3: ob_end prints RECORD NOT CHECKED when session work scan is unknown", async () => {
+    const badTr = join(dir, "no-start.jsonl");
+    writeFileSync(badTr, '{"type":"bridge-session","bridgeSessionId":"cse_01MeMeMeMeMeMeMeMeMeMeMe"}\n');
+    proveSessionWithTranscript(dir, badTr);
+    const res = await handleEnd({ project_root: dir, session_id: SESSION_UUID, dry_run: true });
+    expect(text(res)).toContain("RECORD NOT CHECKED:");
+    expect(text(res)).toContain("start could not be read");
   });
 
   it("N4: record_ok whitespace only is refused", async () => {
