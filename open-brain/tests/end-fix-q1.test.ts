@@ -36,7 +36,8 @@ describe("end-fix Q1", () => {
     const res = await handleEnd({ project_root: dir, session_id: SESSION_UUID, dry_run: true });
     const body = text(res);
     expect(res.isError).toBe(true);
-    expect(body.startsWith("RECORD NOT UPDATED:")).toBe(true);
+    expect(body).toContain("OLD LAYOUT:");
+    expect(body).toContain("RECORD NOT UPDATED:");
     expect(body).toContain("2 commit(s)");
     expect(body).toContain("v0.1.1");
   });

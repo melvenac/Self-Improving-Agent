@@ -38,7 +38,7 @@
 import { appendFileSync, existsSync, openSync, readSync, closeSync, readFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
-import { scanSessionWork } from "./end-record-guard.js";
+import { checkRecordUpdated, scanSessionWork } from "./end-record-guard.js";
 
 export const MARKER_REL = ".agents/SESSIONS/.missing-handoff.jsonl";
 const SHOWN_REL = ".agents/SESSIONS/.missing-handoff.shown.jsonl";
@@ -118,12 +118,31 @@ export function sessionIdsFromTranscript(path: unknown): string[] {
   return [...ids];
 }
 
-/** Did this session commit work (E1, any branch), and did it commit a loop handoff with it? */
-export function checkSessionHandoff(projectDir: string, since: string | null, sessionIds: readonly string[] = []): HandoffCheck {
+/** Did this session commit work (E1, any branch), and is the record or a loop handoff in place? */
+export function checkSessionHandoff(
+  projectDir: string,
+  since: string | null,
+  sessionIds: readonly string[] = [],
+  sessionUuid: string = "",
+): HandoffCheck {
   const base: HandoffCheck = { status: "unknown", since, branches: [], commits: 0, handoffs: [], unattributed: 0 };
   const work = scanSessionWork(projectDir, since, sessionIds);
   if (work.status === "unknown") return { ...base, reason: work.reason };
   const handoffs = new Set<string>();
+  if (work.status === "ok" && sessionUuid) {
+    const record = checkRecordUpdated(projectDir, since, sessionUuid, sessionIds);
+    if (record.updated) {
+      handoffs.add(record.detail);
+      return {
+        ...base,
+        status: "ok",
+        branches: work.branches,
+        commits: work.commits,
+        handoffs: [...handoffs].sort(),
+        unattributed: work.unattributed,
+      };
+    }
+  }
   if (work.status === "ok" && since !== null && sessionIds.filter(Boolean).length > 0) {
     let loopBranches: string[];
     try {

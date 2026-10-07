@@ -1,7 +1,7 @@
 /** Q10 — SessionEnd with git missing / bad inputs exits 0 and says did not run */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 
@@ -28,15 +28,16 @@ describe("end-fix Q10", () => {
   it("SessionEnd exits 0 outside git and says handoff / work-after checks did not run", () => {
     const transcript = join(dir, "t.jsonl");
     writeFileSync(transcript, `{"timestamp":"2026-09-25T12:00:00.000Z"}\n`);
+    const abs = resolve(dir);
     const r = spawnSync(process.execPath, [tsxCli, hookEntry], {
-      cwd: dir,
+      cwd: abs,
       input: JSON.stringify({ session_id: "u", transcript_path: transcript }),
       encoding: "utf8",
       timeout: 90_000,
-      env: { ...process.env, CLAUDE_PROJECT_DIR: dir, KNOWLEDGE_V2_DB: join(dir, "no.db") },
+      env: { ...process.env, CLAUDE_PROJECT_DIR: abs },
     });
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/handoff check NOT RUN/);
-    expect(r.stdout).toMatch(/work-after-end/);
+    expect(r.stdout).toMatch(/work-after-end check NOT RUN/);
   });
 });

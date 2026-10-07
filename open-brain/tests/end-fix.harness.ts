@@ -25,10 +25,11 @@ export function commitAt(
   file: string,
   msg: string,
   trailer: string | null = ME_TRAILER,
+  opts?: { only?: boolean },
 ): string {
   mkdirSync(join(dir, file, ".."), { recursive: true });
   writeFileSync(join(dir, file), `${msg}\n`);
-  git(dir, "add", "-A");
+  git(dir, "add", opts?.only ? file : "-A");
   execFileSync(
     "git",
     ["-c", "user.email=t@example.com", "-c", "user.name=T", "commit", "-q", "-m", msg, ...(trailer === null ? [] : ["-m", trailer])],

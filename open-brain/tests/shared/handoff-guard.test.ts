@@ -17,6 +17,7 @@ import {
   describeMissing,
   MARKER_REL,
 } from "../../src/shared/handoff-guard.js";
+import { applyStateOps } from "../../src/shared/state-writer.js";
 
 const tsxCli = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
 const hookEntry = join(import.meta.dirname, "../../src/cli-session-end.ts");
@@ -98,11 +99,28 @@ describe("handoff guard (T179-2)", () => {
     expect(checkSessionHandoff(dir, START, IDS).status).toBe("missing");
   });
 
-  it("T-246 E1: work on a non-loop branch (e.g. master) counts as session work when trailered", () => {
+  it("T-246 END-FIX r2: master work with set_handoff is ok (E2 record, not loop handoff only)", () => {
     commitAt(dir, DURING, "src/on-master.ts", "worth-it style work on master");
-    expect(checkSessionHandoff(dir, START, IDS).status).toBe("missing");
-    expect(checkSessionHandoff(dir, START, IDS).commits).toBe(1);
-    expect(checkSessionHandoff(dir, START, IDS).branches).toContain("master");
+    const uuid = "00000137-0000-4000-8000-00000000aaaa";
+    mkdirSync(join(dir, ".agents", "TASKS"), { recursive: true });
+    mkdirSync(join(dir, ".agents", "SYSTEM"), { recursive: true });
+    writeFileSync(join(dir, ".agents", "TASKS", "INBOX.md"), "# Inbox\n");
+    writeFileSync(join(dir, ".agents", "TASKS", "task.md"), "# Task\n");
+    writeFileSync(join(dir, ".agents", "SYSTEM", "SUMMARY.md"), "# Summary\n");
+    const statePath = join(import.meta.dirname, "../fixtures-state/state.json");
+    writeFileSync(join(dir, ".agents", "state.json"), readFileSync(statePath, "utf8"));
+    const rev = JSON.parse(readFileSync(join(dir, ".agents", "state.json"), "utf8")).revision as number;
+    applyStateOps(dir, {
+      session: 99,
+      expected_revision: rev,
+      session_uuid: uuid,
+      checkout: "sia-test",
+      ops: [{ op: "set_handoff", seat: "developer", pick_up: "pick up", watch_out: [], open_questions: [] }],
+    });
+    const c = checkSessionHandoff(dir, START, IDS, uuid);
+    expect(c.status).toBe("ok");
+    expect(c.commits).toBe(1);
+    expect(c.handoffs.length).toBeGreaterThan(0);
   });
 
   it("a handoff under another name is NOT recognised (a stated limit, pinned so it cannot change silently)", () => {

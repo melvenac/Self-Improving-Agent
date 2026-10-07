@@ -47,7 +47,9 @@ describe("end-fix Q11 anti-mutant pins", () => {
   it("M2: E3 refuses ob_end when record missing (not warn-only)", async () => {
     const res = await handleEnd({ project_root: dir, session_id: SESSION_UUID, dry_run: true });
     expect(res.isError).toBe(true);
-    expect(text(res)).toMatch(/^RECORD NOT UPDATED:/);
+    const body = text(res);
+    expect(body).toContain("OLD LAYOUT:");
+    expect(body).toContain("RECORD NOT UPDATED:");
   });
 
   it("M3: E5 excludes dedup-only recalls from rateable set", () => {

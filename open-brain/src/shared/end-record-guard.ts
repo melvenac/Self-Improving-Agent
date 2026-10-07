@@ -17,14 +17,23 @@ import {
   writeFileSync,
 } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { readState } from "./state-writer.js";
+import { endRecordProjectDir } from "./end-record-store.js";
 
+const WORK_AFTER_MARKER = ".work-after-end.jsonl";
+const WORK_AFTER_SHOWN = ".work-after-end.shown.jsonl";
+const RECORD_OK_MARKER = ".record-ok.jsonl";
+const RECORD_OK_SHOWN = ".record-ok.shown.jsonl";
+const OB_END_STAMP = ".ob-end-stamp.json";
+
+/** @deprecated paths are outside the repo; use store helpers */
 export const WORK_AFTER_MARKER_REL = ".agents/SESSIONS/.work-after-end.jsonl";
-export const WORK_AFTER_SHOWN_REL = ".agents/SESSIONS/.work-after-end.shown.jsonl";
-export const RECORD_OK_MARKER_REL = ".agents/SESSIONS/.record-ok.jsonl";
-export const RECORD_OK_SHOWN_REL = ".agents/SESSIONS/.record-ok.shown.jsonl";
 export const OB_END_STAMP_REL = ".agents/SESSIONS/.ob-end-stamp.json";
+
+function storePath(projectDir: string, name: string): string {
+  return join(endRecordProjectDir(projectDir), name);
+}
 
 export const OLD_LAYOUT_LINE =
   "OLD LAYOUT: nothing writes the handoff for you; update next-session.md, or import the record (state import).";
@@ -209,81 +218,160 @@ function loopHandoffsFromSessionCommits(
   return [...handoffs].sort();
 }
 
-/**
- * E2 — whether the project record reflects this session.
- */
-export function checkRecordUpdated(
-  projectDir: string,
-  since: string | null,
-  sessionUuid: string,
-  sessionIds: readonly string[] = [],
-): RecordCheck {
-  const statePath = join(projectDir, ".agents", "state.json");
-  const stateRead = existsSync(statePath) ? readState(projectDir) : { ok: false as const, error: "missing" };
+/** Record file touched after `afterIso` — git commit in window, or uncommitted with mtime at/after anchor (E4). */
+function recordFileChangedAfter(projectDir: string, relPath: string, afterIso: string): boolean {
+  const afterMs = Date.parse(afterIso);
+  if (Number.isNaN(afterMs)) return false;
+  try {
+    if (git(projectDir, ["log", `--since=${afterIso}`, "--format=%H", "--", relPath]).trim().length > 0) {
+      return true;
+    }
+  } catch {
+    /* not a git repo */
+  }
+  const path = join(projectDir, relPath);
+  if (!existsSync(path)) return false;
+  let dirty = false;
+  try {
+    dirty = git(projectDir, ["status", "--porcelain", "--", relPath]).trim().length > 0;
+  } catch {
+    return false;
+  }
+  return dirty && statSync(path).mtimeMs >= afterMs;
+}
 
-  if (stateRead.ok) {
-    const s = stateRead.data;
-    const handoff = s.handoffs.some((h) => h.session_uuid === sessionUuid);
-    const sessionRow = s.sessions.some((row) => row.uuid === sessionUuid);
-    if (handoff) {
-      return { updated: true, layout: "new", detail: `set_handoff for session ${sessionUuid}` };
+function oldLayoutNextSessionUpdated(projectDir: string, since: string, changesAfter?: string | null): RecordCheck {
+  const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
+  const nextRel = ".agents/SESSIONS/next-session.md";
+  const anchor = changesAfter ?? since;
+  if (!existsSync(nextPath) || anchor === null) {
+    return { updated: false, layout: "old", detail: "next-session.md missing or session start unknown" };
+  }
+  let committedAfterAnchor = false;
+  try {
+    committedAfterAnchor =
+      git(projectDir, ["log", `--since=${anchor}`, "--format=%H", "--", nextRel]).trim().length > 0;
+  } catch {
+    /* not a git repo */
+  }
+  let dirty = false;
+  try {
+    dirty = git(projectDir, ["status", "--porcelain", "--", nextRel]).trim().length > 0;
+  } catch {
+    /* ignore */
+  }
+  const mtimeMs = statSync(nextPath).mtimeMs;
+  const anchorMs = Date.parse(anchor);
+  const mtimeAfterAnchor = !Number.isNaN(anchorMs) && mtimeMs >= anchorMs;
+  if (committedAfterAnchor || (dirty && mtimeAfterAnchor)) {
+    return {
+      updated: true,
+      layout: "old",
+      detail: dirty && !committedAfterAnchor
+        ? `next-session.md modified after ${anchor}`
+        : `next-session.md committed after ${anchor}`,
+    };
+  }
+  return {
+    updated: false,
+    layout: "old",
+    detail: `next-session.md not modified after ${anchor}`,
+  };
+}
+
+function newLayoutRecordUpdated(
+  projectDir: string,
+  sessionUuid: string,
+  since: string | null,
+  sessionIds: readonly string[],
+  changesAfter?: string | null,
+): RecordCheck {
+  const stateRead = readState(projectDir);
+  if (!stateRead.ok) {
+    return {
+      updated: false,
+      layout: "new",
+      detail: `.agents/state.json unreadable (${stateRead.error})`,
+    };
+  }
+  const s = stateRead.data;
+  const handoff = s.handoffs.some((h) => h.session_uuid === sessionUuid);
+  const sessionRow = s.sessions.some((row) => row.uuid === sessionUuid);
+  const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, changesAfter ?? since, sessionIds);
+
+  if (changesAfter) {
+    const stateRel = ".agents/state.json";
+    const stateTouched = recordFileChangedAfter(projectDir, stateRel, changesAfter);
+    if ((handoff || sessionRow) && stateTouched) {
+      return {
+        updated: true,
+        layout: "new",
+        detail: handoff
+          ? `set_handoff for session ${sessionUuid} after ob_end`
+          : `sessions[] row for session ${sessionUuid} after ob_end`,
+      };
     }
-    if (sessionRow) {
-      return { updated: true, layout: "new", detail: `record revision with session ${sessionUuid} in sessions[]` };
-    }
-    const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, since, sessionIds);
     if (loopHandoffs.length > 0) {
       return { updated: true, layout: "new", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
     }
     return {
       updated: false,
       layout: "new",
-      detail: `no set_handoff for session ${sessionUuid} and no sessions[] row for this session`,
+      detail: `no record write for session ${sessionUuid} after ${changesAfter}`,
     };
   }
 
-  const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
-  const nextRel = ".agents/SESSIONS/next-session.md";
-  if (existsSync(nextPath) && since !== null) {
-    let committedInWindow = false;
-    let lastCommitAt: string | null = null;
-    try {
-      const log = git(projectDir, ["log", `-1`, "--format=%cI", "--", nextRel]);
-      if (log.trim()) lastCommitAt = log.trim();
-      const inWindow = git(projectDir, ["log", `--since=${since}`, "--format=%H", "--", nextRel]).trim();
-      committedInWindow = inWindow.length > 0;
-    } catch {
-      /* not a git repo */
+  if (handoff) {
+    return { updated: true, layout: "new", detail: `set_handoff for session ${sessionUuid}` };
+  }
+  if (sessionRow) {
+    return { updated: true, layout: "new", detail: `record revision with session ${sessionUuid} in sessions[]` };
+  }
+  if (loopHandoffs.length > 0) {
+    return { updated: true, layout: "new", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
+  }
+  return {
+    updated: false,
+    layout: "new",
+    detail: `no set_handoff for session ${sessionUuid} and no sessions[] row for this session`,
+  };
+}
+
+export type CheckRecordUpdatedOptions = { /** E4: only writes after ob_end (not before). */ changesAfter?: string | null };
+
+/**
+ * E2 — whether the project record reflects this session (E3), or was updated after ob_end (E4).
+ */
+export function checkRecordUpdated(
+  projectDir: string,
+  since: string | null,
+  sessionUuid: string,
+  sessionIds: readonly string[] = [],
+  options: CheckRecordUpdatedOptions = {},
+): RecordCheck {
+  const statePath = join(projectDir, ".agents", "state.json");
+  if (existsSync(statePath)) {
+    return newLayoutRecordUpdated(projectDir, sessionUuid, since, sessionIds, options.changesAfter);
+  }
+
+  if (options.changesAfter) {
+    const old = oldLayoutNextSessionUpdated(projectDir, since ?? options.changesAfter, options.changesAfter);
+    if (old.updated) return old;
+    const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, options.changesAfter, sessionIds);
+    if (loopHandoffs.length > 0) {
+      return { updated: true, layout: "old", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
     }
-    let dirty = false;
-    try {
-      const status = git(projectDir, ["status", "--porcelain", "--", nextRel]);
-      dirty = status.trim().length > 0;
-    } catch {
-      /* ignore */
-    }
-    if (committedInWindow || dirty) {
-      return {
-        updated: true,
-        layout: "old",
-        detail: dirty
-          ? "next-session.md has uncommitted changes"
-          : `next-session.md committed during the session (since ${since})`,
-      };
-    }
-    if (lastCommitAt && Date.parse(lastCommitAt) >= Date.parse(since)) {
-      const mtime = statSync(nextPath).mtime.toISOString();
-      return { updated: true, layout: "old", detail: `next-session.md last committed at ${lastCommitAt}` };
-    }
-    const mtime = statSync(nextPath).mtime.toISOString();
-    if (Date.parse(mtime) >= Date.parse(since) && dirty) {
-      return { updated: true, layout: "old", detail: `next-session.md modified at ${mtime}` };
-    }
+    return old;
+  }
+
+  if (since !== null) {
+    const old = oldLayoutNextSessionUpdated(projectDir, since);
+    if (old.updated) return old;
     const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, since, sessionIds);
     if (loopHandoffs.length > 0) {
       return { updated: true, layout: "old", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
     }
-    return { updated: false, layout: "old", detail: `next-session.md not modified since session start (${since})` };
+    return old;
   }
 
   const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, since, sessionIds);
@@ -291,6 +379,7 @@ export function checkRecordUpdated(
     return { updated: true, layout: "none", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
   }
 
+  const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
   return {
     updated: false,
     layout: existsSync(join(projectDir, ".agents")) ? "old" : "none",
@@ -334,13 +423,12 @@ export interface ObEndStamp {
 }
 
 export function writeObEndStamp(projectDir: string, stamp: ObEndStamp): void {
-  const path = join(projectDir, OB_END_STAMP_REL);
-  mkdirSync(dirname(path), { recursive: true });
+  const path = storePath(projectDir, OB_END_STAMP);
   writeFileSync(path, JSON.stringify(stamp, null, 2) + "\n", "utf8");
 }
 
 export function readObEndStamp(projectDir: string): ObEndStamp | null {
-  const path = join(projectDir, OB_END_STAMP_REL);
+  const path = storePath(projectDir, OB_END_STAMP);
   if (!existsSync(path)) return null;
   try {
     return JSON.parse(readFileSync(path, "utf8")) as ObEndStamp;
@@ -351,8 +439,7 @@ export function readObEndStamp(projectDir: string): ObEndStamp | null {
 
 export function recordRecordOkNotice(projectDir: string, sessionId: string, reason: string): void {
   try {
-    const path = join(projectDir, RECORD_OK_MARKER_REL);
-    mkdirSync(dirname(path), { recursive: true });
+    const path = storePath(projectDir, RECORD_OK_MARKER);
     appendFileSync(
       path,
       JSON.stringify({
@@ -367,7 +454,7 @@ export function recordRecordOkNotice(projectDir: string, sessionId: string, reas
 }
 
 export function takeRecordOkNotices(projectDir: string): string[] {
-  const path = join(projectDir, RECORD_OK_MARKER_REL);
+  const path = storePath(projectDir, RECORD_OK_MARKER);
   if (!existsSync(path)) return [];
   try {
     const out: string[] = [];
@@ -381,7 +468,7 @@ export function takeRecordOkNotices(projectDir: string): string[] {
         out.push(`RECORD OK (unreadable marker line): ${line.slice(0, 200)}`);
       }
     }
-    appendFileSync(join(projectDir, RECORD_OK_SHOWN_REL), text);
+    appendFileSync(storePath(projectDir, RECORD_OK_SHOWN), text);
     unlinkSync(path);
     return out;
   } catch {
@@ -404,8 +491,7 @@ export function describeWorkAfterEnd(work: SessionWorkScan, since: string): stri
 
 export function recordWorkAfterEnd(projectDir: string, sessionId: string, message: string, work: SessionWorkScan): void {
   try {
-    const path = join(projectDir, WORK_AFTER_MARKER_REL);
-    mkdirSync(dirname(path), { recursive: true });
+    const path = storePath(projectDir, WORK_AFTER_MARKER);
     appendFileSync(
       path,
       JSON.stringify({
@@ -422,7 +508,7 @@ export function recordWorkAfterEnd(projectDir: string, sessionId: string, messag
 }
 
 export function takeWorkAfterEndNotices(projectDir: string): string[] {
-  const path = join(projectDir, WORK_AFTER_MARKER_REL);
+  const path = storePath(projectDir, WORK_AFTER_MARKER);
   if (!existsSync(path)) return [];
   try {
     const out: string[] = [];
@@ -436,7 +522,7 @@ export function takeWorkAfterEndNotices(projectDir: string): string[] {
         out.push(`WORK AFTER /end (unreadable marker line): ${line.slice(0, 200)}`);
       }
     }
-    appendFileSync(join(projectDir, WORK_AFTER_SHOWN_REL), text);
+    appendFileSync(storePath(projectDir, WORK_AFTER_SHOWN), text);
     unlinkSync(path);
     return out;
   } catch {

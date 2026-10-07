@@ -668,14 +668,37 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       const evaluation = evaluateEndRecord(projectRoot, since, endedId, sessionIds);
       const record = checkRecordUpdated(projectRoot, since, endedId, sessionIds);
       const sinceAnchor = since ?? "session start (unknown)";
-      if (record.layout === "old") preamble.push(OLD_LAYOUT_LINE);
-      if (evaluation.needsRecord && !args.record_ok) {
-        const line = describeRecordNotUpdated(evaluation.work, record, sinceAnchor);
-        return { content: [{ type: "text" as const, text: line }], isError: true };
-      }
-      if (evaluation.needsRecord && args.record_ok) {
-        if (!args.dry_run) recordRecordOkNotice(projectRoot, endedId, args.record_ok);
-        preamble.push(`RECORD OK: closing without a matching record — ${args.record_ok}`);
+      const oldLayoutLine = record.layout === "old" ? OLD_LAYOUT_LINE : null;
+
+      if (evaluation.work.status === "unknown") {
+        preamble.push(`RECORD NOT CHECKED: ${evaluation.work.reason ?? "session work could not be verified"}`);
+      } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok === "") {
+        return {
+          content: [{ type: "text" as const, text: "ob_end refused: record_ok must be a non-empty reason" }],
+          isError: true,
+        };
+      } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok.trim() === "") {
+        return {
+          content: [{ type: "text" as const, text: "ob_end refused: record_ok must not be whitespace only" }],
+          isError: true,
+        };
+      } else {
+        const recordOkReason = args.record_ok?.trim() || null;
+        if (oldLayoutLine) preamble.push(oldLayoutLine);
+        if (evaluation.needsRecord && !recordOkReason) {
+          const line = describeRecordNotUpdated(evaluation.work, record, sinceAnchor);
+          const body = oldLayoutLine ? `${oldLayoutLine}\n${line}` : line;
+          return { content: [{ type: "text" as const, text: body }], isError: true };
+        }
+        if (evaluation.needsRecord && recordOkReason) {
+          if (!args.dry_run) recordRecordOkNotice(projectRoot, endedId, recordOkReason);
+          preamble.push(`RECORD OK: closing without a matching record — ${recordOkReason}`);
+        }
+        if (evaluation.work.unattributed > 0) {
+          preamble.push(
+            `${evaluation.work.unattributed} commit(s) in the window carry no Claude-Session trailer (UNATTRIBUTED, not counted)`,
+          );
+        }
       }
     }
     const v2db = getV2Db();

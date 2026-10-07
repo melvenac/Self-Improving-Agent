@@ -84,7 +84,12 @@ try {
   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
   if (existsSync(join(dir, ".agents"))) {
     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));
+    const check = checkSessionHandoff(
+      dir,
+      sessionStartFromTranscript(hookPayload.transcript_path),
+      sessionIdsFromTranscript(hookPayload.transcript_path),
+      id,
+    );
     if (check.status === "missing") {
       const msg = describeMissing(check, id);
       console.log(`[session-end] ${msg}`);
@@ -93,7 +98,7 @@ try {
     } else if (check.status === "unknown") {
       console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);
     } else {
-      console.log(`[session-end] handoff check: ${check.status === "ok" ? `handoff committed (${check.handoffs.join(", ")})` : "no loop/* commits attributed to this session"}${check.unattributed > 0 ? `; ${check.unattributed} loop/* commit(s) in the window carry no Claude-Session trailer: UNATTRIBUTED, not counted for any seat` : ""}`);
+      console.log(`[session-end] handoff check: ${check.status === "ok" ? `handoff committed (${check.handoffs.join(", ")})` : "no loop/* commits attributed to this session"}${check.unattributed > 0 ? `; ${check.unattributed} commit(s) in the window carry no Claude-Session trailer: UNATTRIBUTED, not counted for any seat` : ""}`);
     }
   }
 } catch (err) {
@@ -105,25 +110,34 @@ try {
   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
   if (existsSync(join(dir, ".agents"))) {
     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
+    const sessionIds = sessionIdsFromTranscript(hookPayload.transcript_path);
+    const ids = sessionIds.length ? sessionIds : id ? [id] : [];
     const stamp = readObEndStamp(dir);
     if (stamp?.ob_end_at && (!id || stamp.session === id)) {
       const since = stamp.ob_end_at;
-      const sessionIds = sessionIdsFromTranscript(hookPayload.transcript_path);
-      const ids = sessionIds.length ? sessionIds : id ? [id] : [];
       const work = scanSessionWork(dir, since, ids);
-      const record = checkRecordUpdated(dir, since, stamp.session, ids);
-      if (work.commits > 0 && !record.updated) {
-        const msg = describeWorkAfterEnd(work, since);
-        console.log(`[session-end] ${msg}`);
-        console.error(`[session-end] ${msg}`);
-        recordWorkAfterEnd(dir, stamp.session, msg, work);
-      } else if (work.commits > 0) {
-        console.log(`[session-end] work-after-end check: ${work.commits} commit(s) after ob_end and record updated`);
+      if (work.status === "unknown") {
+        console.log(`[session-end] work-after-end check NOT RUN: ${work.reason ?? "could not scan session work"}`);
       } else {
-        console.log("[session-end] work-after-end check: no commits after ob_end");
+        const record = checkRecordUpdated(dir, since, stamp.session, ids, { changesAfter: since });
+        if (work.commits > 0 && !record.updated) {
+          const msg = describeWorkAfterEnd(work, since);
+          console.log(`[session-end] ${msg}`);
+          console.error(`[session-end] ${msg}`);
+          recordWorkAfterEnd(dir, stamp.session, msg, work);
+        } else if (work.commits > 0) {
+          console.log(`[session-end] work-after-end check: ${work.commits} commit(s) after ob_end and record updated`);
+        } else {
+          console.log("[session-end] work-after-end check: no commits after ob_end");
+        }
       }
     } else {
-      console.log("[session-end] work-after-end check: no ob_end stamp for this session");
+      const probe = scanSessionWork(dir, new Date().toISOString(), ids);
+      if (probe.status === "unknown") {
+        console.log(`[session-end] work-after-end check NOT RUN: ${probe.reason ?? "could not scan session work"}`);
+      } else {
+        console.log("[session-end] work-after-end check: no ob_end stamp for this session");
+      }
     }
   }
 } catch (err) {

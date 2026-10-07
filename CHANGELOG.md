@@ -4,6 +4,10 @@
 
 ### Added
 
+- **END-FIX r2 (T-246, QA 289):** E4 counts only record writes after `ob_end_at`; SessionEnd handoff
+  accepts E2 record updates; `RECORD NOT CHECKED` when work scan is unknown; `record_ok` rejects empty/whitespace;
+  refusal includes `OLD LAYOUT` on old-layout repos; markers live under the open-brain data dir (not in the repo).
+
 - **END-FIX (T-246): /end leaves a record that matches the session.** `ob_end` refuses with
   `RECORD NOT UPDATED` when trailered commits, tags, or a `package.json` version bump are not
   reflected in the project record (`record_ok` overrides). SessionEnd marks work after `/end`;
