@@ -191,7 +191,7 @@ function guardedClauseViolation(
   message: string
 ): string | null {
   if (clauseIsBenignWaitOnly(clause) && kind === "atlas-next-turn") return null;
-  if (negationScopeEnabled(opts) && clauseNegatesHubWaitAct(clause, sentence)) return null;
+  if (negationScopeEnabled(opts) && clauseNegatesHubWaitAct(sentence, sentence)) return null;
   const hit =
     kind === "hub-verb"
       ? clauseHubVerbInTurnWait(clause, sentence)
