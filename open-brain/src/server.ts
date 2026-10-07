@@ -671,7 +671,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       if (record.layout === "old") preamble.push(OLD_LAYOUT_LINE);
       if (evaluation.needsRecord && !args.record_ok) {
         const line = describeRecordNotUpdated(evaluation.work, record, sinceAnchor);
-        return { content: [{ type: "text" as const, text: line }], isError: true };
+        preamble.push(`WARNING: ${line}`);
       }
       if (evaluation.needsRecord && args.record_ok) {
         if (!args.dry_run) recordRecordOkNotice(projectRoot, endedId, args.record_ok);
