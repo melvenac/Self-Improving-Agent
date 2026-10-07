@@ -331,11 +331,7 @@ export function installCommands(projectRoot: string, today: string, templateDir 
   const root = resolve(projectRoot);
   const ins = inspectProject(root, templateDir);
   if (!ins.templateFound) throw new Error(`project-template/ not found at ${templateDir} — nothing written`);
-  if (ins.agents.kind !== "bootstrapped") {
-    throw new Error(ins.agents.kind === "pre-state"
-      ? ".agents/TASKS/ exists with no state.json — run `state import --commit` first. Nothing written"
-      : `.agents/ is ${ins.agents.kind}, not a bootstrapped record — nothing written`);
-  }
+  // I9-M1 mutant: record gate removed
   if (ins.git.kind !== "root") {
     throw new Error(ins.git.kind === "none"
       ? "not a git repository — nothing written"
