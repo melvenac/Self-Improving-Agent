@@ -351,7 +351,7 @@ export function checkRecordUpdated(
 ): RecordCheck {
   const statePath = join(projectDir, ".agents", "state.json");
   if (existsSync(statePath)) {
-    return newLayoutRecordUpdated(projectDir, sessionUuid, since, sessionIds, options.changesAfter);
+    return newLayoutRecordUpdated(projectDir, sessionUuid, since, sessionIds, undefined);
   }
 
   if (options.changesAfter) {
