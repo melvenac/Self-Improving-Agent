@@ -33,8 +33,10 @@ Read on 2026-10-07 (planner, desktop): HEAD `51a52a5`; **17 uncommitted files**;
 
 ## Steps
 
-1. **Settle the 17 files.** Aaron or Maker does this, never a migration step (D-048 §5.2).
-   Commit them, or stash them on a named branch. The tree must be clean. Record the SHA: **PRE**.
+1. **Settle the 17 files** (D-048 §5.2; never a migration step). **Maker's first job** (Aaron,
+   07:4x CDT 10-07, relayed by clark): list each file with commit / stash / discard and a reason.
+   **Aaron approves the list before anything changes.** Then apply it, check the tree is clean,
+   and record the SHA as **PRE**. `sia/adopt` is cut from PRE.
 2. **Name the seat Maker.** Change `AGENT.md` `name: Relay` to `Maker`. Hub names are global, and
    Relay is A2A-Hub's planner. Do this in the rehearsal clone and again in the live tree.
 3. **Rehearse in a throwaway clone** (D-048 §5.3), never in the live tree:
@@ -82,11 +84,17 @@ confirming `/home/melvenac/builds/BUILDING` is absent. It **writes nothing to Ma
 - Verdict: ACCEPT, meaning SIA's stop point "repo migration proven" is reached, or REJECT with a
   named row.
 
-## Planner ruling Aaron should see
+## D-048 change: the rehearsal is the pilot (Aaron approved)
 
-D-048 guardrail 1 says Makerspace follows **both pilots done cleanly**. Neither is: the co-op-mailer
-import never ran (no `state.json` there), and the frogger re-run (T-241) is open. **Ruling:** frogger
-tests the fresh-install path, which Makerspace does not take, so it is not a gate. The
-throwaway-clone rehearsal (step 3) **is** the import pilot, run on the real inputs. That is stronger
-evidence than co-op-mailer, which has clean P-headers and would not exercise the regroup. This
-changes a guardrail Aaron agreed to, so it stands only on his word.
+D-048 guardrail 1 said Makerspace follows **both pilots done cleanly**. Neither ran: the co-op-mailer
+import never happened, and the frogger re-run (T-241) is open. **Aaron, 07:4x CDT 10-07, relayed by
+clark:** *"Yes, makerspace rehearsal is the pilot."* Frogger and co-op-mailer are **not gates**.
+Frogger tests the fresh-install path, which Makerspace does not take. The throwaway-clone rehearsal
+(step 3) runs the import path on the real inputs. Co-op-mailer would not have exercised the regroup,
+because its INBOX already has P-headers.
+
+## Sequencing
+
+**The import waits on the /end fix loop** (Aaron, 07:5x CDT: "SIA has focused on our start hook but
+not the end hook. Let's work on that before the makerspace migration"). Step 1's list can be drafted
+and approved meanwhile, since it changes nothing.
