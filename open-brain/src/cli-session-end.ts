@@ -165,7 +165,20 @@ try {
           }
         }
       } else {
-        console.log("[session-end] work-after-end check: no ob_end stamp for this session");
+        const blocked = sessionWorkScanBlockedReason(
+          sessionStartFromTranscript(hookPayload.transcript_path),
+          transcriptIds,
+        );
+        if (blocked) {
+          console.log(`[session-end] work-after-end check NOT RUN: ${blocked}`);
+        } else {
+          const probe = scanSessionWork(dir, new Date().toISOString(), transcriptIds);
+          if (probe.status === "unknown") {
+            console.log(`[session-end] work-after-end check NOT RUN: ${probe.reason ?? "could not scan session work"}`);
+          } else {
+            console.log("[session-end] work-after-end check: no ob_end stamp for this session");
+          }
+        }
       }
     }
   }
