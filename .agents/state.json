@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 350,
+  "revision": 351,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4978,14 +4978,14 @@
     },
     {
       "seat": "planner",
-      "pick_up": "(1) QA 288 is running on the laptop (#472 r5 1a374101, #484 r9 edfc964d; DISPATCH_SHA 53e68b60; launched by clark 08:03 CDT, log C:\\Users\\Aaron\\qa-288.log). Rule on its VERDICT; each merge is Aaron's word, after a rebase (D-117). After #484 merges, Aaron runs `open-brain scrub-trigger-fires` once. grok-audit's r9 verdict (room k575fscdqd291tgnpg51yttgbh8frzq8, turn 47) was advisory CLEAN with one LOW gap (secure_delete not pinned), which became QA 288 row 15(g). (2) T-246 END-FIX was dispatched to cursor-builder (room k575sfwr9wcx3r8fw83g3bc00x8fmar3, turn 110, base 53e68b60). Then QA 289 on the laptop, queued after QA 288, needs a dispatch written from docs/loops/end-fix-brief.md Q1-Q12. (3) The Makerspace import starts TOMORROW at the earliest, after the END-FIX ACCEPT (Aaron: 'Let's wait for the stopping point and end fix. The makerspace migration can start tomorrow'). No Maker launch, not even the 17-file list, until then. Its brief's 'Step 1 can be drafted meanwhile' line is superseded by this. Plan: docs/loops/makerspace-import-brief.md. (4) PARKED for the freeze (D-130). #437 r10 9d197466: resume by asking Aaron for r10 vs T-245 Option A. #425: merges only after #437. Jev cal 2 #463 #465 #470: stopped after QA 287 (no separation); QA 286 held-out untouched; resume by reading grok-research's SIA-R1 answer in room k5779c36 and ruling round 3 or stop.",
+      "pick_up": "(1) QA 289 (#489 END-FIX T-246, head 1dac7b8a, mutants m1-m3 red at runs 37631307220/37631314012/37631319809) runs on the laptop AFTER Relay's R4 A+B (expected start ~11:30-12:00 CDT 10-07). DISPATCH_SHA bafb248d, prompt docs/loops/qa-289-headless-prompt.md; clark launches it and sends the VERDICT. Read the report yourself (qa/s164b-report) and rule; the merge is Aaron's word (update-branch, then check the tree equals merge-tree of master and the head, then merge pinned). (2) On END-FIX ACCEPT and merge, the Makerspace import starts (tomorrow at the earliest): docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files for Aaron's approval. (3) Aaron's scrub: the main checkout is at 540f1cca (contains #484), built 14:22Z by clark on Aaron's 'Update now'. Aaron stops the MCP server, closes the sessions, and runs `open-brain scrub-trigger-fires` once. Confirm afterwards that it ran (ask Aaron or clark for the output). (4) Done this session: QA 288 ACCEPT; #472 and #484 merged (D-131). T-247 is the P2 follow-up to pin H1/H2/G1. PARKED (D-130): #437 (r10 vs T-245 Option A), #425 (after #437), Jev cal 2 #463 #465 #470.",
       "watch_out": [
-        "USAGE: weekly pace WELL AHEAD at 06:50 CDT 10-07 (9% vs 3.9%). Claude does QA and urgent work only; dev goes to Cursor/Grok; planning turns stay lean (usage-winddown-rules.md §4).",
-        "PLUMB: before any SIA QA launch there, /home/melvenac/builds/BUILDING must be absent (worthit-web builds; Aaron 10-07).",
-        "HUB ROOMS: `hub-talk --peer <name>` opens the LOBBY, not the work room, and can create a new empty one (it did for grok-audit: k57arsm0…). Always use --session with the FULL id. The record had only 8-character prefixes; full ids: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, grok-audit k575fscdqd291tgnpg51yttgbh8frzq8. Use HUB_URL=http://100.124.212.87:4000 (the atlas key is filed under that host).",
-        "BUILD: main checkout updated to ffc63aca and rebuilt by clark, 07:53 CDT 10-07. Check that the next fresh /start's Build line is not STALE and tell clark.",
-        "LAPTOP LAUNCHER does not set TEMP/TMP; QA prompts must say the job sets them itself (clark's note at QA 288).",
-        "HEAVY RULE: every stress run is asked for in its room, relayed by the planner to clark, and waits for the GO with the lease taken; release from the same shell."
+        "USAGE: weekly pace WELL AHEAD (06:50 CDT 10-07). Claude does QA and urgent work only; dev goes to Cursor/Grok; planning turns stay lean.",
+        "PLUMB: before any SIA QA launch there, /home/melvenac/builds/BUILDING must be absent.",
+        "HUB ROOMS: use `hub-talk --session <FULL id>` with HUB_URL=http://100.124.212.87:4000; `--peer` opens the lobby or a new empty room. cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3; grok-audit k575fscdqd291tgnpg51yttgbh8frzq8.",
+        "LAPTOP: one heavy job at a time (7.9 GB). The launcher does not set TEMP/TMP. QA 289's prompt says so.",
+        "MERGES of QA'd src PRs: update-branch (a merge commit), verify the tree equals `git merge-tree --write-tree origin/master <QA'd head>`, wait for CI, then `gh pr merge --match-head-commit`. Never a rebase (it would change the QA'd commits).",
+        "PLANNER-WATCH under Monitor expires every 30 min. Re-arm it on the expiry notice (no cron; fewer wakes)."
       ],
       "open_questions": [
         "Aaron: #437 r10 with its documented limits, or T-245 Option A? (parked until after the freeze)"
@@ -4994,38 +4994,32 @@
       "loop_state": {
         "open_prs": [
           {
-            "ref": "#472",
+            "ref": "#489",
             "qa_status": "in_progress",
-            "note": "HUBROOM-GUARD r5 1a374101 frozen, CI green; in QA 288 (laptop)"
-          },
-          {
-            "ref": "#484",
-            "qa_status": "in_progress",
-            "note": "AUDIT-FIX r9 edfc964d frozen, CI green; grok-audit r9 advisory CLEAN (1 LOW); in QA 288 (laptop)"
+            "note": "T-246 END-FIX 1dac7b8a, CI green, mutants red; QA 289 queued on the laptop after R4"
           },
           {
             "ref": "#437",
             "qa_status": "in_progress",
-            "note": "PARKED (D-130). T-235 P2-7 r10 9d197466; r10 vs T-245 Option A undecided"
+            "note": "PARKED (D-130). r10 9d197466; r10 vs T-245 Option A undecided"
           },
           {
             "ref": "#425",
             "qa_status": "accepted",
-            "note": "PARKED (D-130). T-235 P2-4, QA 280 ACCEPT; merges only after #437"
+            "note": "PARKED (D-130). Merges only after #437"
           },
           {
             "ref": "#470",
             "qa_status": "in_progress",
-            "note": "PARKED (D-130) with #463 #465. Jev cal 2 dev r2; QA 287 no separation"
+            "note": "PARKED (D-130) with #463 #465. Jev cal 2; QA 287 no separation"
           }
         ],
-        "frozen_sha": "53e68b606b08da543d5f37f8744451f99682d7e1",
+        "frozen_sha": "1dac7b8a528bc2352b3eaf37792d9a2f204a3431",
         "questions_for_aaron": [
-          "#437: r10 with limits, or T-245 Option A? (after the freeze)"
+          "Merge #489 on QA 289 ACCEPT (ask when the verdict lands)."
         ],
         "rulings": [
-          "s164: D-130 (freeze at 'Makerspace migration proven'; rehearsal is the pilot; QA #472+#484; park #437 #425 Jev cal 2; END-FIX T-246 before the import).",
-          "s164 merged on Aaron's word: #487 at e75621ba (master 53e68b60)."
+          "s164: D-130 freeze + pilot ruling + parking; D-131 QA 288 ACCEPT, #472 -> 4cdd8a12 and #484 -> ab4c1c5a merged on Aaron's word; #487 #494 merged on Aaron's word; #488 #493 records under the standing rule."
         ]
       },
       "session_uuid": "63c84e2f-cb93-4270-a361-060c608be6a4",
