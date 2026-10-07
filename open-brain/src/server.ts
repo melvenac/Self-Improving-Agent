@@ -669,11 +669,11 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       const record = checkRecordUpdated(projectRoot, since, endedId, sessionIds);
       const sinceAnchor = since ?? "session start (unknown)";
       if (record.layout === "old") preamble.push(OLD_LAYOUT_LINE);
-      if (evaluation.needsRecord && !args.record_ok) {
+      if (evaluation.needsRecord && args.record_ok === undefined) { // QA289 M6: "" accepted
         const line = describeRecordNotUpdated(evaluation.work, record, sinceAnchor);
         return { content: [{ type: "text" as const, text: line }], isError: true };
       }
-      if (evaluation.needsRecord && args.record_ok) {
+      if (evaluation.needsRecord && args.record_ok !== undefined) {
         if (!args.dry_run) recordRecordOkNotice(projectRoot, endedId, args.record_ok);
         preamble.push(`RECORD OK: closing without a matching record — ${args.record_ok}`);
       }
