@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 349,
+  "revision": 350,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1617,6 +1617,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Brief: docs/loops/end-fix-brief.md (rows E1-E7, acceptance Q1-Q12). Evidence: docs/loops/end-hook-evidence-2026-10-07.md (worth-it beab87e9). Root cause read at ffc63aca: handoff-guard.ts counts work only on local loop/* branches and handoffs only as docs/loops/*-handoff.md, so a non-loop project returns no-work; it never runs in-conversation. Dev: cursor-builder. QA: one Opus run on the laptop after QA 288. Gates the Makerspace import (T-181).",
+      "note_by": [
+        "63c84e2f-cb93-4270-a361-060c608be6a4"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-247",
+      "title": "Pin QA 288's unpinned checks: assertPathUnderDir (H1, plus a date check in writeSummary), secure_delete (H2), and the hub-room guard's clause-scope negation (G1)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 164,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "From QA 288 (D-131). Each is a mutant that leaves the suite green. H1 is MEDIUM and reachable: writeSummary(date: '../../escaped') writes outside the vault once the under-dir check is gone; today's only caller passes an ISO date. After the freeze (D-130).",
       "note_by": [
         "63c84e2f-cb93-4270-a361-060c608be6a4"
       ],
@@ -4424,6 +4438,12 @@
       "title": "s164: SIA freezes at 'Makerspace migration proven'; the Makerspace rehearsal is the import pilot (D-048 guardrail 1 changed); QA #472+#484 then Aaron decides merges; park #437 #425 and Jev cal 2; END-FIX before the import",
       "date": "2026-10-07",
       "note": "Aaron in clark's window 2026-10-07 07:2x-07:5x CDT, relayed by clark (TOLD, one link): focus moves to the Tarrant County Makerspace website; SIA's stop point is 'repo migration proven'. 'Yes, makerspace rehearsal is the pilot' (frogger and co-op-mailer are not gates). 'QA #472 + #484, then I decide merges' (QA 288, laptop, docs/loops/qa-288-s164a-dispatch.md). Parked: #437 (r10 vs T-245 Option A undecided), #425 (gated on #437), Jev cal 2 #463 #465 #470 (stopped at round 2; QA 286 held-out untouched). 'SIA has focused on our start hook but not the end hook. Let's work on that before the makerspace migration' -> END-FIX (docs/loops/end-fix-brief.md). Main checkout updated to ffc63aca and rebuilt by clark on Aaron's word, 07:53 CDT. Makerspace plan: docs/loops/makerspace-import-brief.md; new planner seat Maker; its first job is listing the 17 uncommitted files for Aaron's approval."
+    },
+    {
+      "id": "D-131",
+      "title": "QA 288 ACCEPT (#472 r5 1a374101, #484 r9 edfc964d); both merged on Aaron's word (AskUserQuestion in the planner's window: 'Merge both'). #472 merged at f51d84d7 -> 4cdd8a12, #484 at 62befee2 -> ab4c1c5a",
+      "date": "2026-10-07",
+      "note": "Report qa/s164a-report @ 6564f3aa (docs/loops/s164a-qa-report.md), read by the planner. Merges used GitHub update-branch (merge commits, not rebases), and the planner verified each updated head's tree == git merge-tree of master and the QA'd head (472: fa818a63; 484: 375c0967). QA's batch merge b1394e23 tested both PRs together. Non-blocking findings go to T-247: G1 (negation clause->sentence widening unpinned), H1 (MEDIUM: assertPathUnderDir mutant green and reachable via writeSummary(date)), H2 (secure_delete mutant green). G2 is the documented vocabulary limit of the guard, needing a structural rule. H3-H8 are low. QA ran one diagnostic with the sandbox OFF (clark, from the log; it touched only C:/qa-tmp, and the results are from the corrected script). Ruling: acceptable, but the report did not disclose it, so from QA 289 every dispatch requires every unsandboxed command to be listed in the report. Drivers are uncommitted at C:/qa-tmp/qa288 on the laptop. Flake: tests/server.test.ts 'handleSync > runs sync on project root' timed out at 10.4 s on #488's first CI run, and the rerun was green. NEXT for Aaron: rebuild the main checkout at ab4c1c5a, stop the MCP server, close the Claude Code sessions, then run `open-brain scrub-trigger-fires` once."
     }
   ],
   "handoffs": [
