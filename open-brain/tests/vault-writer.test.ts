@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { mkdtempSync, rmSync, readFileSync, existsSync } from "fs";
+import { mkdtempSync, rmSync, readFileSync, existsSync, mkdirSync } from "fs";
 import { tmpdir } from "os";
-import { join } from "path";
+import { join, resolve, relative } from "path";
 import {
   slugify,
   writeExperience,
@@ -9,6 +9,7 @@ import {
   writeSummary,
   parseFrontmatter,
 } from "../src/vault-writer.js";
+import { joinUnderVaultDir, VaultPathRefusal } from "../src/shared/vault-path-segment.js";
 
 let tmpDirs: string[] = [];
 
@@ -278,6 +279,36 @@ describe("writeSummary", () => {
     const raw = readFileSync(filePath, "utf-8");
     expect(raw).toContain("Important session insights.");
     expect(raw).toContain("sess-003");
+  });
+
+  it("T-247 J1: rejects invalid summary dates before any path is built; accepts today's ISO date", () => {
+    const vault = makeTmp();
+    const base = {
+      sessionId: "sess-t247",
+      project: "proj",
+      model: "claude",
+      content: "x",
+    };
+    for (const date of ["../../escaped", "2026-13-01", "2026-00-00", "2026-02-31"]) {
+      expect(() => writeSummary(vault, { ...base, date })).toThrow(VaultPathRefusal);
+    }
+    expect(existsSync(join(vault, "Summaries"))).toBe(false);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const filePath = writeSummary(vault, { ...base, date: today });
+    expect(filePath).toBeTruthy();
+    expect(existsSync(filePath!)).toBe(true);
+    expect(readFileSync(filePath!, "utf-8")).toContain(`date: ${today}`);
+  });
+
+  it("T-247 H1: joinUnderVaultDir keeps summary files under Summaries (pins assertPathUnderDir)", () => {
+    const vault = makeTmp();
+    const summariesDir = join(vault, "Summaries");
+    mkdirSync(summariesDir, { recursive: true });
+    expect(() => joinUnderVaultDir(summariesDir, "..", "..", "escaped.md")).toThrow(VaultPathRefusal);
+    const safe = joinUnderVaultDir(summariesDir, "2024-06-20-proj.md");
+    const rel = relative(resolve(summariesDir), resolve(safe));
+    expect(rel.startsWith("..")).toBe(false);
   });
 });
 

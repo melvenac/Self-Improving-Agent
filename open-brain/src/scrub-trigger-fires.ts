@@ -55,6 +55,11 @@ function walCheckpointBusy(db: Database.Database): number {
   return typeof busy === "number" ? busy : -1;
 }
 
+/** PRAGMAs applied before rewriting trigger_fires (T-247 H2 pin: must run on non-dry scrub). */
+export function applyScrubDbPragmas(db: Database.Database): void {
+  db.pragma("secure_delete = ON");
+}
+
 function assertWalTruncated(dbPath: string): void {
   const walPath = `${dbPath}-wal`;
   if (!existsSync(walPath)) return;
@@ -111,7 +116,7 @@ export function runScrubTriggerFires(
     db = new Database(resolved, { fileMustExist: true });
     db.pragma(`busy_timeout = ${options.busyTimeoutMs ?? 5000}`);
     initTriggerFires(db);
-    db.pragma("secure_delete = ON");
+    applyScrubDbPragmas(db);
   } catch (err) {
     rethrowScrubOpenError(err);
   }

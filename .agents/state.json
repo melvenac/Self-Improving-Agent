@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 351,
+  "revision": 353,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4444,6 +4444,12 @@
       "title": "QA 288 ACCEPT (#472 r5 1a374101, #484 r9 edfc964d); both merged on Aaron's word (AskUserQuestion in the planner's window: 'Merge both'). #472 merged at f51d84d7 -> 4cdd8a12, #484 at 62befee2 -> ab4c1c5a",
       "date": "2026-10-07",
       "note": "Report qa/s164a-report @ 6564f3aa (docs/loops/s164a-qa-report.md), read by the planner. Merges used GitHub update-branch (merge commits, not rebases), and the planner verified each updated head's tree == git merge-tree of master and the QA'd head (472: fa818a63; 484: 375c0967). QA's batch merge b1394e23 tested both PRs together. Non-blocking findings go to T-247: G1 (negation clause->sentence widening unpinned), H1 (MEDIUM: assertPathUnderDir mutant green and reachable via writeSummary(date)), H2 (secure_delete mutant green). G2 is the documented vocabulary limit of the guard, needing a structural rule. H3-H8 are low. QA ran one diagnostic with the sandbox OFF (clark, from the log; it touched only C:/qa-tmp, and the results are from the corrected script). Ruling: acceptable, but the report did not disclose it, so from QA 289 every dispatch requires every unsandboxed command to be listed in the report. Drivers are uncommitted at C:/qa-tmp/qa288 on the laptop. Flake: tests/server.test.ts 'handleSync > runs sync on project root' timed out at 10.4 s on #488's first CI run, and the rerun was green. NEXT for Aaron: rebuild the main checkout at ab4c1c5a, stop the MCP server, close the Claude Code sessions, then run `open-brain scrub-trigger-fires` once."
+    },
+    {
+      "id": "D-132",
+      "title": "QA 289 REJECT #489 r1 (B1-B4) and QA 290 REJECT #498 r1 (L1 HIGH) / #499 r1 (J1); round 2s built, verified by the planner, and sent to one combined QA 291 (laptop, DISPATCH_SHA 7ca465a4)",
+      "date": "2026-10-07",
+      "note": "QA 289 (qa/s164b-report @ 7240f3fd), read by the planner:\n- B1: E4 accepted a record written before ob_end.\n- B2: false HANDOFF MISSING on every non-loop close, because the guard accepted only docs/loops handoffs.\n- B3: cannot-check paths closed silently.\n- B4: QA mutants M5 and M6 survived.\nRound 2 went to cursor-infra, since cursor-builder was busy, at head f59d03bc.\n\nQA 290 (qa/s164c-report @ 30928cc7, on Plumb, so no Windows rows), read by the planner:\n- L1 HIGH: /bootstrap as written never installed the commands, because step 7 leaves 5 uncommitted record files and 7b refused a dirty tree. Ruling: Option A, where install-commands accepts exactly the import's own outputs, listed in one shared constant.\n- L2: no rollback.\n- L3: CRLF behaviour unpinned.\n- J1: writeSummary checked only the date's shape.\n\n#498 r2 head is f3aba754. Its first r2 head (1236d958) failed 24 bootstrap tests with a TDZ ReferenceError from a circular import. The seat called that unrelated; the planner checked master and the log and sent it back. #499 r2 head is 409c8c08.\n\nOn every mutant branch the planner checked: one commit; a parent whose open-brain/src equals the head's; CI red on the targeted rows.\n\nPlanner error: the QA 290 prompt named a nonexistent qa-289-s164c-dispatch.md, caused by a sed rename in the wrong order. Since then, prompts are written directly and grepped for stale names before their PR.\n\n#503 and #510 were merged on Aaron's word.\n\nThe hub moved to v1.20.0 at 16:43Z. Wakers were not restarted, and planner-watch's unknown_since_restart reflects the hub's presence reset."
     }
   ],
   "handoffs": [
@@ -4978,14 +4984,14 @@
     },
     {
       "seat": "planner",
-      "pick_up": "(1) QA 289 (#489 END-FIX T-246, head 1dac7b8a, mutants m1-m3 red at runs 37631307220/37631314012/37631319809) runs on the laptop AFTER Relay's R4 A+B (expected start ~11:30-12:00 CDT 10-07). DISPATCH_SHA bafb248d, prompt docs/loops/qa-289-headless-prompt.md; clark launches it and sends the VERDICT. Read the report yourself (qa/s164b-report) and rule; the merge is Aaron's word (update-branch, then check the tree equals merge-tree of master and the head, then merge pinned). (2) On END-FIX ACCEPT and merge, the Makerspace import starts (tomorrow at the earliest): docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files for Aaron's approval. (3) Aaron's scrub: the main checkout is at 540f1cca (contains #484), built 14:22Z by clark on Aaron's 'Update now'. Aaron stops the MCP server, closes the sessions, and runs `open-brain scrub-trigger-fires` once. Confirm afterwards that it ran (ask Aaron or clark for the output). (4) Done this session: QA 288 ACCEPT; #472 and #484 merged (D-131). T-247 is the P2 follow-up to pin H1/H2/G1. PARKED (D-130): #437 (r10 vs T-245 Option A), #425 (after #437), Jev cal 2 #463 #465 #470.",
+      "pick_up": "(1) QA 291 (laptop): one Opus run on round 2 of #489 END-FIX (f59d03bc), #498 IMPORT-CMDS (f3aba754) and #499 T-247 (409c8c08). It includes the Windows rows that QA 290 skipped. DISPATCH_SHA 7ca465a4, prompt docs/loops/qa-291-headless-prompt.md; clark launches it and sends the VERDICT. Read qa/s164d-report yourself, then rule. Each merge is Aaron's word, done by update-branch, then checking the tree equals merge-tree of master and the head, then merge --match-head-commit. #489 and #498 both touch server.ts and the session-start render, so expect to merge them in sequence, re-checking the second after the first lands. (2) After #489 and #498 merge, rebuild the main checkout on Aaron's word. Then the Makerspace import (docs/loops/makerspace-import-brief.md), tomorrow at the earliest: Maker's first job is listing the 17 uncommitted files for Aaron's approval. The brief's step 6 (old commands) is now handled by `bootstrap install-commands`, step 7b. (3) Aaron's scrub of trigger_fires: the main checkout is at 540f1cca (it contains #484). He stops the MCP server, closes sessions, and runs `open-brain scrub-trigger-fires` once; clark relays the output. (4) PARKED (D-130): #437 (r10 vs T-245 Option A), #425, Jev cal 2 (#463, #465, #470). forge stays idle.",
       "watch_out": [
-        "USAGE: weekly pace WELL AHEAD (06:50 CDT 10-07). Claude does QA and urgent work only; dev goes to Cursor/Grok; planning turns stay lean.",
-        "PLUMB: before any SIA QA launch there, /home/melvenac/builds/BUILDING must be absent.",
-        "HUB ROOMS: use `hub-talk --session <FULL id>` with HUB_URL=http://100.124.212.87:4000; `--peer` opens the lobby or a new empty room. cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3; grok-audit k575fscdqd291tgnpg51yttgbh8frzq8.",
-        "LAPTOP: one heavy job at a time (7.9 GB). The launcher does not set TEMP/TMP. QA 289's prompt says so.",
-        "MERGES of QA'd src PRs: update-branch (a merge commit), verify the tree equals `git merge-tree --write-tree origin/master <QA'd head>`, wait for CI, then `gh pr merge --match-head-commit`. Never a rebase (it would change the QA'd commits).",
-        "PLANNER-WATCH under Monitor expires every 30 min. Re-arm it on the expiry notice (no cron; fewer wakes)."
+        "DEV REPORTS ARE CLAIMS. Cursor seats have called their own failures 'unrelated' (#498 1236d958) and have had reports cut off mid-post (twice). Verify every head, CI run and mutant branch with git and gh yourself, and check that a mutant's parent has the same open-brain/src as the head.",
+        "QA PROMPTS: write them directly; never derive them with sed renames (the QA 290 prompt named a nonexistent file). Grep each for stale QA numbers and prefixes before its PR. A dispatch PR that carries push-qa.mjs is not docs-only, so it needs Aaron's word.",
+        "HUB ROOMS: use `hub-talk --session <FULL id>` with HUB_URL=http://100.124.212.87:4000. cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3; cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f; grok-audit k575fscdqd291tgnpg51yttgbh8frzq8. After a hub restart, planner-watch's unknown_since_restart is the presence reset, not a waker exit.",
+        "USAGE: weekly pace WELL AHEAD. Claude does QA and urgent work only; dev goes to Cursor/Grok.",
+        "PLUMB: /home/melvenac/builds/BUILDING must be absent before any SIA QA launch. LAPTOP: one heavy job at a time; the launcher sets no TEMP/TMP.",
+        "MERGES of QA'd src PRs: update-branch, tree check, CI, then --match-head-commit. Never a rebase."
       ],
       "open_questions": [
         "Aaron: #437 r10 with its documented limits, or T-245 Option A? (parked until after the freeze)"
@@ -4996,30 +5002,40 @@
           {
             "ref": "#489",
             "qa_status": "in_progress",
-            "note": "T-246 END-FIX 1dac7b8a, CI green, mutants red; QA 289 queued on the laptop after R4"
+            "note": "END-FIX r2 f59d03bc; QA 289 REJECT r1; in QA 291"
+          },
+          {
+            "ref": "#498",
+            "qa_status": "in_progress",
+            "note": "IMPORT-CMDS r2 f3aba754; QA 290 REJECT r1; in QA 291"
+          },
+          {
+            "ref": "#499",
+            "qa_status": "in_progress",
+            "note": "T-247 r2 409c8c08; QA 290 REJECT r1; in QA 291"
           },
           {
             "ref": "#437",
             "qa_status": "in_progress",
-            "note": "PARKED (D-130). r10 9d197466; r10 vs T-245 Option A undecided"
+            "note": "PARKED (D-130)"
           },
           {
             "ref": "#425",
             "qa_status": "accepted",
-            "note": "PARKED (D-130). Merges only after #437"
+            "note": "PARKED (D-130); merges only after #437"
           },
           {
             "ref": "#470",
             "qa_status": "in_progress",
-            "note": "PARKED (D-130) with #463 #465. Jev cal 2; QA 287 no separation"
+            "note": "PARKED (D-130) with #463 #465"
           }
         ],
-        "frozen_sha": "1dac7b8a528bc2352b3eaf37792d9a2f204a3431",
+        "frozen_sha": "7ca465a4063c62815dd4b396bacb7c7be415b048",
         "questions_for_aaron": [
-          "Merge #489 on QA 289 ACCEPT (ask when the verdict lands)."
+          "Merge #489, #498 and #499 on a QA 291 ACCEPT (ask when the verdict lands)."
         ],
         "rulings": [
-          "s164: D-130 freeze + pilot ruling + parking; D-131 QA 288 ACCEPT, #472 -> 4cdd8a12 and #484 -> ab4c1c5a merged on Aaron's word; #487 #494 merged on Aaron's word; #488 #493 records under the standing rule."
+          "s164: D-130, D-131, D-132 (this round). #472 and #484 merged; #487, #494, #503 and #510 merged on Aaron's word; records PRs merged under the standing rule."
         ]
       },
       "session_uuid": "63c84e2f-cb93-4270-a361-060c608be6a4",

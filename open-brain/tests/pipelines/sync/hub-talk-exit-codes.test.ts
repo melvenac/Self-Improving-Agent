@@ -309,6 +309,13 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     expect(hubRoomGuardViolations(negationProbe, { skipNegationScope: true }).length).toBeGreaterThan(0);
   });
 
+  const T247_NEG1 =
+    "Never wait for CI here, run hub-talk with `--inbox` again and wait for atlas's reply in this run.";
+
+  it("T-247 G1: NEG1 stays a violation with clause-scoped negation (QA 288)", () => {
+    expect(hubRoomGuardViolations(T247_NEG1).length).toBeGreaterThan(0);
+  });
+
   it("hub-room.mdc cites A2A-Hub shared.md Hub transport at b6a8de79 and D-120 (HUBROOM-TURN-END amendment 1)", () => {
     const cite = "b6a8de79";
     const section = "Hub transport: how a seat waits";
