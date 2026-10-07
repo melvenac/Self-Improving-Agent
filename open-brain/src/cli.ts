@@ -663,7 +663,12 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  start                                     Start a session");
   console.log("  end [--dry-run]                            End a session");
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
-  console.log("  scrub-trigger-fires [--db <path>] [--dry-run]  One-time rewrite of trigger_fires.command + VACUUM (stop the MCP server and close Claude Code sessions first)");
+  console.log(
+    "  scrub-trigger-fires [--db <path>] [--dry-run]  One-time rewrite of trigger_fires.command + VACUUM (stop the MCP server and close Claude Code sessions first)",
+  );
+  console.log(
+    "    Limits: an older MCP build may still hold the store during the run; a 0-byte or non-knowledge SQLite file may be accepted with its path printed; --dry-run may create empty -wal/-shm siblings.",
+  );
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit [--accept-stale]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");

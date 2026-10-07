@@ -49,10 +49,6 @@ function assertAllCommandsCanonical(db: Database.Database): void {
   }
 }
 
-function freelistCount(db: Database.Database): number {
-  return Number(db.pragma("freelist_count", { simple: true })) || 0;
-}
-
 function walCheckpointBusy(db: Database.Database): number {
   const rows = db.pragma("wal_checkpoint(TRUNCATE)") as Array<{ busy?: number }>;
   const busy = rows[0]?.busy;
@@ -115,6 +111,7 @@ export function runScrubTriggerFires(
     db = new Database(resolved, { fileMustExist: true });
     db.pragma(`busy_timeout = ${options.busyTimeoutMs ?? 5000}`);
     initTriggerFires(db);
+    db.pragma("secure_delete = ON");
   } catch (err) {
     rethrowScrubOpenError(err);
   }
@@ -137,21 +134,18 @@ export function runScrubTriggerFires(
 
     assertAllCommandsCanonical(db);
 
-    const needVacuum = rowsRewritten > 0 || freelistCount(db) > 0;
-    if (needVacuum) {
-      try {
-        db.exec("VACUUM");
-      } catch (err) {
-        const code = sqliteCode(err);
-        if (code === "SQLITE_READONLY") throw new Error(SCRUB_READONLY_STORE_MESSAGE);
-        if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED") throw new Error(SCRUB_HELD_STORE_MESSAGE);
-        throw new Error("scrub verification failed: VACUUM");
-      }
+    try {
+      db.exec("VACUUM");
+    } catch (err) {
+      const code = sqliteCode(err);
+      if (code === "SQLITE_READONLY") throw new Error(SCRUB_READONLY_STORE_MESSAGE);
+      if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED") throw new Error(SCRUB_HELD_STORE_MESSAGE);
+      throw new Error("scrub verification failed: VACUUM");
     }
 
     const busy = walCheckpointBusy(db);
     if (busy !== 0) {
-      throw new Error(`scrub verification failed: wal_checkpoint busy=${busy} (expected 0)`);
+      throw new Error(SCRUB_HELD_STORE_MESSAGE);
     }
 
     db.close();
