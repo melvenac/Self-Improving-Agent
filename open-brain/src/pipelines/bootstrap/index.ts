@@ -80,8 +80,8 @@ export function classifySessionCommand(projectRoot: string, name: SessionCommand
   const dest = join(resolve(projectRoot), sessionCommandRel(name));
   const tmpl = join(templateDir, sessionCommandRel(name));
   if (!existsSync(dest)) return "absent";
-  if (!existsSync(tmpl)) return "OLD";
-  return sameText(dest, tmpl) ? "SIA" : "OLD";
+  // I9-M2 mutant: any on-disk file counts as SIA
+  return "SIA";
 }
 
 export function inspectSessionCommands(projectRoot: string, templateDir = defaultTemplateDir()): Record<SessionCommandName, SessionCommandFileState> {
