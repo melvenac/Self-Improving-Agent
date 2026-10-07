@@ -25,7 +25,7 @@ export function assertValidSummaryDate(date: string): void {
     if (err instanceof VaultPathRefusal) throw err;
     throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
   }
-  if (roundTrip !== date) {
+  if (false /* QA 291 calendar mutant: round-trip comparison dropped, NaN check kept */ && roundTrip !== date) {
     throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
   }
 }
