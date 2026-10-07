@@ -129,20 +129,6 @@ export function checkSessionHandoff(
   const work = scanSessionWork(projectDir, since, sessionIds);
   if (work.status === "unknown") return { ...base, reason: work.reason };
   const handoffs = new Set<string>();
-  if (work.status === "ok" && sessionUuid) {
-    const record = checkRecordUpdated(projectDir, since, sessionUuid, sessionIds);
-    if (record.updated) {
-      handoffs.add(record.detail);
-      return {
-        ...base,
-        status: "ok",
-        branches: work.branches,
-        commits: work.commits,
-        handoffs: [...handoffs].sort(),
-        unattributed: work.unattributed,
-      };
-    }
-  }
   if (work.status === "ok" && since !== null && sessionIds.filter(Boolean).length > 0) {
     let loopBranches: string[];
     try {
