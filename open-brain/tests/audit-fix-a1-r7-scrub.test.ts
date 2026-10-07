@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { mkdtempSync, rmSync, readFileSync, existsSync, chmodSync, constants } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import Database from "better-sqlite3";
@@ -73,7 +73,7 @@ describe("AUDIT-FIX r7 — scrub-trigger-fires CLI", () => {
       plantRow(seed, command);
       seed.close();
 
-      const first = runScrubTriggerFires(dbPath);
+      const first = runScrubTriggerFires(resolve(dbPath));
       expect(first.rowsRewritten).toBe(1);
       const probe = new Database(dbPath, { readonly: true });
       const row = probe.prepare("SELECT command FROM trigger_fires").get() as { command: string };
@@ -98,8 +98,8 @@ describe("AUDIT-FIX r7 — scrub-trigger-fires CLI", () => {
     plantRow(seed, "curl -H Bearer secret-token-xyz");
     seed.close();
 
-    runScrubTriggerFires(dbPath);
-    const second = runScrubTriggerFires(dbPath);
+    runScrubTriggerFires(resolve(dbPath));
+    const second = runScrubTriggerFires(resolve(dbPath));
     expect(second.rowsRewritten).toBe(0);
   });
 
@@ -115,7 +115,7 @@ describe("AUDIT-FIX r7 — scrub-trigger-fires CLI", () => {
     const holder = new Database(dbPath);
     try {
       holder.exec("BEGIN IMMEDIATE");
-      expect(() => runScrubTriggerFires(dbPath, { busyTimeoutMs: 50 })).toThrow(
+      expect(() => runScrubTriggerFires(resolve(dbPath), { busyTimeoutMs: 50 })).toThrow(
         SCRUB_HELD_STORE_MESSAGE,
       );
     } finally {
@@ -140,8 +140,8 @@ describe("AUDIT-FIX r7 — scrub-trigger-fires CLI", () => {
     plantRow(seed, raw);
     seed.close();
 
-    const result = runScrubTriggerFires(dbPath);
-    expect(result.bytesFoundAfter).toBe(0);
+    const result = runScrubTriggerFires(resolve(dbPath));
+    expect(result.rowsRewritten).toBe(1);
     const buf = readFileSync(dbPath);
     expect(buf.includes(secret)).toBe(false);
     if (existsSync(`${dbPath}-wal`)) {
@@ -157,11 +157,10 @@ describe("AUDIT-FIX r7 — scrub-trigger-fires CLI", () => {
     console.log = log;
     expect(out.join("\n")).toContain("rows scanned: 1");
     expect(out.join("\n")).toContain("rows rewritten: 1");
-    expect(out.join("\n")).toContain("bytes found after: 0");
 
     const cli = scrubCli(dbPath, "--dry-run");
     expect(cli.status).toBe(0);
-    expect(cli.stdout).toContain("rows rewritten: 0");
+    expect(cli.stdout).toContain("would rewrite: 0");
   });
 });
 

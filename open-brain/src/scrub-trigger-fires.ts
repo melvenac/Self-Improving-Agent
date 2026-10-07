@@ -1,44 +1,56 @@
 import Database from "better-sqlite3";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
+import { resolve } from "node:path";
 import { initTriggerFires } from "./db-v2.js";
-import { commandCellToString, formatCommandFireLog } from "./trigger/command-log.js";
+import {
+  commandCellToString,
+  formatCommandFireLog,
+  isCanonicalCommandFireLog,
+} from "./trigger/command-log.js";
 
 export const SCRUB_HELD_STORE_MESSAGE =
-  "another connection holds the store: stop the MCP server and hooks, then rerun";
+  "another connection holds the store: stop the MCP server and close Claude Code sessions (hooks) first, then rerun";
 
-function isStoreHeldError(err: unknown): boolean {
+export const SCRUB_READONLY_STORE_MESSAGE = "store is read-only";
+
+function sqliteCode(err: unknown): string | undefined {
   if (err && typeof err === "object" && "code" in err) {
-    const code = String((err as { code: string }).code);
-    if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED" || code === "SQLITE_READONLY") {
-      return true;
-    }
+    return String((err as { code: string }).code);
   }
-  const msg = err instanceof Error ? err.message : String(err);
-  return /locked|readonly/i.test(msg);
+  return undefined;
 }
 
-function failIfStoreHeld(err: unknown): never {
-  if (isStoreHeldError(err)) throw new Error(SCRUB_HELD_STORE_MESSAGE);
+function rethrowScrubOpenError(err: unknown): never {
+  const code = sqliteCode(err);
+  if (code === "SQLITE_READONLY") throw new Error(SCRUB_READONLY_STORE_MESSAGE);
+  if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED") {
+    throw new Error(SCRUB_HELD_STORE_MESSAGE);
+  }
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/readonly/i.test(msg)) throw new Error(SCRUB_READONLY_STORE_MESSAGE);
+  if (/locked/i.test(msg)) throw new Error(SCRUB_HELD_STORE_MESSAGE);
   throw err;
 }
 
 export interface ScrubTriggerFiresResult {
+  dbPath: string;
   rowsScanned: number;
   rowsRewritten: number;
-  bytesFoundAfter: number;
+  dryRun: boolean;
 }
 
-function countSecretBytes(paths: string[], needles: string[]): number {
-  let hits = 0;
-  for (const p of paths) {
-    if (!existsSync(p)) continue;
-    const buf = readFileSync(p);
-    for (const needle of needles) {
-      if (needle.length === 0) continue;
-      if (buf.includes(needle)) hits += 1;
+function assertAllCommandsCanonical(db: Database.Database): void {
+  const rows = db.prepare("SELECT command FROM trigger_fires").all() as Array<{ command: unknown }>;
+  for (const { command } of rows) {
+    const stored = commandCellToString(command);
+    if (!isCanonicalCommandFireLog(stored) || formatCommandFireLog(stored) !== stored) {
+      throw new Error("scrub verification failed: not all trigger_fires.command values are canonical");
     }
   }
-  return hits;
+}
+
+function freelistCount(db: Database.Database): number {
+  return Number(db.pragma("freelist_count", { simple: true })) || 0;
 }
 
 function walCheckpointBusy(db: Database.Database): number {
@@ -47,79 +59,124 @@ function walCheckpointBusy(db: Database.Database): number {
   return typeof busy === "number" ? busy : -1;
 }
 
+function assertWalTruncated(dbPath: string): void {
+  const walPath = `${dbPath}-wal`;
+  if (!existsSync(walPath)) return;
+  const size = statSync(walPath).size;
+  if (size !== 0) {
+    throw new Error(`scrub verification failed: WAL file is ${size} bytes (expected 0)`);
+  }
+}
+
+function scanPending(db: Database.Database): {
+  rowsScanned: number;
+  pending: Array<{ id: number; after: string }>;
+} {
+  const select = db.prepare("SELECT id, command FROM trigger_fires");
+  const pending: Array<{ id: number; after: string }> = [];
+  let rowsScanned = 0;
+  for (const row of select.iterate() as Iterable<{ id: number; command: unknown }>) {
+    rowsScanned += 1;
+    const before = commandCellToString(row.command);
+    const after = formatCommandFireLog(before);
+    if (after !== before) pending.push({ id: row.id, after });
+  }
+  return { rowsScanned, pending };
+}
+
 /**
  * Rewrite every `trigger_fires.command` to `formatCommandFireLog` and reclaim pages.
- * Exits via thrown errors; CLI maps them to stderr + exit 1.
+ * `dbPath` must already be resolved absolute. Throws on failure; CLI maps to exit 1.
  */
 export function runScrubTriggerFires(
   dbPath: string,
   options: { dryRun?: boolean; busyTimeoutMs?: number } = {},
 ): ScrubTriggerFiresResult {
+  const resolved = resolve(dbPath);
   const dryRun = options.dryRun ?? false;
+
+  if (dryRun) {
+    let db: Database.Database;
+    try {
+      db = new Database(resolved, { readonly: true, fileMustExist: true });
+    } catch (err) {
+      rethrowScrubOpenError(err);
+    }
+    try {
+      const { rowsScanned, pending } = scanPending(db);
+      return { dbPath: resolved, rowsScanned, rowsRewritten: pending.length, dryRun: true };
+    } finally {
+      db.close();
+    }
+  }
+
   let db: Database.Database;
   try {
-    db = new Database(dbPath);
+    db = new Database(resolved, { fileMustExist: true });
     db.pragma(`busy_timeout = ${options.busyTimeoutMs ?? 5000}`);
     initTriggerFires(db);
   } catch (err) {
-    failIfStoreHeld(err);
+    rethrowScrubOpenError(err);
   }
 
-  const select = db.prepare("SELECT id, command FROM trigger_fires");
-  const pending: Array<{ id: number; before: string; after: string }> = [];
   let rowsScanned = 0;
-
+  let rowsRewritten = 0;
   try {
-    for (const row of select.iterate() as Iterable<{ id: number; command: unknown }>) {
-      rowsScanned += 1;
-      const before = commandCellToString(row.command);
-      const after = formatCommandFireLog(before);
-      if (after !== before) pending.push({ id: row.id, before, after });
-    }
-  } catch (err) {
-    db.close();
-    failIfStoreHeld(err);
-  }
+    const scanned = scanPending(db);
+    rowsScanned = scanned.rowsScanned;
+    const pending = scanned.pending;
 
-  const replacedValues = pending.map((p) => p.before);
-
-  if (dryRun) {
-    db.close();
-    return { rowsScanned, rowsRewritten: pending.length, bytesFoundAfter: 0 };
-  }
-
-  try {
     if (pending.length > 0) {
       const update = db.prepare("UPDATE trigger_fires SET command = ? WHERE id = ?");
       const apply = db.transaction(() => {
         for (const { id, after } of pending) update.run(after, id);
       });
       apply();
+      rowsRewritten = pending.length;
     }
 
-    db.exec("VACUUM");
+    assertAllCommandsCanonical(db);
+
+    const needVacuum = rowsRewritten > 0 || freelistCount(db) > 0;
+    if (needVacuum) {
+      try {
+        db.exec("VACUUM");
+      } catch (err) {
+        const code = sqliteCode(err);
+        if (code === "SQLITE_READONLY") throw new Error(SCRUB_READONLY_STORE_MESSAGE);
+        if (code === "SQLITE_BUSY" || code === "SQLITE_LOCKED") throw new Error(SCRUB_HELD_STORE_MESSAGE);
+        throw new Error("scrub verification failed: VACUUM");
+      }
+    }
 
     const busy = walCheckpointBusy(db);
-    if (busy !== 0) throw new Error(SCRUB_HELD_STORE_MESSAGE);
-  } catch (err) {
+    if (busy !== 0) {
+      throw new Error(`scrub verification failed: wal_checkpoint busy=${busy} (expected 0)`);
+    }
+
     db.close();
+    assertWalTruncated(resolved);
+  } catch (err) {
+    try {
+      db.close();
+    } catch {
+      /* */
+    }
+    if (err instanceof Error && err.message.startsWith("scrub verification failed:")) throw err;
     if (err instanceof Error && err.message === SCRUB_HELD_STORE_MESSAGE) throw err;
-    failIfStoreHeld(err);
+    if (err instanceof Error && err.message === SCRUB_READONLY_STORE_MESSAGE) throw err;
+    rethrowScrubOpenError(err);
   }
 
-  db.close();
-
-  const paths = [dbPath, `${dbPath}-wal`, `${dbPath}-shm`];
-  const bytesFoundAfter = countSecretBytes(paths, replacedValues);
-  if (bytesFoundAfter !== 0) {
-    throw new Error(`scrub verification failed: ${bytesFoundAfter} replaced value(s) still on disk`);
-  }
-
-  return { rowsScanned, rowsRewritten: pending.length, bytesFoundAfter: 0 };
+  return { dbPath: resolved, rowsScanned, rowsRewritten, dryRun: false };
 }
 
 export function printScrubTriggerFiresResult(result: ScrubTriggerFiresResult): void {
+  console.log(result.dbPath);
   console.log(`rows scanned: ${result.rowsScanned}`);
-  console.log(`rows rewritten: ${result.rowsRewritten}`);
-  console.log(`bytes found after: ${result.bytesFoundAfter}`);
+  if (result.dryRun) {
+    console.log(`would rewrite: ${result.rowsRewritten}`);
+  } else {
+    console.log(`rows rewritten: ${result.rowsRewritten}`);
+  }
 }
