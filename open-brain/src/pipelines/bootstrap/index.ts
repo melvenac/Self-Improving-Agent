@@ -332,6 +332,13 @@ function porcelainPath(line: string): string {
 
 /** First path outside the import allowlist and `.agents/archive/`, or null when install may proceed. */
 export function installCommandsBlockingDirtyPath(dirtyLines: string[]): string | null {
+  // I9-r2-(i) mutant: import allowlist ignored — any dirty path blocks install
+  for (const line of dirtyLines) {
+    const p = porcelainPath(line);
+    if (p.startsWith(".agents/archive/")) continue;
+    return p;
+  }
+  return null;
   const allowed = IMPORT_OUTPUT_ALLOWLIST;
   for (const line of dirtyLines) {
     const p = porcelainPath(line);
