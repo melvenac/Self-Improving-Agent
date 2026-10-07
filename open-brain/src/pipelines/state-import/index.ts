@@ -32,19 +32,11 @@ import {
 } from "../../shared/state-schema.js";
 import { applyStateOps, DONE_RETENTION_SESSIONS } from "../../shared/state-writer.js";
 import { readJson } from "../../shared/fs-utils.js";
+import { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS } from "../../shared/import-outputs.js";
 
+export { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS };
 export const DRAFT_REL = ".agents/state.draft.json";
 export const REPORT_REL = ".agents/state.import-report.md";
-export const STATE_REL = ".agents/state.json";
-
-/** What `state import --commit` writes or re-renders; `bootstrap install-commands` may run with only these dirty (IMPORT-CMDS r2). */
-export const STATE_IMPORT_COMMIT_OUTPUTS: readonly string[] = [
-  STATE_REL,
-  ".agents/TASKS/INBOX.md",
-  ".agents/TASKS/task.md",
-  ".agents/SESSIONS/next-session.md",
-  ".agents/SYSTEM/SUMMARY.md",
-];
 export const SNAPSHOT_PREFIX = "pre-state-migration-";
 
 type Status = Task["status"];

@@ -3,7 +3,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawnSync } from "node:child_process";
 import { isStateRecord, whyNotARecord } from "../../shared/state-record.js";
-import { STATE_IMPORT_COMMIT_OUTPUTS } from "../state-import/index.js";
+import { STATE_IMPORT_COMMIT_OUTPUTS } from "../../shared/import-outputs.js";
 
 /**
  * `/bootstrap`'s deterministic half (docs/loops/bootstrap-fix-brief.md,
