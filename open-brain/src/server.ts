@@ -677,13 +677,8 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
           content: [{ type: "text" as const, text: "ob_end refused: record_ok must be a non-empty reason" }],
           isError: true,
         };
-      } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok.trim() === "") {
-        return {
-          content: [{ type: "text" as const, text: "ob_end refused: record_ok must not be whitespace only" }],
-          isError: true,
-        };
       } else {
-        const recordOkReason = args.record_ok?.trim() || null;
+        const recordOkReason = args.record_ok ?? null;
         if (oldLayoutLine) preamble.push(oldLayoutLine);
         if (evaluation.needsRecord && !recordOkReason) {
           const line = describeRecordNotUpdated(evaluation.work, record, sinceAnchor);
