@@ -1,8 +1,9 @@
-import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync, renameSync, realpathSync, rmdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync, renameSync, realpathSync, rmdirSync, rmSync, accessSync, constants } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawnSync } from "node:child_process";
 import { isStateRecord, whyNotARecord } from "../../shared/state-record.js";
+import { STATE_IMPORT_COMMIT_OUTPUTS } from "../state-import/index.js";
 
 /**
  * `/bootstrap`'s deterministic half (docs/loops/bootstrap-fix-brief.md,
@@ -321,13 +322,60 @@ export interface InstallCommandsResult {
   lines: InstallCommandsLine[];
 }
 
+const IMPORT_OUTPUT_ALLOWLIST = new Set(STATE_IMPORT_COMMIT_OUTPUTS);
+
+function porcelainPath(line: string): string {
+  const rest = line.slice(3).trim();
+  if (rest.startsWith('"') && rest.endsWith('"')) return rest.slice(1, -1).replace(/\\/g, "/");
+  return rest.replace(/\\/g, "/");
+}
+
+/** First path outside the import allowlist and `.agents/archive/`, or null when install may proceed. */
+export function installCommandsBlockingDirtyPath(dirtyLines: string[]): string | null {
+  const allowed = IMPORT_OUTPUT_ALLOWLIST;
+  for (const line of dirtyLines) {
+    const p = porcelainPath(line);
+    if (p.startsWith(".agents/archive/")) continue;
+    if (!allowed.has(p)) return p;
+  }
+  return null;
+}
+
+function preflightInstallCommandsWrite(root: string): void {
+  const claude = join(root, ".claude");
+  const commandsDir = join(claude, "commands");
+  const commandsTarget = existsSync(commandsDir) ? commandsDir : (existsSync(claude) ? claude : root);
+  try {
+    accessSync(commandsTarget, constants.W_OK);
+  } catch {
+    throw new Error("`.claude/commands/` is not writable — fix permissions and try again. Nothing written");
+  }
+  const agents = join(root, ".agents");
+  if (!existsSync(agents)) throw new Error("`.agents/` is missing — nothing written");
+  try {
+    accessSync(agents, constants.W_OK);
+  } catch {
+    throw new Error(
+      "`.agents/` is not writable (session-command archives land under `.agents/archive/`) — fix permissions and try again. Nothing written",
+    );
+  }
+}
+
 /**
  * After import: replace OLD session commands and copy missing ones from
- * project-template. Refuses without a valid record or on a dirty tree. Only
- * touches the four named files under `.claude/commands/`.
+ * project-template. Refuses without a valid record. A dirty tree is allowed
+ * only when every change is `STATE_IMPORT_COMMIT_OUTPUTS`. Re-run when all four
+ * commands are already SIA is a no-op even on a dirty import tree. Only touches
+ * the four named files under `.claude/commands/`.
  */
-export function installCommands(projectRoot: string, today: string, templateDir = defaultTemplateDir(), deps: { rename?: (from: string, to: string) => void } = {}): InstallCommandsResult {
+export function installCommands(
+  projectRoot: string,
+  today: string,
+  templateDir = defaultTemplateDir(),
+  deps: { rename?: (from: string, to: string) => void; preflightWrite?: (root: string) => void } = {},
+): InstallCommandsResult {
   const rename = deps.rename ?? renameSync;
+  const preflightWrite = deps.preflightWrite ?? preflightInstallCommandsWrite;
   const root = resolve(projectRoot);
   const ins = inspectProject(root, templateDir);
   if (!ins.templateFound) throw new Error(`project-template/ not found at ${templateDir} — nothing written`);
@@ -341,33 +389,65 @@ export function installCommands(projectRoot: string, today: string, templateDir 
       ? "not a git repository — nothing written"
       : `inside another git repository (${ins.git.toplevel}) — nothing written`);
   }
-  if (ins.git.dirty.length > 0) {
-    throw new Error(`${ins.git.dirty.length} uncommitted change(s) — commit or stash first. Nothing written`);
+
+  const lines: InstallCommandsLine[] = [];
+  const allSia = SESSION_COMMAND_NAMES.every((n) => ins.commands[n] === "SIA");
+  if (allSia) {
+    for (const name of SESSION_COMMAND_NAMES) lines.push({ name, before: "SIA", after: "SIA" });
+    return { root, archive: null, lines };
   }
+
+  if (ins.git.kind === "root" && ins.git.dirty.length > 0) {
+    const blocked = installCommandsBlockingDirtyPath(ins.git.dirty);
+    if (blocked !== null) {
+      throw new Error(`uncommitted change outside the import (\`${blocked}\`) — commit or stash it first. Nothing written`);
+    }
+  }
+
+  preflightWrite(root);
 
   const commandsDir = join(root, ".claude", "commands");
   let archiveRel: string | null = null;
   let archiveDir: string | null = null;
-  const lines: InstallCommandsLine[] = [];
+  const rolledBack: { archivePath: string; dest: string }[] = [];
 
-  for (const name of SESSION_COMMAND_NAMES) {
-    const before = ins.commands[name];
-    if (before === "SIA") {
+  try {
+    for (const name of SESSION_COMMAND_NAMES) {
+      const before = ins.commands[name];
+      if (before === "SIA") {
+        lines.push({ name, before, after: "SIA" });
+        continue;
+      }
+      if (archiveDir === null) {
+        let rel = `.agents/archive/${COMMAND_ARCHIVE_PREFIX}${today}`;
+        for (let n = 2; existsSync(join(root, rel)); n++) rel = `.agents/archive/${COMMAND_ARCHIVE_PREFIX}${today}-${n}`;
+        archiveRel = rel;
+        archiveDir = join(root, rel);
+        mkdirSync(archiveDir, { recursive: true });
+      }
+      const dest = join(commandsDir, `${name}.md`);
+      if (before === "OLD") {
+        const archived = join(archiveDir, `${name}.md`);
+        rename(dest, archived);
+        rolledBack.push({ archivePath: archived, dest });
+      }
+      mkdirSync(commandsDir, { recursive: true });
+      copyFileSync(join(templateDir, sessionCommandRel(name)), dest);
       lines.push({ name, before, after: "SIA" });
-      continue;
     }
-    if (archiveDir === null) {
-      let rel = `.agents/archive/${COMMAND_ARCHIVE_PREFIX}${today}`;
-      for (let n = 2; existsSync(join(root, rel)); n++) rel = `.agents/archive/${COMMAND_ARCHIVE_PREFIX}${today}-${n}`;
-      archiveRel = rel;
-      archiveDir = join(root, rel);
-      mkdirSync(archiveDir, { recursive: true });
+  } catch (err) {
+    for (const r of rolledBack.reverse()) {
+      if (existsSync(r.archivePath)) renameSync(r.archivePath, r.dest);
     }
-    const dest = join(commandsDir, `${name}.md`);
-    if (before === "OLD") rename(dest, join(archiveDir, `${name}.md`));
-    mkdirSync(commandsDir, { recursive: true });
-    copyFileSync(join(templateDir, sessionCommandRel(name)), dest);
-    lines.push({ name, before, after: "SIA" });
+    if (archiveDir !== null && existsSync(archiveDir)) {
+      try {
+        if (readdirSync(archiveDir).length === 0) rmdirSync(archiveDir);
+        else rmSync(archiveDir, { recursive: true, force: true });
+      } catch { /* best effort */ }
+    }
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes("Nothing written")) throw err;
+    throw new Error(`${message}. Nothing written`);
   }
 
   return { root, archive: archiveRel, lines };

@@ -44,6 +44,7 @@ export function preStateProject(opts: { crlf?: boolean; spacedPath?: boolean } =
   mkdirSync(join(dir, ".claude", "commands"), { recursive: true });
   writeFileSync(join(dir, ".claude", "commands", "start.md"), oldStart);
   writeFileSync(join(dir, ".claude", "commands", "end.md"), oldEnd);
+  writeFileSync(join(dir, ".gitignore"), readFileSync(join(templateDir, "gitignore"), "utf8"));
   git(dir, "init", "-q", "-b", "main");
   git(dir, "config", "user.email", "t@example.com");
   git(dir, "config", "user.name", "T");
@@ -53,11 +54,14 @@ export function preStateProject(opts: { crlf?: boolean; spacedPath?: boolean } =
   return dir;
 }
 
-export function importCommit(dir: string): void {
+/** Runs `state import --commit` only; leaves the import outputs uncommitted (IMPORT-CMDS r2 L1). */
+export function importCommit(dir: string, opts: { commitRecord?: boolean } = {}): void {
   runDraft(dir, TODAY);
   runCommit(dir, TODAY, { version: "0.30.0" });
-  git(dir, "add", STATE_REL, ".agents/SESSIONS/next-session.md", ".agents/TASKS/INBOX.md", ".agents/TASKS/task.md", ".agents/SYSTEM/SUMMARY.md");
-  git(dir, "commit", "-q", "-m", "import record");
+  if (opts.commitRecord) {
+    git(dir, "add", STATE_REL, ".agents/SESSIONS/next-session.md", ".agents/TASKS/INBOX.md", ".agents/TASKS/task.md", ".agents/SYSTEM/SUMMARY.md");
+    git(dir, "commit", "-q", "-m", "import record");
+  }
 }
 
 /** install-commands refuses a dirty tree; commit its writes before a second run or after /start. */

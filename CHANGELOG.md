@@ -8,7 +8,9 @@
   project copies of `/start`, `/end`, `/task` and `/sync` with the template's and archives any `OLD`
   files locally. `bootstrap check` lists each command as `SIA`, `OLD` or `absent` and names
   `install-commands` on the import path when needed. `/start` warns when the record is valid but
-  project `start.md` is not SIA's.
+  project `start.md` is not SIA's. **r2 (QA 290):** allows a dirty tree only for
+  `STATE_IMPORT_COMMIT_OUTPUTS`; re-run when all commands are `SIA` is a no-op; preflight write
+  checks and rollback on failure.
 
 ### Changed
 

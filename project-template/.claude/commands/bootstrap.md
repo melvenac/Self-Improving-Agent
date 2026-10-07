@@ -176,8 +176,8 @@ It writes `.agents/state.json` at revision 0 and renders the views.
 ## Step 7b: Session commands (import path)
 
 If step 1's `commands:` line listed any of `start.md`, `end.md`, `task.md` or `sync.md` as `OLD` or
-`absent`, install SIA's copies **after** the owner has committed the record. The tree must be clean
-(`install-commands` refuses otherwise):
+`absent`, install SIA's copies **right after** step 7's `state import --commit` (the record and its
+four rendered views may still be uncommitted; `install-commands` allows only those paths to be dirty):
 
 ```
 OB bootstrap install-commands
@@ -191,8 +191,20 @@ old project `/start`.
 ## Step 8: The SIA commit
 
 Run `git status --short --untracked-files=all`. Without `--untracked-files=all`, new folders show as one
-line (`?? .agents/`) and cannot be compared. It must list exactly the tracked files from step 3, plus
+line (`?? .agents/`) and cannot be compared.
+
+On the **import path** (step 1 said `PRE-STATE`), step 3 never ran, so its tracked list is **empty**.
+The status must list exactly:
+
+- `.agents/state.json`
+- the four rendered views: `.agents/TASKS/INBOX.md`, `.agents/TASKS/task.md`,
+  `.agents/SESSIONS/next-session.md`, `.agents/SYSTEM/SUMMARY.md`
+- the four session commands: `.claude/commands/start.md`, `end.md`, `task.md`, `sync.md`
+- `CLAUDE.md` if step 4 changed it
+
+On a **fresh install** (step 3 ran), the status must list exactly the tracked files from step 3, plus
 `.agents/state.json` and `.agents/SESSIONS/next-session.md`, plus `CLAUDE.md` if step 4 changed it.
+
 If anything else appears, stop and ask the owner. Then, on the owner's word:
 
 ```

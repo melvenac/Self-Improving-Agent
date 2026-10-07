@@ -36,6 +36,15 @@ import { readJson } from "../../shared/fs-utils.js";
 export const DRAFT_REL = ".agents/state.draft.json";
 export const REPORT_REL = ".agents/state.import-report.md";
 export const STATE_REL = ".agents/state.json";
+
+/** What `state import --commit` writes or re-renders; `bootstrap install-commands` may run with only these dirty (IMPORT-CMDS r2). */
+export const STATE_IMPORT_COMMIT_OUTPUTS: readonly string[] = [
+  STATE_REL,
+  ".agents/TASKS/INBOX.md",
+  ".agents/TASKS/task.md",
+  ".agents/SESSIONS/next-session.md",
+  ".agents/SYSTEM/SUMMARY.md",
+];
 export const SNAPSHOT_PREFIX = "pre-state-migration-";
 
 type Status = Task["status"];
