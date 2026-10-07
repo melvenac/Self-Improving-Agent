@@ -1,7 +1,6 @@
 import { mkdirSync, writeFileSync, existsSync, renameSync } from "fs";
 import { join, dirname, relative, isAbsolute } from "path";
 import {
-  assertPathUnderDir,
   joinUnderVaultDir,
   safeVaultPathSegment,
   VaultPathRefusal,
