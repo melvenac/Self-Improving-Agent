@@ -73,7 +73,10 @@ point: CI's `test-windows` was **skipped** on both heads.
     write; (d) a DB without the table is a named skip, not a crash. **Never point it at `~/.claude/open-brain/`.**
 15. **Mutants.** For each, name the test that goes red: (a) the segment guard accepts `..`; (b) the under-dir check is
     removed; (c) YAML escaping is removed; (d) `resolveOwnKey`'s confinement is removed; (e) redaction is skipped for
-    `trigger_fires`; (f) the scrub skips the rewrite but reports success.
+    `trigger_fires`; (f) the scrub skips the rewrite but reports success; (g) the `secure_delete = ON` pragma is
+    removed from the scrub. For (g), also kill the scrub (Windows: `taskkill /F`) right after its UPDATE on a temp store
+    with auto-checkpoint off. Count the secret bytes left in the db, -wal and -shm before and after one rerun. **A mutant
+    that leaves every test green is a finding, and its severity is your call.**
 16. **Callers.** `vault-writer.ts`, `server.ts`, `topics/index.ts` and `session-end/index-v2.ts` changed, so run their
     existing test files (one per run) at the head and on master. Any new failure is a regression.
 
