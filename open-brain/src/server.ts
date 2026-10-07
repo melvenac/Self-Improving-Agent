@@ -670,9 +670,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       const sinceAnchor = since ?? "session start (unknown)";
       const oldLayoutLine = record.layout === "old" ? OLD_LAYOUT_LINE : null;
 
-      if (evaluation.work.status === "unknown") {
-        preamble.push(`RECORD NOT CHECKED: ${evaluation.work.reason ?? "session work could not be verified"}`);
-      } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok === "") {
+      if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok === "") {
         return {
           content: [{ type: "text" as const, text: "ob_end refused: record_ok must be a non-empty reason" }],
           isError: true,
