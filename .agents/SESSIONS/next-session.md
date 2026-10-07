@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 351 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 352 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,16 +6,16 @@
 
 ### Pick up here
 
-(1) QA 289 (#489 END-FIX T-246, head 1dac7b8a, mutants m1-m3 red at runs 37631307220/37631314012/37631319809) runs on the laptop AFTER Relay's R4 A+B (expected start ~11:30-12:00 CDT 10-07). DISPATCH_SHA bafb248d, prompt docs/loops/qa-289-headless-prompt.md; clark launches it and sends the VERDICT. Read the report yourself (qa/s164b-report) and rule; the merge is Aaron's word (update-branch, then check the tree equals merge-tree of master and the head, then merge pinned). (2) On END-FIX ACCEPT and merge, the Makerspace import starts (tomorrow at the earliest): docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files for Aaron's approval. (3) Aaron's scrub: the main checkout is at 540f1cca (contains #484), built 14:22Z by clark on Aaron's 'Update now'. Aaron stops the MCP server, closes the sessions, and runs `open-brain scrub-trigger-fires` once. Confirm afterwards that it ran (ask Aaron or clark for the output). (4) Done this session: QA 288 ACCEPT; #472 and #484 merged (D-131). T-247 is the P2 follow-up to pin H1/H2/G1. PARKED (D-130): #437 (r10 vs T-245 Option A), #425 (after #437), Jev cal 2 #463 #465 #470.
+(1) QA 289 (#489 END-FIX T-246, head 1dac7b8a, mutants m1-m3 red at runs 37631307220/37631314012/37631319809, draft PRs #490-#492) runs on the laptop AFTER Relay's R4 family B + grade. DISPATCH_SHA bafb248d, prompt docs/loops/qa-289-headless-prompt.md; clark launches it and sends the VERDICT. Read qa/s164b-report yourself and rule; the merge is Aaron's word (update-branch, check the tree equals merge-tree of master and the head, merge pinned). (2) IMPORT-CMDS (freeze path; docs/loops/import-commands-brief.md, C1-C4 / I1-I9) was dispatched to cursor-builder (room k575sfwr9wcx3r8fw83g3bc00x8fmar3, turn 114, base 7f4bf767). The pre-state import never installs SIA's session commands, because scaffold throws on pre-state (bootstrap/index.ts:328). Its QA comes after QA 289 on the laptop, or on Plumb if R4 overruns (check BUILDING first). It needs a dispatch written when the head lands. (3) T-247 (P2 pins H1/H2/G1) was dispatched to cursor-infra (room k57d92gqtjm9wpfs74ekbx9rns8fmy2f, turn 74, base 7f4bf767). It is safe to park. (4) The Makerspace import starts tomorrow at the earliest, after the END-FIX and IMPORT-CMDS merges: docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files for Aaron's approval. (5) Aaron's scrub: the main checkout is at 540f1cca (built 14:22Z). Aaron stops the MCP server, closes the sessions, and runs `open-brain scrub-trigger-fires` once; clark relays the output. (6) PARKED (D-130): #437 (r10 vs T-245 Option A), #425, Jev cal 2 #463 #465 #470. forge is idle by ruling (QA capacity is the bottleneck).
 
 ### Watch out
 
 - USAGE: weekly pace WELL AHEAD (06:50 CDT 10-07). Claude does QA and urgent work only; dev goes to Cursor/Grok; planning turns stay lean.
 - PLUMB: before any SIA QA launch there, /home/melvenac/builds/BUILDING must be absent.
-- HUB ROOMS: use `hub-talk --session <FULL id>` with HUB_URL=http://100.124.212.87:4000; `--peer` opens the lobby or a new empty room. cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3; grok-audit k575fscdqd291tgnpg51yttgbh8frzq8.
-- LAPTOP: one heavy job at a time (7.9 GB). The launcher does not set TEMP/TMP. QA 289's prompt says so.
-- MERGES of QA'd src PRs: update-branch (a merge commit), verify the tree equals `git merge-tree --write-tree origin/master <QA'd head>`, wait for CI, then `gh pr merge --match-head-commit`. Never a rebase (it would change the QA'd commits).
-- PLANNER-WATCH under Monitor expires every 30 min. Re-arm it on the expiry notice (no cron; fewer wakes).
+- HUB ROOMS: use `hub-talk --session <FULL id>` with HUB_URL=http://100.124.212.87:4000; `--peer` opens the lobby or a new empty room. cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3; cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f; grok-audit k575fscdqd291tgnpg51yttgbh8frzq8.
+- LAPTOP: one heavy job at a time (7.9 GB). The launcher does not set TEMP/TMP; the QA prompts say so.
+- MERGES of QA'd src PRs: update-branch (a merge commit), verify the tree equals `git merge-tree --write-tree origin/master <QA'd head>`, wait for CI, then `gh pr merge --match-head-commit`. Never a rebase.
+- PLANNER-WATCH under Monitor expires every 30 min. Re-arm it on the expiry notice (no cron).
 
 ### Open questions
 
@@ -25,9 +25,11 @@
 
 **Open PRs:** 
 - #489 — QA: in_progress — T-246 END-FIX 1dac7b8a, CI green, mutants red; QA 289 queued on the laptop after R4
+- IMPORT-CMDS — QA: not_started — cursor-builder turn 114, base 7f4bf767; no PR yet
+- T-247 — QA: not_started — cursor-infra turn 74, base 7f4bf767; no PR yet
 - #437 — QA: in_progress — PARKED (D-130). r10 9d197466; r10 vs T-245 Option A undecided
 - #425 — QA: accepted — PARKED (D-130). Merges only after #437
-- #470 — QA: in_progress — PARKED (D-130) with #463 #465. Jev cal 2; QA 287 no separation
+- #470 — QA: in_progress — PARKED (D-130) with #463 #465. Jev cal 2
 
 **SHA frozen for QA:** `1dac7b8a528bc2352b3eaf37792d9a2f204a3431`
 
@@ -35,7 +37,7 @@
 - Merge #489 on QA 289 ACCEPT (ask when the verdict lands).
 
 **Rulings made mid-loop:** 
-- s164: D-130 freeze + pilot ruling + parking; D-131 QA 288 ACCEPT, #472 -> 4cdd8a12 and #484 -> ab4c1c5a merged on Aaron's word; #487 #494 merged on Aaron's word; #488 #493 records under the standing rule.
+- s164: D-130 freeze + pilot ruling + parking; D-131 QA 288 ACCEPT, #472 -> 4cdd8a12 and #484 -> ab4c1c5a merged on Aaron's word; #487 #494 merged on Aaron's word; #488 #493 #495 #496 records/docs under the standing rule.
 
 ## developer [sia-builder] _(written session 156)_
 
