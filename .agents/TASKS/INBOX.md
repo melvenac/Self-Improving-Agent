@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 345 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 346 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -49,10 +49,12 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
 - [ ] **T-242** Grok bots in hub-partner-seats.json: add grok-sia-review and grok-qa-sia as atlas reader partners, and unpin the two tests that freeze the live map
+- [ ] **T-244** planner-watch misses peer turns: diff on each room's newest turn number, not unread, and keep prev in memory per process (shared STATE file across instances)
 
 ## P3
 
 - [ ] **T-188** sync's ci-status check reads gh's 'gh auth login' hint in a clone whose origin is not GitHub as 'gh is not authenticated'
+- [ ] **T-243** #484 LOW residuals and pre-existing audit lows: recall-trigger.log keeps a ~10-char excerpt of a malformed payload; single-quoted YAML tags keep their quotes; normalizeProject splits 'C++ Tools' oddly; A2 (repo-local .gitnexus/run.cjs runs on /sync), A4 (ob_start project_root trust), A5 (OPEN_BRAIN_VAULT_DIR override): document the trust boundaries
 
 ## Done (last 3 sessions)
 

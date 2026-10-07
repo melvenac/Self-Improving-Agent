@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 345,
+  "revision": 346,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1561,6 +1561,34 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Opened planner s163. The bots are up (Argus via clark, 2026-10-06). grok-sia-review: room [atlas, grok-sia-review] k57c639j4wkyp3y3vhfxxytn1s8fsdx6, cron minutes 2-57/5, wake line `REVIEW JOB: <branch>@<40-hex sha>`, posts `REVIEW n/total <short>`, findings as F<k> [severity] path:line turns. grok-qa-sia: room [atlas, grok-qa-sia] k573rrq0rz6p519xhh4p9mmyk98fsb55, cron minutes 0-55/5, wake line `QA JOB: <dispatch path>@<40-hex DISPATCH_SHA>`, report as hub turns ending `FIRST-PASS PASS|FAIL <short>`, rows it cannot run marked NOT RUN. Both use read-only SIA-only tokens that expire 2027-01-04 (D-125..D-127). A planner edit adding them to readers.atlas.partners was REVERTED uncommitted, because two tests pin the live file: seat-map.test.ts 'atlas reads exactly these three partners, and no reader or seat still speaks as grok' (the grok-* hub names trip the old forge=grok guard), and hub-presence.test.ts R1 'partnerLines.length toBe(3)'. Fix: make both tests assert properties (every partner row is well-formed; no SEAT speaks as plain 'grok') instead of a count, then add the two rows. The bots are not seats: they have no worktree and no waker, so they stay out of seats{}. Tests change, so this goes through QA.",
+      "note_by": [
+        "d43a0485-7166-4db2-9ca2-eacde1f63101"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-243",
+      "title": "#484 LOW residuals and pre-existing audit lows: recall-trigger.log keeps a ~10-char excerpt of a malformed payload; single-quoted YAML tags keep their quotes; normalizeProject splits 'C++ Tools' oddly; A2 (repo-local .gitnexus/run.cjs runs on /sync), A4 (ob_start project_root trust), A5 (OPEN_BRAIN_VAULT_DIR override): document the trust boundaries",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 163,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner s163 from grok-audit's and grok-sia-review's open-brain security audits at f7a7ee80, triaged by cursor-builder (turn 88: A1-A6 real; A3, A6 and A1 fixed in #484). These items were judged low or trust-boundary-by-design and left out of #484 on purpose.",
+      "note_by": [
+        "d43a0485-7166-4db2-9ca2-eacde1f63101"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-244",
+      "title": "planner-watch misses peer turns: diff on each room's newest turn number, not unread, and keep prev in memory per process (shared STATE file across instances)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 163,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner s163. Between 12:07 and 13:30 CDT 2026-10-06 the watcher fired no NEW TURN for grok-sia-review's #437 r6 review, grok-research's SIA-R1, or part of grok-audit's #484 review. Clark's diagnosis: STATE is one file per planner shared by every instance, and my own --inbox reads lower unread between ticks, so a peer post is netted out. The planner's 30-minute direct room sweep is the backstop until it's fixed. The script is scripts/planner-watch.mjs (PR #481); the fix is code and needs Aaron's word.",
       "note_by": [
         "d43a0485-7166-4db2-9ca2-eacde1f63101"
       ],
@@ -4356,6 +4384,12 @@
       "title": "Jev cal 2: QA 286 held; round 2 goes back to the development phase for tool fixes F1-F4 and inputs under Jev's size limit",
       "date": "2026-10-06",
       "note": "AUTHORITY: Aaron, planner window s163, 2026-10-06: 'hold QA 286 and send Jev calibration 2 back for the tool fixes and smaller inputs'. Evidence: QA 285 (edad72ab, qa/jev-cal-2-dev-report). 16 of 33 dev requests were refused for size (HTTP 400 max_tokens_exceeded), including 4 of 7 REJECTs; on the 17 answered cases the gate rejected all 17 (BA 0.50, Brier 0.4402 against 0.25, per-row AUC 0.24); and the frozen tools failed: F1 the CLI cannot send live, F2 score.mjs joins on the PR number, F3 the score.mjs CLI crashes in markdown(), F4 every non-2xx is filed as transport with the body dropped. A held-out run now would spend the set on a known failure and lose about half of it to size. The held-out 34 stay UNREAD. Round 2 stays round 2: the brief lets the development set be retried as often as needed, and no policy is frozen until a dev rerun answers every dev case. The builder fixes F1-F4 with tests, plus F6, and makes every input fit (per-row hunks only, with a deterministic pre-send byte ceiling below the observed 97,530-byte answered maximum that refuses an oversize input instead of sending it). Held-out inputs may be checked for SIZE ONLY (no label, no answer). QA then reruns all 33 dev rows live; the planner then freezes the policy from that evidence and writes QA 286."
+    },
+    {
+      "id": "D-129",
+      "title": "s163 rulings: #472 guard capped at r5 (prose synonyms are documented limits); #484 A1 stores program name only, and old rows are cleaned by an explicit scrub command, not on open",
+      "date": "2026-10-06",
+      "note": "Planner s163, under Aaron's Claude pause (Cursor/Grok carried the dev work). (1) #472 HUBROOM-GUARD: a regex over prose can't catch every rewording, and the structural fix (wakers end the turn, PR 457) is in. r4 was the LAST scope round; r5 fixed only r4's own regression (a whole-sentence FA exemption) and the exit-3 bypass. QA 284's K2 synonym misses are KNOWN LIMITS named in the guard header. (2) #484 A1 (secrets in trigger_fires.command): three rounds of regex redaction each missed new shapes, so the stored column holds ONLY the lowercase program name ^[a-z][a-z0-9._-]{0,24}$, else '?'; no subcommand and no hash (a hash of a short command was brute-forced in 121 ms). Residual accepted and pinned by a test: a short lowercase secret used AS the program name. (3) Old raw rows are NOT migrated on open: two rounds of open-time migration raced live connections. Instead, `open-brain scrub-trigger-fires [--db] [--dry-run]` runs once with the MCP server stopped and Claude Code closed: secure_delete ON, JS canonicalisation of every row, an unconditional VACUUM, wal_checkpoint(TRUNCATE) checked, and structural verification. After merging #484, Aaron must stop the MCP server and run it once. (4) #437 T-235 P2-7: liveness AND safety are required (zero claims is a failure, as bad as a double). r10 passes all four cross-session shapes 0/0 at 100 trials; the documented limits are F3 (a stall past the TTL), F4 (a triple-crash wedge) and F5 (a crash window of up to 60 s duplicate)."
     }
   ],
   "handoffs": [
@@ -4864,6 +4898,62 @@
       "session_uuid": "b8fa00fd-5821-40b3-b472-eec717bcf49a",
       "checkout": "sia-planner",
       "first_rev": 340
+    },
+    {
+      "seat": "planner",
+      "pick_up": "(1) After the Claude weekly reset (~00:05 CDT 10-07, a new week ON PACE), write ONE narrow Opus QA dispatch covering #437 r10 (9d197466, CI 37546516861), #472 r5 (1a374101, CI 37501631053) and #484 r9 (edfc964d, CI 37553637298 — read grok-audit's final r9 verdict in room k575fscd first). Re-run only the deciding rows plus Windows rows, read grok-qa-sia's #472 r4 first-pass (FIRST-PASS PASS; one uncaught source mutant: negation widened from clause to sentence) and the grok reviews only AFTER QA reports (D-125). All three change src/: each merge needs Aaron's word. (2) Jev cal 2: QA 287 (0836350f) answered 33/33 with tools fixed but NO separation (BA 0.50, AUC 0.385, everything rejected). Rule round 3 or stop: read grok-research's SIA-R1 answer (room k5779c36, 4 parts) first. QA 286 (held-out) stays held. (3) Commit grok-qa-sia's baseline + flake-hunt + #472 first-pass reports verbatim to a qa/* branch (D-127); they're in room k573rrq0.",
+      "watch_out": [
+        "USAGE: Aaron's weekly pace rule (usage-winddown-rules.md §4): allowance = elapsed/7d x 95%; AHEAD means dev work to Cursor/Grok and Claude for planning and QA only. Plus §5: roll before an idle gap over 1 h when under 50% context left, and fewer wakes.",
+        "PLANNER-WATCH: run `node scripts/planner-watch.mjs --as atlas --hub-talk C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs --peers cursor-builder,cursor-infra,forge,grok-qa-sia,grok-sia-review,grok-audit,grok-research --interval 30` under Monitor (an exact allow-rule is in .claude/settings.local.json; CronCreate goes through the classifier). It MISSES turns (task opened), so do a direct room sweep whenever it's quiet for 30+ min with jobs out. Use the a2a-planner copy of hub-talk, never ~/Projects/A2A-Hub (Aaron's stack checkout).",
+        "HEAVY RULE: forge ran r7 HEAVY unbooked and without the lease; it ACKed turn 64's rule. Every stress run: ask in its room, the planner relays to clark, wait for the GO, take the lease, HEAVY END, release from the same shell.",
+        "AFTER #484 MERGES: Aaron must stop the MCP server, close Claude Code sessions, and run `open-brain scrub-trigger-fires` once (4066 trigger_fires rows on his store).",
+        "GROK BOTS: one long QA job per bot, 2 on the VM at once; reviews and audits are light. JOB FAILED / JOB STALLED turns mean ask clark for a hand retry. The bots ask only the planner (QUESTION <turn>)."
+      ],
+      "open_questions": [
+        "Aaron: is #437 r10 acceptable with its documented limits (F3 stall past TTL, F4 triple-crash wedge, F5 60 s crash window), or would he rather go simpler if a rare double sessionStart/End is harmless downstream? (planner recommends accepting r10 if QA confirms)"
+      ],
+      "session": 163,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#437",
+            "qa_status": "in_progress",
+            "note": "T-235 P2-7 r10 9d197466 frozen, CI green; HEAVY 0/0 x4 at r9; grok r9 review: exclusion clean apart from limits; awaits Opus QA + Aaron"
+          },
+          {
+            "ref": "#472",
+            "qa_status": "in_progress",
+            "note": "HUBROOM-GUARD r5 1a374101 frozen, CI green; planner probe 7/7 caught, 5/5 ok; grok-qa-sia first-pass PASS on r4; awaits Opus QA + Aaron"
+          },
+          {
+            "ref": "#484",
+            "qa_status": "not_started",
+            "note": "AUDIT-FIX r9 edfc964d (A3/A6/A1 + scrub-trigger-fires) frozen, CI green; grok-audit final r9 verdict pending; awaits Opus QA + Aaron"
+          },
+          {
+            "ref": "#425",
+            "qa_status": "accepted",
+            "note": "T-235 P2-4, QA 280 ACCEPT; merges only after #437"
+          },
+          {
+            "ref": "#470",
+            "qa_status": "in_progress",
+            "note": "Jev cal 2 dev r2 fa8a8213; QA 287 COMPLETE, no separation; round 3 or stop pending"
+          }
+        ],
+        "frozen_sha": "9d197466d8865b610953b3cb2cd542d0ea8c5c2d",
+        "questions_for_aaron": [
+          "Accept #437 r10 with documented limits, or go simpler (rare doubles ok if capture is idempotent)?"
+        ],
+        "rulings": [
+          "s163 merged (docs/records-only, standing rule): #475 #476 #477 #478 #479 #480 #482 #483; on Aaron's word: #481 (scripts/planner-watch.mjs).",
+          "QA 284 e765175e: #437 r5 REJECT (lost-run F1, breaker F2), #472 r3 REJECT (K1). QA 285 edad72ab / QA 287 0836350f: Jev cal 2 dev, no separation. D-125..D-128 Grok seats + Jev hold.",
+          "Grok calibration: grok-sia-review found 5/5 of QA 283's K1/K2 blind plus 3 new (docs/loops/grok-sia-review-cal-468.md)."
+        ]
+      },
+      "session_uuid": "d43a0485-7166-4db2-9ca2-eacde1f63101",
+      "checkout": "sia-planner",
+      "first_rev": 341
     }
   ],
   "sessions": [
