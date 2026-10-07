@@ -425,6 +425,24 @@ export function recordContentChangedSinceStamp(
   stamp: ObEndStamp,
 ): boolean | null {
   if (!stamp.record_content_hash) return null;
+  if (stamp.ob_end_at) {
+    try {
+      const since = stamp.ob_end_at;
+      if (existsSync(join(projectDir, ".agents", "state.json"))) {
+        if (git(projectDir, ["log", `--since=${since}`, "--format=%H", "--", ".agents/state.json"]).trim()) {
+          return true;
+        }
+      }
+      const nextRel = ".agents/SESSIONS/next-session.md";
+      if (existsSync(join(projectDir, nextRel))) {
+        if (git(projectDir, ["log", `--since=${since}`, "--format=%H", "--", nextRel]).trim()) {
+          return true;
+        }
+      }
+    } catch {
+      /* not a git repo */
+    }
+  }
   const current = computeRecordContentHash(projectDir, sessionUuid);
   if (!current.ok) return null;
   return current.hash !== stamp.record_content_hash;
