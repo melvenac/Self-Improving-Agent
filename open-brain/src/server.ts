@@ -672,25 +672,25 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
 
       if (evaluation.work.status === "unknown") {
         preamble.push(`RECORD NOT CHECKED: ${evaluation.work.reason ?? "session work could not be verified"}`);
-      } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok === "") {
+      } else if (false /* QA291 M6: record_ok "" accepted */ && args.record_ok === "") {
         return {
           content: [{ type: "text" as const, text: "ob_end refused: record_ok must be a non-empty reason" }],
           isError: true,
         };
-      } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok.trim() === "") {
+      } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok !== "" && args.record_ok.trim() === "") {
         return {
           content: [{ type: "text" as const, text: "ob_end refused: record_ok must not be whitespace only" }],
           isError: true,
         };
       } else {
-        const recordOkReason = args.record_ok?.trim() || null;
+        const recordOkReason = args.record_ok === "" ? "" : (args.record_ok?.trim() || null);
         if (oldLayoutLine) preamble.push(oldLayoutLine);
-        if (evaluation.needsRecord && !recordOkReason) {
+        if (evaluation.needsRecord && recordOkReason === null) {
           const line = describeRecordNotUpdated(evaluation.work, record, sinceAnchor);
           const body = oldLayoutLine ? `${oldLayoutLine}\n${line}` : line;
           return { content: [{ type: "text" as const, text: body }], isError: true };
         }
-        if (evaluation.needsRecord && recordOkReason) {
+        if (evaluation.needsRecord && recordOkReason !== null) {
           if (!args.dry_run) recordRecordOkNotice(projectRoot, endedId, recordOkReason);
           preamble.push(`RECORD OK: closing without a matching record — ${recordOkReason}`);
         }
