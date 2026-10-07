@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- **`bootstrap install-commands` (IMPORT-CMDS).** After `state import --commit`, replaces non-SIA
+  project copies of `/start`, `/end`, `/task` and `/sync` with the template's and archives any `OLD`
+  files locally. `bootstrap check` lists each command as `SIA`, `OLD` or `absent` and names
+  `install-commands` on the import path when needed. `/start` warns when the record is valid but
+  project `start.md` is not SIA's.
+
 ### Changed
 
 - **The seat map carries the new per-seat hub rooms, and forge speaks as `forge` (T-213).** In

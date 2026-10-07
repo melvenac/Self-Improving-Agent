@@ -173,6 +173,21 @@ this session:
 
 It writes `.agents/state.json` at revision 0 and renders the views.
 
+## Step 7b: Session commands (import path)
+
+If step 1's `commands:` line listed any of `start.md`, `end.md`, `task.md` or `sync.md` as `OLD` or
+`absent`, install SIA's copies **after** the owner has committed the record. The tree must be clean
+(`install-commands` refuses otherwise):
+
+```
+OB bootstrap install-commands
+```
+
+It archives each `OLD` file under `.agents/archive/pre-bootstrap-commands-<date>/` (local), copies the
+template's four commands, leaves `SIA` files alone, and touches no other file under `.claude/`. Run
+`OB bootstrap check` again: all four should read `SIA`, and `/start` should no longer warn about an
+old project `/start`.
+
 ## Step 8: The SIA commit
 
 Run `git status --short --untracked-files=all`. Without `--untracked-files=all`, new folders show as one

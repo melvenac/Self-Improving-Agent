@@ -80,4 +80,10 @@ export const COMMAND_SPECS = {
     values: {},
     positionals: "directory",
   },
+  bootstrapInstallCommands: {
+    name: "bootstrap install-commands",
+    booleans: [],
+    values: {},
+    positionals: "directory",
+  },
 } as const satisfies Record<string, CommandSpec>;
