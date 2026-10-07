@@ -35,11 +35,9 @@ describe("end-fix Q12 windows-style paths and CRLF", () => {
   });
 
   it("Q1 on master: RECORD NOT UPDATED with CRLF next-session and backslash project_root", async () => {
-    initOldLayoutRepo(dir);
+    initOldLayoutRepo(dir, "# Handoff\r\nstale\r\n");
     const tr = writeTranscript(dir);
     proveSessionWithTranscript(dir, tr);
-    const next = join(dir, ".agents", "SESSIONS", "next-session.md");
-    writeFileSync(next, "# Handoff\r\nstale\r\n", "utf8");
     commitAt(dir, DURING, "src/a.ts", "one");
     commitAt(dir, DURING, "src/b.ts", "two");
     const root = process.platform === "win32" ? dir.replace(/\//g, "\\") : dir;

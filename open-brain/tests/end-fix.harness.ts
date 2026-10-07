@@ -37,11 +37,11 @@ export function commitAt(
   return git(dir, "rev-parse", "HEAD");
 }
 
-export function initOldLayoutRepo(dir: string): void {
+export function initOldLayoutRepo(dir: string, nextSessionBody = "# Handoff\nstale\n"): void {
   git(dir, "init", "-q", "-b", "master");
   mkdirSync(join(dir, ".agents", "SESSIONS"), { recursive: true });
   mkdirSync(join(dir, ".agents", "SYSTEM"), { recursive: true });
-  writeFileSync(join(dir, ".agents", "SESSIONS", "next-session.md"), "# Handoff\nstale\n");
+  writeFileSync(join(dir, ".agents", "SESSIONS", "next-session.md"), nextSessionBody);
   writeFileSync(join(dir, "package.json"), JSON.stringify({ version: "0.1.0" }));
   const base = commitAt(dir, BEFORE, "README.md", "base");
   git(dir, "update-ref", "refs/remotes/origin/master", base);
