@@ -1,6 +1,7 @@
 import type Database from 'better-sqlite3';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
 import { join, basename, relative } from 'node:path';
+import { parseFrontmatterScalar, parseInlineArray } from '../../shared/parse-frontmatter.js';
 
 /**
  * Generate Topic notes — one per subject tag, linking every note that carries it.
@@ -68,11 +69,12 @@ interface Linkable {
 
 function parseTags(raw: string | null | undefined): string[] {
   if (!raw) return [];
-  return raw
-    .replace(/^\[|\]$/g, '')
-    .split(',')
-    .map((t) => t.trim().toLowerCase())
-    .filter(Boolean);
+  const trimmed = raw.trim();
+  const items =
+    trimmed.startsWith('[') && trimmed.endsWith(']')
+      ? parseInlineArray(trimmed.slice(1, -1))
+      : trimmed.split(',').map((t) => parseFrontmatterScalar(t.trim()));
+  return items.map((t) => t.trim().toLowerCase()).filter(Boolean);
 }
 
 function normalizeProject(raw: string | null | undefined): string | null {
@@ -114,7 +116,7 @@ function readSummaries(vaultDir: string): Linkable[] {
     out.push({
       vaultPath: path,
       tags: parseTags(tags),
-      project: normalizeProject(project),
+      project: normalizeProject(project ? parseFrontmatterScalar(project) : undefined),
       projectFirst: true,
     });
   }

@@ -2060,6 +2060,7 @@ export const MEMORY_SIDE: string[] = [
   "server.ts",
   "cli-session-end.ts",
   "cli-recall-trigger.ts",
+  "scrub-trigger-fires.ts",
   "pipelines/session-end/",
   "pipelines/store/",
   "pipelines/topics/",

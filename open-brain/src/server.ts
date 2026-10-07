@@ -49,6 +49,8 @@ import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVault
 import { byPidDir, processStartTime, proveSession, type ProvenSession } from "./shared/process-session.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
+import { yamlInlineArray, yamlScalar } from "./shared/yaml-frontmatter.js";
+import { safeVaultPathSegment, VaultPathRefusal } from "./shared/vault-path-segment.js";
 import { findToolCallScaffolding, scaffoldRejectionMessage } from "./shared/content-guard.js";
 import { recallRankExpr, type Rating, type Maturity } from "./lifecycle.js";
 import type { CategoryScore, ScoreResult } from "./pipelines/sync/types.js";
@@ -1086,7 +1088,15 @@ server.tool(
     const v2db = getV2Db();
     const effectiveProject = scope === "project" ? canonicalizeProjectDir(project_dir) : null;
     // From the raw dir, not `effectiveProject` — see projectDisplayName.
-    const projectName = effectiveProject ? projectDisplayName(project_dir) : "General";
+    let projectName = "General";
+    if (effectiveProject) {
+      try {
+        projectName = safeVaultPathSegment("project", projectDisplayName(project_dir));
+      } catch (err) {
+        const msg = err instanceof VaultPathRefusal ? err.message : String(err);
+        return { content: [{ type: "text" as const, text: `ob_store refused: ${msg}` }], isError: true };
+      }
+    }
 
     // `key` is optional in this schema but NOT NULL UNIQUE in the table, so a
     // keyless store used to die on the constraint — and a placeholder would die
@@ -1100,17 +1110,25 @@ server.tool(
     // re-storing an existing key raised "UNIQUE constraint failed" — and
     // re-storing an existing key is precisely what a `state` fact does.
     const { store } = await import("./pipelines/store/index.js");
-    const result = store({
-      db: v2db,
-      vaultDir: v2VaultDir(),
-      key: effectiveKey,
-      tags: tags || [],
-      content,
-      project: projectName,
-      projectDir: effectiveProject,
-      source: source || "manual",
-      factKind: kind ?? null,
-    });
+    let result;
+    try {
+      result = store({
+        db: v2db,
+        vaultDir: v2VaultDir(),
+        key: effectiveKey,
+        tags: tags || [],
+        content,
+        project: projectName,
+        projectDir: effectiveProject,
+        source: source || "manual",
+        factKind: kind ?? null,
+      });
+    } catch (err) {
+      if (err instanceof VaultPathRefusal) {
+        return { content: [{ type: "text" as const, text: `ob_store refused: ${err.message}` }], isError: true };
+      }
+      throw err;
+    }
 
     const scopeLabel = effectiveProject ? ` [project: ${effectiveProject}]` : " [global]";
 
@@ -1523,11 +1541,18 @@ export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolRespon
   const v2db = getV2Db();
   const now = new Date().toISOString();
   const date = now.slice(0, 10);
-  const tagsStr = tags ? tags.join(", ") : "";
   const normalizedProject = canonicalizeProjectDir(project_dir);
   // Same rule as ob_store: the canonical path is lowercased, so the display
   // name comes from the raw dir. Matches existing checkpoint filenames.
-  const projectSlug = normalizedProject ? projectDisplayName(project_dir, "general") : "general";
+  let projectSlug = "general";
+  if (normalizedProject) {
+    try {
+      projectSlug = safeVaultPathSegment("project", projectDisplayName(project_dir, "general"));
+    } catch (err) {
+      const msg = err instanceof VaultPathRefusal ? err.message : String(err);
+      return { content: [{ type: "text" as const, text: `ob_store_chunk refused: ${msg}` }], isError: true };
+    }
+  }
   const slug = slugify(key);
   const phaseStr = phase != null ? `-phase-${phase}` : "";
 
@@ -1536,16 +1561,17 @@ export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolRespon
   const fileName = `${date}-${projectSlug}-${slug}${phaseStr}.md`;
   const vaultPath = join(v2VaultDir(), categoryDir, fileName);
 
+  const tagList = [category, ...(tags || [])];
   const frontmatter = [
     "---",
-    `type: ${category}`,
-    `key: ${key}`,
-    `project: ${projectSlug}`,
-    `date: ${date}`,
-    ...(session_id ? [`session: ${session_id}`] : []),
+    `type: ${yamlScalar(category)}`,
+    `key: ${yamlScalar(key)}`,
+    `project: ${yamlScalar(projectSlug)}`,
+    `date: ${yamlScalar(date)}`,
+    ...(session_id ? [`session: ${yamlScalar(session_id)}`] : []),
     ...(phase != null ? [`phase: ${phase}`] : []),
-    `tags: [${[category, ...tags || []].join(", ")}]`,
-    ...(normalizedProject ? [`working_dir: ${normalizedProject}`] : []),
+    `tags: ${yamlInlineArray(tagList)}`,
+    ...(normalizedProject ? [`working_dir: ${yamlScalar(normalizedProject)}`] : []),
     "---",
   ].join("\n");
 

@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import { join } from "path";
 import { writeSummary } from "../../vault-writer.js";
+import { safeVaultPathSegment } from "../../shared/vault-path-segment.js";
 import {
   updateFeedbackV2,
   recordFeedbackEvent,
@@ -97,9 +98,15 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
   let summaryWritten = false;
   if (!dryRun && sessionSummary) {
     const date = new Date().toISOString().slice(0, 10);
+    let summaryProject = project;
+    try {
+      safeVaultPathSegment("project", project);
+    } catch {
+      summaryProject = "General";
+    }
     const written = writeSummary(vaultDir, {
       sessionId,
-      project,
+      project: summaryProject,
       date,
       content: sessionSummary,
     });
