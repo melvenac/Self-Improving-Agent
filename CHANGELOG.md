@@ -19,6 +19,14 @@
   `ob_recall` accepts `purpose: "dedup"` so /end dedup lookups are not rated; old-layout repos
   always see the `OLD LAYOUT` line at close.
 
+- **`bootstrap install-commands` (IMPORT-CMDS).** After `state import --commit`, replaces non-SIA
+  project copies of `/start`, `/end`, `/task` and `/sync` with the template's and archives any `OLD`
+  files locally. `bootstrap check` lists each command as `SIA`, `OLD` or `absent` and names
+  `install-commands` on the import path when needed. `/start` warns when the record is valid but
+  project `start.md` is not SIA's. **r2 (QA 290):** allows a dirty tree only for
+  `STATE_IMPORT_COMMIT_OUTPUTS`; re-run when all commands are `SIA` is a no-op; preflight write
+  checks and rollback on failure.
+
 ### Changed
 
 - **The seat map carries the new per-seat hub rooms, and forge speaks as `forge` (T-213).** In
@@ -27,6 +35,12 @@
   `forge.key`. The three atlas-to-seat reader pairs moved with them. Nothing else in the file changed.
 
 ### Added
+
+- **`open-brain scrub-trigger-fires`** — explicit one-time rewrite of legacy `trigger_fires.command`
+  values to the program-only census form, then `VACUUM` and WAL truncate with structural verification.
+  Uses `PRAGMA secure_delete=ON` before rewrite and runs `VACUUM` on every non-dry run so a rerun
+  reclaims bytes left by an interrupted first pass. After upgrading, stop the MCP server **and close
+  Claude Code sessions (hooks)** first, then run `open-brain scrub-trigger-fires` once.
 
 - **FOCUS and SEATS in the budgeted briefing (T-236 (c)).** Opt-in: `briefing_focus` in `.agents/SYSTEM/greeting.json`,
   effective only with `briefing_budget` (absent = off; A2A renders unchanged). A task gains an optional `assignee`, a seat
@@ -47,6 +61,11 @@
   prints in full.
 
 ### Fixed
+
+- **T-247 (QA 288 pins; QA 290 J1).** `writeSummary` rejects a `date` that is not a real calendar day (`YYYY-MM-DD` shape
+  plus UTC round-trip) before building vault paths.
+  Tests pin `assertPathUnderDir`, scrub `PRAGMA secure_delete=ON` after a WAL-held kill, and clause-scoped hub-room
+  negation (NEG1).
 
 - **T-239 follow-up (QA 270 rows 3 and 10).** `checkMissingHandoff` derives the checkout with the shared `checkoutOf`,
   the same function the writer stamps `sessions[].checkout` with, instead of its own inline `basename(resolve())`. New rows

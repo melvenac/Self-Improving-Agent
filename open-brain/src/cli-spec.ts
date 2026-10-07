@@ -32,6 +32,12 @@ export const COMMAND_SPECS = {
     values: { "--min": "equals" },
     positionals: "none",
   },
+  scrubTriggerFires: {
+    name: "scrub-trigger-fires",
+    booleans: ["--dry-run"],
+    values: { "--db": "both" },
+    positionals: "none",
+  },
   detach: {
     name: "detach",
     booleans: ["--dry-run", "--no-fetch", "--force"],
@@ -71,6 +77,12 @@ export const COMMAND_SPECS = {
   bootstrapScaffold: {
     name: "bootstrap scaffold",
     booleans: ["--json"],
+    values: {},
+    positionals: "directory",
+  },
+  bootstrapInstallCommands: {
+    name: "bootstrap install-commands",
+    booleans: [],
     values: {},
     positionals: "directory",
   },

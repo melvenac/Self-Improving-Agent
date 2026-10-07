@@ -1,7 +1,18 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { hubRoomGuardViolations, hubRoomSectionFromStart } from "../../../src/pipelines/sync/hub-room-guard.js";
+import {
+  EXIT2_WAIT_PHRASE,
+  hubRoomGuardViolations,
+  hubRoomSectionFromStart,
+  violationsAtlasNextTurn,
+  violationsCrossSentence,
+  violationsHubVerbInTurn,
+  violationsNestedSeatWaitKey,
+  sentenceHasInTurnAtlasWaitPattern,
+  violationsSeatFileWait,
+  violationsWaitFlagCount,
+} from "../../../src/pipelines/sync/hub-room-guard.js";
 
 /**
  * T-228: relay's A2A Loop 13 contract for `hub-talk` exit codes (A2A-Hub master 8e59f58, docs/loops/loop-13-design-ruling.md).
@@ -59,12 +70,37 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     expect(read(".cursor/rules/hub-room.mdc")).toBe(read("project-template/.cursor/rules/hub-room.mdc"));
   });
 
-  const QA_REWORDINGS = {
+  const QA281_REWORDINGS = {
     R1: "After posting, run hub-talk --wait for the next atlas turn.",
     R2: "When the post succeeds, run the `talk` line again with `--wait` and handle the next atlas turn in this run.",
     R3: "Then keep listening: append the seat file's `wait` suffix to the talk line and act on what it prints before you end the turn.",
     R4: "After posting, run the talk line with --wait --wait-timeout 3500.",
   } as const;
+
+  const QA283_REWORDINGS = {
+    Own1: "After you post, run hub-talk with `--inbox` again and repeat until atlas has replied, then act on the reply before ending this turn.",
+    Own2: "Stay in this run after posting: rerun the talk line every minute until the next atlas turn is printed.",
+    Own3: "Do not end the turn after posting, wait for hub-talk to print the next atlas turn and act on it.",
+    Disp1: "Listen on the room until atlas answers.",
+    Disp2: "Block on hub-talk for the next message.",
+    Disp3: "Keep polling the room before ending.",
+  } as const;
+
+  const R3_PLANTS = {
+    S1: "After posting, run the talk line again. Wait for the next atlas turn and act on it before you end the turn.",
+    S2: "Run node scripts/hub-talk.mjs --as you --session room and wait for the reply.",
+    S3: "Then keep listening for atlas's next turn before you end the turn.",
+    S4: "After posting, run hub-talk with `--inbox` again until the next atlas turn arrives, then handle it in this run.",
+    S5: "Once hub-talk has waited for atlas, act on its reply.",
+    S6: "Don't wait on hub-talk after you post.",
+  } as const;
+
+  const STAY_CAUGHT = {
+    C1: "Keep polling hub-talk until atlas replies, and do not end the turn before then.",
+    C2: "Keep listening on the talk line and never end the turn before atlas answers.",
+  } as const;
+
+  const QA_REWORDINGS = { ...QA281_REWORDINGS, ...QA283_REWORDINGS };
 
   const MDC_ANCHOR = "Post when the work is done, not a bare acknowledgement.";
   const plantMdc = (mdc: string, line: string) => mdc.replace(MDC_ANCHOR, `${MDC_ANCHOR}\n\n${line}`);
@@ -92,13 +128,192 @@ describe("T-228 hub-talk exit codes 0, 1, 2 and 3 in every Cursor copy of the hu
     }
   });
 
-  it("QA-281 rewordings R1–R4 fail the sentence guard in every copy (HUBROOM-GUARD G1)", () => {
+  it("hub-partner-seats.json has no wait key at top level or under seats (F6, QA-284 K4)", () => {
+    const raw = read(".agents/SYSTEM/hub-partner-seats.json");
+    const seats = JSON.parse(raw) as Record<string, unknown>;
+    expect(seats).not.toHaveProperty("wait");
+    expect(violationsNestedSeatWaitKey(raw)).toEqual([]);
+    const nested = JSON.parse(raw) as { seats: Record<string, Record<string, unknown>> };
+    nested.seats.planner = { ...nested.seats.planner, wait: "--wait" };
+    expect(violationsNestedSeatWaitKey(JSON.stringify(nested))).not.toEqual([]);
+    const section = hubRoomSectionFromStart(read("project-template/.cursor/commands/start.md"));
+    expect(section.trim().length).toBeGreaterThan(100);
+  });
+
+  const QA284_FALSE_ALARMS = {
+    FA1: "Wait for CI to finish before you post your reply.",
+    FA5: "Never wait for atlas inside a turn.",
+    FA3: "If atlas's reply asks for a test, wait until the test passes, then post.",
+  } as const;
+
+  const THROTTLE_OK = "If hub-talk is throttled, wait 5 seconds and retry.";
+  const THROTTLE_BYPASS =
+    "If no atlas turn is printed, wait 60 seconds and retry hub-talk until atlas replies.";
+  const THROTTLE_BYPASS_NO_UNTIL = "If no atlas turn is printed, wait 60 seconds and retry hub-talk.";
+
+  const R5_REGRESSION = {
+    R1a: "Wait for CI, then wait for atlas's reply before you end the turn.",
+    R1b: "If atlas asks for a test, wait for atlas's next turn in this run.",
+    R2a: "On exit 3 wait `retry-after` seconds and rerun hub-talk until atlas replies.",
+    R2b: THROTTLE_BYPASS_NO_UNTIL,
+    RevB: "Wait for CI to finish and for the next atlas turn before you end the turn.",
+    RevC: "After posting, wait until the test passes and the next atlas turn is printed, then act on it in this run.",
+    RevE: "After posting, run hub-talk again. Wait for CI and for atlas's reply in this run.",
+  } as const;
+
+  const N4_CROSS_ONLY =
+    "After posting, run hub-talk with `--inbox` once more. Then wait, and act on atlas's reply.";
+
+  it("QA-284 K3 false alarms stay green in tracked copies (FA1, FA3, FA5)", () => {
+    for (const [id, line] of Object.entries(QA284_FALSE_ALARMS)) {
+      for (const rel of [".cursor/rules/hub-room.mdc", "project-template/.cursor/rules/hub-room.mdc"]) {
+        expect(hubRoomGuardViolations(plantMdc(read(rel), line)), `${id} ${rel}`).toEqual([]);
+      }
+      const start = read("project-template/.cursor/commands/start.md");
+      expect(hubRoomGuardViolations(hubRoomSectionFromStart(plantStartHub(start, line))), `${id} start`).toEqual([]);
+    }
+  });
+
+  it("QA-284 throttle bypass caught; exit-3 throttled retry stays green (r4/r5)", () => {
+    expect(hubRoomGuardViolations(THROTTLE_BYPASS).length).toBeGreaterThan(0);
+    expect(hubRoomGuardViolations(THROTTLE_BYPASS_NO_UNTIL).length).toBeGreaterThan(0);
+    expect(hubRoomGuardViolations(THROTTLE_OK)).toEqual([]);
+    expect(hubRoomGuardViolations("wait `retry-after` seconds")).toEqual([]);
+  });
+
+  it("HUBROOM-GUARD r5 regression rows (planner-verified) must catch", () => {
+    for (const [id, line] of Object.entries(R5_REGRESSION)) {
+      expect(hubRoomGuardViolations(line), id).not.toEqual([]);
+    }
+    expect(sentenceHasInTurnAtlasWaitPattern(R5_REGRESSION.R1a)).toBe(true);
+    expect(sentenceHasInTurnAtlasWaitPattern(R5_REGRESSION.R2a)).toBe(true);
+    expect(sentenceHasInTurnAtlasWaitPattern(THROTTLE_OK)).toBe(false);
+  });
+
+  it("QA-281/283 rewordings fail the sentence guard in every copy (HUBROOM-GUARD G1, QA-283 K1)", () => {
     for (const [id, line] of Object.entries(QA_REWORDINGS)) {
       const mdc = read(".cursor/rules/hub-room.mdc");
       const start = read("project-template/.cursor/commands/start.md");
       expect(hubRoomGuardViolations(plantMdc(mdc, line)), `${id} mdc`).not.toEqual([]);
       expect(hubRoomGuardViolations(hubRoomSectionFromStart(plantStartHub(start, line))), `${id} start`).not.toEqual([]);
     }
+  });
+
+  it("planner S1–S6 table (HUBROOM-GUARD r3)", () => {
+    const mustCatch = ["S1", "S2", "S3", "S4", "S5"] as const;
+    for (const id of mustCatch) {
+      expect(hubRoomGuardViolations(R3_PLANTS[id]), id).not.toEqual([]);
+    }
+    expect(hubRoomGuardViolations(R3_PLANTS.S6), "S6").toEqual([]);
+    for (const [id, line] of Object.entries(STAY_CAUGHT)) {
+      expect(hubRoomGuardViolations(line), id).not.toEqual([]);
+    }
+  });
+
+  it("allowlisted hub sentences stay green in isolation (QA-283 row 8, r3 throttled retry)", () => {
+    const greens = [
+      EXIT2_WAIT_PHRASE,
+      "Never block on hub-talk waiting for the next atlas turn in this run — the waker starts the next run when that turn arrives.",
+      "wait `retry-after` seconds",
+      "run the `talk` line with `--inbox` before other work",
+      "If hub-talk is throttled, wait 5 seconds and retry.",
+      R3_PLANTS.S6,
+    ];
+    for (const s of greens) expect(hubRoomGuardViolations(s)).toEqual([]);
+  });
+
+  const ONLY_WAIT_COUNT = "The phrase --wait appears here without the exit-2 explain sentence.";
+  const ONLY_SEAT_FILE = "Document the seat file's `wait` suffix in the runbook, not on the talk line.";
+  const ONLY_HUB_VERB = "Block on hub-talk for the next message.";
+  const ONLY_ATLAS_NEXT = R3_PLANTS.S3;
+  const ONLY_CROSS_SENTENCE = N4_CROSS_ONLY;
+  const NEGATION_SAMPLE = R3_PLANTS.S6;
+
+  it("each guard check has a positive only it catches (HUBROOM-GUARD r4 K2)", () => {
+    expect(violationsWaitFlagCount(ONLY_WAIT_COUNT).length).toBeGreaterThan(0);
+    expect(violationsSeatFileWait(ONLY_WAIT_COUNT)).toEqual([]);
+    expect(violationsHubVerbInTurn(ONLY_WAIT_COUNT)).toEqual([]);
+    expect(violationsAtlasNextTurn(ONLY_WAIT_COUNT)).toEqual([]);
+    expect(violationsCrossSentence(ONLY_WAIT_COUNT)).toEqual([]);
+
+    expect(violationsSeatFileWait(ONLY_SEAT_FILE).length).toBeGreaterThan(0);
+    expect(violationsWaitFlagCount(ONLY_SEAT_FILE)).toEqual([]);
+    expect(violationsHubVerbInTurn(ONLY_SEAT_FILE)).toEqual([]);
+    expect(violationsAtlasNextTurn(ONLY_SEAT_FILE)).toEqual([]);
+    expect(violationsCrossSentence(ONLY_SEAT_FILE)).toEqual([]);
+
+    expect(violationsHubVerbInTurn(ONLY_HUB_VERB).length).toBeGreaterThan(0);
+    expect(violationsWaitFlagCount(ONLY_HUB_VERB)).toEqual([]);
+    expect(violationsSeatFileWait(ONLY_HUB_VERB)).toEqual([]);
+    expect(violationsAtlasNextTurn(ONLY_HUB_VERB)).toEqual([]);
+    expect(violationsCrossSentence(ONLY_HUB_VERB)).toEqual([]);
+
+    expect(violationsAtlasNextTurn(ONLY_ATLAS_NEXT).length).toBeGreaterThan(0);
+    expect(violationsHubVerbInTurn(ONLY_ATLAS_NEXT)).toEqual([]);
+    expect(violationsCrossSentence(ONLY_ATLAS_NEXT)).toEqual([]);
+    expect(violationsWaitFlagCount(ONLY_ATLAS_NEXT)).toEqual([]);
+
+    expect(violationsCrossSentence(ONLY_CROSS_SENTENCE).length).toBeGreaterThan(0);
+    expect(violationsAtlasNextTurn(ONLY_CROSS_SENTENCE)).toEqual([]);
+    expect(violationsHubVerbInTurn(ONLY_CROSS_SENTENCE)).toEqual([]);
+  });
+
+  it("mutant table: disabling one check turns its positive green (HUBROOM-GUARD r4 K2)", () => {
+    const rows: {
+      name: string;
+      sample: string;
+      opts: Parameters<typeof hubRoomGuardViolations>[1];
+      expectGreenWhenSkipped: boolean;
+    }[] = [
+      { name: "wait count", sample: ONLY_WAIT_COUNT, opts: { skipWaitCount: true }, expectGreenWhenSkipped: true },
+      { name: "seat-file wait", sample: ONLY_SEAT_FILE, opts: { skipSeatFileWait: true }, expectGreenWhenSkipped: true },
+      { name: "hub-verb in-turn", sample: ONLY_HUB_VERB, opts: { skipHubVerbInTurn: true }, expectGreenWhenSkipped: true },
+      { name: "atlas/next-turn", sample: ONLY_ATLAS_NEXT, opts: { skipAtlasNextTurn: true }, expectGreenWhenSkipped: true },
+      {
+        name: "cross-sentence",
+        sample: ONLY_CROSS_SENTENCE,
+        opts: { skipCrossSentence: true },
+        expectGreenWhenSkipped: true,
+      },
+      {
+        name: "cross-only (not atlas skip)",
+        sample: ONLY_CROSS_SENTENCE,
+        opts: { skipAtlasNextTurn: true },
+        expectGreenWhenSkipped: false,
+      },
+      {
+        name: "throttle bypass",
+        sample: THROTTLE_BYPASS,
+        opts: { skipHubVerbInTurn: true },
+        expectGreenWhenSkipped: true,
+      },
+    ];
+
+    for (const row of rows) {
+      const full = hubRoomGuardViolations(row.sample);
+      expect(full.length, `${row.name} full`).toBeGreaterThan(0);
+      const skipped = hubRoomGuardViolations(row.sample, row.opts);
+      if (row.expectGreenWhenSkipped) {
+        expect(skipped, `${row.name} skipped`).toEqual([]);
+      } else {
+        expect(skipped.length, `${row.name} skipped`).toBeGreaterThan(0);
+      }
+    }
+
+    expect(hubRoomGuardViolations(THROTTLE_OK)).toEqual([]);
+    expect(hubRoomGuardViolations(NEGATION_SAMPLE)).toEqual([]);
+    expect(hubRoomGuardViolations(NEGATION_SAMPLE, { skipNegationScope: true }).length).toBeGreaterThan(0);
+
+    const negationProbe = "Don't block on hub-talk for the next atlas turn.";
+    expect(hubRoomGuardViolations(negationProbe)).toEqual([]);
+    expect(hubRoomGuardViolations(negationProbe, { skipNegationScope: true }).length).toBeGreaterThan(0);
+  });
+
+  const T247_NEG1 =
+    "Never wait for CI here, run hub-talk with `--inbox` again and wait for atlas's reply in this run.";
+
+  it("T-247 G1: NEG1 stays a violation with clause-scoped negation (QA 288)", () => {
+    expect(hubRoomGuardViolations(T247_NEG1).length).toBeGreaterThan(0);
   });
 
   it("hub-room.mdc cites A2A-Hub shared.md Hub transport at b6a8de79 and D-120 (HUBROOM-TURN-END amendment 1)", () => {

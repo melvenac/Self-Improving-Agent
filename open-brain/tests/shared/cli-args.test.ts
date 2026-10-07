@@ -155,9 +155,9 @@ describe("reading an undeclared flag is a defect, not 'not given'", () => {
 describe("every declared flag of every command is accepted", () => {
   const specs = Object.values(COMMAND_SPECS) as CommandSpec[];
 
-  it("walks at least the eleven commands (proves it looked)", () => {
+  it("walks at least the thirteen commands (proves it looked)", () => {
     expect(specs.map((s) => s.name).sort()).toEqual(
-      ["bootstrap check", "bootstrap move-residue", "bootstrap scaffold", "detach", "relocate", "start", "state erasures", "state migrate", "state show", "sync", "topics"]
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "relocate", "scrub-trigger-fires", "start", "state erasures", "state migrate", "state show", "sync", "topics"]
     );
   });
 
@@ -201,6 +201,7 @@ describe("the declarations agree with the usage text the CLI prints", () => {
     ["sync", /^\s+sync (.*)$/m],
     ["start", /^\s+start(.*)$/m],
     ["relocate", /^\s+relocate (.*)$/m],
+    ["scrub-trigger-fires", /^\s+scrub-trigger-fires (.*)$/m],
     ["topics", /^\s+topics (.*)$/m],
     ["detach", /^\s+detach (.*)$/m],
     ["state show", /^\s+state show (.*)$/m],
@@ -209,6 +210,7 @@ describe("the declarations agree with the usage text the CLI prints", () => {
     ["bootstrap check", /^\s+bootstrap check (.*)$/m],
     ["bootstrap move-residue", /^\s+bootstrap move-residue (.*)$/m],
     ["bootstrap scaffold", /^\s+bootstrap scaffold (.*)$/m],
+    ["bootstrap install-commands", /^\s+bootstrap install-commands (.*)$/m],
   ];
   const specNamed = (name: string): CommandSpec =>
     (Object.values(COMMAND_SPECS) as CommandSpec[]).find((s) => s.name === name)!;

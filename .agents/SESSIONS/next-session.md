@@ -1,43 +1,43 @@
-<!-- generated from .agents/state.json rev 348 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 353 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 163)_
+## planner [sia-planner] _(written session 164)_
 
 ### Pick up here
 
-(1) After the Claude weekly reset (~00:05 CDT 10-07, a new week ON PACE), write ONE narrow Opus QA dispatch covering #437 r10 (9d197466, CI 37546516861), #472 r5 (1a374101, CI 37501631053) and #484 r9 (edfc964d, CI 37553637298 — read grok-audit's final r9 verdict in room k575fscd first). Re-run only the deciding rows plus Windows rows, read grok-qa-sia's #472 r4 first-pass (FIRST-PASS PASS; one uncaught source mutant: negation widened from clause to sentence) and the grok reviews only AFTER QA reports (D-125). All three change src/: each merge needs Aaron's word. (2) Jev cal 2: QA 287 (0836350f) answered 33/33 with tools fixed but NO separation (BA 0.50, AUC 0.385, everything rejected). Rule round 3 or stop: read grok-research's SIA-R1 answer (room k5779c36, 4 parts) first. QA 286 (held-out) stays held. (3) Commit grok-qa-sia's baseline + flake-hunt + #472 first-pass reports verbatim to a qa/* branch (D-127); they're in room k573rrq0.
+(1) QA 291 (laptop): one Opus run on round 2 of #489 END-FIX (f59d03bc), #498 IMPORT-CMDS (f3aba754) and #499 T-247 (409c8c08). It includes the Windows rows that QA 290 skipped. DISPATCH_SHA 7ca465a4, prompt docs/loops/qa-291-headless-prompt.md; clark launches it and sends the VERDICT. Read qa/s164d-report yourself, then rule. Each merge is Aaron's word, done by update-branch, then checking the tree equals merge-tree of master and the head, then merge --match-head-commit. #489 and #498 both touch server.ts and the session-start render, so expect to merge them in sequence, re-checking the second after the first lands. (2) After #489 and #498 merge, rebuild the main checkout on Aaron's word. Then the Makerspace import (docs/loops/makerspace-import-brief.md), tomorrow at the earliest: Maker's first job is listing the 17 uncommitted files for Aaron's approval. The brief's step 6 (old commands) is now handled by `bootstrap install-commands`, step 7b. (3) Aaron's scrub of trigger_fires: the main checkout is at 540f1cca (it contains #484). He stops the MCP server, closes sessions, and runs `open-brain scrub-trigger-fires` once; clark relays the output. (4) PARKED (D-130): #437 (r10 vs T-245 Option A), #425, Jev cal 2 (#463, #465, #470). forge stays idle.
 
 ### Watch out
 
-- USAGE: Aaron's weekly pace rule (usage-winddown-rules.md §4): allowance = elapsed/7d x 95%; AHEAD means dev work to Cursor/Grok and Claude for planning and QA only. Plus §5: roll before an idle gap over 1 h when under 50% context left, and fewer wakes.
-- PLANNER-WATCH: run `node scripts/planner-watch.mjs --as atlas --hub-talk C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs --peers cursor-builder,cursor-infra,forge,grok-qa-sia,grok-sia-review,grok-audit,grok-research --interval 30` under Monitor (an exact allow-rule is in .claude/settings.local.json; CronCreate goes through the classifier). It MISSES turns (task opened), so do a direct room sweep whenever it's quiet for 30+ min with jobs out. Use the a2a-planner copy of hub-talk, never ~/Projects/A2A-Hub (Aaron's stack checkout).
-- HEAVY RULE: forge ran r7 HEAVY unbooked and without the lease; it ACKed turn 64's rule. Every stress run: ask in its room, the planner relays to clark, wait for the GO, take the lease, HEAVY END, release from the same shell.
-- AFTER #484 MERGES: Aaron must stop the MCP server, close Claude Code sessions, and run `open-brain scrub-trigger-fires` once (4066 trigger_fires rows on his store).
-- GROK BOTS: one long QA job per bot, 2 on the VM at once; reviews and audits are light. JOB FAILED / JOB STALLED turns mean ask clark for a hand retry. The bots ask only the planner (QUESTION <turn>).
+- DEV REPORTS ARE CLAIMS. Cursor seats have called their own failures 'unrelated' (#498 1236d958) and have had reports cut off mid-post (twice). Verify every head, CI run and mutant branch with git and gh yourself, and check that a mutant's parent has the same open-brain/src as the head.
+- QA PROMPTS: write them directly; never derive them with sed renames (the QA 290 prompt named a nonexistent file). Grep each for stale QA numbers and prefixes before its PR. A dispatch PR that carries push-qa.mjs is not docs-only, so it needs Aaron's word.
+- HUB ROOMS: use `hub-talk --session <FULL id>` with HUB_URL=http://100.124.212.87:4000. cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3; cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f; grok-audit k575fscdqd291tgnpg51yttgbh8frzq8. After a hub restart, planner-watch's unknown_since_restart is the presence reset, not a waker exit.
+- USAGE: weekly pace WELL AHEAD. Claude does QA and urgent work only; dev goes to Cursor/Grok.
+- PLUMB: /home/melvenac/builds/BUILDING must be absent before any SIA QA launch. LAPTOP: one heavy job at a time; the launcher sets no TEMP/TMP.
+- MERGES of QA'd src PRs: update-branch, tree check, CI, then --match-head-commit. Never a rebase.
 
 ### Open questions
 
-- Aaron: is #437 r10 acceptable with its documented limits (F3 stall past TTL, F4 triple-crash wedge, F5 60 s crash window), or would he rather go simpler if a rare double sessionStart/End is harmless downstream? (planner recommends accepting r10 if QA confirms)
+- Aaron: #437 r10 with its documented limits, or T-245 Option A? (parked until after the freeze)
 
 ### Loop state
 
 **Open PRs:** 
-- #437 — QA: in_progress — T-235 P2-7 r10 9d197466 frozen, CI green; HEAVY 0/0 x4 at r9; grok r9 review: exclusion clean apart from limits; awaits Opus QA + Aaron
-- #472 — QA: in_progress — HUBROOM-GUARD r5 1a374101 frozen, CI green; planner probe 7/7 caught, 5/5 ok; grok-qa-sia first-pass PASS on r4; awaits Opus QA + Aaron
-- #484 — QA: not_started — AUDIT-FIX r9 edfc964d (A3/A6/A1 + scrub-trigger-fires) frozen, CI green; grok-audit final r9 verdict pending; awaits Opus QA + Aaron
-- #425 — QA: accepted — T-235 P2-4, QA 280 ACCEPT; merges only after #437
-- #470 — QA: in_progress — Jev cal 2 dev r2 fa8a8213; QA 287 COMPLETE, no separation; round 3 or stop pending
+- #489 — QA: in_progress — END-FIX r2 f59d03bc; QA 289 REJECT r1; in QA 291
+- #498 — QA: in_progress — IMPORT-CMDS r2 f3aba754; QA 290 REJECT r1; in QA 291
+- #499 — QA: in_progress — T-247 r2 409c8c08; QA 290 REJECT r1; in QA 291
+- #437 — QA: in_progress — PARKED (D-130)
+- #425 — QA: accepted — PARKED (D-130); merges only after #437
+- #470 — QA: in_progress — PARKED (D-130) with #463 #465
 
-**SHA frozen for QA:** `9d197466d8865b610953b3cb2cd542d0ea8c5c2d`
+**SHA frozen for QA:** `7ca465a4063c62815dd4b396bacb7c7be415b048`
 
 **Questions pending for Aaron:** 
-- Accept #437 r10 with documented limits, or go simpler (rare doubles ok if capture is idempotent)?
+- Merge #489, #498 and #499 on a QA 291 ACCEPT (ask when the verdict lands).
 
 **Rulings made mid-loop:** 
-- s163 merged (docs/records-only, standing rule): #475 #476 #477 #478 #479 #480 #482 #483; on Aaron's word: #481 (scripts/planner-watch.mjs).
-- QA 284 e765175e: #437 r5 REJECT (lost-run F1, breaker F2), #472 r3 REJECT (K1). QA 285 edad72ab / QA 287 0836350f: Jev cal 2 dev, no separation. D-125..D-128 Grok seats + Jev hold.
-- Grok calibration: grok-sia-review found 5/5 of QA 283's K1/K2 blind plus 3 new (docs/loops/grok-sia-review-cal-468.md).
+- s164: D-130, D-131, D-132 (this round). #472 and #484 merged; #487, #494, #503 and #510 merged on Aaron's word; records PRs merged under the standing rule.
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -109,7 +109,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_8 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 

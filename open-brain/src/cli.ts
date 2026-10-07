@@ -266,6 +266,26 @@ if (command === "sync") {
   console.log(`\nApplied: ${result.knowledgeRows} entries, ${result.sessionRows} sessions, ${result.notesMoved} notes moved.`);
   for (const f of result.noteFailures) console.log(`  FAILED to move ${f.path}: ${f.reason}`);
   process.exit(result.noteFailures.length > 0 ? 1 : 0);
+} else if (command === "scrub-trigger-fires") {
+  const opts = parseOrRefuse(COMMAND_SPECS.scrubTriggerFires, args.slice(1));
+  const { runScrubTriggerFires, printScrubTriggerFiresResult } = await import(
+    "./scrub-trigger-fires.js"
+  );
+  const paths = resolvePaths(resolve("."));
+  const dbOpt = opts.value("--db");
+  if (dbOpt !== undefined && dbOpt.trim() === "") {
+    console.error("scrub-trigger-fires refused: --db requires a non-empty path");
+    process.exit(2);
+  }
+  const dbPath = resolve(dbOpt ?? paths.knowledgeV2Db);
+  try {
+    const result = runScrubTriggerFires(dbPath, { dryRun: opts.has("--dry-run") });
+    printScrubTriggerFiresResult(result);
+    process.exit(0);
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
 } else if (command === "topics") {
   const opts = parseOrRefuse(COMMAND_SPECS.topics, args.slice(1));
   const { openV2Database } = await import("./db-v2.js");
@@ -331,7 +351,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   // taken literally, never walked up: a fresh project may not be a repository
   // yet, and walking up could land in a PARENT project and scaffold that.
   const sub = args[1];
-  const { inspectProject, moveResidue, scaffold, formatMoveResidueFailure } = await import("./pipelines/bootstrap/index.js");
+  const { inspectProject, moveResidue, scaffold, installCommands, formatMoveResidueFailure, SESSION_COMMAND_NAMES } = await import("./pipelines/bootstrap/index.js");
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   if (sub === "check") {
@@ -349,6 +369,7 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
       : a.kind === "scaffolded" ? `SCAFFOLDED — not yet imported${a.inboxIsTemplate ? "; INBOX.md is still the template's" : ""}`
       : a.kind === "not-a-record" ? `NOT A RECORD — state.json is ${a.why}`
       : a.kind === "bootstrapped" ? "BOOTSTRAPPED — state.json is a record" : a.kind}`);
+    console.log(`commands:  ${SESSION_COMMAND_NAMES.map((n) => `${n}.md ${r.commands[n]}`).join("; ")}`);
     console.log(`Next:      ${r.next}`);
     process.exit(0);
   } else if (sub === "move-residue") {
@@ -386,8 +407,23 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
       console.log(r.verify.ok ? "\nVerified with git: every file above is tracked or ignored exactly as stated; state.json and next-session.md will be tracked; session logs and archive/ will not; .agents/ is eol=lf." : `\nVERIFY FAILED:\n${r.verify.problems.map((p) => `  ${p}`).join("\n")}`);
     }
     process.exit(r.verify.ok ? 0 : 1);
+  } else if (sub === "install-commands") {
+    const opts = parseOrRefuse(COMMAND_SPECS.bootstrapInstallCommands, args.slice(2));
+    try {
+      const r = installCommands(opts.directory ?? resolve("."), today);
+      console.log(`bootstrap install-commands — ${r.root}`);
+      if (r.archive) console.log(`Archive:   ${r.archive}/`);
+      for (const line of r.lines) {
+        const after = line.after === line.before ? `${line.before} (unchanged)` : line.after;
+        console.log(`  ${line.name}.md: ${line.before} -> ${after}`);
+      }
+      process.exit(0);
+    } catch (err) {
+      console.error(`bootstrap install-commands refused: ${err instanceof Error ? err.message : String(err)}`);
+      process.exit(1);
+    }
   } else {
-    console.error(`bootstrap: expected check, move-residue or scaffold, got ${sub === undefined ? "nothing" : `"${sub}"`}. Nothing was run.`);
+    console.error(`bootstrap: expected check, move-residue, scaffold or install-commands, got ${sub === undefined ? "nothing" : `"${sub}"`}. Nothing was run.`);
     process.exit(2);
   }
 } else if (command === "state") {
@@ -643,6 +679,12 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  start                                     Start a session");
   console.log("  end [--dry-run]                            End a session");
   console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
+  console.log(
+    "  scrub-trigger-fires [--db <path>] [--dry-run]  One-time rewrite of trigger_fires.command + VACUUM (stop the MCP server and close Claude Code sessions first)",
+  );
+  console.log(
+    "    Limits: an older MCP build may still hold the store during the run; a 0-byte or non-knowledge SQLite file may be accepted with its path printed; --dry-run may create empty -wal/-shm siblings.",
+  );
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit [--accept-stale]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
@@ -653,5 +695,6 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  bootstrap check [--json] [dir]                Read-only: git, CLAUDE.md and .agents/ as /bootstrap needs them");
   console.log("  bootstrap move-residue [dir]                  Move a residue .agents/ under .agents/archive/ (never deletes)");
   console.log("  bootstrap scaffold [--json] [dir]             Copy the fresh-install files from project-template/ and verify tracking");
+  console.log("  bootstrap install-commands [dir]              After import: install SIA session commands (refuses without a record or on a dirty tree)");
   process.exit(1);
 }

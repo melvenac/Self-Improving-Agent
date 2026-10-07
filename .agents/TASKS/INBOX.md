@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 348 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 353 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -52,6 +52,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
 - [ ] **T-242** Grok bots in hub-partner-seats.json: add grok-sia-review and grok-qa-sia as atlas reader partners, and unpin the two tests that freeze the live map
 - [ ] **T-244** planner-watch misses peer turns: diff on each room's newest turn number, not unread, and keep prev in memory per process (shared STATE file across instances)
+- [ ] **T-247** Pin QA 288's unpinned checks: assertPathUnderDir (H1, plus a date check in writeSummary), secure_delete (H2), and the hub-room guard's clause-scope negation (G1)
 
 ## P3
 

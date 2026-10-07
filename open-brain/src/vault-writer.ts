@@ -1,5 +1,34 @@
 import { mkdirSync, writeFileSync, existsSync, renameSync } from "fs";
 import { join, dirname, relative, isAbsolute } from "path";
+import {
+  joinUnderVaultDir,
+  safeVaultPathSegment,
+  VaultPathRefusal,
+} from "./shared/vault-path-segment.js";
+import { yamlInlineArray, yamlScalar } from "./shared/yaml-frontmatter.js";
+
+const SUMMARY_DATE_SHAPE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Reject bad shape and non-calendar dates before any vault path is built (T-247 H1, QA 290 J1). */
+export function assertValidSummaryDate(date: string): void {
+  if (!SUMMARY_DATE_SHAPE_RE.test(date)) {
+    throw new VaultPathRefusal(`summary date must be YYYY-MM-DD, got "${date}"`);
+  }
+  let roundTrip: string;
+  try {
+    const parsed = new Date(`${date}T00:00:00Z`);
+    if (Number.isNaN(parsed.getTime())) {
+      throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
+    }
+    roundTrip = parsed.toISOString().slice(0, 10);
+  } catch (err) {
+    if (err instanceof VaultPathRefusal) throw err;
+    throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
+  }
+  if (roundTrip !== date) {
+    throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
+  }
+}
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -55,7 +84,9 @@ export { parseFrontmatter } from "./shared/parse-frontmatter.js";
  * the index also knows about it.
  */
 export function experiencePath(vaultDir: string, project: string, key: string): string {
-  return join(vaultDir, "Experiences", project, `${slugify(key)}.md`);
+  const projectSeg = safeVaultPathSegment("project", project);
+  const experiencesDir = join(vaultDir, "Experiences");
+  return joinUnderVaultDir(experiencesDir, projectSeg, `${slugify(key)}.md`);
 }
 
 /**
@@ -98,18 +129,17 @@ export function writeExperience(
 
   if (existsSync(filePath)) return null;
 
-  const tagsInline = input.tags.join(", ");
   const frontmatter = [
     "---",
-    `key: ${input.key}`,
-    `tags: [${tagsInline}]`,
-    `created: ${input.created}`,
-    `maturity: ${input.maturity}`,
+    `key: ${yamlScalar(input.key)}`,
+    `tags: ${yamlInlineArray(input.tags)}`,
+    `created: ${yamlScalar(input.created)}`,
+    `maturity: ${yamlScalar(input.maturity)}`,
     `helpful: ${input.helpful}`,
     `harmful: ${input.harmful}`,
     `neutral: ${input.neutral}`,
-    `project: ${input.project}`,
-    `source: ${input.source}`,
+    `project: ${yamlScalar(input.project)}`,
+    `source: ${yamlScalar(input.source)}`,
     "---",
   ].join("\n");
 
@@ -128,23 +158,19 @@ export function writeFailure(
   input: FailureInput
 ): string | null {
   const keySlug = slugify(input.key);
-  const filePath = join(
-    vaultDir,
-    "Experiences",
-    input.project,
-    `failure-${keySlug}.md`
-  );
+  const projectSeg = safeVaultPathSegment("project", input.project);
+  const experiencesDir = join(vaultDir, "Experiences");
+  const filePath = joinUnderVaultDir(experiencesDir, projectSeg, `failure-${keySlug}.md`);
 
   if (existsSync(filePath)) return null;
 
-  const tagsInline = input.tags.join(", ");
   const frontmatter = [
     "---",
-    `key: ${input.key}`,
+    `key: ${yamlScalar(input.key)}`,
     `type: failure`,
-    `tags: [${tagsInline}]`,
-    `created: ${input.created}`,
-    `project: ${input.project}`,
+    `tags: ${yamlInlineArray(input.tags)}`,
+    `created: ${yamlScalar(input.created)}`,
+    `project: ${yamlScalar(input.project)}`,
     "---",
   ].join("\n");
 
@@ -176,12 +202,10 @@ export function writeSummary(
   vaultDir: string,
   input: SummaryInput
 ): string | null {
-  const projectSlug = slugify(input.project);
-  const filePath = join(
-    vaultDir,
-    "Summaries",
-    `${input.date}-${projectSlug}.md`
-  );
+  assertValidSummaryDate(input.date);
+  const projectSlug = slugify(safeVaultPathSegment("project", input.project));
+  const summariesDir = join(vaultDir, "Summaries");
+  const filePath = joinUnderVaultDir(summariesDir, `${input.date}-${projectSlug}.md`);
 
   if (existsSync(filePath)) return null;
 
@@ -196,10 +220,10 @@ export function writeSummary(
 
   const frontmatter = [
     "---",
-    `sessionId: ${input.sessionId}`,
-    `project: ${input.project}`,
-    `date: ${input.date}`,
-    `tags: [${tags.join(", ")}]`,
+    `sessionId: ${yamlScalar(input.sessionId)}`,
+    `project: ${yamlScalar(input.project)}`,
+    `date: ${yamlScalar(input.date)}`,
+    `tags: ${yamlInlineArray(tags)}`,
     "---",
   ].join("\n");
 

@@ -228,6 +228,7 @@ export function initSchemaV2(db: Database.Database): void {
       INSERT INTO knowledge_fts(rowid, key, content, tags)
       VALUES (new.id, new.key, new.content, new.tags);
     END;
+
   `);
 }
 

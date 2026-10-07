@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import type { AgentIdentity } from "./agent-identity.js";
 import { formatHubSeatState } from "./hub-seat-state.js";
 import { readSeatMapRows, resolveCheckoutSeat, runtimeByHubName, type HubRuntime } from "./seat-map.js";
@@ -83,13 +83,31 @@ export function hubIdForUrl(hubUrl: string): string {
   return `${u.hostname.toLowerCase()}-${port}`;
 }
 
+function safeHubKeyName(keyName: string): string | null {
+  const trimmed = keyName.trim();
+  if (!trimmed || trimmed === "." || trimmed === "..") return null;
+  if (isAbsolute(trimmed)) return null;
+  if (trimmed !== basename(trimmed)) return null;
+  if (trimmed.includes("..")) return null;
+  return trimmed;
+}
+
 export function resolveOwnKey(
   hubUrl: string,
   keyName: string,
   keyDir: string,
 ): { ok: true; key: string } | { ok: false; reason: string } {
-  const path = join(keyDir, hubIdForUrl(hubUrl), `${keyName}.key`);
-  if (!existsSync(path)) return { ok: false, reason: `no hub key for ${keyName} at ${path}` };
+  const safeName = safeHubKeyName(keyName);
+  if (!safeName) {
+    return { ok: false, reason: `hub key for ${keyName} is unavailable (invalid key name)` };
+  }
+  const hubRoot = resolve(join(keyDir, hubIdForUrl(hubUrl)));
+  const path = resolve(join(hubRoot, `${safeName}.key`));
+  const rel = relative(hubRoot, path);
+  if (!rel || rel.startsWith("..") || isAbsolute(rel)) {
+    return { ok: false, reason: `hub key for ${keyName} is unavailable (path outside key directory)` };
+  }
+  if (!existsSync(path)) return { ok: false, reason: `no hub key for ${safeName} at ${path}` };
   let key: string;
   try {
     key = readFileSync(path, "utf8").trim();
