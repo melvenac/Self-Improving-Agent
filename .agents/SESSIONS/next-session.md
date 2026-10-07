@@ -1,43 +1,43 @@
-<!-- generated from .agents/state.json rev 348 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 349 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 163)_
+## planner [sia-planner] _(written session 164)_
 
 ### Pick up here
 
-(1) After the Claude weekly reset (~00:05 CDT 10-07, a new week ON PACE), write ONE narrow Opus QA dispatch covering #437 r10 (9d197466, CI 37546516861), #472 r5 (1a374101, CI 37501631053) and #484 r9 (edfc964d, CI 37553637298 — read grok-audit's final r9 verdict in room k575fscd first). Re-run only the deciding rows plus Windows rows, read grok-qa-sia's #472 r4 first-pass (FIRST-PASS PASS; one uncaught source mutant: negation widened from clause to sentence) and the grok reviews only AFTER QA reports (D-125). All three change src/: each merge needs Aaron's word. (2) Jev cal 2: QA 287 (0836350f) answered 33/33 with tools fixed but NO separation (BA 0.50, AUC 0.385, everything rejected). Rule round 3 or stop: read grok-research's SIA-R1 answer (room k5779c36, 4 parts) first. QA 286 (held-out) stays held. (3) Commit grok-qa-sia's baseline + flake-hunt + #472 first-pass reports verbatim to a qa/* branch (D-127); they're in room k573rrq0.
+(1) QA 288 is running on the laptop (#472 r5 1a374101, #484 r9 edfc964d; DISPATCH_SHA 53e68b60; launched by clark 08:03 CDT, log C:\Users\Aaron\qa-288.log). Rule on its VERDICT; each merge is Aaron's word, after a rebase (D-117). After #484 merges, Aaron runs `open-brain scrub-trigger-fires` once. grok-audit's r9 verdict (room k575fscdqd291tgnpg51yttgbh8frzq8, turn 47) was advisory CLEAN with one LOW gap (secure_delete not pinned), which became QA 288 row 15(g). (2) T-246 END-FIX was dispatched to cursor-builder (room k575sfwr9wcx3r8fw83g3bc00x8fmar3, turn 110, base 53e68b60). Then QA 289 on the laptop, queued after QA 288, needs a dispatch written from docs/loops/end-fix-brief.md Q1-Q12. (3) The Makerspace import starts TOMORROW at the earliest, after the END-FIX ACCEPT (Aaron: 'Let's wait for the stopping point and end fix. The makerspace migration can start tomorrow'). No Maker launch, not even the 17-file list, until then. Its brief's 'Step 1 can be drafted meanwhile' line is superseded by this. Plan: docs/loops/makerspace-import-brief.md. (4) PARKED for the freeze (D-130). #437 r10 9d197466: resume by asking Aaron for r10 vs T-245 Option A. #425: merges only after #437. Jev cal 2 #463 #465 #470: stopped after QA 287 (no separation); QA 286 held-out untouched; resume by reading grok-research's SIA-R1 answer in room k5779c36 and ruling round 3 or stop.
 
 ### Watch out
 
-- USAGE: Aaron's weekly pace rule (usage-winddown-rules.md §4): allowance = elapsed/7d x 95%; AHEAD means dev work to Cursor/Grok and Claude for planning and QA only. Plus §5: roll before an idle gap over 1 h when under 50% context left, and fewer wakes.
-- PLANNER-WATCH: run `node scripts/planner-watch.mjs --as atlas --hub-talk C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs --peers cursor-builder,cursor-infra,forge,grok-qa-sia,grok-sia-review,grok-audit,grok-research --interval 30` under Monitor (an exact allow-rule is in .claude/settings.local.json; CronCreate goes through the classifier). It MISSES turns (task opened), so do a direct room sweep whenever it's quiet for 30+ min with jobs out. Use the a2a-planner copy of hub-talk, never ~/Projects/A2A-Hub (Aaron's stack checkout).
-- HEAVY RULE: forge ran r7 HEAVY unbooked and without the lease; it ACKed turn 64's rule. Every stress run: ask in its room, the planner relays to clark, wait for the GO, take the lease, HEAVY END, release from the same shell.
-- AFTER #484 MERGES: Aaron must stop the MCP server, close Claude Code sessions, and run `open-brain scrub-trigger-fires` once (4066 trigger_fires rows on his store).
-- GROK BOTS: one long QA job per bot, 2 on the VM at once; reviews and audits are light. JOB FAILED / JOB STALLED turns mean ask clark for a hand retry. The bots ask only the planner (QUESTION <turn>).
+- USAGE: weekly pace WELL AHEAD at 06:50 CDT 10-07 (9% vs 3.9%). Claude does QA and urgent work only; dev goes to Cursor/Grok; planning turns stay lean (usage-winddown-rules.md §4).
+- PLUMB: before any SIA QA launch there, /home/melvenac/builds/BUILDING must be absent (worthit-web builds; Aaron 10-07).
+- HUB ROOMS: `hub-talk --peer <name>` opens the LOBBY, not the work room, and can create a new empty one (it did for grok-audit: k57arsm0…). Always use --session with the FULL id. The record had only 8-character prefixes; full ids: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, grok-audit k575fscdqd291tgnpg51yttgbh8frzq8. Use HUB_URL=http://100.124.212.87:4000 (the atlas key is filed under that host).
+- BUILD: main checkout updated to ffc63aca and rebuilt by clark, 07:53 CDT 10-07. Check that the next fresh /start's Build line is not STALE and tell clark.
+- LAPTOP LAUNCHER does not set TEMP/TMP; QA prompts must say the job sets them itself (clark's note at QA 288).
+- HEAVY RULE: every stress run is asked for in its room, relayed by the planner to clark, and waits for the GO with the lease taken; release from the same shell.
 
 ### Open questions
 
-- Aaron: is #437 r10 acceptable with its documented limits (F3 stall past TTL, F4 triple-crash wedge, F5 60 s crash window), or would he rather go simpler if a rare double sessionStart/End is harmless downstream? (planner recommends accepting r10 if QA confirms)
+- Aaron: #437 r10 with its documented limits, or T-245 Option A? (parked until after the freeze)
 
 ### Loop state
 
 **Open PRs:** 
-- #437 — QA: in_progress — T-235 P2-7 r10 9d197466 frozen, CI green; HEAVY 0/0 x4 at r9; grok r9 review: exclusion clean apart from limits; awaits Opus QA + Aaron
-- #472 — QA: in_progress — HUBROOM-GUARD r5 1a374101 frozen, CI green; planner probe 7/7 caught, 5/5 ok; grok-qa-sia first-pass PASS on r4; awaits Opus QA + Aaron
-- #484 — QA: not_started — AUDIT-FIX r9 edfc964d (A3/A6/A1 + scrub-trigger-fires) frozen, CI green; grok-audit final r9 verdict pending; awaits Opus QA + Aaron
-- #425 — QA: accepted — T-235 P2-4, QA 280 ACCEPT; merges only after #437
-- #470 — QA: in_progress — Jev cal 2 dev r2 fa8a8213; QA 287 COMPLETE, no separation; round 3 or stop pending
+- #472 — QA: in_progress — HUBROOM-GUARD r5 1a374101 frozen, CI green; in QA 288 (laptop)
+- #484 — QA: in_progress — AUDIT-FIX r9 edfc964d frozen, CI green; grok-audit r9 advisory CLEAN (1 LOW); in QA 288 (laptop)
+- #437 — QA: in_progress — PARKED (D-130). T-235 P2-7 r10 9d197466; r10 vs T-245 Option A undecided
+- #425 — QA: accepted — PARKED (D-130). T-235 P2-4, QA 280 ACCEPT; merges only after #437
+- #470 — QA: in_progress — PARKED (D-130) with #463 #465. Jev cal 2 dev r2; QA 287 no separation
 
-**SHA frozen for QA:** `9d197466d8865b610953b3cb2cd542d0ea8c5c2d`
+**SHA frozen for QA:** `53e68b606b08da543d5f37f8744451f99682d7e1`
 
 **Questions pending for Aaron:** 
-- Accept #437 r10 with documented limits, or go simpler (rare doubles ok if capture is idempotent)?
+- #437: r10 with limits, or T-245 Option A? (after the freeze)
 
 **Rulings made mid-loop:** 
-- s163 merged (docs/records-only, standing rule): #475 #476 #477 #478 #479 #480 #482 #483; on Aaron's word: #481 (scripts/planner-watch.mjs).
-- QA 284 e765175e: #437 r5 REJECT (lost-run F1, breaker F2), #472 r3 REJECT (K1). QA 285 edad72ab / QA 287 0836350f: Jev cal 2 dev, no separation. D-125..D-128 Grok seats + Jev hold.
-- Grok calibration: grok-sia-review found 5/5 of QA 283's K1/K2 blind plus 3 new (docs/loops/grok-sia-review-cal-468.md).
+- s164: D-130 (freeze at 'Makerspace migration proven'; rehearsal is the pilot; QA #472+#484; park #437 #425 Jev cal 2; END-FIX T-246 before the import).
+- s164 merged on Aaron's word: #487 at e75621ba (master 53e68b60).
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -109,7 +109,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_8 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
