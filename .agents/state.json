@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 346,
+  "revision": 347,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1588,7 +1588,21 @@
       "opened_session": 163,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner s163. Between 12:07 and 13:30 CDT 2026-10-06 the watcher fired no NEW TURN for grok-sia-review's #437 r6 review, grok-research's SIA-R1, or part of grok-audit's #484 review. Clark's diagnosis: STATE is one file per planner shared by every instance, and my own --inbox reads lower unread between ticks, so a peer post is netted out. The planner's 30-minute direct room sweep is the backstop until it's fixed. The script is scripts/planner-watch.mjs (PR #481); the fix is code and needs Aaron's word.",
+      "note": "Opened planner s163. Between 12:07 and 13:30 CDT 2026-10-06 the watcher fired no NEW TURN for grok-sia-review's #437 r6 review, grok-research's SIA-R1, or part of grok-audit's #484 review. Clark's diagnosis: STATE is one file per planner shared by every instance, and my own --inbox reads lower unread between ticks, so a peer post is netted out. The planner's 30-minute direct room sweep is the backstop until it's fixed. The script is scripts/planner-watch.mjs (PR #481); the fix is code and needs Aaron's word. —  s163 close: superseded nothing; still open.",
+      "note_by": [
+        "d43a0485-7166-4db2-9ca2-eacde1f63101"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-245",
+      "title": "#437 Option A: replace the lock cascade with a simple wx claim and accept rare doubles, after making the two non-idempotent hook stages idempotent (handoff-marker append, SessionStart git fetch); plus make ob_end idempotent",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 163,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner s163, decision PENDING with Aaron (he asked 'what would go simpler look like', then for the idempotency check). cursor-builder IDEMPOTENCY-CHECK at origin/master (builder room k575sfwr, turn 109) found that a doubled hook run is close to harmless: the vault summary is a no-op (date+project slug); hook-path auto-feedback, invocations and shadow are no-ops; topics regenerate; session proof, active slot and ob_set_session overwrite; the session log is reused. Only two stages misbehave: (1) .agents/SESSIONS/.missing-handoff.jsonl gets a duplicate line (handoff-guard.ts:178-182): append only if this session_id is absent; (2) SessionStart repeats git fetch (tree-currency.ts:119-142): skip when the sia-fetch-ok marker is younger than the claim TTL. Separately, ob_end run twice duplicates feedback_log rows, inflates knowledge_index counters (db-v2.ts:902-905, 510-524) and appends duplicate shadow JSONL lines (shadow/index.ts:177-178): UPSERT on (session_uuid, knowledge_id), and dedupe shadow lines by session_uuid. Option A = those fixes + a simple wx claim (fresh means skip, stale means unlink and retry once). Planner leans to Option A over accepting r10's cascade; Option B (a SQLite-row claim in a BEGIN IMMEDIATE transaction) is the safe alternative if any double ever matters.",
       "note_by": [
         "d43a0485-7166-4db2-9ca2-eacde1f63101"
       ],
@@ -5055,7 +5069,7 @@
     },
     {
       "n": 163,
-      "date": "2026-10-06",
+      "date": "2026-10-07",
       "uuid": "d43a0485-7166-4db2-9ca2-eacde1f63101",
       "seat": "planner",
       "checkout": "sia-planner",
