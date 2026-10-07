@@ -14,20 +14,7 @@ export function assertValidSummaryDate(date: string): void {
   if (!SUMMARY_DATE_SHAPE_RE.test(date)) {
     throw new VaultPathRefusal(`summary date must be YYYY-MM-DD, got "${date}"`);
   }
-  let roundTrip: string;
-  try {
-    const parsed = new Date(`${date}T00:00:00Z`);
-    if (Number.isNaN(parsed.getTime())) {
-      throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
-    }
-    roundTrip = parsed.toISOString().slice(0, 10);
-  } catch (err) {
-    if (err instanceof VaultPathRefusal) throw err;
-    throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
-  }
-  if (roundTrip !== date) {
-    throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
-  }
+  /* T-247 mut-j1: calendar round-trip removed */
 }
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
