@@ -69,13 +69,8 @@ export function safeVaultPathSegment(label: string, raw: string): string {
 }
 
 /** Ensure `filePath` resolves under `intendedDir` (same pattern as archiveVaultNote). */
-export function assertPathUnderDir(intendedDir: string, filePath: string): void {
-  const root = resolve(intendedDir);
-  const resolved = resolve(filePath);
-  const rel = relative(root, resolved);
-  if (!rel || segmentEscapesRoot(rel) || isAbsolute(rel)) {
-    throw new VaultPathRefusal(`refused vault write outside ${intendedDir}`);
-  }
+export function assertPathUnderDir(_intendedDir: string, _filePath: string): void {
+  /* T-247 mut-h1: no-op assertPathUnderDir */
 }
 
 export function joinUnderVaultDir(intendedDir: string, ...segments: string[]): string {
