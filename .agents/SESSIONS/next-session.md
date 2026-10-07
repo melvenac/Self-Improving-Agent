@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 352 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 353 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,16 +6,16 @@
 
 ### Pick up here
 
-(1) QA 289 (#489 END-FIX T-246, head 1dac7b8a, mutants m1-m3 red at runs 37631307220/37631314012/37631319809, draft PRs #490-#492) runs on the laptop AFTER Relay's R4 family B + grade. DISPATCH_SHA bafb248d, prompt docs/loops/qa-289-headless-prompt.md; clark launches it and sends the VERDICT. Read qa/s164b-report yourself and rule; the merge is Aaron's word (update-branch, check the tree equals merge-tree of master and the head, merge pinned). (2) IMPORT-CMDS (freeze path; docs/loops/import-commands-brief.md, C1-C4 / I1-I9) was dispatched to cursor-builder (room k575sfwr9wcx3r8fw83g3bc00x8fmar3, turn 114, base 7f4bf767). The pre-state import never installs SIA's session commands, because scaffold throws on pre-state (bootstrap/index.ts:328). Its QA comes after QA 289 on the laptop, or on Plumb if R4 overruns (check BUILDING first). It needs a dispatch written when the head lands. (3) T-247 (P2 pins H1/H2/G1) was dispatched to cursor-infra (room k57d92gqtjm9wpfs74ekbx9rns8fmy2f, turn 74, base 7f4bf767). It is safe to park. (4) The Makerspace import starts tomorrow at the earliest, after the END-FIX and IMPORT-CMDS merges: docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files for Aaron's approval. (5) Aaron's scrub: the main checkout is at 540f1cca (built 14:22Z). Aaron stops the MCP server, closes the sessions, and runs `open-brain scrub-trigger-fires` once; clark relays the output. (6) PARKED (D-130): #437 (r10 vs T-245 Option A), #425, Jev cal 2 #463 #465 #470. forge is idle by ruling (QA capacity is the bottleneck).
+(1) QA 291 (laptop): one Opus run on round 2 of #489 END-FIX (f59d03bc), #498 IMPORT-CMDS (f3aba754) and #499 T-247 (409c8c08). It includes the Windows rows that QA 290 skipped. DISPATCH_SHA 7ca465a4, prompt docs/loops/qa-291-headless-prompt.md; clark launches it and sends the VERDICT. Read qa/s164d-report yourself, then rule. Each merge is Aaron's word, done by update-branch, then checking the tree equals merge-tree of master and the head, then merge --match-head-commit. #489 and #498 both touch server.ts and the session-start render, so expect to merge them in sequence, re-checking the second after the first lands. (2) After #489 and #498 merge, rebuild the main checkout on Aaron's word. Then the Makerspace import (docs/loops/makerspace-import-brief.md), tomorrow at the earliest: Maker's first job is listing the 17 uncommitted files for Aaron's approval. The brief's step 6 (old commands) is now handled by `bootstrap install-commands`, step 7b. (3) Aaron's scrub of trigger_fires: the main checkout is at 540f1cca (it contains #484). He stops the MCP server, closes sessions, and runs `open-brain scrub-trigger-fires` once; clark relays the output. (4) PARKED (D-130): #437 (r10 vs T-245 Option A), #425, Jev cal 2 (#463, #465, #470). forge stays idle.
 
 ### Watch out
 
-- USAGE: weekly pace WELL AHEAD (06:50 CDT 10-07). Claude does QA and urgent work only; dev goes to Cursor/Grok; planning turns stay lean.
-- PLUMB: before any SIA QA launch there, /home/melvenac/builds/BUILDING must be absent.
-- HUB ROOMS: use `hub-talk --session <FULL id>` with HUB_URL=http://100.124.212.87:4000; `--peer` opens the lobby or a new empty room. cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3; cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f; grok-audit k575fscdqd291tgnpg51yttgbh8frzq8.
-- LAPTOP: one heavy job at a time (7.9 GB). The launcher does not set TEMP/TMP; the QA prompts say so.
-- MERGES of QA'd src PRs: update-branch (a merge commit), verify the tree equals `git merge-tree --write-tree origin/master <QA'd head>`, wait for CI, then `gh pr merge --match-head-commit`. Never a rebase.
-- PLANNER-WATCH under Monitor expires every 30 min. Re-arm it on the expiry notice (no cron).
+- DEV REPORTS ARE CLAIMS. Cursor seats have called their own failures 'unrelated' (#498 1236d958) and have had reports cut off mid-post (twice). Verify every head, CI run and mutant branch with git and gh yourself, and check that a mutant's parent has the same open-brain/src as the head.
+- QA PROMPTS: write them directly; never derive them with sed renames (the QA 290 prompt named a nonexistent file). Grep each for stale QA numbers and prefixes before its PR. A dispatch PR that carries push-qa.mjs is not docs-only, so it needs Aaron's word.
+- HUB ROOMS: use `hub-talk --session <FULL id>` with HUB_URL=http://100.124.212.87:4000. cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3; cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f; grok-audit k575fscdqd291tgnpg51yttgbh8frzq8. After a hub restart, planner-watch's unknown_since_restart is the presence reset, not a waker exit.
+- USAGE: weekly pace WELL AHEAD. Claude does QA and urgent work only; dev goes to Cursor/Grok.
+- PLUMB: /home/melvenac/builds/BUILDING must be absent before any SIA QA launch. LAPTOP: one heavy job at a time; the launcher sets no TEMP/TMP.
+- MERGES of QA'd src PRs: update-branch, tree check, CI, then --match-head-commit. Never a rebase.
 
 ### Open questions
 
@@ -24,20 +24,20 @@
 ### Loop state
 
 **Open PRs:** 
-- #489 — QA: in_progress — T-246 END-FIX 1dac7b8a, CI green, mutants red; QA 289 queued on the laptop after R4
-- IMPORT-CMDS — QA: not_started — cursor-builder turn 114, base 7f4bf767; no PR yet
-- T-247 — QA: not_started — cursor-infra turn 74, base 7f4bf767; no PR yet
-- #437 — QA: in_progress — PARKED (D-130). r10 9d197466; r10 vs T-245 Option A undecided
-- #425 — QA: accepted — PARKED (D-130). Merges only after #437
-- #470 — QA: in_progress — PARKED (D-130) with #463 #465. Jev cal 2
+- #489 — QA: in_progress — END-FIX r2 f59d03bc; QA 289 REJECT r1; in QA 291
+- #498 — QA: in_progress — IMPORT-CMDS r2 f3aba754; QA 290 REJECT r1; in QA 291
+- #499 — QA: in_progress — T-247 r2 409c8c08; QA 290 REJECT r1; in QA 291
+- #437 — QA: in_progress — PARKED (D-130)
+- #425 — QA: accepted — PARKED (D-130); merges only after #437
+- #470 — QA: in_progress — PARKED (D-130) with #463 #465
 
-**SHA frozen for QA:** `1dac7b8a528bc2352b3eaf37792d9a2f204a3431`
+**SHA frozen for QA:** `7ca465a4063c62815dd4b396bacb7c7be415b048`
 
 **Questions pending for Aaron:** 
-- Merge #489 on QA 289 ACCEPT (ask when the verdict lands).
+- Merge #489, #498 and #499 on a QA 291 ACCEPT (ask when the verdict lands).
 
 **Rulings made mid-loop:** 
-- s164: D-130 freeze + pilot ruling + parking; D-131 QA 288 ACCEPT, #472 -> 4cdd8a12 and #484 -> ab4c1c5a merged on Aaron's word; #487 #494 merged on Aaron's word; #488 #493 #495 #496 records/docs under the standing rule.
+- s164: D-130, D-131, D-132 (this round). #472 and #484 merged; #487, #494, #503 and #510 merged on Aaron's word; records PRs merged under the standing rule.
 
 ## developer [sia-builder] _(written session 156)_
 
