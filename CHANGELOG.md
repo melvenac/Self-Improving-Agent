@@ -37,6 +37,10 @@
 
 ### Fixed
 
+- **T-247 (QA 288 pins).** `writeSummary` rejects a `date` that is not `YYYY-MM-DD` before building vault paths.
+  Tests pin `assertPathUnderDir`, scrub `PRAGMA secure_delete=ON` after a WAL-held kill, and clause-scoped hub-room
+  negation (NEG1).
+
 - **T-239 follow-up (QA 270 rows 3 and 10).** `checkMissingHandoff` derives the checkout with the shared `checkoutOf`,
   the same function the writer stamps `sessions[].checkout` with, instead of its own inline `basename(resolve())`. New rows
   pin `ob_start` passing `ownCheckout` to both renderers (QA 270's surviving mutant), and a session the real writer
