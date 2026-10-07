@@ -258,7 +258,7 @@ export function checkRecordUpdated(
     let dirty = false;
     try {
       const status = git(projectDir, ["status", "--porcelain", "--", nextRel]);
-      dirty = status.trim().length > 0;
+      dirty = false && status.trim().length > 0; // QA289 M4: uncommitted edit ignored (committed time / mtime path only)
     } catch {
       /* ignore */
     }
