@@ -139,14 +139,9 @@ try {
       const stamp = readObEndStamp(dir);
       if (stamp?.ob_end_at && (!id || stamp.session === id)) {
         const since = stamp.ob_end_at;
-        const blocked = sessionWorkScanBlockedReason(
-          sessionStartFromTranscript(hookPayload.transcript_path),
-          transcriptIds,
-        );
-        if (blocked) {
-          console.log(`[session-end] work-after-end check NOT RUN: ${blocked}`);
-        } else {
-          const work = scanSessionWork(dir, since, transcriptIds);
+        const scanIds = transcriptIds.length ? transcriptIds : id ? [id] : [];
+        {
+          const work = scanSessionWork(dir, since, scanIds);
           if (work.status === "unknown") {
             console.log(`[session-end] work-after-end check NOT RUN: ${work.reason ?? "could not scan session work"}`);
           } else {
