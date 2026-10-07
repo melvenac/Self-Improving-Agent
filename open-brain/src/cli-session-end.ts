@@ -86,12 +86,7 @@ try {
   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
   if (existsSync(join(dir, ".agents"))) {
     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
-    const statePath = join(dir, ".agents", "state.json");
-    const stateRead = existsSync(statePath) ? readState(dir) : null;
-    const stateUnreadable = stateRead && !stateRead.ok ? stateRead.error : null;
-    if (stateUnreadable) {
-      console.log(`[session-end] handoff check NOT RUN: state.json unreadable: ${stateUnreadable}`);
-    } else if (!id) {
+    if (!id) {
       console.log("[session-end] handoff check NOT RUN: the payload carried no session id");
     } else {
       const check = checkSessionHandoff(
@@ -130,12 +125,7 @@ try {
   if (existsSync(join(dir, ".agents"))) {
     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
     const transcriptIds = sessionIdsFromTranscript(hookPayload.transcript_path);
-    const statePath = join(dir, ".agents", "state.json");
-    const stateRead = existsSync(statePath) ? readState(dir) : null;
-    const stateUnreadable = stateRead && !stateRead.ok ? stateRead.error : null;
-    if (stateUnreadable) {
-      console.log(`[session-end] work-after-end check NOT RUN: state.json unreadable: ${stateUnreadable}`);
-    } else {
+    {
       const stamp = readObEndStamp(dir);
       if (stamp?.ob_end_at && (!id || stamp.session === id)) {
         const since = stamp.ob_end_at;

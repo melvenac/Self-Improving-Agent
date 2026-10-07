@@ -129,11 +129,6 @@ export function checkSessionHandoff(
   sessionUuid: string = "",
 ): HandoffCheck {
   const base: HandoffCheck = { status: "unknown", since, branches: [], commits: 0, handoffs: [], unattributed: 0 };
-  const statePath = join(projectDir, ".agents", "state.json");
-  if (existsSync(statePath)) {
-    const stateRead = readState(projectDir);
-    if (!stateRead.ok) return { ...base, reason: `state.json unreadable: ${stateRead.error}` };
-  }
   const work = scanSessionWork(projectDir, since, sessionIds);
   if (work.status === "unknown") return { ...base, reason: work.reason };
   const handoffs = new Set<string>();
