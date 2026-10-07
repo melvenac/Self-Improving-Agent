@@ -1,56 +1,43 @@
-<!-- generated from .agents/state.json rev 339 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 349 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 161)_
+## planner [sia-planner] _(written session 164)_
 
 ### Pick up here
 
-(1) #451: infra is resolving its checks.ts conflict by merging master into the branch. Read the resolution with git show --remerge-diff (only the conflict hunks, mechanical), wait for CI, merge pinned; it is QA-accepted (QA 277) and Aaron said merge. (2) #437 r2 (QA 279 REJECT: stale reclaim double-claims at 8 claimers) and #445 r2 (REJECT: CC-19 unpaired, 5 doc readers unlisted): Aaron chose 'All 13, now', but the classifier refused merging rejected PRs, so ask Aaron (via clark) whether to fix and re-QA (forge #437 r3, builder #445 r3) or merge as-is himself. #425 merges only after #437. (3) Then T-168's follow-up (wire the owner resolver to #427's findCursorAgentHostPid, plus QA's different-owner row), G-056 (two vacuous regression tests), T-025's /sync frontmatter check (now buildable: #424 and #442 merged), and close T-235.
+(1) QA 288 is running on the laptop (#472 r5 1a374101, #484 r9 edfc964d; DISPATCH_SHA 53e68b60; launched by clark 08:03 CDT, log C:\Users\Aaron\qa-288.log). Rule on its VERDICT; each merge is Aaron's word, after a rebase (D-117). After #484 merges, Aaron runs `open-brain scrub-trigger-fires` once. grok-audit's r9 verdict (room k575fscdqd291tgnpg51yttgbh8frzq8, turn 47) was advisory CLEAN with one LOW gap (secure_delete not pinned), which became QA 288 row 15(g). (2) T-246 END-FIX was dispatched to cursor-builder (room k575sfwr9wcx3r8fw83g3bc00x8fmar3, turn 110, base 53e68b60). Then QA 289 on the laptop, queued after QA 288, needs a dispatch written from docs/loops/end-fix-brief.md Q1-Q12. (3) The Makerspace import starts TOMORROW at the earliest, after the END-FIX ACCEPT (Aaron: 'Let's wait for the stopping point and end fix. The makerspace migration can start tomorrow'). No Maker launch, not even the 17-file list, until then. Its brief's 'Step 1 can be drafted meanwhile' line is superseded by this. Plan: docs/loops/makerspace-import-brief.md. (4) PARKED for the freeze (D-130). #437 r10 9d197466: resume by asking Aaron for r10 vs T-245 Option A. #425: merges only after #437. Jev cal 2 #463 #465 #470: stopped after QA 287 (no separation); QA 286 held-out untouched; resume by reading grok-research's SIA-R1 answer in room k5779c36 and ruling round 3 or stop.
 
 ### Watch out
 
-- QUESTIONS GO TO CLARK (Aaron's 'ask clark', s161): routing, sequencing and record calls go to clark by SendMessage. Acts needing Aaron's own word go to clark, who asks once and relays his words; proceed only on his quoted words. D-121 is NOT committed (classifier: instruction poisoning); it needs Aaron's own word in the planner's window.
-- CLASSIFIER (s161): merging a QA-REJECTED PR is refused as CI bypass even on Aaron's explicit word; re-run the batch without the flagged items and leave those to Aaron. Committing a peer-relayed standing rule is refused as instruction poisoning.
-- MERGE MECHANICS (s161): update-branch, then wait for CI; GitHub's mergeStateStatus can read BEHIND or UNKNOWN for a while after the update, so re-read before giving up. Check first parent = the frozen head and an equal PR patch-id; a conflict goes back to its seat, which merges master into the branch, and the resolution is read with git show --remerge-diff (the patch-id then legitimately differs). Script: the s161 scratchpad mergeall.sh.
-- CURSOR SEATS on the QA PC, one room each: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. hub-talk.mjs --as atlas --session <room> --say / --wait --wait-timeout 3500 (background; it replays unread backlog first, so check the TASK line). A --say with backticks, dollar signs, pipes or double quotes can arrive truncated.
-- G-055: the QA PC's Cursor default model is grok-4.7-high since ~05:40 CDT s161 (restoring composer-2.5 is with Aaron). Every freeze names its model from store.db; builder != judge holds (QA is Opus).
-- QA LAUNCH: Plumb first; real-Windows rows on the laptop (machine-lease with -File); never the desktop (D-065). clark launches, or Aaron by hand when clark's classifier blocks. A claude -p job writes its log only at exit, and can die on the session limit; clark relaunches after the reset.
-- MACHINE LEASE: HEAVY runs on the QA PC and laptop take machine-lease.ps1 -File with the D-119 owner, and release right after; a seat holding it idle blocks other projects.
-- FROZEN MEANS CI GREEN: read gh pr checks yourself. Seats push nothing to a frozen PR.
-- QA DISPATCHES: DISPATCH_SHA contains every file (cat-file); Write prompts, Edit helpers, refusals tested with exit codes read unpiped; check every sed-derived prompt's wording.
-- VERIFY BEFORE RULING; seats repeat stale note text. Production code carries no test seams that feed attribution (s161 #427).
-- GITNEXUS (T-166): impact() misses calls through nullable or optional receivers on 1.6.12 and can say 'exact'; grep the method name too. The CLAUDE.md paragraph waits on Aaron. T-146 BLOCKED (desktop corpus). T-241 frogger: no remote; reset 05ec972 plus the residue's reflection-queue.json.
+- USAGE: weekly pace WELL AHEAD at 06:50 CDT 10-07 (9% vs 3.9%). Claude does QA and urgent work only; dev goes to Cursor/Grok; planning turns stay lean (usage-winddown-rules.md §4).
+- PLUMB: before any SIA QA launch there, /home/melvenac/builds/BUILDING must be absent (worthit-web builds; Aaron 10-07).
+- HUB ROOMS: `hub-talk --peer <name>` opens the LOBBY, not the work room, and can create a new empty one (it did for grok-audit: k57arsm0…). Always use --session with the FULL id. The record had only 8-character prefixes; full ids: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, grok-audit k575fscdqd291tgnpg51yttgbh8frzq8. Use HUB_URL=http://100.124.212.87:4000 (the atlas key is filed under that host).
+- BUILD: main checkout updated to ffc63aca and rebuilt by clark, 07:53 CDT 10-07. Check that the next fresh /start's Build line is not STALE and tell clark.
+- LAPTOP LAUNCHER does not set TEMP/TMP; QA prompts must say the job sets them itself (clark's note at QA 288).
+- HEAVY RULE: every stress run is asked for in its room, relayed by the planner to clark, and waits for the GO with the lease taken; release from the same shell.
 
 ### Open questions
 
-- #437 and #445 (QA-rejected): fix and re-QA, or merge as-is by Aaron's own hand?
-- D-121 in Aaron's own words in the planner's window.
-- CLAUDE.md GitNexus paragraph (T-166): yes or no.
-- T-146: still wanted, and where does it run?
-- Restore composer-2.5 as the QA PC's Cursor default (G-055).
+- Aaron: #437 r10 with its documented limits, or T-245 Option A? (parked until after the freeze)
 
 ### Loop state
 
 **Open PRs:** 
-- #451 — QA: accepted — T-187 1e8cba7c (QA 277); checks.ts conflict after #442, infra resolving; Aaron said merge
-- #437 — QA: rejected — T-235 P2-7 r2 3dfa2424; QA 279: stale reclaim double-claims at 8 claimers
-- #445 — QA: rejected — T-156 r2 43ed65a9; QA 279: CC-19 unpaired, 5 doc readers unlisted
-- #425 — QA: accepted — T-235 P2-4 9fcb97ca; merges only after #437
+- #472 — QA: in_progress — HUBROOM-GUARD r5 1a374101 frozen, CI green; in QA 288 (laptop)
+- #484 — QA: in_progress — AUDIT-FIX r9 edfc964d frozen, CI green; grok-audit r9 advisory CLEAN (1 LOW); in QA 288 (laptop)
+- #437 — QA: in_progress — PARKED (D-130). T-235 P2-7 r10 9d197466; r10 vs T-245 Option A undecided
+- #425 — QA: accepted — PARKED (D-130). T-235 P2-4, QA 280 ACCEPT; merges only after #437
+- #470 — QA: in_progress — PARKED (D-130) with #463 #465. Jev cal 2 dev r2; QA 287 no separation
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `53e68b606b08da543d5f37f8744451f99682d7e1`
 
 **Questions pending for Aaron:** 
-- #437/#445: fix and re-QA, or merge as-is
-- D-121 own word
-- CLAUDE.md GitNexus paragraph
-- T-146
-- composer-2.5 (G-055)
+- #437: r10 with limits, or T-245 Option A? (after the freeze)
 
 **Rulings made mid-loop:** 
-- s161 merged on Aaron's 'merge any open prs': #421 315e116f, #424 5869d9ba, #436 d4a54f0e, #441 a6024d4e, #442 7723f592, #446 ef97fb61, #427 bda94d19, #434 4da16370, #444 59eb1c9d; earlier #443 1d45222c
-- QA 279 (8396ffbc): #427 #434 #444 ACCEPT; #437 #445 REJECT
-- Closed s161: G-050 G-052 G-053 G-054, T-055 T-173 T-240; opened T-240 T-241 G-055 G-056
+- s164: D-130 (freeze at 'Makerspace migration proven'; rehearsal is the pilot; QA #472+#484; park #437 #425 Jev cal 2; END-FIX T-246 before the import).
+- s164 merged on Aaron's word: #487 at e75621ba (master 53e68b60).
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -126,4 +113,4 @@ _9 older handoff(s), superseded within their seat and checkout, are in state.jso
 
 ## Last session
 
-Session 161 — 2026-10-04 — planner [sia-planner] — `9a3bc5a9-fd23-444f-a45e-3bc75c455cd1` (13 writing session(s) in the record)
+Session 164 — 2026-10-07 — planner [sia-planner] — `63c84e2f-cb93-4270-a361-060c608be6a4` (13 writing session(s) in the record)
