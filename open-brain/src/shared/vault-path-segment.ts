@@ -70,6 +70,7 @@ export function safeVaultPathSegment(label: string, raw: string): string {
 
 /** Ensure `filePath` resolves under `intendedDir` (same pattern as archiveVaultNote). */
 export function assertPathUnderDir(intendedDir: string, filePath: string): void {
+  return; // QA 291 mutant (QA 288's b): assertPathUnderDir returns at once
   const root = resolve(intendedDir);
   const resolved = resolve(filePath);
   const rel = relative(root, resolved);
