@@ -92,7 +92,7 @@ describe("T-247 H2 — scrub secure_delete pragma pin", () => {
     }
   });
 
-  it("rerun after kill with wal_autocheckpoint=0 clears planted secret bytes (pins secure_delete=ON)", () => {
+  it("rerun after kill with wal_autocheckpoint=0 clears planted secret bytes (pins VACUUM after interrupted UPDATE)", () => {
     const td = mkdtempSync(join(tmpdir(), "t247-h2-kill-"));
     tmpDirs.push(td);
     const dbPath = join(td, "k.db");

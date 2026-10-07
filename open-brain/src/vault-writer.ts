@@ -5,10 +5,30 @@ import {
   safeVaultPathSegment,
   VaultPathRefusal,
 } from "./shared/vault-path-segment.js";
-
-/** Session summary filenames use `YYYY-MM-DD`; reject traversal in `date` before building paths (T-247 H1). */
-const SUMMARY_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 import { yamlInlineArray, yamlScalar } from "./shared/yaml-frontmatter.js";
+
+const SUMMARY_DATE_SHAPE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Reject bad shape and non-calendar dates before any vault path is built (T-247 H1, QA 290 J1). */
+export function assertValidSummaryDate(date: string): void {
+  if (!SUMMARY_DATE_SHAPE_RE.test(date)) {
+    throw new VaultPathRefusal(`summary date must be YYYY-MM-DD, got "${date}"`);
+  }
+  let roundTrip: string;
+  try {
+    const parsed = new Date(`${date}T00:00:00Z`);
+    if (Number.isNaN(parsed.getTime())) {
+      throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
+    }
+    roundTrip = parsed.toISOString().slice(0, 10);
+  } catch (err) {
+    if (err instanceof VaultPathRefusal) throw err;
+    throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
+  }
+  if (roundTrip !== date) {
+    throw new VaultPathRefusal(`summary date is not a valid calendar date, got "${date}"`);
+  }
+}
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -182,9 +202,7 @@ export function writeSummary(
   vaultDir: string,
   input: SummaryInput
 ): string | null {
-  if (!SUMMARY_DATE_RE.test(input.date)) {
-    throw new VaultPathRefusal(`summary date must be YYYY-MM-DD, got "${input.date}"`);
-  }
+  assertValidSummaryDate(input.date);
   const projectSlug = slugify(safeVaultPathSegment("project", input.project));
   const summariesDir = join(vaultDir, "Summaries");
   const filePath = joinUnderVaultDir(summariesDir, `${input.date}-${projectSlug}.md`);

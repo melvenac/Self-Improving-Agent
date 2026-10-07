@@ -37,7 +37,8 @@
 
 ### Fixed
 
-- **T-247 (QA 288 pins).** `writeSummary` rejects a `date` that is not `YYYY-MM-DD` before building vault paths.
+- **T-247 (QA 288 pins; QA 290 J1).** `writeSummary` rejects a `date` that is not a real calendar day (`YYYY-MM-DD` shape
+  plus UTC round-trip) before building vault paths.
   Tests pin `assertPathUnderDir`, scrub `PRAGMA secure_delete=ON` after a WAL-held kill, and clause-scoped hub-room
   negation (NEG1).
 
