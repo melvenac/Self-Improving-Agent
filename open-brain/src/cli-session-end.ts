@@ -114,7 +114,7 @@ try {
     const ids = sessionIds.length ? sessionIds : id ? [id] : [];
     const stamp = readObEndStamp(dir);
     if (stamp?.ob_end_at && (!id || stamp.session === id)) {
-      const since = stamp.ob_end_at;
+      const since = sessionStartFromTranscript(hookPayload.transcript_path) ?? stamp.ob_end_at; // QA291 M5: session start in place of ob_end_at
       const work = scanSessionWork(dir, since, ids);
       if (work.status === "unknown") {
         console.log(`[session-end] work-after-end check NOT RUN: ${work.reason ?? "could not scan session work"}`);
