@@ -7,6 +7,7 @@
  * when there is work and no record (unless record_ok). E4 — SessionEnd re-checks
  * from ob_end time and marks work-after-/end without blocking.
  */
+import { createHash } from "node:crypto";
 import {
   appendFileSync,
   existsSync,
@@ -26,6 +27,7 @@ const WORK_AFTER_SHOWN = ".work-after-end.shown.jsonl";
 const RECORD_OK_MARKER = ".record-ok.jsonl";
 const RECORD_OK_SHOWN = ".record-ok.shown.jsonl";
 const OB_END_STAMP = ".ob-end-stamp.json";
+const SHOWN_MAX_LINES = 200;
 
 /** @deprecated paths are outside the repo; use store helpers */
 export const WORK_AFTER_MARKER_REL = ".agents/SESSIONS/.work-after-end.jsonl";
@@ -33,6 +35,44 @@ export const OB_END_STAMP_REL = ".agents/SESSIONS/.ob-end-stamp.json";
 
 function storePath(projectDir: string, name: string): string {
   return join(endRecordProjectDir(projectDir), name);
+}
+
+export function appendEndRecordShownCapped(shownPath: string, movedText: string): void {
+  const prev = existsSync(shownPath) ? readFileSync(shownPath, "utf8") : "";
+  const lines = (prev + movedText).split(/\r?\n/).filter((l) => l.trim());
+  const kept = lines.slice(-SHOWN_MAX_LINES).join("\n");
+  writeFileSync(shownPath, kept ? `${kept}\n` : "", "utf8");
+}
+
+function normalizeNextSessionText(raw: string): string {
+  return raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+}
+
+/** Old layout when there is no state.json but next-session.md exists. */
+export function isOldLayoutProject(projectDir: string): boolean {
+  if (existsSync(join(projectDir, ".agents", "state.json"))) return false;
+  return existsSync(join(projectDir, ".agents", "SESSIONS", "next-session.md"));
+}
+
+export type RecordContentHash = { ok: true; hash: string; layout: "new" | "old" } | { ok: false; error: string };
+
+/** Content fingerprint stored in the ob_end stamp (R1). */
+export function computeRecordContentHash(projectDir: string, sessionUuid: string): RecordContentHash {
+  const statePath = join(projectDir, ".agents", "state.json");
+  if (existsSync(statePath)) {
+    const stateRead = readState(projectDir);
+    if (!stateRead.ok) return { ok: false, error: stateRead.error };
+    const s = stateRead.data;
+    const handoff = s.handoffs.find((h) => h.session_uuid === sessionUuid) ?? null;
+    const payload = { revision: s.revision, handoff };
+    const hash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+    return { ok: true, hash, layout: "new" };
+  }
+  const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
+  if (!existsSync(nextPath)) return { ok: false, error: "no record file for this layout" };
+  const normalized = normalizeNextSessionText(readFileSync(nextPath, "utf8"));
+  const hash = createHash("sha256").update(normalized, "utf8").digest("hex");
+  return { ok: true, hash, layout: "old" };
 }
 
 export const OLD_LAYOUT_LINE =
@@ -89,6 +129,14 @@ function sessionIdsOk(sessionIds: readonly string[]): string | null {
     return "this session's Claude-Session id could not be read from its transcript, so its commits cannot be told from another seat's (a commit is attributed by its trailer, never by git identity)";
   }
   return null;
+}
+
+/** Why E4 work-after scan cannot run (R2). */
+export function sessionWorkScanBlockedReason(since: string | null, sessionIds: readonly string[]): string | null {
+  if (since === null) {
+    return "this session's start could not be read from its transcript, so its commits cannot be told from anyone else's";
+  }
+  return sessionIdsOk(sessionIds);
 }
 
 /**
@@ -218,28 +266,6 @@ function loopHandoffsFromSessionCommits(
   return [...handoffs].sort();
 }
 
-/** Record file touched after `afterIso` — git commit in window, or uncommitted with mtime at/after anchor (E4). */
-function recordFileChangedAfter(projectDir: string, relPath: string, afterIso: string): boolean {
-  const afterMs = Date.parse(afterIso);
-  if (Number.isNaN(afterMs)) return false;
-  try {
-    if (git(projectDir, ["log", `--since=${afterIso}`, "--format=%H", "--", relPath]).trim().length > 0) {
-      return true;
-    }
-  } catch {
-    /* not a git repo */
-  }
-  const path = join(projectDir, relPath);
-  if (!existsSync(path)) return false;
-  let dirty = false;
-  try {
-    dirty = git(projectDir, ["status", "--porcelain", "--", relPath]).trim().length > 0;
-  } catch {
-    return false;
-  }
-  return dirty && statSync(path).mtimeMs >= afterMs;
-}
-
 function oldLayoutNextSessionUpdated(projectDir: string, since: string, changesAfter?: string | null): RecordCheck {
   const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
   const nextRel = ".agents/SESSIONS/next-session.md";
@@ -299,28 +325,6 @@ function newLayoutRecordUpdated(
   const sessionRow = s.sessions.some((row) => row.uuid === sessionUuid);
   const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, changesAfter ?? since, sessionIds);
 
-  if (changesAfter) {
-    const stateRel = ".agents/state.json";
-    const stateTouched = recordFileChangedAfter(projectDir, stateRel, changesAfter);
-    if ((handoff || sessionRow) && stateTouched) {
-      return {
-        updated: true,
-        layout: "new",
-        detail: handoff
-          ? `set_handoff for session ${sessionUuid} after ob_end`
-          : `sessions[] row for session ${sessionUuid} after ob_end`,
-      };
-    }
-    if (loopHandoffs.length > 0) {
-      return { updated: true, layout: "new", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
-    }
-    return {
-      updated: false,
-      layout: "new",
-      detail: `no record write for session ${sessionUuid} after ${changesAfter}`,
-    };
-  }
-
   if (handoff) {
     return { updated: true, layout: "new", detail: `set_handoff for session ${sessionUuid}` };
   }
@@ -352,16 +356,6 @@ export function checkRecordUpdated(
   const statePath = join(projectDir, ".agents", "state.json");
   if (existsSync(statePath)) {
     return newLayoutRecordUpdated(projectDir, sessionUuid, since, sessionIds, options.changesAfter);
-  }
-
-  if (options.changesAfter) {
-    const old = oldLayoutNextSessionUpdated(projectDir, since ?? options.changesAfter, options.changesAfter);
-    if (old.updated) return old;
-    const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, options.changesAfter, sessionIds);
-    if (loopHandoffs.length > 0) {
-      return { updated: true, layout: "old", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
-    }
-    return old;
   }
 
   if (since !== null) {
@@ -420,11 +414,33 @@ export interface ObEndStamp {
   session: string;
   ob_end_at: string;
   record_ok?: string | null;
+  /** R1: record content at ob_end; E4 compares current content to this hash. */
+  record_content_hash?: string;
+}
+
+/** True when record content differs from the stamp; false when equal; null when unknown. */
+export function recordContentChangedSinceStamp(
+  projectDir: string,
+  sessionUuid: string,
+  stamp: ObEndStamp,
+): boolean | null {
+  if (!stamp.record_content_hash) return null;
+  const current = computeRecordContentHash(projectDir, sessionUuid);
+  if (!current.ok) return null;
+  return current.hash !== stamp.record_content_hash;
 }
 
 export function writeObEndStamp(projectDir: string, stamp: ObEndStamp): void {
+  const hashRes = stamp.record_content_hash
+    ? null
+    : computeRecordContentHash(projectDir, stamp.session);
+  const full: ObEndStamp = {
+    ...stamp,
+    record_content_hash:
+      stamp.record_content_hash ?? (hashRes && hashRes.ok ? hashRes.hash : undefined),
+  };
   const path = storePath(projectDir, OB_END_STAMP);
-  writeFileSync(path, JSON.stringify(stamp, null, 2) + "\n", "utf8");
+  writeFileSync(path, JSON.stringify(full, null, 2) + "\n", "utf8");
 }
 
 export function readObEndStamp(projectDir: string): ObEndStamp | null {
@@ -468,7 +484,7 @@ export function takeRecordOkNotices(projectDir: string): string[] {
         out.push(`RECORD OK (unreadable marker line): ${line.slice(0, 200)}`);
       }
     }
-    appendFileSync(storePath(projectDir, RECORD_OK_SHOWN), text);
+    appendEndRecordShownCapped(storePath(projectDir, RECORD_OK_SHOWN), text);
     unlinkSync(path);
     return out;
   } catch {
@@ -522,7 +538,7 @@ export function takeWorkAfterEndNotices(projectDir: string): string[] {
         out.push(`WORK AFTER /end (unreadable marker line): ${line.slice(0, 200)}`);
       }
     }
-    appendFileSync(storePath(projectDir, WORK_AFTER_SHOWN), text);
+    appendEndRecordShownCapped(storePath(projectDir, WORK_AFTER_SHOWN), text);
     unlinkSync(path);
     return out;
   } catch {

@@ -4,7 +4,11 @@ import { mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from "no
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { handleEnd } from "../src/server.js";
-import { checkRecordUpdated } from "../src/shared/end-record-guard.js";
+import {
+  computeRecordContentHash,
+  recordContentChangedSinceStamp,
+  writeObEndStamp,
+} from "../src/shared/end-record-guard.js";
 import { applyStateOps } from "../src/shared/state-writer.js";
 import {
   AFTER_END,
@@ -35,7 +39,7 @@ describe("end-fix r2 pins (QA 289)", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it("M5: E4 record check uses ob_end_at, not session start (set_handoff before ob_end does not clear work-after)", () => {
+  it("M5: E4 uses content hash — set_handoff before ob_end still counts as not updated after sweep commit", () => {
     const rev = JSON.parse(readFileSync(join(dir, ".agents", "state.json"), "utf8")).revision as number;
     applyStateOps(dir, {
       session: 99,
@@ -44,13 +48,16 @@ describe("end-fix r2 pins (QA 289)", () => {
       checkout: "sia-test",
       ops: [{ op: "set_handoff", seat: "developer", pick_up: "before end", watch_out: [], open_questions: [] }],
     });
-    const statePath = join(dir, ".agents", "state.json");
-    const t = Date.parse(DURING) / 1000;
-    utimesSync(statePath, t, t);
-    const atEnd = checkRecordUpdated(dir, START, SESSION_UUID, [], { changesAfter: AFTER_END });
-    expect(atEnd.updated).toBe(false);
-    const atStart = checkRecordUpdated(dir, START, SESSION_UUID, []);
-    expect(atStart.updated).toBe(true);
+    const hashAtEnd = computeRecordContentHash(dir, SESSION_UUID);
+    expect(hashAtEnd.ok).toBe(true);
+    writeObEndStamp(dir, {
+      session: SESSION_UUID,
+      ob_end_at: AFTER_END,
+      record_content_hash: hashAtEnd.ok ? hashAtEnd.hash : undefined,
+    });
+    commitAt(dir, AFTER_END, "src/sweep.ts", "sweep all");
+    const stamp = { session: SESSION_UUID, ob_end_at: AFTER_END, record_content_hash: hashAtEnd.ok ? hashAtEnd.hash : "" };
+    expect(recordContentChangedSinceStamp(dir, SESSION_UUID, stamp)).toBe(false);
   });
 
   it("M6: record_ok empty string is refused", async () => {

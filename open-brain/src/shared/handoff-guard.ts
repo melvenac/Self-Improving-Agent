@@ -38,10 +38,13 @@
 import { appendFileSync, existsSync, openSync, readSync, closeSync, readFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
-import { checkRecordUpdated, scanSessionWork } from "./end-record-guard.js";
+import { appendEndRecordShownCapped, checkRecordUpdated, scanSessionWork } from "./end-record-guard.js";
+import { endRecordProjectDir } from "./end-record-store.js";
+import { readState } from "./state-writer.js";
 
 export const MARKER_REL = ".agents/SESSIONS/.missing-handoff.jsonl";
-const SHOWN_REL = ".agents/SESSIONS/.missing-handoff.shown.jsonl";
+const MISSING_HANDOFF_STORE = ".missing-handoff.jsonl";
+const MISSING_HANDOFF_SHOWN_STORE = ".missing-handoff.shown.jsonl";
 const HANDOFF_RE = /^docs\/loops\/.*-handoff\.md$/;
 
 export interface HandoffCheck {
@@ -126,6 +129,11 @@ export function checkSessionHandoff(
   sessionUuid: string = "",
 ): HandoffCheck {
   const base: HandoffCheck = { status: "unknown", since, branches: [], commits: 0, handoffs: [], unattributed: 0 };
+  const statePath = join(projectDir, ".agents", "state.json");
+  if (existsSync(statePath)) {
+    const stateRead = readState(projectDir);
+    if (!stateRead.ok) return { ...base, reason: `state.json unreadable: ${stateRead.error}` };
+  }
   const work = scanSessionWork(projectDir, since, sessionIds);
   if (work.status === "unknown") return { ...base, reason: work.reason };
   const handoffs = new Set<string>();
@@ -184,7 +192,7 @@ export function describeMissing(c: HandoffCheck, sessionId: string): string {
 /** Append the warning where the next session's greeting will show it. Never throws. */
 export function recordMissingHandoff(projectDir: string, sessionId: string, c: HandoffCheck): void {
   try {
-    const path = join(projectDir, MARKER_REL);
+    const path = join(endRecordProjectDir(projectDir), MISSING_HANDOFF_STORE);
     mkdirSync(dirname(path), { recursive: true });
     appendFileSync(path, JSON.stringify({ at: new Date().toISOString(), session: sessionId || null, message: describeMissing(c, sessionId), branches: c.branches, commits: c.commits, since: c.since }) + "\n");
   } catch {
@@ -197,25 +205,43 @@ export function recordMissingHandoff(projectDir: string, sessionId: string, c: H
  * aside after reading, so a warning is not repeated into every later session.
  * Never throws.
  */
-export function takeMissingHandoffNotices(projectDir: string): string[] {
-  const path = join(projectDir, MARKER_REL);
-  if (!existsSync(path)) return [];
-  try {
-    const out: string[] = [];
-    const text = readFileSync(path, "utf8");
-    for (const line of text.split(/\r?\n/)) {
-      if (!line.trim()) continue;
-      try {
-        const m = (JSON.parse(line) as { message?: unknown }).message;
-        if (typeof m === "string") out.push(m);
-      } catch {
-        out.push(`HANDOFF MISSING (unreadable marker line): ${line.slice(0, 200)}`);
-      }
+function parseMissingHandoffLines(text: string): string[] {
+  const out: string[] = [];
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    try {
+      const m = (JSON.parse(line) as { message?: unknown }).message;
+      if (typeof m === "string") out.push(m);
+    } catch {
+      out.push(`HANDOFF MISSING (unreadable marker line): ${line.slice(0, 200)}`);
     }
-    appendFileSync(join(projectDir, SHOWN_REL), text);
-    unlinkSync(path);
+  }
+  return out;
+}
+
+export function takeMissingHandoffNotices(projectDir: string): string[] {
+  const out: string[] = [];
+  const storePath = join(endRecordProjectDir(projectDir), MISSING_HANDOFF_STORE);
+  const legacyPath = join(projectDir, MARKER_REL);
+  let moved = "";
+  try {
+    if (existsSync(legacyPath)) {
+      const legacyText = readFileSync(legacyPath, "utf8");
+      out.push(...parseMissingHandoffLines(legacyText));
+      moved += legacyText;
+      unlinkSync(legacyPath);
+    }
+    if (existsSync(storePath)) {
+      const text = readFileSync(storePath, "utf8");
+      out.push(...parseMissingHandoffLines(text));
+      moved += text;
+      unlinkSync(storePath);
+    }
+    if (moved) {
+      appendEndRecordShownCapped(join(endRecordProjectDir(projectDir), MISSING_HANDOFF_SHOWN_STORE), moved);
+    }
     return out;
   } catch {
-    return [];
+    return out;
   }
 }

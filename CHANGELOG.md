@@ -4,6 +4,11 @@
 
 ### Added
 
+- **END-FIX r3 (T-246, QA 291):** E4 compares record **content** via a hash stored at `ob_end` (not commit-touch);
+  hook work-after uses transcript ids only; unreadable `state.json` skips handoff/work-after; missing-handoff markers
+  live in the open-brain data dir; `OLD LAYOUT` with `RECORD NOT CHECKED`; no-id payload skips handoff; `.shown` capped
+  at 200 lines. Documented R6: case-distinct Windows paths can share one store key.
+
 - **END-FIX r2 (T-246, QA 289):** E4 counts only record writes after `ob_end_at`; SessionEnd handoff
   accepts E2 record updates; `RECORD NOT CHECKED` when work scan is unknown; `record_ok` rejects empty/whitespace;
   refusal includes `OLD LAYOUT` on old-layout repos; markers live under the open-brain data dir (not in the repo).

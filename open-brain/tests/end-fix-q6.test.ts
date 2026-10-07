@@ -104,4 +104,49 @@ describe("end-fix Q6", () => {
     expect(r.stdout + r.stderr).toContain("WORK AFTER /end NOT RECORDED");
     rmSync(nd, { recursive: true, force: true });
   });
+
+  it("old layout: git add -A after ob_end still gets WORK AFTER marker (R1 sweep)", async () => {
+    touchNextSession(dir, DURING);
+    await handleEnd({ project_root: resolve(dir), session_id: SESSION_UUID, dry_run: false, session_summary: "s" });
+    commitAt(dir, new Date().toISOString(), "src/after.ts", "after sweep");
+    const r = spawnSync(process.execPath, [tsxCli, hookEntry], {
+      cwd: dir,
+      input: JSON.stringify({ session_id: SESSION_UUID, transcript_path: transcript, hook_event_name: "SessionEnd" }),
+      encoding: "utf8",
+      timeout: 90_000,
+      env: { ...process.env, CLAUDE_PROJECT_DIR: resolve(dir) },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout + r.stderr).toContain("WORK AFTER /end NOT RECORDED");
+  });
+
+  it("new layout: set_handoff, ob_end with dirty views, git add -A commit gets WORK AFTER (R1 sweep)", async () => {
+    const nd = mkdtempSync(join(tmpdir(), "endfix-q6-sweep-"));
+    initNewLayoutRepo(nd);
+    initScratchDb();
+    const tr = writeTranscript(nd);
+    proveSessionWithTranscript(nd, tr);
+    commitAt(nd, DURING, "src/a.ts", "work");
+    const rev = JSON.parse(readFileSync(join(nd, ".agents", "state.json"), "utf8")).revision as number;
+    applyStateOps(nd, {
+      session: 99,
+      expected_revision: rev,
+      session_uuid: SESSION_UUID,
+      checkout: "sia-test",
+      ops: [{ op: "set_handoff", seat: "developer", pick_up: "x", watch_out: [], open_questions: [] }],
+    });
+    const ndAbs = resolve(nd);
+    await handleEnd({ project_root: ndAbs, session_id: SESSION_UUID, dry_run: false, session_summary: "s" });
+    commitAt(nd, new Date().toISOString(), "src/after.ts", "sweep");
+    const r = spawnSync(process.execPath, [tsxCli, hookEntry], {
+      cwd: nd,
+      input: JSON.stringify({ session_id: SESSION_UUID, transcript_path: tr, hook_event_name: "SessionEnd" }),
+      encoding: "utf8",
+      timeout: 90_000,
+      env: { ...process.env, CLAUDE_PROJECT_DIR: ndAbs },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout + r.stderr).toContain("WORK AFTER /end NOT RECORDED");
+    rmSync(nd, { recursive: true, force: true });
+  });
 });

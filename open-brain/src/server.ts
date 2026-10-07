@@ -50,6 +50,7 @@ import { byPidDir, processStartTime, proveSession, type ProvenSession, type Proc
 import { sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
 import {
   OLD_LAYOUT_LINE,
+  isOldLayoutProject,
   checkRecordUpdated,
   describeRecordNotUpdated,
   evaluateEndRecord,
@@ -671,6 +672,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       const oldLayoutLine = record.layout === "old" ? OLD_LAYOUT_LINE : null;
 
       if (evaluation.work.status === "unknown") {
+        if (isOldLayoutProject(projectRoot)) preamble.push(OLD_LAYOUT_LINE);
         preamble.push(`RECORD NOT CHECKED: ${evaluation.work.reason ?? "session work could not be verified"}`);
       } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok === "") {
         return {
