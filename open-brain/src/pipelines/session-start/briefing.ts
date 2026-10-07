@@ -52,6 +52,8 @@ export interface BriefingInput {
    * exactly at its cap), so it is APPENDED to the pick-up line, which is never cut after the append.
    */
   missingHandoff?: string | null;
+  /** IMPORT-CMDS C4: valid record but project `.claude/commands/start.md` is not SIA's copy. */
+  oldStartCommand?: string | null;
   /**
    * T-239, OPT-IN per repo (greeting.json `handoff_by_checkout`, via `handoffCheckout`), default OFF. Set: the reader's
    * checkout, and only that checkout's handoff is the pick-up. Absent: the role's newest handoff, as before.
@@ -73,6 +75,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   const out: string[] = [BRIEFING_START];
 
   out.push(i.serving);
+  if (i.oldStartCommand) out.push(i.oldStartCommand);
   out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
   out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}`);
@@ -166,7 +169,9 @@ function isExpired(w: WatchOut, sessionNumber: number | null, date: string): boo
 
 function renderBudgeted(i: BriefingInput): string[] {
   const s = i.state;
-  const out: string[] = [BRIEFING_START, i.serving, i.usage];
+  const out: string[] = [BRIEFING_START, i.serving];
+  if (i.oldStartCommand) out.push(i.oldStartCommand);
+  out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
   const drift =
     i.drift.length === 0

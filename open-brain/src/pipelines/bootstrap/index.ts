@@ -1,8 +1,9 @@
-import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync, renameSync, realpathSync, rmdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync, renameSync, realpathSync, rmdirSync, rmSync, accessSync, constants } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawnSync } from "node:child_process";
-import { whyNotARecord } from "../../shared/state-record.js";
+import { isStateRecord, whyNotARecord } from "../../shared/state-record.js";
+import { STATE_IMPORT_COMMIT_OUTPUTS } from "../../shared/import-outputs.js";
 
 /**
  * `/bootstrap`'s deterministic half (docs/loops/bootstrap-fix-brief.md,
@@ -50,6 +51,11 @@ export type AgentsState =
 
 export type ClaudeMdState = "absent" | "present" | "has-sia-section";
 
+/** The four session commands scaffold copies from project-template (IMPORT-CMDS C1). */
+export const SESSION_COMMAND_NAMES = ["start", "end", "task", "sync"] as const;
+export type SessionCommandName = (typeof SESSION_COMMAND_NAMES)[number];
+export type SessionCommandFileState = "SIA" | "OLD" | "absent";
+
 export interface ProjectInspection {
   root: string;
   template: string;
@@ -57,7 +63,44 @@ export interface ProjectInspection {
   git: GitState;
   claudeMd: ClaudeMdState;
   agents: AgentsState;
+  /** Each `.claude/commands/<name>.md` versus project-template (IMPORT-CMDS C1). */
+  commands: Record<SessionCommandName, SessionCommandFileState>;
   next: string;
+}
+
+export const COMMAND_ARCHIVE_PREFIX = "pre-bootstrap-commands-";
+
+/** Line ob_start adds when the record is valid but project /start is not SIA's (IMPORT-CMDS C4). */
+export const OLD_START_COMMAND_WARNING = "OLD /start in this project: run bootstrap install-commands";
+
+export function sessionCommandRel(name: SessionCommandName): string {
+  return `.claude/commands/${name}.md`;
+}
+
+export function classifySessionCommand(projectRoot: string, name: SessionCommandName, templateDir: string): SessionCommandFileState {
+  const dest = join(resolve(projectRoot), sessionCommandRel(name));
+  const tmpl = join(templateDir, sessionCommandRel(name));
+  if (!existsSync(dest)) return "absent";
+  if (!existsSync(tmpl)) return "OLD";
+  return sameText(dest, tmpl) ? "SIA" : "OLD";
+}
+
+export function inspectSessionCommands(projectRoot: string, templateDir = defaultTemplateDir()): Record<SessionCommandName, SessionCommandFileState> {
+  const out = {} as Record<SessionCommandName, SessionCommandFileState>;
+  for (const n of SESSION_COMMAND_NAMES) out[n] = classifySessionCommand(projectRoot, n, templateDir);
+  return out;
+}
+
+export function sessionCommandsNeedInstall(commands: Record<SessionCommandName, SessionCommandFileState>): boolean {
+  return SESSION_COMMAND_NAMES.some((n) => commands[n] === "OLD" || commands[n] === "absent");
+}
+
+/** Null when no warning; valid record and an on-disk /start that is not SIA's template copy. */
+export function oldStartCommandWarning(projectRoot: string, templateDir = defaultTemplateDir()): string | null {
+  const statePath = join(resolve(projectRoot), ".agents", "state.json");
+  if (!isStateRecord(statePath)) return null;
+  const st = classifySessionCommand(projectRoot, "start", templateDir);
+  return st === "OLD" ? OLD_START_COMMAND_WARNING : null;
 }
 
 /** The heading bootstrap appends to an owner's CLAUDE.md, and the one `check` looks for. */
@@ -69,7 +112,8 @@ export function inspectProject(projectRoot: string, templateDir = defaultTemplat
   const claudeMd = claudeMdState(root);
   const agents = agentsState(root, templateDir);
   const templateFound = existsSync(join(templateDir, ".agents"));
-  return { root, template: templateDir, templateFound, git, claudeMd, agents, next: nextStep(git, agents, templateFound) };
+  const commands = inspectSessionCommands(root, templateDir);
+  return { root, template: templateDir, templateFound, git, claudeMd, agents, commands, next: nextStep(git, agents, templateFound, commands) };
 }
 
 function gitState(root: string): GitState {
@@ -146,15 +190,23 @@ function sameText(a: string, b: string): boolean {
   return readFileSync(a, "utf8").replace(/\r\n/g, "\n") === readFileSync(b, "utf8").replace(/\r\n/g, "\n");
 }
 
-function nextStep(g: GitState, a: AgentsState, templateFound: boolean): string {
+function nextStep(g: GitState, a: AgentsState, templateFound: boolean, commands: Record<SessionCommandName, SessionCommandFileState>): string {
   if (!templateFound) return "STOP: project-template/ was not found beside this open-brain install — the install is incomplete.";
-  if (a.kind === "bootstrapped") return "Already bootstrapped (.agents/state.json exists). Run /start.";
+  if (a.kind === "bootstrapped") {
+    if (sessionCommandsNeedInstall(commands)) {
+      return "Bootstrapped, but session commands are not all SIA: run `bootstrap install-commands` (refuses a dirty tree).";
+    }
+    return "Already bootstrapped (.agents/state.json exists). Run /start.";
+  }
   if (a.kind === "not-a-record") return `.agents/state.json is not a record (${a.why}), so this project is NOT bootstrapped. If it is left over, \`bootstrap move-residue\` moves it aside (nothing is deleted); then run check again. If it was this project's record, restore it from git instead (\`git checkout -- .agents/state.json\`).`;
   if (a.kind === "scaffolded") {
     return "Scaffolded, not yet imported: continue at step 4 (CLAUDE.md), then step 5, then step 6 (`state import --draft`)." +
       (a.inboxIsTemplate ? " .agents/TASKS/INBOX.md still holds the template's example tasks: step 5 replaces them with this project's." : "");
   }
-  if (a.kind === "pre-state") return "An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.";
+  if (a.kind === "pre-state") {
+    const base = "An existing project on the pre-record framework (.agents/TASKS/ with no state.json): this is the IMPORT path, not a fresh install. Run `state import --draft`.";
+    return sessionCommandsNeedInstall(commands) ? `${base} After \`state import --commit\`, run \`bootstrap install-commands\`.` : base;
+  }
   if (g.kind === "nested") return `STOP: this folder is inside another repository (${g.toplevel}). \`git init\` here makes this folder its own project, or move the folder out of the enclosing repository.`;
   // Residue first: moved before the pre-SIA commit, it never enters it.
   if (a.kind === "residue") return "Move the residue aside first (`bootstrap move-residue`), then run check again.";
@@ -252,6 +304,153 @@ export function moveResidue(projectRoot: string, today: string, deps: { rename?:
   }
   const landed = readdirSync(dest).map((n) => (statSync(join(dest, n)).isDirectory() ? `${n}/` : n)).sort();
   return { to: rel, entries: landed };
+}
+
+// ---------------------------------------------------------------------------
+// install-commands (IMPORT-CMDS C2)
+// ---------------------------------------------------------------------------
+
+export interface InstallCommandsLine {
+  name: SessionCommandName;
+  before: SessionCommandFileState;
+  after: SessionCommandFileState;
+}
+
+export interface InstallCommandsResult {
+  root: string;
+  archive: string | null;
+  lines: InstallCommandsLine[];
+}
+
+const IMPORT_OUTPUT_ALLOWLIST = new Set(STATE_IMPORT_COMMIT_OUTPUTS);
+
+function porcelainPath(line: string): string {
+  const rest = line.slice(3).trim();
+  if (rest.startsWith('"') && rest.endsWith('"')) return rest.slice(1, -1).replace(/\\/g, "/");
+  return rest.replace(/\\/g, "/");
+}
+
+/** First path outside the import allowlist and `.agents/archive/`, or null when install may proceed. */
+export function installCommandsBlockingDirtyPath(dirtyLines: string[]): string | null {
+  const allowed = IMPORT_OUTPUT_ALLOWLIST;
+  for (const line of dirtyLines) {
+    const p = porcelainPath(line);
+    if (p.startsWith(".agents/archive/")) continue;
+    if (!allowed.has(p)) return p;
+  }
+  return null;
+}
+
+function preflightInstallCommandsWrite(root: string): void {
+  const claude = join(root, ".claude");
+  const commandsDir = join(claude, "commands");
+  const commandsTarget = existsSync(commandsDir) ? commandsDir : (existsSync(claude) ? claude : root);
+  try {
+    accessSync(commandsTarget, constants.W_OK);
+  } catch {
+    throw new Error("`.claude/commands/` is not writable — fix permissions and try again. Nothing written");
+  }
+  const agents = join(root, ".agents");
+  if (!existsSync(agents)) throw new Error("`.agents/` is missing — nothing written");
+  try {
+    accessSync(agents, constants.W_OK);
+  } catch {
+    throw new Error(
+      "`.agents/` is not writable (session-command archives land under `.agents/archive/`) — fix permissions and try again. Nothing written",
+    );
+  }
+}
+
+/**
+ * After import: replace OLD session commands and copy missing ones from
+ * project-template. Refuses without a valid record. A dirty tree is allowed
+ * only when every change is `STATE_IMPORT_COMMIT_OUTPUTS`. Re-run when all four
+ * commands are already SIA is a no-op even on a dirty import tree. Only touches
+ * the four named files under `.claude/commands/`.
+ */
+export function installCommands(
+  projectRoot: string,
+  today: string,
+  templateDir = defaultTemplateDir(),
+  deps: { rename?: (from: string, to: string) => void; preflightWrite?: (root: string) => void } = {},
+): InstallCommandsResult {
+  const rename = deps.rename ?? renameSync;
+  const preflightWrite = deps.preflightWrite ?? preflightInstallCommandsWrite;
+  const root = resolve(projectRoot);
+  const ins = inspectProject(root, templateDir);
+  if (!ins.templateFound) throw new Error(`project-template/ not found at ${templateDir} — nothing written`);
+  if (ins.agents.kind !== "bootstrapped") {
+    throw new Error(ins.agents.kind === "pre-state"
+      ? ".agents/TASKS/ exists with no state.json — run `state import --commit` first. Nothing written"
+      : `.agents/ is ${ins.agents.kind}, not a bootstrapped record — nothing written`);
+  }
+  if (ins.git.kind !== "root") {
+    throw new Error(ins.git.kind === "none"
+      ? "not a git repository — nothing written"
+      : `inside another git repository (${ins.git.toplevel}) — nothing written`);
+  }
+
+  const lines: InstallCommandsLine[] = [];
+  const allSia = SESSION_COMMAND_NAMES.every((n) => ins.commands[n] === "SIA");
+  if (allSia) {
+    for (const name of SESSION_COMMAND_NAMES) lines.push({ name, before: "SIA", after: "SIA" });
+    return { root, archive: null, lines };
+  }
+
+  if (ins.git.kind === "root" && ins.git.dirty.length > 0) {
+    const blocked = installCommandsBlockingDirtyPath(ins.git.dirty);
+    if (blocked !== null) {
+      throw new Error(`uncommitted change outside the import (\`${blocked}\`) — commit or stash it first. Nothing written`);
+    }
+  }
+
+  preflightWrite(root);
+
+  const commandsDir = join(root, ".claude", "commands");
+  let archiveRel: string | null = null;
+  let archiveDir: string | null = null;
+  const rolledBack: { archivePath: string; dest: string }[] = [];
+
+  try {
+    for (const name of SESSION_COMMAND_NAMES) {
+      const before = ins.commands[name];
+      if (before === "SIA") {
+        lines.push({ name, before, after: "SIA" });
+        continue;
+      }
+      if (archiveDir === null) {
+        let rel = `.agents/archive/${COMMAND_ARCHIVE_PREFIX}${today}`;
+        for (let n = 2; existsSync(join(root, rel)); n++) rel = `.agents/archive/${COMMAND_ARCHIVE_PREFIX}${today}-${n}`;
+        archiveRel = rel;
+        archiveDir = join(root, rel);
+        mkdirSync(archiveDir, { recursive: true });
+      }
+      const dest = join(commandsDir, `${name}.md`);
+      if (before === "OLD") {
+        const archived = join(archiveDir, `${name}.md`);
+        rename(dest, archived);
+        rolledBack.push({ archivePath: archived, dest });
+      }
+      mkdirSync(commandsDir, { recursive: true });
+      copyFileSync(join(templateDir, sessionCommandRel(name)), dest);
+      lines.push({ name, before, after: "SIA" });
+    }
+  } catch (err) {
+    for (const r of rolledBack.reverse()) {
+      if (existsSync(r.archivePath)) renameSync(r.archivePath, r.dest);
+    }
+    if (archiveDir !== null && existsSync(archiveDir)) {
+      try {
+        if (readdirSync(archiveDir).length === 0) rmdirSync(archiveDir);
+        else rmSync(archiveDir, { recursive: true, force: true });
+      } catch { /* best effort */ }
+    }
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes("Nothing written")) throw err;
+    throw new Error(`${message}. Nothing written`);
+  }
+
+  return { root, archive: archiveRel, lines };
 }
 
 // ---------------------------------------------------------------------------
