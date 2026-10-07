@@ -65,6 +65,33 @@ function simulateKillAfterUpdateWalHeld(dbPath: string): void {
 }
 
 describe("T-247 H2 — scrub secure_delete pragma pin", () => {
+  it("sets secure_delete ON during a non-dry scrub run (pins applyScrubDbPragmas)", () => {
+    const td = mkdtempSync(join(tmpdir(), "t247-h2-pragma-"));
+    tmpDirs.push(td);
+    const dbPath = join(td, "k.db");
+    const seed = new Database(dbPath);
+    initSchemaV2(seed);
+    seed.close();
+
+    const pragmaCalls: string[] = [];
+    const originalPragma = Database.prototype.pragma;
+    Database.prototype.pragma = function pragmaSpy(
+      this: Database.Database,
+      pragma: string | Record<string, unknown>,
+      ...rest: unknown[]
+    ) {
+      if (typeof pragma === "string") pragmaCalls.push(pragma);
+      return originalPragma.call(this, pragma as never, ...(rest as never[]));
+    };
+
+    try {
+      runScrubTriggerFires(resolve(dbPath));
+      expect(pragmaCalls.some((p) => /secure_delete\s*=\s*ON/i.test(p))).toBe(true);
+    } finally {
+      Database.prototype.pragma = originalPragma;
+    }
+  });
+
   it("rerun after kill with wal_autocheckpoint=0 clears planted secret bytes (pins secure_delete=ON)", () => {
     const td = mkdtempSync(join(tmpdir(), "t247-h2-kill-"));
     tmpDirs.push(td);
