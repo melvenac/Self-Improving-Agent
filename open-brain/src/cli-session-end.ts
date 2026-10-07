@@ -107,7 +107,7 @@ try {
     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
     const stamp = readObEndStamp(dir);
     if (stamp?.ob_end_at && (!id || stamp.session === id)) {
-      const since = stamp.ob_end_at;
+      const since = sessionStartFromTranscript(hookPayload.transcript_path) ?? stamp.ob_end_at; // QA289 M5: session start, not ob_end time
       const sessionIds = sessionIdsFromTranscript(hookPayload.transcript_path);
       const ids = sessionIds.length ? sessionIds : id ? [id] : [];
       const work = scanSessionWork(dir, since, ids);
