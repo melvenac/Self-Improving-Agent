@@ -1,0 +1,31 @@
+// QA 289 row 7 / Q9: E5 dedup recalls through the real MCP server.
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { freshDir, oldLayout, transcript, prove, server, iso, H, R, show } from "./lib.mjs";
+
+const UUID = "28900000-0000-4000-8000-0000000000f1";
+const CSE = "01QA289dedupDDDDDDDDDDDDD";
+const db = `${R}/db/dedup-${Date.now()}.db`;
+const dir = freshDir("dedup");
+oldLayout(dir);
+const tr = transcript(dir, iso(-2 * H), CSE); await prove(UUID, tr);
+const s = await server(dir, db);
+const st1 = await s.call("ob_store", { content: "Zebra quokka lesson: always pin the flux capacitor before release.", key: "zebra-quokka-flux", tags: ["qa289"] });
+const st2 = await s.call("ob_store", { content: "Marmot heron lesson: the gizmo wants a dry run first.", key: "marmot-heron-gizmo", tags: ["qa289"] });
+show("stores", [st1.text.split("\n")[0], st2.text.split("\n")[0]]);
+show("ob_recalled at start", (await s.call("ob_recalled")).text.split("\n")[0]);
+const d1 = await s.call("ob_recall", { queries: ["zebra quokka flux"], trigger: "explicit", purpose: "dedup", project: dir });
+show("ob_recall dedup (zebra)", d1.text.split("\n").slice(0, 3).join("\n"));
+const d2 = await s.call("ob_recall", { queries: ["marmot heron gizmo"], trigger: "explicit", purpose: "dedup", project: dir });
+show("ob_recall dedup (marmot)", d2.text.split("\n").slice(0, 3).join("\n"));
+show("ob_recalled after dedup-only recalls (expect none)", (await s.call("ob_recalled")).text);
+const r1 = await s.call("ob_recall", { queries: ["zebra quokka flux"], trigger: "explicit", project: dir });
+show("ob_recall REAL (zebra)", r1.text.split("\n").slice(0, 3).join("\n"));
+show("ob_recalled after real recall of zebra (expect zebra only)", (await s.call("ob_recalled")).text);
+const e = await s.call("ob_end", { session_summary: "dedup test", dry_run: true });
+show("ob_end dry_run (rated set)", e.text.split("\n").filter((l) => /Recalled ids|Feedback|rated/i.test(l)).join("\n"));
+await s.close();
+const Database = (await import("file:///C:/qa-scratch/qa289-pr489/open-brain/node_modules/better-sqlite3/lib/index.js")).default;
+const d = new Database(db, { readonly: true });
+show("recall_log rows", d.prepare("SELECT knowledge_id, query, recall_trigger, recall_purpose FROM recall_log ORDER BY id").all());
+d.close();
