@@ -38,6 +38,7 @@
 import { appendFileSync, existsSync, openSync, readSync, closeSync, readFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
+import { scanSessionWork } from "./end-record-guard.js";
 
 export const MARKER_REL = ".agents/SESSIONS/.missing-handoff.jsonl";
 const SHOWN_REL = ".agents/SESSIONS/.missing-handoff.shown.jsonl";
@@ -117,52 +118,39 @@ export function sessionIdsFromTranscript(path: unknown): string[] {
   return [...ids];
 }
 
-/** Did this session commit loop work, and did it commit a handoff with it? */
+/** Did this session commit work (E1, any branch), and did it commit a loop handoff with it? */
 export function checkSessionHandoff(projectDir: string, since: string | null, sessionIds: readonly string[] = []): HandoffCheck {
   const base: HandoffCheck = { status: "unknown", since, branches: [], commits: 0, handoffs: [], unattributed: 0 };
-  if (since === null) return { ...base, reason: "this session's start could not be read from its transcript, so its commits cannot be told from anyone else's" };
-  const ids = sessionIds.filter(Boolean);
-  if (ids.length === 0) return { ...base, reason: "this session's Claude-Session id could not be read from its transcript, so its commits cannot be told from another seat's (a commit is attributed by its trailer, never by git identity)" };
-  let branches: string[];
-  try {
-    branches = git(projectDir, ["for-each-ref", "--format=%(refname:short)", "refs/heads/loop/"]).split(/\r?\n/).filter(Boolean);
-  } catch {
-    return { ...base, reason: "git could not list local branches here" };
-  }
-  let exclude: string[] = [];
-  try {
-    git(projectDir, ["rev-parse", "--verify", "--quiet", "origin/master"]);
-    exclude = ["^origin/master"];
-  } catch {
-    /* no origin/master: count everything on the branch in the window */
-  }
-  // T-212: a commit is this session's only by its Claude-Session trailer. No
-  // trailer = UNATTRIBUTED, counted apart and never assigned to this seat by git
-  // identity (two seats share one identity: the check once blamed a session for
-  // 28 commits that were another seat's). A trailer naming another session is
-  // that session's.
-  const mine = new Set<string>();
-  const unattributed = new Set<string>();
-  const withWork = new Set<string>();
+  const work = scanSessionWork(projectDir, since, sessionIds);
+  if (work.status === "unknown") return { ...base, reason: work.reason };
   const handoffs = new Set<string>();
-  for (const b of branches) {
-    const rows = git(projectDir, ["log", `--since=${since}`, "--format=%H%x1f%(trailers:key=Claude-Session,valueonly,separator=%x20)%x1e", b, ...exclude]);
-    for (const row of rows.split("\x1e")) {
-      const [sha, trailer = ""] = row.trim().split("\x1f");
-      if (!sha) continue;
-      if (trailer.trim() === "") {
-        unattributed.add(sha);
-        continue;
+  if (work.status === "ok" && since !== null && sessionIds.filter(Boolean).length > 0) {
+    let loopBranches: string[];
+    try {
+      loopBranches = git(projectDir, ["for-each-ref", "--format=%(refname:short)", "refs/heads/loop/"]).split(/\r?\n/).filter(Boolean);
+    } catch {
+      return { ...base, reason: "git could not list local loop branches here" };
+    }
+    const ids = sessionIds.filter(Boolean);
+    for (const b of loopBranches) {
+      const rows = git(projectDir, ["log", `--since=${since}`, "--format=%H%x1f%(trailers:key=Claude-Session,valueonly,separator=%x20)%x1e", b]);
+      for (const row of rows.split("\x1e")) {
+        const [sha, trailer = ""] = row.trim().split("\x1f");
+        if (!sha || !ids.some((id) => trailer.includes(id))) continue;
+        const names = git(projectDir, ["show", "--format=", "--name-only", "--diff-filter=AM", sha, "--", "docs/loops"]);
+        for (const n of names.split(/\r?\n/)) if (HANDOFF_RE.test(n.trim())) handoffs.add(n.trim());
       }
-      if (!ids.some((id) => trailer.includes(id))) continue;
-      mine.add(sha);
-      withWork.add(b);
-      const names = git(projectDir, ["show", "--format=", "--name-only", "--diff-filter=AM", sha, "--", "docs/loops"]);
-      for (const n of names.split(/\r?\n/)) if (HANDOFF_RE.test(n.trim())) handoffs.add(n.trim());
     }
   }
-  const status = mine.size === 0 ? "no-work" : handoffs.size > 0 ? "ok" : "missing";
-  return { ...base, status, branches: [...withWork], commits: mine.size, handoffs: [...handoffs].sort(), unattributed: unattributed.size };
+  const status = work.commits === 0 ? "no-work" : handoffs.size > 0 ? "ok" : "missing";
+  return {
+    ...base,
+    status,
+    branches: work.branches,
+    commits: work.commits,
+    handoffs: [...handoffs].sort(),
+    unattributed: work.unattributed,
+  };
 }
 
 /** The warning, in words a human reading a hook's output can act on. */

@@ -29,6 +29,7 @@ import {
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, resolveCursorAgentHost, writeProcessSession } from "./shared/process-session.js";
 import { takeMissingHandoffNotices } from "./shared/handoff-guard.js";
+import { takeRecordOkNotices, takeWorkAfterEndNotices } from "./shared/end-record-guard.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
 // Claude Code includes `agent_id` when the hook fires inside a subagent.
@@ -308,6 +309,14 @@ if (hasAgents) {
 // whether a SessionEnd hook's output reaches anyone is up to the host.
 if (hasAgents) {
   for (const notice of takeMissingHandoffNotices(cwd)) {
+    lines.push("");
+    lines.push(notice);
+  }
+  for (const notice of takeRecordOkNotices(cwd)) {
+    lines.push("");
+    lines.push(notice);
+  }
+  for (const notice of takeWorkAfterEndNotices(cwd)) {
     lines.push("");
     lines.push(notice);
   }

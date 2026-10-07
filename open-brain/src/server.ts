@@ -39,14 +39,23 @@ import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
 import { formatScanCounts } from "./pipelines/session-start/scan-counts.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
-import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger } from "./db-v2.js";
+import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger, type RecallPurpose } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
 import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
-import { byPidDir, processStartTime, proveSession, type ProvenSession } from "./shared/process-session.js";
+import { byPidDir, processStartTime, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
+import { sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
+import {
+  OLD_LAYOUT_LINE,
+  checkRecordUpdated,
+  describeRecordNotUpdated,
+  evaluateEndRecord,
+  recordRecordOkNotice,
+  writeObEndStamp,
+} from "./shared/end-record-guard.js";
 import { formatShadowReport, readShadowLog } from "./pipelines/shadow/index.js";
 import { slugify, archiveVaultNote } from "./vault-writer.js";
 import { findToolCallScaffolding, scaffoldRejectionMessage } from "./shared/content-guard.js";
@@ -615,16 +624,59 @@ export interface EndArgs {
   recalled_entry_ids?: number[];
   entry_ratings?: Record<string, "helpful" | "harmful" | "neutral">;
   dry_run?: boolean;
+  /** When the record gate would refuse, pass a reason to close anyway (stored for the next greeting). */
+  record_ok?: string;
+}
+
+function readParentSessionProof(): ProcessSessionProof | null {
+  const path = join(byPidDir(resolvePaths(process.cwd()).activeSession), `${process.ppid}.json`);
+  if (!existsSync(path)) return null;
+  try {
+    return JSON.parse(readFileSync(path, "utf-8")) as ProcessSessionProof;
+  } catch {
+    return null;
+  }
+}
+
+function endSessionWindow(projectRoot: string, sessionId: string): { since: string | null; sessionIds: string[] } {
+  const proof = readParentSessionProof();
+  const since = proof?.transcript_path ? sessionStartFromTranscript(proof.transcript_path) : null;
+  let sessionIds = proof?.transcript_path ? sessionIdsFromTranscript(proof.transcript_path) : [];
+  if (sessionIds.length === 0 && sessionId) sessionIds = [sessionId];
+  return { since, sessionIds };
 }
 
 export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
   try {
     const projectRoot = resolve(args.project_root ?? ".");
+    const preamble: string[] = [];
     // T-003: a named session_id is checked against the proven one, never
     // trusted: ob_end writes ratings under it.
     const endSession = attributedSession(args.session_id);
     if (endSession.refusal) {
       return { content: [{ type: "text" as const, text: `ob_end refused: ${endSession.refusal}` }], isError: true };
+    }
+    const endedId = endSession.id;
+    if (endedId === null) {
+      preamble.push(
+        `RECORD NOT CHECKED: this server cannot prove its session (${endSession.reason ?? "no proof"}). ` +
+          `Session work and record update were not verified (Cursor writes no session proof). ` +
+          `Pass record_ok with a reason to note that in the next greeting.`,
+      );
+    } else {
+      const { since, sessionIds } = endSessionWindow(projectRoot, endedId);
+      const evaluation = evaluateEndRecord(projectRoot, since, endedId, sessionIds);
+      const record = checkRecordUpdated(projectRoot, since, endedId, sessionIds);
+      const sinceAnchor = since ?? "session start (unknown)";
+      if (record.layout === "old") preamble.push(OLD_LAYOUT_LINE);
+      if (evaluation.needsRecord && !args.record_ok) {
+        const line = describeRecordNotUpdated(evaluation.work, record, sinceAnchor);
+        preamble.push(`WARNING: ${line}`);
+      }
+      if (evaluation.needsRecord && args.record_ok) {
+        if (!args.dry_run) recordRecordOkNotice(projectRoot, endedId, args.record_ok);
+        preamble.push(`RECORD OK: closing without a matching record — ${args.record_ok}`);
+      }
     }
     const v2db = getV2Db();
 
@@ -632,7 +684,6 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     // consulted when it names this same session. See resolveRecalledIds.
     // No named id means the proven one. end.md calls ob_end that way, and a
     // rating ob_recalled lists is in recall_log under that id (D3).
-    const endedId = endSession.id;
     const { resolved, foreign } = resolveRecalledIdsObserved({
       db: v2db,
       sessionId: endedId,
@@ -680,10 +731,19 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
 
     const shadowReport = formatShadowReport(readShadowLog(resolvePaths(projectRoot).shadowLog));
 
+    if (!args.dry_run && endedId) {
+      writeObEndStamp(projectRoot, {
+        session: endedId,
+        ob_end_at: new Date().toISOString(),
+        record_ok: args.record_ok ?? null,
+      });
+    }
+
+    const head = preamble.length ? preamble.join("\n") + "\n\n" : "";
     return {
       content: [{
         type: "text",
-        text: `Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged (${result.invocations.skippedSessions} already logged, ${result.invocations.unreadableSessions} unreadable, ${result.invocations.appendFailures} append failed)\n${shadowLine}\n\n${shadowReport}`,
+        text: `${head}Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged (${result.invocations.skippedSessions} already logged, ${result.invocations.unreadableSessions} unreadable, ${result.invocations.appendFailures} append failed)\n${shadowLine}\n\n${shadowReport}`,
       }],
     };
   } catch (err) {
@@ -803,6 +863,7 @@ server.tool(
     recalled_entry_ids: z.array(z.number()).optional().default([]).describe("IDs of knowledge entries recalled this session"),
     entry_ratings: z.record(z.string(), z.enum(["helpful", "harmful", "neutral"])).optional().describe("Explicit per-entry judgments keyed by entry ID, e.g. {\"42\": \"harmful\"}. Rate an entry harmful when it was applied and proved wrong or misleading — not merely when it went unused. Entries omitted here fall back to tag matching against the summary."),
     dry_run: z.boolean().optional().default(false).describe("Run feedback but skip vault writes"),
+    record_ok: z.string().optional().describe("When the record gate would refuse, pass a reason to close anyway; stored for the next greeting."),
   },
   async (args) => handleEnd(args)
 );
@@ -908,6 +969,7 @@ export async function handleRecall(args: {
   verbose?: boolean;
   limit?: number;
   trigger?: RecallTrigger;
+  purpose?: RecallPurpose;
 }): Promise<ToolResponse> {
   const {
     queries,
@@ -917,6 +979,7 @@ export async function handleRecall(args: {
     verbose = false,
     limit = 5,
     trigger = "unspecified",
+    purpose,
   } = args;
     const v2db = getV2Db();
     const normalizedProject = canonicalizeProjectDir(project);
@@ -1007,7 +1070,7 @@ export async function handleRecall(args: {
         const session = writeSessionId();
         if (session.id !== null) {
           try {
-            recordRecallEvent(v2db, session.id, query, rows.map((r) => r.id), trigger);
+            recordRecallEvent(v2db, session.id, query, rows.map((r) => r.id), trigger, purpose);
           } catch (err) {
             const message = err instanceof Error ? err.message : String(err);
             results.push(`_(NOT LOGGED: recall log write failed — ${message})_`);
@@ -1053,6 +1116,8 @@ server.tool(
     limit: z.number().optional().default(5).describe("Results per query (default: 5)"),
     trigger: z.enum(["start", "checkpoint", "explicit", "unspecified"]).optional().default("unspecified")
       .describe("How this recall reached the agent: 'start' = session-start injection, 'checkpoint' = checkpoint restoration, 'explicit' = deliberate mid-task fetch. ALWAYS pass one of the first three; an omitted trigger is recorded as 'unspecified' (a countable labeling gap, never assumed to be a deliberate fetch). Recorded for analysis — injection and on-demand fetch are different treatments."),
+    purpose: z.enum(["dedup"]).optional()
+      .describe("When 'dedup', the recall is for /end lesson deduplication only — entries recalled solely with this purpose are excluded from ob_recalled and from ratings."),
   },
   async (args) => handleRecall(args),
 );

@@ -22,6 +22,13 @@ import { resolveSessionId } from "./shared/active-session.js";
 import { byPidDir, removeProcessSession } from "./shared/process-session.js";
 import { resolvePaths } from "./shared/paths.js";
 import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
+import {
+  checkRecordUpdated,
+  describeWorkAfterEnd,
+  readObEndStamp,
+  recordWorkAfterEnd,
+  scanSessionWork,
+} from "./shared/end-record-guard.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
@@ -91,6 +98,36 @@ try {
   }
 } catch (err) {
   console.log(`[session-end] handoff check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+}
+
+// T-246 E4: work after ob_end with no later record write — warn and record for the next greeting; never block.
+try {
+  const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  if (existsSync(join(dir, ".agents"))) {
+    const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
+    const stamp = readObEndStamp(dir);
+    if (stamp?.ob_end_at && (!id || stamp.session === id)) {
+      const since = stamp.ob_end_at;
+      const sessionIds = sessionIdsFromTranscript(hookPayload.transcript_path);
+      const ids = sessionIds.length ? sessionIds : id ? [id] : [];
+      const work = scanSessionWork(dir, since, ids);
+      const record = checkRecordUpdated(dir, since, stamp.session, ids);
+      if (work.commits > 0 && !record.updated) {
+        const msg = describeWorkAfterEnd(work, since);
+        console.log(`[session-end] ${msg}`);
+        console.error(`[session-end] ${msg}`);
+        recordWorkAfterEnd(dir, stamp.session, msg, work);
+      } else if (work.commits > 0) {
+        console.log(`[session-end] work-after-end check: ${work.commits} commit(s) after ob_end and record updated`);
+      } else {
+        console.log("[session-end] work-after-end check: no commits after ob_end");
+      }
+    } else {
+      console.log("[session-end] work-after-end check: no ob_end stamp for this session");
+    }
+  }
+} catch (err) {
+  console.log(`[session-end] work-after-end check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
 }
 
 try {

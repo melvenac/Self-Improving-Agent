@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- **END-FIX (T-246): /end leaves a record that matches the session.** `ob_end` refuses with
+  `RECORD NOT UPDATED` when trailered commits, tags, or a `package.json` version bump are not
+  reflected in the project record (`record_ok` overrides). SessionEnd marks work after `/end`;
+  `ob_recall` accepts `purpose: "dedup"` so /end dedup lookups are not rated; old-layout repos
+  always see the `OLD LAYOUT` line at close.
+
 ### Changed
 
 - **The seat map carries the new per-seat hub rooms, and forge speaks as `forge` (T-213).** In

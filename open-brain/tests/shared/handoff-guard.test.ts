@@ -98,13 +98,11 @@ describe("handoff guard (T179-2)", () => {
     expect(checkSessionHandoff(dir, START, IDS).status).toBe("missing");
   });
 
-  it("work already on origin/master is not counted, and a non-loop branch is not checked", () => {
-    git(dir, "checkout", "-q", "-b", "docs/notes");
-    commitAt(dir, DURING, "docs/n.md", "a docs branch");
-    git(dir, "checkout", "-q", "-b", "loop/merged");
-    const sha = commitAt(dir, DURING, "src/a.ts", "merged already");
-    git(dir, "update-ref", "refs/remotes/origin/master", sha);
-    expect(checkSessionHandoff(dir, START, IDS).status).toBe("no-work");
+  it("T-246 E1: work on a non-loop branch (e.g. master) counts as session work when trailered", () => {
+    commitAt(dir, DURING, "src/on-master.ts", "worth-it style work on master");
+    expect(checkSessionHandoff(dir, START, IDS).status).toBe("missing");
+    expect(checkSessionHandoff(dir, START, IDS).commits).toBe(1);
+    expect(checkSessionHandoff(dir, START, IDS).branches).toContain("master");
   });
 
   it("a handoff under another name is NOT recognised (a stated limit, pinned so it cannot change silently)", () => {
