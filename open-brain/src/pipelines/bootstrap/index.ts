@@ -82,7 +82,8 @@ export function classifySessionCommand(projectRoot: string, name: SessionCommand
   const tmpl = join(templateDir, sessionCommandRel(name));
   if (!existsSync(dest)) return "absent";
   if (!existsSync(tmpl)) return "OLD";
-  return sameText(dest, tmpl) ? "SIA" : "OLD";
+  // I9-r2-(iii) mutant: raw bytes, no CRLF normalisation
+  return readFileSync(dest).equals(readFileSync(tmpl)) ? "SIA" : "OLD";
 }
 
 export function inspectSessionCommands(projectRoot: string, templateDir = defaultTemplateDir()): Record<SessionCommandName, SessionCommandFileState> {
