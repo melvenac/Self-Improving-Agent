@@ -66,7 +66,7 @@ function git(cwd: string, args: string[]): string {
 
 function listLocalBranches(projectDir: string): string[] | null {
   try {
-    return git(projectDir, ["for-each-ref", "--format=%(refname:short)", "refs/heads/"])
+    return git(projectDir, ["for-each-ref", "--format=%(refname:short)", "refs/heads/loop/"])
       .split(/\r?\n/)
       .filter(Boolean);
   } catch {
