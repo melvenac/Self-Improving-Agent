@@ -1,7 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { BRIEFING_BUDGET, renderBriefing, standingRulesBudgetLine, type BriefingInput } from "../../../src/pipelines/session-start/briefing.js";
+import {
+  BRIEFING_BUDGET,
+  renderBriefing,
+  STANDING_RULES_LINE_CHARS,
+  standingRulesBudgetLine,
+  type BriefingInput,
+} from "../../../src/pipelines/session-start/briefing.js";
 import { parseState, type State } from "../../../src/shared/state-schema.js";
 
 const FIXTURES = join(import.meta.dirname, "../../fixtures-state");
@@ -73,6 +79,7 @@ describe("STANDING-BUDGET: standing rules in the budgeted briefing", () => {
     const idsOnLine = line.slice(line.indexOf(": ") + 2).replace(/ \+\d+ more$/, "").split(" ").filter(Boolean);
     expect(k).toBe(60 - idsOnLine.length);
     expect(idsOnLine[0]).toBe("D-060");
+    expect(line.length).toBeLessThanOrEqual(STANDING_RULES_LINE_CHARS);
     const { lines: n, chars } = size(lines);
     expect(n).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
     expect(chars).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
