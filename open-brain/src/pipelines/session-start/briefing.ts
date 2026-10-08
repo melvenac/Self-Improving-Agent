@@ -80,6 +80,24 @@ export function standingRulesLines(state: State): string[] {
   return out;
 }
 
+/** Budgeted layout: one line of standing decision ids, newest first; null when none. */
+export function standingRulesBudgetLine(state: State): string | null {
+  const ids = state.decisions.filter((d) => d.standing === true).map((d) => d.id).reverse();
+  if (ids.length === 0) return null;
+  const prefix = `STANDING RULES (${ids.length}): `;
+  let line = prefix;
+  let shown = 0;
+  for (const id of ids) {
+    const add = shown === 0 ? id : ` ${id}`;
+    if (line.length + add.length > STANDING_RULES_LINE_CHARS) break;
+    line += add;
+    shown++;
+  }
+  const hidden = ids.length - shown;
+  if (hidden > 0) line += ` +${hidden} more`;
+  return line;
+}
+
 export function renderBriefing(i: BriefingInput): string[] {
   if (i.budget === true) return renderBudgeted(i);
   const s = i.state;
@@ -159,6 +177,8 @@ export const BRIEFING_BUDGET = { lines: 30, chars: 4096 } as const;
 
 /** Per-section caps. Each section ends with `+N more: <pointer>` when it cuts, never silently. */
 const CAPS = { objective: 400, next: 2, watch: HANDOFF_CAPS.watchOuts, watchChars: HANDOFF_CAPS.watchOutChars, waiting: 2, open: 2, question: 160, drift: 160, blocked: 3 } as const;
+/** Budgeted layout only: one `STANDING RULES (N): id id …` line; whole ids drop before `+K more`. */
+const STANDING_RULES_LINE_CHARS = 200;
 const MORE_WATCH = "state.json handoffs[].watch_out";
 const MORE_QUESTIONS = "state.json handoffs[].open_questions";
 const MORE_TASKS = "state.json tasks[]";
@@ -227,7 +247,8 @@ function renderBudgeted(i: BriefingInput): string[] {
     }
   }
 
-  out.push(...standingRulesLines(s));
+  const standingLine = standingRulesBudgetLine(s);
+  if (standingLine) out.push(standingLine);
 
   // (e) WAITING ON AARON: every seat's CURRENT handoff (the newest per seat and checkout), unresolved questions owned by aaron.
   const waiting = newestHandoffPerInstance(s.handoffs).flatMap((h) =>

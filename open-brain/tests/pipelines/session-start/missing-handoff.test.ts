@@ -37,6 +37,7 @@ function stateWith(sessions: SessionRecord[], handoffs: Handoff[]): State {
   const s = structuredClone(readRepoRecord().state);
   s.sessions = sessions;
   s.handoffs = handoffs;
+  s.decisions = s.decisions.map(({ standing: _s, ...d }) => d);
   return s;
 }
 
