@@ -57,7 +57,7 @@ export function isOldLayoutProject(projectDir: string): boolean {
 export type RecordContentHash = { ok: true; hash: string; layout: "new" | "old" } | { ok: false; error: string };
 
 /** Content fingerprint stored in the ob_end stamp (R1). */
-export function computeRecordContentHash(projectDir: string, sessionUuid: string): RecordContentHash {
+export function computeRecordContentHash(projectDir: string, sessionUuid: string, rawEol = false): RecordContentHash {
   const statePath = join(projectDir, ".agents", "state.json");
   if (existsSync(statePath)) {
     const stateRead = readState(projectDir);
@@ -70,7 +70,8 @@ export function computeRecordContentHash(projectDir: string, sessionUuid: string
   }
   const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
   if (!existsSync(nextPath)) return { ok: false, error: "no record file for this layout" };
-  const normalized = normalizeNextSessionText(readFileSync(nextPath, "utf8"));
+  const raw = readFileSync(nextPath, "utf8");
+  const normalized = rawEol ? raw : normalizeNextSessionText(raw);
   const hash = createHash("sha256").update(normalized, "utf8").digest("hex");
   return { ok: true, hash, layout: "old" };
 }
@@ -425,7 +426,7 @@ export function recordContentChangedSinceStamp(
   stamp: ObEndStamp,
 ): boolean | null {
   if (!stamp.record_content_hash) return null;
-  const current = computeRecordContentHash(projectDir, sessionUuid);
+  const current = computeRecordContentHash(projectDir, sessionUuid, true);
   if (!current.ok) return null;
   return current.hash !== stamp.record_content_hash;
 }
