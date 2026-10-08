@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 355,
+  "revision": 356,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4462,6 +4462,12 @@
       "title": "END-FIX (#489, T-246) ACCEPT at r4 (QA 293) and MERGED on Aaron's word (8abb8948 -> ecb64730); fleet deterministic-dispatch agreed with Relay and clark, SIA's A+E before the Makerspace import (Aaron)",
       "date": "2026-10-08",
       "note": "END-FIX history:\n- QA 292 REJECT r3 on S1. This was the planner's error: the r3 ruling put state.json's revision into the hash, so any ob_state write cleared the marker.\n- r4 hashes only this session's handoffs[] entry and sessions[] row (QA 293 qa/s164f-report @ 1637a388, no findings). QA's own mutants M3 and M4 are caught only by r4-pins S1c (noted, not a finding).\n\nFleet design: docs/loops/fleet-deterministic-dispatch.md (#515). docs/ is an allowlist, so the first-planned docs/fleet/ path was gitignored.\n- A (SIA): developer.md's Building checks section becomes a generated .cursor/rules/developer-building-checks.mdc with alwaysApply, plus a /sync cursor-rules-current check that fails on drift, plus a requiredBlock entry in hub-partner-seats.json.\n- E (SIA): decisions can be marked standing and render under STANDING RULES in the ob_start briefing.\n- B (dispatch gate), C (READY verifier) and D (waker chat rotation): clark, in A2A, after A2A's freeze.\n- Order agreed: C -> B -> A+E -> D. Aaron put SIA's A+E before the Makerspace import.\n\nFLEET-AE is #516 at 1bc4d20d (cursor-builder): CI green; mutants fleet-ae-mut-1, -2 and -3 are each red on F2, F6 and F7 respectively (verified by the planner). QA 294 dispatch is #520, DISPATCH_SHA 7c2d034d.\n\nE4 (tag the existing standing rules through set_standing) is a planner act after #516 merges. Candidates: D-060, D-117, D-125, D-130, D-131."
+    },
+    {
+      "id": "D-135",
+      "title": "SG-1 standing merge rule: clark merges SIA/A2A PRs without asking when CI is green, the merge is pinned to the head SHA, and either the PR is config/rule-text/tests only, or it is code with QA ACCEPT from a judge other than the builder. Excluded: auth/keys/secrets, rate limits, .github/workflows, .claude/settings* or hooks, data-deleting migrations, new or upgraded dependencies. An SIA merge includes the main-checkout rebuild (backup, readback, rollback). Paused by Aaron saying 'pause SG-1'. Planners route questions to clark (D-045 coordinator).",
+      "date": "2026-10-08",
+      "note": "SOURCE: Aaron, typed in clark's window. Verified by the planner reading clark's transcript 92593c18 itself: 2026-10-08T14:43:58Z \"es on step 1 (the hooks) Yes on SG-1 (the merge rule as worded above)\" and 14:24:48Z \"Ideally I only talk to you, the planners report to you and you coordiante\". Confirmed again in the planner's window (AskUserQuestion: 'Confirmed'). The fleet copy is fleet.json standingGos SG-1 (fleet 9f12b2a).\n\nPROCESS FROM NOW ON:\n- On QA ACCEPT, the planner sends clark the PR, the QA number, the report sha and the head sha. clark checks, merges pinned, logs to ~/Worktrees/standing-go-log.jsonl, and sends a D-063 notice.\n- QA-dispatch PRs (with push-qa.mjs) also go to clark.\n- A relayed Aaron decision is verified by reading his typed turn in clark's transcript (type 'user', string content not starting with '<' and not 'Another Claude session'). If it isn't there, ask clark, not Aaron.\n- A PreToolUse hook that routes AskUserQuestion to clark is coming (step 1); behave as if it is live."
     }
   ],
   "handoffs": [
