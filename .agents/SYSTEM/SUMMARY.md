@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 355 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 356 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — s162: Jev calibration 2 round 2 is live (QA 285 dev phase on the laptop); freeze the policy from its dev evidence, then QA 286 on the held-out 34. #437 r4 (forge) to QA 284 with #472 (guard r2); then #425 after #437. Waker restarts after any hub swap need planner-confirmed dlv until A2A T-104/T-113.
 
 ## What's working
@@ -169,6 +169,13 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 
 ## Decisions
 
+- 2026-10-08 — SG-1 standing merge rule: clark merges SIA/A2A PRs without asking when CI is green, the merge is pinned to the head SHA, and either the PR is config/rule-text/tests only, or it is code with QA ACCEPT from a judge other than the builder. Excluded: auth/keys/secrets, rate limits, .github/workflows, .claude/settings* or hooks, data-deleting migrations, new or upgraded dependencies. An SIA merge includes the main-checkout rebuild (backup, readback, rollback). Paused by Aaron saying 'pause SG-1'. Planners route questions to clark (D-045 coordinator). — SOURCE: Aaron, typed in clark's window. Verified by the planner reading clark's transcript 92593c18 itself: 2026-10-08T14:43:58Z "es on step 1 (the hooks) Yes on SG-1 (the merge rule as worded above)" and 14:24:48Z "Ideally I only talk to you, the planners report to you and you coordiante". Confirmed again in the planner's window (AskUserQuestion: 'Confirmed'). The fleet copy is fleet.json standingGos SG-1 (fleet 9f12b2a).
+
+PROCESS FROM NOW ON:
+- On QA ACCEPT, the planner sends clark the PR, the QA number, the report sha and the head sha. clark checks, merges pinned, logs to ~/Worktrees/standing-go-log.jsonl, and sends a D-063 notice.
+- QA-dispatch PRs (with push-qa.mjs) also go to clark.
+- A relayed Aaron decision is verified by reading his typed turn in clark's transcript (type 'user', string content not starting with '<' and not 'Another Claude session'). If it isn't there, ask clark, not Aaron.
+- A PreToolUse hook that routes AskUserQuestion to clark is coming (step 1); behave as if it is live.
 - 2026-10-08 — END-FIX (#489, T-246) ACCEPT at r4 (QA 293) and MERGED on Aaron's word (8abb8948 -> ecb64730); fleet deterministic-dispatch agreed with Relay and clark, SIA's A+E before the Makerspace import (Aaron) — END-FIX history:
 - QA 292 REJECT r3 on S1. This was the planner's error: the r3 ruling put state.json's revision into the hash, so any ob_state write cleared the marker.
 - r4 hashes only this session's handoffs[] entry and sessions[] row (QA 293 qa/s164f-report @ 1637a388, no findings). QA's own mutants M3 and M4 are caught only by r4-pins S1c (noted, not a finding).
@@ -224,7 +231,6 @@ Planner error: the QA 290 prompt named a nonexistent qa-289-s164c-dispatch.md, c
 
 The hub moved to v1.20.0 at 16:43Z. Wakers were not restarted, and planner-watch's unknown_since_restart reflects the hub's presence reset.
 - 2026-10-07 — QA 288 ACCEPT (#472 r5 1a374101, #484 r9 edfc964d); both merged on Aaron's word (AskUserQuestion in the planner's window: 'Merge both'). #472 merged at f51d84d7 -> 4cdd8a12, #484 at 62befee2 -> ab4c1c5a — Report qa/s164a-report @ 6564f3aa (docs/loops/s164a-qa-report.md), read by the planner. Merges used GitHub update-branch (merge commits, not rebases), and the planner verified each updated head's tree == git merge-tree of master and the QA'd head (472: fa818a63; 484: 375c0967). QA's batch merge b1394e23 tested both PRs together. Non-blocking findings go to T-247: G1 (negation clause->sentence widening unpinned), H1 (MEDIUM: assertPathUnderDir mutant green and reachable via writeSummary(date)), H2 (secure_delete mutant green). G2 is the documented vocabulary limit of the guard, needing a structural rule. H3-H8 are low. QA ran one diagnostic with the sandbox OFF (clark, from the log; it touched only C:/qa-tmp, and the results are from the corrected script). Ruling: acceptable, but the report did not disclose it, so from QA 289 every dispatch requires every unsandboxed command to be listed in the report. Drivers are uncommitted at C:/qa-tmp/qa288 on the laptop. Flake: tests/server.test.ts 'handleSync > runs sync on project root' timed out at 10.4 s on #488's first CI run, and the rerun was green. NEXT for Aaron: rebuild the main checkout at ab4c1c5a, stop the MCP server, close the Claude Code sessions, then run `open-brain scrub-trigger-fires` once.
-- 2026-10-07 — s164: SIA freezes at 'Makerspace migration proven'; the Makerspace rehearsal is the import pilot (D-048 guardrail 1 changed); QA #472+#484 then Aaron decides merges; park #437 #425 and Jev cal 2; END-FIX before the import — Aaron in clark's window 2026-10-07 07:2x-07:5x CDT, relayed by clark (TOLD, one link): focus moves to the Tarrant County Makerspace website; SIA's stop point is 'repo migration proven'. 'Yes, makerspace rehearsal is the pilot' (frogger and co-op-mailer are not gates). 'QA #472 + #484, then I decide merges' (QA 288, laptop, docs/loops/qa-288-s164a-dispatch.md). Parked: #437 (r10 vs T-245 Option A undecided), #425 (gated on #437), Jev cal 2 #463 #465 #470 (stopped at round 2; QA 286 held-out untouched). 'SIA has focused on our start hook but not the end hook. Let's work on that before the makerspace migration' -> END-FIX (docs/loops/end-fix-brief.md). Main checkout updated to ffc63aca and rebuilt by clark on Aaron's word, 07:53 CDT. Makerspace plan: docs/loops/makerspace-import-brief.md; new planner seat Maker; its first job is listing the 17 uncommitted files for Aaron's approval.
 <!-- state:end -->
 ## Architecture Overview
 
