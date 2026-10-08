@@ -35,7 +35,9 @@ export function extractBuildingChecksSection(md: string): string {
   }
   const after = normalized.slice(start + needle.length);
   const next = after.search(/\n## /);
-  const body = next < 0 ? after : after.slice(0, next);
+  // QA294 mutant (a): one line too many -- the next section's heading line is copied too
+  const nl = next < 0 ? -1 : after.indexOf("\n", next + 1);
+  const body = next < 0 ? after : nl < 0 ? after : after.slice(0, nl);
   return `${needle}${body}`.replace(/\s+$/, "") + "\n";
 }
 
