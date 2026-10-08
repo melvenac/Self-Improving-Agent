@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, copyFileSync } from "node:fs";
 import { join, basename } from "node:path";
 import { tmpdir } from "node:os";
@@ -7,7 +7,10 @@ import { renderBriefing, BRIEFING_BUDGET, BRIEFING_END, BRIEFING_START, type Bri
 import { handleStart } from "../../../src/server.js";
 import { byPidDir, processStartTime, writeProcessSession } from "../../../src/shared/process-session.js";
 import { parseState, type Handoff, type SessionRecord, type State } from "../../../src/shared/state-schema.js";
+import * as repoRecord from "../../helpers/repo-record.js";
 import { readRepoRecord, REPO_ROOT } from "../../helpers/repo-record.js";
+
+const FIXTURES = join(import.meta.dirname, "../../fixtures-state");
 
 /**
  * T-199. A seat session that wrote the record but left no handoff is DETECTED at that checkout's next /start.
@@ -33,11 +36,47 @@ function handoff(uuid: string | null, checkout: string | null, first_rev: number
   } as unknown as Handoff;
 }
 
-function stateWith(sessions: SessionRecord[], handoffs: Handoff[]): State {
-  const s = structuredClone(readRepoRecord().state);
+type StateWithExtra = { injectStanding: number };
+
+/** Optional base (default: live record). Strips `standing` from the live record; fixture bases keep their tags. */
+function stateWith(sessions: SessionRecord[], handoffs: Handoff[], third?: State | StateWithExtra): State {
+  const inject = third && "injectStanding" in third ? third.injectStanding : 0;
+  const base = third && "revision" in third ? third : undefined;
+  const fromLive = base === undefined && inject === 0;
+  const s = structuredClone(base ?? readRepoRecord().state);
   s.sessions = sessions;
   s.handoffs = handoffs;
+  if (fromLive) s.decisions = s.decisions.map(({ standing: _s, ...d }) => d);
+  if (inject > 0) {
+    s.decisions = s.decisions.map(({ standing: _s, ...d }) => d);
+    for (let i = 0; i < inject; i++) {
+      s.decisions.push({
+        id: `D-${900 + i}`,
+        title: `standing rule ${900 + i}`,
+        date: "2026-10-08",
+        note: "",
+        standing: true,
+      });
+    }
+  }
   return s;
+}
+
+function baseWithStandingRules(count: number): State {
+  const raw = structuredClone(JSON.parse(readFileSync(join(FIXTURES, "state.json"), "utf8")));
+  raw.decisions = [
+    ...raw.decisions,
+    ...Array.from({ length: count }, (_, i) => ({
+      id: `D-${String(900 + i)}`,
+      title: `standing rule ${900 + i}`,
+      date: "2026-10-08",
+      note: "",
+      standing: true,
+    })),
+  ];
+  const parsed = parseState(JSON.stringify(raw));
+  if (!parsed.ok) throw new Error(parsed.error);
+  return parsed.data;
 }
 
 const line = (state: State, opts: Record<string, unknown> = {}): string | null =>
@@ -216,6 +255,46 @@ describe("T-199 HO-4: the line is in the BRIEFING, once, and the budgeted layout
     const s = stateWith([], [{ ...handoff("u-own", "sia-builder", 1, 5), pick_up: "Pick up ".repeat(300) } as Handoff]);
     const lines = renderBriefing(base(s, { budget: true, missingHandoff: NOTICE }));
     expect(lines.length).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
+    expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+  });
+
+  it("the budget still holds with 20 standing rules in the record (fixture base, not live tags)", () => {
+    const s = stateWith(
+      [],
+      [{ ...handoff("u-own", "sia-builder", 1, 5), pick_up: "Pick up ".repeat(300) } as Handoff],
+      baseWithStandingRules(20) as State,
+    );
+    const lines = renderBriefing(base(s, { budget: true, missingHandoff: NOTICE }));
+    expect(lines.length).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
+    expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
+  });
+
+  it("the budget still holds with 20 injected standing rules after live-record strip (master-safe)", () => {
+    const live = structuredClone(readRepoRecord().state);
+    for (let i = 0; i < 20; i++) {
+      live.decisions.push({
+        id: `D-L${String(i).padStart(2, "0")}`,
+        title: "live pollution",
+        date: "2026-10-08",
+        note: "",
+        standing: true,
+      });
+    }
+    const spy = vi.spyOn(repoRecord, "readRepoRecord").mockReturnValue({ state: live, migrated: false });
+    try {
+      const s = stateWith(
+        [],
+        [{ ...handoff("u-own", "sia-builder", 1, 5), pick_up: "Pick up ".repeat(300) } as Handoff],
+        { injectStanding: 20 },
+      );
+      const lines = renderBriefing(base(s, { budget: true, missingHandoff: NOTICE }));
+      expect(lines.length).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
+      expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+      expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 
