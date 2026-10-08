@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 360 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 361 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-s162: Jev calibration 2 round 2 is live (QA 285 dev phase on the laptop); freeze the policy from its dev evidence, then QA 286 on the held-out 34. #437 r4 (forge) to QA 284 with #472 (guard r2); then #425 after #437. Waker restarts after any hub swap need planner-confirmed dlv until A2A T-104/T-113. _(since session 162)_
+s164/D-130: SIA is frozen at 'Makerspace migration proven'. Next: the Makerspace import (docs/loops/makerspace-import-brief.md; Maker lists the 17 uncommitted files first, routed via clark under SG-1), then BRIEFING-FIX. Parked: #437, #425, Jev cal 2. Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md. _(since session 165)_
 
 ## Top tasks
 

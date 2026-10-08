@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 360 by open-brain v0.45.0 — do not edit; change state via ob_state -->
-> **Status:** v0.45.0 — s162: Jev calibration 2 round 2 is live (QA 285 dev phase on the laptop); freeze the policy from its dev evidence, then QA 286 on the held-out 34. #437 r4 (forge) to QA 284 with #472 (guard r2); then #425 after #437. Waker restarts after any hub swap need planner-confirmed dlv until A2A T-104/T-113.
+<!-- generated from .agents/state.json rev 361 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+> **Status:** v0.45.0 — s164/D-130: SIA is frozen at 'Makerspace migration proven'. Next: the Makerspace import (docs/loops/makerspace-import-brief.md; Maker lists the 17 uncommitted files first, routed via clark under SG-1), then BRIEFING-FIX. Parked: #437, #425, Jev cal 2. Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md.
 
 ## What's working
 
@@ -84,6 +84,7 @@
 - G-042's signature did not reproduce at the SAME SHA with the SAME test count on an idle machine: eb14d09 ran 1031/1031 exit 0 idle, against 1030 passed / 1 failed exit 1 under concurrent seat activity _(V-076, 3 evidence)_
 - A correct detector was dismissed by BOTH seats that saw it, and severity alone would not have fixed it: 'pre-existing' was used as a reason to classify a finding as unrelated, when it is only a statement about WHEN it started _(V-077, 3 evidence)_
 - tcm's A2A hub has run AUTH_MODE=strict since 2026-09-30T12:32:42Z (D-063 / A2A D-033), and SIA's seats are reachable under it: atlas's own-key read of the {atlas, forge} room k571c0nz returned 200 at 12:34:05Z _(V-078, 3 evidence)_
+- Aaron's one-time scrub-trigger-fires ran on the production store (2026-10-08, ~16:49 CDT). VERIFIED BY A POST-RUN DRY RUN, not by the run's own output, which was not kept: the pre-scrub dry run showed 19964 of 22536 rows pending; the post-run dry run shows 22957 rows scanned, 0 to rewrite, exit 0. _(V-079, 1 evidence)_
 
 ## What's broken
 
@@ -169,6 +170,8 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 
 ## Decisions
 
+- 2026-10-08 — STANDING-BUDGET: in the budgeted briefing layout standing rules render as ONE line 'STANDING RULES (N): <ids newest first>', capped at 200 chars including ' +K more'; the legacy layout keeps the full list; tests never read the live record's standing tags — Clark's ruling (s165) on the planner's proposal, after #530 (E4, 20 standing tags) failed missing-handoff.test.ts:215 (37 > 30 lines). FLEET-AE E3's uncapped list collided with T-236's 30-line budget, and the test read the live record. Built by cursor-infra in 2 rounds (PR #532, reviewed head 42d97496). Judge: grok-sia-review, SB-1..SB-5 PASS, no findings (docs/loops/standing-budget-review.md @ 51cbbb07), plus the planner's re-run (35/35, tsc 0, mutants a/b/c red). Merged by clark under SG-1 at 6f83c5ab, main checkout rebuilt to 6f83c5ab. #530 then went green and merged at 1a19e6fd. Brief: docs/loops/standing-budget-brief.md. Process note: Aaron's rule (17:4x via clark) that every Cursor brief must pass ~/Worktrees/cursor-brief-checklist.md came mid-job, and round 2's procedure (hub turn 90) was rewritten to it.
+- 2026-10-08 — D-061 is the standing CI rule; D-040 is not tagged, and D-040's 'automatic trigger on push' half is superseded by T-227 (CI runs on PRs and master pushes only) — Ruled by clark (coordinator, SG-1/D-135) on the planner's recommendation, s165. It changes no rule, only the standing tag. D-061 (developers never run CI; QA dispatches CI on frozen candidates) explicitly amends D-040 for developer seats. T-178 shipped auto-CI on branch push (#199), but T-227 later narrowed ci.yml's push trigger to master only. Branches run CI on their PR, and a branch with no PR runs it by workflow_dispatch (QA or the planner, never a developer). Do not revive D-040's push trigger from its text.
 - 2026-10-08 — Mutant runs are scoped to the changed code (all three projects): each QA round mutates only the lines that round changed, plus a few QA-chosen extras; the FULL mutant run happens once per release, before the tag, by the builder or a Grok bot (not Claude QA); a full-run survivor becomes a fix list for the next loop, not a REJECT — SOURCE: Aaron, typed in clark's window. Verified by the planner reading clark's transcript 997776c7 itself.
 - 2026-10-08T19:11:32Z: "does each qa run require mutant runs? These runs are really slow. I don't understand the purpose of them."
 - 19:17:52Z: "mutant run scoped to the changed code for all three projects, then yes to each above". 'Each above' is clark's preceding proposals: the full run once per release before the tag, by the builder or a Grok bot; survivors become a fix list.
@@ -195,38 +198,6 @@ PROCESS FROM NOW ON:
 - QA-dispatch PRs (with push-qa.mjs) also go to clark.
 - A relayed Aaron decision is verified by reading his typed turn in clark's transcript (type 'user', string content not starting with '<' and not 'Another Claude session'). If it isn't there, ask clark, not Aaron.
 - A PreToolUse hook that routes AskUserQuestion to clark is coming (step 1); behave as if it is live.
-- 2026-10-08 — END-FIX (#489, T-246) ACCEPT at r4 (QA 293) and MERGED on Aaron's word (8abb8948 -> ecb64730); fleet deterministic-dispatch agreed with Relay and clark, SIA's A+E before the Makerspace import (Aaron) — END-FIX history:
-- QA 292 REJECT r3 on S1. This was the planner's error: the r3 ruling put state.json's revision into the hash, so any ob_state write cleared the marker.
-- r4 hashes only this session's handoffs[] entry and sessions[] row (QA 293 qa/s164f-report @ 1637a388, no findings). QA's own mutants M3 and M4 are caught only by r4-pins S1c (noted, not a finding).
-
-Fleet design: docs/loops/fleet-deterministic-dispatch.md (#515). docs/ is an allowlist, so the first-planned docs/fleet/ path was gitignored.
-- A (SIA): developer.md's Building checks section becomes a generated .cursor/rules/developer-building-checks.mdc with alwaysApply, plus a /sync cursor-rules-current check that fails on drift, plus a requiredBlock entry in hub-partner-seats.json.
-- E (SIA): decisions can be marked standing and render under STANDING RULES in the ob_start briefing.
-- B (dispatch gate), C (READY verifier) and D (waker chat rotation): clark, in A2A, after A2A's freeze.
-- Order agreed: C -> B -> A+E -> D. Aaron put SIA's A+E before the Makerspace import.
-
-FLEET-AE is #516 at 1bc4d20d (cursor-builder): CI green; mutants fleet-ae-mut-1, -2 and -3 are each red on F2, F6 and F7 respectively (verified by the planner). QA 294 dispatch is #520, DISPATCH_SHA 7c2d034d.
-
-E4 (tag the existing standing rules through set_standing) is a planner act after #516 merges. Candidates: D-060, D-117, D-125, D-130, D-131.
-- 2026-10-08 — QA 291: #498 IMPORT-CMDS r2 and #499 T-247 r2 ACCEPT, both merged on Aaron's word (#499 c10600f1 -> c61959da, #498 11f6c2c1 -> 1bbf2a5d); #489 END-FIX r2 REJECT (R1 HIGH, R2), r3 verified and in QA 292 — QA 291 (qa/s164d-report @ 6561ae33), read by the planner.
-
-REJECT #489, two blocking findings:
-- R1: a record written before ob_end counted as updated after it when the post-/end commit (git add -A) staged it.
-- R2: the hook printed 'no commits' with no transcript, and treated an unreadable state.json as missing.
-
-Ruling for R1: E4 compares a content hash of the record stored at ob_end. R3-R8 were also fixed; R6 (case-distinct projects in a case-sensitive NTFS dir share one key) is a documented limit.
-
-#489 r3 (cursor-infra) is ffe65478, merged with master as 854c6ced (CHANGELOG union only; the planner checked it against merge-tree). Mutants r3-hash, r3-ids and r3-state are each one commit on the head, with equal src, all red.
-
-#498 merged with two non-blocking findings for a follow-up:
-- P1: on Windows, an unwritable folder is refused as 'commit or stash'.
-- P2: a command copied into an absent slot survives a forced failure, yet the message says 'Nothing written'.
-
-QA 292 (#489 r3, laptop, DISPATCH_SHA c8c12869, #512 merged on Aaron's word) was launched by Aaron himself on 2026-10-08 06:55 CDT, because clark's classifier blocked the remote write.
-
-OPEN for Aaron:
-- clark's recall-trigger proposal for after the freeze: match on /end MATCH lines, measure whether an injection changes the next act, promote a lesson that fires twice. The planner recommends one loop that measures first.
-- The one-time scrub-trigger-fires.
 <!-- state:end -->
 ## Architecture Overview
 

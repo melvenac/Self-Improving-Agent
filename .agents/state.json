@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 360,
+  "revision": 361,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "s162: Jev calibration 2 round 2 is live (QA 285 dev phase on the laptop); freeze the policy from its dev evidence, then QA 286 on the held-out 34. #437 r4 (forge) to QA 284 with #472 (guard r2); then #425 after #437. Waker restarts after any hub swap need planner-confirmed dlv until A2A T-104/T-113.",
-    "since_session": 162
+    "text": "s164/D-130: SIA is frozen at 'Makerspace migration proven'. Next: the Makerspace import (docs/loops/makerspace-import-brief.md; Maker lists the 17 uncommitted files first, routed via clark under SG-1), then BRIEFING-FIX. Parked: #437, #425, Jev cal 2. Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md.",
+    "since_session": 165
   },
   "tasks": [
     {
@@ -3116,6 +3116,19 @@
       ],
       "since_session": 153,
       "status": "verified"
+    },
+    {
+      "id": "V-079",
+      "claim": "Aaron's one-time scrub-trigger-fires ran on the production store (2026-10-08, ~16:49 CDT). VERIFIED BY A POST-RUN DRY RUN, not by the run's own output, which was not kept: the pre-scrub dry run showed 19964 of 22536 rows pending; the post-run dry run shows 22957 rows scanned, 0 to rewrite, exit 0.",
+      "evidence": [
+        {
+          "type": "command",
+          "path": "node build\\cli.js scrub-trigger-fires --dry-run (main checkout, build ba53859)",
+          "observation": "Run by clark ~17:1x CDT 2026-10-08: rows scanned 22957, would rewrite 0, exit 0. knowledge-v2.db mtime 16:49 CDT, consistent with the scrub's VACUUM. The 421 rows added since the pre-scrub dry run are new fires, already clean (D-129 A1). Relayed by clark (TOLD, one link); the planner did not run it."
+        }
+      ],
+      "since_session": 165,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -4027,7 +4040,8 @@
       "id": "D-061",
       "title": "Developers never run CI: local tests only (shift-left, not acceptance). CI is the runtime's deterministic step (T-178, now P0); until it lands, QA dispatches CI on the frozen candidate",
       "date": "2026-09-28",
-      "note": "Aaron, planner session 148, 2026-09-28: 'yes and T-178 raised to P0', answering the planner's proposal. He had first said 'I thought we ruled that devs never run ci, that's qa work'. The planner found no such ruling in the record: D-040 had given every seat CI on its own branches, and developer.md:67 said a mutant runs on CI. Basis, docs/hoh_jev.md:89-112 and 174-190: the developer does 'implementation + local tests', which do not count as acceptance; the RUNTIME runs deterministic tests between developer and QA; QA may run tests on the frozen candidate. AMENDS D-040 for developer seats: a developer never dispatches tcm or Windows CI and reports local test output only. QA dispatches the red, green and mutant runs until T-178 makes CI automatic on push. First applied to records 198 and 200 (briefed with CI budgets before this ruling) and to every brief after it."
+      "note": "Aaron, planner session 148, 2026-09-28: 'yes and T-178 raised to P0', answering the planner's proposal. He had first said 'I thought we ruled that devs never run ci, that's qa work'. The planner found no such ruling in the record: D-040 had given every seat CI on its own branches, and developer.md:67 said a mutant runs on CI. Basis, docs/hoh_jev.md:89-112 and 174-190: the developer does 'implementation + local tests', which do not count as acceptance; the RUNTIME runs deterministic tests between developer and QA; QA may run tests on the frozen candidate. AMENDS D-040 for developer seats: a developer never dispatches tcm or Windows CI and reports local test output only. QA dispatches the red, green and mutant runs until T-178 makes CI automatic on push. First applied to records 198 and 200 (briefed with CI budgets before this ruling) and to every brief after it.",
+      "standing": true
     },
     {
       "id": "D-062",
@@ -4500,6 +4514,18 @@
       "date": "2026-10-08",
       "note": "SOURCE: Aaron, typed in clark's window. Verified by the planner reading clark's transcript 997776c7 itself.\n- 2026-10-08T19:11:32Z: \"does each qa run require mutant runs? These runs are really slow. I don't understand the purpose of them.\"\n- 19:17:52Z: \"mutant run scoped to the changed code for all three projects, then yes to each above\". 'Each above' is clark's preceding proposals: the full run once per release before the tag, by the builder or a Grok bot; survivors become a fix list.\n\nAPPLY TO EVERY QA DISPATCH FROM NOW ON. The 'your own mutants' row names only the files and lines changed in this round's diff, plus at most 2 QA-chosen extras on those same files. The developer's red-first mutants stay in place: they are cheap, one commit each, and run in CI.",
       "standing": true
+    },
+    {
+      "id": "D-138",
+      "title": "D-061 is the standing CI rule; D-040 is not tagged, and D-040's 'automatic trigger on push' half is superseded by T-227 (CI runs on PRs and master pushes only)",
+      "date": "2026-10-08",
+      "note": "Ruled by clark (coordinator, SG-1/D-135) on the planner's recommendation, s165. It changes no rule, only the standing tag. D-061 (developers never run CI; QA dispatches CI on frozen candidates) explicitly amends D-040 for developer seats. T-178 shipped auto-CI on branch push (#199), but T-227 later narrowed ci.yml's push trigger to master only. Branches run CI on their PR, and a branch with no PR runs it by workflow_dispatch (QA or the planner, never a developer). Do not revive D-040's push trigger from its text."
+    },
+    {
+      "id": "D-139",
+      "title": "STANDING-BUDGET: in the budgeted briefing layout standing rules render as ONE line 'STANDING RULES (N): <ids newest first>', capped at 200 chars including ' +K more'; the legacy layout keeps the full list; tests never read the live record's standing tags",
+      "date": "2026-10-08",
+      "note": "Clark's ruling (s165) on the planner's proposal, after #530 (E4, 20 standing tags) failed missing-handoff.test.ts:215 (37 > 30 lines). FLEET-AE E3's uncapped list collided with T-236's 30-line budget, and the test read the live record. Built by cursor-infra in 2 rounds (PR #532, reviewed head 42d97496). Judge: grok-sia-review, SB-1..SB-5 PASS, no findings (docs/loops/standing-budget-review.md @ 51cbbb07), plus the planner's re-run (35/35, tsc 0, mutants a/b/c red). Merged by clark under SG-1 at 6f83c5ab, main checkout rebuilt to 6f83c5ab. #530 then went green and merged at 1a19e6fd. Brief: docs/loops/standing-budget-brief.md. Process note: Aaron's rule (17:4x via clark) that every Cursor brief must pass ~/Worktrees/cursor-brief-checklist.md came mid-job, and round 2's procedure (hub turn 90) was rewritten to it."
     }
   ],
   "handoffs": [
