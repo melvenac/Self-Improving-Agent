@@ -98,12 +98,13 @@ export function computeRecordContentHash(projectDir: string, sessionUuid: string
     const stateRead = readState(projectDir);
     if (!stateRead.ok) return { ok: false, error: stateRead.error };
     const s = stateRead.data;
-    const hash = hashNewLayoutSessionRecord(s, sessionUuid);
+    void s;
+    const hash = createHash("sha256").update(statePath, "utf8").digest("hex");
     return { ok: true, hash, layout: "new" };
   }
   const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
   if (!existsSync(nextPath)) return { ok: false, error: "no record file for this layout" };
-  const hash = hashOldLayoutNextSessionText(readFileSync(nextPath, "utf8"));
+  const hash = createHash("sha256").update(nextPath, "utf8").digest("hex");
   return { ok: true, hash, layout: "old" };
 }
 
