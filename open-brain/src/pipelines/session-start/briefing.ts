@@ -116,12 +116,13 @@ export function renderBriefing(i: BriefingInput): string[] {
   else out.push(noneRecorded(i.seat, i.ownCheckout));
   if (i.missingHandoff) out.push(i.missingHandoff);
 
+  // F8-r2-(ii) mutant: STANDING RULES above WATCH OUT
+  out.push(...standingRulesLines(s));
+
   if (own && own.watch_out.length > 0) {
     out.push("", "WATCH OUT");
     for (const w of own.watch_out) out.push(`- ${watchText(w)}`);
   }
-
-  out.push(...standingRulesLines(s));
 
   if (own) {
     const { open, resolved } = splitQuestions(own.open_questions);
@@ -216,6 +217,8 @@ function renderBudgeted(i: BriefingInput): string[] {
     : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : noneRecorded(i.seat, i.ownCheckout);
   out.push(i.missingHandoff ? `${pickUp} · ${i.missingHandoff}` : pickUp);
 
+  out.push(...standingRulesLines(s));
+
   if (own) {
     const live = own.watch_out.filter((w) => !isExpired(w, i.sessionNumber, i.date));
     const expired = own.watch_out.length - live.length;
@@ -226,8 +229,6 @@ function renderBudgeted(i: BriefingInput): string[] {
       if (notes.length > 0) out.push(notes.join(" · "));
     }
   }
-
-  out.push(...standingRulesLines(s));
 
   // (e) WAITING ON AARON: every seat's CURRENT handoff (the newest per seat and checkout), unresolved questions owned by aaron.
   const waiting = newestHandoffPerInstance(s.handoffs).flatMap((h) =>
