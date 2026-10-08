@@ -103,7 +103,7 @@ export function computeRecordContentHash(projectDir: string, sessionUuid: string
   }
   const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
   if (!existsSync(nextPath)) return { ok: false, error: "no record file for this layout" };
-  const hash = hashOldLayoutNextSessionText(readFileSync(nextPath, "utf8"));
+  const hash = createHash("sha256").update(nextPath).digest("hex");
   return { ok: true, hash, layout: "old" };
 }
 
