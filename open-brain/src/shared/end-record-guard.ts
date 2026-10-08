@@ -57,7 +57,8 @@ export function hashOldLayoutNextSessionText(raw: string): string {
 
 /** New-layout digest for one session only (no revision; no other sessions). */
 export function hashNewLayoutSessionRecord(state: State, sessionUuid: string): string {
-  const h = state.handoffs.find((x) => x.session_uuid === sessionUuid);
+  const mine = state.handoffs.find((x) => x.session_uuid === sessionUuid);
+  const h = mine === undefined ? undefined : [...state.handoffs].reverse().find((x) => x.seat === mine.seat);
   const handoff =
     h === undefined
       ? null
