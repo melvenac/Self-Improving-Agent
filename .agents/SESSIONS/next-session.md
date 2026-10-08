@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 358 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 359 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-(1) WAIT for the main-checkout rebuild readback from clark's successor (look up the live clark with ListAgents; it was rolling at 2026-10-08 ~12:00 CDT). The rebuild covers #498 IMPORT-CMDS, #489 END-FIX and #516 FLEET-AE, all merged; master is e86461b6. Check that the readback's build commit contains e86461b6. (2) E4: in a session served by the rebuilt build (check that the Build line is current and that ob_state lists set_standing), tag the standing rules with ob_state set_standing: D-060, D-117, D-125, D-130, D-131, D-135 and any other decision that is a rule rather than an event. Then check that STANDING RULES renders in your own next /start. (3) The Makerspace import is then clear from SIA's side: docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files, with the answer going through clark (SG-1/D-135: planners report to clark). (4) After the import, the first loop is BRIEFING-FIX: plain '## Briefing' header, a stale-usage line, READS OWED, clark's Fleet block, the 4 QA 295 findings, and #498's P1/P2. Brief it from docs/loops/fleet-deterministic-dispatch.md and D-134..D-136. (5) Aaron still owes the one-time scrub-trigger-fires; ask via clark. (6) PARKED (D-130): #437, #425, Jev cal 2.
+(1) The main-checkout rebuild is DONE and verified: clark's successor rebuilt to ba53859c (it contains e86461b6, so #498, #489 and #516 are all in); build-info ba53859c, built 2026-10-08T18:45:53Z. (2) E4: in a session served by the rebuilt build (check the Build line, and that ob_state lists set_standing), tag the standing rules with ob_state set_standing: D-060, D-117, D-125, D-130, D-131, D-135, D-137 and any other decision that is a rule rather than an event. Then check that STANDING RULES renders in your own next /start. (3) The Makerspace import is clear from SIA's side: docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files, with the answer going through clark (SG-1/D-135). (4) After the import, the first loop is BRIEFING-FIX: plain '## Briefing' header, a stale-usage line, READS OWED, clark's Fleet block, the 4 QA 295 findings, and #498's P1/P2. Brief it from docs/loops/fleet-deterministic-dispatch.md and D-134..D-136. Apply D-137 (mutants scoped to the changed code) in every QA dispatch. (5) Aaron's one-time scrub-trigger-fires: the dry run on his store showed 22536 rows scanned, 19964 would be rewritten. clark times the real run (after Caliper QA-041 exits) and records the output. (6) PARKED (D-130): #437, #425, Jev cal 2.
 
 ### Watch out
 
@@ -16,6 +16,7 @@
 - QA PROMPTS: write them directly; NEVER sed-rename a previous prompt. That bit twice: QA 290 shipped a wrong filename, and QA 295's was caught by the grep. Grep for stale numbers before the PR.
 - A dispatch PR that is BEHIND master won't merge ('Required status check test is expected'): update-branch, then merge pinned. No --admin.
 - docs/ is an ALLOWLIST (only docs/loops); so is /.agents/SYSTEM/*. A new file there needs an allowlist line.
+- GROK BOTS WAKE BY HUB PUSH (A2A v1.21.0, Aaron 2026-10-08, via clark). A job turn must START with its prefix as the very first characters: case-sensitive, no leading blank line, no markdown. It must be sent as atlas. Prefixes: grok-qa-sia QA JOB:, grok-sia-review REVIEW JOB:, grok-audit REVIEW JOB:, grok-research RESEARCH JOB:. grok-sia-review and grok-audit share REVIEW JOB:, so keep them in separate rooms, or one job wakes both. The crons remain as a duplicate-safe backstop.
 
 ### Open questions
 
@@ -34,7 +35,7 @@
 **Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s164: D-130..D-136. Merged: #472 #484 #487 #489 #494 #498 #499 #503 #510 #512 #514 #516 (SG-1) #520 #526 (SG-1); docs/records under the standing rule.
+- s164: D-130..D-137. Merged: #472 #484 #487 #489 #494 #498 #499 #503 #510 #512 #514 #516 (SG-1) #520 #526 (SG-1); docs/records under the standing rule.
 
 ## developer [sia-builder] _(written session 156)_
 
