@@ -95,7 +95,7 @@ export function parseSectionShaFromMdc(mdc: string): string | null {
 
 export function expectedDeveloperBuildingChecksMdc(projectRoot: string): string {
   const section = buildingChecksSectionFromRoot(projectRoot);
-  const sha = gitHashObjectStdin(section);
+  const sha = gitHashObjectStdin(readDeveloperRoleMarkdown(projectRoot)); // QA295 mutant m3: whole-file hash
   return renderDeveloperBuildingChecksMdc(section, sha);
 }
 
