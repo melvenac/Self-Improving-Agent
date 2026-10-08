@@ -36,13 +36,20 @@ tools carry the rules and the checks, so nothing depends on a planner rememberin
 - **The single source** is the `## Building checks` section of `.agents/roles/developer.md`. Nothing else holds a copy
   by hand.
 - **A1. Generated Cursor rule.** A script writes `.cursor/rules/developer-building-checks.mdc` with `alwaysApply: true`.
-  Its body is that section, verbatim, after a generated-file header that names the source path and the source blob
-  SHA. The script is `node scripts/gen-cursor-rules.mjs`, or an `open-brain` subcommand if that fits better.
+  Its body is that section, verbatim, after a generated-file header. The header names the source path, the heading, and
+  a **section hash**: `git hash-object` of the extracted section text, labelled as such, for example
+  `section-sha 2d74077c… (git hash-object of the extracted section)`. It is NOT the file's blob SHA. **Ruling,
+  2026-10-08 (QA 294):** a file-blob header would fail `/sync` on every edit anywhere in `developer.md`. The section
+  hash changes exactly when the rules do, and anyone can re-derive it by extracting the section and hashing it. A test
+  pins the header hash to `git hash-object` of the section. The script is `node scripts/gen-cursor-rules.mjs`.
 - **A2. `/sync` check.** `cursor-rules-current` FAILS (it does not warn) when the `.mdc` body differs from the section,
   or when the file is missing. This is the detector that keeps the copy from drifting.
 - **A3. The section is the required block for B.** B, the fleet's gate, reads this repo's required-block file. For SIA,
-  that file is the same section. Name it in one place: a `requiredBlock` entry in `.agents/SYSTEM/hub-partner-seats.json`
-  (path + heading). B never holds its own copy.
+  that file is the same section. Name it in one place: **`.agents/SYSTEM/required-block.json`** (`{path, heading}`),
+  the same file in every repo (B2, below). It replaces #516 r1's `requiredBlock` entry in `hub-partner-seats.json`,
+  because a minimal `hub-partner-seats.json` elsewhere would fail SIA's hub-seats check. SIA's `.gitignore` ignores
+  `/.agents/SYSTEM/*`, so the file needs an allowlist line (`!/.agents/SYSTEM/required-block.json`). Otherwise it never
+  travels. B never holds its own copy.
 - **A4. Claude seats already load `developer.md`.** No change, apart from a test that the hook's role-knowledge output
   names `developer.md` for a developer seat.
 
@@ -154,7 +161,7 @@ clark's MUSTs:
 |---|---|
 | F1 | `gen-cursor-rules` output is byte-stable: a second run is a no-op. The `.mdc` body equals the section |
 | F2 | Editing the section without regenerating makes `/sync` FAIL, naming the file. Regenerating makes it pass |
-| F3 | `requiredBlock` resolves to the same section text that F1 wrote |
+| F3 | `.agents/SYSTEM/required-block.json` is tracked (`git ls-files`) and resolves to the same section text that F1 wrote; `hub-partner-seats.json` carries no `requiredBlock` |
 | F4 | `add_decision {standing:true}` and `set_standing` both render the decision under STANDING RULES on the next `ob_start`, through the real MCP path. Untagging removes it |
 | F5 | A record with no `standing` field anywhere renders exactly as today (snapshot test against current master) |
 | F6 | STANDING RULES is never trimmed: 40 standing decisions all render |
