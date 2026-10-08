@@ -244,3 +244,53 @@ describe("cli-bootstrap SESSION_UUID contract", { timeout: 30_000 }, () => {
     expect(r.stdout).toMatch(/SESSION_UUID: real-1234/);
   });
 });
+
+describe("cli-bootstrap T-235 P2-7 cursor dedupe", { timeout: 30_000 }, () => {
+  const script = resolve(__dirname, "../src/cli-bootstrap.ts");
+  let cwd: string;
+  let home: string;
+
+  beforeEach(() => {
+    cwd = mkdtempSync(join(tmpdir(), "ob-boot-p27-cwd-"));
+    home = mkdtempSync(join(tmpdir(), "ob-boot-p27-home-"));
+    mkdirSync(join(cwd, ".agents"), { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(cwd, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+    rmSync(home, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+  });
+
+  async function runCursorStart(sessionId: string): Promise<{ status: number | null; stdout: string }> {
+    const TSX_CLI = createRequire(import.meta.url).resolve("tsx/cli");
+    const payload = { cwd, session_id: sessionId, cursor_version: "1.0" };
+    const r = await spawnAsync(process.execPath, [TSX_CLI, script], {
+      input: JSON.stringify(payload),
+      env: { ...process.env, HOME: home, USERPROFILE: home },
+    });
+    return { status: r.status, stdout: r.stdout ?? "" };
+  }
+
+  it("R1: second cursor SessionStart with the same session_id is skipped", async () => {
+    const id = "dup-cursor-1111";
+    const first = await runCursorStart(id);
+    const second = await runCursorStart(id);
+    expect(first.stdout).toMatch(/SESSION_UUID/);
+    expect(second.stdout).toMatch(/SESSION_START_SKIPPED/);
+    expect(second.stdout).not.toMatch(/SESSION_UUID/);
+  });
+
+  it("R3: Claude Code payload without cursor_version is never suppressed", async () => {
+    const id = "cc-only-2222";
+    const TSX_CLI = createRequire(import.meta.url).resolve("tsx/cli");
+    const payload = { cwd, session_id: id };
+    const env = { ...process.env, HOME: home, USERPROFILE: home };
+    const runOnce = () =>
+      spawnAsync(process.execPath, [TSX_CLI, script], { input: JSON.stringify(payload), env });
+    const a = await runOnce();
+    const b = await runOnce();
+    expect(a.stdout).toMatch(/SESSION_UUID/);
+    expect(b.stdout).toMatch(/SESSION_UUID/);
+    expect(b.stdout).not.toMatch(/SESSION_START_SKIPPED/);
+  });
+});

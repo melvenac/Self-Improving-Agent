@@ -18,7 +18,8 @@ import { formatSessionEndLines, sessionEndV2 } from "./pipelines/session-end/ind
 import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
-import { resolveSessionId } from "./shared/active-session.js";
+import { currentIde, detectIde, resolveSessionId } from "./shared/active-session.js";
+import { appendHookMetric, dedupeCursorHookRuns, tryClaimHookRun } from "./shared/session-hook-claim.js";
 import { byPidDir, removeProcessSession } from "./shared/process-session.js";
 import { resolvePaths } from "./shared/paths.js";
 import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
@@ -50,6 +51,24 @@ try {
   const raw = Buffer.concat(chunks).toString().trim();
   if (raw) hookPayload = JSON.parse(raw);
 } catch { /* stdin unavailable — fall back to the environment below */ }
+
+const home = process.env.HOME || process.env.USERPROFILE || "";
+const registeredAs = currentIde();
+const sessionForClaim = resolveSessionId(hookPayload)?.uuid;
+if (sessionForClaim && dedupeCursorHookRuns(hookPayload, registeredAs)) {
+  const claim = tryClaimHookRun(home, "sessionEnd", sessionForClaim);
+  appendHookMetric(home, {
+    t: new Date().toISOString(),
+    event: "sessionEnd",
+    session_id: sessionForClaim,
+    outcome: claim,
+    script: "session-end",
+  });
+  if (claim === "duplicate") {
+    console.log(`SESSION_END_SKIPPED: duplicate hook for session ${sessionForClaim}`);
+    process.exit(0);
+  }
+}
 
 // T-003: remove THIS session's proof first, before anything slow or anything
 // that can exit early. SessionEnd fires on /clear as well as on exit, so if the
