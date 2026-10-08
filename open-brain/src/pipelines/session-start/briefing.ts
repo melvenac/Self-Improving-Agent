@@ -74,7 +74,7 @@ export function standingRulesLines(state: State): string[] {
   const standing = state.decisions.filter((d) => d.standing === true);
   if (standing.length === 0) return [];
   const out = ["", "STANDING RULES"];
-  for (const d of [...standing].reverse()) {
+  for (const d of [...standing]) { // QA294 mutant (c): oldest first
     out.push(`- ${d.id} — ${d.title}`);
   }
   return out;
