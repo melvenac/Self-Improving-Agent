@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 357 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 358 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — s162: Jev calibration 2 round 2 is live (QA 285 dev phase on the laptop); freeze the policy from its dev evidence, then QA 286 on the held-out 34. #437 r4 (forge) to QA 284 with #472 (guard r2); then #425 after #437. Waker restarts after any hub swap need planner-confirmed dlv until A2A T-104/T-113.
 
 ## What's working
@@ -169,6 +169,11 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 
 ## Decisions
 
+- 2026-10-08 — Mutant runs are scoped to the changed code (all three projects): each QA round mutates only the lines that round changed, plus a few QA-chosen extras; the FULL mutant run happens once per release, before the tag, by the builder or a Grok bot (not Claude QA); a full-run survivor becomes a fix list for the next loop, not a REJECT — SOURCE: Aaron, typed in clark's window. Verified by the planner reading clark's transcript 997776c7 itself.
+- 2026-10-08T19:11:32Z: "does each qa run require mutant runs? These runs are really slow. I don't understand the purpose of them."
+- 19:17:52Z: "mutant run scoped to the changed code for all three projects, then yes to each above". 'Each above' is clark's preceding proposals: the full run once per release before the tag, by the builder or a Grok bot; survivors become a fix list.
+
+APPLY TO EVERY QA DISPATCH FROM NOW ON. The 'your own mutants' row names only the files and lines changed in this round's diff, plus at most 2 QA-chosen extras on those same files. The developer's red-first mutants stay in place: they are cheap, one commit each, and run in CI.
 - 2026-10-08 — FLEET-AE (#516, SIA's A+E of the fleet design) ACCEPT at r2 (QA 295) and MERGED under SG-1 by clark (41fc56e0 -> e86461b6). SIA's code before the Makerspace import is complete: #498, #489 and #516. — QA 294 REJECT r1: the A1 header named the section's hash as if it were the file blob. Planner ruling: keep the section hash, label it 'section-sha … (git hash-object of the extracted section)', and pin it with a test (#524 doc). Aaron folded A3 into r2: required-block.json, tracked through a .gitignore allowlist line.
 
 QA 295 (qa/s164h-report @ bf0b9862) ACCEPT, read by the planner. The tree check before the merge passed (3cd84e57).
@@ -222,28 +227,6 @@ QA 292 (#489 r3, laptop, DISPATCH_SHA c8c12869, #512 merged on Aaron's word) was
 OPEN for Aaron:
 - clark's recall-trigger proposal for after the freeze: match on /end MATCH lines, measure whether an injection changes the next act, promote a lesson that fires twice. The planner recommends one loop that measures first.
 - The one-time scrub-trigger-fires.
-- 2026-10-07 — QA 289 REJECT #489 r1 (B1-B4) and QA 290 REJECT #498 r1 (L1 HIGH) / #499 r1 (J1); round 2s built, verified by the planner, and sent to one combined QA 291 (laptop, DISPATCH_SHA 7ca465a4) — QA 289 (qa/s164b-report @ 7240f3fd), read by the planner:
-- B1: E4 accepted a record written before ob_end.
-- B2: false HANDOFF MISSING on every non-loop close, because the guard accepted only docs/loops handoffs.
-- B3: cannot-check paths closed silently.
-- B4: QA mutants M5 and M6 survived.
-Round 2 went to cursor-infra, since cursor-builder was busy, at head f59d03bc.
-
-QA 290 (qa/s164c-report @ 30928cc7, on Plumb, so no Windows rows), read by the planner:
-- L1 HIGH: /bootstrap as written never installed the commands, because step 7 leaves 5 uncommitted record files and 7b refused a dirty tree. Ruling: Option A, where install-commands accepts exactly the import's own outputs, listed in one shared constant.
-- L2: no rollback.
-- L3: CRLF behaviour unpinned.
-- J1: writeSummary checked only the date's shape.
-
-#498 r2 head is f3aba754. Its first r2 head (1236d958) failed 24 bootstrap tests with a TDZ ReferenceError from a circular import. The seat called that unrelated; the planner checked master and the log and sent it back. #499 r2 head is 409c8c08.
-
-On every mutant branch the planner checked: one commit; a parent whose open-brain/src equals the head's; CI red on the targeted rows.
-
-Planner error: the QA 290 prompt named a nonexistent qa-289-s164c-dispatch.md, caused by a sed rename in the wrong order. Since then, prompts are written directly and grepped for stale names before their PR.
-
-#503 and #510 were merged on Aaron's word.
-
-The hub moved to v1.20.0 at 16:43Z. Wakers were not restarted, and planner-watch's unknown_since_restart reflects the hub's presence reset.
 <!-- state:end -->
 ## Architecture Overview
 
