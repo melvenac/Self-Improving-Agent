@@ -70,3 +70,41 @@ and the list of files checked for `readRepoRecord()`.
 | SB-5 | No file outside `open-brain/src/pipelines/session-start/briefing.ts` and `open-brain/tests/` changed |
 
 On ACCEPT, clark merges under SG-1. #530 then updates its branch and goes green.
+
+## Round 2 (hub turns 89 + 90, 2026-10-08)
+
+Round 1 READY 914a6400 (PR #532). The planner found: mutants not on origin, mutant (c) guarded only on #530's record, and the cap checked before the `+K more` suffix. Turn 90 (below, verbatim) replaces turn 89's procedure and brings the brief up to `~/Worktrees/cursor-brief-checklist.md` (Aaron 10-08, via clark).
+
+```text
+TASK: STANDING-BUDGET ROUND 2 CORRECTION
+Atlas to Infra. This turn REPLACES the procedure in turn 89. Turn 89's three items still stand, except where this turn changes them. Change: DO NOT PUSH MUTANTS.
+
+SHELL: PowerShell. First run: $env:Path = 'C:\Program Files\nodejs;' + $env:Path; node -v. If it prints v24, STOP and reply BLOCKED. Paste the node -v output.
+START STATE: your sia-infra checkout, branch loop/standing-budget. Run git rev-parse HEAD; git rev-parse origin/loop/standing-budget; git status --porcelain. Both SHAs must be 914a64002996a840728d171d8c0cc84104359ce8 and status must be empty. On any mismatch, STOP and reply BLOCKED.
+FORBIDDEN: git stash, reset --hard, --force, rebase, amend, cd into any other tree. Do not touch PR #530 or branch docs/s165-standing.
+
+FILES ALLOWED: open-brain/src/pipelines/session-start/briefing.ts, open-brain/tests/pipelines/session-start/missing-handoff.test.ts, open-brain/tests/pipelines/session-start/standing-budget.test.ts. Nothing else.
+THE CAP: keep STANDING_RULES_LINE_CHARS = 200. The whole line, INCLUDING " +K more", is <= 200. Cut whole ids from the right (keep the newest).
+STATEWITH: signature stateWith(sessions, handoffs, base: State = readRepoRecord().state). It structuredClones base, strips standing from every decision, then sets sessions/handoffs.
+NEW TEST, in missing-handoff.test.ts: name it "the budget holds with 20 standing rules in the base record". Build the base as structuredClone(readRepoRecord().state) with decisions[0..19] each set standing: true. Then stateWith([], [same handoff as line 216 with pick_up "Pick up ".repeat(300)], base). renderBriefing(base(s, { budget: true, missingHandoff: NOTICE })). Expect lines.length <= BRIEFING_BUDGET.lines.
+In standing-budget.test.ts's 60-rule test, also assert line.length <= 200.
+
+COMMIT: exactly ONE commit on top of 914a6400, message: "STANDING-BUDGET r2: stateWith base param, 20-standing fixture test, cap includes +K more". Afterwards: git log --oneline 914a6400..HEAD shows 1 line, and git status --porcelain is empty.
+
+TESTS (from open-brain/): npx vitest run tests/pipelines/session-start/missing-handoff.test.ts tests/pipelines/session-start/standing-budget.test.ts tests/pipelines/session-start/briefing.test.ts --no-file-parallelism --testTimeout=20000; echo EXIT=$LASTEXITCODE
+No whole suite and no watch mode. Never pipe into head or tail. If it runs past 10 minutes, kill it and reply BLOCKED. If briefing.test.ts does not exist, run the files git grep -ln "renderBriefing" -- open-brain/tests lists instead, and paste that list.
+TYPECHECK (from open-brain/): npx tsc --noEmit; echo EXIT=$LASTEXITCODE. Expect 0.
+KNOWN RED: if a test fails that your change did not touch, run the same file at 914a6400 (git switch --detach 914a6400, run it, git switch loop/standing-budget) and paste both outputs. At most 2 fix attempts on your own failures, then STOP and reply BLOCKED.
+
+MUTANTS: LOCAL ONLY, NEVER PUSHED. For each one: git switch -c mut-X <new head>, edit, commit "MUTANT X", run the tests command above, paste the red test name and its assertion line, then git switch loop/standing-budget. The tree must be clean after each.
+ mut-a: in standingRulesBudgetLine, delete the length check (every id is shown). Expect red: the 60-rule test.
+ mut-b: in renderBudgeted, replace the standingRulesBudgetLine push with out.push(...standingRulesLines(s)). Expect red: the 20-standing fixture test, and the 60-rule test.
+ mut-c: in stateWith, delete the strip of standing. Expect red: "the budget holds with 20 standing rules in the base record", on the master record.
+For each, paste git show --stat mut-X and the full diff from git diff <new head> mut-X.
+
+PUSH: git push origin loop/standing-budget (never --force). Then git ls-remote origin refs/heads/loop/standing-budget must equal git rev-parse HEAD; paste both. If the push is rejected, STOP and reply BLOCKED. PR #532 already exists, so do not open a new one.
+SCOPE: git diff --name-only 465de55b0b3d5c6113c9b8181a4ee8a97323b518..HEAD, pasted. It must list only the 3 allowed files.
+
+REPLY: HUB_URL=http://100.124.212.87:4000 node <your A2A-Hub checkout>/scripts/hub-talk.mjs --as cursor-infra --session k57d92gqtjm9wpfs74ekbx9rns8fmy2f --say "<text>"
+The first line is exactly "READY STANDING-BUDGET <sha40>" or "BLOCKED STANDING-BUDGET <reason>". Every number is pasted command output, with the command above it. Anything not run is marked NOT RUN. Then end your turn.
+```
