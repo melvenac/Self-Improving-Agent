@@ -656,7 +656,7 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
     case "add_decision": {
       const id = op.id ?? nextId("D", s.decisions.map((d) => d.id));
       if (s.decisions.some((d) => d.id === id)) return { ok: false, error: `decision ${id} already exists` };
-      const row = { id, title: op.title, date: op.date, note: op.note, ...(op.standing === true ? { standing: true as const } : {}) };
+      const row = { id, title: op.title, date: op.date, note: op.note }; // QA294 mutant (b): add_decision ignores standing
       s.decisions.push(row);
       if (op.standing === true) ctx.notes.push(`add_decision ${id}: standing true`);
       return { ok: true, id };
