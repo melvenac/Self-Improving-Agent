@@ -79,7 +79,7 @@ export function hashNewLayoutSessionRecord(state: State, sessionUuid: string): s
           seat: row.seat,
           uuid: row.uuid,
         };
-  const payload = { handoff, session };
+  const payload = { revision: state.revision, handoff, session };
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
 
