@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 361,
+  "revision": 362,
   "project": {
     "name": "self-improving-agent"
   },
@@ -5068,6 +5068,47 @@
       "session_uuid": "63c84e2f-cb93-4270-a361-060c608be6a4",
       "checkout": "sia-planner",
       "first_rev": 348
+    },
+    {
+      "seat": "planner",
+      "pick_up": "(1) Wait for Maker; clark says when it's up. Makerspace import per docs/loops/makerspace-import-brief.md; the 17-file list goes via clark. (2) After the import: dispatch BRIEFING-FIX (docs/loops/briefing-fix-brief.md, master 34c516c2) to cursor-builder. Restate the 40-char base SHA in the turn; clark runs prelaunch-impact on the IMPACT-TARGETS. (3) Parked (D-130): #437, #425, Jev cal 2.",
+      "watch_out": [
+        "EVERY CURSOR BRIEF/TURN must pass ~/Worktrees/cursor-brief-checklist.md (Aaron 10-08 via clark) plus an IMPACT-TARGETS: line. Mutants stay LOCAL and are never pushed. Give exact SHAs, commits, test commands and reply line.",
+        "HUB-TALK: use C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000, never ~/Projects/A2A-Hub. Grok job turns start with their prefix (REVIEW JOB:/QA JOB:) as the first characters.",
+        "21 STANDING RULES now render in every briefing (D-139: one line in the budgeted layout). Tag new rule-type decisions with standing:true. Read the rules there; don't re-list them in watch-outs."
+      ],
+      "open_questions": [
+        "Aaron (via clark): post-freeze recall-trigger loop?",
+        "Aaron (via clark): #437 r10 or T-245 Option A? (parked)"
+      ],
+      "session": 165,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#437",
+            "qa_status": "in_progress",
+            "note": "PARKED (D-130)"
+          },
+          {
+            "ref": "#425",
+            "qa_status": "accepted",
+            "note": "PARKED (D-130)"
+          },
+          {
+            "ref": "#470",
+            "qa_status": "in_progress",
+            "note": "PARKED (D-130) with #463 #465"
+          }
+        ],
+        "frozen_sha": null,
+        "questions_for_aaron": [],
+        "rulings": [
+          "s165: E4 done (21 standing rules: #530, #535); STANDING-BUDGET #532 merged under SG-1 (D-139); D-138 (D-040 push trigger superseded by T-227); V-079 scrub verified by dry run; BRIEFING-FIX brief #536 written, clark accepted its 4 deviations."
+        ]
+      },
+      "session_uuid": "367df9c3-ef6b-47f0-be31-1f60993dddcd",
+      "checkout": "sia-planner",
+      "first_rev": 360
     }
   ],
   "sessions": [

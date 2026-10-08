@@ -1,22 +1,18 @@
-<!-- generated from .agents/state.json rev 361 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 362 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 164)_
+## planner [sia-planner] _(written session 165)_
 
 ### Pick up here
 
-(1) The main-checkout rebuild is DONE and verified: clark's successor rebuilt to ba53859c (it contains e86461b6, so #498, #489 and #516 are all in); build-info ba53859c, built 2026-10-08T18:45:53Z. (2) E4: in a session served by the rebuilt build (check the Build line, and that ob_state lists set_standing), tag the standing rules with ob_state set_standing: D-060, D-117, D-125, D-130, D-131, D-135, D-137 and any other decision that is a rule rather than an event. Then check that STANDING RULES renders in your own next /start. (3) The Makerspace import is clear from SIA's side: docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files, with the answer going through clark (SG-1/D-135). (4) After the import, the first loop is BRIEFING-FIX: plain '## Briefing' header, a stale-usage line, READS OWED, clark's Fleet block, the 4 QA 295 findings, and #498's P1/P2. Brief it from docs/loops/fleet-deterministic-dispatch.md and D-134..D-136. Apply D-137 (mutants scoped to the changed code) in every QA dispatch. (5) Aaron's one-time scrub-trigger-fires: the dry run on his store showed 22536 rows scanned, 19964 would be rewritten. clark times the real run (after Caliper QA-041 exits) and records the output. (6) PARKED (D-130): #437, #425, Jev cal 2.
+(1) Wait for Maker; clark says when it's up. Makerspace import per docs/loops/makerspace-import-brief.md; the 17-file list goes via clark. (2) After the import: dispatch BRIEFING-FIX (docs/loops/briefing-fix-brief.md, master 34c516c2) to cursor-builder. Restate the 40-char base SHA in the turn; clark runs prelaunch-impact on the IMPACT-TARGETS. (3) Parked (D-130): #437, #425, Jev cal 2.
 
 ### Watch out
 
-- SG-1 (D-135): don't ask Aaron. Send QA ACCEPTs to clark (PR, QA number, report sha, head sha) and questions to clark. Verify a relayed Aaron decision in clark's transcript (type user, string; skip '<' and 'Another Claude session…' lines).
-- DEV REPORTS ARE CLAIMS. Verify every head, CI run and mutant (one commit; same src as the head; red on its own rows) with git and gh. Reports get cut off, and seats call their own failures 'unrelated'.
-- A RULING CAN BE THE BUG (QA 292's S1 came from the r3 ruling). Say what a check must NOT react to.
-- QA PROMPTS: write them directly; NEVER sed-rename a previous prompt. That bit twice: QA 290 shipped a wrong filename, and QA 295's was caught by the grep. Grep for stale numbers before the PR.
-- A dispatch PR that is BEHIND master won't merge ('Required status check test is expected'): update-branch, then merge pinned. No --admin.
-- docs/ is an ALLOWLIST (only docs/loops); so is /.agents/SYSTEM/*. A new file there needs an allowlist line.
-- GROK BOTS WAKE BY HUB PUSH (A2A v1.21.0, Aaron 2026-10-08, via clark). A job turn must START with its prefix as the very first characters: case-sensitive, no leading blank line, no markdown. It must be sent as atlas. Prefixes: grok-qa-sia QA JOB:, grok-sia-review REVIEW JOB:, grok-audit REVIEW JOB:, grok-research RESEARCH JOB:. grok-sia-review and grok-audit share REVIEW JOB:, so keep them in separate rooms, or one job wakes both. The crons remain as a duplicate-safe backstop.
+- EVERY CURSOR BRIEF/TURN must pass ~/Worktrees/cursor-brief-checklist.md (Aaron 10-08 via clark) plus an IMPACT-TARGETS: line. Mutants stay LOCAL and are never pushed. Give exact SHAs, commits, test commands and reply line.
+- HUB-TALK: use C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000, never ~/Projects/A2A-Hub. Grok job turns start with their prefix (REVIEW JOB:/QA JOB:) as the first characters.
+- 21 STANDING RULES now render in every briefing (D-139: one line in the budgeted layout). Tag new rule-type decisions with standing:true. Read the rules there; don't re-list them in watch-outs.
 
 ### Open questions
 
@@ -30,12 +26,12 @@
 - #425 — QA: accepted — PARKED (D-130)
 - #470 — QA: in_progress — PARKED (D-130) with #463 #465
 
-**SHA frozen for QA:** `e86461b6c55dee98dc8a5ce03fbd3fde8ac9bd23`
+**SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s164: D-130..D-137. Merged: #472 #484 #487 #489 #494 #498 #499 #503 #510 #512 #514 #516 (SG-1) #520 #526 (SG-1); docs/records under the standing rule.
+- s165: E4 done (21 standing rules: #530, #535); STANDING-BUDGET #532 merged under SG-1 (D-139); D-138 (D-040 push trigger superseded by T-227); V-079 scrub verified by dry run; BRIEFING-FIX brief #536 written, clark accepted its 4 deviations.
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -107,7 +103,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_8 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
