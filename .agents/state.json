@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 357,
+  "revision": 358,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4474,6 +4474,12 @@
       "title": "FLEET-AE (#516, SIA's A+E of the fleet design) ACCEPT at r2 (QA 295) and MERGED under SG-1 by clark (41fc56e0 -> e86461b6). SIA's code before the Makerspace import is complete: #498, #489 and #516.",
       "date": "2026-10-08",
       "note": "QA 294 REJECT r1: the A1 header named the section's hash as if it were the file blob. Planner ruling: keep the section hash, label it 'section-sha … (git hash-object of the extracted section)', and pin it with a test (#524 doc). Aaron folded A3 into r2: required-block.json, tracked through a .gitignore allowlist line.\n\nQA 295 (qa/s164h-report @ bf0b9862) ACCEPT, read by the planner. The tree check before the merge passed (3cd84e57).\n\nNon-blocking findings, going to the post-import BRIEFING-FIX loop:\n1. State the extraction convention: trailing blank lines are trimmed, ending with one LF.\n2. Two F8 test labels name the wrong mutants.\n3. F9 assumes developer.md is LF on disk.\n4. /sync now spawns git hash-object.\n\nNEXT:\n- clark's successor does the ONE main-checkout rebuild (#498, #489 and #516; the checkout is at 540f1cca) and sends the readback.\n- E4, the planner tagging standing rules with set_standing, needs a session served by the rebuilt build, because the running MCP server predates set_standing.\n- The Makerspace import is clear from SIA's side after the readback."
+    },
+    {
+      "id": "D-137",
+      "title": "Mutant runs are scoped to the changed code (all three projects): each QA round mutates only the lines that round changed, plus a few QA-chosen extras; the FULL mutant run happens once per release, before the tag, by the builder or a Grok bot (not Claude QA); a full-run survivor becomes a fix list for the next loop, not a REJECT",
+      "date": "2026-10-08",
+      "note": "SOURCE: Aaron, typed in clark's window. Verified by the planner reading clark's transcript 997776c7 itself.\n- 2026-10-08T19:11:32Z: \"does each qa run require mutant runs? These runs are really slow. I don't understand the purpose of them.\"\n- 19:17:52Z: \"mutant run scoped to the changed code for all three projects, then yes to each above\". 'Each above' is clark's preceding proposals: the full run once per release before the tag, by the builder or a Grok bot; survivors become a fix list.\n\nAPPLY TO EVERY QA DISPATCH FROM NOW ON. The 'your own mutants' row names only the files and lines changed in this round's diff, plus at most 2 QA-chosen extras on those same files. The developer's red-first mutants stay in place: they are cheap, one commit each, and run in CI."
     }
   ],
   "handoffs": [
