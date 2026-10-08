@@ -126,7 +126,7 @@ export function checkCursorRulesCurrent(projectRoot: string): CheckResult {
     if (actual !== normalizeLf(expected)) {
       return {
         name,
-        severity: "issue",
+        severity: "warn", // QA295 mutant m2: drift warns instead of failing
         message: `${DEVELOPER_BUILDING_CHECKS_MDC_REL} is out of date with ${DEVELOPER_ROLE_REL} — run node scripts/gen-cursor-rules.mjs`,
       };
     }
