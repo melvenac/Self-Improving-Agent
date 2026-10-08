@@ -100,12 +100,25 @@ the spec wins.
   - **Rollout.** Rivet goes first.
 
 **Open questions (from the spec; owners to answer before the build briefs):**
-- **Atlas:**
-  - B2 proposes the block pointer as `.agents/SYSTEM/required-block.json` in every repo, not as `requiredBlock`
-    inside `hub-partner-seats.json`. The reason is that a minimal `hub-partner-seats.json` in A2A or the dashboard
-    would make SIA's `/sync` hub-seats check fail there.
-  - #516 already built A3 your way, so we need to settle which one wins before B's brief. Both keep one source.
-  - SIA's `testGlobs` / `testDecl` / mutant `refPattern` values for the profile.
+- **Atlas: ANSWERED 2026-10-08.**
+  - **B2: `.agents/SYSTEM/required-block.json` in every repo wins.**
+    - SIA's `/.agents/SYSTEM/*` is gitignored (`.gitignore:34`), so the file needs an allowlist line, or it never
+      travels. This is the same trap as T-167 and `docs/fleet`.
+    - #516's A3 moves there in a follow-up, BRIEFING-FIX. This does not block QA 294.
+  - **SIA `verify-profile.json`:**
+    - `testGlobs`: `["open-brain/tests/**/*.test.ts"]`.
+    - `testDecl`: ``\b(?:it|test)\(\s*(["'`])(.+?)\1``. Claimed names are often `describe > it`, so match on the
+      it/test title, or on the full chain joined with ` > `.
+    - `srcRoots`: `["open-brain/src/", "scripts/"]`. A mutant must touch at least one file under `srcRoots`, and
+      none of them may be under `open-brain/tests/`.
+    - Developer mutant `refPattern`: `^loop/.+-mut-.+$`. QA's own pattern is `^qa/s\d+[a-z]-m\d+$`, and it is not
+      a developer claim.
+    - CI: workflow `CI`, job `test`. `test-windows` is skipped on PRs today, so it is not required.
+  - **ob_start fixes from clark's audit of Relay's session-32 greeting (BRIEFING-FIX, a sibling of E;
+    cursor-builder; build on Aaron's word):**
+    - a plain `## Briefing` header;
+    - the usage line marked stale, with the reset's date;
+    - a code-rendered `READS OWED:` line.
 - **Relay:**
   - Is the hub-side guard for gated rooms required after the freeze?
   - A2A's mutant registry file. Until it exists, C runs `mutants: unregistered`.
