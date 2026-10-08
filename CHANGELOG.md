@@ -4,6 +4,12 @@
 
 ### Added
 
+- **FLEET-AE (deterministic dispatch, SIA A+E).** Generated `.cursor/rules/developer-building-checks.mdc` from
+  `.agents/roles/developer.md` (`node scripts/gen-cursor-rules.mjs`); `/sync` check `cursor-rules-current`;
+  `.agents/SYSTEM/required-block.json` (tracked). Decisions may carry `standing: true`; `ob_state set_standing` tags or
+  untags; `ob_start` briefing lists `STANDING RULES` between WATCH OUT and OPEN QUESTIONS. **r2 (QA 294):** header
+  labels `section-sha` from `git hash-object` of the extracted section; required block moved off hub-partner-seats.
+
 - **END-FIX r4 (T-246, QA 292):** New-layout record hash covers only this session's `handoffs[]` slice and
   `sessions[]` row (fixed key order; no `revision` or other sessions). Old and new layouts share one digest
   function on each side; `RECORD NOT CHECKED` with no session proof also prints `OLD LAYOUT` on old-layout repos.

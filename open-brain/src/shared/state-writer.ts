@@ -77,7 +77,15 @@ export const OpSchema = z.discriminatedUnion("op", [
   z.strictObject({ op: z.literal("add_gap"), id: z.string().optional(), what: z.string().min(1), evidence: z.string(), recommended_update: z.string() }),
   z.strictObject({ op: z.literal("update_gap"), id: z.string(), what: z.string().min(1).optional(), evidence: z.string().optional(), recommended_update: z.string().optional() }),
   z.strictObject({ op: z.literal("close_gap"), id: z.string() }),
-  z.strictObject({ op: z.literal("add_decision"), id: z.string().optional(), title: z.string().min(1), date: z.string().regex(ISO_DATE, "expected YYYY-MM-DD"), note: z.string() }),
+  z.strictObject({
+    op: z.literal("add_decision"),
+    id: z.string().optional(),
+    title: z.string().min(1),
+    date: z.string().regex(ISO_DATE, "expected YYYY-MM-DD"),
+    note: z.string(),
+    standing: z.literal(true).optional(),
+  }),
+  z.strictObject({ op: z.literal("set_standing"), id: z.string(), standing: z.boolean() }),
   z.strictObject({ op: z.literal("set_objective"), text: z.string().min(1).nullable() }),
   // `seat` is REQUIRED and is an enum so an unknown seat refuses rather than
   // creating a fourth seat nobody reads. The WRITING SESSION is deliberately not
@@ -648,8 +656,19 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
     case "add_decision": {
       const id = op.id ?? nextId("D", s.decisions.map((d) => d.id));
       if (s.decisions.some((d) => d.id === id)) return { ok: false, error: `decision ${id} already exists` };
-      s.decisions.push({ id, title: op.title, date: op.date, note: op.note });
+      const row = { id, title: op.title, date: op.date, note: op.note, ...(op.standing === true ? { standing: true as const } : {}) };
+      s.decisions.push(row);
+      if (op.standing === true) ctx.notes.push(`add_decision ${id}: standing true`);
       return { ok: true, id };
+    }
+    case "set_standing": {
+      const d = s.decisions.find((x) => x.id === op.id);
+      if (!d) return { ok: false, error: `unknown decision ${op.id}` };
+      const before = d.standing === true;
+      if (op.standing) d.standing = true;
+      else delete d.standing;
+      ctx.notes.push(`set_standing ${op.id}: standing ${before ? "true" : "false"} → ${op.standing ? "true" : "false"}`);
+      return { ok: true, id: op.id };
     }
     case "set_objective": {
       s.objective = op.text === null ? null : { text: op.text, since_session: session };

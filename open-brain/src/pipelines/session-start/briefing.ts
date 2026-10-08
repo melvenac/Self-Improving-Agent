@@ -69,6 +69,17 @@ function noneRecorded(seat: Seat, ownCheckout: string | undefined): string {
 const NEXT_SHOWN = 3;
 const GAPS_BRIEFED = 5;
 
+/** FLEET-AE E3: standing decisions, newest first; never capped. */
+export function standingRulesLines(state: State): string[] {
+  const standing = state.decisions.filter((d) => d.standing === true);
+  if (standing.length === 0) return [];
+  const out = ["", "STANDING RULES"];
+  for (const d of [...standing].reverse()) {
+    out.push(`- ${d.id} — ${d.title}`);
+  }
+  return out;
+}
+
 export function renderBriefing(i: BriefingInput): string[] {
   if (i.budget === true) return renderBudgeted(i);
   const s = i.state;
@@ -109,6 +120,8 @@ export function renderBriefing(i: BriefingInput): string[] {
     out.push("", "WATCH OUT");
     for (const w of own.watch_out) out.push(`- ${watchText(w)}`);
   }
+
+  out.push(...standingRulesLines(s));
 
   if (own) {
     const { open, resolved } = splitQuestions(own.open_questions);
@@ -213,6 +226,8 @@ function renderBudgeted(i: BriefingInput): string[] {
       if (notes.length > 0) out.push(notes.join(" · "));
     }
   }
+
+  out.push(...standingRulesLines(s));
 
   // (e) WAITING ON AARON: every seat's CURRENT handoff (the newest per seat and checkout), unresolved questions owned by aaron.
   const waiting = newestHandoffPerInstance(s.handoffs).flatMap((h) =>
