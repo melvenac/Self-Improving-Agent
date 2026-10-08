@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 356 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 357 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,39 +6,35 @@
 
 ### Pick up here
 
-(1) QA 294 (#516 FLEET-AE, SIA's A+E, head 1bc4d20d) is queued for the laptop. DISPATCH_SHA 7c2d034d, prompt docs/loops/qa-294-headless-prompt.md; clark launches it, or Aaron does with `!` if clark's classifier blocks the SSH write. Read qa/s164g-report yourself, then rule. On ACCEPT, the merge is Aaron's word: update-branch, the tree check, CI, then merge --match-head-commit. Then E4: tag the standing rules with ob_state set_standing (D-060, D-117, D-125, D-130, D-131 and others that are rules, not events). (2) After #516: one main-checkout rebuild on Aaron's word. It carries #498, #489 and #516; the checkout is at 540f1cca. Then the Makerspace import (docs/loops/makerspace-import-brief.md): Maker's first job is listing the 17 uncommitted files for Aaron's approval. (3) Aaron still owes the one-time `open-brain scrub-trigger-fires`. (4) Fleet B, C and D are clark's, in A2A after its freeze: docs/loops/fleet-deterministic-dispatch.md. (5) For Aaron to rule: clark's recall-trigger idea for after the freeze. (6) Follow-up: #498's P1/P2 (D-133). (7) PARKED (D-130): #437, #425, Jev cal 2.
+(1) WAIT for the main-checkout rebuild readback from clark's successor (look up the live clark with ListAgents; it was rolling at 2026-10-08 ~12:00 CDT). The rebuild covers #498 IMPORT-CMDS, #489 END-FIX and #516 FLEET-AE, all merged; master is e86461b6. Check that the readback's build commit contains e86461b6. (2) E4: in a session served by the rebuilt build (check that the Build line is current and that ob_state lists set_standing), tag the standing rules with ob_state set_standing: D-060, D-117, D-125, D-130, D-131, D-135 and any other decision that is a rule rather than an event. Then check that STANDING RULES renders in your own next /start. (3) The Makerspace import is then clear from SIA's side: docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files, with the answer going through clark (SG-1/D-135: planners report to clark). (4) After the import, the first loop is BRIEFING-FIX: plain '## Briefing' header, a stale-usage line, READS OWED, clark's Fleet block, the 4 QA 295 findings, and #498's P1/P2. Brief it from docs/loops/fleet-deterministic-dispatch.md and D-134..D-136. (5) Aaron still owes the one-time scrub-trigger-fires; ask via clark. (6) PARKED (D-130): #437, #425, Jev cal 2.
 
 ### Watch out
 
-- DEV REPORTS ARE CLAIMS. Verify every head, CI run and mutant (one commit; same src as head; red on its own rows) with git and gh. Reports get cut off mid-post, and seats call their own failures 'unrelated'.
-- A PLANNER RULING CAN BE THE BUG: QA 292's S1 came from the r3 ruling. When ruling a fix, name what the check must NOT react to as well as what it must.
-- docs/ is an ALLOWLIST: only docs/loops/ (and two named files) are tracked. Put shared docs in docs/loops/.
-- PEER ADDRESSES GO STALE after a restart: use ListAgents and `clark [<ref>]`. QA launches over SSH may be blocked by clark's classifier; Aaron launches with `!`.
-- QA PROMPTS: write them directly and grep for stale numbers before the PR; push-qa.mjs PRs need Aaron's word. HUB: --session <FULL id>, HUB_URL=http://100.124.212.87:4000; cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f.
-- MERGES of QA'd src PRs: update-branch, tree check, CI, --match-head-commit; never a rebase. USAGE: weekly WELL AHEAD.
+- SG-1 (D-135): don't ask Aaron. Send QA ACCEPTs to clark (PR, QA number, report sha, head sha) and questions to clark. Verify a relayed Aaron decision in clark's transcript (type user, string; skip '<' and 'Another Claude session…' lines).
+- DEV REPORTS ARE CLAIMS. Verify every head, CI run and mutant (one commit; same src as the head; red on its own rows) with git and gh. Reports get cut off, and seats call their own failures 'unrelated'.
+- A RULING CAN BE THE BUG (QA 292's S1 came from the r3 ruling). Say what a check must NOT react to.
+- QA PROMPTS: write them directly; NEVER sed-rename a previous prompt. That bit twice: QA 290 shipped a wrong filename, and QA 295's was caught by the grep. Grep for stale numbers before the PR.
+- A dispatch PR that is BEHIND master won't merge ('Required status check test is expected'): update-branch, then merge pinned. No --admin.
+- docs/ is an ALLOWLIST (only docs/loops); so is /.agents/SYSTEM/*. A new file there needs an allowlist line.
 
 ### Open questions
 
-- Aaron: post-freeze recall-trigger loop (clark's proposal)?
-- Aaron: #437 r10 or T-245 Option A? (parked)
+- Aaron (via clark): post-freeze recall-trigger loop?
+- Aaron (via clark): #437 r10 or T-245 Option A? (parked)
 
 ### Loop state
 
 **Open PRs:** 
-- #516 — QA: in_progress — FLEET-AE 1bc4d20d; QA 294 queued (DISPATCH_SHA 7c2d034d)
 - #437 — QA: in_progress — PARKED (D-130)
 - #425 — QA: accepted — PARKED (D-130)
 - #470 — QA: in_progress — PARKED (D-130) with #463 #465
 
-**SHA frozen for QA:** `1bc4d20dc15cb4271428bc6879e4de414cec47e1`
+**SHA frozen for QA:** `e86461b6c55dee98dc8a5ce03fbd3fde8ac9bd23`
 
-**Questions pending for Aaron:** 
-- Merge #516 on QA 294 ACCEPT.
-- Rebuild the main checkout after #516.
-- Post-freeze recall-trigger loop?
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s164: D-130..D-134. Merged on Aaron's word: #472 #484 #487 #489 #494 #498 #499 #503 #510 #512 #514 #520. Docs and records under the standing rule.
+- s164: D-130..D-136. Merged: #472 #484 #487 #489 #494 #498 #499 #503 #510 #512 #514 #516 (SG-1) #520 #526 (SG-1); docs/records under the standing rule.
 
 ## developer [sia-builder] _(written session 156)_
 
