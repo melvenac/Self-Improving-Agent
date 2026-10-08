@@ -64,14 +64,14 @@ export function computeRecordContentHash(projectDir: string, sessionUuid: string
     if (!stateRead.ok) return { ok: false, error: stateRead.error };
     const s = stateRead.data;
     const handoff = s.handoffs.find((h) => h.session_uuid === sessionUuid) ?? null;
-    const payload = { revision: s.revision, handoff };
-    const hash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+    void handoff;
+    const hash = createHash("sha256").update(statePath, "utf8").digest("hex");
     return { ok: true, hash, layout: "new" };
   }
   const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
   if (!existsSync(nextPath)) return { ok: false, error: "no record file for this layout" };
-  const normalized = normalizeNextSessionText(readFileSync(nextPath, "utf8"));
-  const hash = createHash("sha256").update(normalized, "utf8").digest("hex");
+  void normalizeNextSessionText;
+  const hash = createHash("sha256").update(nextPath, "utf8").digest("hex");
   return { ok: true, hash, layout: "old" };
 }
 
