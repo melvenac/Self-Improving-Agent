@@ -6,8 +6,28 @@
 
 - **FLEET-AE (deterministic dispatch, SIA A+E).** Generated `.cursor/rules/developer-building-checks.mdc` from
   `.agents/roles/developer.md` (`node scripts/gen-cursor-rules.mjs`); `/sync` check `cursor-rules-current`;
-  `requiredBlock` in `hub-partner-seats.json`. Decisions may carry `standing: true`; `ob_state set_standing` tags or
-  untags; `ob_start` briefing lists `STANDING RULES` between WATCH OUT and OPEN QUESTIONS.
+  `.agents/SYSTEM/required-block.json` (tracked). Decisions may carry `standing: true`; `ob_state set_standing` tags or
+  untags; `ob_start` briefing lists `STANDING RULES` between WATCH OUT and OPEN QUESTIONS. **r2 (QA 294):** header
+  labels `section-sha` from `git hash-object` of the extracted section; required block moved off hub-partner-seats.
+
+- **END-FIX r4 (T-246, QA 292):** New-layout record hash covers only this session's `handoffs[]` slice and
+  `sessions[]` row (fixed key order; no `revision` or other sessions). Old and new layouts share one digest
+  function on each side; `RECORD NOT CHECKED` with no session proof also prints `OLD LAYOUT` on old-layout repos.
+
+- **END-FIX r3 (T-246, QA 291):** E4 compares record **content** via a hash stored at `ob_end` (not commit-touch);
+  hook work-after uses transcript ids only; unreadable `state.json` skips handoff/work-after; missing-handoff markers
+  live in the open-brain data dir; `OLD LAYOUT` with `RECORD NOT CHECKED`; no-id payload skips handoff; `.shown` capped
+  at 200 lines. Documented R6: case-distinct Windows paths can share one store key.
+
+- **END-FIX r2 (T-246, QA 289):** E4 counts only record writes after `ob_end_at`; SessionEnd handoff
+  accepts E2 record updates; `RECORD NOT CHECKED` when work scan is unknown; `record_ok` rejects empty/whitespace;
+  refusal includes `OLD LAYOUT` on old-layout repos; markers live under the open-brain data dir (not in the repo).
+
+- **END-FIX (T-246): /end leaves a record that matches the session.** `ob_end` refuses with
+  `RECORD NOT UPDATED` when trailered commits, tags, or a `package.json` version bump are not
+  reflected in the project record (`record_ok` overrides). SessionEnd marks work after `/end`;
+  `ob_recall` accepts `purpose: "dedup"` so /end dedup lookups are not rated; old-layout repos
+  always see the `OLD LAYOUT` line at close.
 
 - **`bootstrap install-commands` (IMPORT-CMDS).** After `state import --commit`, replaces non-SIA
   project copies of `/start`, `/end`, `/task` and `/sync` with the template's and archives any `OLD`

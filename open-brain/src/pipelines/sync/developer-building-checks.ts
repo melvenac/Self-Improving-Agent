@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { readJson } from "../../shared/fs-utils.js";
@@ -7,14 +7,13 @@ import type { CheckResult } from "./types.js";
 export const DEVELOPER_ROLE_REL = ".agents/roles/developer.md";
 export const BUILDING_CHECKS_HEADING = "Building checks";
 export const DEVELOPER_BUILDING_CHECKS_MDC_REL = ".cursor/rules/developer-building-checks.mdc";
+export const REQUIRED_BLOCK_REL = ".agents/SYSTEM/required-block.json";
 
 const GENERATED_HEADER_PREFIX = "<!-- generated from ";
 
-/** Git blob SHA for a UTF-8 string (same as `git hash-object`). */
-export function gitBlobSha(content: string): string {
-  const buf = Buffer.from(content, "utf8");
-  const header = `blob ${buf.length}\0`;
-  return createHash("sha1").update(header).update(buf).digest("hex");
+/** Same as `git hash-object --stdin` on the UTF-8 bytes (LF-normalised section text). */
+export function gitHashObjectStdin(content: string): string {
+  return execFileSync("git", ["hash-object", "--stdin"], { input: content, encoding: "utf8" }).trim();
 }
 
 /** Normalize line endings to LF for stable generation under `core.autocrlf`. */
@@ -55,13 +54,12 @@ export interface RequiredBlockConfig {
 }
 
 export function readRequiredBlockConfig(projectRoot: string): RequiredBlockConfig {
-  const seatsPath = join(projectRoot, ".agents", "SYSTEM", "hub-partner-seats.json");
-  const data = readJson<{ requiredBlock?: RequiredBlockConfig }>(seatsPath);
-  const rb = data?.requiredBlock;
-  if (!rb || typeof rb.path !== "string" || typeof rb.heading !== "string") {
-    throw new Error("hub-partner-seats.json missing requiredBlock { path, heading }");
+  const cfgPath = join(projectRoot, REQUIRED_BLOCK_REL);
+  const data = readJson<RequiredBlockConfig>(cfgPath);
+  if (!data || typeof data.path !== "string" || typeof data.heading !== "string") {
+    throw new Error(`${REQUIRED_BLOCK_REL} missing or invalid { path, heading }`);
   }
-  return rb;
+  return data;
 }
 
 /** Same bytes F1 writes into the `.mdc` body (section only, after the generated header line). */
@@ -70,17 +68,17 @@ export function requiredBlockSectionText(projectRoot: string): string {
   const rel = cfg.path.replace(/\\/g, "/");
   const md = readFileSync(join(projectRoot, rel), "utf8");
   if (cfg.heading !== BUILDING_CHECKS_HEADING) {
-    throw new Error(`requiredBlock heading must be "${BUILDING_CHECKS_HEADING}" (got ${JSON.stringify(cfg.heading)})`);
+    throw new Error(`required-block heading must be "${BUILDING_CHECKS_HEADING}" (got ${JSON.stringify(cfg.heading)})`);
   }
   if (rel !== DEVELOPER_ROLE_REL) {
-    throw new Error(`requiredBlock path must be ${DEVELOPER_ROLE_REL} (got ${rel})`);
+    throw new Error(`required-block path must be ${DEVELOPER_ROLE_REL} (got ${rel})`);
   }
   return extractBuildingChecksSection(md);
 }
 
-export function renderDeveloperBuildingChecksMdc(section: string, sourceBlobSha: string): string {
+export function renderDeveloperBuildingChecksMdc(section: string, sectionSha: string): string {
   const header =
-    `${GENERATED_HEADER_PREFIX}${DEVELOPER_ROLE_REL} @ ${sourceBlobSha} — run: node scripts/gen-cursor-rules.mjs -->\n`;
+    `${GENERATED_HEADER_PREFIX}${DEVELOPER_ROLE_REL}, heading "${BUILDING_CHECKS_HEADING}", section-sha ${sectionSha} (git hash-object of the extracted section) — run: node scripts/gen-cursor-rules.mjs -->\n`;
   return `---
 description: Building checks from ${DEVELOPER_ROLE_REL} (generated; do not edit).
 alwaysApply: true
@@ -89,9 +87,15 @@ alwaysApply: true
 ${header}${section}`;
 }
 
+/** Parse `section-sha <hex>` from the generated header comment. */
+export function parseSectionShaFromMdc(mdc: string): string | null {
+  const m = normalizeLf(mdc).match(/section-sha ([0-9a-f]{40})/);
+  return m?.[1] ?? null;
+}
+
 export function expectedDeveloperBuildingChecksMdc(projectRoot: string): string {
   const section = buildingChecksSectionFromRoot(projectRoot);
-  const sha = gitBlobSha(section);
+  const sha = gitHashObjectStdin(section);
   return renderDeveloperBuildingChecksMdc(section, sha);
 }
 

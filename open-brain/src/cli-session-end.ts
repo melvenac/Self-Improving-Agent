@@ -22,6 +22,15 @@ import { resolveSessionId } from "./shared/active-session.js";
 import { byPidDir, removeProcessSession } from "./shared/process-session.js";
 import { resolvePaths } from "./shared/paths.js";
 import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
+import { readState } from "./shared/state-writer.js";
+import {
+  describeWorkAfterEnd,
+  readObEndStamp,
+  recordContentChangedSinceStamp,
+  recordWorkAfterEnd,
+  scanSessionWork,
+  sessionWorkScanBlockedReason,
+} from "./shared/end-record-guard.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
@@ -77,20 +86,104 @@ try {
   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
   if (existsSync(join(dir, ".agents"))) {
     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
-    const check = checkSessionHandoff(dir, sessionStartFromTranscript(hookPayload.transcript_path), sessionIdsFromTranscript(hookPayload.transcript_path));
-    if (check.status === "missing") {
-      const msg = describeMissing(check, id);
-      console.log(`[session-end] ${msg}`);
-      console.error(`[session-end] ${msg}`);
-      recordMissingHandoff(dir, id, check);
-    } else if (check.status === "unknown") {
-      console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);
+    const statePath = join(dir, ".agents", "state.json");
+    const stateRead = existsSync(statePath) ? readState(dir) : null;
+    const stateUnreadable = stateRead && !stateRead.ok ? stateRead.error : null;
+    if (stateUnreadable) {
+      console.log(`[session-end] handoff check NOT RUN: state.json unreadable: ${stateUnreadable}`);
+    } else if (!id) {
+      console.log("[session-end] handoff check NOT RUN: the payload carried no session id");
     } else {
-      console.log(`[session-end] handoff check: ${check.status === "ok" ? `handoff committed (${check.handoffs.join(", ")})` : "no loop/* commits attributed to this session"}${check.unattributed > 0 ? `; ${check.unattributed} loop/* commit(s) in the window carry no Claude-Session trailer: UNATTRIBUTED, not counted for any seat` : ""}`);
+      const check = checkSessionHandoff(
+        dir,
+        sessionStartFromTranscript(hookPayload.transcript_path),
+        sessionIdsFromTranscript(hookPayload.transcript_path),
+        id,
+      );
+      if (check.status === "missing") {
+        const msg = describeMissing(check, id);
+        console.log(`[session-end] ${msg}`);
+        console.error(`[session-end] ${msg}`);
+        recordMissingHandoff(dir, id, check);
+      } else if (check.status === "unknown") {
+        console.log(`[session-end] handoff check NOT RUN: ${check.reason}`);
+      } else {
+        const noHandoff =
+          check.status === "ok"
+            ? `handoff committed (${check.handoffs.join(", ")})`
+            : "no handoff or record update for this session";
+        const unPart =
+          check.unattributed > 0
+            ? `; ${check.unattributed} commit(s) in the window carry no Claude-Session trailer: UNATTRIBUTED, not counted for any seat`
+            : "";
+        console.log(`[session-end] handoff check: ${noHandoff}${unPart}`);
+      }
     }
   }
 } catch (err) {
   console.log(`[session-end] handoff check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+}
+
+// T-246 E4: work after ob_end with no later record write — warn and record for the next greeting; never block.
+try {
+  const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  if (existsSync(join(dir, ".agents"))) {
+    const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
+    const transcriptIds = sessionIdsFromTranscript(hookPayload.transcript_path);
+    const statePath = join(dir, ".agents", "state.json");
+    const stateRead = existsSync(statePath) ? readState(dir) : null;
+    const stateUnreadable = stateRead && !stateRead.ok ? stateRead.error : null;
+    if (stateUnreadable) {
+      console.log(`[session-end] work-after-end check NOT RUN: state.json unreadable: ${stateUnreadable}`);
+    } else {
+      const stamp = readObEndStamp(dir);
+      if (stamp?.ob_end_at && (!id || stamp.session === id)) {
+        const since = stamp.ob_end_at;
+        const blocked = sessionWorkScanBlockedReason(
+          sessionStartFromTranscript(hookPayload.transcript_path),
+          transcriptIds,
+        );
+        if (blocked) {
+          console.log(`[session-end] work-after-end check NOT RUN: ${blocked}`);
+        } else {
+          const work = scanSessionWork(dir, since, transcriptIds);
+          if (work.status === "unknown") {
+            console.log(`[session-end] work-after-end check NOT RUN: ${work.reason ?? "could not scan session work"}`);
+          } else {
+            const changed = recordContentChangedSinceStamp(dir, stamp.session, stamp);
+            const recordUpdated = changed === true;
+            if (work.commits > 0 && !recordUpdated) {
+              const msg = describeWorkAfterEnd(work, since);
+              console.log(`[session-end] ${msg}`);
+              console.error(`[session-end] ${msg}`);
+              recordWorkAfterEnd(dir, stamp.session, msg, work);
+            } else if (work.commits > 0) {
+              console.log(`[session-end] work-after-end check: ${work.commits} commit(s) after ob_end and record updated`);
+            } else {
+              console.log("[session-end] work-after-end check: no commits after ob_end");
+            }
+          }
+        }
+      } else {
+        const blocked = sessionWorkScanBlockedReason(
+          sessionStartFromTranscript(hookPayload.transcript_path),
+          transcriptIds,
+        );
+        if (blocked) {
+          console.log(`[session-end] work-after-end check NOT RUN: ${blocked}`);
+        } else {
+          const probe = scanSessionWork(dir, new Date().toISOString(), transcriptIds);
+          if (probe.status === "unknown") {
+            console.log(`[session-end] work-after-end check NOT RUN: ${probe.reason ?? "could not scan session work"}`);
+          } else {
+            console.log("[session-end] work-after-end check: no ob_end stamp for this session");
+          }
+        }
+      }
+    }
+  }
+} catch (err) {
+  console.log(`[session-end] work-after-end check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
 }
 
 try {

@@ -23,7 +23,7 @@ Give every lesson the key a machine could match against the act that repeats it.
 `MATCH:` yet:** the recall trigger matches on the command text, not on this line. The line is
 written now so the entries exist, keyed, when something does read it.
 
-For each lesson, `ob_recall` its title first (explicit trigger); skip it if it is already stored,
+For each lesson, `ob_recall` its title first with `purpose: "dedup"` (explicit trigger); skip it if it is already stored,
 or add the new detail. Then call `ob_store` with `kind: "event"`:
 
 ```
@@ -50,6 +50,15 @@ attributed** (ruling Q2). Without a proof `ob_recalled` says why and lists nothi
 zero, so report that, not "none". Call
 `ob_end` once, with `entry_ratings` only for entries `ob_recalled` lists: `helpful` if it changed what
 you did, `harmful` if it misled you, `neutral` if unused. Do not rate what you did not see.
+
+### Record gate (`RECORD NOT UPDATED`)
+
+When this session has **committed work** (trailered commits, tags, or a `package.json` version bump) and the
+**project record was not updated** for this session, `ob_end` **refuses** as its first line:
+`RECORD NOT UPDATED: …` and writes nothing. Fix the record (`ob_state set_handoff` or any write that records
+this session in `sessions[]` on the new layout; edit `.agents/SESSIONS/next-session.md` on the old layout), then
+call `ob_end` again. To close without updating the record, pass `record_ok: "<reason>"` — the reason is stored and
+printed once in the next session's greeting.
 
 ## 4. Report
 

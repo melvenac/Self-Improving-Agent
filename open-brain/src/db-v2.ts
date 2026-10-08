@@ -176,7 +176,8 @@ export function initSchemaV2(db: Database.Database): void {
       knowledge_id INTEGER NOT NULL,
       rank INTEGER NOT NULL,
       created_at TEXT NOT NULL,
-      recall_trigger TEXT DEFAULT NULL
+      recall_trigger TEXT DEFAULT NULL,
+      recall_purpose TEXT DEFAULT NULL
     );
 
     -- rating_origin records WHERE the rated id came from, computed at the
@@ -261,6 +262,7 @@ interface AddedColumn {
 const ADDED_COLUMNS: AddedColumn[] = [
   { table: 'knowledge_index', column: 'fact_kind', ddl: 'TEXT DEFAULT NULL' },
   { table: 'recall_log', column: 'recall_trigger', ddl: 'TEXT DEFAULT NULL' },
+  { table: 'recall_log', column: 'recall_purpose', ddl: 'TEXT DEFAULT NULL' },
   { table: 'feedback_log', column: 'rating_origin', ddl: 'TEXT DEFAULT NULL' },
   { table: 'feedback_log', column: 'rating_method', ddl: 'TEXT DEFAULT NULL' },
 ];
@@ -803,22 +805,26 @@ const RECALL_TRIGGERS: ReadonlySet<string> = new Set(['start', 'checkpoint', 'ex
  * make the row uninterpretable again, and passing through would let free text
  * erode the vocabulary.
  */
+export type RecallPurpose = 'dedup';
+
 export function recordRecallEvent(
   db: Database.Database,
   sessionUuid: string,
   query: string,
   entryIds: number[],
   trigger: RecallTrigger = 'unspecified',
+  purpose?: RecallPurpose | null,
 ): void {
   if (!sessionUuid || entryIds.length === 0) return;
   const now = new Date().toISOString();
   const safeTrigger = RECALL_TRIGGERS.has(trigger) ? trigger : 'unspecified';
+  const safePurpose = purpose === 'dedup' ? 'dedup' : null;
   const stmt = db.prepare(`
-    INSERT INTO recall_log (session_uuid, query, knowledge_id, rank, created_at, recall_trigger)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO recall_log (session_uuid, query, knowledge_id, rank, created_at, recall_trigger, recall_purpose)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
   const insertAll = db.transaction((ids: number[]) => {
-    ids.forEach((id, i) => stmt.run(sessionUuid, query, id, i + 1, now, safeTrigger));
+    ids.forEach((id, i) => stmt.run(sessionUuid, query, id, i + 1, now, safeTrigger, safePurpose));
   });
   insertAll(entryIds);
 }
@@ -837,7 +843,9 @@ export function getSessionRecalledIds(db: Database.Database, sessionUuid: string
   if (!sessionUuid) return [];
   const rows = db.prepare(`
     SELECT knowledge_id FROM recall_log WHERE session_uuid = ?
-    GROUP BY knowledge_id ORDER BY MIN(id)
+    GROUP BY knowledge_id
+    HAVING MAX(CASE WHEN recall_purpose IS NULL OR recall_purpose != 'dedup' THEN 1 ELSE 0 END) = 1
+    ORDER BY MIN(id)
   `).all(sessionUuid) as Array<{ knowledge_id: number }>;
   return rows.map((r) => r.knowledge_id);
 }

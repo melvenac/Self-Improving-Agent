@@ -8,8 +8,9 @@ import {
   checkCursorRulesCurrent,
   writeDeveloperBuildingChecksMdc,
 } from "../../src/pipelines/sync/developer-building-checks.js";
+import { expectRepoClean, REPO_ROOT } from "./fleet-ae-harness.js";
 
-const ROOT = join(import.meta.dirname, "../../..");
+const ROOT = REPO_ROOT;
 
 function git(cwd: string, ...args: string[]): void {
   execFileSync("git", args, { cwd, stdio: "ignore" });
@@ -24,7 +25,7 @@ describe("F9: CRLF developer.md does not flap sync", () => {
     mkdirSync(join(dir, ".agents", "roles"), { recursive: true });
     mkdirSync(join(dir, ".agents", "SYSTEM"), { recursive: true });
     mkdirSync(join(dir, ".cursor", "rules"), { recursive: true });
-    cpSync(join(ROOT, ".agents/SYSTEM/hub-partner-seats.json"), join(dir, ".agents/SYSTEM/hub-partner-seats.json"));
+    cpSync(join(ROOT, ".agents/SYSTEM/required-block.json"), join(dir, ".agents/SYSTEM/required-block.json"));
     savedRole = readFileSync(join(ROOT, ".agents/roles/developer.md"), "utf8");
     writeFileSync(join(dir, ".agents/roles/developer.md"), savedRole.replace(/\n/g, "\r\n"));
     git(dir, "init", "-q", "-b", "main");
@@ -33,7 +34,10 @@ describe("F9: CRLF developer.md does not flap sync", () => {
     git(dir, "config", "core.autocrlf", "true");
   });
 
-  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+    expectRepoClean(REPO_ROOT);
+  });
 
   it("CRLF developer.md produces an identical .mdc body and cursor-rules-current passes", () => {
     writeDeveloperBuildingChecksMdc(dir);

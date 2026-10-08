@@ -3,7 +3,7 @@ description: Building checks from .agents/roles/developer.md (generated; do not 
 alwaysApply: true
 ---
 
-<!-- generated from .agents/roles/developer.md @ 2d74077c035433e79572fe9b39c6240f6137b3f0 — run: node scripts/gen-cursor-rules.mjs -->
+<!-- generated from .agents/roles/developer.md, heading "Building checks", section-sha 2d74077c035433e79572fe9b39c6240f6137b3f0 (git hash-object of the extracted section) — run: node scripts/gen-cursor-rules.mjs -->
 ## Building checks
 
 **See it red on the real condition before trusting it green.** Extract the real pre-fix defect with
