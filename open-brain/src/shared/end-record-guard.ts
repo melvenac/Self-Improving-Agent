@@ -71,14 +71,14 @@ export function hashNewLayoutSessionRecord(state: State, sessionUuid: string): s
   const session =
     row === undefined
       ? null
-      : {
-          checkout: row.checkout,
-          date: row.date,
-          first_rev: row.first_rev,
-          n: row.n,
-          seat: row.seat,
-          uuid: row.uuid,
-        };
+      : state.sessions.filter((x) => x.seat === row.seat).map((r) => ({
+          checkout: r.checkout,
+          date: r.date,
+          first_rev: r.first_rev,
+          n: r.n,
+          seat: r.seat,
+          uuid: r.uuid,
+        }));
   const payload = { handoff, session };
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
