@@ -663,6 +663,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     }
     const endedId = endSession.id;
     if (endedId === null) {
+      if (isOldLayoutProject(projectRoot)) preamble.push(OLD_LAYOUT_LINE);
       preamble.push(
         `RECORD NOT CHECKED: this server cannot prove its session (${endSession.reason ?? "no proof"}). ` +
           `Session work and record update were not verified (Cursor writes no session proof). ` +

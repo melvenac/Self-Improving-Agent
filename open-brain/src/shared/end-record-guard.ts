@@ -19,6 +19,7 @@ import {
 } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
+import type { State } from "./state-schema.js";
 import { readState } from "./state-writer.js";
 import { endRecordProjectDir } from "./end-record-store.js";
 
@@ -48,6 +49,40 @@ function normalizeNextSessionText(raw: string): string {
   return raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 }
 
+/** Shared old-layout digest (stamp write and E4 check must use this). */
+export function hashOldLayoutNextSessionText(raw: string): string {
+  const normalized = normalizeNextSessionText(raw);
+  return createHash("sha256").update(normalized, "utf8").digest("hex");
+}
+
+/** New-layout digest for one session only (no revision; no other sessions). */
+export function hashNewLayoutSessionRecord(state: State, sessionUuid: string): string {
+  const h = state.handoffs.find((x) => x.session_uuid === sessionUuid);
+  const handoff =
+    h === undefined
+      ? null
+      : {
+          loop_state: h.loop_state,
+          open_questions: h.open_questions,
+          pick_up: h.pick_up,
+          watch_out: h.watch_out,
+        };
+  const row = state.sessions.find((x) => x.uuid === sessionUuid);
+  const session =
+    row === undefined
+      ? null
+      : {
+          checkout: row.checkout,
+          date: row.date,
+          first_rev: row.first_rev,
+          n: row.n,
+          seat: row.seat,
+          uuid: row.uuid,
+        };
+  const payload = { handoff, session };
+  return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+}
+
 /** Old layout when there is no state.json but next-session.md exists. */
 export function isOldLayoutProject(projectDir: string): boolean {
   if (existsSync(join(projectDir, ".agents", "state.json"))) return false;
@@ -63,15 +98,12 @@ export function computeRecordContentHash(projectDir: string, sessionUuid: string
     const stateRead = readState(projectDir);
     if (!stateRead.ok) return { ok: false, error: stateRead.error };
     const s = stateRead.data;
-    const handoff = s.handoffs.find((h) => h.session_uuid === sessionUuid) ?? null;
-    const payload = { revision: s.revision, handoff };
-    const hash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+    const hash = hashNewLayoutSessionRecord(s, sessionUuid);
     return { ok: true, hash, layout: "new" };
   }
   const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
   if (!existsSync(nextPath)) return { ok: false, error: "no record file for this layout" };
-  const normalized = normalizeNextSessionText(readFileSync(nextPath, "utf8"));
-  const hash = createHash("sha256").update(normalized, "utf8").digest("hex");
+  const hash = hashOldLayoutNextSessionText(readFileSync(nextPath, "utf8"));
   return { ok: true, hash, layout: "old" };
 }
 

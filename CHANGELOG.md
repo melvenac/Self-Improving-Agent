@@ -4,6 +4,10 @@
 
 ### Added
 
+- **END-FIX r4 (T-246, QA 292):** New-layout record hash covers only this session's `handoffs[]` slice and
+  `sessions[]` row (fixed key order; no `revision` or other sessions). Old and new layouts share one digest
+  function on each side; `RECORD NOT CHECKED` with no session proof also prints `OLD LAYOUT` on old-layout repos.
+
 - **END-FIX r3 (T-246, QA 291):** E4 compares record **content** via a hash stored at `ob_end` (not commit-touch);
   hook work-after uses transcript ids only; unreadable `state.json` skips handoff/work-after; missing-handoff markers
   live in the open-brain data dir; `OLD LAYOUT` with `RECORD NOT CHECKED`; no-id payload skips handoff; `.shown` capped
