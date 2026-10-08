@@ -103,7 +103,7 @@ export function computeRecordContentHash(projectDir: string, sessionUuid: string
   }
   const nextPath = join(projectDir, ".agents", "SESSIONS", "next-session.md");
   if (!existsSync(nextPath)) return { ok: false, error: "no record file for this layout" };
-  const hash = hashOldLayoutNextSessionText(readFileSync(nextPath, "utf8"));
+  const hash = createHash("sha256").update(readFileSync(nextPath)).digest("hex");
   return { ok: true, hash, layout: "old" };
 }
 
@@ -465,7 +465,15 @@ export function recordContentChangedSinceStamp(
 export function writeObEndStamp(projectDir: string, stamp: ObEndStamp): void {
   const hashRes = stamp.record_content_hash
     ? null
-    : computeRecordContentHash(projectDir, stamp.session);
+    : existsSync(join(projectDir, ".agents", "state.json"))
+      ? computeRecordContentHash(projectDir, stamp.session)
+      : {
+          ok: true as const,
+          hash: hashOldLayoutNextSessionText(
+            readFileSync(join(projectDir, ".agents", "SESSIONS", "next-session.md"), "utf8"),
+          ),
+          layout: "old" as const,
+        };
   const full: ObEndStamp = {
     ...stamp,
     record_content_hash:
