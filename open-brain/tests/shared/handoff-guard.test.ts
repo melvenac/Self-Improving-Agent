@@ -5,6 +5,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync, readFileSync } from "node:fs";
+import { endRecordProjectDir } from "../../src/shared/end-record-store.js";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -17,6 +18,7 @@ import {
   describeMissing,
   MARKER_REL,
 } from "../../src/shared/handoff-guard.js";
+import { applyStateOps } from "../../src/shared/state-writer.js";
 
 const tsxCli = join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
 const hookEntry = join(import.meta.dirname, "../../src/cli-session-end.ts");
@@ -54,6 +56,7 @@ describe("handoff guard (T179-2)", () => {
   let dir: string;
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "t179-guard-"));
+    process.env.KNOWLEDGE_V2_DB = join(dir, "scratch.db");
     git(dir, "init", "-q", "-b", "master");
     mkdirSync(join(dir, ".agents", "SESSIONS"), { recursive: true });
     const base = commitAt(dir, BEFORE, "README.md", "base");
@@ -98,13 +101,28 @@ describe("handoff guard (T179-2)", () => {
     expect(checkSessionHandoff(dir, START, IDS).status).toBe("missing");
   });
 
-  it("work already on origin/master is not counted, and a non-loop branch is not checked", () => {
-    git(dir, "checkout", "-q", "-b", "docs/notes");
-    commitAt(dir, DURING, "docs/n.md", "a docs branch");
-    git(dir, "checkout", "-q", "-b", "loop/merged");
-    const sha = commitAt(dir, DURING, "src/a.ts", "merged already");
-    git(dir, "update-ref", "refs/remotes/origin/master", sha);
-    expect(checkSessionHandoff(dir, START, IDS).status).toBe("no-work");
+  it("T-246 END-FIX r2: master work with set_handoff is ok (E2 record, not loop handoff only)", () => {
+    commitAt(dir, DURING, "src/on-master.ts", "worth-it style work on master");
+    const uuid = "00000137-0000-4000-8000-00000000aaaa";
+    mkdirSync(join(dir, ".agents", "TASKS"), { recursive: true });
+    mkdirSync(join(dir, ".agents", "SYSTEM"), { recursive: true });
+    writeFileSync(join(dir, ".agents", "TASKS", "INBOX.md"), "# Inbox\n");
+    writeFileSync(join(dir, ".agents", "TASKS", "task.md"), "# Task\n");
+    writeFileSync(join(dir, ".agents", "SYSTEM", "SUMMARY.md"), "# Summary\n");
+    const statePath = join(import.meta.dirname, "../fixtures-state/state.json");
+    writeFileSync(join(dir, ".agents", "state.json"), readFileSync(statePath, "utf8"));
+    const rev = JSON.parse(readFileSync(join(dir, ".agents", "state.json"), "utf8")).revision as number;
+    applyStateOps(dir, {
+      session: 99,
+      expected_revision: rev,
+      session_uuid: uuid,
+      checkout: "sia-test",
+      ops: [{ op: "set_handoff", seat: "developer", pick_up: "pick up", watch_out: [], open_questions: [] }],
+    });
+    const c = checkSessionHandoff(dir, START, IDS, uuid);
+    expect(c.status).toBe("ok");
+    expect(c.commits).toBe(1);
+    expect(c.handoffs.length).toBeGreaterThan(0);
   });
 
   it("a handoff under another name is NOT recognised (a stated limit, pinned so it cannot change silently)", () => {
@@ -191,12 +209,14 @@ describe("handoff guard (T179-2)", () => {
     commitAt(dir, DURING, "src/a.ts", "work");
     const c = checkSessionHandoff(dir, START, IDS);
     recordMissingHandoff(dir, "u-1", c);
-    expect(existsSync(join(dir, MARKER_REL))).toBe(true);
+    const storeDir = endRecordProjectDir(dir);
+    expect(existsSync(join(storeDir, ".missing-handoff.jsonl"))).toBe(true);
+    expect(existsSync(join(dir, MARKER_REL))).toBe(false);
     const first = takeMissingHandoffNotices(dir);
     expect(first).toHaveLength(1);
     expect(first[0]).toContain("HANDOFF MISSING: session u-1");
     expect(takeMissingHandoffNotices(dir)).toEqual([]);
-    expect(readFileSync(join(dir, ".agents/SESSIONS/.missing-handoff.shown.jsonl"), "utf8")).toContain("u-1");
+    expect(readFileSync(join(storeDir, ".missing-handoff.shown.jsonl"), "utf8")).toContain("u-1");
   });
 });
 
@@ -204,6 +224,7 @@ describe("the SessionEnd hook runs the guard and NEVER blocks (T179-2)", () => {
   let dir: string;
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "t179-hook-"));
+    process.env.KNOWLEDGE_V2_DB = join(dir, "scratch.db");
   });
   afterEach(() => rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 }));
 
@@ -214,7 +235,7 @@ describe("the SessionEnd hook runs the guard and NEVER blocks (T179-2)", () => {
       encoding: "utf8",
       timeout: 90_000,
       // No DB at this path, so the memory stages exit early AFTER the guard ran.
-      env: { ...process.env, CLAUDE_PROJECT_DIR: dir, KNOWLEDGE_V2_DB: join(dir, "no-such.db") },
+      env: { ...process.env, CLAUDE_PROJECT_DIR: dir, KNOWLEDGE_V2_DB: join(dir, "scratch.db") },
     });
   }
 
@@ -232,7 +253,8 @@ describe("the SessionEnd hook runs the guard and NEVER blocks (T179-2)", () => {
     expect(r.status, r.stdout + r.stderr).toBe(0);
     expect(r.stdout).toContain("HANDOFF MISSING: session 11111111-2222-4333-8444-555555555555 committed 1 commit(s) on loop/x");
     expect(r.stderr).toContain("HANDOFF MISSING");
-    expect(existsSync(join(dir, MARKER_REL))).toBe(true);
+    expect(existsSync(join(endRecordProjectDir(dir), ".missing-handoff.jsonl"))).toBe(true);
+    expect(existsSync(join(dir, MARKER_REL))).toBe(false);
   }, 120_000);
 
   it("outside a git repository it says NOT RUN and still exits 0", () => {
