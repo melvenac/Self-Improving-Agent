@@ -4,6 +4,11 @@
 
 ### Added
 
+- **FLEET-AE (deterministic dispatch, SIA A+E).** Generated `.cursor/rules/developer-building-checks.mdc` from
+  `.agents/roles/developer.md` (`node scripts/gen-cursor-rules.mjs`); `/sync` check `cursor-rules-current`;
+  `requiredBlock` in `hub-partner-seats.json`. Decisions may carry `standing: true`; `ob_state set_standing` tags or
+  untags; `ob_start` briefing lists `STANDING RULES` between WATCH OUT and OPEN QUESTIONS.
+
 - **`bootstrap install-commands` (IMPORT-CMDS).** After `state import --commit`, replaces non-SIA
   project copies of `/start`, `/end`, `/task` and `/sync` with the template's and archives any `OLD`
   files locally. `bootstrap check` lists each command as `SIA`, `OLD` or `absent` and names

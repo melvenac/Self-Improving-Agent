@@ -44,6 +44,7 @@ import { checkSeatIdentity } from "./seat-identity.js";
 import { checkTaskAssignees } from "./task-assignees.js";
 import { checkCursorHookCompat } from "./cursor-hook-compat.js";
 import { checkShadowMergeLedger } from "../../harness/shadow-merge.js";
+import { checkCursorRulesCurrent } from "./developer-building-checks.js";
 
 export function runSync(input: SyncOptions): SyncResult {
   // R4 (Loop 3): the given root may be a subdirectory (open-brain/ has its
@@ -99,6 +100,7 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkTemplate(options.projectRoot));
   checks.push(checkSpecProvenance(options.projectRoot));
   checks.push(checkRules(options.projectRoot));
+  checks.push(checkCursorRulesCurrent(options.projectRoot));
   checks.push(checkCommandParity(options.projectRoot));
   checks.push(checkCommandToolNames(options.projectRoot));
   checks.push(checkCommandNames(options.projectRoot));

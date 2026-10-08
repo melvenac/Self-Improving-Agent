@@ -1,0 +1,45 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`F5: no standing field renders as before > a record with no standing anywhere omits STANDING RULES (master snapshot) 1`] = `
+"## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+Serving build: synthetic
+Usage: GREEN → dispatches open
+Session 12 — 2026-10-03 · Self-Improving-Agent v9.9.9 · state rev 7
+Drift: none
+
+OBJECTIVE
+Replace the four prose state files with a record: state.json read side, then /end writes it, then dogfood on this repo. (since session 54)
+
+NEXT
+- [P0] T-005 state.json strict schema module with parseState / serializeState
+- [P0] T-006 readProjectState detects state.json; absent and invalid are distinct
+- [P0] T-007 ob_start renders State section when state.json is valid
+16 active (4 P0, 7 P1, 4 P2, 1 P3); 11 done. Backlog order, not a decision: the pick-up below rules what starts.
+
+PICK UP HERE
+Loop 2: run V1–V9 on the frozen tag, then dispatch Loop 3 (the writer) once accepted.
+
+WATCH OUT
+- The live MCP server stays on the old build until /mcp reconnect open-brain.
+- Run vitest from open-brain/, never the repo root (entry 462).
+- Re-index GitNexus before detect_changes or hunks land on neighbouring symbols.
+
+OPEN QUESTIONS
+- Q2: does the memory module become something the core does not import?
+- Q3: is the rating signal cut or replaced?
+
+BROKEN (5 gaps open; newest G-005)
+- G-005 — vault-index-parity warns on one unindexed Checkpoints note
+- G-004 — GitNexus index goes stale at every commit and misattributes hunks to neighbouring symbols
+- G-003 — SESSION_TEMPLATE.md Pre-Session Checklist still says Read SUMMARY.md / Read INBOX.md
+- G-002 — repo .claude/ is gitignored so the repo start.md mirror exists on disk only
+- G-001 — Cursor start.md copies still hand-read SUMMARY.md and do not call ob_start
+- blocked: T-012 /end writes state.json through one structured tool
+- blocked: T-013 SUMMARY.md and INBOX.md become generated views
+- blocked: T-014 Migrate this repo's .agents/ into state.json and run three sessions
+- blocked: 2 P2/P3 task(s): INBOX.md
+
+Working tree: clean
+Skills: none
+## End Briefing"
+`;

@@ -166,6 +166,8 @@ export const DecisionSchema = z.strictObject({
   title: z.string(),
   date: z.string().regex(ISO_DATE, "expected YYYY-MM-DD"),
   note: z.string(),
+  /** FLEET-AE E1: standing rules appear in every start briefing; absent means false. */
+  standing: z.literal(true).optional(),
 });
 
 /**
@@ -508,7 +510,7 @@ export const KEY_ORDER: Readonly<Record<string, readonly string[]>> = {
   verified: ["id", "claim", "evidence", "since_session", "status"],
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session", "status", "closed_session", "closed_rev"],
-  decisions: ["id", "title", "date", "note"],
+  decisions: ["id", "title", "date", "note", "standing"],
   handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state", "session_uuid", "checkout", "first_rev"],
   loop_state: ["open_prs", "frozen_sha", "questions_for_aaron", "rulings"],
   open_prs: ["ref", "qa_status", "note"],
