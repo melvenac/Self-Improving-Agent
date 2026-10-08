@@ -116,12 +116,11 @@ export function renderBriefing(i: BriefingInput): string[] {
   else out.push(noneRecorded(i.seat, i.ownCheckout));
   if (i.missingHandoff) out.push(i.missingHandoff);
 
+  out.push(...standingRulesLines(s)); // QA294 mutant (d): STANDING RULES above WATCH OUT
   if (own && own.watch_out.length > 0) {
     out.push("", "WATCH OUT");
     for (const w of own.watch_out) out.push(`- ${watchText(w)}`);
   }
-
-  out.push(...standingRulesLines(s));
 
   if (own) {
     const { open, resolved } = splitQuestions(own.open_questions);
