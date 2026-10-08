@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, copyFileSync } from "node:fs";
 import { join, basename } from "node:path";
 import { tmpdir } from "node:os";
@@ -7,6 +7,7 @@ import { renderBriefing, BRIEFING_BUDGET, BRIEFING_END, BRIEFING_START, type Bri
 import { handleStart } from "../../../src/server.js";
 import { byPidDir, processStartTime, writeProcessSession } from "../../../src/shared/process-session.js";
 import { parseState, type Handoff, type SessionRecord, type State } from "../../../src/shared/state-schema.js";
+import * as repoRecord from "../../helpers/repo-record.js";
 import { readRepoRecord, REPO_ROOT } from "../../helpers/repo-record.js";
 
 const FIXTURES = join(import.meta.dirname, "../../fixtures-state");
@@ -270,15 +271,30 @@ describe("T-199 HO-4: the line is in the BRIEFING, once, and the budgeted layout
   });
 
   it("the budget still holds with 20 injected standing rules after live-record strip (master-safe)", () => {
-    const s = stateWith(
-      [],
-      [{ ...handoff("u-own", "sia-builder", 1, 5), pick_up: "Pick up ".repeat(300) } as Handoff],
-      { injectStanding: 20 },
-    );
-    const lines = renderBriefing(base(s, { budget: true, missingHandoff: NOTICE }));
-    expect(lines.length).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
-    expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
-    expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
+    const live = structuredClone(readRepoRecord().state);
+    for (let i = 0; i < 20; i++) {
+      live.decisions.push({
+        id: `D-L${String(i).padStart(2, "0")}`,
+        title: "live pollution",
+        date: "2026-10-08",
+        note: "",
+        standing: true,
+      });
+    }
+    const spy = vi.spyOn(repoRecord, "readRepoRecord").mockReturnValue({ state: live, migrated: false });
+    try {
+      const s = stateWith(
+        [],
+        [{ ...handoff("u-own", "sia-builder", 1, 5), pick_up: "Pick up ".repeat(300) } as Handoff],
+        { injectStanding: 20 },
+      );
+      const lines = renderBriefing(base(s, { budget: true, missingHandoff: NOTICE }));
+      expect(lines.length).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
+      expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+      expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 
