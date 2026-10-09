@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import type { AgentIdentity } from "./agent-identity.js";
 import { gitShow } from "./git-read.js";
+import { resolveUpstreamRef } from "./upstream-ref.js";
 
 /**
  * Loads the seat's role knowledge and says where it came from.
@@ -157,9 +158,10 @@ export function describeRoleFiles(
   // a session that cannot say who it is still has to obey the rules everyone has.
   wanted.push({ rel: SHARED_REL, owner: "shared" });
 
+  const upstreamRef = resolveUpstreamRef(projectRoot);
   const fromRef = options.fromRef;
   const files = wanted.map(({ rel, owner }) =>
-    fromRef ? readOneFromRef(projectRoot, rel, owner, fromRef) : readOne(projectRoot, rel, owner, inGit),
+    fromRef ? readOneFromRef(projectRoot, rel, owner, fromRef) : readOne(projectRoot, rel, owner, inGit, upstreamRef),
   );
 
   for (const f of files) {
@@ -203,7 +205,7 @@ function render(files: RoleFileReport[], inGit: boolean, notASeat: boolean, from
     const where = f.commit
       ? `@ ${f.commit.slice(0, 7)}${f.commitDate ? ` ${f.commitDate.slice(0, 10)}` : ""}`
       : `@ no commit resolved${f.note ? ` — ${f.note}` : ""}`;
-    const flags = [f.stale ? "STALE vs HEAD" : null, !f.tracked ? "UNTRACKED" : null, f.behindUpstream ? "behind origin/master" : null]
+    const flags = [f.stale ? "STALE vs HEAD" : null, !f.tracked ? "UNTRACKED" : null, f.behindUpstream ? "behind upstream" : null]
       .filter(Boolean)
       .join(", ");
     lines.push(`  ${f.rel} ${where}${flags ? ` [${flags}]` : ""}`);
@@ -247,7 +249,13 @@ function readOneFromRef(projectRoot: string, rel: string, owner: string, ref: st
   };
 }
 
-function readOne(projectRoot: string, rel: string, owner: string, inGit: boolean): RoleFileReport {
+function readOne(
+  projectRoot: string,
+  rel: string,
+  owner: string,
+  inGit: boolean,
+  upstreamRef: string,
+): RoleFileReport {
   const abs = join(projectRoot, rel);
   const base: RoleFileReport = {
     rel,
@@ -299,7 +307,7 @@ function readOne(projectRoot: string, rel: string, owner: string, inGit: boolean
     commit: commit || null,
     commitDate: commitDate || null,
     stale,
-    behindUpstream: isBehindUpstream(projectRoot, rel),
+    behindUpstream: isBehindUpstream(projectRoot, rel, upstreamRef),
     note: commit ? null : "tracked but no commit touches this path",
   };
 }
@@ -313,9 +321,9 @@ function readOne(projectRoot: string, rel: string, owner: string, inGit: boolean
  * on either side, yields false — this is a RECORDED observation and an
  * unanswerable one must not read as a positive.
  */
-function isBehindUpstream(projectRoot: string, rel: string): boolean {
+export function isBehindUpstream(projectRoot: string, rel: string, upstreamRef: string): boolean {
   const here = git(projectRoot, ["rev-parse", `HEAD:${rel}`]);
-  const there = git(projectRoot, ["rev-parse", `origin/master:${rel}`]);
+  const there = git(projectRoot, ["rev-parse", `${upstreamRef}:${rel}`]);
   if (here === null || there === null) return false;
   return here !== there;
 }
