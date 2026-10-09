@@ -229,3 +229,203 @@ gh pr create --base master --head fix/t255-session-log-id --title "T-255: always
 | T255-A2 | Mutants 1–4 are each red on their named rows |
 | T255-A3 | Live, after the SG-1 rebuild and an explicit `/mcp` reconnect: Maker's next `ob_start` creates one log carrying a `> **Session ID:**` line, and a second `ob_start` in the same session prints `(existing log for this session id — reused, nothing created)` |
 | T255-A4 | After A3, Maker deletes `Session_57.md`. It is evidence only, and it was overwritten with a blank template |
+
+## ROUND 2 (2026-10-09): grok-sia-review F1 (major), F2, F4, F6 (`docs/loops/t255-review-r1.md`)
+
+**Ruling:**
+- **F1 is real.** It would hit Maker on its very next start: the record says max n=56 and `Session_57.md` exists
+  without an id, so every `ob_start` computes 57 and refuses forever. **A skipped log is worse than a renumbered one.**
+  R2-1 replaces "refuse" with "take the next free number".
+- **F2:** the `existsSync` → `writeFileSync` race is closed by an atomic `wx` create.
+- **F4:** the CLI prints the skip.
+- **F6:** a real record-path test.
+- **F3** is mostly moot after R2-1, and the remaining refusal message is reworded per F3. **F5** and **F7** are
+  recorded only (nits, no code).
+
+**Start state:** your branch `fix/t255-session-log-id`, with HEAD and `origin/fix/t255-session-log-id` both at
+**`7a6f870fde58af7bf55e726e3746b06de73f0b8f`**, and an empty porcelain. Otherwise STOP with `BLOCKED T-255 r2 start state`.
+
+Every round-1 rule still holds:
+- §1: Node 22.
+- §3: forbidden git.
+- §6: the Start-Process block with a temp HOME, `--no-file-parallelism`, a 10-minute cap, and a **PID-only kill**
+  (`taskkill /PID <recorded pid> /T`; never by name, image or command line).
+- §8: tsc.
+- §11: STOP after 2 attempts.
+- §12: the reply.
+
+```text
+IMPACT-TARGETS: createSessionLog sessionStart handleStart
+```
+
+`claimSessionLog` is new.
+
+### R2-1 (F1 + F2): `session-log.ts`
+
+**In `createSessionLog`:**
+- DELETE the round-1 line `if (existsSync(logPath)) return "";`.
+- Replace the final `writeFileSync(logPath, content, "utf-8");` with:
+
+```ts
+  // T-255 r2 (F2): an atomic create. A log that already exists belongs to some session and is never overwritten.
+  try {
+    writeFileSync(logPath, content, { encoding: "utf-8", flag: "wx" });
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "EEXIST") return "";
+    throw err;
+  }
+```
+
+Nothing else in `createSessionLog` changes.
+
+**Add this directly below `createSessionLog`:**
+
+```ts
+/** T-255 r2 (F1): how many numbers past the first a session may skip to find a free Session_N.md. */
+export const SESSION_LOG_PROBE_LIMIT = 20;
+
+/**
+ * Create this session's log at `firstNumber`, or at the next number whose file does not exist yet. A taken number is
+ * never overwritten, and it is never refused forever either: the record's number does not move until a session is
+ * recorded, so refusing would leave every ob_start of this session without a log (review r1 F1).
+ * Returns null only when all SESSION_LOG_PROBE_LIMIT numbers are taken.
+ */
+export function claimSessionLog(
+  projectRoot: string,
+  firstNumber: number,
+  sessionId: string | null,
+  date: string,
+): { sessionNumber: number; logPath: string } | null {
+  for (let n = firstNumber; n < firstNumber + SESSION_LOG_PROBE_LIMIT; n++) {
+    const logPath = createSessionLog(projectRoot, n, sessionId, date);
+    if (logPath !== "") return { sessionNumber: n, logPath };
+  }
+  return null;
+}
+```
+
+### R2-2: `types.ts` and `index.ts` (`sessionStart`)
+
+- **`types.ts`:** `SessionInfo` gains
+  `/** T-255 r2: the number the record proposed, when its Session_N.md was already taken and a later number was used. */ takenNumber?: number;`
+- **`index.ts`:** replace the body of the `else` branch (the round-1 code from `const { sessionNumber, source } = …` to
+  the end of the `if (logPath === "") … else …`) with:
+
+```ts
+        const { sessionNumber, source } = nextGreetingSessionNumber(options.projectRoot, state.stateJson);
+        const date = new Date().toISOString().split("T")[0];
+        const claimed = claimSessionLog(options.projectRoot, sessionNumber, sessionId, date);
+        if (claimed === null) {
+          session = {
+            sessionId,
+            sessionNumber: 0,
+            logPath: "",
+            reused: false,
+            skippedReason: `Session_${sessionNumber}.md through Session_${sessionNumber + SESSION_LOG_PROBE_LIMIT - 1}.md all already exist (not matched to this session's id) — none was overwritten, and no log was created for this session`,
+          };
+        } else {
+          session = {
+            sessionId,
+            sessionNumber: claimed.sessionNumber,
+            logPath: claimed.logPath,
+            reused: false,
+            skippedReason: null,
+            sessionNumberSource: source,
+            ...(claimed.sessionNumber !== sessionNumber ? { takenNumber: sessionNumber } : {}),
+          };
+        }
+```
+
+Import `claimSessionLog` and `SESSION_LOG_PROBE_LIMIT` from `./session-log.js`, and drop `createSessionLog` from that
+import.
+
+### R2-3: `server.ts` (`handleStart`, the session line at line 332)
+
+Inside the template literal, directly after the `${result.session.reused ? … : localNote}` expression, add:
+
+```ts
+${result.session.takenNumber !== undefined ? ` (Session_${result.session.takenNumber}.md was already taken and was not overwritten; this session's log is Session_${result.session.sessionNumber}.md)` : ""}
+```
+
+Nothing else in `server.ts` changes.
+
+### R2-4 (F4): `cli.ts`
+
+Directly after the `if (result.session.logPath) { … }` block at line 209, add:
+
+```ts
+  else if (result.session.skippedReason) console.log(`\nSession log: ${result.session.skippedReason}`);
+```
+
+This one has no test row; it is verified from the diff.
+
+### Round-2 tests
+
+**SL-6 changes** (`session-log-id-skip.test.ts`):
+- The mock becomes `claimSessionLog: () => null`, in place of `createSessionLog`. A module mock does not intercept
+  calls made inside `session-log.ts` itself, so mocking `createSessionLog` would no longer reach this path.
+- It asserts
+  `skippedReason === "Session_1.md through Session_20.md all already exist (not matched to this session's id) — none was overwritten, and no log was created for this session"`.
+
+**New rows** in `session-log-id.test.ts`:
+
+| Row | Setup | Asserts |
+|---|---|---|
+| SL-7 | Temp root. Copy `open-brain/tests/fixtures-state/state.json` to `<root>/.agents/state.json` (its max `sessions[].n` is 54). Create an empty `.agents/SESSIONS/`. FIRST assert that `nextGreetingSessionNumber(root, readProjectState(root).stateJson)` deep-equals `{ sessionNumber: 55, source: "record" }` (`readProjectState` comes from `src/pipelines/session-start/state-reader.js`). If it does not, STOP with `BLOCKED T-255 r2 SL-7 fixture`. Pre-write `Session_55.md` = `"OLD\n"`. Call `sessionStart({ projectRoot: root, homePath: <temp>, sessionId: ID })` twice | **First call:** `sessionNumber === 56`, `logPath` ends with `Session_56.md`, `takenNumber === 55`, `reused === false`, and `Session_55.md` still reads exactly `"OLD\n"`. **Second call:** `reused === true` with the same `logPath`. **Afterwards:** the SESSIONS files matching `/^Session_\d+\.md$/` number exactly 2 |
+| SL-8 | Local root with `Session_1.md` … `Session_20.md`, each `"X\n"` | `claimSessionLog(root, 1, ID, "2026-10-09") === null`, and `Session_21.md` does not exist |
+| SL-9 | Local root with `Session_3.md` = `"X\n"` | `claimSessionLog(root, 3, ID, "2026-10-09")` deep-equals `{ sessionNumber: 4, logPath: join(root, ".agents", "SESSIONS", "Session_4.md") }`, and `Session_3.md` still reads `"X\n"` |
+
+SL-5 stays unchanged. With the early `existsSync` gone, it now proves the `wx` create.
+
+### Round-2 mutants
+
+These are local only, never pushed. Run ALL of them and paste every red row.
+
+| N | Edit | Must turn red |
+|---|---|---|
+| 5 | `claimSessionLog` loop bound `n < firstNumber + 1` (no probing) | SL-7, SL-9 |
+| 6 | Remove `flag: "wx"` (plain overwrite) | SL-5, SL-9 |
+| 7 | Loop bound `n <= firstNumber + SESSION_LOG_PROBE_LIMIT` | SL-8 |
+| 8 | Drop the `takenNumber` spread | SL-7 |
+
+Re-run round-1 mutants 1, 3 and 4 as well. Mutant 3 now means: set `skippedReason: null` in the `claimed === null`
+branch. It must turn SL-6 red. Mutant 2 is superseded by mutant 6.
+
+### Commits, scope, tests, push, reply
+
+**Commits:** exactly two, on top of 7a6f870f:
+
+1. `T-255 r2: tests (red)`. This holds the SL-6 change plus SL-7, SL-8 and SL-9.
+2. `T-255 r2: take the next free log number atomically instead of refusing; CLI prints the skip (review F1, F2, F4)`.
+
+`git log --oneline 7a6f870f..HEAD` must show 2 lines.
+
+**Scope:** `git diff --name-only 7a6f870f..HEAD` may contain only these files. Anything else means STOP.
+- `open-brain/src/pipelines/session-start/session-log.ts`
+- `open-brain/src/pipelines/session-start/index.ts`
+- `open-brain/src/pipelines/session-start/types.ts`
+- `open-brain/src/server.ts`
+- `open-brain/src/cli.ts`
+- the two `session-log-id*` test files
+
+**Tests:** use the §6 block with the same five files, and add `tests/pipelines/session-start/briefing.test.ts`,
+because `server.ts` changed.
+
+**Push:** `git push origin fix/t255-session-log-id`. Never use `--force`. `ls-remote` must equal HEAD. PR #564 already
+exists, so open no new PR.
+
+**Reply:** use the §12 format. Item 5 is the pasted `git diff 7a6f870f..HEAD -- open-brain/src`. The first two lines
+are:
+
+```text
+TASK: T-255 ROUND 2, review F1 F2 F4 F6 (fix/t255-session-log-id)
+READY T-255 <sha40>
+```
+
+**Acceptance A3 now reads:** run Maker's next `ob_start` after the rebuild and reconnect.
+- The session line says
+  `Session_57.md was already taken and was not overwritten; this session's log is Session_58.md`.
+- That log carries a `> **Session ID:**` line.
+- A second `ob_start` prints the reuse marker.
+
+**A4:** after A3, Maker deletes `Session_57.md`.
