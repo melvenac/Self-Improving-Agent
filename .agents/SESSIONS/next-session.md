@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 366 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 367 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,17 +6,17 @@
 
 ### Pick up here
 
-(1) Makerspace PROVEN (D-141): Aaron merges sia/adopt @ bb06a367 (on clark's On deck). (2) Dispatch BRIEFING-FIX (docs/loops/briefing-fix-brief.md) to cursor-builder. Send the exact task text to clark first: the 17-item checklist plus prelaunch-impact. Restate the base SHA. (3) Parked (D-130): #437, #425, Jev cal 2.
+(1) VERIFY #545 LIVE: this /start runs on build a7443d3. The block must open with a plain '## Briefing', show READS OWED after Latest brief, a FLEET line listing SIA's seats with no 'vv', and a usage line (STALE only if slots.json is old). (2) D-143: small fixes only; support Maker on SIA questions. (3) The laptop QA 298 leftovers go in clark's batched Aaron ask.
 
 ### Watch out
 
-- EVERY CURSOR TASK goes to clark before dispatch: ~/Worktrees/cursor-brief-checklist.md (17 items: IMPACT-TARGETS, PID-only kills, isolated test HOME) plus prelaunch-impact. Mutants stay LOCAL. Exact SHAs, commands, reply line.
-- QA DISPATCHES: a /start row needs a machine that runs SIA (the laptop has no open-brain). On the desktop, call ob_* in-session with KNOWLEDGE_V2_DB/OPEN_BRAIN_VAULT_DIR set at launch. A planner set_handoff needs loop_state (C3).
-- HUB-TALK: C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000. Grok job turns start with their prefix. Under D-140 QA defaults to Grok; Claude QA only for cases (1)-(3).
+- D-143: NO new SIA loops. Work T-248..T-253 only if one becomes a real issue for Maker (T-250 the likeliest). Every Cursor task: text to clark first (checklist plus IMPACT-TARGETS first in the brief), and post on GO.
+- QA on Windows: a laptop QA launched by ssh is ELEVATED, and DENY ACLs don't bind it. Use clark's RunLevel Limited scheduled task, a privilege preflight via System32 whoami.exe that fails closed, and fresh scratch names per rerun.
+- HUB-TALK: C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000. Grok job turns start with their prefix. A planner set_handoff needs loop_state (C3).
 
 ### Open questions
 
-- Aaron (via clark): post-freeze recall-trigger loop?
+- Aaron (via clark): post-freeze recall-trigger loop? (now under D-143: small fixes only)
 - Aaron (via clark): #437 r10 or T-245 Option A? (parked)
 
 ### Loop state
@@ -31,7 +31,7 @@
 **Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s165: E4 (21 standing rules); STANDING-BUDGET merged (D-139); D-138; V-079; D-140 QA routing (standing); BRIEFING-FIX brief #536; Makerspace PROVEN (D-141): QA 296 INCOMPLETE (laptop), QA 297 REJECT on dispatch defect F1, ruled ACCEPT on QA's variant.
+- s165: E4 (21 standing); STANDING-BUDGET (D-139); D-138; V-079; D-140 QA routing; Makerspace PROVEN (D-141, sia/adopt merged 56877428); BRIEFING-FIX merged (D-142, a7443d33, rebuilt); D-143 small-fixes-only; tasks T-248..T-253.
 
 ## developer [sia-builder] _(written session 156)_
 
