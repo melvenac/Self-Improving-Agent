@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 372 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 373 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-143 (Aaron 10-09): SIA is in SMALL-FIXES-ONLY mode; the focus is the Makerspace build. The SIA planner supports Maker on SIA questions. A task from T-248..T-253 is worked only when it becomes a real issue for Maker (T-250 the likeliest), small, through clark.
 
 ## What's working
