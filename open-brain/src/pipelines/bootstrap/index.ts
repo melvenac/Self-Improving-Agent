@@ -436,15 +436,7 @@ export function installCommands(
       lines.push({ name, before, after: "SIA" });
     }
   } catch (err) {
-    for (const r of rolledBack.reverse()) {
-      if (existsSync(r.archivePath)) renameSync(r.archivePath, r.dest);
-    }
-    if (archiveDir !== null && existsSync(archiveDir)) {
-      try {
-        if (readdirSync(archiveDir).length === 0) rmdirSync(archiveDir);
-        else rmSync(archiveDir, { recursive: true, force: true });
-      } catch { /* best effort */ }
-    }
+    // I9-r2-(ii) mutant: rollback removed
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes("Nothing written")) throw err;
     throw new Error(`${message}. Nothing written`);
