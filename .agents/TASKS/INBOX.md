@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 365 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 366 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -56,6 +56,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-248** state import takes the project name from package.json with no override, and nothing can change project.name after --commit: add a --name flag to --draft (or an ob_state set_project op)
 - [ ] **T-249** Project identity resolves a worktree to its repo (the git common dir): one project per repo for knowledge-DB session scoping and the vault display name, with `open-brain relocate` folding the existing split history
 - [ ] **T-251** Adopted projects get role-file stubs and the right handoff seat: project-template ships minimal .agents/roles/{planner,developer,qa,shared}.md stubs (project-specific content, not SIA's), bootstrap/import installs them when absent, and state import seats the imported handoff from AGENT.md's role
+- [ ] **T-252** BRIEFING-FIX follow-ups (grok re-review r2 F1-F4): guard null projects[] entries in fleetProjectKey; a BF-F7 case that reaches describeFleet's catch (so M9 dies); no 'seats none +K more' when seats exist but don't fit; handleStart's fallback names the real default fleet.json path
+- [ ] **T-253** state import drops a bullet's continuation lines silently: bullets() keeps only lines starting '- ' or '* ', and the report counts bullets only; join indented continuation lines and count un-imported lines
 
 ## P3
 
