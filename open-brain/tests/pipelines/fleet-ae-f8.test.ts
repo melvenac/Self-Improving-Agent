@@ -17,7 +17,7 @@ describe("F8: mutant targets (green on candidate)", () => {
     expectRepoClean(REPO_ROOT);
   });
 
-  it("cursor-rules-current fails when the .mdc drifts (mut-1 hashes whole file)", () => {
+  it("cursor-rules-current fails when the .mdc drifts (an appended line)", () => {
     dir = mkFleetAeTemp("fleet-ae-f8-");
     seedFleetAeCursorProject(dir);
     writeDeveloperBuildingChecksMdc(dir);
@@ -73,7 +73,7 @@ describe("F8: mutant targets (green on candidate)", () => {
     expect(lines.filter((l) => l.startsWith("- D-")).length).toBe(15);
   });
 
-  it("set_standing refuses unknown decision ids (mut-3 reads hub-partner-seats requiredBlock)", () => {
+  it("set_standing refuses unknown decision ids", () => {
     dir = mkFleetAeTemp("fleet-ae-f8-");
     mkdirSync(join(dir, ".agents"), { recursive: true });
     cpSync(join(import.meta.dirname, "../fixtures-state/state.json"), join(dir, ".agents/state.json"));
