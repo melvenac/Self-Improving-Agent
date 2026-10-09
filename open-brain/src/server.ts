@@ -436,7 +436,15 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
           roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
           ownCheckout ?? null,
         ),
-        fleet: describeFleet(projectName, process.env, startNow),
+        fleet: (() => {
+          try {
+            return describeFleet(projectRoot, projectName, process.env, startNow);
+          } catch (err) {
+            const path = process.env.FLEET_JSON ?? "fleet.json";
+            const line = `FLEET: unavailable (${path}: invalid shape: ${(err instanceof Error ? err.message : String(err)).split("\n")[0]})`;
+            return { legacy: [line], budget: line };
+          }
+        })(),
         workingTree: describeWorkingTree(projectRoot),
         skills: describeSkills(projectRoot),
         // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.

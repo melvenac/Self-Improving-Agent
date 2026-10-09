@@ -300,12 +300,14 @@ function renderBudgeted(i: BriefingInput): string[] {
   }
 
   out.push(i.workingTree);
-  if (seats !== null && i.latestBrief) out.push(`${i.latestBrief} · ${i.skills}`);
-  else {
+  if (seats !== null && i.latestBrief) {
+    out.push(`${i.latestBrief} · ${i.skills}`);
+    if (i.readsOwed) out.push(i.readsOwed);
+  } else {
     if (i.latestBrief) out.push(i.latestBrief);
+    if (i.readsOwed) out.push(i.readsOwed);
     out.push(i.skills);
   }
-  if (i.readsOwed) out.push(i.readsOwed);
   out.push(BRIEFING_END);
   return out;
 }

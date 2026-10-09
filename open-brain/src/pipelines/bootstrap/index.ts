@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync, renameSync, realpathSync, rmdirSync, rmSync, unlinkSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -341,8 +342,26 @@ export function installCommandsBlockingDirtyPath(dirtyLines: string[]): string |
   return null;
 }
 
+function cleanupStaleWriteProbes(dir: string): void {
+  const cutoff = Date.now() - 10 * 60 * 1000;
+  try {
+    for (const name of readdirSync(dir)) {
+      if (!name.startsWith(".sia-write-probe-")) continue;
+      const full = join(dir, name);
+      try {
+        if (statSync(full).mtimeMs < cutoff) unlinkSync(full);
+      } catch {
+        /* ignore */
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
 function writeProbe(dir: string): void {
-  const probe = join(dir, `.sia-write-probe-${process.pid}`);
+  cleanupStaleWriteProbes(dir);
+  const probe = join(dir, `.sia-write-probe-${process.pid}-${randomBytes(4).toString("hex")}`);
   writeFileSync(probe, "", { flag: "wx" });
   unlinkSync(probe);
 }
