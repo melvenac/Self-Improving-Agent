@@ -1,4 +1,5 @@
-import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync, renameSync, realpathSync, rmdirSync, rmSync, accessSync, constants } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync, renameSync, realpathSync, rmdirSync, rmSync, unlinkSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -341,19 +342,55 @@ export function installCommandsBlockingDirtyPath(dirtyLines: string[]): string |
   return null;
 }
 
+function cleanupStaleWriteProbes(dir: string): void {
+  const cutoff = Date.now() - 10 * 60 * 1000;
+  try {
+    for (const name of readdirSync(dir)) {
+      if (!name.startsWith(".sia-write-probe-")) continue;
+      const full = join(dir, name);
+      try {
+        if (statSync(full).mtimeMs < cutoff) unlinkSync(full);
+      } catch {
+        /* ignore */
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function writeProbe(dir: string): void {
+  cleanupStaleWriteProbes(dir);
+  const probe = join(dir, `.sia-write-probe-${process.pid}-${randomBytes(4).toString("hex")}`);
+  writeFileSync(probe, "", { flag: "wx" });
+  unlinkSync(probe);
+}
+
+function pathReadable(absPath: string): boolean {
+  try {
+    if (statSync(absPath).isDirectory()) readdirSync(absPath);
+    else readFileSync(absPath);
+    return true;
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === "EACCES" || code === "EPERM") return false;
+    return true;
+  }
+}
+
 function preflightInstallCommandsWrite(root: string): void {
   const claude = join(root, ".claude");
   const commandsDir = join(claude, "commands");
   const commandsTarget = existsSync(commandsDir) ? commandsDir : (existsSync(claude) ? claude : root);
   try {
-    accessSync(commandsTarget, constants.W_OK);
+    writeProbe(commandsTarget);
   } catch {
     throw new Error("`.claude/commands/` is not writable — fix permissions and try again. Nothing written");
   }
   const agents = join(root, ".agents");
   if (!existsSync(agents)) throw new Error("`.agents/` is missing — nothing written");
   try {
-    accessSync(agents, constants.W_OK);
+    writeProbe(agents);
   } catch {
     throw new Error(
       "`.agents/` is not writable (session-command archives land under `.agents/archive/`) — fix permissions and try again. Nothing written",
@@ -372,10 +409,15 @@ export function installCommands(
   projectRoot: string,
   today: string,
   templateDir = defaultTemplateDir(),
-  deps: { rename?: (from: string, to: string) => void; preflightWrite?: (root: string) => void } = {},
+  deps: {
+    rename?: (from: string, to: string) => void;
+    preflightWrite?: (root: string) => void;
+    readable?: (absPath: string) => boolean;
+  } = {},
 ): InstallCommandsResult {
   const rename = deps.rename ?? renameSync;
   const preflightWrite = deps.preflightWrite ?? preflightInstallCommandsWrite;
+  const readable = deps.readable ?? pathReadable;
   const root = resolve(projectRoot);
   const ins = inspectProject(root, templateDir);
   if (!ins.templateFound) throw new Error(`project-template/ not found at ${templateDir} — nothing written`);
@@ -397,19 +439,26 @@ export function installCommands(
     return { root, archive: null, lines };
   }
 
+  preflightWrite(root);
+
   if (ins.git.kind === "root" && ins.git.dirty.length > 0) {
     const blocked = installCommandsBlockingDirtyPath(ins.git.dirty);
     if (blocked !== null) {
+      const absBlocked = join(root, blocked);
+      if (!readable(absBlocked)) {
+        throw new Error(
+          `\`${blocked}\` is not readable (permissions), so git reports it as changed — fix permissions and try again. Nothing written`,
+        );
+      }
       throw new Error(`uncommitted change outside the import (\`${blocked}\`) — commit or stash it first. Nothing written`);
     }
   }
-
-  preflightWrite(root);
 
   const commandsDir = join(root, ".claude", "commands");
   let archiveRel: string | null = null;
   let archiveDir: string | null = null;
   const rolledBack: { archivePath: string; dest: string }[] = [];
+  const createdCopies: string[] = [];
 
   try {
     for (const name of SESSION_COMMAND_NAMES) {
@@ -433,9 +482,13 @@ export function installCommands(
       }
       mkdirSync(commandsDir, { recursive: true });
       copyFileSync(join(templateDir, sessionCommandRel(name)), dest);
+      if (before === "absent") createdCopies.push(dest);
       lines.push({ name, before, after: "SIA" });
     }
   } catch (err) {
+    for (const dest of createdCopies) {
+      if (existsSync(dest)) unlinkSync(dest);
+    }
     for (const r of rolledBack.reverse()) {
       if (existsSync(r.archivePath)) renameSync(r.archivePath, r.dest);
     }

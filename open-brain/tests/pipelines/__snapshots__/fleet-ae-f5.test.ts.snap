@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`F5: no standing field renders as before > a record with no standing anywhere omits STANDING RULES (master snapshot) 1`] = `
-"## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+"## Briefing
 Serving build: synthetic
 Usage: GREEN → dispatches open
 Session 12 — 2026-10-03 · Self-Improving-Agent v9.9.9 · state rev 7
