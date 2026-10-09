@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { parseState, type State } from "../../shared/state-schema.js";
 import { gitLine, gitShow } from "./git-read.js";
 import { readLastFetchAt, revisionOf } from "./tree-currency.js";
+import { resolveUpstreamRef } from "./upstream-ref.js";
 
 /**
  * Which record does `/start` brief from? (T-200, planner ruling session 149.)
@@ -54,7 +55,7 @@ export type RecordSource =
 
 const STATE_REL = ".agents/state.json";
 
-export function resolveRecordSource(projectRoot: string, upstreamRef = "origin/master"): RecordSource {
+export function resolveRecordSource(projectRoot: string, upstreamRef = resolveUpstreamRef(projectRoot)): RecordSource {
   const local = (unreadableCause: string | null, line: string): RecordSource => ({
     kind: "local",
     upstreamRef,
