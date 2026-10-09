@@ -384,10 +384,27 @@ first line.
 
 ```powershell
 $env:HUB_URL = "http://100.124.212.87:4000"
-node <your A2A-Hub checkout>/scripts/hub-talk.mjs --as cursor-builder --session k575sfwr9wcx3r8fw83g3bc00x8fmar3 --say "<text>"
+$ht = "C:/Users/Aaron Melven/Projects/A2A-Hub/scripts/hub-talk.mjs"
+if (-not (Test-Path $ht)) { "hub-talk not at $ht: use the exact hub-talk.mjs path your --inbox call used at the start of this run" }
+node $ht --as cursor-builder --session k575sfwr9wcx3r8fw83g3bc00x8fmar3 --say-file "$iso\reply.txt"; "EXIT=$LASTEXITCODE"
 ```
 
-- **First line:** exactly `READY BRIEFING-FIX <sha40>` or `BLOCKED BRIEFING-FIX <reason>`.
+- **Write the reply to `$iso\reply.txt`, not inline.** It is posted with `--say-file`. If your hub-talk has no
+  `--say-file`, use `--say (Get-Content -Raw "$iso\reply.txt")`.
+- **Exit code:** follow `.cursor/rules/hub-room.mdc`.
+  - Exit 0 means posted; end the turn.
+  - Exit 1 means the call was wrong: fix it, and do not retry it as-is.
+  - Exit 3 means the hub is unavailable: wait the `retry-after` seconds, otherwise back off 5 s doubling to 60 s. After
+    5 consecutive exit-3s, stop.
+  - If the reply cannot be posted at all, leave it in `$iso\reply.txt` and end the turn. The planner's room sweep will
+    notice the silence.
+- **Size:** the waker skips turns of 9,990 characters or more. Keep each post **under 9,000 characters**. If it is
+  longer, post two turns: the first carries the two header lines below plus items 1–7, and the second starts
+  `TASK: BRIEFING-FIX READY (2/2)` and carries the rest.
+- **Line 1** (the dashboard reads it, per `hub-room.mdc`):
+  `TASK: BRIEFING-FIX READY, plain header + usage + READS OWED + Fleet + N1-N4 + P1/P2 (loop/briefing-fix)`, with
+  `BLOCKED` in place of `READY` on a stop.
+- **Line 2:** exactly `READY BRIEFING-FIX <sha40>` or `BLOCKED BRIEFING-FIX <reason>`.
 - **Then, in order:**
   1. `node -v`
   2. The start-state output
