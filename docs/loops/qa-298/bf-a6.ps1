@@ -1,7 +1,7 @@
 # QA 298 / BRIEFING-FIX BF-A6: #498 P1 under a REAL Windows ACL. Run as:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File bf-a6.ps1 -Cli <path to built cli.js> -Fixture <path to fixtures-state/state.json>
 # Every ACL change is undone in a finally block. icacls is printed before and after each case.
-param([Parameter(Mandatory)][string]$Cli, [Parameter(Mandatory)][string]$Fixture)
+param([Parameter(Mandatory)][string]$Cli, [Parameter(Mandatory)][string]$Fixture, [string]$Root = "C:\qa-tmp\qa298")
 $ErrorActionPreference = "Stop"
 # QA 298-r2: an elevated token (SeBackupPrivilege/SeRestorePrivilege ENABLED) gets past DENY ACEs via libuv backup
 # semantics, so the ACL never reaches node. Such a session cannot exercise P1: STOP (exit 3 = INCOMPLETE).
@@ -10,9 +10,9 @@ whoami /groups | Select-String "Mandatory Label"
 $bad = whoami /priv | Where-Object { $_ -match '^(SeBackupPrivilege|SeRestorePrivilege)\s' -and $_ -match 'Enabled\s*$' }
 if ($bad) { "STOP INCOMPLETE: elevated session"; $bad; exit 3 }
 "privileges OK: no Backup/Restore privilege enabled"
-$root = "C:\qa-tmp\qa298"
+$root = $Root
 $repo = Join-Path $root "repo"
-if (Test-Path $repo) { "REFUSED: $repo exists; use a fresh C:\qa-tmp\qa298"; exit 2 }
+if (Test-Path $repo) { "REFUSED: $repo exists; use a fresh -Root"; exit 2 }
 New-Item -ItemType Directory -Force (Join-Path $repo ".agents"), (Join-Path $repo ".claude\commands") | Out-Null
 Copy-Item $Fixture (Join-Path $repo ".agents\state.json")
 Set-Content (Join-Path $repo ".claude\commands\keep.txt") "keep" -Encoding ascii
