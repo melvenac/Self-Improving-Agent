@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 365 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 366 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — s164/D-130: SIA is frozen at 'Makerspace migration proven'. Next: the Makerspace import (docs/loops/makerspace-import-brief.md; Maker lists the 17 uncommitted files first, routed via clark under SG-1), then BRIEFING-FIX. Parked: #437, #425, Jev cal 2. Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md.
 
 ## What's working

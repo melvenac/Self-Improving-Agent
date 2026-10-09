@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 365,
+  "revision": 366,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1687,6 +1687,34 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s165 ruling, on clark's flags from Maker's first /start: role files are PER-REPO content. SIA's planner.md and shared.md carry SIA procedure and must not be copied, so Maker writes its own. The gap is that a new seat starts with NO role file. Also seen: the imported Makerspace handoff was seated as developer although AGENT.md says role: planner; clark has Maker re-seat it with ob_state set_handoff. A missing domains.json and a missing docs/loops brief are NORMAL for a non-SIA project: /start step 4 says skip absent residual reads, so they are not flags.",
+      "note_by": [
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-252",
+      "title": "BRIEFING-FIX follow-ups (grok re-review r2 F1-F4): guard null projects[] entries in fleetProjectKey; a BF-F7 case that reaches describeFleet's catch (so M9 dies); no 'seats none +K more' when seats exist but don't fit; handleStart's fallback names the real default fleet.json path",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 165,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "From docs/loops/briefing-fix-review-r2.md (grok-sia-review, delta 19cb1e5f..3ded135d, 0 blocking, 0 major). The planner ruled it ACCEPT-level, with these 4 tracked rather than a round 4 (s165). F2: `projects:[null]` makes fleetProjectKey throw, and describeFleet's catch then shows 'FLEET: unavailable' for every seat. It degrades and is not fatal, but it is the same class as r1 F2. F3: mutant 9 (describeFleet's try/catch removed) stays GREEN, because the shape guards stop every BF-F7 input before the catch; add `{\"projects\":[null]}` as a BF-F7 case.",
+      "note_by": [
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-253",
+      "title": "state import drops a bullet's continuation lines silently: bullets() keeps only lines starting '- ' or '* ', and the report counts bullets only; join indented continuation lines and count un-imported lines",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 165,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found in the Makerspace import (s165, via clark and Maker): two multi-line watch-outs lost their 2nd line. Code: state-import/index.ts:488. It applies to watch_out and open_questions. Maker restored the text from the archived next-session.md. This is the frogger F1 class: a summary that says fine while text was lost.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd"
       ],
