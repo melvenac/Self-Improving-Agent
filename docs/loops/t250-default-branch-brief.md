@@ -247,3 +247,62 @@ One test process, and no hub listener running alongside it. No real sleeps: none
 | T250-A2 | Mutants 1–4 are each red on their named rows |
 | T250-A3 | A real `ob_start` (fresh build) in `~/Worktrees/makerspace-planner` prints a `Tree currency:` line naming `origin/main` and no `NOT CHECKED`, and a `record source:` line that is not `LOCAL (origin/master unreadable…)` |
 | T250-A4 | In this repo (`sia-planner`) the currency and record-source lines are byte-identical to the pre-fix build's apart from counts (master default unchanged) |
+
+## ROUND 2 (2026-10-09): grok-sia-review F1 and F2 (`docs/loops/t250-review-r1.md`)
+
+**Start state:** your branch `fix/t250-default-branch`, with HEAD and `origin/fix/t250-default-branch` both at
+**`780e8e1cce8d44fe04dd9c9f7545663c85b5da66`** and an empty porcelain. Otherwise STOP with `BLOCKED T-250 r2 start state`.
+
+Every round-1 rule still holds: §1 (Node 22), §3 (forbidden git), §6 (the Start-Process block with a temp HOME and
+PID-only kill), §7, §8 (tsc), §11 (STOP after 2) and §12 (reply). Round 2 changes ONLY `role-files.ts` and
+`tests/pipelines/session-start/upstream-ref.test.ts`.
+
+```text
+IMPACT-TARGETS: describeRoleFiles readOne
+```
+
+**R2-1 (F2, minor): resolve once per call.**
+- In `describeRoleFiles` (role-files.ts), add `const upstreamRef = resolveUpstreamRef(projectRoot);` on the line directly
+  above `const fromRef = options.fromRef;` (line 160 at 780e8e1c).
+- `readOne` gains a fifth parameter, `upstreamRef: string`. Its signature becomes
+  `function readOne(projectRoot: string, rel: string, owner: string, inGit: boolean, upstreamRef: string): RoleFileReport`,
+  and the `files` map calls `readOne(projectRoot, rel, owner, inGit, upstreamRef)`.
+- Inside `readOne`, `behindUpstream: isBehindUpstream(projectRoot, rel, resolveUpstreamRef(projectRoot)),` becomes
+  `behindUpstream: isBehindUpstream(projectRoot, rel, upstreamRef),`.
+- `readOneFromRef` is unchanged. Keep the NUL line (239) byte-for-byte and paste the diff of `role-files.ts`, as in W4.
+
+**R2-2 (F1, major): row UR-9 pins the role-file wiring.** Add it to `upstream-ref.test.ts`:
+
+| Row | Setup | Asserts |
+|---|---|---|
+| UR-9 | A main-default fixture (as UR-1). The seed clone commits `.agents/roles/shared.md` with content `upstream\n` and `.agents/roles/developer.md` with `dev\n`, and pushes to `main`. `work` then fetches and merges (`git -C work pull --ff-only`), commits `.agents/roles/shared.md` = `local\n`, and does NOT push | `const r = describeRoleFiles(work, { name: "Seat", role: "developer", partner: "Other" })`. Then `r.files.find(f => f.rel === ".agents/roles/shared.md")!.behindUpstream === true`, `r.files.find(f => f.rel === ".agents/roles/developer.md")!.behindUpstream === false`, and `r.lines.join("\n")` contains `behind upstream` |
+
+UR-9 is GREEN at 780e8e1c, because the wiring is already right. It exists to catch mutant 5.
+
+**Round-2 mutant** (local only, never pushed; same procedure as §5):
+
+| N | Edit | Must turn red |
+|---|---|---|
+| 5 | In `describeRoleFiles`, `const upstreamRef = resolveUpstreamRef(projectRoot);` becomes `const upstreamRef = "origin/master";` | UR-9 |
+
+Also run mutants 1–4 again against the new head and report each one's red row. **Every mutant is run. None may be
+reported `NOT RUN`.**
+
+**Commit (exactly one, on top of 780e8e1c):**
+`T-250 r2: resolve the upstream ref once in describeRoleFiles; UR-9 pins role-file wiring (review F1, F2)`.
+Afterwards `git log --oneline 780e8e1c..HEAD` shows 1 line.
+
+**Tests:** the §6 block with the same 8 files.
+
+**Push:** `git push origin fix/t250-default-branch`, never `--force`, with ls-remote equal to HEAD. PR #556 already exists,
+so open no new PR.
+
+**Reply:** §12's format, with these two lines first:
+
+```text
+TASK: T-250 ROUND 2, review F1-F2 (fix/t250-default-branch)
+READY T-250 <sha40>
+```
+
+Item 5 is the pasted `git diff 780e8e1c..HEAD -- open-brain/src/pipelines/session-start/role-files.ts`, not a
+description of it.
