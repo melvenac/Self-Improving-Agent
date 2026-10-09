@@ -50,6 +50,12 @@ function urlWithOptionalSlash(u: string | undefined): string {
   return u.endsWith("/") ? u : `${u}/`;
 }
 
+function vtag(v: unknown): string {
+  if (typeof v !== "string" || v === "") return "?";
+  if (v.startsWith("v") || v.startsWith("V")) return v;
+  return `v${v}`;
+}
+
 export function fleetProjectKey(projectRoot: string, recordName: string, fleet: FleetJson): string {
   let repoName: string | null = null;
   try {
@@ -127,9 +133,9 @@ function hubFields(data: FleetJson): { hubV: string; hubUrl: string; dashV: stri
   const dash =
     data.dashboard && typeof data.dashboard === "object" && !Array.isArray(data.dashboard) ? data.dashboard : null;
   return {
-    hubV: hub && typeof hub.version === "string" ? hub.version : "?",
+    hubV: vtag(hub?.version),
     hubUrl: urlWithOptionalSlash(hub && typeof hub.url === "string" ? hub.url : undefined),
-    dashV: dash && typeof dash.version === "string" ? dash.version : "?",
+    dashV: vtag(dash?.version),
     dashUrl: urlWithOptionalSlash(dash && typeof dash.url === "string" ? dash.url : undefined),
   };
 }
@@ -156,7 +162,7 @@ function buildFleet(
   const legacy: string[] = [
     header,
     `Coordinator: ${coord} · questions and Aaron's decisions go to ${coord}`,
-    `Hub: v${hubV} ${hubUrl} · Dashboard: v${dashV} ${dashUrl}`,
+    `Hub: ${hubV} ${hubUrl} · Dashboard: ${dashV} ${dashUrl}`,
     seats.length === 0
       ? `Seats (${fleetKey}): none in fleet.json`
       : `Seats (${fleetKey}): ${seats.map(seatToken).join(" · ")}`,
@@ -164,7 +170,7 @@ function buildFleet(
 
   const verifiedSuffix = `(verified ${verifiedLabel})${stale ?? ""}`;
   const allNames = seats.map((s) => s.name);
-  const budgetCore = `FLEET: coordinator ${coord} · hub v${hubV} · dashboard v${dashV} · seats `;
+  const budgetCore = `FLEET: coordinator ${coord} · hub ${hubV} · dashboard ${dashV} · seats `;
   const suffix = ` ${verifiedSuffix}`;
   let shown = allNames.length;
   let budget = "";
