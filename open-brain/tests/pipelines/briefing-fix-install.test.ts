@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, afterEach } from "vitest";
 import { execFileSync } from "node:child_process";
-import { existsSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, renameSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { installCommands, defaultTemplateDir } from "../../src/pipelines/bootstrap/index.js";
 import { cleanupTmps, importCommit, preStateProject, TODAY } from "./import-cmds-harness.js";
@@ -68,5 +68,19 @@ describe("BF-P: installCommands permissions and rollback", () => {
       }),
     ).toThrow(/simulated failure/);
     expect(existsSync(startDest)).toBe(false);
+  });
+
+  it("BF-P3: a stale .sia-write-probe file does not block install", () => {
+    const dir = preStateProject();
+    importCommit(dir, { commitRecord: true });
+    const cmds = join(dir, ".claude", "commands");
+    const stale = join(cmds, ".sia-write-probe-99999-deadbeef");
+    writeFileSync(stale, "");
+    const old = Date.now() - 11 * 60 * 1000;
+    utimesSync(stale, old / 1000, old / 1000);
+    git(dir, "add", ".claude/commands/.sia-write-probe-99999-deadbeef");
+    git(dir, "commit", "-q", "-m", "stale probe fixture");
+    expect(() => installCommands(dir, TODAY, defaultTemplateDir())).not.toThrow();
+    expect(existsSync(stale)).toBe(false);
   });
 });

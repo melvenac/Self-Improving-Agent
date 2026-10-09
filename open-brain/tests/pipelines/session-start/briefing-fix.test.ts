@@ -15,7 +15,7 @@ import {
   type BriefingInput,
 } from "../../../src/pipelines/session-start/briefing.js";
 import { describeReadsOwed } from "../../../src/pipelines/session-start/reads-owed.js";
-import { describeFleet } from "../../../src/pipelines/session-start/fleet.js";
+import { describeFleet, fleetProjectKey } from "../../../src/pipelines/session-start/fleet.js";
 
 const FIXTURE = JSON.parse(readFileSync(join(import.meta.dirname, "../../fixtures-state/state.json"), "utf8"));
 const tmps: string[] = [];
@@ -284,16 +284,26 @@ describe("BF-F: Fleet block", () => {
 
   const now = new Date("2026-10-08T22:00:00.000Z");
 
+  function gitRepo(dir: string): void {
+    git(dir, "init", "-q", "-b", "main");
+    git(dir, "config", "user.email", "t@example.com");
+    git(dir, "config", "user.name", "T");
+    writeFileSync(join(dir, "marker"), "x");
+    git(dir, "add", "-A");
+    git(dir, "commit", "-q", "-m", "init");
+  }
+
   it("BF-F1: valid fleet file legacy block and budget line", () => {
     const root = tmp("bf-f1-");
+    gitRepo(root);
     const path = join(root, "fleet.json");
     writeFileSync(path, fleetFixture());
     const env = { FLEET_JSON: path };
-    const { legacy, budget } = describeFleet("SIA", env, now);
+    const { legacy, budget } = describeFleet(root, "SIA", env, now);
     expect(legacy).toEqual([
       "## Fleet (fleet.json, verified 10-08 16:40 CDT)",
       "Coordinator: clark · questions and Aaron's decisions go to clark",
-      "Hub: v1.21.0 http://100.124.212.87:4000 · Dashboard: v1.15.0 http://100.124.212.87:4100/",
+      "Hub: v1.21.0 http://100.124.212.87:4000/ · Dashboard: v1.15.0 http://100.124.212.87:4100/",
       "Seats (SIA): atlas-sia planner claude-code/opus DESKTOP-UGEKR74 active · cursor-infra dev cursor/composer-2.5 DESKTOP-O4EGB1E active",
     ]);
     expect(budget).toBe(
@@ -314,7 +324,8 @@ describe("BF-F: Fleet block", () => {
     const root = tmp("bf-f2-");
     const path = join(root, "fleet.json");
     writeFileSync(path, fleetFixture({ seats }));
-    const { budget } = describeFleet("SIA", { FLEET_JSON: path }, now);
+    gitRepo(root);
+    const { budget } = describeFleet(root, "SIA", { FLEET_JSON: path }, now);
     expect(budget.length).toBeLessThanOrEqual(200);
     if (budget.includes("+")) expect(budget).toMatch(/ \+\d+ more/);
   });
@@ -324,7 +335,8 @@ describe("BF-F: Fleet block", () => {
     const path = join(root, "fleet.json");
     writeFileSync(path, fleetFixture({ verifiedAt: "2026-10-07T20:00:00.000Z" }));
     const staleNow = new Date("2026-10-08T22:00:00.000Z");
-    const { legacy, budget } = describeFleet("SIA", { FLEET_JSON: path }, staleNow);
+    gitRepo(root);
+    const { legacy, budget } = describeFleet(root, "SIA", { FLEET_JSON: path }, staleNow);
     expect(legacy[0]).toContain(" · STALE (verified ");
     expect(budget).toContain(" · STALE (verified ");
   });
@@ -334,16 +346,19 @@ describe("BF-F: Fleet block", () => {
     const missing = join(root, "missing.json");
     const bad = join(root, "bad.json");
     writeFileSync(bad, "{");
-    expect(describeFleet("SIA", { FLEET_JSON: missing }, now).budget).toBe(`FLEET: unavailable (${missing}: not found)`);
-    expect(describeFleet("SIA", { FLEET_JSON: bad }, now).budget).toBe(`FLEET: unavailable (${bad}: invalid JSON)`);
-    const lines = renderBriefing(baseInput({ fleet: describeFleet("SIA", { FLEET_JSON: missing }, now) }));
+    gitRepo(root);
+    expect(describeFleet(root, "SIA", { FLEET_JSON: missing }, now).budget).toBe(`FLEET: unavailable (${missing}: not found)`);
+    expect(describeFleet(root, "SIA", { FLEET_JSON: bad }, now).budget).toBe(`FLEET: unavailable (${bad}: invalid JSON)`);
+    const lines = renderBriefing(baseInput({ fleet: describeFleet(root, "SIA", { FLEET_JSON: missing }, now) }));
     expect(lines[lines.length - 1]).toBe(BRIEFING_END);
   });
 
   it("BF-F5: fleet placement in legacy and budget layouts", () => {
-    const fpath = join(tmp("bf-f5-"), "fleet.json");
+    const froot = tmp("bf-f5-");
+    gitRepo(froot);
+    const fpath = join(froot, "fleet.json");
     writeFileSync(fpath, fleetFixture());
-    const fleet2 = describeFleet("SIA", { FLEET_JSON: fpath }, now);
+    const fleet2 = describeFleet(froot, "SIA", { FLEET_JSON: fpath }, now);
     const legacy = renderBriefing(baseInput({ fleet: fleet2 }));
     const pick = legacy.indexOf("PICK UP HERE");
     const fleetHeader = legacy.findIndex((l) => l.startsWith("## Fleet"));
@@ -364,5 +379,79 @@ describe("BF-F: Fleet block", () => {
     expect(seatsAt).toBeGreaterThan(-1);
     expect(fleetAt).toBe(seatsAt + 1);
     expect(pickAt).toBeGreaterThan(fleetAt);
+  });
+
+  it("BF-F6: fleetProjectKey maps repo folder to fleet name from main and linked worktree", () => {
+    const main = tmp("bf-f6-main-");
+    git(main, "init", "-q", "-b", "main");
+    git(main, "config", "user.email", "t@example.com");
+    git(main, "config", "user.name", "T");
+    writeFileSync(join(main, "x"), "1");
+    git(main, "add", "-A");
+    git(main, "commit", "-q", "-m", "init");
+    const repoFolder = main.split(/[/\\]/).pop()!;
+    const wt = join(main, "wt");
+    git(main, "worktree", "add", "-b", "linked", wt);
+    const fleet = { projects: [{ name: "SIA", repo: repoFolder }] };
+    expect(fleetProjectKey(main, "self-improving-agent", fleet)).toBe("SIA");
+    expect(fleetProjectKey(wt, "self-improving-agent", fleet)).toBe("SIA");
+  });
+
+  it("BF-F7: describeFleet never throws on bad JSON shapes", () => {
+    const root = tmp("bf-f7-");
+    gitRepo(root);
+    const cases: Array<[string, (line: string) => void]> = [
+      ["null", (l) => expect(l).toMatch(/invalid shape: not an object/)],
+      ["[]", (l) => expect(l).toMatch(/invalid shape: not an object/)],
+      ['{"seats":[{"name":"a"}]}', (l) => expect(l).toContain("seats none")],
+      ['{"seats":"x"}', (l) => expect(l).toContain("seats none")],
+    ];
+    for (const [body, assert] of cases) {
+      const path = join(root, `fleet-${body.length}.json`);
+      writeFileSync(path, body);
+      expect(() => describeFleet(root, "SIA", { FLEET_JSON: path }, now)).not.toThrow();
+      assert(describeFleet(root, "SIA", { FLEET_JSON: path }, now).budget);
+    }
+  });
+
+  it("BF-F9: empty seat list prints seats none without double space", () => {
+    const root = tmp("bf-f9-");
+    gitRepo(root);
+    const path = join(root, "fleet.json");
+    writeFileSync(path, fleetFixture({ seats: [] }));
+    const { budget } = describeFleet(root, "SIA", { FLEET_JSON: path }, now);
+    expect(budget).toContain("seats none");
+    expect(budget).not.toMatch(/seats  +/);
+  });
+});
+
+describe("BF-F8: READS OWED placement in budgeted layout", () => {
+  it("without SEATS, READS OWED is directly after Latest brief", () => {
+    const reads = "READS OWED: none";
+    const lines = renderBriefing(
+      baseInput({
+        budget: true,
+        focus: { seats: null, focus: null },
+        readsOwed: reads,
+      }),
+    );
+    const briefAt = lines.findIndex((l) => l.includes("Latest brief:"));
+    expect(briefAt).toBeGreaterThan(-1);
+    expect(lines[briefAt + 1]).toBe(reads);
+    expect(lines[briefAt + 2]).toMatch(/^Skills:/);
+  });
+
+  it("with SEATS, READS OWED is directly after the Latest brief line", () => {
+    const reads = "READS OWED (1): docs/loops/x.md";
+    const lines = renderBriefing(
+      baseInput({
+        budget: true,
+        focus: { seats: "SEATS: a", focus: null },
+        readsOwed: reads,
+      }),
+    );
+    const briefAt = lines.findIndex((l) => l.includes("Latest brief:"));
+    expect(briefAt).toBeGreaterThan(-1);
+    expect(lines[briefAt + 1]).toBe(reads);
   });
 });

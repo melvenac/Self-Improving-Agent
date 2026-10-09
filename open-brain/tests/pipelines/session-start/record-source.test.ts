@@ -18,7 +18,7 @@ import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { handleStart } from "../../../src/server.js";
 import { gitShow } from "../../../src/pipelines/session-start/git-read.js";
-import { BRIEFING_START } from "../../../src/pipelines/session-start/briefing.js";
+import { BRIEFING_END, BRIEFING_START } from "../../../src/pipelines/session-start/briefing.js";
 import { composeGreeting } from "../../../src/pipelines/sync/checks.js";
 
 const SPAWN_TIMEOUT_MS = 60_000;
@@ -258,6 +258,37 @@ describe("T-200 record source", { timeout: SPAWN_TIMEOUT_MS }, () => {
     expect(cut.ok === false && cut.cause).toMatch(/larger than 10000 bytes, so it was not read whole/);
     const whole = gitShow(f.clone, "origin/master", ".agents/state.json");
     expect(whole.ok && Buffer.byteLength(whole.text, "utf8")).toBe(size);
+  });
+
+  describe("BF-F10: invalid fleet.json shape does not fail ob_start", () => {
+    const savedFleet = process.env.FLEET_JSON;
+    afterEach(() => {
+      if (savedFleet === undefined) delete process.env.FLEET_JSON;
+      else process.env.FLEET_JSON = savedFleet;
+    });
+
+    async function startWithFleet(clone: string, fleetBody: string): Promise<{ text: string; isError?: boolean }> {
+      const fleetPath = join(root, `fleet-${fleetBody.length}-${Math.random().toString(16).slice(2)}.json`);
+      writeFileSync(fleetPath, fleetBody);
+      process.env.FLEET_JSON = fleetPath;
+      const res = await handleStart({ project_root: clone });
+      return { text: res.content[0]?.text ?? "", isError: res.isError };
+    }
+
+    it("FLEET_JSON null: briefing includes unavailable fleet and End Briefing", async () => {
+      const f = makeFixture(root, LOCAL);
+      const { text, isError } = await startWithFleet(f.clone, "null");
+      expect(isError).toBeFalsy();
+      expect(text).toContain("FLEET: unavailable (");
+      expect(text).toContain(BRIEFING_END);
+    });
+
+    it("seat without project: briefing completes with End Briefing", async () => {
+      const f = makeFixture(root, LOCAL);
+      const { text, isError } = await startWithFleet(f.clone, JSON.stringify({ seats: [{ name: "a" }] }));
+      expect(isError).toBeFalsy();
+      expect(text).toContain(BRIEFING_END);
+    });
   });
 
   it("the greeting-size composer follows the same source and counts the source line", () => {
