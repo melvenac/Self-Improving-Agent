@@ -437,3 +437,101 @@ node $ht --as cursor-builder --session k575sfwr9wcx3r8fw83g3bc00x8fmar3 --say-fi
 | BF-A4 | `/sync` `cursor-rules-current` passes after regeneration; the `.mdc` header carries the N1 wording |
 | BF-A5 | Mutants 1–7 are each red on their named row |
 | BF-A6 | Windows only: P1 reproduced with a real ACL (`icacls <dir> /deny "%USERNAME%:(W)"`) gives the permissions message, and the ACL is restored afterwards |
+
+## ROUND 2 (2026-10-09): grok-sia-review findings F1–F7 (`docs/loops/briefing-fix-review-r1.md`)
+
+**Start state:** your branch `loop/briefing-fix`, HEAD and `origin/loop/briefing-fix` both
+**`19cb1e5f5157dacafdac9c71bb06a1ac71e5377a`**, porcelain empty. Otherwise STOP. Every round-1 rule still holds: §1
+(Node 22), §3 (forbidden git), §6 (the Start-Process block with a temp HOME and PID-only kill), §8 (tsc), §9 (scope), §11
+(STOP after 2), §12 (reply). Round 2 changes ONLY these files: `fleet.ts`, `server.ts`, `briefing.ts`, `bootstrap/index.ts`,
+`developer-building-checks.ts` (only if R2-4 needs it), and tests.
+
+```text
+IMPACT-TARGETS: describeFleet handleStart renderBudgeted preflightInstallCommandsWrite fleetProjectKey
+```
+
+**R2-1 (F1, major): fleet project key.**
+- In `fleet.ts`, add `fleetProjectKey(projectRoot: string, recordName: string, fleet: FleetJson): string | null`:
+  1. `repoName` = the basename of the parent of `git -C <projectRoot> rev-parse --path-format=absolute --git-common-dir`.
+     This is the same from every worktree; for this repo it is `Self-Improving-Agent`. Use `execFileSync("git", …)`
+     with a 3 s timeout. On any error, `repoName = null`.
+  2. If `fleet.projects` is an array, return the `name` of the first entry whose `repo` equals `repoName`
+     (case-insensitive).
+  3. Otherwise return the `name` of the first entry whose `name` equals `recordName` (case-insensitive).
+  4. Otherwise return `recordName`.
+- `describeFleet` matches `seats[].project` against THIS key, case-insensitively. The headers show the key:
+  `Seats (SIA): …`.
+- Change the signature to `describeFleet(projectRoot, recordName, env = process.env, now = new Date())`. `handleStart`
+  passes `projectRoot` and `sj.data.project.name`.
+
+**R2-2 (F2, major): describeFleet never throws.**
+- Wrap its whole body in try/catch. Any throw prints the single line
+  `FLEET: unavailable (<path>: invalid shape: <error message's first line>)` in both layouts.
+- Also guard the shape before use:
+  - top level not a plain object → `invalid shape: not an object`;
+  - `seats` not an array → treat as `[]`;
+  - a seat whose `name` or `project` is not a string → skip it;
+  - `hub` or `dashboard` missing or not objects → print `?` for their versions and urls.
+- `handleStart` ALSO wraps the `describeFleet` call in try/catch, so a bug can never fail `ob_start`.
+
+**R2-3 (F3, minor): READS OWED placement in the budgeted layout.**
+- In `renderBudgeted`, READS OWED goes on the line directly after the line that contains `Latest brief:`, in both
+  branches of the `seats !== null` choice.
+- Order without SEATS: `Latest brief:…` / `READS OWED…` / `Skills:…`.
+- Order with SEATS: `Latest brief:… · Skills:…` / `READS OWED…`.
+
+**R2-4 (F4, minor): a behavioural BF-N4.**
+- Replace the body of BF-N4 with Grok's variant:
+  1. save `process.env.PATH`, then set `process.env.PATH = ""`;
+  2. compute the sha via `expectedDeveloperBuildingChecksMdc` on a temp copy;
+  3. expect the FIXED value parsed from the repo's committed `.cursor/rules/developer-building-checks.mdc` header
+     (`parseSectionShaFromMdc(readFileSync(<repo>/.cursor/rules/developer-building-checks.mdc))`);
+  4. restore PATH in `finally`.
+- Keep the source-regex assertions as a second `it`.
+
+**R2-5 (F5–F7, nits).**
+- **F5:** an empty seat-name list prints `seats none`, never a double space.
+- **F6:** the Dashboard url gets a trailing `/` only when it lacks one. The same for Hub.
+- **F7:** the write probe file is `.sia-write-probe-<pid>-<8 random hex>`. Before writing, delete any
+  `.sia-write-probe-*` older than 10 minutes in that directory, in try/catch so it never throws.
+
+**New rows** (add them to the existing test files):
+
+| Row | Asserts |
+|---|---|
+| BF-F6 | `fleetProjectKey` on a temp repo with a linked worktree (`git worktree add`) returns the fleet name for the repo folder from BOTH paths. `projects=[{name:"SIA",repo:"<tmp repo folder name>"}]` |
+| BF-F7 | `describeFleet` with FLEET_JSON `null`, `[]`, `{"seats":[{"name":"a"}]}` and `{"seats":"x"}` never throws. The first two print `FLEET: unavailable (… invalid shape …)`; the last two render with the bad seat skipped / no seats |
+| BF-F8 | Budgeted layout with no SEATS: the READS OWED line index is the `Latest brief:` index + 1. With SEATS: also +1 |
+| BF-F9 | An empty seat list renders `seats none` and has no double space |
+| BF-P3 | A leftover `.sia-write-probe-*` file older than 10 min in a writable `.claude/commands` does NOT cause a "not writable" refusal |
+
+**Round-2 mutants** (LOCAL ONLY, never pushed; same procedure as §5):
+
+| N | Edit | Must turn red |
+|---|---|---|
+| 8 | `fleetProjectKey` returns `recordName` unconditionally | BF-F6 |
+| 9 | Remove describeFleet's try/catch | BF-F7 |
+| 10 | Push READS OWED after Skills again | BF-F8 |
+| 11 | BF-N4: restore `execFileSync("git",["hash-object","--stdin"],…)` as the section hash | the PATH-emptied BF-N4 `it` |
+
+**Commits (exactly two, on top of 19cb1e5f):**
+1. `BRIEFING-FIX r2: tests (red)`: the new rows and the BF-N4 rewrite.
+2. `BRIEFING-FIX r2: fleet project key, never-throw fleet, READS OWED placement, nits (F1-F7)`.
+
+Afterwards `git log --oneline 19cb1e5f..HEAD` shows 2 lines.
+
+**Tests:** the §6 block, with the same 14 files. Run once more with only
+`tests/pipelines/session-start/briefing-fix.test.ts tests/pipelines/briefing-fix-sync.test.ts tests/pipelines/briefing-fix-install.test.ts`
+to show the r2 rows.
+
+**Push:** `git push origin loop/briefing-fix`, never `--force`, with ls-remote == HEAD. PR #545 already exists, so
+open no new PR.
+
+**Reply:** §12's format, with these two lines first:
+
+```text
+TASK: BRIEFING-FIX ROUND 2, F1-F7 (loop/briefing-fix)
+READY BRIEFING-FIX <sha40>
+```
+
+Mutants 8–11 are reported the same way as 1–7.

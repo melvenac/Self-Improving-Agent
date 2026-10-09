@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 364 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 365 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -37,6 +37,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-225** Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text
 - [ ] **T-235** Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps
 - [ ] **T-245** #437 Option A: replace the lock cascade with a simple wx claim and accept rare doubles, after making the two non-idempotent hook stages idempotent (handoff-marker append, SessionStart git fetch); plus make ob_end idempotent
+- [ ] **T-250** Tree currency and role-file freshness compare against a hardcoded origin/master: resolve the remote's default branch (origin/HEAD, else `git ls-remote --symref origin HEAD`) so a project on `main` gets a real currency line
 
 ## P2
 
@@ -53,6 +54,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-244** planner-watch misses peer turns: diff on each room's newest turn number, not unread, and keep prev in memory per process (shared STATE file across instances)
 - [ ] **T-247** Pin QA 288's unpinned checks: assertPathUnderDir (H1, plus a date check in writeSummary), secure_delete (H2), and the hub-room guard's clause-scope negation (G1)
 - [ ] **T-248** state import takes the project name from package.json with no override, and nothing can change project.name after --commit: add a --name flag to --draft (or an ob_state set_project op)
+- [ ] **T-249** Project identity resolves a worktree to its repo (the git common dir): one project per repo for knowledge-DB session scoping and the vault display name, with `open-brain relocate` folding the existing split history
+- [ ] **T-251** Adopted projects get role-file stubs and the right handoff seat: project-template ships minimal .agents/roles/{planner,developer,qa,shared}.md stubs (project-specific content, not SIA's), bootstrap/import installs them when absent, and state import seats the imported handoff from AGENT.md's role
 
 ## P3
 
