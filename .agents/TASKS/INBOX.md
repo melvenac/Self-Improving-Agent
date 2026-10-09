@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 372 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 373 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -37,7 +37,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-225** Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text
 - [ ] **T-235** Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps
 - [ ] **T-245** #437 Option A: replace the lock cascade with a simple wx claim and accept rare doubles, after making the two non-idempotent hook stages idempotent (handoff-marker append, SessionStart git fetch); plus make ob_end idempotent
-- [ ] **T-255** After an open-brain process restart, ob_start called before ob_set_session creates a NEW session log (Session_N+1) under the same session id instead of reusing the existing log
+- [~] **T-255** After an open-brain process restart, ob_start called before ob_set_session creates a NEW session log (Session_N+1) under the same session id instead of reusing the existing log
 
 ## P2
 
