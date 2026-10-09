@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 367 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 368 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,13 +6,13 @@
 
 ### Pick up here
 
-(1) VERIFY #545 LIVE: this /start runs on build a7443d3. The block must open with a plain '## Briefing', show READS OWED after Latest brief, a FLEET line listing SIA's seats with no 'vv', and a usage line (STALE only if slots.json is old). (2) D-143: small fixes only; support Maker on SIA questions. (3) The laptop QA 298 leftovers go in clark's batched Aaron ask.
+(1) VERIFY #545 LIVE on build a7443d3: plain '## Briefing', READS OWED after Latest brief, a FLEET line with SIA seats and no 'vv'. (2) FORWARD grok-audit's reply to clark: room k575fscdqd291tgnpg51yttgbh8frzq8, after job turn 48 (MAKERSPACE AUDIT P4, 17:16Z). (3) D-143: small fixes only; support Maker. (4) Laptop QA 298 leftovers go in clark's batched ask.
 
 ### Watch out
 
 - D-143: NO new SIA loops. Work T-248..T-253 only if one becomes a real issue for Maker (T-250 the likeliest). Every Cursor task: text to clark first (checklist plus IMPACT-TARGETS first in the brief), and post on GO.
 - QA on Windows: a laptop QA launched by ssh is ELEVATED, and DENY ACLs don't bind it. Use clark's RunLevel Limited scheduled task, a privilege preflight via System32 whoami.exe that fails closed, and fresh scratch names per rerun.
-- HUB-TALK: C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000. Grok job turns start with their prefix. A planner set_handoff needs loop_state (C3).
+- HUB-TALK: C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000. Grok job turns start with their prefix (grok-audit also takes 'MAKERSPACE JOB:'). A planner set_handoff needs loop_state (C3).
 
 ### Open questions
 
@@ -31,7 +31,7 @@
 **Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s165: E4 (21 standing); STANDING-BUDGET (D-139); D-138; V-079; D-140 QA routing; Makerspace PROVEN (D-141, sia/adopt merged 56877428); BRIEFING-FIX merged (D-142, a7443d33, rebuilt); D-143 small-fixes-only; tasks T-248..T-253.
+- s165: E4 (21 standing); STANDING-BUDGET (D-139); D-138; V-079; D-140 QA routing; Makerspace PROVEN (D-141, sia/adopt merged 56877428); BRIEFING-FIX merged (D-142, a7443d33, rebuilt); D-143 small-fixes-only; tasks T-248..T-253; Makerspace audit P4 posted to grok-audit (turn 48) for clark.
 
 ## developer [sia-builder] _(written session 156)_
 
