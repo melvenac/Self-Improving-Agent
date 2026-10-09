@@ -1,5 +1,5 @@
 === renderBriefing seat=planner ===
-## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+## Briefing
 Build abc1234 · current
 Usage: GREEN → dispatches open
 Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
@@ -126,7 +126,7 @@ Other handoffs (newest per seat and checkout; named, not rendered — read one b
 
 Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writing session(s) in the record
 === renderBriefing seat=developer ===
-## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+## Briefing
 Build abc1234 · current
 Usage: GREEN → dispatches open
 Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
@@ -201,7 +201,7 @@ Other handoffs (newest per seat and checkout; named, not rendered — read one b
 
 Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writing session(s) in the record
 === renderBriefing seat=qa ===
-## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+## Briefing
 Build abc1234 · current
 Usage: GREEN → dispatches open
 Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
@@ -297,7 +297,7 @@ Other handoffs (newest per seat and checkout; named, not rendered — read one b
 
 Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writing session(s) in the record
 === renderBriefing seat=null ===
-## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)
+## Briefing
 Build abc1234 · current
 Usage: GREEN → dispatches open
 Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
