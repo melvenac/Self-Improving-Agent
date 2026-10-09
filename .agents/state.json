@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 364,
+  "revision": 365,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1645,6 +1645,48 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Found in the Makerspace import (s165, Maker Q1): package.json name 'rename' became 'Project: rename'. The workaround was the designed draft review point, a hand-edit of state.draft.json's project.name before --commit (runCommit re-validates the draft, state-import/index.ts:1053-1057). A project whose package.json name is wrong, and which must not touch site files (A4), has no other route.",
+      "note_by": [
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-249",
+      "title": "Project identity resolves a worktree to its repo (the git common dir): one project per repo for knowledge-DB session scoping and the vault display name, with `open-brain relocate` folding the existing split history",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 165,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s165: SIA's own sessions carry 7 project_dir values, one per checkout (sia-planner 25, main 18, sia-forge 16, ...), because canonicalizeProjectDir only normalises slashes and case, and projectDisplayName takes the last path segment. The Makerspace planner moved to ~/Worktrees/makerspace-planner (Aaron, via clark, 2026-10-09), so its vault folder becomes 'makerspace-planner'. The record (state.json) does NOT split: it is tracked, and sessions[] stores the checkout.",
+      "note_by": [
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-250",
+      "title": "Tree currency and role-file freshness compare against a hardcoded origin/master: resolve the remote's default branch (origin/HEAD, else `git ls-remote --symref origin HEAD`) so a project on `main` gets a real currency line",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 165,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s165: the Makerspace planner's first /start (session 55, from makerspace-planner) printed tree currency as unchecked, because Makerspace's default branch is main. The files clark named are tree-currency.ts and role-files.ts. P1 because every adopted non-SIA project (T-181) is likely on main, and a stale-tree warning that never fires is G-034's class.",
+      "note_by": [
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-251",
+      "title": "Adopted projects get role-file stubs and the right handoff seat: project-template ships minimal .agents/roles/{planner,developer,qa,shared}.md stubs (project-specific content, not SIA's), bootstrap/import installs them when absent, and state import seats the imported handoff from AGENT.md's role",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 165,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s165 ruling, on clark's flags from Maker's first /start: role files are PER-REPO content. SIA's planner.md and shared.md carry SIA procedure and must not be copied, so Maker writes its own. The gap is that a new seat starts with NO role file. Also seen: the imported Makerspace handoff was seated as developer although AGENT.md says role: planner; clark has Maker re-seat it with ob_state set_handoff. A missing domains.json and a missing docs/loops brief are NORMAL for a non-SIA project: /start step 4 says skip absent residual reads, so they are not flags.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd"
       ],
