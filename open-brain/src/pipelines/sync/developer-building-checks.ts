@@ -95,7 +95,8 @@ export function parseSectionShaFromMdc(mdc: string): string | null {
 
 export function expectedDeveloperBuildingChecksMdc(projectRoot: string): string {
   const section = buildingChecksSectionFromRoot(projectRoot);
-  const sha = gitHashObjectStdin(section);
+  // F8-r2-(i) mutant: hashes the whole role file, not the extracted section
+  const sha = gitHashObjectStdin(normalizeLf(readDeveloperRoleMarkdown(projectRoot)));
   return renderDeveloperBuildingChecksMdc(section, sha);
 }
 
