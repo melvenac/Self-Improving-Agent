@@ -3,6 +3,13 @@
 # Every ACL change is undone in a finally block. icacls is printed before and after each case.
 param([Parameter(Mandatory)][string]$Cli, [Parameter(Mandatory)][string]$Fixture)
 $ErrorActionPreference = "Stop"
+# QA 298-r2: an elevated token (SeBackupPrivilege/SeRestorePrivilege ENABLED) gets past DENY ACEs via libuv backup
+# semantics, so the ACL never reaches node. Such a session cannot exercise P1: STOP (exit 3 = INCOMPLETE).
+"=== PRIVILEGE PREFLIGHT"
+whoami /groups | Select-String "Mandatory Label"
+$bad = whoami /priv | Where-Object { $_ -match '^(SeBackupPrivilege|SeRestorePrivilege)\s' -and $_ -match 'Enabled\s*$' }
+if ($bad) { "STOP INCOMPLETE: elevated session"; $bad; exit 3 }
+"privileges OK: no Backup/Restore privilege enabled"
 $root = "C:\qa-tmp\qa298"
 $repo = Join-Path $root "repo"
 if (Test-Path $repo) { "REFUSED: $repo exists; use a fresh C:\qa-tmp\qa298"; exit 2 }
