@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 368,
+  "revision": 369,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1668,13 +1668,14 @@
       "id": "T-250",
       "title": "Tree currency and role-file freshness compare against a hardcoded origin/master: resolve the remote's default branch (origin/HEAD, else `git ls-remote --symref origin HEAD`) so a project on `main` gets a real currency line",
       "priority": "P1",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 165,
       "closed_session": null,
       "supersedes": null,
-      "note": "s165: the Makerspace planner's first /start (session 55, from makerspace-planner) printed tree currency as unchecked, because Makerspace's default branch is main. The files clark named are tree-currency.ts and role-files.ts. P1 because every adopted non-SIA project (T-181) is likely on main, and a stale-tree warning that never fires is G-034's class.",
+      "note": "s165: the Makerspace planner's first /start (session 55, from makerspace-planner) printed tree currency as unchecked, because Makerspace's default branch is main. The files clark named are tree-currency.ts and role-files.ts. P1 because every adopted non-SIA project (T-181) is likely on main, and a stale-tree warning that never fires is G-034's class. — s166: brief docs/loops/t250-default-branch-brief.md (#555); built by cursor-builder (PR #556); Grok review r1 F1 major (role-file wiring untested) fixed in r2 (31b24468); planner verified all mutants, including Grok's call-site M5. Clark is merging under SG-1 at the update-branch head 4db52f6f once CI is green. F3 (nit): only a remote named 'origin' is resolved, by design under W1. T250-A3 (Maker's ob_start prints origin/main) needs Maker's open-brain reconnected after the rebuild.",
       "note_by": [
-        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd",
+        "73efb2c2-ab62-465b-a3fd-bf635649141f"
       ],
       "closed_rev": null
     },
@@ -1717,6 +1718,20 @@
       "note": "Found in the Makerspace import (s165, via clark and Maker): two multi-line watch-outs lost their 2nd line. Code: state-import/index.ts:488. It applies to watch_out and open_questions. Maker restored the text from the archived next-session.md. This is the frogger F1 class: a summary that says fine while text was lost.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-254",
+      "title": "The serving-build line reads build-info.json from DISK on every call, so an MCP process loaded before a rebuild prints 'Build <new> · current' while running old code: snapshot the stamp at module load and print STALE PROCESS when disk differs",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 166,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s166 (clark GO under D-143, small fix): two seats hit this on 10-09. Atlas's 22 h-old process and Maker's c28bf91a (a /clear inside a 09:57 CDT process, before the 11:42 rebuild; its /mcp reconnected only clerk) both printed 'Build a7443d3 · current' while rendering pre-#545 output. describeServingBuild (serving-build.ts:46) reads build/build-info.json at call time, so it describes the disk, not the running code. G-034's class. It also means an SG-1 post-merge rebuild silently reaches no running seat. Until this lands, clark's rebuild notes say 'running seats must /mcp reconnect open-brain'. Brief: docs/loops/stale-process-build-line-brief.md.",
+      "note_by": [
+        "73efb2c2-ab62-465b-a3fd-bf635649141f"
       ],
       "closed_rev": null
     }
@@ -5323,6 +5338,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 360
+    },
+    {
+      "n": 166,
+      "date": "2026-10-09",
+      "uuid": "73efb2c2-ab62-465b-a3fd-bf635649141f",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 369
     }
   ]
 }
