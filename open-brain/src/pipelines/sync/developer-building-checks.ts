@@ -1,6 +1,6 @@
-import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { gitBlobSha } from "../../harness/gate-records.js";
 import { readJson } from "../../shared/fs-utils.js";
 import type { CheckResult } from "./types.js";
 
@@ -10,11 +10,6 @@ export const DEVELOPER_BUILDING_CHECKS_MDC_REL = ".cursor/rules/developer-buildi
 export const REQUIRED_BLOCK_REL = ".agents/SYSTEM/required-block.json";
 
 const GENERATED_HEADER_PREFIX = "<!-- generated from ";
-
-/** Same as `git hash-object --stdin` on the UTF-8 bytes (LF-normalised section text). */
-export function gitHashObjectStdin(content: string): string {
-  return execFileSync("git", ["hash-object", "--stdin"], { input: content, encoding: "utf8" }).trim();
-}
 
 /** Normalize line endings to LF for stable generation under `core.autocrlf`. */
 export function normalizeLf(text: string): string {
@@ -78,7 +73,7 @@ export function requiredBlockSectionText(projectRoot: string): string {
 
 export function renderDeveloperBuildingChecksMdc(section: string, sectionSha: string): string {
   const header =
-    `${GENERATED_HEADER_PREFIX}${DEVELOPER_ROLE_REL}, heading "${BUILDING_CHECKS_HEADING}", section-sha ${sectionSha} (git hash-object of the extracted section) — run: node scripts/gen-cursor-rules.mjs -->\n`;
+    `${GENERATED_HEADER_PREFIX}${DEVELOPER_ROLE_REL}, heading "${BUILDING_CHECKS_HEADING}", section-sha ${sectionSha} (git hash-object of the extracted section: trailing whitespace trimmed, one final LF) — run: node scripts/gen-cursor-rules.mjs -->\n`;
   return `---
 description: Building checks from ${DEVELOPER_ROLE_REL} (generated; do not edit).
 alwaysApply: true
@@ -95,7 +90,7 @@ export function parseSectionShaFromMdc(mdc: string): string | null {
 
 export function expectedDeveloperBuildingChecksMdc(projectRoot: string): string {
   const section = buildingChecksSectionFromRoot(projectRoot);
-  const sha = gitHashObjectStdin(section);
+  const sha = gitBlobSha(section);
   return renderDeveloperBuildingChecksMdc(section, sha);
 }
 

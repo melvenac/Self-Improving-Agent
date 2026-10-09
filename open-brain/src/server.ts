@@ -37,6 +37,8 @@ import { describeServingBuild } from "./pipelines/session-start/serving-build.js
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
 import { oldStartCommandWarning } from "./pipelines/bootstrap/index.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
+import { describeReadsOwed } from "./pipelines/session-start/reads-owed.js";
+import { describeFleet } from "./pipelines/session-start/fleet.js";
 import { formatScanCounts } from "./pipelines/session-start/scan-counts.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
@@ -407,6 +409,8 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       // developer's handoff to the planner is C4 failing on the row C2 exists for.
       // T-239: with handoff_by_checkout on, only THIS checkout's handoff is "yours", in both renders.
       const ownCheckout = handoffCheckout(projectRoot);
+      const startNow = new Date();
+      const projectName = sj.data.project.name;
       lines.push(...renderState(sj.data, result.state.version, {
         seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
         projectRoot,
@@ -423,8 +427,16 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         sessionNote: result.session.skippedReason,
         date: new Date().toISOString().slice(0, 10),
         drift: result.drift,
-        usage: describeUsage(projectRoot),
+        usage: describeUsage(projectRoot, process.env, startNow),
         latestBrief,
+        readsOwed: describeReadsOwed(
+          projectRoot,
+          sj.data,
+          result.session.logPath ? result.session.sessionNumber : null,
+          roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+          ownCheckout ?? null,
+        ),
+        fleet: describeFleet(projectName, process.env, startNow),
         workingTree: describeWorkingTree(projectRoot),
         skills: describeSkills(projectRoot),
         // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.

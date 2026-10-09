@@ -16,7 +16,7 @@ import { COUNT_ONLY_PRIORITIES, GAP_CLIP, TITLE_CLIP, clip, newestGapFirst, spli
  * FLAGS. It is pure: every input is collected by a function below or by the caller, so a test hands it a record and
  * reads the text, and Relay's /start gets the same bytes from the same function.
  */
-export const BRIEFING_START = "## Briefing (print everything down to the End Briefing line verbatim, then FLAGS)";
+export const BRIEFING_START = "## Briefing";
 export const BRIEFING_END = "## End Briefing";
 
 export interface BriefingInput {
@@ -59,6 +59,10 @@ export interface BriefingInput {
    * checkout, and only that checkout's handoff is the pick-up. Absent: the role's newest handoff, as before.
    */
   ownCheckout?: string;
+  /** When set, printed on the line after Latest brief (both layouts). */
+  readsOwed?: string;
+  /** When set, legacy block before PICK UP HERE; budget line after SEATS when printed. */
+  fleet?: { legacy: string[]; budget: string };
 }
 
 /** PICK UP HERE when the reader's seat resolved and no handoff is its own. */
@@ -130,6 +134,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   out.push(`${active.length} active (${byPriority.map(([p, g]) => `${g.length} ${p}`).join(", ")}); ${done} done. Backlog order, not a decision: the pick-up below rules what starts.`);
 
   const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+  if (i.fleet) out.push("", ...i.fleet.legacy);
   out.push("", "PICK UP HERE");
   if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : own.pick_up.trim());
   else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
@@ -165,6 +170,7 @@ export function renderBriefing(i: BriefingInput): string[] {
 
   out.push("", i.workingTree);
   if (i.latestBrief) out.push(i.latestBrief);
+  if (i.readsOwed) out.push(i.readsOwed);
   out.push(i.skills);
   out.push(BRIEFING_END);
   return out;
@@ -231,6 +237,7 @@ function renderBudgeted(i: BriefingInput): string[] {
   // SEATS is paid for by brief and skills sharing one line below, and FOCUS by sharing the header: net 0 lines.
   const seats = i.focus?.seats ?? null;
   if (seats !== null) out.push(seats);
+  if (i.fleet) out.push(i.fleet.budget);
   const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
   out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
   const pickUp = own
@@ -298,6 +305,7 @@ function renderBudgeted(i: BriefingInput): string[] {
     if (i.latestBrief) out.push(i.latestBrief);
     out.push(i.skills);
   }
+  if (i.readsOwed) out.push(i.readsOwed);
   out.push(BRIEFING_END);
   return out;
 }
@@ -368,6 +376,41 @@ export const USAGE_CONSEQUENCES: Readonly<Record<string, string>> = {
 /** The weekly percentage at which every seat winds down; below it, from 95, the weekly window only holds new work. */
 const WEEKLY_STOP = 98;
 const WEEKLY_STOP_CONSEQUENCE = "park, push WIP";
+export const USAGE_STALE_MINUTES = 45;
+
+/** `MM-DD HH:MM TZ` in America/Chicago (CDT/CST). */
+export function chicagoStamp(d: Date): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZoneName: "short",
+  }).formatToParts(d);
+  const get = (type: Intl.DateTimeFormatPartTypes): string => parts.find((p) => p.type === type)?.value ?? "";
+  let hour = get("hour");
+  if (hour === "24") hour = "00";
+  return `${get("month")}-${get("day")} ${hour}:${get("minute")} ${get("timeZoneName")}`;
+}
+
+function usageStaleSuffix(obj: Record<string, unknown> | null, now: Date, fiveHourResetsAt: Date | null): string {
+  if (obj === null) return "";
+  const reasons: string[] = [];
+  if (typeof obj.set === "string") {
+    const setAt = new Date(obj.set);
+    if (!Number.isNaN(setAt.getTime())) {
+      const mins = Math.floor((now.getTime() - setAt.getTime()) / 60_000);
+      if (mins > USAGE_STALE_MINUTES) reasons.push(`set ${chicagoStamp(setAt)}, ${mins} min ago`);
+    }
+  }
+  if (fiveHourResetsAt !== null && fiveHourResetsAt.getTime() <= now.getTime()) {
+    reasons.push(`reset ${chicagoStamp(fiveHourResetsAt)} passed`);
+  }
+  if (reasons.length === 0) return "";
+  return ` · STALE (${reasons.join("; ")})`;
+}
 
 function frontmatterValue(file: string, key: string): string | null {
   if (!existsSync(file)) return null;
@@ -383,7 +426,7 @@ function frontmatterValue(file: string, key: string): string | null {
   return null;
 }
 
-export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = process.env): string {
+export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = process.env, now: Date = new Date()): string {
   const notChecked = (cause: string): string => `Usage: not checked (${cause})`;
   let path: string | null = null;
   let source = "";
@@ -426,23 +469,35 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
 
   const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
   const fivePct = obj ? num(obj.fiveHourPct) : null;
-  let resets: string | null = null;
+  let resetAt: Date | null = null;
   if (obj && typeof obj.fiveHourResetsAt === "string") {
     const t = new Date(obj.fiveHourResetsAt);
-    if (!Number.isNaN(t.getTime())) resets = `${String(t.getUTCHours()).padStart(2, "0")}:${String(t.getUTCMinutes()).padStart(2, "0")}Z`;
+    if (!Number.isNaN(t.getTime())) resetAt = t;
   }
-  const bits = [fivePct !== null ? `5h ${fivePct}%` : null, resets !== null ? `resets ${resets}` : null].filter((b): b is string => b !== null);
-  const head = `${five}${bits.length > 0 ? ` (${bits.join(", ")})` : ""}`;
+  const paceLevel =
+    obj && typeof obj.pace === "object" && obj.pace !== null && !Array.isArray(obj.pace) && typeof (obj.pace as Record<string, unknown>).level === "string"
+      ? (obj.pace as Record<string, unknown>).level as string
+      : null;
+  const weeklyNum = obj ? num(obj.sevenDayPct) : null;
+  const fiveParts: string[] = [];
+  if (fivePct !== null) fiveParts.push(`5h ${fivePct}%`);
+  if (resetAt !== null) fiveParts.push(`resets ${chicagoStamp(resetAt)}`);
+  let inner = fiveParts.join(", ");
+  if (weeklyNum !== null) {
+    const week = paceLevel !== null ? `week ${weeklyNum}% ${paceLevel}` : `week ${weeklyNum}%`;
+    inner = inner === "" ? week : `${inner}; ${week}`;
+  }
+  const head = inner.length > 0 ? `${five} (${inner})` : five;
+  const stale = usageStaleSuffix(obj, now, resetAt);
 
   // WEEKLY comes ONLY from the numeric sevenDayPct. Percentages are never parsed out of the free-text `level`; an absent
   // number is `weekly not checked`. `weeklyOverride` (string, optional) names the loop Aaron lifted the hold for.
-  const weekly: number | null = obj ? num(obj.sevenDayPct) : null;
+  const weekly: number | null = weeklyNum;
   const override = obj && typeof obj.weeklyOverride === "string" && obj.weeklyOverride.trim() !== "" ? obj.weeklyOverride.trim() : null;
   // T-234 A: at weekly >= 98 the WEEKLY window caused the stop, and the 5-hour reset does not lift it, so the weekly window
   // comes first and the line never names the 5-hour reset. Aaron's one-time reset is his act, not a consequence the line can state.
   if (weekly !== null && weekly >= WEEKLY_STOP) {
-    // The band word is STOP whatever the file's leading word says: a GREEN file with weekly 98 must never print GREEN.
-    return `Usage: STOP (weekly ${weekly}%) · ${WEEKLY_STOP_CONSEQUENCE}${fivePct !== null ? ` · 5h ${fivePct}%` : ""}`;
+    return `Usage: STOP (weekly ${weekly}%) · ${WEEKLY_STOP_CONSEQUENCE}${fivePct !== null ? ` · 5h ${fivePct}%` : ""}${stale}`;
   }
   let weeklyConsequence: string | null = null;
   if (weekly !== null && weekly >= 95) {
@@ -450,5 +505,5 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
   }
   // Below 95 adds nothing: no weekly segment. Not checked is named, never dropped.
   const weeklyPart = weekly === null ? " + weekly not checked" : weeklyConsequence !== null ? ` + WEEKLY ${weekly}%` : "";
-  return `Usage: ${head}${weeklyPart} → ${[consequence, weeklyConsequence].filter((c): c is string => c !== null).join("; ")}`;
+  return `Usage: ${head}${weeklyPart} → ${[consequence, weeklyConsequence].filter((c): c is string => c !== null).join("; ")}${stale}`;
 }
