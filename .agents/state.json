@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 369,
+  "revision": 370,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1725,15 +1725,15 @@
       "id": "T-254",
       "title": "The serving-build line reads build-info.json from DISK on every call, so an MCP process loaded before a rebuild prints 'Build <new> · current' while running old code: snapshot the stamp at module load and print STALE PROCESS when disk differs",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 166,
-      "closed_session": null,
+      "closed_session": 166,
       "supersedes": null,
-      "note": "s166 (clark GO under D-143, small fix): two seats hit this on 10-09. Atlas's 22 h-old process and Maker's c28bf91a (a /clear inside a 09:57 CDT process, before the 11:42 rebuild; its /mcp reconnected only clerk) both printed 'Build a7443d3 · current' while rendering pre-#545 output. describeServingBuild (serving-build.ts:46) reads build/build-info.json at call time, so it describes the disk, not the running code. G-034's class. It also means an SG-1 post-merge rebuild silently reaches no running seat. Until this lands, clark's rebuild notes say 'running seats must /mcp reconnect open-brain'. Brief: docs/loops/stale-process-build-line-brief.md.",
+      "note": "s166 (clark GO under D-143, small fix): two seats hit this on 10-09. Atlas's 22 h-old process and Maker's c28bf91a (a /clear inside a 09:57 CDT process, before the 11:42 rebuild; its /mcp reconnected only clerk) both printed 'Build a7443d3 · current' while rendering pre-#545 output. describeServingBuild (serving-build.ts:46) reads build/build-info.json at call time, so it describes the disk, not the running code. G-034's class. It also means an SG-1 post-merge rebuild silently reaches no running seat. Until this lands, clark's rebuild notes say 'running seats must /mcp reconnect open-brain'. Brief: docs/loops/stale-process-build-line-brief.md. — s166 CLOSED: built by cursor-builder (PR #559, 688628dc), planner verified first-hand (M1-M4 each red; T254-A2 real process: a copied build with a rewritten stamp printed 'Build 688628d · STALE PROCESS: disk has ccccccc …'), grok-sia-review ACCEPT-level (docs/loops/t254-review-r1.md). Clark merged it under SG-1 at 5d633411 and rebuilt the main checkout (smoke: LOADED_COMMIT 5d633411, 'Build 5d63341 · current'). A4: processes started before this rebuild have no check, so the 'running seats must /mcp reconnect open-brain' note stays for this rebuild. FOLLOW-UPS, worked only if one bites (D-143): F2 a process started inside the rebuild window (prebuild rmSync to postbuild stamp) gets LOADED_COMMIT=null, so the check is off for its whole life; F3 a dirty-tree rebuild at the same HEAD keeps the same stamp (fix: compare builtAt too); F1 lazy dynamic imports load disk code in a stale process (mixed code; wording only); F4 no behavioural test of the no-arg path (make A2 a child-process test; survivor: slice(0,7) comparison); F5 an unstamped disk build returns not-checked without naming the loaded commit.",
       "note_by": [
         "73efb2c2-ab62-465b-a3fd-bf635649141f"
       ],
-      "closed_rev": null
+      "closed_rev": 370
     }
   ],
   "verified": [
