@@ -4,11 +4,11 @@ import { join } from "node:path";
 import {
   buildingChecksSectionFromRoot,
   extractBuildingChecksSection,
-  gitHashObjectStdin,
   normalizeLf,
   parseSectionShaFromMdc,
   writeDeveloperBuildingChecksMdc,
 } from "../../src/pipelines/sync/developer-building-checks.js";
+import { gitBlobSha } from "../../src/harness/gate-records.js";
 import { expectRepoClean, mkFleetAeTemp, REPO_ROOT, seedFleetAeCursorProject } from "./fleet-ae-harness.js";
 
 describe("F1: gen-cursor-rules output is byte-stable", () => {
@@ -31,7 +31,7 @@ describe("F1: gen-cursor-rules output is byte-stable", () => {
     expect(mdc).toContain(section);
     expect(extractBuildingChecksSection(mdc)).toBe(section);
     const headerSha = parseSectionShaFromMdc(mdc);
-    expect(headerSha).toBe(gitHashObjectStdin(section));
-    expect(headerSha).not.toBe(gitHashObjectStdin(readFileSync(join(dir, ".agents/roles/developer.md"), "utf8")));
+    expect(headerSha).toBe(gitBlobSha(section));
+    expect(headerSha).not.toBe(gitBlobSha(readFileSync(join(dir, ".agents/roles/developer.md"), "utf8")));
   });
 });

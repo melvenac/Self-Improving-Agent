@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import {
   buildingChecksSectionFromRoot,
   checkCursorRulesCurrent,
+  normalizeLf,
   writeDeveloperBuildingChecksMdc,
 } from "../../src/pipelines/sync/developer-building-checks.js";
 import { expectRepoClean, REPO_ROOT } from "./fleet-ae-harness.js";
@@ -27,7 +28,7 @@ describe("F9: CRLF developer.md does not flap sync", () => {
     mkdirSync(join(dir, ".cursor", "rules"), { recursive: true });
     cpSync(join(ROOT, ".agents/SYSTEM/required-block.json"), join(dir, ".agents/SYSTEM/required-block.json"));
     savedRole = readFileSync(join(ROOT, ".agents/roles/developer.md"), "utf8");
-    writeFileSync(join(dir, ".agents/roles/developer.md"), savedRole.replace(/\n/g, "\r\n"));
+    writeFileSync(join(dir, ".agents/roles/developer.md"), normalizeLf(savedRole).replace(/\n/g, "\r\n"));
     git(dir, "init", "-q", "-b", "main");
     git(dir, "config", "user.email", "t@example.com");
     git(dir, "config", "user.name", "T");

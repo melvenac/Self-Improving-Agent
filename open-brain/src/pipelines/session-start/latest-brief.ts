@@ -16,34 +16,44 @@ import { join } from "node:path";
  */
 export const BRIEF_DIR = "docs/loops";
 
-export function describeLatestBrief(projectRoot: string): string | null {
+function latestBriefSelection(projectRoot: string): { path: string; date: string } | null {
   const run = (args: string[]): string =>
     execFileSync("git", args, { cwd: projectRoot, encoding: "utf-8", maxBuffer: 1 << 26, stdio: ["ignore", "pipe", "pipe"] }).replace(/\r\n/g, "\n");
-  // No docs/loops directory: nothing to name, and a project that is not a git repository is not told so.
   if (!existsSync(join(projectRoot, BRIEF_DIR))) return null;
+  const present = new Set(
+    run(["ls-tree", "-r", "--name-only", "HEAD", "--", `${BRIEF_DIR}/`])
+      .split("\n")
+      .filter((p) => isBrief(p)),
+  );
+  if (present.size === 0) return null;
+  const log = run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${BRIEF_DIR}/`]);
+  const latest = new Map<string, string>();
+  let date = "";
+  for (const line of log.split("\n")) {
+    if (line.startsWith("@")) { date = line.slice(1); continue; }
+    if (!present.has(line)) continue;
+    const seen = latest.get(line);
+    if (!seen || Date.parse(date) > Date.parse(seen)) latest.set(line, date);
+  }
+  let best: [string, string] | null = null;
+  for (const [path, d] of latest) {
+    if (best === null || Date.parse(d) > Date.parse(best[1]) || (Date.parse(d) === Date.parse(best[1]) && path > best[0])) best = [path, d];
+  }
+  return best ? { path: best[0], date: best[1] } : null;
+}
+
+export function latestBriefPath(projectRoot: string): { path: string; date: string } | null {
   try {
-    // Briefs present at HEAD. A brief deleted since is history, not the latest brief.
-    const present = new Set(
-      run(["ls-tree", "-r", "--name-only", "HEAD", "--", `${BRIEF_DIR}/`])
-        .split("\n")
-        .filter((p) => isBrief(p)),
-    );
-    if (present.size === 0) return null;
-    // Newest-first by default, but ordering is not trusted: every appearance is compared by date.
-    const log = run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${BRIEF_DIR}/`]);
-    const latest = new Map<string, string>();
-    let date = "";
-    for (const line of log.split("\n")) {
-      if (line.startsWith("@")) { date = line.slice(1); continue; }
-      if (!present.has(line)) continue;
-      const seen = latest.get(line);
-      if (!seen || Date.parse(date) > Date.parse(seen)) latest.set(line, date);
-    }
-    let best: [string, string] | null = null;
-    for (const [path, d] of latest) {
-      if (best === null || Date.parse(d) > Date.parse(best[1]) || (Date.parse(d) === Date.parse(best[1]) && path > best[0])) best = [path, d];
-    }
-    return best ? `Latest brief: ${best[0]} (${best[1].slice(0, 10)})` : null;
+    return latestBriefSelection(projectRoot);
+  } catch {
+    return null;
+  }
+}
+
+export function describeLatestBrief(projectRoot: string): string | null {
+  try {
+    const best = latestBriefSelection(projectRoot);
+    return best ? `Latest brief: ${best.path} (${best.date.slice(0, 10)})` : null;
   } catch (err) {
     const cause = (err as { stderr?: string; message?: string }).stderr?.trim().split("\n")[0] || (err as Error).message.split("\n")[0];
     return `Latest brief: not determined (git: ${cause})`;

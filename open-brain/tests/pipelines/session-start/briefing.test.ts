@@ -18,6 +18,8 @@ import {
   renderBriefing,
   type BriefingInput,
 } from "../../../src/pipelines/session-start/briefing.js";
+import { describeReadsOwed } from "../../../src/pipelines/session-start/reads-owed.js";
+import { describeFleet } from "../../../src/pipelines/session-start/fleet.js";
 import { renderState } from "../../../src/pipelines/session-start/state-render.js";
 
 /**
@@ -269,22 +271,26 @@ describe("T-233 B item 4: the Usage line", () => {
         ...over,
       },
     });
+  /** After `set`, before `fiveHourResetsAt`, and within 45m of `set` — no STALE suffix. */
+  const USAGE_NOW = new Date("2026-10-02T21:30:00.000Z");
   const usageFor = (body: string): string => {
     const root = tmp("t233b-usage-obj-");
     seatFile(root, [`usage_file: ${slots(root, body)}`]);
-    return describeUsage(root, {});
+    return describeUsage(root, {}, USAGE_NOW);
   };
 
   it("the real object shape: the 5-hour token, the numbers, the weekly cap, in the ruled format", () => {
     expect(usageFor(realShape())).toBe(
-      "Usage: RED (5h 87%, resets 03:15Z) + WEEKLY 95% → devs finish the current step then park; planners rule and merge only; no new QA, tasks or dispatches",
+      "Usage: RED (5h 87%, resets 10-02 22:15 CDT; week 95%) + WEEKLY 95% → devs finish the current step then park; planners rule and merge only; no new QA, tasks or dispatches",
     );
   });
 
   it("a one-word level, and free text with a LEADING WORD, both give the 5-hour level", () => {
-    expect(usageFor(realShape({ level: "GREEN", fiveHourPct: 4, sevenDayPct: 40, fiveHourResetsAt: "2026-10-03T05:00:00Z" }))).toBe("Usage: GREEN (5h 4%, resets 05:00Z) → dispatches open");
+    expect(usageFor(realShape({ level: "GREEN", fiveHourPct: 4, sevenDayPct: 40, fiveHourResetsAt: "2026-10-03T05:00:00Z" }))).toBe(
+      "Usage: GREEN (5h 4%, resets 10-03 00:00 CDT; week 40%) → dispatches open",
+    );
     expect(usageFor(realShape({ level: "amber (5h 60%); weekly 97%: hold except T-233", fiveHourPct: 60, sevenDayPct: 20 }))).toBe(
-      "Usage: AMBER (5h 60%, resets 03:15Z) → small LIGHT tasks only, QA cap 2",
+      "Usage: AMBER (5h 60%, resets 10-02 22:15 CDT; week 20%) → small LIGHT tasks only, QA cap 2",
     );
   });
 
@@ -300,7 +306,9 @@ describe("T-233 B item 4: the Usage line", () => {
   it("an object without sevenDayPct says weekly not checked, and keeps the 5-hour part", () => {
     const { usageLevel } = JSON.parse(realShape()) as { usageLevel: Record<string, unknown> };
     delete usageLevel.sevenDayPct;
-    expect(usageFor(JSON.stringify({ usageLevel }))).toBe("Usage: RED (5h 87%, resets 03:15Z) + weekly not checked → devs finish the current step then park; planners rule and merge only");
+    expect(usageFor(JSON.stringify({ usageLevel }))).toBe(
+      "Usage: RED (5h 87%, resets 10-02 22:15 CDT) + weekly not checked → devs finish the current step then park; planners rule and merge only",
+    );
   });
 
   it("the weekly consequence follows sevenDayPct: below 95 adds nothing, 95 and 96 hold, 98 winds down", () => {
@@ -345,7 +353,7 @@ describe("T-233 B item 4: the Usage line", () => {
 
   it("a STOP from the 5-hour window keeps the 5-hour reset text and the 5-hour window first", () => {
     expect(usageFor(realShape({ level: "STOP", fiveHourPct: 100, sevenDayPct: 40, fiveHourResetsAt: "2026-10-03T02:50:00Z" }))).toBe(
-      "Usage: STOP (5h 100%, resets 02:50Z) → everyone parks until the 5-hour reset",
+      "Usage: STOP (5h 100%, resets 10-02 21:50 CDT; week 40%) → everyone parks until the 5-hour reset",
     );
   });
 
@@ -370,7 +378,7 @@ describe("T-233 B item 4: the Usage line", () => {
 
   it("weeklyOverride names the lifted loop at >= 95 only; absent or null changes nothing", () => {
     expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: "T-233" }))).toContain("no new QA, tasks or dispatches except T-233 (Aaron's lift)");
-    expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: null }))).toMatch(/no new QA, tasks or dispatches$/);
+    expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: null }))).toMatch(/no new QA, tasks or dispatches/);
     expect(usageFor(realShape({ sevenDayPct: 96, weeklyOverride: "  " }))).toMatch(/no new QA, tasks or dispatches$/);
     expect(usageFor(realShape({ sevenDayPct: 90, weeklyOverride: "T-233" }))).not.toContain("T-233");
   });
@@ -384,7 +392,11 @@ describe("T-233 B item 4: the Usage line", () => {
   });
 
   it("a bad timestamp drops only the reset time", () => {
-    expect(usageFor(realShape({ fiveHourResetsAt: "soon", sevenDayPct: 10 }))).toBe("Usage: RED (5h 87%) → devs finish the current step then park; planners rule and merge only");
+    const { usageLevel } = JSON.parse(realShape({ fiveHourResetsAt: "soon" })) as { usageLevel: Record<string, unknown> };
+    delete usageLevel.sevenDayPct;
+    expect(usageFor(JSON.stringify({ usageLevel }))).toBe(
+      "Usage: RED (5h 87%) + weekly not checked → devs finish the current step then park; planners rule and merge only",
+    );
   });
 
   it("a relative path and an unfilled placeholder are not checked", () => {
@@ -453,14 +465,17 @@ describe("ob_start carries the same block, and every /start copy prints it verba
     if (!parsed.ok) throw new Error(parsed.error);
     const sessionLine = block[3]!;
     const n = Number(sessionLine.match(/^Session (\d+) /)![1]);
+    const startNow = new Date();
     const expected = renderBriefing(
       input(parsed.data, {
         version: "1.0.0",
         sessionNumber: n,
         serving: block[1]!,
         date: new Date().toISOString().slice(0, 10),
-        usage: describeUsage(root),
+        usage: describeUsage(root, process.env, startNow),
         latestBrief: null,
+        readsOwed: describeReadsOwed(root, parsed.data, n, "developer", "x"),
+        fleet: describeFleet(root, parsed.data.project.name, process.env, startNow),
         workingTree: describeWorkingTree(root),
         skills: describeSkills(root),
       }),
@@ -567,15 +582,19 @@ describe("ob_start carries the same block, and every /start copy prints it verba
       const block = blockOf(text);
       const parsed = parseState(readFileSync(join(root, ".agents", "state.json"), "utf8"));
       if (!parsed.ok) throw new Error(parsed.error);
+      const startNow = new Date();
+      const sessionNumber = Number(block[3]!.match(/^Session (\d+) /)![1]);
       expect(block).toEqual(
         renderBriefing(
           input(parsed.data, {
             version: "1.0.0",
-            sessionNumber: Number(block[3]!.match(/^Session (\d+) /)![1]),
+            sessionNumber,
             serving: first,
             date: new Date().toISOString().slice(0, 10),
-            usage: describeUsage(root),
+            usage: describeUsage(root, process.env, startNow),
             latestBrief: null,
+            readsOwed: describeReadsOwed(root, parsed.data, sessionNumber, "developer", "x"),
+            fleet: describeFleet(root, parsed.data.project.name, process.env, startNow),
             workingTree: describeWorkingTree(root),
             skills: describeSkills(root),
           }),
