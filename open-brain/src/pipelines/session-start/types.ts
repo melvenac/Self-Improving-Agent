@@ -94,6 +94,8 @@ export interface SessionInfo {
   skippedReason: string | null;
   /** Where sessionNumber came from when the log was created (T-164). Omitted when reused or skipped. */
   sessionNumberSource?: SessionNumberSource;
+  /** T-255 r2: the number the record proposed, when its Session_N.md was already taken and a later number was used. */
+  takenNumber?: number;
   /** T-048: Session_N.md files that could not be read during the existing-log search. Undefined when no search ran (no session id). */
   unreadableLogs?: number;
 }

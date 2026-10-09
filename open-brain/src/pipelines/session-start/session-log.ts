@@ -96,12 +96,46 @@ export function createSessionLog(
   content = content.replace("[Date]", date);
 
   if (sessionId) {
-    content = content.replace(
-      /^(>.*Status:.*$)/m,
-      `> **Session ID:** ${sessionId}\n$1`
-    );
+    const idLine = `> **Session ID:** ${sessionId}`;
+    const withStatus = content.replace(/^(>.*Status:.*$)/m, `${idLine}\n$1`);
+    if (withStatus !== content) {
+      content = withStatus;
+    } else {
+      // T-255: a template with no `> …Status:` line (a project's own SESSION_TEMPLATE.md) used to get no id at all, so
+      // findExistingSessionLog could never match it and every ob_start minted a new log. Put the id under the first line.
+      const nl = content.indexOf("\n");
+      content = nl === -1 ? `${content}\n${idLine}\n` : `${content.slice(0, nl + 1)}${idLine}\n${content.slice(nl + 1)}`;
+    }
   }
 
-  writeFileSync(logPath, content, "utf-8");
+  // T-255 r2 (F2): an atomic create. A log that already exists belongs to some session and is never overwritten.
+  try {
+    writeFileSync(logPath, content, { encoding: "utf-8", flag: "wx" });
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "EEXIST") return "";
+    throw err;
+  }
   return logPath;
+}
+
+/** T-255 r2 (F1): how many numbers past the first a session may skip to find a free Session_N.md. */
+export const SESSION_LOG_PROBE_LIMIT = 20;
+
+/**
+ * Create this session's log at `firstNumber`, or at the next number whose file does not exist yet. A taken number is
+ * never overwritten, and it is never refused forever either: the record's number does not move until a session is
+ * recorded, so refusing would leave every ob_start of this session without a log (review r1 F1).
+ * Returns null only when all SESSION_LOG_PROBE_LIMIT numbers are taken.
+ */
+export function claimSessionLog(
+  projectRoot: string,
+  firstNumber: number,
+  sessionId: string | null,
+  date: string,
+): { sessionNumber: number; logPath: string } | null {
+  for (let n = firstNumber; n < firstNumber + SESSION_LOG_PROBE_LIMIT; n++) {
+    const logPath = createSessionLog(projectRoot, n, sessionId, date);
+    if (logPath !== "") return { sessionNumber: n, logPath };
+  }
+  return null;
 }
