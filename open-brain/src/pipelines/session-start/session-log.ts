@@ -84,6 +84,8 @@ export function createSessionLog(
   if (!existsSync(sessionsDir)) return "";
   const templatePath = join(sessionsDir, "SESSION_TEMPLATE.md");
   const logPath = join(sessionsDir, `Session_${sessionNumber}.md`);
+  // T-255: a log that already exists belongs to some session; it is never overwritten (Maker's Session_57 was).
+  if (existsSync(logPath)) return "";
 
   let content: string;
   if (existsSync(templatePath)) {
@@ -96,10 +98,16 @@ export function createSessionLog(
   content = content.replace("[Date]", date);
 
   if (sessionId) {
-    content = content.replace(
-      /^(>.*Status:.*$)/m,
-      `> **Session ID:** ${sessionId}\n$1`
-    );
+    const idLine = `> **Session ID:** ${sessionId}`;
+    const withStatus = content.replace(/^(>.*Status:.*$)/m, `${idLine}\n$1`);
+    if (withStatus !== content) {
+      content = withStatus;
+    } else {
+      // T-255: a template with no `> …Status:` line (a project's own SESSION_TEMPLATE.md) used to get no id at all, so
+      // findExistingSessionLog could never match it and every ob_start minted a new log. Put the id under the first line.
+      const nl = content.indexOf("\n");
+      content = nl === -1 ? `${content}\n${idLine}\n` : `${content.slice(0, nl + 1)}${idLine}\n${content.slice(nl + 1)}`;
+    }
   }
 
   writeFileSync(logPath, content, "utf-8");

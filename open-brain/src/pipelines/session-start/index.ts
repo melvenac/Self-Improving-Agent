@@ -44,14 +44,24 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
         const { sessionNumber, source } = nextGreetingSessionNumber(options.projectRoot, state.stateJson);
         const date = new Date().toISOString().split("T")[0];
         const logPath = createSessionLog(options.projectRoot, sessionNumber, sessionId, date);
-        session = {
-          sessionId,
-          sessionNumber,
-          logPath,
-          reused: false,
-          skippedReason: null,
-          sessionNumberSource: source,
-        };
+        if (logPath === "") {
+          session = {
+            sessionId,
+            sessionNumber: 0,
+            logPath: "",
+            reused: false,
+            skippedReason: `Session_${sessionNumber}.md already exists and does not carry this session's id — it was NOT overwritten, and no log was created for this session`,
+          };
+        } else {
+          session = {
+            sessionId,
+            sessionNumber,
+            logPath,
+            reused: false,
+            skippedReason: null,
+            sessionNumberSource: source,
+          };
+        }
       }
       // T-048: the count is set whenever the search ran, so 0 (looked, none unreadable) differs from undefined (did not look).
       if (searched) session.unreadableLogs = unreadableLogs.length;
