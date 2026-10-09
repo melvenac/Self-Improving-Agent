@@ -35,6 +35,26 @@ export function runningBuildDir(): string {
   return join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 }
 
+/** The 40-hex `commit` stamped in `<buildDir>/build-info.json`, or null when the file is absent, unreadable, not JSON, or not stamped. Never throws. */
+export function readStampedCommit(buildDir: string): string | null {
+  try {
+    const infoPath = join(buildDir, "build-info.json");
+    if (!existsSync(infoPath)) return null;
+    const info = JSON.parse(readFileSync(infoPath, "utf8")) as { commit?: unknown };
+    if (typeof info.commit !== "string" || !/^[0-9a-f]{40}$/.test(info.commit)) return null;
+    return info.commit;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * T-254: the build this PROCESS loaded, read ONCE when the module is evaluated. A stdio MCP server keeps its modules for
+ * its whole life, so after a rebuild the disk stamp moves and this does not. Comparing the two is the only way the
+ * first line can tell a reader that the code answering them is older than the code on disk.
+ */
+export const LOADED_COMMIT: string | null = readStampedCommit(runningBuildDir());
+
 const gitIn = (cwd: string, args: string[]): string =>
   execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 
@@ -43,9 +63,11 @@ const why = (err: unknown): string => {
   return (e.stderr?.trim().split("\n")[0] || e.message || String(err)).split("\n")[0]!;
 };
 
-export function describeServingBuild(buildDir: string = runningBuildDir()): string {
+export function describeServingBuild(buildDir?: string, loadedCommit?: string | null): string {
+  const dir = buildDir ?? runningBuildDir();
+  const loaded = loadedCommit !== undefined ? loadedCommit : buildDir === undefined ? LOADED_COMMIT : null;
   const notChecked = (cause: string): string => `Serving build: not checked (${cause})`;
-  const infoPath = join(buildDir, "build-info.json");
+  const infoPath = join(dir, "build-info.json");
   if (!existsSync(infoPath)) return notChecked(`${infoPath} does not exist: this build predates the stamp, or the server is not running from a build`);
 
   let info: { commit?: unknown; builtAt?: unknown; reason?: unknown };
@@ -61,8 +83,12 @@ export function describeServingBuild(buildDir: string = runningBuildDir()): stri
   const short = commit.slice(0, 7);
   const builtAt = typeof info.builtAt === "string" ? info.builtAt : "an unrecorded time";
 
+  if (loaded !== null && loaded !== commit) {
+    return `Build ${loaded.slice(0, 7)} · STALE PROCESS: disk has ${short} (built ${builtAt}) → /mcp reconnect open-brain`;
+  }
+
   // The tree is the build's grandparent: <tree>/open-brain/build.
-  const tree = join(buildDir, "..", "..");
+  const tree = join(dir, "..", "..");
   try {
     gitIn(tree, ["rev-parse", "HEAD"]);
   } catch (err) {
