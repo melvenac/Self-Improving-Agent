@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { resolveUpstreamRef, FALLBACK_UPSTREAM } from "../../../src/pipelines/session-start/upstream-ref.js";
 import { describeTreeCurrency } from "../../../src/pipelines/session-start/tree-currency.js";
 import { resolveRecordSource } from "../../../src/pipelines/session-start/record-source.js";
-import { isBehindUpstream } from "../../../src/pipelines/session-start/role-files.js";
+import { describeRoleFiles, isBehindUpstream } from "../../../src/pipelines/session-start/role-files.js";
 
 const tmps: string[] = [];
 afterEach(() => {
@@ -147,5 +147,26 @@ describe("T-250 upstream ref", { timeout: 30_000 }, () => {
     git(work, "add", "a.md");
     git(work, "commit", "-q", "-m", "match upstream");
     expect(isBehindUpstream(work, "a.md", "origin/main")).toBe(false);
+  });
+
+  it("UR-9: describeRoleFiles uses resolved upstream for behindUpstream per file", () => {
+    const root = rootDir();
+    const { work, seed } = setupRemote(root, "main");
+    mkdirSync(join(seed, ".agents", "roles"), { recursive: true });
+    writeFileSync(join(seed, ".agents", "roles", "shared.md"), "upstream\n");
+    writeFileSync(join(seed, ".agents", "roles", "developer.md"), "dev\n");
+    git(seed, "add", "-A");
+    git(seed, "commit", "-q", "-m", "role files");
+    git(seed, "push", "-q", "origin", "main");
+    git(work, "fetch", "-q", "origin");
+    git(work, "pull", "-q", "--ff-only");
+    mkdirSync(join(work, ".agents", "roles"), { recursive: true });
+    writeFileSync(join(work, ".agents", "roles", "shared.md"), "local\n");
+    git(work, "add", ".agents/roles/shared.md");
+    git(work, "commit", "-q", "-m", "local shared");
+    const r = describeRoleFiles(work, { name: "Seat", role: "developer", partner: "Other" });
+    expect(r.files.find((f) => f.rel === ".agents/roles/shared.md")!.behindUpstream).toBe(true);
+    expect(r.files.find((f) => f.rel === ".agents/roles/developer.md")!.behindUpstream).toBe(false);
+    expect(r.lines.join("\n")).toContain("behind upstream");
   });
 });

@@ -158,9 +158,10 @@ export function describeRoleFiles(
   // a session that cannot say who it is still has to obey the rules everyone has.
   wanted.push({ rel: SHARED_REL, owner: "shared" });
 
+  const upstreamRef = resolveUpstreamRef(projectRoot);
   const fromRef = options.fromRef;
   const files = wanted.map(({ rel, owner }) =>
-    fromRef ? readOneFromRef(projectRoot, rel, owner, fromRef) : readOne(projectRoot, rel, owner, inGit),
+    fromRef ? readOneFromRef(projectRoot, rel, owner, fromRef) : readOne(projectRoot, rel, owner, inGit, upstreamRef),
   );
 
   for (const f of files) {
@@ -248,7 +249,13 @@ function readOneFromRef(projectRoot: string, rel: string, owner: string, ref: st
   };
 }
 
-function readOne(projectRoot: string, rel: string, owner: string, inGit: boolean): RoleFileReport {
+function readOne(
+  projectRoot: string,
+  rel: string,
+  owner: string,
+  inGit: boolean,
+  upstreamRef: string,
+): RoleFileReport {
   const abs = join(projectRoot, rel);
   const base: RoleFileReport = {
     rel,
@@ -300,7 +307,7 @@ function readOne(projectRoot: string, rel: string, owner: string, inGit: boolean
     commit: commit || null,
     commitDate: commitDate || null,
     stale,
-    behindUpstream: isBehindUpstream(projectRoot, rel, resolveUpstreamRef(projectRoot)),
+    behindUpstream: isBehindUpstream(projectRoot, rel, upstreamRef),
     note: commit ? null : "tracked but no commit touches this path",
   };
 }
