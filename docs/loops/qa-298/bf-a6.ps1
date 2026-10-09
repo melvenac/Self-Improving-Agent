@@ -6,8 +6,13 @@ $ErrorActionPreference = "Stop"
 # QA 298-r2: an elevated token (SeBackupPrivilege/SeRestorePrivilege ENABLED) gets past DENY ACEs via libuv backup
 # semantics, so the ACL never reaches node. Such a session cannot exercise P1: STOP (exit 3 = INCOMPLETE).
 "=== PRIVILEGE PREFLIGHT"
-whoami /groups | Select-String "Mandatory Label"
-$bad = whoami /priv | Where-Object { $_ -match '^(SeBackupPrivilege|SeRestorePrivilege)\s' -and $_ -match 'Enabled\s*$' }
+# QA 298-r3 F1: call System32's whoami.exe explicitly. Under Git Bash, bare `whoami` resolves to GNU coreutils, which
+# rejects /priv, so an unqualified call made this check vacuous (fail-open). Fail CLOSED if the output is not Windows'.
+$who = Join-Path $env:SystemRoot "System32\whoami.exe"
+$privOut = & $who /priv 2>&1 | Out-String
+if ($LASTEXITCODE -ne 0 -or $privOut -notmatch "PRIVILEGES INFORMATION") { "STOP INCOMPLETE: privilege check could not run ($who)"; $privOut; exit 3 }
+& $who /groups | Select-String "Mandatory Label"
+$bad = $privOut -split "`r?`n" | Where-Object { $_ -match '^(SeBackupPrivilege|SeRestorePrivilege)\s' -and $_ -match 'Enabled\s*$' }
 if ($bad) { "STOP INCOMPLETE: elevated session"; $bad; exit 3 }
 "privileges OK: no Backup/Restore privilege enabled"
 $root = $Root
