@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 370,
+  "revision": 371,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1672,7 +1672,7 @@
       "opened_session": 165,
       "closed_session": null,
       "supersedes": null,
-      "note": "s165: the Makerspace planner's first /start (session 55, from makerspace-planner) printed tree currency as unchecked, because Makerspace's default branch is main. The files clark named are tree-currency.ts and role-files.ts. P1 because every adopted non-SIA project (T-181) is likely on main, and a stale-tree warning that never fires is G-034's class. — s166: brief docs/loops/t250-default-branch-brief.md (#555); built by cursor-builder (PR #556); Grok review r1 F1 major (role-file wiring untested) fixed in r2 (31b24468); planner verified all mutants, including Grok's call-site M5. Clark is merging under SG-1 at the update-branch head 4db52f6f once CI is green. F3 (nit): only a remote named 'origin' is resolved, by design under W1. T250-A3 (Maker's ob_start prints origin/main) needs Maker's open-brain reconnected after the rebuild.",
+      "note": "s165: the Makerspace planner's first /start (session 55, from makerspace-planner) printed tree currency as unchecked, because Makerspace's default branch is main. The files clark named are tree-currency.ts and role-files.ts. P1 because every adopted non-SIA project (T-181) is likely on main, and a stale-tree warning that never fires is G-034's class. — s166: brief docs/loops/t250-default-branch-brief.md (#555); built by cursor-builder (PR #556); Grok review r1 F1 major (role-file wiring untested) fixed in r2 (31b24468); planner verified all mutants, including Grok's call-site M5. Clark is merging under SG-1 at the update-branch head 4db52f6f once CI is green. F3 (nit): only a remote named 'origin' is resolved, by design under W1. T250-A3 (Maker's ob_start prints origin/main) needs Maker's open-brain reconnected after the rebuild. — s166 T250-A3 first attempt (Maker 21:40:55Z) printed origin/master NOT CHECKED. Ruled NOT a T-250 defect. The serving build at 5d633411, run in a fresh node process against makerspace-planner (forward-slash and backslash paths), gives resolveUpstreamRef=origin/main and 'THIS TREE HAS DIVERGED from origin/main: 3 behind, 9 ahead'. Maker's printed 'Build 5d63341 · current' with origin/master is only possible if its process loaded code at or before a7443d3, which has neither T-250 nor T-254: with f64ff7c6 loaded, currency would name origin/main; with 5d633411 loaded, both lines would be right. Its transcript has no /mcp after 20:21:29 (which connected clerk only). A3 is re-run after Maker does an explicit /mcp reconnect open-brain; expect T-254's honest build line plus an origin/main currency line.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd",
         "73efb2c2-ab62-465b-a3fd-bf635649141f"
@@ -1734,6 +1734,20 @@
         "73efb2c2-ab62-465b-a3fd-bf635649141f"
       ],
       "closed_rev": 370
+    },
+    {
+      "id": "T-255",
+      "title": "After an open-brain process restart, ob_start called before ob_set_session creates a NEW session log (Session_N+1) under the same session id instead of reusing the existing log",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 166,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s166 (clark relay of Maker's report; D-143 small fix, brief after the AMBER reset). Evidence: Maker session c28bf91a (makerspace-planner). Session_56.md was created at 20:21Z (ob_set_session 20:21:48 then ob_start 20:21:49). Its open-brain process later restarted (no /mcp in the transcript; the restart time is unknown but before 21:12Z, per T-250 A3's analysis). At 21:40:55Z ob_start ran BEFORE ob_set_session (21:41:10) and created Session_57.md stamped with the same id c28bf91a, so the reuse-by-id lookup (since 62a3a00d) missed the existing log. Session_57.md is left untracked in makerspace-planner as evidence: do not fold or delete it until this task's fix is verified, then delete it. To find: does ob_start resolve the id from the per-process proof without registration, and if so why did the lookup not match Session_56's log? Or should ob_start refuse or auto-register when nothing is registered? Deterministic-first: a code fix, not a /start wording fix.",
+      "note_by": [
+        "73efb2c2-ab62-465b-a3fd-bf635649141f"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
