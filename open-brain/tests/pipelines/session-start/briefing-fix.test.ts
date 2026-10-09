@@ -311,6 +311,26 @@ describe("BF-F: Fleet block", () => {
     );
   });
 
+  it("BF-F11: version strings are not double-prefixed with v", () => {
+    const root = tmp("bf-f11-");
+    gitRepo(root);
+    const path = join(root, "fleet.json");
+    writeFileSync(
+      path,
+      fleetFixture({
+        hub: { version: "v1.22.0", url: "http://100.124.212.87:4000" },
+        dashboard: { version: "1.16.0", url: "http://100.124.212.87:4100" },
+      }),
+    );
+    const { legacy, budget } = describeFleet(root, "SIA", { FLEET_JSON: path }, now);
+    const block = legacy.join("\n");
+    expect(block).toContain("Hub: v1.22.0 ");
+    expect(block).toContain("Dashboard: v1.16.0 ");
+    expect(budget).toContain("hub v1.22.0 · dashboard v1.16.0");
+    expect(block).not.toMatch(/vv/);
+    expect(budget).not.toMatch(/vv/);
+  });
+
   it("BF-F2: budget line with 40 seats stays within 200 chars", () => {
     const seats = Array.from({ length: 40 }, (_, i) => ({
       name: `seat-${String(i).padStart(2, "0")}`,
