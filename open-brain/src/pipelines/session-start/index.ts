@@ -3,7 +3,12 @@ import { join } from "node:path";
 import { readProjectState } from "./state-reader.js";
 import { discoverSessionUuid } from "./session-discovery.js";
 import { detectDrift } from "./drift-detector.js";
-import { findExistingSessionLog, createSessionLog, nextGreetingSessionNumber } from "./session-log.js";
+import {
+  claimSessionLog,
+  findExistingSessionLog,
+  nextGreetingSessionNumber,
+  SESSION_LOG_PROBE_LIMIT,
+} from "./session-log.js";
 import { runHealthChecks } from "./health-checks.js";
 import type { SessionInfo, SessionStartOptions, SessionStartResult } from "./types.js";
 
@@ -43,23 +48,24 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
       } else {
         const { sessionNumber, source } = nextGreetingSessionNumber(options.projectRoot, state.stateJson);
         const date = new Date().toISOString().split("T")[0];
-        const logPath = createSessionLog(options.projectRoot, sessionNumber, sessionId, date);
-        if (logPath === "") {
+        const claimed = claimSessionLog(options.projectRoot, sessionNumber, sessionId, date);
+        if (claimed === null) {
           session = {
             sessionId,
             sessionNumber: 0,
             logPath: "",
             reused: false,
-            skippedReason: `Session_${sessionNumber}.md already exists and does not carry this session's id — it was NOT overwritten, and no log was created for this session`,
+            skippedReason: `Session_${sessionNumber}.md through Session_${sessionNumber + SESSION_LOG_PROBE_LIMIT - 1}.md all already exist (not matched to this session's id) — none was overwritten, and no log was created for this session`,
           };
         } else {
           session = {
             sessionId,
-            sessionNumber,
-            logPath,
+            sessionNumber: claimed.sessionNumber,
+            logPath: claimed.logPath,
             reused: false,
             skippedReason: null,
             sessionNumberSource: source,
+            ...(claimed.sessionNumber !== sessionNumber ? { takenNumber: sessionNumber } : {}),
           };
         }
       }

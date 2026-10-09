@@ -329,7 +329,7 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
           ? " (local — from this checkout's session logs; no valid state.json)"
           : "";
       lines.push(
-        `\nSession #${result.session.sessionNumber}${result.session.reused ? " (existing log for this session id — reused, nothing created)" : localNote}`,
+        `\nSession #${result.session.sessionNumber}${result.session.reused ? " (existing log for this session id — reused, nothing created)" : localNote}${result.session.takenNumber !== undefined ? ` (Session_${result.session.takenNumber}.md was already taken and was not overwritten; this session's log is Session_${result.session.sessionNumber}.md)` : ""}`,
       );
       lines.push(`Log: ${result.session.logPath}`);
       lines.push(sessionIdLine);

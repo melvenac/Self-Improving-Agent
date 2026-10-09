@@ -209,7 +209,7 @@ if (command === "sync") {
   if (result.session.logPath) {
     console.log(`\nSession log: ${result.session.logPath}`);
     console.log(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
-  }
+  } else if (result.session.skippedReason) console.log(`\nSession log: ${result.session.skippedReason}`);
 
   console.log(`\nState: ${result.state.summary ? "SUMMARY loaded" : "no SUMMARY"}`);
   console.log(`Inbox: ${result.state.inbox ? "INBOX loaded" : "no INBOX"}`);
