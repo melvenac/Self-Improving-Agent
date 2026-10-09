@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 
 vi.mock("../../../src/pipelines/session-start/session-log.js", async (orig) => ({
   ...(await orig<typeof import("../../../src/pipelines/session-start/session-log.js")>()),
-  createSessionLog: () => "",
+  claimSessionLog: () => null,
 }));
 
 import { sessionStart } from "../../../src/pipelines/session-start/index.js";
@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 describe("T-255 session log skip reason", () => {
-  it("SL-6: empty logPath from createSessionLog sets skippedReason", () => {
+  it("SL-6: claimSessionLog returning null sets skippedReason for probe exhaustion", () => {
     const root = mkdtempSync(join(tmpdir(), "t255-"));
     const home = mkdtempSync(join(tmpdir(), "t255-home-"));
     tmps.push(root, home);
@@ -30,7 +30,7 @@ describe("T-255 session log skip reason", () => {
     expect(result.session.logPath).toBe("");
     expect(result.session.reused).toBe(false);
     expect(result.session.skippedReason).toBe(
-      "Session_1.md already exists and does not carry this session's id — it was NOT overwritten, and no log was created for this session",
+      "Session_1.md through Session_20.md all already exist (not matched to this session's id) — none was overwritten, and no log was created for this session",
     );
   });
 });
