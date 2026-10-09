@@ -1,7 +1,8 @@
 # BRIEFING-FIX: ob_start briefing fixes, QA 295's four findings, #498's P1/P2
 
-**By:** Atlas (planner), session 165, 2026-10-08. **Status: WRITTEN, NOT DISPATCHED.** Aaron's order: dispatch after
-the Makerspace import. **Specs:** clark's audit of Relay's session-32 greeting
+**By:** Atlas (planner), session 165, 2026-10-08. **Status:** the Makerspace import is PROVEN (D-141), so this is
+dispatchable. Amended 2026-10-09 for checklist items 16–17 (PID-only kills, an isolated HOME, the impact reply). **The
+base SHA in the dispatch turn overrides §2's.** **Specs:** clark's audit of Relay's session-32 greeting
 (`docs/loops/fleet-deterministic-dispatch.md` §"ob_start fixes"), clark's BRIEFING-FIX spec of 2026-10-08 (pinned below),
 QA 295's non-blocking findings (`qa/s164h-report` @ `bf0b9862`, `docs/loops/s164h-qa-report.md` §Findings), and #498's
 P1/P2 (QA 291, `qa/s164d-report` @ `6561ae33`). Decisions: D-134, D-136, D-137, D-139. **Seat:** cursor-builder
@@ -299,15 +300,28 @@ All are hermetic:
 | BF-P2 | A forced failure (injected `rename` that throws on the second OLD file) with one `absent` slot → after the throw, the absent slot's file does not exist |
 | BF-N4 | With `PATH` emptied in the test's spawn environment (or `child_process.execFileSync` spied to throw), the section sha still equals the fixture value |
 
-**Command** (from `open-brain/`). Run only these files, and never pipe the output:
+**Command** (PowerShell, from `open-brain/`). Run only these files, and never pipe the output. The run is started as a
+process whose PID you record. It has a temp HOME, and the 10-minute cap stops ONLY that PID's tree (checklist 17):
 
 ```powershell
-npx vitest run tests/pipelines/session-start/briefing-fix.test.ts tests/pipelines/briefing-fix-install.test.ts tests/pipelines/briefing-fix-sync.test.ts tests/pipelines/session-start/briefing.test.ts tests/pipelines/session-start/briefing-budget.test.ts tests/pipelines/session-start/missing-handoff.test.ts tests/pipelines/session-start/standing-budget.test.ts tests/pipelines/session-start/a2a-byte-identical.test.ts tests/pipelines/session-start/record-source.test.ts tests/pipelines/fleet-ae-f1.test.ts tests/pipelines/fleet-ae-f5.test.ts tests/pipelines/fleet-ae-f8.test.ts tests/pipelines/fleet-ae-f9.test.ts tests/pipelines/bootstrap-fix-r4.test.ts --no-file-parallelism --testTimeout=20000; echo "EXIT=$LASTEXITCODE"
+$iso = Join-Path $env:TEMP ("bf-home-" + [guid]::NewGuid().ToString("N")); New-Item -ItemType Directory $iso | Out-Null
+$env:HOME = $iso; $env:USERPROFILE = $iso
+$files = "tests/pipelines/session-start/briefing-fix.test.ts tests/pipelines/briefing-fix-install.test.ts tests/pipelines/briefing-fix-sync.test.ts tests/pipelines/session-start/briefing.test.ts tests/pipelines/session-start/briefing-budget.test.ts tests/pipelines/session-start/missing-handoff.test.ts tests/pipelines/session-start/standing-budget.test.ts tests/pipelines/session-start/a2a-byte-identical.test.ts tests/pipelines/session-start/record-source.test.ts tests/pipelines/fleet-ae-f1.test.ts tests/pipelines/fleet-ae-f5.test.ts tests/pipelines/fleet-ae-f8.test.ts tests/pipelines/fleet-ae-f9.test.ts tests/pipelines/bootstrap-fix-r4.test.ts"
+$p = Start-Process -FilePath "npx.cmd" -ArgumentList "vitest run $files --no-file-parallelism --testTimeout=20000" -NoNewWindow -PassThru -RedirectStandardOutput "$iso\vitest.out" -RedirectStandardError "$iso\vitest.err"
+if (-not $p.WaitForExit(600000)) { taskkill /PID $p.Id /T /F; "BLOCKED: 10-minute cap, killed PID $($p.Id) tree only" } else { "EXIT=$($p.ExitCode)" }
+Get-Content "$iso\vitest.out"
 ```
 
+- Paste the vitest summary from `vitest.out` and the `EXIT=` line separately (G-042).
+- **Killing:** only `taskkill /PID <the PID you recorded> /T`. Never kill by name, image or command-line filter
+  (`Stop-Process -Name`, `taskkill /IM`, `Where-Object CommandLine -match`). To look at stray processes, LIST them and
+  paste the list; do not stop them.
+- **Isolation:** no test in this job spawns a waker or an agent.
+  - Every test that reads usage, fleet or record files passes temp paths and an `env` object (§6, hermetic).
+  - The run's HOME and USERPROFILE are the temp `$iso`.
+  - After the run, paste `Get-ChildItem $iso -Recurse -Name` as evidence of what the run wrote.
 - Also run every other test file that `git grep -ln "describeUsage\|describeLatestBrief\|installCommands\|gitHashObjectStdin\|BRIEFING_START" -- open-brain/tests`
-  lists. Paste that list.
-- **Wall clock:** if a run passes 10 minutes, stop it (`Stop-Process` on its node children) and reply BLOCKED.
+  lists, with the same block. Paste that list.
 - No watch mode. No whole suite.
 
 ## 7. Known red
@@ -385,6 +399,9 @@ node <your A2A-Hub checkout>/scripts/hub-talk.mjs --as cursor-builder --session 
   8. Each mutant: name, red test and assertion line
   9. The push readback
   10. The PR number
+  11. **GitNexus impact (checklist 16).** Clark's launcher puts `gitnexus impact` output for every IMPACT-TARGET at the
+      top of your prompt. Name each target it rates HIGH, CRITICAL or UNKNOWN, and for each one name the test rows
+      (BF-…, or an existing file from §6) that cover its callers. If there are none, write `IMPACT: no HIGH/CRITICAL/UNKNOWN`.
 - Every number is pasted command output, with the command above it. Anything not run is marked `NOT RUN`.
 - End your turn after posting.
 
