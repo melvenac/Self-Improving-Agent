@@ -3,6 +3,7 @@ import { join, isAbsolute } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { parseState } from "../../shared/state-schema.js";
 import { gitShow } from "./git-read.js";
+import { resolveUpstreamRef } from "./upstream-ref.js";
 
 /**
  * Is this checkout current with the remote, and is its record current with the
@@ -85,7 +86,7 @@ export interface TreeCurrency {
 }
 
 export interface TreeCurrencyOptions {
-  /** Defaults to `origin/master`. */
+  /** Defaults to resolveUpstreamRef(projectRoot) (T-250). */
   upstreamRef?: string;
   /**
    * The result of the `git fetch --prune origin` the CALLER just made (T-208).
@@ -224,7 +225,7 @@ export function describeTreeCurrency(projectRoot: string, options: TreeCurrencyO
 }
 
 function compare(projectRoot: string, options: TreeCurrencyOptions): TreeCurrency {
-  const upstreamRef = options.upstreamRef ?? "origin/master";
+  const upstreamRef = options.upstreamRef ?? resolveUpstreamRef(projectRoot);
 
   const skip = (skipReason: string): TreeCurrency => ({
     severity: "skip",
