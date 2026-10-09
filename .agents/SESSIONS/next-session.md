@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 363 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 364 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,13 +6,13 @@
 
 ### Pick up here
 
-(1) Wait for Maker; clark says when it's up. Makerspace import per docs/loops/makerspace-import-brief.md; the 17-file list goes via clark. (2) After the import: dispatch BRIEFING-FIX (docs/loops/briefing-fix-brief.md, master 34c516c2) to cursor-builder. Restate the 40-char base SHA in the turn; clark runs prelaunch-impact on the IMPACT-TARGETS. (3) Parked (D-130): #437, #425, Jev cal 2.
+(1) Makerspace PROVEN (D-141): Aaron merges sia/adopt @ bb06a367 (on clark's On deck). (2) Dispatch BRIEFING-FIX (docs/loops/briefing-fix-brief.md) to cursor-builder. Send the exact task text to clark first: the 17-item checklist plus prelaunch-impact. Restate the base SHA. (3) Parked (D-130): #437, #425, Jev cal 2.
 
 ### Watch out
 
-- EVERY CURSOR BRIEF/TURN must pass ~/Worktrees/cursor-brief-checklist.md (Aaron 10-08 via clark) plus an IMPACT-TARGETS: line. Mutants stay LOCAL and are never pushed. Give exact SHAs, commits, test commands and reply line.
-- HUB-TALK: use C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000, never ~/Projects/A2A-Hub. Grok job turns start with their prefix (REVIEW JOB:/QA JOB:) as the first characters.
-- 21 STANDING RULES now render in every briefing (D-139: one line in the budgeted layout). Tag new rule-type decisions with standing:true. Read the rules there; don't re-list them in watch-outs.
+- EVERY CURSOR TASK goes to clark before dispatch: ~/Worktrees/cursor-brief-checklist.md (17 items: IMPACT-TARGETS, PID-only kills, isolated test HOME) plus prelaunch-impact. Mutants stay LOCAL. Exact SHAs, commands, reply line.
+- QA DISPATCHES: a /start row needs a machine that runs SIA (the laptop has no open-brain). On the desktop, call ob_* in-session with KNOWLEDGE_V2_DB/OPEN_BRAIN_VAULT_DIR set at launch. A planner set_handoff needs loop_state (C3).
+- HUB-TALK: C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000. Grok job turns start with their prefix. Under D-140 QA defaults to Grok; Claude QA only for cases (1)-(3).
 
 ### Open questions
 
@@ -31,7 +31,7 @@
 **Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s165: E4 done (21 standing rules: #530, #535); STANDING-BUDGET #532 merged under SG-1 (D-139); D-138 (D-040 push trigger superseded by T-227); V-079 scrub verified by dry run; BRIEFING-FIX brief #536 written, clark accepted its 4 deviations.
+- s165: E4 (21 standing rules); STANDING-BUDGET merged (D-139); D-138; V-079; D-140 QA routing (standing); BRIEFING-FIX brief #536; Makerspace PROVEN (D-141): QA 296 INCOMPLETE (laptop), QA 297 REJECT on dispatch defect F1, ruled ACCEPT on QA's variant.
 
 ## developer [sia-builder] _(written session 156)_
 
