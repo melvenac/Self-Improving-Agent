@@ -14,6 +14,7 @@ import {
   QA_REGRESSION_QUESTION_ID,
   buildJevRequest,
   buildQaScoreQuestions,
+  e_tStateForJev,
   qaResultQuestionId,
   qaSeverityQuestionId,
   redact,
@@ -129,9 +130,9 @@ export async function runShadowQaGate(options: RunShadowQaOptions): Promise<RunS
     model: "jev-latest",
     questions,
     context: {
-      e_t: ev,
+      e_t: e_tStateForJev(ev),
       e_t_ref: { ...options.evidence, blob },
-      note: "Rows without evidence are not asked; they are recorded untested by code.",
+      note: "Rows without evidence are not asked; they are recorded untested by code. Requirement statuses are omitted from the Jev request.",
     },
   };
 

@@ -31,6 +31,18 @@
     },
     "hand_to_qa_requires_green_checks": {
       "type": "boolean"
+    },
+    "plan_match": {
+      "type": "string",
+      "enum": [
+        "whole_diff",
+        "requirement_rows"
+      ]
+    },
+    "requirement_row_min_noul": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
     }
   },
   "required": [

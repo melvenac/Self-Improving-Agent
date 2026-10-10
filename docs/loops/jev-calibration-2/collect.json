@@ -1,0 +1,655 @@
+{
+  "cases": [
+    {
+      "base_how": "merge-parent",
+      "base_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+      "candidate_sha": "00552846cc6d2b7469d3b202407b949bc2d3fc8c",
+      "case_id": "t209-t210",
+      "case_no": 1,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "5bfc1a70de63d007ad13d6ab2a23d32436360bc0",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-253-t209-t210-dispatch.md",
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "6c495794145097d47f009963c2c93dadfb1a319b",
+        "5ceb6eef7ed217cbb4fdcc6c9f34f9cc5ea37cd4",
+        "79d1f5d915e2fb89680afec51ead485c9cf4e893"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 253,
+      "qa_report_ref": {
+        "commit": "a753fb7ff3570585b82757b4f6d24c8112943b99",
+        "path": "docs/loops/t209-t210-qa-report.md",
+        "ref": "origin/qa/t209-t210-report"
+      },
+      "verdict_text": "# QA 253 report: T-209 (gaps newest-first) + T-210 (latest brief by git commit date)  **By:** QA 253 (headless Claude Code, Opus 5.5), record session 253, 2026-10-02. **Dispatch:** `docs/loops/qa-253-"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
+      "candidate_sha": "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
+      "case_id": "t208-t212",
+      "case_no": 2,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md",
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "e442b955f2b713c7bdddb1edb5bb86253dfe0203",
+        "626f7d1347d3080ae2dd15022391f4f402a6d495",
+        "1e61ccb20a9c427df530b2f976aefe3b1a2ae350",
+        "79d1f5d915e2fb89680afec51ead485c9cf4e893"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 254,
+      "qa_report_ref": {
+        "commit": "6a908ebff5bca2b999103a1081873ea915f2f3ef",
+        "path": "docs/loops/t208-t212-qa-report.md",
+        "ref": "origin/qa/t208-t212-report"
+      },
+      "verdict_text": "# QA 254 report: T-208 (fetch before currency) + T-212 (handoff check attributes by trailer)  **By:** QA 254 (headless Claude Code, Opus 5.5), record session 254, 2026-10-02. **Dispatch:** `docs/loops"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "507004147df01ec665ff5970257ee400534720ef",
+      "candidate_sha": "507004147df01ec665ff5970257ee400534720ef",
+      "case_id": "b1-start",
+      "case_no": 3,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
+      "label": null,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "0085e78a81e445d942965efce1c358fb9e83f57e",
+        "79d1f5d915e2fb89680afec51ead485c9cf4e893",
+        "f76392d2963ad549defee2e52fecc5ba8eee20b6",
+        "fc71d9696527f97f28ac6a7c4cd8ee572e0fa1f0",
+        "19714baa42a002d306f118f6b5c4403617bdaf34",
+        "5ec37cdf4d5566237bb3ecfc552d77cc0b486e69",
+        "a753fb7ff3570585b82757b4f6d24c8112943b99"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 255,
+      "qa_report_ref": {
+        "commit": "0736e432916e3aadfeed927a223a6fdc631d7e7c",
+        "path": "docs/loops/b1-start-qa-report.md",
+        "ref": "origin/qa/b1-start-report"
+      },
+      "verdict_text": "# QA 255, batch B1 (session-start render): #287, #291, #297, #312  **By:** QA 255 (record session 255), headless Claude Code on Opus, 2026-10-02. Dispatch: `docs/loops/qa-255-b1-start-dispatch.md`. **"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "7427ee5587f0343bc663cf2e6e8ba49357cab8bf",
+      "candidate_sha": "7427ee5587f0343bc663cf2e6e8ba49357cab8bf",
+      "case_id": "t203",
+      "case_no": 4,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "dcc767c285144469f0539d360224df3c0a642205",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-266-t203-dispatch.md",
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "09f82a12193788df0b50113aae20e2cd3cccf49c",
+        "f9a3af2ef3c23fc2ab5792a436c980adf7109a53",
+        "a947b8b47c7eb453207110fe5ca2b691f8affc52",
+        "b7f7f3a07940fb835a152750d39cc33dcb35e297",
+        "072fb18feec874259365ae858dbf40c609396be5",
+        "6c1fbb95e3b98c758e2a17f6a3981b74e40e3a6f",
+        "a29dbd94d6c259883fddedb53407fa38cd4bbc98"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 266,
+      "qa_report_ref": {
+        "commit": "9460e90f70caf768244425e91fc276dd3ecdb741",
+        "path": "docs/loops/t203-qa-report.md",
+        "ref": "origin/qa/t203-report"
+      },
+      "verdict_text": "# QA 266 report: T-203 (a seat is resolved by its checkout, #376)  **By:** QA 266 (headless Claude Code, Opus 5.5), record session 159, 2026-10-03. **Dispatch:** `docs/loops/qa-266-t203-dispatch.md`. "
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "7779e6fee1fc1ee013ad6523dcb5a2e115e9dbda",
+      "candidate_sha": "7779e6fee1fc1ee013ad6523dcb5a2e115e9dbda",
+      "case_id": "s160c",
+      "case_no": 5,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "7431063d4ef8b2d3a4b411a02172b878b1cd18bb",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-268-s160c-dispatch.md",
+      "label": "REJECT",
+      "leak_group": true,
+      "leak_hits": [
+        "accepted"
+      ],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "6f145faf9d1bba962d281e16285fcb59b14b68c7",
+        "3e95016c92844b67113ae44f9d9c7ed362335587",
+        "f8345f1b1929bb05a3cf3230d7a0cc91a30266a9",
+        "6e55119baeb6e9b87c5341e03120e16f8de586e7",
+        "4020a42bdd0b20e1299342af3b353e0eb84a90a6"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 268,
+      "qa_report_ref": {
+        "commit": "eca6c256e33237d1b428c8d0c2e8b624b4bf52b4",
+        "path": "docs/loops/s160c-qa-report.md",
+        "ref": "origin/qa/s160c-report"
+      },
+      "verdict_text": "# QA 268 report: session-160 batch c (#393 r2 narrow, #397)  **By:** QA 268 (headless Claude Code, Opus), record session 160, 2026-10-03 (UTC 2026-10-04). **Dispatch:** `docs/loops/qa-268-s160c-dispat"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "617d0f80a8ba37005f58281ecd3ec5996a031cd6",
+      "candidate_sha": "617d0f80a8ba37005f58281ecd3ec5996a031cd6",
+      "case_id": "s160d",
+      "case_no": 6,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "9ea9f54a6e81ad3f465f56bf92243f3f129ceeba",
+        "c3ee949b8e6e6a45a2758af61c7d6bafd8ca8ce0",
+        "3212ed69a87bf3bbfad5f933691bc457b3435a13",
+        "5add91379641ef211f98b2f79d1551c0090821eb",
+        "ef57c10ceae8c1ccb390e40eec28e8b1283992a1",
+        "3e95016c92844b67113ae44f9d9c7ed362335587",
+        "d4507be6950cc5c8f3f45c27970920f136898389",
+        "e14593baf387ca845df2789b72abeaf230f5e2c0",
+        "bbc2acbf65c54ab640713b03ec806a8e5a9c4f14",
+        "783cdc14c503b416e1d54837c5722ddcd42089e8",
+        "169956b843b716846131db12e2d0a2800bdeba2c"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 269,
+      "qa_report_ref": {
+        "commit": "56ebcf3724a526b955ff44c856bf692d016ee0f1",
+        "path": "docs/loops/s160d-qa-report.md",
+        "ref": "origin/qa/s160d-report"
+      },
+      "verdict_text": "# QA 269 report: session-160 batch d (#397 r2 narrow, #401, #402, #404)  **By:** QA 269 (headless Claude Code, Opus), record session 160, 2026-10-03 (UTC 2026-10-04). **Dispatch:** `docs/loops/qa-269-"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "0bc93353a7eae700b59835e09e573549948ce13c",
+      "candidate_sha": "0bc93353a7eae700b59835e09e573549948ce13c",
+      "case_id": "s160e",
+      "case_no": 7,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "538059a1271a552b52f9d008e75a4d1324d49350",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md",
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "f918de5844a89d38f03d4d4e23173e4540c9f814",
+        "e00c0d5aae7ad902a589d09b60a672d0700ae78c",
+        "be9132757ad040b7ab944e0adfaa19f3d3400eeb",
+        "c1ed6b2af20a870b902f0d6f1f58ae71d7ef57b2"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 270,
+      "qa_report_ref": {
+        "commit": "70aefd51a231a48e04a7df259ce34afa388fae96",
+        "path": "docs/loops/s160e-qa-report.md",
+        "ref": "origin/qa/s160e-report"
+      },
+      "verdict_text": "# QA 270 report (s160e): #412 (T-238 KEY_ORDER guard) + #413 (T-239 handoff by checkout)  **By:** QA 270 (headless Claude Code, Opus 5.5), record session 160, 2026-10-04 UTC. **Dispatch:** `docs/loops"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "71b2b924b1020a454e2eaa7035366c841de0f8f5",
+      "candidate_sha": "71b2b924b1020a454e2eaa7035366c841de0f8f5",
+      "case_id": "s160f",
+      "case_no": 8,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "687200f90fe15927859568493c26fe622c894d39",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
+      "label": "ACCEPT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "4ada3bb375400ccddb795c9610aa51e2f123c997",
+        "dc092840af38f86dfe18af060564fe181988f159",
+        "8f14ca91d5ddfb5986bc025566c853af8d45e042",
+        "0d2bc66e94ebed4ca7008395eede8426f43e055c",
+        "651ac36b19a127adc1c365327e3e7e64a3669256",
+        "82aeb3da3e9036d5f6812738be541cb67ada1e07",
+        "b92df3c8fc3248105af635bb06a595d1c0d3822e"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 272,
+      "qa_report_ref": {
+        "commit": "d562eca0db647ecc3913287d4d522f382f4869a2",
+        "path": "docs/loops/s160f-qa-report.md",
+        "ref": "origin/qa/s160f-report"
+      },
+      "verdict_text": "# QA 272 report (s160f): #415 (T-239 follow-up), #420 (T-200 port), #421 (G-053), plus the #418 retro-check  **By:** QA 272 (headless Claude Code, Opus 5.5), record session 160, 2026-10-04 UTC. **Disp"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "0565c51ff97bac036cd4cac18bfa4ce4e1b2729d",
+      "candidate_sha": "0565c51ff97bac036cd4cac18bfa4ce4e1b2729d",
+      "case_id": "s161a",
+      "case_no": 9,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "9915a59baad67d9e29a415adec0a931b335c1cba",
+        "12c289264e433bb306f55e212193a7a2448c2eca",
+        "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b",
+        "270b550b97ada09f50c256f381e4ec26ff98782a",
+        "651ac36b19a127adc1c365327e3e7e64a3669256",
+        "71b2b924b1020a454e2eaa7035366c841de0f8f5",
+        "f8dc13a5bb8e2d9fe6d972fef0a7cadc2c202317",
+        "3bcd7d72ddd5e7ea1e64ca839fea5482c977682c",
+        "82aeb3da3e9036d5f6812738be541cb67ada1e07"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 273,
+      "qa_report_ref": {
+        "commit": "7ce087186ffac0afe156060c60c751b24da02dea",
+        "path": "docs/loops/s161a-qa-report.md",
+        "ref": "origin/qa/s161a-report"
+      },
+      "verdict_text": "# QA 273 (s161a) report: #421 r2, #424, #425, #427 (Plumb, Linux)  **By:** QA 273, record session 161, headless Claude Code on Opus on Plumb (Linux). Nobody watching live. **Dispatch:** `docs/loops/qa"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "bbea9698417a70344ea777c6e15283cdd6ec7ad7",
+      "candidate_sha": "bbea9698417a70344ea777c6e15283cdd6ec7ad7",
+      "case_id": "s161c",
+      "case_no": 10,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "7ce087186ffac0afe156060c60c751b24da02dea",
+        "bfc225089a4be11b9c3cea7c734e472991a4efcc",
+        "8173cef6495dd9333cd199d0c05c82ac671589ed",
+        "b9026d71d1fbfa2ba42de465fac4d54feae702cd",
+        "987901c9cb43f3dd3a31b9e22fec164edd9769dd",
+        "12f26320fdb89ea9e9c76dfc30790628b707d6d7",
+        "144623d2f9707d7b501a0657f842f4a827d85562",
+        "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+        "651ac36b19a127adc1c365327e3e7e64a3669256",
+        "71b2b924b1020a454e2eaa7035366c841de0f8f5",
+        "f8dc13a5bb8e2d9fe6d972fef0a7cadc2c202317",
+        "91e144511bf70477089aa10f1fb396c5954adc7d",
+        "270b550b97ada09f50c256f381e4ec26ff98782a",
+        "d8f4c9dcd17f71b8b76d41fabca46d395650eb1c",
+        "82aeb3da3e9036d5f6812738be541cb67ada1e07",
+        "9915a59baad67d9e29a415adec0a931b335c1cba",
+        "12c289264e433bb306f55e212193a7a2448c2eca",
+        "4100c8781ef83c4d07ed8508fe650922a02cffe8"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 275,
+      "qa_report_ref": {
+        "commit": "2dc5f1149e5fd5b69909afdfc6f507f29e3078a6",
+        "path": "docs/loops/s161c-qa-report.md",
+        "ref": "origin/qa/s161c-report"
+      },
+      "verdict_text": "# QA 275 (s161c) report: #434, #436, #437, plus amendment 1 (#421 r3, #424 r2, #427 r2, batch merge) (Plumb, Linux)  **By:** QA 275, record session 161, headless Claude Code on Opus on Plumb (Linux). "
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+      "candidate_sha": "b20d574fc575761ba5493ad2ce0033707570517c",
+      "case_id": "s161d",
+      "case_no": 11,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "18ebc58b83113e9c18a5fd71fa9d45682708f8b9",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-276-s161d-dispatch.md",
+      "label": null,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "987901c9cb43f3dd3a31b9e22fec164edd9769dd",
+        "270b550b97ada09f50c256f381e4ec26ff98782a"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 276,
+      "qa_report_ref": {
+        "commit": "84aef34c17259d4fd59c07bd27545d5bd088ceaa",
+        "path": "docs/loops/s161d-qa-report.md",
+        "ref": "origin/qa/s161d-report"
+      },
+      "verdict_text": "# QA 276 (s161d): #427 r2's walk on real Windows  **Seat:** QA, headless Claude Code on Opus, record session 161. **Machine: the laptop (DESKTOP-0GV3HAD)**, Windows 10 Pro 19045, Windows PowerShell 5."
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "b5c19fa45228cbe070e0a52fe2e3c2d5615f771a",
+      "candidate_sha": "b5c19fa45228cbe070e0a52fe2e3c2d5615f771a",
+      "case_id": "s161e",
+      "case_no": 12,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
+      "label": "REJECT",
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "a6d75b5273091d75bbc127826853170fe3ddeb4a",
+        "48bf479562296a0f4c717fb91cc0fec92f11ed86",
+        "08fa900211547aade6538792c88feab037ba23f8",
+        "a5f118192f3479ad35dd58aebb3d24510f0f24b4",
+        "d292747f8ce5e9173edfc71e5feb3f249693b147",
+        "685b9fe931a08f31d59977c90fbbd06cb977588b",
+        "1e8cba7c92d3639a17691e03700cd32a84b6711f",
+        "987901c9cb43f3dd3a31b9e22fec164edd9769dd"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 277,
+      "qa_report_ref": {
+        "commit": "7d34d8bb68aeef41b8b11c679f9af66476d637db",
+        "path": "docs/loops/s161e-qa-report.md",
+        "ref": "origin/qa/s161e-report"
+      },
+      "verdict_text": "# QA 277 report: session-161 batch e (prefix `s161e`), seven PRs  **By:** QA 277, headless Claude Code (Opus 5.5) on Plumb (Linux), record session 161, 2026-10-04. **Dispatch:** `docs/loops/qa-277-s16"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "972c60264a336f20ece99b7eb9c55f13e83f2ec5",
+      "candidate_sha": "972c60264a336f20ece99b7eb9c55f13e83f2ec5",
+      "case_id": "s161g",
+      "case_no": 13,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
+      "label": "REJECT",
+      "leak_group": true,
+      "leak_hits": [
+        "rejected"
+      ],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "9daf38d8cdb575f6c51f9b30d43f96126c7a8eb4",
+        "b9f8a5dfc2437b3d35049df691dd85483424e950",
+        "3dfa24245cd1b3b99344cd2d675735bc608d04c8",
+        "9bfb2e1e78cc1701394988cc9c65288af4269582",
+        "43ed65a9f2e55b649b4bd1dbb46baddc84d3e0e6",
+        "a6d75b5273091d75bbc127826853170fe3ddeb4a",
+        "12f26320fdb89ea9e9c76dfc30790628b707d6d7",
+        "23d46156a5fa34873ef1bee0ab723e52d1b33858",
+        "a5f118192f3479ad35dd58aebb3d24510f0f24b4",
+        "d292747f8ce5e9173edfc71e5feb3f249693b147"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 279,
+      "qa_report_ref": {
+        "commit": "8396ffbcc6b3085ad91dced7f0868964e68d0d06",
+        "path": "docs/loops/s161g-qa-report.md",
+        "ref": "origin/qa/s161g-report"
+      },
+      "verdict_text": "# QA 279 report: session-161 batch g (prefix `s161g`), narrow re-runs of five PRs (Plumb, Linux)  **Seat:** QA, headless Claude Code on Opus, record session 161. Machine: Plumb (Linux). 2026-10-04. Di"
+    },
+    {
+      "base_how": "merge-parent",
+      "base_sha": "5e28a9103c21342666017a447ecd3e3317b4bed6",
+      "candidate_sha": "5e28a9103c21342666017a447ecd3e3317b4bed6",
+      "case_id": "s162a",
+      "case_no": 14,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "dispatch_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
+      "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "dispatch_commit_date": "2026-10-05T22:24:09-05:00",
+      "dispatch_how": "master-dispatch",
+      "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
+      "label": "REJECT",
+      "leak_group": true,
+      "leak_hits": [
+        "accepted",
+        "reject"
+      ],
+      "merge_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+      "merged": true,
+      "other_candidates_named": [
+        "1671d00547c5c1ef1200d22698c4a607779928e2",
+        "8e751360ba2190b810323a623f74ee08def34b6a",
+        "260d68352fb89030a92029eae56053d00ed3f7d0",
+        "2f8e6489e7d816dff9fc667431425699569071c3",
+        "1eea3cdb3740690078fb2254b8c8b41887c3b3cd",
+        "9fcb97ca8bb266c03cef7501c4b2b831c8d1601b"
+      ],
+      "provenance": "seat-built",
+      "qa_no": 280,
+      "qa_report_ref": {
+        "commit": "d8cb4652471d5d962beeae105bc9460f271950bb",
+        "path": "docs/loops/s162a-qa-report.md",
+        "ref": "origin/qa/s162a-report"
+      },
+      "verdict_text": "# QA 280 report: session-162 batch a (prefix `s162a`), narrow re-runs of #437 r3 and #445 r3, #425 after its conflict, and the batch merge (Plumb, Linux)  **Seat:** QA, headless Claude Code on Opus, r"
+    }
+  ],
+  "max_qa": 320,
+  "min_qa": 253,
+  "origin_master": "e71a8959d75e280e3670994265549fa5565b9537",
+  "pool": {
+    "ACCEPT": 3,
+    "REJECT": 9,
+    "checks_none": 14,
+    "checks_recorded": 0,
+    "headline_pool": 11,
+    "leak_group": 3,
+    "runtime_built": 0,
+    "seat_built": 14,
+    "total": 14,
+    "unlabelled": 2
+  },
+  "unusable": [
+    {
+      "dispatch": "docs/loops/qa-258-b4-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/b4-qa-report.md",
+      "report_ref": "origin/qa/b4-report"
+    },
+    {
+      "dispatch": "docs/loops/qa-259-b5-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/b5-qa-report.md",
+      "report_ref": "origin/qa/b5-report"
+    },
+    {
+      "dispatch": "docs/loops/qa-260-b2r2-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/b2r2-qa-report.md",
+      "report_ref": "origin/qa/b2r2-report"
+    },
+    {
+      "dispatch": "docs/loops/qa-261-302r2-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/302r2-qa-report.md",
+      "report_ref": "origin/qa/302r2-report"
+    },
+    {
+      "dispatch": "docs/loops/qa-262-r3-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/r3-qa-report.md",
+      "report_ref": "origin/qa/r3-report"
+    },
+    {
+      "dispatch": "docs/loops/qa-264-s159-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/s159-qa-report.md",
+      "report_ref": "origin/qa/s159-report"
+    },
+    {
+      "dispatch": "docs/loops/qa-265-s159b-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/s159b-qa-report.md",
+      "report_ref": "origin/qa/s159b-report"
+    },
+    {
+      "dispatch": "docs/loops/qa-267-s160-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/s160-qa-report.md",
+      "report_ref": "origin/qa/s160-report"
+    },
+    {
+      "dispatch": "docs/loops/qa-271-t204-dispatch.md",
+      "reason": "report-missing",
+      "report_path": "docs/loops/t204-qa-report.md",
+      "report_ref": "origin/qa/t204-report"
+    },
+    {
+      "candidate": "507004147df01ec665ff5970257ee400534720ef",
+      "reason": "duplicate-candidate",
+      "report": "docs/loops/b2-sync-qa-report.md"
+    },
+    {
+      "candidate": "507004147df01ec665ff5970257ee400534720ef",
+      "reason": "duplicate-candidate",
+      "report": "docs/loops/b3-misc-qa-report.md"
+    }
+  ]
+}

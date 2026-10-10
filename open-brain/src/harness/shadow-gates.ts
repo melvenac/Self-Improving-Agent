@@ -27,9 +27,9 @@ import { createHash, randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import {
-  DONE_GATE_QUESTIONS,
   DryRunTransport,
   JevTransport,
+  buildDoneGateQuestions,
   buildJevRequest,
   redact,
   type GateAnswer,
@@ -245,15 +245,27 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
   const pDir = options.policiesDir ?? policiesDir();
   const policy = loadPolicies(pDir).done;
 
+  const diffText = gitTry(repoRoot, ["diff", `${options.baseSha}..${options.scoredSha}`, "-U3"]);
+  const diffHunks = diffText.ok && diffText.stdout.trim() !== "" ? diffText.stdout.slice(0, 16_000) : "";
+  const requirementRows =
+    policy.plan_match === "requirement_rows"
+      ? plan.acceptance.map((row) => ({
+          id: row.id,
+          observable: row.observable,
+          hunks: diffHunks ? [diffHunks] : [],
+        }))
+      : undefined;
+
   const payload: GatePayload = {
     gate: "developer-done",
     loop: plan.loop,
     model: "jev-latest",
-    questions: DONE_GATE_QUESTIONS,
+    questions: buildDoneGateQuestions(plan, policy),
     context: {
       plan,
       candidate: options.scoredSha,
       diffstat,
+      ...(requirementRows !== undefined ? { requirement_rows: requirementRows } : {}),
       checks: {
         source: options.checks.source,
         build: { exit_code: options.checks.build_exit },
@@ -282,7 +294,14 @@ export async function runShadowDoneGate(options: RunShadowDoneOptions): Promise<
   });
 
   const answers = result.answer?.answers ?? null;
-  const decision = answers === null ? null : decideDoneGate(answers, policy, { checksPassed, checksSource: options.checks.source });
+  const decision =
+    answers === null
+      ? null
+      : decideDoneGate(answers, policy, {
+          checksPassed,
+          checksSource: options.checks.source,
+          planAcceptanceIds: policy.plan_match === "requirement_rows" ? plan.acceptance.map((a) => a.id) : undefined,
+        });
   const record: ShadowDoneRecord = {
     gate: "developer-done",
     loop: plan.loop,

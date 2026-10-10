@@ -1,0 +1,100 @@
+[
+  {
+    "case_id": "t209-t210",
+    "case_no": 1,
+    "dispatch_blob": "5bfc1a70de63d007ad13d6ab2a23d32436360bc0",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-253-t209-t210-dispatch.md"
+  },
+  {
+    "case_id": "t208-t212",
+    "case_no": 2,
+    "dispatch_blob": "b6dcbb67da6a074de140e7c8e3235181e8d90faa",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md"
+  },
+  {
+    "case_id": "b1-start",
+    "case_no": 3,
+    "dispatch_blob": "5c9324cf7ddccdadd68767036691ff088849ddd9",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md"
+  },
+  {
+    "case_id": "t203",
+    "case_no": 4,
+    "dispatch_blob": "dcc767c285144469f0539d360224df3c0a642205",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-266-t203-dispatch.md"
+  },
+  {
+    "case_id": "s160c",
+    "case_no": 5,
+    "dispatch_blob": "7431063d4ef8b2d3a4b411a02172b878b1cd18bb",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-268-s160c-dispatch.md"
+  },
+  {
+    "case_id": "s160d",
+    "case_no": 6,
+    "dispatch_blob": "26a8918abb49a48b19a925afd4dc9da0c4dcf178",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md"
+  },
+  {
+    "case_id": "s160e",
+    "case_no": 7,
+    "dispatch_blob": "538059a1271a552b52f9d008e75a4d1324d49350",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md"
+  },
+  {
+    "case_id": "s160f",
+    "case_no": 8,
+    "dispatch_blob": "687200f90fe15927859568493c26fe622c894d39",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md"
+  },
+  {
+    "case_id": "s161a",
+    "case_no": 9,
+    "dispatch_blob": "6b237c28c2c9d3c4b30032a180b5d6cb0349b00a",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md"
+  },
+  {
+    "case_id": "s161c",
+    "case_no": 10,
+    "dispatch_blob": "b004667cc0307ac21c28186457781e90f9209e6c",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md"
+  },
+  {
+    "case_id": "s161d",
+    "case_no": 11,
+    "dispatch_blob": "18ebc58b83113e9c18a5fd71fa9d45682708f8b9",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-276-s161d-dispatch.md"
+  },
+  {
+    "case_id": "s161e",
+    "case_no": 12,
+    "dispatch_blob": "d6f160fd0f1ae1194b70c63423e721f13e49bbd0",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md"
+  },
+  {
+    "case_id": "s161g",
+    "case_no": 13,
+    "dispatch_blob": "090cf25569340f6a02ad8a804860f202f905f51c",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md"
+  },
+  {
+    "case_id": "s162a",
+    "case_no": 14,
+    "dispatch_blob": "ae4e980142c69d685fe50e3850b69c114aa6a21f",
+    "dispatch_commit": "e71a8959d75e280e3670994265549fa5565b9537",
+    "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md"
+  }
+]
