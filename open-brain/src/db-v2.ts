@@ -843,9 +843,7 @@ export function getSessionRecalledIds(db: Database.Database, sessionUuid: string
   if (!sessionUuid) return [];
   const rows = db.prepare(`
     SELECT knowledge_id FROM recall_log WHERE session_uuid = ?
-    GROUP BY knowledge_id
-    HAVING MAX(CASE WHEN recall_purpose IS NULL OR recall_purpose != 'dedup' THEN 1 ELSE 0 END) = 1
-    ORDER BY MIN(id)
+    GROUP BY knowledge_id ORDER BY MIN(id)
   `).all(sessionUuid) as Array<{ knowledge_id: number }>;
   return rows.map((r) => r.knowledge_id);
 }
