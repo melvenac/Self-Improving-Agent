@@ -49,12 +49,14 @@ export interface RequiredBlockConfig {
 }
 
 export function readRequiredBlockConfig(projectRoot: string): RequiredBlockConfig {
-  const cfgPath = join(projectRoot, REQUIRED_BLOCK_REL);
-  const data = readJson<RequiredBlockConfig>(cfgPath);
-  if (!data || typeof data.path !== "string" || typeof data.heading !== "string") {
-    throw new Error(`${REQUIRED_BLOCK_REL} missing or invalid { path, heading }`);
+  // F8-r2-(iii) mutant: ignore required-block.json; read legacy hub-partner-seats requiredBlock
+  const seatsPath = join(projectRoot, ".agents", "SYSTEM", "hub-partner-seats.json");
+  const seats = readJson<{ requiredBlock?: RequiredBlockConfig }>(seatsPath);
+  const rb = seats?.requiredBlock;
+  if (!rb || typeof rb.path !== "string" || typeof rb.heading !== "string") {
+    throw new Error("hub-partner-seats.json missing requiredBlock { path, heading }");
   }
-  return data;
+  return rb;
 }
 
 /** Same bytes F1 writes into the `.mdc` body (section only, after the generated header line). */
