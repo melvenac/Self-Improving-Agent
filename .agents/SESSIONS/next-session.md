@@ -1,22 +1,23 @@
-<!-- generated from .agents/state.json rev 374 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 375 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 165)_
+## planner [sia-planner] _(written session 166)_
 
 ### Pick up here
 
-(1) VERIFY #545 LIVE on build a7443d3: plain '## Briefing', READS OWED after Latest brief, a FLEET line with SIA seats and no 'vv'. (2) FORWARD grok-audit's reply to clark: room k575fscdqd291tgnpg51yttgbh8frzq8, after job turn 48 (MAKERSPACE AUDIT P4, 17:16Z). (3) D-143: small fixes only; support Maker. (4) Laptop QA 298 leftovers go in clark's batched ask.
+(1) CLOSE T-255 on A3: Maker, after an explicit /mcp reconnect open-brain, runs /start. It should print 'Build c23fff6 · current', the note 'Session_57.md was already taken and was not overwritten; this session's log is Session_58.md', and Session_58 must carry a Session ID line; a 2nd ob_start prints the reuse marker. Then Maker deletes Session_57.md (A4). As of s166's end there was no Session_58 in makerspace-planner. (2) D-143 small fixes only; support Maker. (3) D-144: no Claude except planners. Aaron stopped all work 10-09 ~23:3x CDT; resume late 10-10.
 
 ### Watch out
 
-- D-143: NO new SIA loops. Work T-248..T-253 only if one becomes a real issue for Maker (T-250 the likeliest). Every Cursor task: text to clark first (checklist plus IMPACT-TARGETS first in the brief), and post on GO.
-- QA on Windows: a laptop QA launched by ssh is ELEVATED, and DENY ACLs don't bind it. Use clark's RunLevel Limited scheduled task, a privilege preflight via System32 whoami.exe that fails closed, and fresh scratch names per rerun.
-- HUB-TALK: C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000. Grok job turns start with their prefix (grok-audit also takes 'MAKERSPACE JOB:'). A planner set_handoff needs loop_state (C3).
+- D-144 (Aaron 10-09): no Claude Code except planners. Dev goes to Cursor (cursor-builder, room k575sfwr9wcx3r8fw83g3bc00x8fmar3); QA goes to Grok bots (grok-sia-review room k57c639j4wkyp3y3vhfxxytn1s8fsdx6; grok-audit room k575fscdqd291tgnpg51yttgbh8frzq8, which also takes 'MAKERSPACE JOB:'). A gate that needs Claude goes to clark, then Aaron.
+- A rebuild reaches no running seat until that seat runs an explicit /mcp reconnect open-brain AFTER the rebuild time. /clear keeps the old process. T-254 (merged 5d633411) makes processes started after that rebuild report STALE PROCESS on the build line.
+- Records PRs move master. Land them only AFTER clark merges the code PR in flight, or that PR goes BEHIND (D-117) and needs another update-branch plus CI run.
+- Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md. Restate items 6 (single-process tests plus a cap) and 17 (PID-only kills) in the dispatch. Run every mutant first-hand: builders have skipped mutants and posted empty diffs.
 
 ### Open questions
 
-- Aaron (via clark): post-freeze recall-trigger loop? (now under D-143: small fixes only)
+- Aaron (via clark): a post-freeze recall-trigger loop? (under D-143, small fixes only)
 - Aaron (via clark): #437 r10 or T-245 Option A? (parked)
 
 ### Loop state
@@ -31,7 +32,7 @@
 **Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s165: E4 (21 standing); STANDING-BUDGET (D-139); D-138; V-079; D-140 QA routing; Makerspace PROVEN (D-141, sia/adopt merged 56877428); BRIEFING-FIX merged (D-142, a7443d33, rebuilt); D-143 small-fixes-only; tasks T-248..T-253; Makerspace audit P4 posted to grok-audit (turn 48) for clark.
+- s166: T-250 merged f64ff7c6 CLOSED (A3 passed on Maker); T-254 STALE PROCESS build line merged 5d633411 CLOSED (F1-F5 follow-ups); T-255 session log id + next-free-number merged c23fff60, open until A3; D-144 no CC except planners; #545 live PASS; grok-audit P4 forwarded to clark; P3 forwarded to Maker (tie-breaks done, Maker T-090..093).
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -103,7 +104,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 

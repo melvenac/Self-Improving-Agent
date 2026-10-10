@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 374,
+  "revision": 375,
   "project": {
     "name": "self-improving-agent"
   },
@@ -5253,6 +5253,48 @@
       "session_uuid": "367df9c3-ef6b-47f0-be31-1f60993dddcd",
       "checkout": "sia-planner",
       "first_rev": 360
+    },
+    {
+      "seat": "planner",
+      "pick_up": "(1) CLOSE T-255 on A3: Maker, after an explicit /mcp reconnect open-brain, runs /start. It should print 'Build c23fff6 · current', the note 'Session_57.md was already taken and was not overwritten; this session's log is Session_58.md', and Session_58 must carry a Session ID line; a 2nd ob_start prints the reuse marker. Then Maker deletes Session_57.md (A4). As of s166's end there was no Session_58 in makerspace-planner. (2) D-143 small fixes only; support Maker. (3) D-144: no Claude except planners. Aaron stopped all work 10-09 ~23:3x CDT; resume late 10-10.",
+      "watch_out": [
+        "D-144 (Aaron 10-09): no Claude Code except planners. Dev goes to Cursor (cursor-builder, room k575sfwr9wcx3r8fw83g3bc00x8fmar3); QA goes to Grok bots (grok-sia-review room k57c639j4wkyp3y3vhfxxytn1s8fsdx6; grok-audit room k575fscdqd291tgnpg51yttgbh8frzq8, which also takes 'MAKERSPACE JOB:'). A gate that needs Claude goes to clark, then Aaron.",
+        "A rebuild reaches no running seat until that seat runs an explicit /mcp reconnect open-brain AFTER the rebuild time. /clear keeps the old process. T-254 (merged 5d633411) makes processes started after that rebuild report STALE PROCESS on the build line.",
+        "Records PRs move master. Land them only AFTER clark merges the code PR in flight, or that PR goes BEHIND (D-117) and needs another update-branch plus CI run.",
+        "Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md. Restate items 6 (single-process tests plus a cap) and 17 (PID-only kills) in the dispatch. Run every mutant first-hand: builders have skipped mutants and posted empty diffs."
+      ],
+      "open_questions": [
+        "Aaron (via clark): a post-freeze recall-trigger loop? (under D-143, small fixes only)",
+        "Aaron (via clark): #437 r10 or T-245 Option A? (parked)"
+      ],
+      "session": 166,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#437",
+            "qa_status": "in_progress",
+            "note": "PARKED (D-130)"
+          },
+          {
+            "ref": "#425",
+            "qa_status": "accepted",
+            "note": "PARKED (D-130)"
+          },
+          {
+            "ref": "#470",
+            "qa_status": "in_progress",
+            "note": "PARKED (D-130) with #463 #465"
+          }
+        ],
+        "frozen_sha": null,
+        "questions_for_aaron": [],
+        "rulings": [
+          "s166: T-250 merged f64ff7c6 CLOSED (A3 passed on Maker); T-254 STALE PROCESS build line merged 5d633411 CLOSED (F1-F5 follow-ups); T-255 session log id + next-free-number merged c23fff60, open until A3; D-144 no CC except planners; #545 live PASS; grok-audit P4 forwarded to clark; P3 forwarded to Maker (tie-breaks done, Maker T-090..093)."
+        ]
+      },
+      "session_uuid": "73efb2c2-ab62-465b-a3fd-bf635649141f",
+      "checkout": "sia-planner",
+      "first_rev": 369
     }
   ],
   "sessions": [
