@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 373,
+  "revision": 374,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4662,6 +4662,13 @@
       "title": "Aaron's priority: slow down on the dashboard, SIA and A2A-Hub builds and focus on the Makerspace build; only small fixes to those three repos as issues come up",
       "date": "2026-10-09",
       "note": "Aaron, verbatim, typed in clark's window at 2026-10-09T16:43:37Z (the planner READ it in clark's transcript e8fda6fc): \"Let's slow down on the dashboard, sia and a2a hub builds and focus on the makerspace build.  Let's only do small fixes to those three repos as issue come up.\" For SIA: NO new loops. T-248..T-253 stay as tasks, worked only if one becomes a real issue for Maker's work. T-250 (origin/master hardcoded, so a 'main' repo gets no currency line) is the likely one if Maker's greeting keeps flagging it. Small fixes go through clark (SG-1/D-135; Cursor brief checklist). The planner's role is mainly supporting Maker (the Makerspace planner) on SIA questions.",
+      "standing": true
+    },
+    {
+      "id": "D-144",
+      "title": "No more Claude Code usage except for planners: dev goes to Cursor, QA to Grok bots (or a Cursor QA run for Windows-only checks). Amends D-140, so there are no more Claude QA gates; a gate that cannot be covered without Claude goes to clark, who takes it to Aaron",
+      "date": "2026-10-09",
+      "note": "Aaron, 10-09 ~22:5x CDT, typed in clark's window (session c71ddc34, verified in its transcript by Atlas): 'No more cc usage except for planners. Everything else goes to cursor and grok bot agents.' Context: the 5h usage window hit STOP (93%) on 10-09.",
       "standing": true
     }
   ],
