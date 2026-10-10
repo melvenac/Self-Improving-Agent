@@ -13,7 +13,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorRecallHook, repoRootFrom, copyCursorSlashCommands } from './setup-hooks.mjs';
+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorSessionEndHook, withCursorRecallHook, repoRootFrom, copyCursorSlashCommands } from './setup-hooks.mjs';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
@@ -22,6 +22,7 @@ const REPO_ROOT = repoRootFrom(import.meta.url);
 const OPEN_BRAIN_DIR = path.join(REPO_ROOT, 'open-brain');
 const OPEN_BRAIN_SERVER = path.join(OPEN_BRAIN_DIR, 'build', 'server.js');
 const OPEN_BRAIN_BOOTSTRAP = path.join(OPEN_BRAIN_DIR, 'build', 'cli-bootstrap.js');
+const OPEN_BRAIN_SESSION_END = path.join(OPEN_BRAIN_DIR, 'build', 'cli-session-end.js');
 const OPEN_BRAIN_RECALL_TRIGGER = path.join(OPEN_BRAIN_DIR, 'build', 'cli-recall-trigger.js');
 
 // Status indicators
@@ -211,12 +212,14 @@ function registerCursorHooks() {
     config = JSON.parse(fs.readFileSync(hooksPath, 'utf-8'));
   }
 
-  const r = withCursorSessionHook(config, OPEN_BRAIN_BOOTSTRAP, process.execPath);
-  for (const n of r.notes) log(n.includes('already') ? SKIP : OK, n);
-  if (!r.changed) return;
+  const rStart = withCursorSessionHook(config, OPEN_BRAIN_BOOTSTRAP, process.execPath);
+  const rEnd = withCursorSessionEndHook(rStart.config, OPEN_BRAIN_SESSION_END, process.execPath);
+  const changed = rStart.changed || rEnd.changed;
+  for (const n of [...rStart.notes, ...rEnd.notes]) log(n.includes('already') ? SKIP : OK, n);
+  if (!changed) return;
 
   ensureDir(CURSOR_DIR);
-  fs.writeFileSync(hooksPath, JSON.stringify(r.config, null, 2) + '\n');
+  fs.writeFileSync(hooksPath, JSON.stringify(rEnd.config, null, 2) + '\n');
 }
 
 function registerCursorRecallHook() {
