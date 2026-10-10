@@ -35,7 +35,6 @@ import { countWords, estimateTokens, STATE_JSON_REL } from "./pipelines/session-
 import { renderState, missingHandoffLine } from "./pipelines/session-start/state-render.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./pipelines/session-start/briefing.js";
-import { oldStartCommandWarning } from "./pipelines/bootstrap/index.js";
 import { describeLatestBrief } from "./pipelines/session-start/latest-brief.js";
 import { describeReadsOwed } from "./pipelines/session-start/reads-owed.js";
 import { describeFleet } from "./pipelines/session-start/fleet.js";
@@ -462,7 +461,6 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         missingHandoff: greetingFlag(projectRoot, "missing_handoff")
           ? missingHandoffLine(sj.data, { projectRoot, sessionUuid: proven.id, seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null })
           : null,
-        oldStartCommand: oldStartCommandWarning(projectRoot),
       }));
     } else {
       // F3: an unknown schema_version REFUSES, with no prose fallback.
