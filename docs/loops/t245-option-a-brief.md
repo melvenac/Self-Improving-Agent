@@ -376,3 +376,33 @@ sets an mtime with `utimesSync`.
 | T245-A2 | Mutants 1–7 are each red on their named rows. |
 | T245-A3 | A Grok review (D-145 lane) of the diff returns APPROVE, or CHANGES that the planner rules on. |
 | T245-A4 | Live, after merge, a rebuild of the main tree and an explicit `/mcp reconnect` in one Cursor seat: one Cursor session start prints one full greeting and one `SESSION_START_SKIPPED` line. That session's end leaves 1 line in `.missing-handoff.jsonl` (when the handoff is missing), 0 duplicate `feedback_log` rows for its session, and 1 shadow line. |
+
+## ROUND 2 (2026-10-11): drop W3
+
+cursor-builder stopped correctly with `BLOCKED T-245 tree-currency-fetch.test.ts`. Its local head is
+`8b210fe41153fb45ae89d91fc27f7839dda02fec`, not pushed. W3 turned two existing rows red:
+`r2 row 3b/5 (startup)` and `(resume)`. The planner confirmed the cause:
+
+- **T-208's contract is that every session start fetches, or says the fetch failed.** Those rows make a fetch succeed,
+  break the remote, then expect `fetch FAILED:`. W3 reused the fresh ok marker, so it hid a fetch that had just broken.
+- **W3 was also redundant.** W1's claim already stops Cursor's second start before it reaches the fetch, and Claude
+  Code runs SessionStart once.
+- **The defect is the brief's, not the build's.** The planner did not run `tree-currency-fetch.test.ts` against W3
+  before dispatching.
+
+### R2 work (one new commit on top of `8b210fe4`; no amend, no rebase)
+
+1. In `open-brain/src/pipelines/session-start/tree-currency.ts`, delete `recentFetchOk` entirely. The file must equal
+   base: `git diff b142886f..HEAD -- open-brain/src/pipelines/session-start/tree-currency.ts` prints nothing.
+2. In `open-brain/src/cli-bootstrap.ts`, line 189 goes back to `fetchOrigin(cwd)`. Remove the `recentFetchOk` import,
+   and keep W1's claim block and its imports.
+3. In `open-brain/tests/t245-idempotent-stages.test.ts`, delete row ID-2 and any import it alone used.
+4. Commit: `T-245 r2: drop W3 (fetch reuse); T-208's fetch-every-start contract stands`. Then paste
+   `git log --oneline b142886f..HEAD` (3 lines) and an empty `git status --porcelain`.
+5. Run §6's command unchanged. **All 8 files must be green, including `tree-currency-fetch.test.ts` at 12/12.**
+6. Run mutants **1–6** (mutant 7 is withdrawn with W3). For each, paste the row that turned red.
+7. Run `tsc`, the scope check (`tree-currency.ts` must no longer appear), then §10 push and PR.
+8. Reply as §12, with line 1 `TASK: T-245 READY r2, Option A claim + idempotent stages (fix/t245-option-a)`.
+
+**Allowed:** the `node_modules` `npm rebuild better-sqlite3` that cursor-builder ran for Node 22 is fine. It touches no
+tracked file. **Acceptance changes:** A1 drops ID-2, and A2 is mutants 1–6.
