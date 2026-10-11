@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import * as net from "node:net";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, cpSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, cpSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -22,6 +22,9 @@ const HUB_ID = "hub.test-4000";
 const FORGE_ROOM = "k571z4ghp7nbp34djhecwnsk3n8fmhsf";
 const INFRA_ROOM = "k57d92gqtjm9wpfs74ekbx9rns8fmy2f";
 const BUILDER_ROOM = "k575sfwr9wcx3r8fw83g3bc00x8fmar3";
+// T-242: the Grok bots' rooms with atlas ([atlas, grok-sia-review], [atlas, grok-qa-sia]).
+const GROK_REVIEW_ROOM = "k57c639j4wkyp3y3vhfxxytn1s8fsdx6";
+const GROK_QA_ROOM = "k573rrq0rz6p519xhh4p9mmyk98fsb55";
 const KEY = `test-key-${"x".repeat(40)}`;
 
 const atlasIdentity = { name: "Atlas", role: "planner", partner: "Forge" };
@@ -212,7 +215,13 @@ describe("T-198 hub presence at /start (r2)", () => {
     }));
     const block = await describe_(fetchFn);
     const partnerLines = block.lines.slice(1);
-    expect(partnerLines.length).toBe(3);
+    // T-242: one line per partner the checkout's own copy of the map lists, in its order. Not a frozen count.
+    const listed = (JSON.parse(readFileSync(join(root, HUB_PARTNER_SEATS_REL), "utf8")) as {
+      readers: { atlas: { partners: { label: string }[] } };
+    }).readers.atlas.partners;
+    expect(listed.length).toBeGreaterThan(0);
+    expect(partnerLines.length).toBe(listed.length);
+    partnerLines.forEach((line, n) => expect(line.startsWith(`  ${listed[n]!.label}: `), line).toBe(true));
     for (const line of partnerLines) {
       expect(line).toMatch(/^ {2}\S.*: (hub listener:|working|idle|owes_reply|state:unknown|absent)/);
       expect(line).not.toMatch(/seen|\bread\b|acknowledg/i);
@@ -220,6 +229,24 @@ describe("T-198 hub presence at /start (r2)", () => {
     expect(block.lines[0]).toContain("listener");
     expect(block.lines[0]).toMatch(/not proof|does not show/);
   });
+
+it("T-242 HP-1 the Grok bots render as hub-listener partner lines from the same single fetch", async () => {
+  const base = roster();
+  const { fetchFn, calls } = fixtureFetch({
+    agents: [
+      ...base.agents,
+      { name: "grok-sia-review", rooms: [{ sessionId: GROK_REVIEW_ROOM, unread: 1, pollingNow: false, pollAgeMs: 60_000 }] },
+      { name: "grok-qa-sia", rooms: [{ sessionId: "k5700000000000000000000000000000", unread: 0, pollingNow: true, pollAgeMs: 0 }] },
+    ],
+  });
+  const block = await describe_(fetchFn);
+  expect(calls).toHaveLength(1);
+  expect(block.lines).toContain("  grok-sia-review: hub listener: not polling, 1 unread since 1m");
+  // grok-qa-sia is on the roster but not in its atlas room (GROK_QA_ROOM), so it is absent.
+  expect(block.lines).toContain("  grok-qa-sia: absent");
+  expect(GROK_QA_ROOM).toMatch(/^k[0-9a-z]{31}$/);
+  expect(block.lines.join("\n")).not.toMatch(/grok-(sia-review|qa-sia): (working|idle|owes_reply|state:unknown)/);
+});
 
   it("PR-3 hub unreachable prints ONE UNKNOWN line with its cause", async () => {
     const fetchFn = (async () => {

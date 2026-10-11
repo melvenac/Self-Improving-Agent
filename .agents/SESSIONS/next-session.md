@@ -1,38 +1,43 @@
-<!-- generated from .agents/state.json rev 380 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 391 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 166)_
+## planner [sia-planner] _(written session 167)_
 
 ### Pick up here
 
-(1) CLOSE T-255 on A3: Maker, after an explicit /mcp reconnect open-brain, runs /start. It should print 'Build c23fff6 · current', the note 'Session_57.md was already taken and was not overwritten; this session's log is Session_58.md', and Session_58 must carry a Session ID line; a 2nd ob_start prints the reuse marker. Then Maker deletes Session_57.md (A4). As of s166's end there was no Session_58 in makerspace-planner. (2) D-143 small fixes only; support Maker. (3) D-144: no Claude except planners. Aaron stopped all work 10-09 ~23:3x CDT; resume late 10-10.
+Roll at Aaron's word (2026-10-11 23:00Z, clark's window, verified: 'yes, merge. Let's roll all agents on the desktop when ready.'). Open SIA code PRs, all planner-ACCEPTed and reviewed, all BEHIND master: #576 T-245 r4 (2ce8eeb5; CC Opus review CHANGES -> r4 fixed), #579 T-253 (72f384a3; grok-audit APPROVE of 4349c14c, identical patch-id), #580 T-252 (4f607a6f; grok-audit APPROVE of 6e3374d5, identical patch-id), #588 T-256 r2 (49899106; CC Opus review CHANGES -> r2 fixed). Aaron's 'yes, merge' was relayed to clark; clark merges. Before EACH merge: gh pr update-branch, prove the PR's own diff unchanged (git patch-id --stable of merge-base..old vs origin/master..new; src/tests diff old..new empty), wait CI test, send clark the new head. #595 T-257 (da164982, tests-only): SG-1 merge by clark when grok-audit's review of da164982 (job posted, atlas<->grok-audit room) APPROVEs and CI passes. After #576 merges + SIA rebuild: T-245 A4 live (doubled Cursor start/end: one claim, one feedback row, one shadow line; a resume within 120 s is NOT skipped; BOTH doubled payloads carry cursor_version), then the D-148 recall-effect analysis per docs/loops/recall-effect-design-2026-10-11.md (uncommitted local run; anchor = transcript attachment toolUseID).
 
 ### Watch out
 
-- D-144 (Aaron 10-09): no Claude Code except planners. Dev goes to Cursor (cursor-builder, room k575sfwr9wcx3r8fw83g3bc00x8fmar3); QA goes to Grok bots (grok-sia-review room k57c639j4wkyp3y3vhfxxytn1s8fsdx6; grok-audit room k575fscdqd291tgnpg51yttgbh8frzq8, which also takes 'MAKERSPACE JOB:'). A gate that needs Claude goes to clark, then Aaron.
-- A rebuild reaches no running seat until that seat runs an explicit /mcp reconnect open-brain AFTER the rebuild time. /clear keeps the old process. T-254 (merged 5d633411) makes processes started after that rebuild report STALE PROCESS on the build line.
-- Records PRs move master. Land them only AFTER clark merges the code PR in flight, or that PR goes BEHIND (D-117) and needs another update-branch plus CI run.
-- Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md. Restate items 6 (single-process tests plus a cap) and 17 (PID-only kills) in the dispatch. Run every mutant first-hand: builders have skipped mutants and posted empty diffs.
+- Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk.
+- SG-1 needs a review naming the EXACT head: update-branch BEFORE posting a review job.
+- Headless CC / desktop one-offs have no hub key: dispatch text inside the brief and an ABSOLUTE reply path; run logs are UTF-16.
+- Grok bots: <=3 queued per bot; a doubled 'SIA JOB:' prefix was a VM-side parser bug fixed by Argus 10-11 (turn 130), do not resend.
+- Local runs of sync tests hang in record-erasure (T-259) and three tests read the developer machine (T-260): re-run a red file at the base before calling it a regression; CI is the full-suite gate.
+- Until T-257 (#595) merges, end-fix-r3-pins R7 is red in any CC-hosted local run.
 
 ### Open questions
 
-- Aaron (via clark): a post-freeze recall-trigger loop? (under D-143, small fixes only)
-- Aaron (via clark): #437 r10 or T-245 Option A? (parked)
+- T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.
+- T-258 (doubled-hook residuals), T-259 (record-erasure /sync hang, P2), T-260 (tests reading the dev machine, P3): next CC briefs after the roll; T-259 first, it blocks local sync-test runs.
 
 ### Loop state
 
 **Open PRs:** 
-- #437 — QA: in_progress — PARKED (D-130)
-- #425 — QA: accepted — PARKED (D-130)
-- #470 — QA: in_progress — PARKED (D-130) with #463 #465
+- #576 — QA: accepted — T-245 r4 2ce8eeb5; Aaron merge; update-branch first
+- #579 — QA: accepted — T-253 72f384a3; Aaron merge; update-branch first
+- #580 — QA: accepted — T-252 4f607a6f; Aaron merge; update-branch first
+- #588 — QA: accepted — T-256 r2 49899106; Aaron merge; update-branch first
+- #595 — QA: in_progress — T-257 da164982 tests-only; SG-1 on grok-audit APPROVE + CI
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** _None._
+**Questions pending for Aaron:** 
+- T-194 option (a)/(b)/(c)
 
 **Rulings made mid-loop:** 
-- s166: T-250 merged f64ff7c6 CLOSED (A3 passed on Maker); T-254 STALE PROCESS build line merged 5d633411 CLOSED (F1-F5 follow-ups); T-255 session log id + next-free-number merged c23fff60, open until A3; D-144 no CC except planners; #545 live PASS; grok-audit P4 forwarded to clark; P3 forwarded to Maker (tie-breaks done, Maker T-090..093).
+- s167: T-245 r4 ACCEPT (Opus review CHANGES -> r4); T-253, T-252 ACCEPT (grok-audit APPROVE); T-256 r2 ACCEPT (Opus review CHANGES -> r2); T-242 merged #585 under SG-1, CLOSED; T-244 CLOSED not built (no users); D-150 fleet routing (CC dev, Grok review, Cursor reserve); opened T-256..T-260; recall-effect design landed for D-148.
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -104,7 +109,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
