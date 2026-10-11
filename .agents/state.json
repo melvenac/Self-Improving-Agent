@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 388,
+  "revision": 389,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1558,15 +1558,16 @@
       "id": "T-242",
       "title": "Grok bots in hub-partner-seats.json: add grok-sia-review and grok-qa-sia as atlas reader partners, and unpin the two tests that freeze the live map",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 163,
-      "closed_session": null,
+      "closed_session": 167,
       "supersedes": null,
-      "note": "Opened planner s163. The bots are up (Argus via clark, 2026-10-06). grok-sia-review: room [atlas, grok-sia-review] k57c639j4wkyp3y3vhfxxytn1s8fsdx6, cron minutes 2-57/5, wake line `REVIEW JOB: <branch>@<40-hex sha>`, posts `REVIEW n/total <short>`, findings as F<k> [severity] path:line turns. grok-qa-sia: room [atlas, grok-qa-sia] k573rrq0rz6p519xhh4p9mmyk98fsb55, cron minutes 0-55/5, wake line `QA JOB: <dispatch path>@<40-hex DISPATCH_SHA>`, report as hub turns ending `FIRST-PASS PASS|FAIL <short>`, rows it cannot run marked NOT RUN. Both use read-only SIA-only tokens that expire 2027-01-04 (D-125..D-127). A planner edit adding them to readers.atlas.partners was REVERTED uncommitted, because two tests pin the live file: seat-map.test.ts 'atlas reads exactly these three partners, and no reader or seat still speaks as grok' (the grok-* hub names trip the old forge=grok guard), and hub-presence.test.ts R1 'partnerLines.length toBe(3)'. Fix: make both tests assert properties (every partner row is well-formed; no SEAT speaks as plain 'grok') instead of a count, then add the two rows. The bots are not seats: they have no worktree and no waker, so they stay out of seats{}. Tests change, so this goes through QA.",
+      "note": "Opened planner s163. The bots are up (Argus via clark, 2026-10-06). grok-sia-review: room [atlas, grok-sia-review] k57c639j4wkyp3y3vhfxxytn1s8fsdx6, cron minutes 2-57/5, wake line `REVIEW JOB: <branch>@<40-hex sha>`, posts `REVIEW n/total <short>`, findings as F<k> [severity] path:line turns. grok-qa-sia: room [atlas, grok-qa-sia] k573rrq0rz6p519xhh4p9mmyk98fsb55, cron minutes 0-55/5, wake line `QA JOB: <dispatch path>@<40-hex DISPATCH_SHA>`, report as hub turns ending `FIRST-PASS PASS|FAIL <short>`, rows it cannot run marked NOT RUN. Both use read-only SIA-only tokens that expire 2027-01-04 (D-125..D-127). A planner edit adding them to readers.atlas.partners was REVERTED uncommitted, because two tests pin the live file: seat-map.test.ts 'atlas reads exactly these three partners, and no reader or seat still speaks as grok' (the grok-* hub names trip the old forge=grok guard), and hub-presence.test.ts R1 'partnerLines.length toBe(3)'. Fix: make both tests assert properties (every partner row is well-formed; no SEAT speaks as plain 'grok') instead of a count, then add the two rows. The bots are not seats: they have no worktree and no waker, so they stay out of seats{}. Tests change, so this goes through QA. — s167 DONE: PR #585 merged at 42352a7d (pinned to 7bd717ce, an update-branch of ef7213a0 with identical patch-id) under SG-1 by clark after CI test SUCCESS. CC Sonnet one-off built it (desktop); grok-audit job 74 APPROVE (3 INFO); planner ACCEPT; the two session_ids match the live rooms atlas used today. Config + tests only, no rebuild. Live check left: atlas's next ob_start presence block lists grok-sia-review and grok-qa-sia lines from one roster fetch (T242-A4).",
       "note_by": [
-        "d43a0485-7166-4db2-9ca2-eacde1f63101"
+        "d43a0485-7166-4db2-9ca2-eacde1f63101",
+        "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
-      "closed_rev": null
+      "closed_rev": 389
     },
     {
       "id": "T-243",
