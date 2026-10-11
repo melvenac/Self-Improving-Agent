@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { existsSync, mkdtempSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { claimHookRun, shouldClaimHookRun } from "../../src/shared/hook-claim.js";
+import { HOOK_CLAIM_TTL_MS, claimHookRun, releaseHookClaim, shouldClaimHookRun } from "../../src/shared/hook-claim.js";
 
 // T-245 Option A: one claim per doubled Cursor hook. Every `now` is passed
 // explicitly: no fake timers, no sleeps.
@@ -65,5 +65,23 @@ describe("hook-claim (T-245)", () => {
   it("HC-8: the session id is sanitised into the file name", () => {
     claimHookRun({ kind: "start", sessionId: "a/b:c", dir, now: T0 });
     expect(existsSync(join(dir, "start-a_b_c.claim"))).toBe(true);
+  });
+
+  it("HC-9: the TTL boundary claims", () => {
+    claimHookRun({ kind: "start", sessionId: "s-1", dir, now: T0 });
+    const file = join(dir, "start-s-1.claim");
+    utimesSync(file, T0 / 1000, T0 / 1000);
+    expect(claimHookRun({ kind: "start", sessionId: "s-1", dir, now: T0 + HOOK_CLAIM_TTL_MS })).toBe("claimed");
+  });
+
+  it("HC-10: claiming one kind releases the other", () => {
+    expect(claimHookRun({ kind: "start", sessionId: "X", dir, now: T0 })).toBe("claimed");
+    releaseHookClaim({ kind: "start", sessionId: "X", dir });
+    expect(claimHookRun({ kind: "start", sessionId: "X", dir, now: T0 + 1000 })).toBe("claimed");
+  });
+
+  it("HC-11: releasing a missing claim is a no-op", () => {
+    expect(() => releaseHookClaim({ kind: "end", sessionId: "nope", dir })).not.toThrow();
+    expect(() => releaseHookClaim({ kind: "end", sessionId: "nope", dir: join(dir, "missing", "sub") })).not.toThrow();
   });
 });

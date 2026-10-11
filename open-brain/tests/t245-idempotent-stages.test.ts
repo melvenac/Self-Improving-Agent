@@ -3,7 +3,7 @@ import Database from "better-sqlite3";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { initSchemaV2, indexKnowledge, recordSession } from "../src/db-v2.js";
+import { initSchemaV2, indexKnowledge, recordFeedbackEvent, recordSession } from "../src/db-v2.js";
 import { sessionEndV2 } from "../src/pipelines/session-end/index-v2.js";
 import { recordMissingHandoff, type HandoffCheck } from "../src/shared/handoff-guard.js";
 import { endRecordProjectDir } from "../src/shared/end-record-store.js";
@@ -71,6 +71,65 @@ describe("T-245 idempotent stages", () => {
         try { rmSync(d, { recursive: true }); } catch { /* Windows race */ }
       }
     }
+  });
+
+  // ID-3b / ID-3c pin the first and third filters of hasSuppliedFeedback
+  // (session_uuid, rating_method); ID-3 pins the knowledge_id one.
+  const withEntry = (fn: (ctx: { db: Database.Database; vault: string; agents: string; id: number }) => void) => {
+    const db = new Database(":memory:");
+    initSchemaV2(db);
+    const vault = mkdtempSync(join(tmpdir(), "t245-vault-"));
+    const agents = mkdtempSync(join(tmpdir(), "t245-agents-"));
+    try {
+      indexKnowledge(db, {
+        vaultPath: join(vault, "Experiences", "General", "e.md"), key: "e", content: "c", tags: "alpha", source: "agent", projectDir: undefined,
+      });
+      const id = (db.prepare(`SELECT id FROM knowledge_index WHERE key = ?`).get("e") as { id: number }).id;
+      fn({ db, vault, agents, id });
+    } finally {
+      for (const d of [vault, agents]) {
+        try { rmSync(d, { recursive: true }); } catch { /* Windows race */ }
+      }
+    }
+  };
+  const counters = (db: Database.Database, id: number) =>
+    db.prepare(`SELECT harmful, helpful FROM knowledge_index WHERE id = ?`).get(id) as { harmful: number; helpful: number };
+
+  it("ID-3b: a second session's rating of the same entry is written", () => {
+    withEntry(({ db, vault, agents, id }) => {
+      recordSession(db, "s1", null);
+      recordSession(db, "s2", null);
+      const end = (sessionId: string, rating: "harmful" | "helpful") =>
+        sessionEndV2({
+          db, vaultDir: vault, agentsDir: agents, sessionId,
+          sessionSummary: "x", project: "General",
+          recalledEntryIds: [id], entryRatings: { [id]: rating }, dryRun: false,
+        });
+      const r1 = end("s1", "harmful");
+      const r2 = end("s2", "helpful");
+      const rows = db.prepare(`SELECT session_uuid FROM feedback_log WHERE knowledge_id = ? ORDER BY session_uuid`).all(id) as Array<{ session_uuid: string }>;
+      expect(rows.map((r) => r.session_uuid)).toEqual(["s1", "s2"]);
+      expect(counters(db, id)).toMatchObject({ harmful: 1, helpful: 1 });
+      expect(r1.feedback.notWritten ?? []).toEqual([]);
+      expect(r2.feedback.notWritten ?? []).toEqual([]);
+    });
+  });
+
+  it("ID-3c: a 'direct' row does not suppress the session-end rating", () => {
+    withEntry(({ db, vault, agents, id }) => {
+      recordSession(db, "s1", null);
+      recordFeedbackEvent(db, "s1", id, "helpful", "direct", "direct");
+      const before = counters(db, id).helpful;
+      const result = sessionEndV2({
+        db, vaultDir: vault, agentsDir: agents, sessionId: "s1",
+        sessionSummary: "x", project: "General",
+        recalledEntryIds: [id], entryRatings: { [id]: "helpful" }, dryRun: false,
+      });
+      const methods = db.prepare(`SELECT rating_method FROM feedback_log WHERE session_uuid = ? AND knowledge_id = ? ORDER BY rating_method`).all("s1", id) as Array<{ rating_method: string }>;
+      expect(methods.map((m) => m.rating_method)).toEqual(["direct", "supplied"]);
+      expect(counters(db, id).helpful).toBe(before + 1);
+      expect(result.feedback.notWritten ?? []).toEqual([]);
+    });
   });
 
   it("ID-4: the shadow log holds one line per session", () => {
