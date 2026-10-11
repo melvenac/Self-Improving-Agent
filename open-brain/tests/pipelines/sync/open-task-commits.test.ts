@@ -176,6 +176,63 @@ describe("T-256: open-task-commits", () => {
     ]);
   });
 
+  it("T256-6(e) a null task entry is ignored, not thrown", () => {
+    const d = tmp("t256-6e-");
+    mkdirSync(join(d, ".agents"), { recursive: true });
+    writeFileSync(join(d, ".agents", "state.json"), '{"tasks":[null,{"id":"T-7","status":"open","note":""}]}');
+    let r!: ReturnType<typeof checkOpenTaskCommits>;
+    expect(() => { r = checkOpenTaskCommits(d, () => ({ ok: false, error: "x" })); }).not.toThrow();
+    expect(r.severity).toBe("skip");
+    expect(r.message).toMatch(/^skipped — not a git repository \(x\); open-task commits: unknown$/);
+  });
+
+  it("T256-6(f) a state file with no tasks array skips", () => {
+    const d = tmp("t256-6f-");
+    mkdirSync(join(d, ".agents"), { recursive: true });
+    writeFileSync(join(d, ".agents", "state.json"), "{}");
+    expect(checkOpenTaskCommits(d).message).toBe("skipped — .agents/state.json has no tasks array; open-task commits: unknown");
+  });
+
+  it("T256-6(g) a repo with no commits skips on git log failure", () => {
+    const d = repo("t256-6g-");
+    writeState(d, [{ id: "T-7", status: "open", note: "" }]);
+    const r = checkOpenTaskCommits(d);
+    expect(r.severity).toBe("skip");
+    expect(r.message).toMatch(/^skipped — git log failed \(.+\); open-task commits: unknown$/);
+  });
+
+  it("T256-9 no open task means no git call", () => {
+    const d = tmp("t256-9-");
+    writeState(d, [{ id: "T-1", status: "done", note: "" }, { id: "T-2", status: "blocked", note: "" }]);
+    const calls: Array<{ cmd: string; args: string[] }> = [];
+    const counting: CommandRunner = (cmd, args, cwd) => {
+      calls.push({ cmd, args });
+      return execRunner(cmd, args, cwd);
+    };
+    const r = checkOpenTaskCommits(d, counting);
+    expect(calls).toEqual([]);
+    expect(r).toEqual({ name: "open-task-commits", report: true, severity: "pass", message: "0 open/in_progress tasks; nothing to match (git not run)" });
+  });
+
+  it("T256-10 a commit mixing code and docs counts as code", () => {
+    const d = repo("t256-10-");
+    writeState(d, [{ id: "T-7", status: "open", note: "" }]);
+    commitFiles(d, "init", ["src/seed.ts"]);
+    commitFiles(d, "T-7: fix + brief", ["src/a.ts", "docs/loops/t7.md"]);
+    const r = checkOpenTaskCommits(d);
+    expect(r.severity).toBe("warn");
+    expect(r.message).toContain("T-7");
+  });
+
+  it("T256-11 word boundary and upper-case .MD", () => {
+    const d = repo("t256-11-");
+    writeState(d, [{ id: "T-24", status: "open", note: "" }, { id: "T-8", status: "open", note: "" }]);
+    commitFiles(d, "init", ["src/seed.ts"]);
+    commitFiles(d, "T-24x: lookalike", ["src/b.ts"]);
+    commitFiles(d, "T-8: notes", ["NOTES.MD"]);
+    expect(checkOpenTaskCommits(d).severity).toBe("pass");
+  });
+
   it("T256-8 runSync is wired to checkOpenTaskCommits", () => {
     const needle = "checks.push(checkOpenTaskCommits(options.projectRoot))";
     const wired = (src: string) => src.split("\n").some((line) => {
