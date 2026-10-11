@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 384,
+  "revision": 385,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1586,15 +1586,16 @@
       "id": "T-244",
       "title": "planner-watch misses peer turns: diff on each room's newest turn number, not unread, and keep prev in memory per process (shared STATE file across instances)",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 163,
-      "closed_session": null,
+      "closed_session": 167,
       "supersedes": null,
-      "note": "Opened planner s163. Between 12:07 and 13:30 CDT 2026-10-06 the watcher fired no NEW TURN for grok-sia-review's #437 r6 review, grok-research's SIA-R1, or part of grok-audit's #484 review. Clark's diagnosis: STATE is one file per planner shared by every instance, and my own --inbox reads lower unread between ticks, so a peer post is netted out. The planner's 30-minute direct room sweep is the backstop until it's fixed. The script is scripts/planner-watch.mjs (PR #481); the fix is code and needs Aaron's word. —  s163 close: superseded nothing; still open.",
+      "note": "Opened planner s163. Between 12:07 and 13:30 CDT 2026-10-06 the watcher fired no NEW TURN for grok-sia-review's #437 r6 review, grok-research's SIA-R1, or part of grok-audit's #484 review. Clark's diagnosis: STATE is one file per planner shared by every instance, and my own --inbox reads lower unread between ticks, so a peer post is netted out. The planner's 30-minute direct room sweep is the backstop until it's fixed. The script is scripts/planner-watch.mjs (PR #481); the fix is code and needs Aaron's word. —  s163 close: superseded nothing; still open. — s167 CLOSED, not built: nobody runs scripts/planner-watch.mjs (clark 2026-10-11: Relay uses room.sh's non-marking API read, clark its own hub-watch, the planner hub.sh --wait loops). The draft brief found hub-talk has no non-marking way to read a room's newest turn and sender, so a fix inside SIA would call the hub HTTP API directly, copying A2A-Hub's transport into SIA. Not worth it for an unused script. The script itself stays until a cleanup removes it (code change).",
       "note_by": [
-        "d43a0485-7166-4db2-9ca2-eacde1f63101"
+        "d43a0485-7166-4db2-9ca2-eacde1f63101",
+        "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
-      "closed_rev": null
+      "closed_rev": 385
     },
     {
       "id": "T-245",
