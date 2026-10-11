@@ -45,6 +45,18 @@ function stamp(fd: number, now: number): void {
   }
 }
 
+/** The claim file for (kind, session): one name, built here for both claim and release. */
+function claimFile(dir: string, kind: HookKind, sessionId: string): string {
+  return join(dir, `${kind}-${sessionId.replace(/[^A-Za-z0-9._-]/g, "_")}.claim`);
+}
+
+/** Remove a claim. A run that claims one kind releases the other, so a real resume is not swallowed. Never throws. */
+export function releaseHookClaim(opts: { kind: HookKind; sessionId: string; dir?: string }): void {
+  try {
+    unlinkSync(claimFile(opts.dir ?? defaultClaimDir(), opts.kind, opts.sessionId));
+  } catch { /* nothing to release, or not ours to remove */ }
+}
+
 export function claimHookRun(opts: {
   kind: HookKind;
   sessionId: string;
@@ -55,7 +67,7 @@ export function claimHookRun(opts: {
   const dir = opts.dir ?? defaultClaimDir();
   const now = opts.now ?? Date.now();
   const ttlMs = opts.ttlMs ?? HOOK_CLAIM_TTL_MS;
-  const file = join(dir, `${opts.kind}-${opts.sessionId.replace(/[^A-Za-z0-9._-]/g, "_")}.claim`);
+  const file = claimFile(dir, opts.kind, opts.sessionId);
   try {
     mkdirSync(dir, { recursive: true });
     try {

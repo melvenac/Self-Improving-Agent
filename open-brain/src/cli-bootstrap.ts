@@ -29,7 +29,7 @@ import {
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, resolveCursorAgentHost, writeProcessSession } from "./shared/process-session.js";
 import { takeMissingHandoffNotices } from "./shared/handoff-guard.js";
-import { HOOK_CLAIM_TTL_MS, claimHookRun, shouldClaimHookRun } from "./shared/hook-claim.js";
+import { HOOK_CLAIM_TTL_MS, claimHookRun, releaseHookClaim, shouldClaimHookRun } from "./shared/hook-claim.js";
 import { takeRecordOkNotices, takeWorkAfterEndNotices } from "./shared/end-record-guard.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
@@ -85,9 +85,12 @@ if (hookInput.agent_id || (hookInput as Record<string, unknown>).is_background_a
 
 {
   const claimId = shouldClaimHookRun(hookInput as Record<string, unknown>);
-  if (claimId !== null && claimHookRun({ kind: "start", sessionId: claimId }) === "skip") {
-    console.log(`SESSION_START_SKIPPED: a SessionStart for ${claimId} already ran within ${HOOK_CLAIM_TTL_MS / 1000}s (T-245).`);
-    process.exit(0);
+  if (claimId !== null) {
+    if (claimHookRun({ kind: "start", sessionId: claimId }) === "skip") {
+      console.log(`SESSION_START_SKIPPED: a SessionStart for ${claimId} already ran within ${HOOK_CLAIM_TTL_MS / 1000}s (T-245).`);
+      process.exit(0);
+    }
+    releaseHookClaim({ kind: "end", sessionId: claimId });
   }
 }
 
