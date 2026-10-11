@@ -134,7 +134,7 @@ describe("T-203 S-4: /sync flags an AGENT.local.md that disagrees with the map f
 describe("T-213: the tracked map carries the rooms clark created (atlas, <hub_name>, <hub_name>-waker) and forge speaks as forge", () => {
   // Read straight from the tracked file: these are the values every seat's presence and hub-talk read.
   const map = JSON.parse(readFileSync(SEAT_FILE, "utf8")) as {
-    seats: Record<string, { checkout: string; hub_name?: string; room?: string; dispatch?: { cursor?: { room?: string } } }>;
+    seats: Record<string, { checkout: string; hub_name?: string; room?: string; dispatch?: { cursor?: { room?: string; hub_name?: string } } }>;
     readers: Record<string, { partners: { label: string; hub_as: string; session_id: string }[] }>;
   };
   const ROOMS = {
@@ -157,9 +157,47 @@ describe("T-213: the tracked map carries the rooms clark created (atlas, <hub_na
     expect(map.readers[want.hub_name]?.partners).toEqual([{ label: "Atlas", hub_as: "atlas", session_id: want.room }]);
   });
 
-  it("atlas reads exactly these three partners, and no reader or seat still speaks as grok", () => {
-    expect(map.readers.atlas!.partners.map((p) => p.hub_as).sort()).toEqual(["cursor-builder", "cursor-infra", "forge"]);
-    expect(Object.keys(map.readers).sort()).toEqual(["atlas", "cursor-builder", "cursor-infra", "forge"]);
-    expect(Object.values(map.seats).map((s) => s.hub_name)).not.toContain("grok");
+  // T-242: the Grok bots are atlas's partners on their own rooms. They are not seats (no worktree, no waker) and not readers.
+  const SESSION_ID = /^k[0-9a-z]{31}$/;
+  const BOTS = [
+    { label: "grok-sia-review", hub_as: "grok-sia-review", session_id: "k57c639j4wkyp3y3vhfxxytn1s8fsdx6" },
+    { label: "grok-qa-sia", hub_as: "grok-qa-sia", session_id: "k573rrq0rz6p519xhh4p9mmyk98fsb55" },
+  ] as const;
+
+  it("T-242 SM-1 atlas reads both Grok bots, each exactly once, on its own room", () => {
+    for (const bot of BOTS) {
+      expect(map.readers.atlas!.partners.filter((p) => p.hub_as === bot.hub_as)).toEqual([bot]);
+    }
+  });
+
+  it("T-242 SM-2 every partner row of every reader is well-formed, and atlas's partners are distinct", () => {
+    for (const [reader, block] of Object.entries(map.readers)) {
+      expect(block.partners.length, reader).toBeGreaterThan(0);
+      for (const p of block.partners) {
+        for (const field of [p.label, p.hub_as]) {
+          expect(typeof field === "string" && field.length > 0 && field === field.trim(), `${reader}: ${JSON.stringify(p)}`).toBe(true);
+        }
+        expect(p.session_id, `${reader}: ${JSON.stringify(p)}`).toMatch(SESSION_ID);
+      }
+    }
+    const atlas = map.readers.atlas!.partners;
+    expect(new Set(atlas.map((p) => p.hub_as)).size).toBe(atlas.length);
+    expect(new Set(atlas.map((p) => p.session_id)).size).toBe(atlas.length);
+  });
+
+  it("T-242 SM-3 no seat, reader or partner speaks as plain grok; every reader is a seat; the Grok bots are neither seats nor readers", () => {
+    const seatHubNames = Object.values(map.seats)
+      .flatMap((s) => [s.hub_name, s.dispatch?.cursor?.hub_name])
+      .filter((n): n is string => typeof n === "string");
+    expect(seatHubNames).not.toContain("grok");
+    expect(Object.keys(map.readers)).not.toContain("grok");
+    for (const [reader, block] of Object.entries(map.readers)) {
+      expect(block.partners.map((p) => p.hub_as), reader).not.toContain("grok");
+      expect(Object.values(map.seats).map((s) => s.hub_name), `reader ${reader} is a seat's hub_name`).toContain(reader);
+    }
+    for (const bot of BOTS) {
+      expect(seatHubNames).not.toContain(bot.hub_as);
+      expect(Object.keys(map.readers)).not.toContain(bot.hub_as);
+    }
   });
 });
