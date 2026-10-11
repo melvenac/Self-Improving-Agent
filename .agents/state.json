@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 389,
+  "revision": 390,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1780,7 +1780,7 @@
       "opened_session": 167,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner s167 from T-245 r4's CC one-off (2026-10-11): end-fix-r3-pins R7 failed identically at 2ce8eeb5, 5d4276c7 and b142886f when run from a headless Claude Code session, and passed 4/4 with every CLAUDE* var unset. Cause per the run: the session's own CLAUDE_PID / CLAUDE_CODE_SESSION_ID leak into the spawned hook. CI is green because CI has no such vars. With D-150 routing dev to CC, every CC dev run hits this: fix the tests (spawn hooks with a scrubbed env, or set the vars explicitly), not the runs. Find every test that spawns a hook entry and check it.",
+      "note": "Opened planner s167 from T-245 r4's CC one-off (2026-10-11): end-fix-r3-pins R7 failed identically at 2ce8eeb5, 5d4276c7 and b142886f when run from a headless Claude Code session, and passed 4/4 with every CLAUDE* var unset. Cause per the run: the session's own CLAUDE_PID / CLAUDE_CODE_SESSION_ID leak into the spawned hook. CI is green because CI has no such vars. With D-150 routing dev to CC, every CC dev run hits this: fix the tests (spawn hooks with a scrubbed env, or set the vars explicitly), not the runs. Find every test that spawns a hook entry and check it. — s167: built by a CC Sonnet one-off (desktop), PR #595 at f521c9b3, updated to da164982 before review (tests-only, 3 files). Reproduced first-hand in the run: R7 red at base with 13 host CLAUDE_* vars set (the run's own session id leaked into the hook), green at commit 2; M1-M4 red on their rows. Review posted to grok-audit (tests-only, so SG-1-eligible once the review names da164982 and CI passes). The run found two OTHER host leaks red at base and head, not CLAUDE_*: harness/config-channel.test.ts CA-4c reads the user's global git identity ('Aaron Melven / …' instead of 'HoH harness runtime'), and suite-run-meta.test.ts 'a lease already held by the same owner runs without take' (expected 2 to be 0). Also server.test.ts has an intermittent 5 s timeout (T-236 slice 2 briefing_budget) red at base. Follow-up: T-260.",
       "note_by": [
         "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
@@ -1809,6 +1809,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Opened planner s167 from the T-256 CC Opus review (2026-10-11, desktop): runSync on the real SIA root did not finish within 6+ minutes; the process tree showed it blocked in git cat-file --batch-check spawned by record-erasure.ts:213 (called at sync/index.ts:138), before T-256's check runs. T-256 round 1's dev run also saw cursor-hook-compat 'wired into runSync' time out at 120 s at both base and head on the desktop: same cause likely. Pre-existing, not T-256's. Find why --batch-check blocks (stdin never closed? one call per revision over the whole state.json history?) and bound it.",
+      "note_by": [
+        "6646f34e-175c-4a4e-a39b-a2878070946b"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-260",
+      "title": "Tests that read the developer machine: config-channel CA-4c reads the global git identity; suite-run-meta same-owner lease; server.test.ts 5 s timeout",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 167,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner s167 from T-257's CC run (2026-10-11, desktop): red at both 843d8d18 and the T-257 head, so not caused by it. (1) harness/config-channel.test.ts CA-4c got the user's global git user.name/email instead of 'HoH harness runtime': set GIT_CONFIG_GLOBAL/GIT_CONFIG_NOSYSTEM (or the identity) in the test. (2) suite-run-meta.test.ts 'cli: a lease already held by the same owner runs without take' expected 2 to be 0: likely a real lease or owner on the developer machine. (3) server.test.ts T-236 slice 2 briefing_budget: 5 s timeout, flaky on a loaded desktop. CI is green on all three; they cost every local dev run a re-check.",
       "note_by": [
         "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
