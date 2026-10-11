@@ -70,11 +70,13 @@ export function fleetProjectKey(projectRoot: string, recordName: string, fleet: 
   }
   if (Array.isArray(fleet.projects)) {
     for (const p of fleet.projects) {
+      if (!p || typeof p !== "object") continue;
       if (repoName !== null && typeof p.repo === "string" && p.repo.toLowerCase() === repoName.toLowerCase()) {
         return typeof p.name === "string" ? p.name : recordName;
       }
     }
     for (const p of fleet.projects) {
+      if (!p || typeof p !== "object") continue;
       if (typeof p.name === "string" && p.name.toLowerCase() === recordName.toLowerCase()) {
         return p.name;
       }
@@ -119,7 +121,7 @@ function seatToken(s: FleetSeat): string {
   return `${s.name} ${s.kind} ${s.runtime}/${s.model} ${s.host} ${s.status}`;
 }
 
-function verifiedStale(verifiedAt: string | undefined, now: Date): string | null {
+function verifiedStale(verifiedAt: string | number | undefined, now: Date): string | null {
   if (!verifiedAt) return null;
   const t = new Date(verifiedAt);
   if (Number.isNaN(t.getTime())) return null;
@@ -154,9 +156,14 @@ function buildFleet(
       ? data.coordinator.name
       : "?";
   const { hubV, hubUrl, dashV, dashUrl } = hubFields(data);
-  const verified = data.verifiedAt ? new Date(data.verifiedAt) : null;
+  const rawVerified: unknown = data.verifiedAt;
+  const verifiedAt =
+    typeof rawVerified === "string" || (typeof rawVerified === "number" && Number.isFinite(rawVerified))
+      ? rawVerified
+      : undefined;
+  const verified = verifiedAt ? new Date(verifiedAt) : null;
   const verifiedLabel = verified && !Number.isNaN(verified.getTime()) ? chicagoStamp(verified) : "?";
-  const stale = verifiedStale(data.verifiedAt, now);
+  const stale = verifiedStale(verifiedAt, now);
 
   const header = `## Fleet (fleet.json, verified ${verifiedLabel})${stale ?? ""}`;
   const legacy: string[] = [
@@ -177,9 +184,11 @@ function buildFleet(
   while (shown >= 0) {
     const names = allNames.slice(0, shown);
     const hidden = allNames.length - shown;
-    const more = hidden > 0 ? ` +${hidden} more` : "";
-    const namePart = names.length > 0 ? names.join(", ") : "none";
-    budget = `${budgetCore}${namePart}${more}${suffix}`;
+    let seatPart: string;
+    if (allNames.length === 0) seatPart = "none";
+    else if (shown === 0) seatPart = `+${hidden} more`;
+    else seatPart = hidden > 0 ? `${names.join(", ")} +${hidden} more` : names.join(", ");
+    budget = `${budgetCore}${seatPart}${suffix}`;
     if (budget.length <= FLEET_LINE_CHARS || shown === 0) break;
     shown -= 1;
   }
@@ -214,4 +223,10 @@ export function describeFleet(
   } catch (err) {
     return invalidShape(path, firstLine(err));
   }
+}
+
+/** handleStart's fallback when describeFleet itself throws: names the path describeFleet reads. Never throws. */
+export function fleetFallback(err: unknown, env: NodeJS.ProcessEnv = process.env): { legacy: string[]; budget: string } {
+  const msg = (err instanceof Error ? err.message : String(err)).split("\n")[0]!;
+  return invalidShape(fleetPath(env), msg);
 }
