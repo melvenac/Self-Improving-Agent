@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 382,
+  "revision": 383,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4704,6 +4704,12 @@
       "title": "Aaron 10-11: each planner mines its own transcripts for repeated work and writes a seat skill (~/.claude/skills/<seat>-ops), so a new session calls the skill instead of relearning. SIA planner: atlas-ops",
       "date": "2026-10-11",
       "note": "Aaron typed in clark's window, 2026-10-11T16:02:42Z (transcript 0cfb92a1, verified by the planner with atlas-ops relay-check.mjs): 'Ask the planners to do the same, have them read their transcripts and look for repetitive tasks, scripts etc they can write skills for…'. atlas-ops (s167), each script tested live: state.mjs (task/decision/gap reads), hub.sh (say/watch/room with HUB_URL pinned and --session always; rooms.json), turns.mjs (forward a result unread), relay-check.mjs (SG-1 typed-input check), records-pr.sh (records PR with auto-merge, HEAD left on the commit), pr-wait.sh (updates a BEHIND PR; prints the dispatch SHA). Proposed for the SIA protocol instead of a skill: the hub room map (T-196), a stale-open-task check in /sync, and records-PR serialisation in ob_state."
+    },
+    {
+      "id": "D-150",
+      "title": "Aaron 10-11: the Cursor and Grok-bot seat rules are lifted; the fleet may use Claude Code for all seats or any mix of Grok bot, Cursor and CC (\"Optimize the fleet\"). Routing set by clark from the budgets: DEV goes to Claude Code headless (claude -p, Sonnet 5.5), with \"Runtime: CC\" and an absolute reply path in the brief; release and hard QA gates go to CC Opus; first-pass QA, review and research go to the Grok bots; Cursor Sonnet is reserve.",
+      "date": "2026-10-11",
+      "note": "Aaron typed in clark's window, 2026-10-11T19:40:15Z (transcript 0cfb92a1, queue-operation, verified by the planner with atlas-ops relay-check.mjs): 'The rules about using cursor and grokbot are lifted as well. You can use cc for all 3 seats or a mixture of gorkbot, cursor and cc. Optimize the fleet.' The routing and the budget figures come from clark's relay and are NOT typed input: Cursor 'Other Models' (Sonnet on Cursor) 79% used, resets Nov 3, on-demand off; Composer/Grok-in-Cursor 28%; Grok Bot 6% of the week; Claude Code ~3% of the week. Headless CC has no hub key, so its reply goes to a file and clark forwards it; desktop one-offs on 10-11 (T-252, T-253) showed the dispatch text must sit inside the prompt and the reply path must be absolute, because a temp HOME redirects relative paths. QA PC wakers on sonnet-5-5-high draw the 79% bucket on every wake, so new work prefers CC dispatch."
     }
   ],
   "handoffs": [
