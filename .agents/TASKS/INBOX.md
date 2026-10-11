@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 385 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 386 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -54,6 +54,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-252** BRIEFING-FIX follow-ups (grok re-review r2 F1-F4): guard null projects[] entries in fleetProjectKey; a BF-F7 case that reaches describeFleet's catch (so M9 dies); no 'seats none +K more' when seats exist but don't fit; handleStart's fallback names the real default fleet.json path
 - [ ] **T-253** state import drops a bullet's continuation lines silently: bullets() keeps only lines starting '- ' or '* ', and the report counts bullets only; join indented continuation lines and count un-imported lines
 - [ ] **T-256** /sync warns when a CODE commit on HEAD names a task that is still open (stale-open-task check)
+- [ ] **T-257** Hook-spawning tests inherit the caller's CLAUDE_* env: end-fix-r3-pins R7 fails when the suite runs inside a Claude Code session
 
 ## P3
 
