@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 376,
+  "revision": 377,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "D-143 (Aaron 10-09): SIA is in SMALL-FIXES-ONLY mode; the focus is the Makerspace build. The SIA planner supports Maker on SIA questions. A task from T-248..T-253 is worked only when it becomes a real issue for Maker (T-250 the likeliest), small, through clark.",
-    "since_session": 165
+    "text": "D-145 (Aaron 10-11): SIA loop back at normal pace, usage restrictions off. Work the backlog by priority (P0 first); Cursor/Grok for dev, Claude QA lanes allowed again; clark launches runs on the laptop/QA PC from briefs with pinned SHAs. Pending Aaron via clark: Q2 (#437 r10 vs T-245 Option A) gates #437/#425; Q1 (recall-trigger loop) follows Q2.",
+    "since_session": 167
   },
   "tasks": [
     {
@@ -4662,14 +4662,19 @@
       "id": "D-143",
       "title": "Aaron's priority: slow down on the dashboard, SIA and A2A-Hub builds and focus on the Makerspace build; only small fixes to those three repos as issues come up",
       "date": "2026-10-09",
-      "note": "Aaron, verbatim, typed in clark's window at 2026-10-09T16:43:37Z (the planner READ it in clark's transcript e8fda6fc): \"Let's slow down on the dashboard, sia and a2a hub builds and focus on the makerspace build.  Let's only do small fixes to those three repos as issue come up.\" For SIA: NO new loops. T-248..T-253 stay as tasks, worked only if one becomes a real issue for Maker's work. T-250 (origin/master hardcoded, so a 'main' repo gets no currency line) is the likely one if Maker's greeting keeps flagging it. Small fixes go through clark (SG-1/D-135; Cursor brief checklist). The planner's role is mainly supporting Maker (the Makerspace planner) on SIA questions.",
-      "standing": true
+      "note": "Aaron, verbatim, typed in clark's window at 2026-10-09T16:43:37Z (the planner READ it in clark's transcript e8fda6fc): \"Let's slow down on the dashboard, sia and a2a hub builds and focus on the makerspace build.  Let's only do small fixes to those three repos as issue come up.\" For SIA: NO new loops. T-248..T-253 stay as tasks, worked only if one becomes a real issue for Maker's work. T-250 (origin/master hardcoded, so a 'main' repo gets no currency line) is the likely one if Maker's greeting keeps flagging it. Small fixes go through clark (SG-1/D-135; Cursor brief checklist). The planner's role is mainly supporting Maker (the Makerspace planner) on SIA questions."
     },
     {
       "id": "D-144",
       "title": "No more Claude Code usage except for planners: dev goes to Cursor, QA to Grok bots (or a Cursor QA run for Windows-only checks). Amends D-140, so there are no more Claude QA gates; a gate that cannot be covered without Claude goes to clark, who takes it to Aaron",
       "date": "2026-10-09",
-      "note": "Aaron, 10-09 ~22:5x CDT, typed in clark's window (session c71ddc34, verified in its transcript by Atlas): 'No more cc usage except for planners. Everything else goes to cursor and grok bot agents.' Context: the 5h usage window hit STOP (93%) on 10-09.",
+      "note": "Aaron, 10-09 ~22:5x CDT, typed in clark's window (session c71ddc34, verified in its transcript by Atlas): 'No more cc usage except for planners. Everything else goes to cursor and grok bot agents.' Context: the 5h usage window hit STOP (93%) on 10-09."
+    },
+    {
+      "id": "D-145",
+      "title": "Aaron 10-11: CC plan upgraded, usage reset; 'get all agents and project loops going again. Usage restrictions are off.' Supersedes D-144 (no CC except planners) and D-143's small-fixes-only mode; SIA loop restarts at normal pace",
+      "date": "2026-10-11",
+      "note": "Aaron's typed words, queued mid-turn in clark's window: transcript 9311ff14-296a-405f-a38f-558ad2217881.jsonl, queue-operation 2026-10-11T14:19:17Z, read first-hand by the planner (s167). Relayed by clark with: un-park only what was cost-parked; Claude QA lanes allowed again (Cursor/Grok still fine); max 2 Cursor runs per PC; clark launches laptop/QA PC runs from briefs with pinned SHAs. D-130's parks (#437 #425 #470) were FOCUS-parked, not cost-parked: they stay parked until Aaron rules Q2 (#437 r10 vs T-245 Option A; planner recommends A) and Jev cal 2 is re-raised. Q1 (recall-trigger loop; planner recommends yes, one bounded measurement loop, after Q2's fix) is with clark to put to Aaron.",
       "standing": true
     }
   ],
@@ -5349,7 +5354,7 @@
     },
     {
       "n": 167,
-      "date": "2026-10-10",
+      "date": "2026-10-11",
       "uuid": "6646f34e-175c-4a4e-a39b-a2878070946b",
       "seat": "planner",
       "checkout": "sia-planner",

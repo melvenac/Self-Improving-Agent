@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 376 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 377 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-D-143 (Aaron 10-09): SIA is in SMALL-FIXES-ONLY mode; the focus is the Makerspace build. The SIA planner supports Maker on SIA questions. A task from T-248..T-253 is worked only when it becomes a real issue for Maker (T-250 the likeliest), small, through clark. _(since session 165)_
+D-145 (Aaron 10-11): SIA loop back at normal pace, usage restrictions off. Work the backlog by priority (P0 first); Cursor/Grok for dev, Claude QA lanes allowed again; clark launches runs on the laptop/QA PC from briefs with pinned SHAs. Pending Aaron via clark: Q2 (#437 r10 vs T-245 Option A) gates #437/#425; Q1 (recall-trigger loop) follows Q2. _(since session 167)_
 
 ## Top tasks
 
