@@ -63,6 +63,7 @@ export function checkOpenTaskCommits(projectRoot: string, run: CommandRunner = e
 
   const hits: string[] = [];
   for (const t of open) {
+    run("git", ["rev-parse", "HEAD"], projectRoot);
     const h = newest.get(t.id as string);
     if (!h) continue;
     const sha7 = h.sha.slice(0, 7);
