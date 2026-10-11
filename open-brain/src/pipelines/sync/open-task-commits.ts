@@ -35,7 +35,7 @@ export function checkOpenTaskCommits(projectRoot: string, run: CommandRunner = e
   } catch (err) {
     return skip(`.agents/state.json unreadable: ${(err as Error).message.split("\n")[0]}`);
   }
-  const open = tasks.filter((t) => typeof t.id === "string" && (t.status === "open" || t.status === "in_progress"));
+  const open = tasks.filter((t) => t !== null && typeof t === "object" && typeof t.id === "string" && (t.status === "open" || t.status === "in_progress"));
   if (open.length === 0) {
     return { name, report: true, severity: "pass", message: "0 open/in_progress tasks; nothing to match (git not run)" };
   }
