@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 390,
+  "revision": 391,
   "project": {
     "name": "self-improving-agent"
   },
@@ -5353,6 +5353,62 @@
       "session_uuid": "73efb2c2-ab62-465b-a3fd-bf635649141f",
       "checkout": "sia-planner",
       "first_rev": 369
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Roll at Aaron's word (2026-10-11 23:00Z, clark's window, verified: 'yes, merge. Let's roll all agents on the desktop when ready.'). Open SIA code PRs, all planner-ACCEPTed and reviewed, all BEHIND master: #576 T-245 r4 (2ce8eeb5; CC Opus review CHANGES -> r4 fixed), #579 T-253 (72f384a3; grok-audit APPROVE of 4349c14c, identical patch-id), #580 T-252 (4f607a6f; grok-audit APPROVE of 6e3374d5, identical patch-id), #588 T-256 r2 (49899106; CC Opus review CHANGES -> r2 fixed). Aaron's 'yes, merge' was relayed to clark; clark merges. Before EACH merge: gh pr update-branch, prove the PR's own diff unchanged (git patch-id --stable of merge-base..old vs origin/master..new; src/tests diff old..new empty), wait CI test, send clark the new head. #595 T-257 (da164982, tests-only): SG-1 merge by clark when grok-audit's review of da164982 (job posted, atlas<->grok-audit room) APPROVEs and CI passes. After #576 merges + SIA rebuild: T-245 A4 live (doubled Cursor start/end: one claim, one feedback row, one shadow line; a resume within 120 s is NOT skipped; BOTH doubled payloads carry cursor_version), then the D-148 recall-effect analysis per docs/loops/recall-effect-design-2026-10-11.md (uncommitted local run; anchor = transcript attachment toolUseID).",
+      "watch_out": [
+        "Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk.",
+        "SG-1 needs a review naming the EXACT head: update-branch BEFORE posting a review job.",
+        "Headless CC / desktop one-offs have no hub key: dispatch text inside the brief and an ABSOLUTE reply path; run logs are UTF-16.",
+        "Grok bots: <=3 queued per bot; a doubled 'SIA JOB:' prefix was a VM-side parser bug fixed by Argus 10-11 (turn 130), do not resend.",
+        "Local runs of sync tests hang in record-erasure (T-259) and three tests read the developer machine (T-260): re-run a red file at the base before calling it a regression; CI is the full-suite gate.",
+        "Until T-257 (#595) merges, end-fix-r3-pins R7 is red in any CC-hosted local run."
+      ],
+      "open_questions": [
+        "T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.",
+        "T-258 (doubled-hook residuals), T-259 (record-erasure /sync hang, P2), T-260 (tests reading the dev machine, P3): next CC briefs after the roll; T-259 first, it blocks local sync-test runs."
+      ],
+      "session": 167,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#576",
+            "qa_status": "accepted",
+            "note": "T-245 r4 2ce8eeb5; Aaron merge; update-branch first"
+          },
+          {
+            "ref": "#579",
+            "qa_status": "accepted",
+            "note": "T-253 72f384a3; Aaron merge; update-branch first"
+          },
+          {
+            "ref": "#580",
+            "qa_status": "accepted",
+            "note": "T-252 4f607a6f; Aaron merge; update-branch first"
+          },
+          {
+            "ref": "#588",
+            "qa_status": "accepted",
+            "note": "T-256 r2 49899106; Aaron merge; update-branch first"
+          },
+          {
+            "ref": "#595",
+            "qa_status": "in_progress",
+            "note": "T-257 da164982 tests-only; SG-1 on grok-audit APPROVE + CI"
+          }
+        ],
+        "frozen_sha": null,
+        "questions_for_aaron": [
+          "T-194 option (a)/(b)/(c)"
+        ],
+        "rulings": [
+          "s167: T-245 r4 ACCEPT (Opus review CHANGES -> r4); T-253, T-252 ACCEPT (grok-audit APPROVE); T-256 r2 ACCEPT (Opus review CHANGES -> r2); T-242 merged #585 under SG-1, CLOSED; T-244 CLOSED not built (no users); D-150 fleet routing (CC dev, Grok review, Cursor reserve); opened T-256..T-260; recall-effect design landed for D-148."
+        ]
+      },
+      "session_uuid": "6646f34e-175c-4a4e-a39b-a2878070946b",
+      "checkout": "sia-planner",
+      "first_rev": 376
     }
   ],
   "sessions": [
