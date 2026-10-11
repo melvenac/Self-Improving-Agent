@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 380,
+  "revision": 381,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1629,15 +1629,16 @@
       "id": "T-247",
       "title": "Pin QA 288's unpinned checks: assertPathUnderDir (H1, plus a date check in writeSummary), secure_delete (H2), and the hub-room guard's clause-scope negation (G1)",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 164,
-      "closed_session": null,
+      "closed_session": 167,
       "supersedes": null,
-      "note": "From QA 288 (D-131). Each is a mutant that leaves the suite green. H1 is MEDIUM and reachable: writeSummary(date: '../../escaped') writes outside the vault once the under-dir check is gone; today's only caller passes an ISO date. After the freeze (D-130).",
+      "note": "From QA 288 (D-131). Each is a mutant that leaves the suite green. H1 is MEDIUM and reachable: writeSummary(date: '../../escaped') writes outside the vault once the under-dir check is gone; today's only caller passes an ISO date. After the freeze (D-130). — s167 CLOSED as already done: PR #499 'T-247: pin QA 288 H1/H2/G1 mutants' merged 2026-10-07 (c10600f1 -> c61959da) after QA 291 ACCEPT on Aaron's word (D-133); c61959da is an ancestor of master b142886f (planner, first-hand). Pins at master: vault-writer.ts assertValidSummaryDate + tests/vault-writer.test.ts 'T-247 J1'/'T-247 H1'; tests/t247-pins-scrub.test.ts (secure_delete); tests/pipelines/sync/hub-talk-exit-codes.test.ts 'T-247 G1'. The task was left open after the merge, the third such stale task found in s167 (T-200, T-233).",
       "note_by": [
-        "63c84e2f-cb93-4270-a361-060c608be6a4"
+        "63c84e2f-cb93-4270-a361-060c608be6a4",
+        "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
-      "closed_rev": null
+      "closed_rev": 381
     },
     {
       "id": "T-248",
