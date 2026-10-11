@@ -406,3 +406,53 @@ cursor-builder stopped correctly with `BLOCKED T-245 tree-currency-fetch.test.ts
 
 **Allowed:** the `node_modules` `npm rebuild better-sqlite3` that cursor-builder ran for Node 22 is fine. It touches no
 tracked file. **Acceptance changes:** A1 drops ID-2, and A2 is mutants 1–6.
+
+## ROUND 3 (2026-10-11): W4's check moves inside the `try`
+
+Round 2 pushed `5540f973` (PR #576), and W3 is gone as asked. CI `test` then failed, 1 of 250 files:
+`tests/t048-r2.test.ts > SILENT 16 counts only a feedback_log write that landed, and names the one that threw`,
+`SQLITE_ERROR`.
+
+- **Cause (planner, first-hand at `5540f973`).** SILENT 16 drops `feedback_log` to prove that a failed write is named
+  and not counted.
+- W4 put `hasSuppliedFeedback` **before** the `try` (`index-v2.ts:177`), so its `SELECT` on the missing table throws
+  uncaught.
+- **The defect is the brief's.** `t048-r2` calls `sessionEndV2`, and §6 did not list it. Round 1's test list missed
+  every test of the changed functions except two. CI ran the whole suite and caught it.
+- No reply turn reached room `k575sfwr…` for round 2. If you posted one, give its turn number in this round's reply.
+  If not, include round 2's items in this round's reply.
+
+### R3 work (one new commit on top of `5540f973`; no amend, no rebase)
+
+1. In `open-brain/src/pipelines/session-end/index-v2.ts`, replace lines 177–186 (from the W4 `if` through the end of the
+   `if (sessionId) { try … catch … }` block) with:
+   ```ts
+    let wrote = true;
+    let already = false;
+    if (sessionId) {
+      try {
+        if (hasSuppliedFeedback(db, sessionId, id)) already = true;
+        else recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin, method);
+      } catch (err) {
+        wrote = false;
+        notWritten.push({ id, reason: err instanceof Error ? err.message : String(err) });
+      }
+    }
+    if (already) continue;
+   ```
+   Keep the T-245 W4 comment above it. The lines `if (!wrote) continue;`, `updateFeedbackV2(...)` and
+   `ratings.push(...)` stay as they are.
+2. Commit: `T-245 r3: W4's duplicate check inside the try (SILENT 16: a missing table is named, not thrown)`.
+   `git log --oneline b142886f..HEAD` must then print 4 lines.
+3. **Test command.** Use §6's block, with this `$files` (every test that imports a changed function or runs a changed
+   hook entry, at `5540f973`):
+   ```
+   tests/shared/hook-claim.test.ts tests/t245-idempotent-stages.test.ts tests/t048-r2.test.ts tests/t048-r2b.test.ts tests/rating-method.test.ts tests/pipelines/session-end/index-v2.test.ts tests/audit-fix-r3-callers.test.ts tests/shadow-stage.test.ts tests/shadow-evaluate.test.ts tests/shared/handoff-guard.test.ts tests/pipelines/session-start/tree-currency-fetch.test.ts tests/cli-bootstrap.test.ts tests/active-session.test.ts tests/end-fix-q6.test.ts tests/end-fix-q10.test.ts tests/end-fix-q12.test.ts tests/end-fix-r3-pins.test.ts tests/end-fix-r4-pins.test.ts
+   ```
+   All 18 files must be green. If one is red at your head, run it at `b142886f` too (§7) and paste both outputs.
+4. **Mutants.** Re-run mutant 5 (delete `if (already) continue;`; it must turn ID-3 red). Add **mutant 8**: move
+   `hasSuppliedFeedback` back outside the `try`. It must turn `t048-r2` SILENT 16 red.
+5. `tsc`, then push (no force) and read the push back. PR #576 updates itself.
+6. **Wait for CI.** Then paste `gh pr checks 576`. `test` must show `pass`.
+7. Reply in room `k575sfwr9wcx3r8fw83g3bc00x8fmar3`. Line 1: `TASK: T-245 READY r3, Option A claim + idempotent stages (fix/t245-option-a)`.
+   Include the line **`MODEL: <the model this run used>`**, taken from your own run, not from a config file.
