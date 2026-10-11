@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 387,
+  "revision": 388,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1706,9 +1706,10 @@
       "opened_session": 165,
       "closed_session": null,
       "supersedes": null,
-      "note": "From docs/loops/briefing-fix-review-r2.md (grok-sia-review, delta 19cb1e5f..3ded135d, 0 blocking, 0 major). The planner ruled it ACCEPT-level, with these 4 tracked rather than a round 4 (s165). F2: `projects:[null]` makes fleetProjectKey throw, and describeFleet's catch then shows 'FLEET: unavailable' for every seat. It degrades and is not fatal, but it is the same class as r1 F2. F3: mutant 9 (describeFleet's try/catch removed) stays GREEN, because the shape guards stop every BF-F7 input before the catch; add `{\"projects\":[null]}` as a BF-F7 case.",
+      "note": "From docs/loops/briefing-fix-review-r2.md (grok-sia-review, delta 19cb1e5f..3ded135d, 0 blocking, 0 major). The planner ruled it ACCEPT-level, with these 4 tracked rather than a round 4 (s165). F2: `projects:[null]` makes fleetProjectKey throw, and describeFleet's catch then shows 'FLEET: unavailable' for every seat. It degrades and is not fatal, but it is the same class as r1 F2. F3: mutant 9 (describeFleet's try/catch removed) stays GREEN, because the shape guards stop every BF-F7 input before the catch; add `{\"projects\":[null]}` as a BF-F7 case. — s167: PR #580 grok-audit job 73 APPROVE at 6e3374d5 (0 HIGH/MED/LOW, 3 INFO: fleetFallback's 'never throws' reads err.message unguarded; verifiedAt 0 reads as absent; T252-7 checks wiring by source text). Planner ACCEPT; branch updated to 4f607a6f (patch-id identical, src/tests unchanged). Merge needs Aaron (code PR).",
       "note_by": [
-        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd",
+        "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
       "closed_rev": null
     },
@@ -1720,9 +1721,10 @@
       "opened_session": 165,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found in the Makerspace import (s165, via clark and Maker): two multi-line watch-outs lost their 2nd line. Code: state-import/index.ts:488. It applies to watch_out and open_questions. Maker restored the text from the archived next-session.md. This is the frogger F1 class: a summary that says fine while text was lost.",
+      "note": "Found in the Makerspace import (s165, via clark and Maker): two multi-line watch-outs lost their 2nd line. Code: state-import/index.ts:488. It applies to watch_out and open_questions. Maker restored the text from the archived next-session.md. This is the frogger F1 class: a summary that says fine while text was lost. — s167: PR #579 grok-audit job 72 APPROVE at 4349c14c (0 HIGH/MED, 1 LOW, 3 INFO); planner ACCEPT; branch updated to 72f384a3 (patch-id identical, src/tests unchanged), CI pass. Follow-ups, not blockers: renderImportReport index.ts:942 puts a not_imported line in single backticks, so a line with its own backtick breaks the span; index.ts:501 truncates not_imported text to 120 chars with no marker.",
       "note_by": [
-        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd",
+        "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
       "closed_rev": null
     },
@@ -1763,7 +1765,7 @@
       "opened_session": 167,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner s167. On 2026-10-11 the planner found T-200, T-233 and T-247 merged on master but still open, and nearly briefed one again. Check: newest 1500 non-merge commits, subjects only, \\bT-NNN\\b, code = touches a path outside docs/, .agents/ and *.md; open/in_progress warn; suppress with 'stays open after <sha7>' in the task note. Brief: docs/loops/t256-stale-open-task-check-brief.md (CC laptop one-off, D-150). Its prototype at 5b249bca hits T-168, T-235, T-046 and T-172 (T-172 is a cross-reference in a T-233 subject): triage those after merge.",
+      "note": "Opened planner s167. On 2026-10-11 the planner found T-200, T-233 and T-247 merged on master but still open, and nearly briefed one again. Check: newest 1500 non-merge commits, subjects only, \\bT-NNN\\b, code = touches a path outside docs/, .agents/ and *.md; open/in_progress warn; suppress with 'stays open after <sha7>' in the task note. Brief: docs/loops/t256-stale-open-task-check-brief.md (CC laptop one-off, D-150). Its prototype at 5b249bca hits T-168, T-235, T-046 and T-172 (T-172 is a cross-reference in a T-233 subject): triage those after merge. — s167: r1 at ed9bb254 (PR #588), CC Opus review CHANGES: a {\"tasks\":[null]} record throws TypeError and aborts /sync (filter outside the try); untested branches (no-open-task zero git calls, !log.ok, no tasks array, some-vs-every code path, word boundary, .MD case). Round 2 in the brief (base 9c0784f3 after update-branch). The 4 hits at the head (T-046, T-168, T-235 real partials needing 'stays open after <sha7>'; T-172 noise) triage after merge.",
       "note_by": [
         "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
@@ -1792,6 +1794,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Opened planner s167 from grok-sia-review's idempotency audit at b142886 (room k57c639j). F1 [major as written, P3 after T-245]: cli-session-end.ts:155-159 recordWorkAfterEnd -> end-record-guard.ts:543 appendFileSync with no read-before-write, so a doubled SessionEnd that reaches it writes 2 identical lines and the next greeting shows WORK AFTER /end twice. With T-245's claim a doubled end skips before :159, so this only bites when the claim misses (stale-path race, or a payload without cursor_version). Fix: W2's session dedupe applied to recordWorkAfterEnd. F5 [minor]: handoff-guard.ts:236-238 and end-record-guard.ts:574 take*Notices read-then-unlink, so two overlapping SessionStarts can both print the notices. F6 [minor]: invocation-logger.ts:111/:144 dedupe by read-then-append, so overlapping (not sequential) SessionEnds duplicate invocation rows. All three only matter when T-245's claim fails; rank after T-245 A4.",
+      "note_by": [
+        "6646f34e-175c-4a4e-a39b-a2878070946b"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-259",
+      "title": "/sync hangs for 6+ minutes in the record-erasure check (git cat-file --batch-check) on the real repo root",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 167,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Opened planner s167 from the T-256 CC Opus review (2026-10-11, desktop): runSync on the real SIA root did not finish within 6+ minutes; the process tree showed it blocked in git cat-file --batch-check spawned by record-erasure.ts:213 (called at sync/index.ts:138), before T-256's check runs. T-256 round 1's dev run also saw cursor-hook-compat 'wired into runSync' time out at 120 s at both base and head on the desktop: same cause likely. Pre-existing, not T-256's. Find why --batch-check blocks (stdin never closed? one call per revision over the whole state.json history?) and bound it.",
       "note_by": [
         "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],

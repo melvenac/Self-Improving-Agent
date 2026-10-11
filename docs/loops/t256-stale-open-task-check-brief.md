@@ -440,3 +440,74 @@ One test process. No hub listener, no second node. No real sleeps; nothing in th
 | T256-A3 | Mutants 1–7 are each red on their named rows. |
 | T256-A4 | A Grok review (D-150 lane) of the diff returns APPROVE, or CHANGES that the planner rules on. |
 | T256-A5 | After merge, `/sync` on master prints `open-task-commits` and the planner triages each hit (close with evidence, or `stays open after <sha7>` in the note). |
+
+## ROUND 2 (2026-10-11): a null task entry skips; pin the untested branches
+
+Round 1 pushed `ed9bb254` (PR #588). CI passes and all 7 mutants went red. The planner then updated the branch with
+master (`gh pr update-branch`, no code change), so **the branch head is now `9c0784f315a8c154fd7cd346fefc95b22024b46c`**.
+A CC Opus review (read-only, `MODEL: claude-opus-5-5`) returned CHANGES. The planner checked the source at the head and
+takes these:
+
+- **R2-1, a bug.** Line 38's filter, `tasks.filter((t) => typeof t.id === …)`, reads `t.id` on a `null` entry, and
+  the filter is outside the `try`. `{"tasks":[null]}` throws `TypeError` and aborts the whole `/sync`. The file's
+  own rule is that a record it cannot read degrades to a skip.
+- **R2-2.** The "no open task means no git call" branch is untested. Mutant `if (false)` stays green.
+- **R2-3.** The `!log.ok` skip and the `no tasks array` skip are untested. Mutating either stays green, and the mutant
+  throws on a repo with no commits, or on `{}`.
+- **R2-4.** "At least one CODE path" is untested. `files.some` → `files.every` stays green, and would ignore the
+  common commit that fixes `src/` and updates a doc.
+- **R2-5 (cheap).** Pin the word boundary (`T-24x` must not match `T-24`) and the case-insensitive `.MD`.
+- **Not taken:** quoted-path parsing (`-z`), rename detection and folded subjects. These are rare, and the
+  report says so.
+- **Not this PR:** the review saw `runSync` hang for 6+ minutes in the pre-existing `record-erasure` check
+  (`git cat-file --batch-check`). It is filed as its own task.
+
+### R2 work (two new commits on top of `9c0784f3`; no amend, no rebase, no force)
+
+**Start state.** In a fresh clone: `git switch fix/t256-open-task-commits` (tracking origin), then
+`git rev-parse HEAD` must print `9c0784f315a8c154fd7cd346fefc95b22024b46c` and `git status --porcelain` must
+print nothing. Then run `npm ci` in `open-brain/`. Otherwise STOP: `BLOCKED T-256 r2 start state`.
+
+**Commit 1: `T-256 r2: tests (red)`.** In `open-brain/tests/pipelines/sync/open-task-commits.test.ts`, use the
+existing helpers (`tmp`, `repo`, `writeState`, `commitFiles`, `git`) and add:
+
+| Row | Setup | Expect |
+|---|---|---|
+| T256-6(e) null entry | `d = tmp("t256-6e-")`; write `.agents/state.json` as the literal text `{"tasks":[null,{"id":"T-7","status":"open","note":""}]}`; runner `() => ({ ok: false, error: "x" })` | does not throw; `severity` `"skip"`; `message` toMatch `/^skipped — not a git repository \(x\); open-task commits: unknown$/` (the null entry is ignored, T-7 is open, so git is reached) |
+| T256-6(f) no tasks array | `d = tmp("t256-6f-")`; state.json is the text `{}` | `message` toBe `"skipped — .agents/state.json has no tasks array; open-task commits: unknown"` |
+| T256-6(g) repo with no commits | `d = repo("t256-6g-")` (git init only, no commit); `writeState(d, [{id:"T-7",status:"open",note:""}])` | `severity` `"skip"`; `message` toMatch `/^skipped — git log failed \(.+\); open-task commits: unknown$/` |
+| T256-9 no open task, no git | `d = tmp("t256-9-")`; `writeState(d, [{id:"T-1",status:"done",note:""},{id:"T-2",status:"blocked",note:""}])`; a counting runner as in T256-7 | `calls` toEqual `[]`; `r` toEqual `{ name: "open-task-commits", report: true, severity: "pass", message: "0 open/in_progress tasks; nothing to match (git not run)" }` |
+| T256-10 mixed paths count as code | `d = repo("t256-10-")`; state T-7 open; `commitFiles(d,"init",["src/seed.ts"])`; `commitFiles(d,"T-7: fix + brief",["src/a.ts","docs/loops/t7.md"])` | `severity` `"warn"`; `message` contains `T-7` |
+| T256-11 boundary and case | `d = repo("t256-11-")`; state T-24 and T-8 open; `commitFiles(d,"init",["src/seed.ts"])`; `commitFiles(d,"T-24x: lookalike",["src/b.ts"])`; `commitFiles(d,"T-8: notes",["NOTES.MD"])` | `severity` `"pass"` (no hit: `T-24x` is not `T-24`, and an upper-case `.MD` is not code) |
+
+If `commitFiles` cannot create a file in a subdirectory (`docs/loops/`), extend it to `mkdirSync(dirname(p),
+{recursive:true})` first. That is a test-helper change, allowed in this file. Expected after commit 1: **T256-6(e)
+red** (TypeError), and T256-6(f), (g), 9, 10 and 11 **green**. They exist to kill mutants. Paste the run.
+
+**Commit 2: `T-256 r2: a null task entry is ignored, not thrown`.** In `open-task-commits.ts`, change the filter's
+predicate to:
+```ts
+(t) => t !== null && typeof t === "object" && typeof t.id === "string" && (t.status === "open" || t.status === "in_progress")
+```
+Change nothing else in src.
+
+**Tests:** the round 1 §6 command and file list, plus nothing new. All green. Then `tsc --noEmit`, `EXIT=0`.
+
+**Mutants (local branches off commit 2, never pushed, restored after each):**
+- **N1:** drop `t !== null && typeof t === "object" &&`. **T256-6(e)** must go red.
+- **N2:** `if (open.length === 0) {` → `if (false) {`. **T256-9** must go red.
+- **N3:** `if (!log.ok) return skip(…)` → `if (false) return skip(…)`. **T256-6(g)** must go red.
+- **N4:** `if (!Array.isArray(data.tasks)) return skip(…)` → `if (false) …`. **T256-6(f)** must go red.
+- **N5:** `files.some(isCodePath)` → `files.every(isCodePath)`. **T256-10** must go red.
+- **N6:** `TASK_ID_RE` → `/\bT-\d+/g`. **T256-11** must go red.
+- **N7:** `/\.md$/i` → `/\.md$/`. **T256-11** must go red.
+
+**Scope:** `git diff --name-only 9c0784f3..HEAD` shows only `open-brain/src/pipelines/sync/open-task-commits.ts` and
+`open-brain/tests/pipelines/sync/open-task-commits.test.ts`. **Push** (no force), read it back (`ls-remote` =
+`HEAD`), wait for CI, and paste `gh pr checks 588`. `test` must pass. Before pushing, `git status --porcelain` must
+be empty and no mutant code may be on the branch. Otherwise STOP: `BLOCKED T-256 r2 push gate`.
+
+**Reply:** to `C:\Users\melve\AppData\Local\Temp\t256-r2-reply.md` (absolute). Line 1: `READY T-256 r2 <sha40>` or
+`BLOCKED T-256 r2 <reason>`. Line 2: `MODEL: <your model>`. Then the start state, the commit-1 run, the full run,
+tsc, N1–N7 with their red rows, the scope, the push readback and `gh pr checks 588`.
+Runtime (D-150): CC, `claude -p`, Sonnet 5.5, a one-off in a fresh clone on the desktop.
