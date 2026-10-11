@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 381,
+  "revision": 382,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4698,6 +4698,12 @@
       "title": "Aaron 10-11 (in the planner's window): run the recall-trigger loop, bounded: does an injected entry change the next act. It starts after T-245 Option A lands; a Grok bot reads trigger_fires against transcripts; no new code unless the data says so",
       "date": "2026-10-11",
       "note": "Aaron typed 'yes' (s167) to the planner's Q1 recommendation."
+    },
+    {
+      "id": "D-149",
+      "title": "Aaron 10-11: each planner mines its own transcripts for repeated work and writes a seat skill (~/.claude/skills/<seat>-ops), so a new session calls the skill instead of relearning. SIA planner: atlas-ops",
+      "date": "2026-10-11",
+      "note": "Aaron typed in clark's window, 2026-10-11T16:02:42Z (transcript 0cfb92a1, verified by the planner with atlas-ops relay-check.mjs): 'Ask the planners to do the same, have them read their transcripts and look for repetitive tasks, scripts etc they can write skills for…'. atlas-ops (s167), each script tested live: state.mjs (task/decision/gap reads), hub.sh (say/watch/room with HUB_URL pinned and --session always; rooms.json), turns.mjs (forward a result unread), relay-check.mjs (SG-1 typed-input check), records-pr.sh (records PR with auto-merge, HEAD left on the commit), pr-wait.sh (updates a BEHIND PR; prints the dispatch SHA). Proposed for the SIA protocol instead of a skill: the hub room map (T-196), a stale-open-task check in /sync, and records-PR serialisation in ob_state."
     }
   ],
   "handoffs": [
