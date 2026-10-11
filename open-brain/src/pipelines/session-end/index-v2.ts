@@ -174,16 +174,18 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // after that write lands: a throw used to be counted anyway (SILENT 16).
     // T-245 W4: a doubled SessionEnd rates each entry once. The continue skips the
     // event row and updateFeedbackV2 alike, so the counter moves once.
-    if (sessionId && hasSuppliedFeedback(db, sessionId, id)) continue;
     let wrote = true;
+    let already = false;
     if (sessionId) {
       try {
-        recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin, method);
+        if (hasSuppliedFeedback(db, sessionId, id)) already = true;
+        else recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin, method);
       } catch (err) {
         wrote = false;
         notWritten.push({ id, reason: err instanceof Error ? err.message : String(err) });
       }
     }
+    if (already) continue;
     if (!wrote) continue;
     updateFeedbackV2(db, row.vault_path, rating);
     ratings.push({ id, rating });
