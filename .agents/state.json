@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 378,
+  "revision": 379,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4678,6 +4678,24 @@
       "date": "2026-10-11",
       "note": "Aaron's typed words, queued mid-turn in clark's window: transcript 9311ff14-296a-405f-a38f-558ad2217881.jsonl, queue-operation 2026-10-11T14:19:17Z, read first-hand by the planner (s167). Relayed by clark with: un-park only what was cost-parked; Claude QA lanes allowed again (Cursor/Grok still fine); max 2 Cursor runs per PC; clark launches laptop/QA PC runs from briefs with pinned SHAs. D-130's parks (#437 #425 #470) were FOCUS-parked, not cost-parked: they stay parked until Aaron rules Q2 (#437 r10 vs T-245 Option A; planner recommends A) and Jev cal 2 is re-raised. Q1 (recall-trigger loop; planner recommends yes, one bounded measurement loop, after Q2's fix) is with clark to put to Aaron.",
       "standing": true
+    },
+    {
+      "id": "D-146",
+      "title": "Aaron 10-11 (in the planner's window): T-245 Option A over #437 r10. Replace the lock cascade with a simple wx claim and accept rare doubles, after making handoff-marker append, the SessionStart git fetch and ob_end idempotent. Close #437 and #425",
+      "date": "2026-10-11",
+      "note": "Aaron typed 'A, 3, yes' in the planner's window (s167), answering the planner's recommendation 'Q2: choose T-245 Option A and close #437 and #425'. Basis: #437 still double-claims at 8 concurrent claimers after nine rounds; the cursor-builder IDEMPOTENCY-CHECK showed a doubled hook run is near-harmless except the two stages and ob_end."
+    },
+    {
+      "id": "D-147",
+      "title": "Aaron 10-11 (in the planner's window): T-194 option 3. A GitHub ruleset on master now (PR required, force push blocked), the r7 hook as a courtesy, sparse planner checkout later. Approval mechanics still open: see note",
+      "date": "2026-10-11",
+      "note": "Aaron typed '3' (s167). OPEN, raised by the planner after the ruling: docs/loops/t194-design-decision.md lines 46-49 and 74. A REQUIRED APPROVAL cannot be given by the same account that opened the PR, and every seat acts through Aaron's GitHub account. So with required approvals, every merge (records PRs included) needs Aaron's click in GitHub, or the planner gets its own bot account. With admin bypass, the agents bypass too. The planner asked Aaron which."
+    },
+    {
+      "id": "D-148",
+      "title": "Aaron 10-11 (in the planner's window): run the recall-trigger loop, bounded: does an injected entry change the next act. It starts after T-245 Option A lands; a Grok bot reads trigger_fires against transcripts; no new code unless the data says so",
+      "date": "2026-10-11",
+      "note": "Aaron typed 'yes' (s167) to the planner's Q1 recommendation."
     }
   ],
   "handoffs": [
