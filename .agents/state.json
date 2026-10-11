@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 379,
+  "revision": 380,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1600,13 +1600,14 @@
       "id": "T-245",
       "title": "#437 Option A: replace the lock cascade with a simple wx claim and accept rare doubles, after making the two non-idempotent hook stages idempotent (handoff-marker append, SessionStart git fetch); plus make ob_end idempotent",
       "priority": "P1",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 163,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner s163, decision PENDING with Aaron (he asked 'what would go simpler look like', then for the idempotency check). cursor-builder IDEMPOTENCY-CHECK at origin/master (builder room k575sfwr, turn 109) found that a doubled hook run is close to harmless: the vault summary is a no-op (date+project slug); hook-path auto-feedback, invocations and shadow are no-ops; topics regenerate; session proof, active slot and ob_set_session overwrite; the session log is reused. Only two stages misbehave: (1) .agents/SESSIONS/.missing-handoff.jsonl gets a duplicate line (handoff-guard.ts:178-182): append only if this session_id is absent; (2) SessionStart repeats git fetch (tree-currency.ts:119-142): skip when the sia-fetch-ok marker is younger than the claim TTL. Separately, ob_end run twice duplicates feedback_log rows, inflates knowledge_index counters (db-v2.ts:902-905, 510-524) and appends duplicate shadow JSONL lines (shadow/index.ts:177-178): UPSERT on (session_uuid, knowledge_id), and dedupe shadow lines by session_uuid. Option A = those fixes + a simple wx claim (fresh means skip, stale means unlink and retry once). Planner leans to Option A over accepting r10's cascade; Option B (a SQLite-row claim in a BEGIN IMMEDIATE transaction) is the safe alternative if any double ever matters.",
+      "note": "Opened planner s163, decision PENDING with Aaron (he asked 'what would go simpler look like', then for the idempotency check). cursor-builder IDEMPOTENCY-CHECK at origin/master (builder room k575sfwr, turn 109) found that a doubled hook run is close to harmless: the vault summary is a no-op (date+project slug); hook-path auto-feedback, invocations and shadow are no-ops; topics regenerate; session proof, active slot and ob_set_session overwrite; the session log is reused. Only two stages misbehave: (1) .agents/SESSIONS/.missing-handoff.jsonl gets a duplicate line (handoff-guard.ts:178-182): append only if this session_id is absent; (2) SessionStart repeats git fetch (tree-currency.ts:119-142): skip when the sia-fetch-ok marker is younger than the claim TTL. Separately, ob_end run twice duplicates feedback_log rows, inflates knowledge_index counters (db-v2.ts:902-905, 510-524) and appends duplicate shadow JSONL lines (shadow/index.ts:177-178): UPSERT on (session_uuid, knowledge_id), and dedupe shadow lines by session_uuid. Option A = those fixes + a simple wx claim (fresh means skip, stale means unlink and retry once). Planner leans to Option A over accepting r10's cascade; Option B (a SQLite-row claim in a BEGIN IMMEDIATE transaction) is the safe alternative if any double ever matters. — s167: Aaron chose Option A (D-146); #437 and #425 closed. Brief docs/loops/t245-option-a-brief.md (W1 hook-claim.ts wx claim, Cursor payloads only, TTL 120 s, fail-open; W2 handoff marker once per session; W3 recentFetchOk reuses a fetch younger than the TTL; W4 hasSuppliedFeedback skips the duplicate event row and counter; W5 appendShadowLog one line per session). 7 mutants; acceptance A1-A4 (A3 a Grok review, A4 live in a Cursor seat). Base a37eaf59 unless the dispatch names another. Seat cursor-builder, launched by clark.",
       "note_by": [
-        "d43a0485-7166-4db2-9ca2-eacde1f63101"
+        "d43a0485-7166-4db2-9ca2-eacde1f63101",
+        "6646f34e-175c-4a4e-a39b-a2878070946b"
       ],
       "closed_rev": null
     },
