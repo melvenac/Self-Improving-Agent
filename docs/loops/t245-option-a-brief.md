@@ -376,3 +376,166 @@ sets an mtime with `utimesSync`.
 | T245-A2 | Mutants 1–7 are each red on their named rows. |
 | T245-A3 | A Grok review (D-145 lane) of the diff returns APPROVE, or CHANGES that the planner rules on. |
 | T245-A4 | Live, after merge, a rebuild of the main tree and an explicit `/mcp reconnect` in one Cursor seat: one Cursor session start prints one full greeting and one `SESSION_START_SKIPPED` line. That session's end leaves 1 line in `.missing-handoff.jsonl` (when the handoff is missing), 0 duplicate `feedback_log` rows for its session, and 1 shadow line. |
+
+## ROUND 2 (2026-10-11): drop W3
+
+cursor-builder stopped correctly with `BLOCKED T-245 tree-currency-fetch.test.ts`. Its local head is
+`8b210fe41153fb45ae89d91fc27f7839dda02fec`, not pushed. W3 turned two existing rows red:
+`r2 row 3b/5 (startup)` and `(resume)`. The planner confirmed the cause:
+
+- **T-208's contract is that every session start fetches, or says the fetch failed.** Those rows make a fetch succeed,
+  break the remote, then expect `fetch FAILED:`. W3 reused the fresh ok marker, so it hid a fetch that had just broken.
+- **W3 was also redundant.** W1's claim already stops Cursor's second start before it reaches the fetch, and Claude
+  Code runs SessionStart once.
+- **The defect is the brief's, not the build's.** The planner did not run `tree-currency-fetch.test.ts` against W3
+  before dispatching.
+
+### R2 work (one new commit on top of `8b210fe4`; no amend, no rebase)
+
+1. In `open-brain/src/pipelines/session-start/tree-currency.ts`, delete `recentFetchOk` entirely. The file must equal
+   base: `git diff b142886f..HEAD -- open-brain/src/pipelines/session-start/tree-currency.ts` prints nothing.
+2. In `open-brain/src/cli-bootstrap.ts`, line 189 goes back to `fetchOrigin(cwd)`. Remove the `recentFetchOk` import,
+   and keep W1's claim block and its imports.
+3. In `open-brain/tests/t245-idempotent-stages.test.ts`, delete row ID-2 and any import it alone used.
+4. Commit: `T-245 r2: drop W3 (fetch reuse); T-208's fetch-every-start contract stands`. Then paste
+   `git log --oneline b142886f..HEAD` (3 lines) and an empty `git status --porcelain`.
+5. Run §6's command unchanged. **All 8 files must be green, including `tree-currency-fetch.test.ts` at 12/12.**
+6. Run mutants **1–6** (mutant 7 is withdrawn with W3). For each, paste the row that turned red.
+7. Run `tsc`, the scope check (`tree-currency.ts` must no longer appear), then §10 push and PR.
+8. Reply as §12, with line 1 `TASK: T-245 READY r2, Option A claim + idempotent stages (fix/t245-option-a)`.
+
+**Allowed:** the `node_modules` `npm rebuild better-sqlite3` that cursor-builder ran for Node 22 is fine. It touches no
+tracked file. **Acceptance changes:** A1 drops ID-2, and A2 is mutants 1–6.
+
+## ROUND 3 (2026-10-11): W4's check moves inside the `try`
+
+Round 2 pushed `5540f973` (PR #576), and W3 is gone as asked. CI `test` then failed, 1 of 250 files:
+`tests/t048-r2.test.ts > SILENT 16 counts only a feedback_log write that landed, and names the one that threw`,
+`SQLITE_ERROR`.
+
+- **Cause (planner, first-hand at `5540f973`).** SILENT 16 drops `feedback_log` to prove that a failed write is named
+  and not counted.
+- W4 put `hasSuppliedFeedback` **before** the `try` (`index-v2.ts:177`), so its `SELECT` on the missing table throws
+  uncaught.
+- **The defect is the brief's.** `t048-r2` calls `sessionEndV2`, and §6 did not list it. Round 1's test list missed
+  every test of the changed functions except two. CI ran the whole suite and caught it.
+- No reply turn reached room `k575sfwr…` for round 2. If you posted one, give its turn number in this round's reply.
+  If not, include round 2's items in this round's reply.
+
+### R3 work (one new commit on top of `5540f973`; no amend, no rebase)
+
+1. In `open-brain/src/pipelines/session-end/index-v2.ts`, replace lines 177–186 (from the W4 `if` through the end of the
+   `if (sessionId) { try … catch … }` block) with:
+   ```ts
+    let wrote = true;
+    let already = false;
+    if (sessionId) {
+      try {
+        if (hasSuppliedFeedback(db, sessionId, id)) already = true;
+        else recordFeedbackEvent(db, sessionId, id, rating, input.recalledOrigin, method);
+      } catch (err) {
+        wrote = false;
+        notWritten.push({ id, reason: err instanceof Error ? err.message : String(err) });
+      }
+    }
+    if (already) continue;
+   ```
+   Keep the T-245 W4 comment above it. The lines `if (!wrote) continue;`, `updateFeedbackV2(...)` and
+   `ratings.push(...)` stay as they are.
+2. Commit: `T-245 r3: W4's duplicate check inside the try (SILENT 16: a missing table is named, not thrown)`.
+   `git log --oneline b142886f..HEAD` must then print 4 lines.
+3. **Test command.** Use §6's block, with this `$files` (every test that imports a changed function or runs a changed
+   hook entry, at `5540f973`):
+   ```
+   tests/shared/hook-claim.test.ts tests/t245-idempotent-stages.test.ts tests/t048-r2.test.ts tests/t048-r2b.test.ts tests/rating-method.test.ts tests/pipelines/session-end/index-v2.test.ts tests/audit-fix-r3-callers.test.ts tests/shadow-stage.test.ts tests/shadow-evaluate.test.ts tests/shared/handoff-guard.test.ts tests/pipelines/session-start/tree-currency-fetch.test.ts tests/cli-bootstrap.test.ts tests/active-session.test.ts tests/end-fix-q6.test.ts tests/end-fix-q10.test.ts tests/end-fix-q12.test.ts tests/end-fix-r3-pins.test.ts tests/end-fix-r4-pins.test.ts
+   ```
+   All 18 files must be green. If one is red at your head, run it at `b142886f` too (§7) and paste both outputs.
+4. **Mutants.** Re-run mutant 5 (delete `if (already) continue;`; it must turn ID-3 red). Add **mutant 8**: move
+   `hasSuppliedFeedback` back outside the `try`. It must turn `t048-r2` SILENT 16 red.
+5. `tsc`, then push (no force) and read the push back. PR #576 updates itself.
+6. **Wait for CI.** Then paste `gh pr checks 576`. `test` must show `pass`.
+7. Reply in room `k575sfwr9wcx3r8fw83g3bc00x8fmar3`. Line 1: `TASK: T-245 READY r3, Option A claim + idempotent stages (fix/t245-option-a)`.
+   Include the line **`MODEL: <the model this run used>`**, taken from your own run, not from a config file.
+
+## ROUND 4 (2026-10-11): pin W4's two filters, release the opposite claim, a TTL boundary row
+
+Round 3 pushed `5d4276c7`. CI `test` passes, the 18 files are green, and mutants 5 and 8 went red. A CC Opus review
+(read-only, `MODEL: claude-opus-5-5`) returned CHANGES. The planner checked each finding at `5d4276c7`:
+
+- **R4-1 (taken).** `hasSuppliedFeedback` (`db-v2.ts`, `WHERE session_uuid = ? AND knowledge_id = ? AND
+  rating_method = 'supplied'`) is correct, but no test pins its first or third filter. Drop `session_uuid = ?` and a
+  second session's rating of the same entry is skipped silently. Drop `rating_method = 'supplied'` and an
+  `ob_feedback` ('direct') row skips that session's end rating. All 102 tests stay green under both mutants.
+- **R4-2 (taken).** The claim is keyed on (kind, id) plus the TTL, so a real resume of conversation X within 120 s of
+  X's SessionEnd would print `SESSION_START_SKIPPED`. Swallowing a real run is worse than the rare double Option A
+  accepts. Fix: a run that claims one kind releases the opposite kind's claim.
+- **R4-3 (taken, test only).** No row pins the TTL boundary (`now - mtime === ttlMs` must claim).
+- **Not taken: the stale-path race** (two claimants that both see a stale claim can both win). It is bounded:
+  W2, W4 and W5 make the doubled end stages harmless, and only a doubled greeting can return, and only when a stale
+  claim meets a doubled hook. Option A accepts rare doubles (D-146). Do not change the stale path.
+- **Not taken: the untested fail-open arms after `mkdirSync`, and the hook wiring.** A4 (live) covers the wiring.
+
+### R4 work (two new commits on top of `5d4276c7`; no amend, no rebase)
+
+**Commit 1, tests (red):** `T-245 r4: tests (red)`. Add the rows below. Row names are exact.
+
+In `tests/t245-idempotent-stages.test.ts`, beside ID-3 and built the same way (same fixture, same entry, and the same
+reads of `feedback_log` and the counters that ID-3 uses):
+- **ID-3b: a second session's rating of the same entry is written.** `sessionEndV2` for session `s1` rates the entry
+  `harmful`, then for `s2` rates it `helpful`. Expect 2 `feedback_log` rows for the entry, one per session, the
+  harmful counter moved once, the helpful counter moved once, and nothing in `notWritten`.
+- **ID-3c: a 'direct' row does not suppress the session-end rating.** Seed
+  `recordFeedbackEvent(db, "s1", id, "helpful", "direct", "direct")`. Then run `sessionEndV2` once for `s1`, rating the
+  entry. Expect 2 rows for (s1, entry), one `direct` and one `supplied`, and the counter moved by the session-end
+  rating.
+
+In `tests/shared/hook-claim.test.ts`:
+- **HC-9: the TTL boundary claims.** A claim stamped at `T0`, then a run at `now = T0 + ttlMs`, returns `"claimed"`.
+  Set the mtime with `utimesSync`, as HC-3 does.
+- **HC-10: claiming one kind releases the other.** `claimHookRun({kind:"start", sessionId:"X", dir, now:T0})` returns
+  claimed. Then `releaseHookClaim({kind:"start", sessionId:"X", dir})`. Then a start for X at `T0 + 1000` returns
+  `"claimed"`, not `"skip"`.
+- **HC-11: releasing a missing claim is a no-op.** Releasing a claim that does not exist, and releasing into a
+  directory that does not exist, both return without throwing.
+
+After commit 1: ID-3b and ID-3c are **green** (the code is already right; they exist to kill mutants).
+HC-10 and HC-11 are **red**: `releaseHookClaim` is not exported yet. HC-9 is **green**. Paste the run.
+
+**Commit 2, fix:** `T-245 r4: a claimed run releases the opposite kind's claim (a real resume is not swallowed)`.
+1. In `open-brain/src/shared/hook-claim.ts`, export:
+   ```ts
+   export function releaseHookClaim(opts: { kind: "start" | "end"; sessionId: string; dir?: string }): void
+   ```
+   It builds the same file name `claimHookRun` builds (factor out the name into one helper that both use), then
+   `unlinkSync`, catching and ignoring every error. It never throws.
+2. In `open-brain/src/cli-bootstrap.ts`, inside the claim block: when `claimHookRun({kind:"start", …})` returns
+   `"claimed"`, call `releaseHookClaim({ kind: "end", sessionId: claimId })`.
+3. In `open-brain/src/cli-session-end.ts`, inside the claim block: when `claimHookRun({kind:"end", …})` returns
+   `"claimed"`, call `releaseHookClaim({ kind: "start", sessionId: claimId })`.
+4. Nothing else changes. A doubled pair is still caught: the second of the pair sees its own kind's claim.
+
+**Scope:** `git diff --name-only 5d4276c7..HEAD` shows only `open-brain/src/shared/hook-claim.ts`,
+`open-brain/src/cli-bootstrap.ts`, `open-brain/src/cli-session-end.ts`, `open-brain/tests/shared/hook-claim.test.ts`
+and `open-brain/tests/t245-idempotent-stages.test.ts`. `git log --oneline b142886f..HEAD` prints 6 lines.
+
+**Tests:** round 3's 18-file `$files`, single worker (`--pool=forks --poolOptions.forks.maxForks=1`), temp
+HOME/USERPROFILE/KNOWLEDGE_V2_DB. All 18 files must be green. Then `tsc --noEmit`, `EXIT=0`.
+
+**Mutants (local branches off your commit 2, never pushed; restore with `git checkout -- <file>` after each):**
+- **MA:** in `hasSuppliedFeedback`, drop `session_uuid = ? AND` (and its bound parameter). **ID-3b** must go red.
+- **MB:** drop `AND rating_method = 'supplied'`. **ID-3c** must go red.
+- **MD:** in `claimHookRun`, change the stale test's `<` to `<=`. **HC-9** must go red.
+- **MR:** make `releaseHookClaim`'s body empty. **HC-10** must go red.
+- **MW:** delete the `releaseHookClaim` call in `cli-session-end.ts`. Expected **survives** (wiring is A4's). Report it
+  as survived; that is not a failure.
+
+**Push** (no force), read it back (`ls-remote` = `HEAD`), wait for CI, and paste `gh pr checks 576`. `test` must
+show `pass`. Before pushing, `git status --porcelain` must be empty (ignore `.cursor/` and `.agents/`), and
+`git diff 5d4276c7 HEAD -- open-brain/src` must contain no mutant code. Otherwise STOP: `BLOCKED T-245 r4 push gate`.
+
+**Reply:** write it to `C:\Users\melve\AppData\Local\Temp\t245-r4-reply.md` (an absolute path; resolve it before
+any temp HOME is set). Line 1: `READY T-245 r4 <sha40>` or `BLOCKED T-245 r4 <reason>`, then `MODEL: <the model
+this run used, from your own run>`. Include the commit-1 run, the 18-file run, tsc, each mutant's result, the scope
+diff, the push readback and `gh pr checks 576`.
+Runtime (D-150): CC, `claude -p`, Sonnet 5.5, a one-off in a fresh clone checked out at `fix/t245-option-a`
+(`5d4276c7`), `npm ci` first.
