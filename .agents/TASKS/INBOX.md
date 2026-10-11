@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 386 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 387 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -60,6 +60,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 
 - [ ] **T-188** sync's ci-status check reads gh's 'gh auth login' hint in a clone whose origin is not GitHub as 'gh is not authenticated'
 - [ ] **T-243** #484 LOW residuals and pre-existing audit lows: recall-trigger.log keeps a ~10-char excerpt of a malformed payload; single-quoted YAML tags keep their quotes; normalizeProject splits 'C++ Tools' oddly; A2 (repo-local .gitnexus/run.cjs runs on /sync), A4 (ob_start project_root trust), A5 (OPEN_BRAIN_VAULT_DIR override): document the trust boundaries
+- [ ] **T-258** Doubled-hook residuals outside T-245: work-after-end marker has no per-session dedupe; take*Notices and logInvocations are check-then-write
 
 ## Done (last 3 sessions)
 
