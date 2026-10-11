@@ -15,7 +15,7 @@ import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeRoleFiles } from "./pipelines/session-start/role-files.js";
 import { describeDerivedArtifacts } from "./pipelines/session-start/derived-artifacts.js";
-import { describeTreeCurrency, fetchOrigin } from "./pipelines/session-start/tree-currency.js";
+import { describeTreeCurrency, fetchOrigin, recentFetchOk } from "./pipelines/session-start/tree-currency.js";
 import { describeDriftLine } from "./pipelines/session-start/drift-line.js";
 import {
   resolveSessionId,
@@ -29,6 +29,7 @@ import {
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, resolveCursorAgentHost, writeProcessSession } from "./shared/process-session.js";
 import { takeMissingHandoffNotices } from "./shared/handoff-guard.js";
+import { HOOK_CLAIM_TTL_MS, claimHookRun, shouldClaimHookRun } from "./shared/hook-claim.js";
 import { takeRecordOkNotices, takeWorkAfterEndNotices } from "./shared/end-record-guard.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
@@ -80,6 +81,14 @@ let hookInput: { agent_id?: string; cwd?: string; session_id?: string } = {};
 // with `is_background_agent`. Neither should register a session.
 if (hookInput.agent_id || (hookInput as Record<string, unknown>).is_background_agent === true) {
   process.exit(0);
+}
+
+{
+  const claimId = shouldClaimHookRun(hookInput as Record<string, unknown>);
+  if (claimId !== null && claimHookRun({ kind: "start", sessionId: claimId }) === "skip") {
+    console.log(`SESSION_START_SKIPPED: a SessionStart for ${claimId} already ran within ${HOOK_CLAIM_TTL_MS / 1000}s (T-245).`);
+    process.exit(0);
+  }
 }
 
 // Cursor runs hooks with cwd set to its CONFIG dir, not the open workspace, so
@@ -186,7 +195,7 @@ if (hasAgents) {
   // T-208: fetch FIRST (bounded, pruning), on every SessionStart event: the hook
   // is registered without a matcher, so startup and resume take this one path.
   // The outcome rides into the currency lines, which say so when it failed.
-  for (const line of describeTreeCurrency(cwd, { fetch: fetchOrigin(cwd) }).lines) lines.push(line);
+  for (const line of describeTreeCurrency(cwd, { fetch: recentFetchOk(cwd, HOOK_CLAIM_TTL_MS) ?? fetchOrigin(cwd) }).lines) lines.push(line);
   // T-208 r3: drift beside currency, on startup and resume (same check ob_start reports).
   lines.push(describeDriftLine(cwd));
 }

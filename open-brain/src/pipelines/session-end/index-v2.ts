@@ -5,6 +5,7 @@ import { safeVaultPathSegment } from "../../shared/vault-path-segment.js";
 import {
   updateFeedbackV2,
   recordFeedbackEvent,
+  hasSuppliedFeedback,
   type RatingOrigin,
   type RatingMethod,
 } from "../../db-v2.js";
@@ -171,6 +172,9 @@ export function sessionEndV2(input: SessionEndV2Input): SessionEndV2Result {
     // auto-feedback labels never reach the shadow harness and most sessions
     // would score as having no ground truth at all. The counter moves only
     // after that write lands: a throw used to be counted anyway (SILENT 16).
+    // T-245 W4: a doubled SessionEnd rates each entry once. The continue skips the
+    // event row and updateFeedbackV2 alike, so the counter moves once.
+    if (sessionId && hasSuppliedFeedback(db, sessionId, id)) continue;
     let wrote = true;
     if (sessionId) {
       try {

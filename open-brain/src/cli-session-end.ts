@@ -19,6 +19,7 @@ import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWrit
 import { obsidianVaultDir } from "./shared/paths.js";
 import { resolveHookProjectDir } from "./shared/repo-root.js";
 import { resolveSessionId } from "./shared/active-session.js";
+import { HOOK_CLAIM_TTL_MS, claimHookRun, shouldClaimHookRun } from "./shared/hook-claim.js";
 import { byPidDir, removeProcessSession } from "./shared/process-session.js";
 import { resolvePaths } from "./shared/paths.js";
 import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
@@ -59,6 +60,14 @@ try {
   const raw = Buffer.concat(chunks).toString().trim();
   if (raw) hookPayload = JSON.parse(raw);
 } catch { /* stdin unavailable — fall back to the environment below */ }
+
+{
+  const claimId = shouldClaimHookRun(hookPayload);
+  if (claimId !== null && claimHookRun({ kind: "end", sessionId: claimId }) === "skip") {
+    console.log(`[session-end] SESSION_END_SKIPPED: a SessionEnd for ${claimId} already ran within ${HOOK_CLAIM_TTL_MS / 1000}s (T-245).`);
+    process.exit(0);
+  }
+}
 
 // T-003: remove THIS session's proof first, before anything slow or anything
 // that can exit early. SessionEnd fires on /clear as well as on exit, so if the
