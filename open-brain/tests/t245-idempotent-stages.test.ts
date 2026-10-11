@@ -1,14 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import Database from "better-sqlite3";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { spawnSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { initSchemaV2, indexKnowledge, recordSession } from "../src/db-v2.js";
 import { sessionEndV2 } from "../src/pipelines/session-end/index-v2.js";
 import { recordMissingHandoff, type HandoffCheck } from "../src/shared/handoff-guard.js";
 import { endRecordProjectDir } from "../src/shared/end-record-store.js";
-import { recentFetchOk } from "../src/pipelines/session-start/tree-currency.js";
 import { appendShadowLog, readShadowLog, type ShadowLogEntry } from "../src/pipelines/shadow/index.js";
 
 // T-245 Option A: a doubled run of each stage is harmless.
@@ -45,19 +43,6 @@ describe("T-245 idempotent stages", () => {
     recordMissingHandoff(tmp, "u-1", C);
     recordMissingHandoff(tmp, "u-2", C);
     expect(nonEmptyLines(join(endRecordProjectDir(tmp), ".missing-handoff.jsonl"))).toHaveLength(2);
-  });
-
-  it("ID-2: a fetch younger than the TTL is reused; an old or absent one is not", () => {
-    const repo = join(tmp, "r");
-    mkdirSync(repo);
-    spawnSync("git", ["init", "-q", repo]);
-    const marker = join(repo, ".git", "sia-fetch-ok");
-    writeFileSync(marker, "x\n");
-    const T0 = statSync(marker).mtimeMs;
-    expect(recentFetchOk(repo, 120_000, T0 + 1000)).toEqual({ ok: true, at: new Date(T0).toISOString(), cause: null });
-    expect(recentFetchOk(repo, 120_000, T0 + 200_000)).toBeNull();
-    rmSync(marker);
-    expect(recentFetchOk(repo, 120_000, T0)).toBeNull();
   });
 
   it("ID-3: a doubled session end writes one feedback row and moves the counter once", () => {

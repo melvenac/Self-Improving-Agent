@@ -161,21 +161,6 @@ function commonDirOf(projectRoot: string): string | null {
   return d === null ? null : isAbsolute(d) ? d : join(projectRoot, d);
 }
 
-/** The last successful start fetch when it is younger than maxAgeMs, else null. Never throws. */
-export function recentFetchOk(projectRoot: string, maxAgeMs: number, now: number = Date.now()): FetchResult | null {
-  try {
-    const dir = commonDirOf(projectRoot);
-    if (dir === null) return null;
-    const marker = join(dir, OK_MARKER);
-    if (!existsSync(marker)) return null;
-    const mtimeMs = statSync(marker).mtimeMs;
-    if (now - mtimeMs >= maxAgeMs) return null;
-    return { ok: true, at: new Date(mtimeMs).toISOString(), cause: null };
-  } catch {
-    return null;
-  }
-}
-
 /**
  * Persist the outcome so ob_start and /sync, which do not fetch, can tell that the
  * LAST start fetch failed. Success writes the ok marker (its mtime is the last
