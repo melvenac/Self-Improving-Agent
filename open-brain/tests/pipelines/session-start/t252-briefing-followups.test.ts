@@ -93,8 +93,8 @@ describe("T-252: BRIEFING-FIX r2 follow-ups", () => {
     expect(fleetFallback(null, { FLEET_JSON: alt }).budget).toBe(`FLEET: unavailable (${alt}: invalid shape: null)`);
   });
 
-  it("T252-7 (F4): handleStart's fallback is wired to fleetFallback", () => {
-    const src = readFileSync(join(import.meta.dirname, "../../../src/server.ts"), "utf8");
+  it("T252-7 (F4): renderStartReport's fallback is wired to fleetFallback", () => {
+    const src = readFileSync(join(import.meta.dirname, "../../../src/pipelines/session-start/start-report.ts"), "utf8");
     expect(src).toContain("return fleetFallback(err, process.env);");
     expect(src).not.toContain('process.env.FLEET_JSON ?? "fleet.json"');
   });
