@@ -28,10 +28,13 @@ import {
   describeWorkAfterEnd,
   readObEndStamp,
   recordContentChangedSinceStamp,
+  recordSkillsAuditNotice,
   recordWorkAfterEnd,
   scanSessionWork,
   sessionWorkScanBlockedReason,
 } from "./shared/end-record-guard.js";
+
+import { auditSkills, readShellCommands } from "./pipelines/skills-audit/index.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
@@ -196,6 +199,31 @@ try {
   }
 } catch (err) {
   console.log(`[session-end] work-after-end check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+}
+
+// T-262-2 (D-152): a session that closed without /end's skills audit is named in the next greeting.
+try {
+  const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  const tp = hookPayload.transcript_path;
+  if (existsSync(join(dir, ".agents")) && typeof tp === "string" && existsSync(tp)) {
+    const audited = readShellCommands(tp).commands.some((c) => c.includes("skills-audit"));
+    if (audited) {
+      console.log("[session-end] skills-audit check: audited in session");
+    } else {
+      const r = auditSkills({ projectDir: dir, home: homedir(), transcript: tp, last: 1 });
+      const byHand = r.rows.filter((x) => x.status === "by-hand");
+      if (byHand.length === 0) {
+        console.log("[session-end] skills-audit check: not audited, 0 by-hand hits");
+      } else {
+        const shape = byHand.slice(0, 3).map((x) => `${x.key} ×${x.thisSession}`).join(", ");
+        const msg = `SKILLS AUDIT NOT RUN: session ${r.session.slice(0, 8)} closed without /end's skills audit; ${byHand.length} command shape(s) repeated 3+ times by hand: ${shape}. Run /end at close (D-152).`;
+        console.log(`[session-end] ${msg}`);
+        recordSkillsAuditNotice(dir, r.session, msg);
+      }
+    }
+  }
+} catch (err) {
+  console.log(`[session-end] skills-audit check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
 }
 
 try {

@@ -312,8 +312,26 @@ if (command === "sync") {
     process.exit(1);
   }
 
+  const runtimeArg = opts.value("--runtime");
+  if (runtimeArg !== undefined && runtimeArg !== "claude" && runtimeArg !== "cursor") {
+    console.error(`Invalid --runtime: expected claude or cursor, got "${runtimeArg}".`);
+    process.exit(1);
+  }
+  const seatArg = opts.value("--seat");
+  if (seatArg !== undefined && !/^[A-Za-z][\w-]*$/.test(seatArg)) {
+    console.error(`Invalid --seat: expected a seat name, got "${seatArg}".`);
+    process.exit(1);
+  }
+
   try {
-    const report = auditSkills({ projectDir: resolve(opts.directory ?? "."), home: homedir(), session: opts.value("--session"), last });
+    const report = auditSkills({
+      projectDir: resolve(opts.directory ?? "."),
+      home: homedir(),
+      session: opts.value("--session"),
+      last,
+      seat: seatArg,
+      runtime: runtimeArg,
+    });
     console.log(opts.has("--json") ? JSON.stringify(report, null, 2) : renderAudit(report));
   } catch (err) {
     console.error(err instanceof Error ? err.message : String(err));
@@ -686,7 +704,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     "    Limits: an older MCP build may still hold the store during the run; a 0-byte or non-knowledge SQLite file may be accepted with its path printed; --dry-run may create empty -wal/-shm siblings.",
   );
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
-  console.log("  skills-audit [--session <uuid>] [--last <n>] [--json] [dir]   Read-only: shell commands this session repeated (T-262)");
+  console.log("  skills-audit [--session <uuid>] [--last <n>] [--seat <name>] [--runtime claude|cursor] [--json] [dir]   Read-only: shell commands this session repeated (T-262)");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit [--accept-stale]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
   console.log("  state erasures [dir]                          Records a committed write removed that another session had added (T-163)");
