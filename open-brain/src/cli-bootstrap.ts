@@ -10,6 +10,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { fileURLToPath } from "url";
 import { randomUUID } from "crypto";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
@@ -29,6 +30,7 @@ import {
 import { resolvePaths, canonicalizeProjectDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, resolveCursorAgentHost, writeProcessSession } from "./shared/process-session.js";
 import { takeMissingHandoffNotices } from "./shared/handoff-guard.js";
+import { HOOK_CLAIM_TTL_MS, claimHookRun, releaseHookClaim, shouldClaimHookRun } from "./shared/hook-claim.js";
 import { takeRecordOkNotices, takeWorkAfterEndNotices } from "./shared/end-record-guard.js";
 
 // Anti-loop: read hook input from stdin to detect subagent context.
@@ -80,6 +82,17 @@ let hookInput: { agent_id?: string; cwd?: string; session_id?: string } = {};
 // with `is_background_agent`. Neither should register a session.
 if (hookInput.agent_id || (hookInput as Record<string, unknown>).is_background_agent === true) {
   process.exit(0);
+}
+
+{
+  const claimId = shouldClaimHookRun(hookInput as Record<string, unknown>);
+  if (claimId !== null) {
+    if (claimHookRun({ kind: "start", sessionId: claimId }) === "skip") {
+      console.log(`SESSION_START_SKIPPED: a SessionStart for ${claimId} already ran within ${HOOK_CLAIM_TTL_MS / 1000}s (T-245).`);
+      process.exit(0);
+    }
+    releaseHookClaim({ kind: "end", sessionId: claimId });
+  }
 }
 
 // Cursor runs hooks with cwd set to its CONFIG dir, not the open workspace, so
@@ -171,6 +184,14 @@ const hasMeta = hasAgents && existsSync(join(cwd, ".agents", "META"));
 
 if (hasAgents) {
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ", META mode" : ""})`);
+  const cliPath = fileURLToPath(new URL("./cli.js", import.meta.url)).replace(/\\/g, "/");
+  const cwdPath = cwd.replace(/\\/g, "/");
+  const offendingPath = [cliPath, cwdPath].find((p) => /['‘’‚‛]/.test(p));
+  lines.push(
+    offendingPath === undefined
+      ? `CLI start (no open-brain MCP): node '${cliPath}' start '${cwdPath}'`
+      : `CLI start (no open-brain MCP): unavailable — a path contains a single quote: ${offendingPath}`,
+  );
 } else {
   lines.push("No .agents/ detected — general session.");
 }

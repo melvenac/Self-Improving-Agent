@@ -13,6 +13,12 @@ import { mkdtempSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 import { bindSymlinkTest } from "./harness/symlink-or-skip.js";
+import { scrubHostEnv } from "./harness/host-env.js";
+
+// T-257: a run inside Claude Code or Cursor inherits the host session's CLAUDE_* / CURSOR_* variables, and every hook
+// a test spawns inherits them in turn (end-fix-r3-pins R7 resolved the host's session id and went red). CI has
+// none of them, so dropping them here makes a local run match CI. A test that needs one sets it explicitly.
+scrubHostEnv(process.env);
 
 beforeEach((ctx) => {
   bindSymlinkTest(ctx);

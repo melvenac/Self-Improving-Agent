@@ -194,6 +194,17 @@ export function recordMissingHandoff(projectDir: string, sessionId: string, c: H
   try {
     const path = join(endRecordProjectDir(projectDir), MISSING_HANDOFF_STORE);
     mkdirSync(dirname(path), { recursive: true });
+    // T-245 W2: a doubled SessionEnd must not append a second warning for the same session.
+    if (sessionId && existsSync(path)) {
+      for (const line of readFileSync(path, "utf8").split("\n")) {
+        if (!line.trim()) continue;
+        try {
+          if ((JSON.parse(line) as { session?: unknown }).session === sessionId) return;
+        } catch {
+          /* an unreadable line is not a match */
+        }
+      }
+    }
     appendFileSync(path, JSON.stringify({ at: new Date().toISOString(), session: sessionId || null, message: describeMissing(c, sessionId), branches: c.branches, commits: c.commits, since: c.since }) + "\n");
   } catch {
     /* best effort — the printed warning still stands */
