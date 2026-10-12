@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 392,
+  "revision": 394,
   "project": {
     "name": "self-improving-agent"
   },
@@ -375,12 +375,13 @@
     {
       "id": "T-154",
       "title": "Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger",
-      "priority": "P1",
-      "status": "open",
+      "priority": "P0",
+      "status": "in_progress",
       "opened_session": 64,
       "closed_session": null,
       "supersedes": null,
-      "note": "DERIVED FROM C4's FAILURE, NOT RULED AS THE NEXT LOOP'S SUBJECT. Aaron ruled on 2026-09-17 only that this work is not Loop 13's. Recording it as a decision would manufacture a sequencing ruling he did not make. See the gap recorded this revision for the two halves and their provenance. The shape of the fix is known and the ruling is not: start.md names ob_start six times with no CLI path, and every piece /start needs already runs without memory - cli-bootstrap.js exits 0 on a memory-free install with the project detected and agent identity read. Changing the hook contract is a ruling, not a build decision.",
+      "note": "DERIVED FROM C4's FAILURE, NOT RULED AS THE NEXT LOOP'S SUBJECT. Aaron ruled on 2026-09-17 only that this work is not Loop 13's. Recording it as a decision would manufacture a sequencing ruling he did not make. See the gap recorded this revision for the two halves and their provenance. The shape of the fix is known and the ruling is not: start.md names ob_start six times with no CLI path, and every piece /start needs already runs without memory - cli-bootstrap.js exits 0 on a memory-free install with the project detected and agent identity read. Changing the hook contract is a ruling, not a build decision. — s168 RULED by Aaron (D-151): do it NOW by the CLI route. Brief: docs/loops/t154-cli-start-route-brief.md (base 28e41ff6, Runtime CC on the desktop, launched by clark). Design: handleStart's body moves byte-for-byte to the memory-free pipelines/session-start/start-report.ts (renderStartReport); the CLI start prints it; the hook prints a 'CLI start (no open-brain MCP):' line; the three start.md copies gain one identical fallback paragraph. Acceptance: CS-1..CS-6 plus a deny-better-sqlite3 positive control, and mutants M1-M4. Expected side effect: adopted projects show the OLD /start warning until they reinstall.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -1826,6 +1827,34 @@
       "note": "Opened planner s167 from T-257's CC run (2026-10-11, desktop): red at both 843d8d18 and the T-257 head, so not caused by it. (1) harness/config-channel.test.ts CA-4c got the user's global git user.name/email instead of 'HoH harness runtime': set GIT_CONFIG_GLOBAL/GIT_CONFIG_NOSYSTEM (or the identity) in the test. (2) suite-run-meta.test.ts 'cli: a lease already held by the same owner runs without take' expected 2 to be 0: likely a real lease or owner on the developer machine. (3) server.test.ts T-236 slice 2 briefing_budget: 5 s timeout, flaky on a loaded desktop. CI is green on all three; they cost every local dev run a re-check.",
       "note_by": [
         "6646f34e-175c-4a4e-a39b-a2878070946b"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-261",
+      "title": "Physically split core and memory into separate packages (after T-154; D-151)",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 168,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Aaron ruled in s168 (D-151): after T-154 lands, at low priority. Idea B of the Step-Back page; the module-boundary /sync check already enforces the direction (core never imports memory). Shape not yet briefed.",
+      "note_by": [
+        "f21ca920-a048-4990-935f-42f102efc85f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-262",
+      "title": "/end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 168,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Per docs/loops/end-skills-audit-proposal-2026-10-11.md and D-152. After T-154. The brief must flag clark's inferred defaults (in-session; /end expected at every seat close; seat -ops edits need no per-script ask) so Aaron can veto them. Kill criterion as an acceptance row: cut after 20 /end runs with no script a later session called.",
+      "note_by": [
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
       "closed_rev": null
     }
@@ -4785,6 +4814,18 @@
       "title": "Aaron 10-11: the Cursor and Grok-bot seat rules are lifted; the fleet may use Claude Code for all seats or any mix of Grok bot, Cursor and CC (\"Optimize the fleet\"). Routing set by clark from the budgets: DEV goes to Claude Code headless (claude -p, Sonnet 5.5), with \"Runtime: CC\" and an absolute reply path in the brief; release and hard QA gates go to CC Opus; first-pass QA, review and research go to the Grok bots; Cursor Sonnet is reserve.",
       "date": "2026-10-11",
       "note": "Aaron typed in clark's window, 2026-10-11T19:40:15Z (transcript 0cfb92a1, queue-operation, verified by the planner with atlas-ops relay-check.mjs): 'The rules about using cursor and grokbot are lifted as well. You can use cc for all 3 seats or a mixture of gorkbot, cursor and cc. Optimize the fleet.' The routing and the budget figures come from clark's relay and are NOT typed input: Cursor 'Other Models' (Sonnet on Cursor) 79% used, resets Nov 3, on-demand off; Composer/Grok-in-Cursor 28%; Grok Bot 6% of the week; Claude Code ~3% of the week. Headless CC has no hub key, so its reply goes to a file and clark forwards it; desktop one-offs on 10-11 (T-252, T-253) showed the dispatch text must sit inside the prompt and the reply path must be absolute, because a temp HOME redirects relative paths. QA PC wakers on sonnet-5-5-high draw the 79% bucket on every wake, so new work prefers CC dispatch."
+    },
+    {
+      "id": "D-151",
+      "title": "Aaron 10-11 (typed to the planner, s168): do T-154 NOW by the CLI route; physically splitting core and memory into separate packages comes after T-154, at low priority",
+      "date": "2026-10-11",
+      "note": "Aaron's words: 'Do T154 now. I would say let's do this CLI path. And then once that's done, physically split core and memory into separate packages, but as a low priority, get the first two done first.' The planner's options were (1) T-154 now: yes; (2) route: a CLI path (open-brain start prints the same report ob_start does, and /start falls back to it when no open-brain MCP tools exist) rather than the hook carrying the state; (3) the physical split: the planner recommended NOT now, and Aaron ruled it after T-154 at low priority (T-261). Acceptance stays Aaron's 2026-09-14 test: fresh machine, one command, /start works."
+    },
+    {
+      "id": "D-152",
+      "title": "Aaron 10-11: agrees to (1) shrinking the seat -ops skills into a short index plus reference files and (2) agents adding their repeated steps to their own skills at /end (the planner's skills-audit proposal, docs/loops/end-skills-audit-proposal-2026-10-11.md)",
+      "date": "2026-10-11",
+      "note": "VERIFIED TYPED (SG-1, relay-check.mjs): clark's window, transcript 851d449c, queue-operation at 2026-10-12T03:23:57Z: 'You have two bullet points under what would actually help orchestration. Shrinking the op skills into a short index plus reference files is the first bullet point. The second one is agents adding their repeated steps to their own skills at end, Atlas's proposal. Then you say both reduce how often the planners need me. I agree with both those points.' INFERRED BY CLARK, NOT AARON'S WORDS, and open to his veto: (a) a seat adding scripts or notes to its OWN -ops skill needs no per-script ask (new skills still go through the skill gate); (b) the audit runs in-session, not in a hook spawning claude -p; (c) /end is expected at every seat close. Build per the proposal: a deterministic `open-brain skills-audit` extractor, /end step 1b, and the SessionEnd hook only flagging an unaudited session (T-262). The atlas-ops restructure comes after T-154 lands."
     }
   ],
   "handoffs": [
