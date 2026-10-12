@@ -93,7 +93,19 @@ describe("T-154 CLI start route", { timeout: TIMEOUT }, () => {
   it("CS-2: the CLI briefing equals ob_start's", async () => {
     const a = fixture();
     const b = fixture();
-    const mcp = (await handleStart({ project_root: a })).content[0].text;
+    // Same HOME as the spawned CLI: the fleet block reads it, and the real one would differ.
+    const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+    process.env.HOME = home;
+    process.env.USERPROFILE = home;
+    let mcp: string;
+    try {
+      mcp = (await handleStart({ project_root: a })).content[0].text;
+    } finally {
+      for (const [k, v] of Object.entries(saved)) {
+        if (v === undefined) delete process.env[k];
+        else process.env[k] = v;
+      }
+    }
     const r = cli(b, ["start", b]);
     expect(r.status).toBe(0);
     expect(briefing(r.stdout, b)).toBe(briefing(mcp, a));

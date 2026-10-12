@@ -10,6 +10,7 @@
 
 import { existsSync } from "fs";
 import { join } from "path";
+import { fileURLToPath } from "url";
 import { randomUUID } from "crypto";
 import { runHealthChecks } from "./pipelines/session-start/health-checks.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
@@ -183,6 +184,8 @@ const hasMeta = hasAgents && existsSync(join(cwd, ".agents", "META"));
 
 if (hasAgents) {
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ", META mode" : ""})`);
+  const cliPath = fileURLToPath(new URL("./cli.js", import.meta.url)).replace(/\\/g, "/");
+  lines.push(`CLI start (no open-brain MCP): node "${cliPath}" start "${cwd}"`);
 } else {
   lines.push("No .agents/ detected — general session.");
 }
