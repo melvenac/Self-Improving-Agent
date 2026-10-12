@@ -127,7 +127,7 @@ describe("scanErasures process counts (T-259)", () => {
   }, 120_000);
 
   it("ES-6: a linear history of 5 record commits spawns one --batch, no cat-file -p, no merge-base", () => {
-    for (let i = 0; i < 5; i++) handOff(dir, 50 + i, `L${i}`, `linear ${i}`, `c-${i}`);
+    for (let i = 0; i < 5; i++) handOff(dir, 100 + i, `L${i}`, `linear ${i}`, `c-${i}`);
     vi.mocked(execFileSync).mockClear();
     const r = scanErasures(dir);
     const calls = gitCalls();
