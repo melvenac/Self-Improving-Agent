@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 395 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 397 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,39 +6,39 @@
 
 ### Pick up here
 
-A4 for T-245 is PARKED until Aaron opens and closes ONE interactive Cursor chat on the desktop (clark forwards the UTC time); then read the claim files, greeting and counts per the T-245 note (s168) and rule. #576 merged as 378687d5; main tree rebuilt to aa386568. Still queued: #595 T-257 (SG-1 when grok-audit names its head and CI passes), then #579 T-253, #580 T-252, #588 T-256 r2 for Aaron's word, update-branch each just before its own merge. After A4: the D-148 recall-effect analysis (docs/loops/recall-effect-design-2026-10-11.md). The /end skills-audit proposal for Aaron is docs/loops/end-skills-audit-proposal-2026-10-11.md (#598, merged); three decisions are pending with him via clark.
+T-154 (#602): Opus re-check of F1-F3 at f0da2c65 (clark launches). On ACCEPT plus CI green clark merges pinned (Aaron typed 'Yes, merge 602.', verified) and rebuilds the main tree. Then the planner verifies live: in a checkout with .agents/, the SessionStart hook prints the single-quoted 'CLI start (no open-brain MCP):' line and running it prints the Briefing. Then: restructure atlas-ops into a short SKILL.md index plus reference/<task>.md (scripts unchanged; D-152), then brief T-262 (/end skills audit; flag clark's inferred defaults for Aaron's veto). A4 for T-245 still waits on Aaron's interactive Cursor chat (clark forwards the UTC time). Queued for Aaron's word: #579 T-253, #580 T-252, #588 T-256 r2 (update-branch each just before its merge).
 
 ### Watch out
 
-- Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk.
-- SG-1 needs a review naming the EXACT head: update-branch BEFORE posting a review job.
-- A loaded desktop plus a clone under %TEMP% gives about 8 environmental reds by construction (cli-flags R185-8, r3 R7, briefing F4, suite-run-meta lease, q6 timeouts): compare against base in the SAME clone before calling any of them a regression; CI is the full-suite gate.
+- Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk; prove the PR's own diff unchanged by patch-id.
+- A review must name the EXACT head: update-branch BEFORE launching a review.
+- A loaded desktop plus a clone under %TEMP% gives environmental reds by construction (cli-flags R185-8, briefing QA 263 F4, suite-run-meta lease, end-fix timeouts): A/B against base in the SAME clone before calling any regression; CI is the full-suite gate.
 - Headless cursor-agent -p on the desktop fired no session hooks (s168, one run): it cannot carry a hook live check.
-- atlas-ops records-pr.sh: pass the message file as C:/... not /c/... (git cannot read the MSYS path), and a failed run leaves the branch checked out; detach before retrying.
-- Headless CC / desktop one-offs have no hub key: dispatch text inside the brief and an ABSOLUTE reply path; run logs are UTF-16.
+- atlas-ops scripts under Git Bash: pass Windows-form paths to node and git (cygpath -m), not /c/...; records-pr.sh leaves a branch on failure, so detach before retrying; tree-sync refuses with an untracked docs file, so land or move it first.
+- Shell quoting for an agent-run command line: single quotes are literal in both PowerShell and bash, but the escape for an embedded ' differs ('' vs '\''), so refuse rather than escape.
 
 ### Open questions
 
 - T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.
-- /end skills audit (#598): in-session vs headless; does D-149 cover seat -ops edits without a per-script ask; is /end expected at every seat close.
-- T-258/T-259/T-260: next CC briefs after A4; T-259 first.
+- D-152 inferences open to Aaron's veto: seat -ops edits need no per-script ask; the audit runs in-session; /end expected at every seat close.
+- T-258/T-259/T-260: next CC briefs after T-154 and T-262; T-259 first.
 
 ### Loop state
 
 **Open PRs:** 
+- #602 — QA: accepted — T-154 f0da2c65; Opus re-check F1-F3 then clark merges pinned (Aaron typed yes)
 - #579 — QA: accepted — T-253 72f384a3; Aaron merge; update-branch first
 - #580 — QA: accepted — T-252 4f607a6f; Aaron merge; update-branch first
 - #588 — QA: accepted — T-256 r2 49899106; Aaron merge; update-branch first
-- #595 — QA: in_progress — T-257 da164982 tests-only; SG-1 on grok-audit APPROVE + CI
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
 - T-194 option (a)/(b)/(c)
-- /end skills audit: 3 decisions (#598)
+- D-152 inferred defaults (veto)
 
 **Rulings made mid-loop:** 
-- s168: #576 post-merge reds ENVIRONMENTAL (base A/B in same clone), rebuild may go; A4 parked (headless -p fires no session hooks on the desktop)
+- s168: #576 post-merge reds environmental; #595 SG-1 merged; D-151 T-154 CLI route; T-154 ACCEPT plus fix-1 ACCEPT (F2 fixed by single-quote + refuse, not '' doubling); D-152 verified typed; T-261, T-262 opened
 
 ## developer [sia-builder] _(written session 156)_
 
