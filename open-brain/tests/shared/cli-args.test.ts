@@ -155,9 +155,9 @@ describe("reading an undeclared flag is a defect, not 'not given'", () => {
 describe("every declared flag of every command is accepted", () => {
   const specs = Object.values(COMMAND_SPECS) as CommandSpec[];
 
-  it("walks at least the thirteen commands (proves it looked)", () => {
+  it("walks at least the fourteen commands (proves it looked)", () => {
     expect(specs.map((s) => s.name).sort()).toEqual(
-      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "relocate", "scrub-trigger-fires", "start", "state erasures", "state migrate", "state show", "sync", "topics"]
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "relocate", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "sync", "topics"]
     );
   });
 
@@ -203,6 +203,7 @@ describe("the declarations agree with the usage text the CLI prints", () => {
     ["relocate", /^\s+relocate (.*)$/m],
     ["scrub-trigger-fires", /^\s+scrub-trigger-fires (.*)$/m],
     ["topics", /^\s+topics (.*)$/m],
+    ["skills-audit", /^\s+skills-audit (.*)$/m],
     ["detach", /^\s+detach (.*)$/m],
     ["state show", /^\s+state show (.*)$/m],
     ["state erasures", /^\s+state erasures (.*)$/m],

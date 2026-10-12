@@ -20,6 +20,30 @@ A lesson is a wrong turn, a surprise, or a correction that a later session could
 what went wrong and what you had to re-do; most sessions have zero to three. Nothing to store is a
 fine answer: say so and go to step 3.
 
+## 1b. Audit the commands you repeated (D-152)
+
+Run the extractor on this session. It reads your transcript and writes nothing:
+
+`node <build>/cli.js skills-audit --runtime cursor [--seat <name>] "<project dir>"`
+
+`<build>` is the open-brain build directory named on the SessionStart hook's `CLI start` line (in this
+repository: `open-brain/build`). Pass `--seat <name>` when the header says `seat none` but you have an
+ops skill at `~/.claude/skills/<name>-ops/`.
+
+For **each `by-hand` row**, do exactly one of these, in this session:
+
+1. **Script it.** Add or extend a script in your own `~/.claude/skills/<seat>-ops/scripts/` and run it once,
+   live. Your own ops skill needs no per-script ask (D-152).
+2. **Propose it.** Anything outside your own ops skill (a shared skill, a `/sync` check, an `ob_state` op) is
+   one line in the step 4 report, for clark to take to Aaron. Never write it to a file or a queue.
+3. **Drop it, with a reason.** To stop it returning, add the key to `audit-ignore.txt` in your ops directory
+   as `<key> # <reason>`. If the reason is "already scripted and I did not use it", that is a lesson for
+   step 2, keyed `MATCH: command: <key>`.
+
+`script` rows are your existing scripts at work; they need nothing. No rows: report `0 hits`. If the
+command exits 1, report its stderr line instead. A session that skips this step is named in the next
+greeting (`SKILLS AUDIT NOT RUN`).
+
 ## 2. Store each one with its KEY
 
 Give every lesson the key a machine could match against the act that repeats it. **Nothing reads
@@ -56,7 +80,7 @@ you did, `harmful` if it misled you, `neutral` if unused. Do not rate what you d
 
 ## 4. Report
 
-`Lessons stored: {n} — {title} [MATCH: command|path|error|none], ... · Ratings: {ids}, none, or "no proven session"`
+`Lessons stored: {n} — {title} [MATCH: command|path|error|none], ... · Ratings: {ids}, none, or "no proven session" · Skills audit: {n} hits; scripted {keys}; proposed {keys}; dropped {n}`
 
 ## What moved out of /end
 

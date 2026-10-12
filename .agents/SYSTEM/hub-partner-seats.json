@@ -89,7 +89,9 @@
       "partners": [
         { "label": "forge", "hub_as": "forge", "session_id": "k571z4ghp7nbp34djhecwnsk3n8fmhsf" },
         { "label": "cursor-infra", "hub_as": "cursor-infra", "session_id": "k57d92gqtjm9wpfs74ekbx9rns8fmy2f" },
-        { "label": "cursor-builder", "hub_as": "cursor-builder", "session_id": "k575sfwr9wcx3r8fw83g3bc00x8fmar3" }
+        { "label": "cursor-builder", "hub_as": "cursor-builder", "session_id": "k575sfwr9wcx3r8fw83g3bc00x8fmar3" },
+        { "label": "grok-sia-review", "hub_as": "grok-sia-review", "session_id": "k57c639j4wkyp3y3vhfxxytn1s8fsdx6" },
+        { "label": "grok-qa-sia", "hub_as": "grok-qa-sia", "session_id": "k573rrq0rz6p519xhh4p9mmyk98fsb55" }
       ]
     },
     "forge": {

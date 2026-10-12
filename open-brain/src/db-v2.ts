@@ -913,6 +913,13 @@ export function recordFeedbackEvent(
   `).run(sessionUuid, knowledgeId, rating, new Date().toISOString(), safeOrigin, safeMethod);
 }
 
+/** True when this session already has a session-end ('supplied') rating for this entry. */
+export function hasSuppliedFeedback(db: Database.Database, sessionUuid: string, knowledgeId: number): boolean {
+  return db.prepare(
+    `SELECT 1 FROM feedback_log WHERE session_uuid = ? AND knowledge_id = ? AND rating_method = 'supplied' LIMIT 1`,
+  ).get(sessionUuid, knowledgeId) !== undefined;
+}
+
 /** Distinct queries this session issued, in first-use order. */
 export function getSessionQueries(db: Database.Database, sessionUuid: string): string[] {
   const rows = db.prepare(`

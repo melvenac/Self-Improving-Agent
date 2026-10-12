@@ -43,9 +43,12 @@ export interface ShadowStageResult {
   leader: string | null;
 }
 
-export function appendShadowLog(logPath: string, entry: ShadowLogEntry): void {
+/** Appends one line, unless this session already has one (T-245 W5). True when it wrote. */
+export function appendShadowLog(logPath: string, entry: ShadowLogEntry): boolean {
+  if (entry.session_uuid && readShadowLog(logPath).some((e) => e.session_uuid === entry.session_uuid)) return false;
   mkdirSync(dirname(logPath), { recursive: true });
   appendFileSync(logPath, JSON.stringify(entry) + "\n");
+  return true;
 }
 
 export function readShadowLog(logPath: string): ShadowLogEntry[] {

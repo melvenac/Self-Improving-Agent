@@ -189,30 +189,11 @@ if (command === "sync") {
 } else if (command === "start") {
   const projectRoot = parseOrRefuse(COMMAND_SPECS.start, args.slice(1)).directory ?? resolve(".");
 
-  // Dynamic import to avoid loading session-start code when running sync
-  const { sessionStart } = await import("./pipelines/session-start/index.js");
-  const { homedir } = await import("node:os");
-  const result = sessionStart({ projectRoot, homePath: homedir() });
-
-  console.log(`\nSession Start — ${result.state.mode} mode`);
-  // Same line as ob_start's header, and the same fix (bootstrap-fix BF-8, F12).
-  const recordName = result.state.stateJson.data?.project.name ?? null;
-  console.log(recordName ? `Project: ${recordName} v${result.state.version}` : `Project: v${result.state.version}`);
-
-  if (result.drift.length > 0) {
-    console.log(`\nDrift detected:`);
-    for (const d of result.drift) {
-      console.log(`  ${d.field}: expected ${d.expected}, got ${d.actual}`);
-    }
-  }
-
-  if (result.session.logPath) {
-    console.log(`\nSession log: ${result.session.logPath}`);
-    console.log(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
-  } else if (result.session.skippedReason) console.log(`\nSession log: ${result.session.skippedReason}`);
-
-  console.log(`\nState: ${result.state.summary ? "SUMMARY loaded" : "no SUMMARY"}`);
-  console.log(`Inbox: ${result.state.inbox ? "INBOX loaded" : "no INBOX"}`);
+  // T-154: the same report ob_start returns, from a module with no memory imports.
+  const { renderStartReport } = await import("./pipelines/session-start/start-report.js");
+  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" } });
+  console.log(r.text);
+  process.exitCode = r.isError ? 1 : 0;
 } else if (command === "relocate") {
   // Parsed before the database is opened: a refusal must not have touched it.
   const opts = parseOrRefuse(COMMAND_SPECS.relocate, args.slice(1));
@@ -318,6 +299,43 @@ if (command === "sync") {
   if (result.skippedForeign.length > 0) {
     console.log(`Left ${result.skippedForeign.length} hand-written note(s) in Topics/ untouched:`);
     for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
+  }
+} else if (command === "skills-audit") {
+  const opts = parseOrRefuse(COMMAND_SPECS.skillsAudit, args.slice(1));
+  const { auditSkills, renderAudit } = await import("./pipelines/skills-audit/index.js");
+  const { homedir } = await import("node:os");
+
+  const lastArg = opts.value("--last");
+  const last = lastArg !== undefined ? Number(lastArg) : 5;
+  if (!Number.isInteger(last) || last < 1) {
+    console.error(`Invalid --last: expected a positive integer, got "${lastArg}".`);
+    process.exit(1);
+  }
+
+  const runtimeArg = opts.value("--runtime");
+  if (runtimeArg !== undefined && runtimeArg !== "claude" && runtimeArg !== "cursor") {
+    console.error(`Invalid --runtime: expected claude or cursor, got "${runtimeArg}".`);
+    process.exit(1);
+  }
+  const seatArg = opts.value("--seat");
+  if (seatArg !== undefined && !/^[A-Za-z][\w-]*$/.test(seatArg)) {
+    console.error(`Invalid --seat: expected a seat name, got "${seatArg}".`);
+    process.exit(1);
+  }
+
+  try {
+    const report = auditSkills({
+      projectDir: resolve(opts.directory ?? "."),
+      home: homedir(),
+      session: opts.value("--session"),
+      last,
+      seat: seatArg,
+      runtime: runtimeArg,
+    });
+    console.log(opts.has("--json") ? JSON.stringify(report, null, 2) : renderAudit(report));
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
   }
 } else if (command === "detach") {
   // C3's concrete first piece: "return the tree to detached after a push." It had
@@ -704,6 +722,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     "    Limits: an older MCP build may still hold the store during the run; a 0-byte or non-knowledge SQLite file may be accepted with its path printed; --dry-run may create empty -wal/-shm siblings.",
   );
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
+  console.log("  skills-audit [--session <uuid>] [--last <n>] [--seat <name>] [--runtime claude|cursor] [--json] [dir]   Read-only: shell commands this session repeated (T-262)");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft [--name <project name>]|--commit [--accept-stale]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
   console.log("  state erasures [dir]                          Records a committed write removed that another session had added (T-163)");
