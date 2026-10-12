@@ -189,30 +189,11 @@ if (command === "sync") {
 } else if (command === "start") {
   const projectRoot = parseOrRefuse(COMMAND_SPECS.start, args.slice(1)).directory ?? resolve(".");
 
-  // Dynamic import to avoid loading session-start code when running sync
-  const { sessionStart } = await import("./pipelines/session-start/index.js");
-  const { homedir } = await import("node:os");
-  const result = sessionStart({ projectRoot, homePath: homedir() });
-
-  console.log(`\nSession Start — ${result.state.mode} mode`);
-  // Same line as ob_start's header, and the same fix (bootstrap-fix BF-8, F12).
-  const recordName = result.state.stateJson.data?.project.name ?? null;
-  console.log(recordName ? `Project: ${recordName} v${result.state.version}` : `Project: v${result.state.version}`);
-
-  if (result.drift.length > 0) {
-    console.log(`\nDrift detected:`);
-    for (const d of result.drift) {
-      console.log(`  ${d.field}: expected ${d.expected}, got ${d.actual}`);
-    }
-  }
-
-  if (result.session.logPath) {
-    console.log(`\nSession log: ${result.session.logPath}`);
-    console.log(`Session ID: ${result.session.sessionId ?? "discovery failed"}`);
-  } else if (result.session.skippedReason) console.log(`\nSession log: ${result.session.skippedReason}`);
-
-  console.log(`\nState: ${result.state.summary ? "SUMMARY loaded" : "no SUMMARY"}`);
-  console.log(`Inbox: ${result.state.inbox ? "INBOX loaded" : "no INBOX"}`);
+  // T-154: the same report ob_start returns, from a module with no memory imports.
+  const { renderStartReport } = await import("./pipelines/session-start/start-report.js");
+  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" } });
+  console.log(r.text);
+  process.exitCode = r.isError ? 1 : 0;
 } else if (command === "relocate") {
   // Parsed before the database is opened: a refusal must not have touched it.
   const opts = parseOrRefuse(COMMAND_SPECS.relocate, args.slice(1));
