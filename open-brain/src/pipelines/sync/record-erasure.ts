@@ -187,8 +187,57 @@ export function erasuresInMerge(parents: Array<Raw | null>, base: Raw | null, af
   return out;
 }
 
+/**
+ * Pure: does a merge need its merge base? True iff some record is in a parent, gone from the merge,
+ * not explained by retention, and not in every parent — exactly when `erasuresInMerge` reaches `inBase`.
+ */
+export function mergeNeedsBase(parents: Array<Raw | null>, after: Raw | null): boolean {
+  const a = recordsOf(after);
+  const parentRecs = parents.map(recordsOf);
+  for (const recs of parentRecs) {
+    for (const r of recs) {
+      if (presentIn(a, r) || explainedByRetention(r, after)) continue;
+      if (!parentRecs.every((p) => presentIn(p, r))) return true;
+    }
+  }
+  return false;
+}
+
 function git(cwd: string, args: string[], input?: string): Buffer {
   return execFileSync("git", args, { cwd, input, stdio: ["pipe", "pipe", "ignore"], maxBuffer: 1024 * 1024 * 1024 });
+}
+
+/** One `git cat-file --batch` for every id. A missing object, or content that is not JSON, maps to null. */
+function loadBlobs(projectRoot: string, ids: string[]): Map<string, Raw | null> {
+  const out = new Map<string, Raw | null>();
+  const uniq = [...new Set(ids)];
+  if (uniq.length === 0) return out;
+  const buf = git(projectRoot, ["cat-file", "--batch"], uniq.join("\n") + "\n");
+  let pos = 0;
+  for (const id of uniq) {
+    const nl = buf.indexOf(0x0a, pos);
+    if (nl < 0) {
+      out.set(id, null);
+      continue;
+    }
+    const header = buf.toString("latin1", pos, nl).split(" ");
+    pos = nl + 1;
+    if (header.length < 3 || header[1] === "missing") {
+      out.set(id, null);
+      continue;
+    }
+    const size = Number(header[2]);
+    const body = buf.toString("utf8", pos, pos + size);
+    pos += size + 1;
+    let v: Raw | null = null;
+    try {
+      v = JSON.parse(body) as Raw;
+    } catch {
+      v = null;
+    }
+    out.set(id, v);
+  }
+  return out;
 }
 
 /** Every state.json step on HEAD's history, and the erasures in each. */
@@ -220,50 +269,57 @@ export function scanErasures(projectRoot: string): ScanResult {
     return { ok: false, skip: `${STATE_REL} is not in HEAD's history — nothing to read` };
   }
 
-  const cache = new Map<string, Raw | null>();
-  const load = (blob: string | null): Raw | null => {
-    if (blob === null) return null;
-    if (!cache.has(blob)) {
-      let v: Raw | null = null;
-      try {
-        v = JSON.parse(git(projectRoot, ["cat-file", "-p", blob]).toString("utf8")) as Raw;
-      } catch {
-        v = null;
-      }
-      cache.set(blob, v);
-    }
-    return cache.get(blob)!;
-  };
-
-  const erasures: Erasure[] = [];
-  let steps = 0;
-  let enforcedSteps = 0;
+  type Step = { c: string; ps: string[]; pbs: Array<string | null>; bc: string };
+  const stepList: Step[] = [];
   for (const c of shas) {
     const bc = blobOf.get(c) ?? null;
     if (bc === null) continue;
     const ps = parentsOf.get(c) ?? [];
     const pbs = ps.map((p) => blobOf.get(p) ?? null);
     if (ps.length === 0 || pbs.every((pb) => pb === bc)) continue;
-    const after = load(bc);
+    stepList.push({ c, ps, pbs, bc });
+  }
+
+  const want: string[] = [];
+  for (const st of stepList) {
+    want.push(st.bc);
+    for (const pb of st.pbs) if (pb !== null) want.push(pb);
+  }
+  const blobs = loadBlobs(projectRoot, want);
+  const get = (id: string | null): Raw | null => (id === null ? null : blobs.get(id) ?? null);
+
+  // A merge asks for its base only when mergeNeedsBase says the answer can depend on it.
+  const baseBlob = new Map<string, string | null>();
+  for (const st of stepList) {
+    if (st.ps.length < 2 || !mergeNeedsBase(st.pbs.map(get), get(st.bc))) continue;
+    try {
+      const mb = git(projectRoot, ["merge-base", ...st.ps]).toString().trim();
+      baseBlob.set(st.c, blobOf.get(mb) ?? null);
+    } catch {
+      baseBlob.set(st.c, null);
+    }
+  }
+  const more = [...baseBlob.values()].filter((b): b is string => b !== null && !blobs.has(b));
+  for (const [id, v] of loadBlobs(projectRoot, more)) blobs.set(id, v);
+
+  const erasures: Erasure[] = [];
+  let steps = 0;
+  let enforcedSteps = 0;
+  for (const { c, ps, pbs, bc } of stepList) {
+    const after = get(bc);
     steps++;
     const enforced = schemaOf(after) >= 3;
     if (enforced) enforcedSteps++;
 
     if (ps.length === 1) {
       if (pbs[0] === null) continue; // the file was created here
-      const before = load(pbs[0]);
+      const before = get(pbs[0]);
       for (const e of erasuresInStep(before, after)) {
         erasures.push({ commit: c, parent: ps[0], merge: false, revBefore: revisionOf(before), revAfter: revisionOf(after), enforced, removed: e.removed, addedBySameStep: e.added });
       }
     } else {
-      let base: Raw | null = null;
-      try {
-        const mb = git(projectRoot, ["merge-base", ...ps]).toString().trim();
-        base = load(blobOf.get(mb) ?? null);
-      } catch {
-        base = null;
-      }
-      const parents = pbs.map(load);
+      const base = get(baseBlob.get(c) ?? null);
+      const parents = pbs.map(get);
       for (const e of erasuresInMerge(parents, base, after)) {
         erasures.push({ commit: c, parent: ps.join("+"), merge: true, revBefore: Math.max(...parents.map((p) => revisionOf(p) ?? -1)), revAfter: revisionOf(after), enforced, removed: e.removed, addedBySameStep: e.added });
       }
