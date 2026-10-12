@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 392 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 393 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -13,6 +13,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-031** Add agent attribution to sessions
 - [ ] **T-044** The slot needs an OWNER, not just a timestamp
 - [ ] **T-046** Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
+- [~] **T-154** Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger
 - [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-167** The scope layer did not travel: PRD/DECISIONS/ENTITIES were untracked, so no seat worktree had them — tracked at session 77; make prd-version an ISSUE, and render the problem statement at /start
 - [ ] **T-194** Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
@@ -22,7 +23,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 ## P1
 
 - [ ] **T-146** Run the recency sweep at 0.01 / 0.02 / 0.04
-- [ ] **T-154** Give /start a memory-free documented route, and make the SessionStart hook installable by a stranger
 - [ ] **T-159** The trigger's cheap not-asked path — record a not-asked fire without opening the store
 - [ ] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
 - [ ] **T-166** GitNexus impact() missed a call site on the exact path under repair while reporting epistemic 'exact' - the MUST-run-impact rule is only as good as the resolver
@@ -62,6 +62,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-243** #484 LOW residuals and pre-existing audit lows: recall-trigger.log keeps a ~10-char excerpt of a malformed payload; single-quoted YAML tags keep their quotes; normalizeProject splits 'C++ Tools' oddly; A2 (repo-local .gitnexus/run.cjs runs on /sync), A4 (ob_start project_root trust), A5 (OPEN_BRAIN_VAULT_DIR override): document the trust boundaries
 - [ ] **T-258** Doubled-hook residuals outside T-245: work-after-end marker has no per-session dedupe; take*Notices and logInvocations are check-then-write
 - [ ] **T-260** Tests that read the developer machine: config-channel CA-4c reads the global git identity; suite-run-meta same-owner lease; server.test.ts 5 s timeout
+- [ ] **T-261** Physically split core and memory into separate packages (after T-154; D-151)
 
 ## Done (last 3 sessions)
 
