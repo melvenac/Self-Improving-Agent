@@ -120,6 +120,14 @@ describe("auditSkills", { timeout: TIMEOUT }, () => {
     expect(r.scriptsCalled).toEqual([{ script: "foo.sh", count: 3 }]);
   });
 
+  it("SA-3b a script name is matched whole, not as a substring of the last word", () => {
+    makeOps();
+    writeSession(U(1), mtime(1), times(3, "bash C:/s/xfoo.sh a"));
+    const r = auditSkills({ projectDir: proj, home });
+    expect(r.rows.find((x) => x.key === "bash xfoo.sh")?.status).toBe("by-hand");
+    expect(r.scriptsCalled).toEqual([]);
+  });
+
   it("SA-4 audit-ignore.txt keys are counted, not listed", () => {
     makeOps();
     writeFileSync(join(opsDir(), "audit-ignore.txt"), "# comment\n\ngh pr view # read-only lookups\n");
@@ -166,7 +174,7 @@ describe("auditSkills", { timeout: TIMEOUT }, () => {
 
   it("SA-9 subagent transcripts in subdirectories are never read", () => {
     mkdirSync(join(tdir(), U(1), "subagents"), { recursive: true });
-    writeFileSync(join(tdir(), U(1), "subagents", "x.jsonl"), times(3, "git push").map((l) => JSON.stringify(l)).join("\n") + "\n");
+    writeFileSync(join(tdir(), U(1), "subagents", `${U(9)}.jsonl`), times(3, "git push").map((l) => JSON.stringify(l)).join("\n") + "\n");
     writeSession(U(1), mtime(1), times(3, "git log"));
     const r = auditSkills({ projectDir: proj, home });
     expect(r.rows.map((x) => x.key)).toEqual(["git log"]);
