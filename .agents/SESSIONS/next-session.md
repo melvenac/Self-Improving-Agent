@@ -1,31 +1,31 @@
-<!-- generated from .agents/state.json rev 391 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 392 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 167)_
+## planner [sia-planner] _(written session 168)_
 
 ### Pick up here
 
-Roll at Aaron's word (2026-10-11 23:00Z, clark's window, verified: 'yes, merge. Let's roll all agents on the desktop when ready.'). Open SIA code PRs, all planner-ACCEPTed and reviewed, all BEHIND master: #576 T-245 r4 (2ce8eeb5; CC Opus review CHANGES -> r4 fixed), #579 T-253 (72f384a3; grok-audit APPROVE of 4349c14c, identical patch-id), #580 T-252 (4f607a6f; grok-audit APPROVE of 6e3374d5, identical patch-id), #588 T-256 r2 (49899106; CC Opus review CHANGES -> r2 fixed). Aaron's 'yes, merge' was relayed to clark; clark merges. Before EACH merge: gh pr update-branch, prove the PR's own diff unchanged (git patch-id --stable of merge-base..old vs origin/master..new; src/tests diff old..new empty), wait CI test, send clark the new head. #595 T-257 (da164982, tests-only): SG-1 merge by clark when grok-audit's review of da164982 (job posted, atlas<->grok-audit room) APPROVEs and CI passes. After #576 merges + SIA rebuild: T-245 A4 live (doubled Cursor start/end: one claim, one feedback row, one shadow line; a resume within 120 s is NOT skipped; BOTH doubled payloads carry cursor_version), then the D-148 recall-effect analysis per docs/loops/recall-effect-design-2026-10-11.md (uncommitted local run; anchor = transcript attachment toolUseID).
+A4 for T-245 is PARKED until Aaron opens and closes ONE interactive Cursor chat on the desktop (clark forwards the UTC time); then read the claim files, greeting and counts per the T-245 note (s168) and rule. #576 merged as 378687d5; main tree rebuilt to aa386568. Still queued: #595 T-257 (SG-1 when grok-audit names its head and CI passes), then #579 T-253, #580 T-252, #588 T-256 r2 for Aaron's word, update-branch each just before its own merge. After A4: the D-148 recall-effect analysis (docs/loops/recall-effect-design-2026-10-11.md). The /end skills-audit proposal for Aaron is docs/loops/end-skills-audit-proposal-2026-10-11.md (#598, merged); three decisions are pending with him via clark.
 
 ### Watch out
 
 - Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk.
 - SG-1 needs a review naming the EXACT head: update-branch BEFORE posting a review job.
+- A loaded desktop plus a clone under %TEMP% gives about 8 environmental reds by construction (cli-flags R185-8, r3 R7, briefing F4, suite-run-meta lease, q6 timeouts): compare against base in the SAME clone before calling any of them a regression; CI is the full-suite gate.
+- Headless cursor-agent -p on the desktop fired no session hooks (s168, one run): it cannot carry a hook live check.
+- atlas-ops records-pr.sh: pass the message file as C:/... not /c/... (git cannot read the MSYS path), and a failed run leaves the branch checked out; detach before retrying.
 - Headless CC / desktop one-offs have no hub key: dispatch text inside the brief and an ABSOLUTE reply path; run logs are UTF-16.
-- Grok bots: <=3 queued per bot; a doubled 'SIA JOB:' prefix was a VM-side parser bug fixed by Argus 10-11 (turn 130), do not resend.
-- Local runs of sync tests hang in record-erasure (T-259) and three tests read the developer machine (T-260): re-run a red file at the base before calling it a regression; CI is the full-suite gate.
-- Until T-257 (#595) merges, end-fix-r3-pins R7 is red in any CC-hosted local run.
 
 ### Open questions
 
 - T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.
-- T-258 (doubled-hook residuals), T-259 (record-erasure /sync hang, P2), T-260 (tests reading the dev machine, P3): next CC briefs after the roll; T-259 first, it blocks local sync-test runs.
+- /end skills audit (#598): in-session vs headless; does D-149 cover seat -ops edits without a per-script ask; is /end expected at every seat close.
+- T-258/T-259/T-260: next CC briefs after A4; T-259 first.
 
 ### Loop state
 
 **Open PRs:** 
-- #576 — QA: accepted — T-245 r4 2ce8eeb5; Aaron merge; update-branch first
 - #579 — QA: accepted — T-253 72f384a3; Aaron merge; update-branch first
 - #580 — QA: accepted — T-252 4f607a6f; Aaron merge; update-branch first
 - #588 — QA: accepted — T-256 r2 49899106; Aaron merge; update-branch first
@@ -35,9 +35,10 @@ Roll at Aaron's word (2026-10-11 23:00Z, clark's window, verified: 'yes, merge. 
 
 **Questions pending for Aaron:** 
 - T-194 option (a)/(b)/(c)
+- /end skills audit: 3 decisions (#598)
 
 **Rulings made mid-loop:** 
-- s167: T-245 r4 ACCEPT (Opus review CHANGES -> r4); T-253, T-252 ACCEPT (grok-audit APPROVE); T-256 r2 ACCEPT (Opus review CHANGES -> r2); T-242 merged #585 under SG-1, CLOSED; T-244 CLOSED not built (no users); D-150 fleet routing (CC dev, Grok review, Cursor reserve); opened T-256..T-260; recall-effect design landed for D-148.
+- s168: #576 post-merge reds ENVIRONMENTAL (base A/B in same clone), rebuild may go; A4 parked (headless -p fires no session hooks on the desktop)
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -113,4 +114,4 @@ _10 older handoff(s), superseded within their seat and checkout, are in state.js
 
 ## Last session
 
-Session 167 — 2026-10-11 — planner [sia-planner] — `6646f34e-175c-4a4e-a39b-a2878070946b` (14 writing session(s) in the record)
+Session 168 — 2026-10-11 — planner [sia-planner] — `f21ca920-a048-4990-935f-42f102efc85f` (14 writing session(s) in the record)
