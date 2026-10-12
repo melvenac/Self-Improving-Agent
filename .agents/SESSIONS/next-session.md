@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 399 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 400 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-T-154 (#602) is ready at 12f1bb98 (planner ACCEPT through fix-2, CI green): it waits for Aaron's word in the morning on the planner's recommendation to merge with no third Opus round. When clark says REBUILT: the live check in a checkout with .agents/ (the SessionStart hook prints `CLI start (no open-brain MCP): node '<path>/build/cli.js' start '<cwd>'`; running it prints the Briefing with `Session ID: none — CLI start...`), then close T-154. Then: restructure atlas-ops into a short SKILL.md index plus reference/<task>.md (scripts unchanged; D-152), then brief T-262 (/end skills audit; flag clark's inferred defaults for veto). A4 for T-245 waits on Aaron's interactive Cursor chat. Queued for Aaron: #579 T-253, #580 T-252, #588 T-256 r2.
+T-154 is DONE: #602 merged at 926cd3dc on Aaron's word, main tree rebuilt, planner live check PASS in bash and PowerShell, closed at rev 399. atlas-ops is restructured per D-152 (SKILL.md index + reference/*.md, scripts unchanged; a live-check recipe added to reference/prs.md). NEXT: brief T-262 (/end skills audit; the extractor first, per docs/loops/end-skills-audit-proposal-2026-10-11.md) and flag the D-152 inferred defaults for Aaron's veto; then T-259 first among T-258/T-259/T-260; T-261 (physical core/memory split) is P3, after. A4 for T-245 waits on Aaron's interactive Cursor chat. Queued for Aaron: #579 T-253, #580 T-252, #588 T-256 r2. Re-confirm GO/HOLD when clark sends the v1.22.7 QA PC waker restart time.
 
 ### Watch out
 
@@ -16,18 +16,17 @@ T-154 (#602) is ready at 12f1bb98 (planner ACCEPT through fix-2, CI green): it w
 - Headless cursor-agent -p on the desktop fired no session hooks (s168, one run): it cannot carry a hook live check.
 - atlas-ops scripts under Git Bash: pass Windows-form paths to node and git (cygpath -m), not /c/...; records-pr.sh leaves a branch on failure, so detach before retrying; tree-sync refuses with an untracked docs file, so land or move it first.
 - Shell quoting for an agent-run command line: single quotes are literal in both PowerShell and bash, but the escape for an embedded ' differs, and PowerShell also treats U+2018-201B as single quotes: refuse rather than escape.
+- After T-154 adopted projects print 'OLD /start in this project: run bootstrap install-commands' until reinstalled; expected, not a regression.
 
 ### Open questions
 
-- #602: merge with no third Opus round (planner recommends yes), via clark in the morning.
 - T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.
 - D-152 inferences open to Aaron's veto: seat -ops edits need no per-script ask; the audit runs in-session; /end expected at every seat close.
-- T-258/T-259/T-260: next CC briefs after T-154 and T-262; T-259 first.
+- T-258/T-259/T-260: next CC briefs after T-262; T-259 first.
 
 ### Loop state
 
 **Open PRs:** 
-- #602 — QA: accepted — T-154 12f1bb98; CI green; Aaron's word (no third Opus round)
 - #579 — QA: accepted — T-253 72f384a3; Aaron merge; update-branch first
 - #580 — QA: accepted — T-252 4f607a6f; Aaron merge; update-branch first
 - #588 — QA: accepted — T-256 r2 49899106; Aaron merge; update-branch first
@@ -35,12 +34,13 @@ T-154 (#602) is ready at 12f1bb98 (planner ACCEPT through fix-2, CI green): it w
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- #602 merge, no third Opus round
 - T-194 option (a)/(b)/(c)
 - D-152 inferred defaults (veto)
+- A4: one interactive Cursor chat on the desktop, UTC time via clark
+- #579/#580/#588 merge word
 
 **Rulings made mid-loop:** 
-- s168: #576 post-merge reds environmental; #595 SG-1 merged; D-151 T-154 CLI route; T-154 ACCEPT, fix-1 ACCEPT, fix-2 ACCEPT (F2: single-quote + refuse incl. U+2018-201B); D-152 verified typed; T-261, T-262 opened
+- s168: #576 post-merge reds environmental; #595 SG-1 merged; D-151 T-154 CLI route; T-154 ACCEPT, fix-1, fix-2 ACCEPT; #602 merged 926cd3dc, live check PASS, T-154 closed; D-152 verified typed; T-261, T-262 opened; atlas-ops restructured
 
 ## developer [sia-builder] _(written session 156)_
 
