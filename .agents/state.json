@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 414,
+  "revision": 415,
   "project": {
     "name": "self-improving-agent"
   },
@@ -5442,35 +5442,24 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 168 (Atlas). Merged today: #610 T-262 part 1, #617 T-262 part 2, #615 T-259, #621 T-260, #579 T-253+T-248, #588 T-256; main tree at 61690bdf. Live checks on the main build all pass: state erasures 6 s (was 115 s); skills-audit claude+cursor; `state import --name` refuses a doubled --name; sync's open-task-commits warns on 5 tasks. Closed: T-154, T-245 (A4 not testable: no Cursor editor on any machine), T-257, T-259, T-260, T-253, T-248, T-256. Waiting on Aaron's word: #580 T-252 (accepted at a1ea7495) and #620 T-188 (accepted at bce21e24); pr-refresh each just before its own merge. Aaron merges in Atlas's window too ('merge SIA #621' came here). NEXT: (1) triage the 4 open-task-commits warnings (T-046, T-168, T-172, T-235): close with evidence or add 'stays open after <sha7>'; (2) T-258 (end-record-guard idempotency residuals), now unblocked by #617; (3) T-263 harness runtimeGitEnv identity leak (P3); (4) the T-262 Cursor end.md wording fix plus the stray doc comment; (5) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later.",
+      "pick_up": "Session 168 (Atlas). Merged today: #610 T-262 part 1, #617 T-262 part 2, #615 T-259, #621 T-260, #579 T-253+T-248, #588 T-256, then on Aaron's word #580 T-252 (5d61f3dd) and #620 T-188 (57dd36c8); main tree rebuilt by clark at 57dd36c8. Live checks on 57dd36c8 (scratch clone, throwaway DB): FLEET with projects:null renders without throwing; missing and invalid-JSON fleet files name the real FLEET_JSON path; sync ci-status reports master's conclusion with a GitHub remote and 'skipped - no GitHub remote ... absent is not green' without one. Closed: T-154, T-245, T-257, T-259, T-260, T-253, T-248, T-256, T-252, T-188. NEXT: (1) triage the open-task-commits warnings (T-046, T-168, T-172, T-235): close with evidence or add 'stays open after <sha7>'; (2) T-258 (end-record-guard idempotency residuals); (3) T-263 harness runtimeGitEnv identity leak (P3); (4) T-262 fix brief: the Cursor end.md wording (a skipped audit is not named under Cursor), the stray doc comment, AND sync's template-personal-names ISSUE that #617 introduced: line 35 of project-template/.claude/commands/end.md and project-template/.cursor/commands/end.md says 'for clark to take to Aaron' (make it 'for the coordinator'); the harness-audit.md 'Aaron' hit predates #617; (5) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later.",
       "watch_out": [
         "The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.",
         "A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff (old merge-base..old head vs master..new head) before calling for a re-review (#579, s168).",
+        "Right after a merge GitHub reports the next PR UNKNOWN; pr-refresh now waits that out (s168 #620 first run gave a false PROOF FAILED).",
         "Reply files: launchers also write an uppercase <TAG>-reply.md copy in %TEMP%; check both names.",
         "Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it (T-188, s168). CI's gh is installed but unauthenticated.",
         "Before saying no test pins a call site, grep the PR's own new test file for the old path (T-252-mf, s168).",
         "Desktop one-off launchers set GIT_AUTHOR_*/GIT_COMMITTER_*; config-channel CA-4c stays red locally until T-263.",
+        "sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level ~/.claude and ~/.cursor command copies differ from the template), not a code regression.",
         "ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task."
       ],
       "open_questions": [],
       "session": 168,
       "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#580",
-            "qa_status": "accepted",
-            "note": "T-252, planner ACCEPT at a1ea7495; needs Aaron's word"
-          },
-          {
-            "ref": "#620",
-            "qa_status": "accepted",
-            "note": "T-188, planner ACCEPT at bce21e24; needs Aaron's word"
-          }
-        ],
+        "open_prs": [],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "merge SIA #580",
-          "merge SIA #620",
           "T-194: (a), (b) or (c)"
         ],
         "rulings": [
