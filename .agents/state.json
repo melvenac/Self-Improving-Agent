@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 391,
+  "revision": 392,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1606,10 +1606,11 @@
       "opened_session": 163,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner s163, decision PENDING with Aaron (he asked 'what would go simpler look like', then for the idempotency check). cursor-builder IDEMPOTENCY-CHECK at origin/master (builder room k575sfwr, turn 109) found that a doubled hook run is close to harmless: the vault summary is a no-op (date+project slug); hook-path auto-feedback, invocations and shadow are no-ops; topics regenerate; session proof, active slot and ob_set_session overwrite; the session log is reused. Only two stages misbehave: (1) .agents/SESSIONS/.missing-handoff.jsonl gets a duplicate line (handoff-guard.ts:178-182): append only if this session_id is absent; (2) SessionStart repeats git fetch (tree-currency.ts:119-142): skip when the sia-fetch-ok marker is younger than the claim TTL. Separately, ob_end run twice duplicates feedback_log rows, inflates knowledge_index counters (db-v2.ts:902-905, 510-524) and appends duplicate shadow JSONL lines (shadow/index.ts:177-178): UPSERT on (session_uuid, knowledge_id), and dedupe shadow lines by session_uuid. Option A = those fixes + a simple wx claim (fresh means skip, stale means unlink and retry once). Planner leans to Option A over accepting r10's cascade; Option B (a SQLite-row claim in a BEGIN IMMEDIATE transaction) is the safe alternative if any double ever matters. — s167: Aaron chose Option A (D-146); #437 and #425 closed. Brief docs/loops/t245-option-a-brief.md (W1 hook-claim.ts wx claim, Cursor payloads only, TTL 120 s, fail-open; W2 handoff marker once per session; W3 recentFetchOk reuses a fetch younger than the TTL; W4 hasSuppliedFeedback skips the duplicate event row and counter; W5 appendShadowLog one line per session). 7 mutants; acceptance A1-A4 (A3 a Grok review, A4 live in a Cursor seat). Base a37eaf59 unless the dispatch names another. Seat cursor-builder, launched by clark. — s167: r4 at 2ce8eeb5 (PR #576). CC Opus review at 5d4276c7 returned CHANGES; the planner took R4-1 (pin hasSuppliedFeedback's session and 'supplied' filters: ID-3b/3c), R4-2 (a claimed run releases the opposite kind's claim so a real resume is not swallowed: releaseHookClaim, HC-10/11), R4-3 (TTL boundary HC-9). Not taken: stale-path race (bounded, D-146), untested fail-open arms. r4 verified first-hand: src diff is exactly the brief, 18 files 197 tests, mutants MA/MB/MD/MR killed, MW survived as expected (A4), CI test pass. Planner ACCEPT; merge needs Aaron naming #576; A4 live after merge. — s167: grok-sia-review's hook double-run idempotency audit (static, at b142886, room k57c639j) arrived after r4. Effect on T-245: F3 (stale-path race) is the race already NOT taken; F4 (a real resume/new end inside 120 s is skipped) is what r4's releaseHookClaim fixes. F2: the SessionEnd HOOK passes no entryRatings and no shadowLogPath to sessionEndV2, so W4/W5 cannot fire from the hook; they guard ob_end/other callers only (still correct, rationale was overstated). NEW for A4: F4's tail says the claim is gated on payload.cursor_version, so if one of Cursor's two hook copies (the Claude-compatible settings.json one) sends no cursor_version, that copy is never claimed and both run every time. A4 must show both doubled payloads carry cursor_version (or one claim file per doubled pair).",
+      "note": "Opened planner s163, decision PENDING with Aaron (he asked 'what would go simpler look like', then for the idempotency check). cursor-builder IDEMPOTENCY-CHECK at origin/master (builder room k575sfwr, turn 109) found that a doubled hook run is close to harmless: the vault summary is a no-op (date+project slug); hook-path auto-feedback, invocations and shadow are no-ops; topics regenerate; session proof, active slot and ob_set_session overwrite; the session log is reused. Only two stages misbehave: (1) .agents/SESSIONS/.missing-handoff.jsonl gets a duplicate line (handoff-guard.ts:178-182): append only if this session_id is absent; (2) SessionStart repeats git fetch (tree-currency.ts:119-142): skip when the sia-fetch-ok marker is younger than the claim TTL. Separately, ob_end run twice duplicates feedback_log rows, inflates knowledge_index counters (db-v2.ts:902-905, 510-524) and appends duplicate shadow JSONL lines (shadow/index.ts:177-178): UPSERT on (session_uuid, knowledge_id), and dedupe shadow lines by session_uuid. Option A = those fixes + a simple wx claim (fresh means skip, stale means unlink and retry once). Planner leans to Option A over accepting r10's cascade; Option B (a SQLite-row claim in a BEGIN IMMEDIATE transaction) is the safe alternative if any double ever matters. — s167: Aaron chose Option A (D-146); #437 and #425 closed. Brief docs/loops/t245-option-a-brief.md (W1 hook-claim.ts wx claim, Cursor payloads only, TTL 120 s, fail-open; W2 handoff marker once per session; W3 recentFetchOk reuses a fetch younger than the TTL; W4 hasSuppliedFeedback skips the duplicate event row and counter; W5 appendShadowLog one line per session). 7 mutants; acceptance A1-A4 (A3 a Grok review, A4 live in a Cursor seat). Base a37eaf59 unless the dispatch names another. Seat cursor-builder, launched by clark. — s167: r4 at 2ce8eeb5 (PR #576). CC Opus review at 5d4276c7 returned CHANGES; the planner took R4-1 (pin hasSuppliedFeedback's session and 'supplied' filters: ID-3b/3c), R4-2 (a claimed run releases the opposite kind's claim so a real resume is not swallowed: releaseHookClaim, HC-10/11), R4-3 (TTL boundary HC-9). Not taken: stale-path race (bounded, D-146), untested fail-open arms. r4 verified first-hand: src diff is exactly the brief, 18 files 197 tests, mutants MA/MB/MD/MR killed, MW survived as expected (A4), CI test pass. Planner ACCEPT; merge needs Aaron naming #576; A4 live after merge. — s167: grok-sia-review's hook double-run idempotency audit (static, at b142886, room k57c639j) arrived after r4. Effect on T-245: F3 (stale-path race) is the race already NOT taken; F4 (a real resume/new end inside 120 s is skipped) is what r4's releaseHookClaim fixes. F2: the SessionEnd HOOK passes no entryRatings and no shadowLogPath to sessionEndV2, so W4/W5 cannot fire from the hook; they guard ob_end/other callers only (still correct, rationale was overstated). NEW for A4: F4's tail says the claim is gated on payload.cursor_version, so if one of Cursor's two hook copies (the Claude-compatible settings.json one) sends no cursor_version, that copy is never claimed and both run every time. A4 must show both doubled payloads carry cursor_version (or one claim file per doubled pair). — s168: #576 MERGED on Aaron's word as 378687d5 (pinned head 5326448b, patch-id b9a1d830 = reviewed 2ce8eeb5). Clark's post-merge fresh clone (loaded desktop, under %TEMP%) showed 11 reds; the planner ruled them environmental, not regressions. 8 were identical at base 85e7e1ac in a fresh clone. The 5 merge-only ones were timeouts: q6 x4 and r3 R2 x2 passed on re-run, and import-cmds L3 and the cursor-hook-compat runSync test passed at BOTH SHAs in one fresh clone (39.7 s merge vs 39.3 s base). The SG-1 rebuild went: main tree c23fff60 -> aa386568, build-info aa38656. A4 NOT DONE, PARKED until Aaron is back. HEADLESS FINDING (one run, one machine): on the desktop, `cursor-agent -p --trust` (no --model; Cursor default stayed claude-sonnet-5-5) in a scratch SIA clone at 2026-10-12T02:24:53Z fired NO session hooks. There was no ~/.claude/open-brain/hook-claims dir, no new by-pid proof, no session log, no hook text in the model's context, and feedback_log stayed at 695. Neither the user-level ~/.cursor/hooks.json sessionStart nor the Claude-compat ~/.claude/settings.json copies ran. Contrast: T-235 P2-2 saw sessionStart fire under -p on the QA PC with PROJECT-level .cursor/hooks.json. So a headless run cannot carry A4 here. A4 route queued with Aaron via clark: one INTERACTIVE Cursor chat in any SIA checkout on the desktop (the only machine whose build has 378687d5), opened and closed, UTC time sent. Then the planner reads the claim files start-/end-<id>, the greeting (one SESSION_START_SKIPPED line expected), and the feedback_log/.missing-handoff counts. Both doubled payloads carrying cursor_version = one claim file per doubled pair plus a SKIPPED line; a full double greeting with no SKIPPED = F4, which moves T-258 up.",
       "note_by": [
         "d43a0485-7166-4db2-9ca2-eacde1f63101",
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
+        "6646f34e-175c-4a4e-a39b-a2878070946b",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
       "closed_rev": null
     },
@@ -4862,46 +4863,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Planner session 157 ROLLING about 18:4xZ 2026-10-02 at 37% context (roll point 40%). DONE today: 31 code PRs merged with QA (B1, B3, B4, B5, B2 r2 and #302, plus the earlier ones), CI moved to hosted runners (#310), Jev calibration 1 complete (D-100), the backlog audit closed 20 stale tasks, decisions D-097..D-108. OPEN NOW: (1) master push CI on 19b79b39 was running at the roll, so check it. (2) #295 and #298: Aaron said merge both at 931998db and 3b485b7c, but #295 is DIRTY (node:fs import vs the merged #309). sia-forge is rebasing (union import only, then #298 on top). Review both range-diffs, ask Aaron ONE AskUserQuestion naming #295 and #298 at the new heads, merge pinned. (3) The gate is open (fewer than 6 code PRs await QA): dispatch sia-forge and sia-builder (sia-builder is on the /clear list at 31%; re-brief it by message after its /start) with the objective's list. Every rolled dev seat needs a re-brief by message (G-049/T-203).",
-      "watch_out": [
-        "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
-        "BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.",
-        "A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`. '=' commits plus a trivial conflict line may go on as reviewed (#294, #302 did); anything else gets a narrow re-QA. A moved head needs a fresh approval if Aaron's word pinned the old SHA (#295 now).",
-        "CI (T-227, #310): GitHub-hosted ubuntu-latest, fetch-depth 0, a few minutes per run; push runs ONLY on master; a branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is an opt-in (tcm=true).",
-        "STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).",
-        "QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).",
-        "RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.",
-        "STANDING REPORTING RULES FROM AARON (via Clark), RESTORED at session 154 after being dropped at the session-153 roll (present in session 150's handoff, absent from 153's), CADENCE CHANGED at session 155 by D-077: (1) send `clark` ONE line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner), with derived evidence; (2) EVERY 60 MINUTES while active (was 30), a status to `clark` of at most three lines: changed / in flight / waiting on Aaron ('no change; waiting on X since HH:MM' is valid). Re-create the cadence at /start (CronCreate at :04 only). If `clark` is not in ListAgents, skip the send. Completions and blocks are reported as they happen. Until T-211 puts the minutes in seat data, CARRY THIS ITEM FORWARD VERBATIM at every roll. (T-211 merged as #272 in session 157: check whether the standing-cron line now prints at start before dropping this item.)",
-        "DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.",
-        "VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.",
-        "JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first."
-      ],
-      "open_questions": [],
-      "session": 157,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#295 (rebasing) + #298",
-            "qa_status": "accepted",
-            "note": "QA 262 ACCEPT at 931998db/3b485b7c; Aaron approved those SHAs; #295 DIRTY after #309, so rebase, review the range-diff, re-confirm with Aaron"
-          }
-        ],
-        "frozen_sha": null,
-        "questions_for_aaron": [
-          "Merge #295 and #298 at their rebased heads (after the planner's range-diff review)?"
-        ],
-        "rulings": [
-          "D-106 QA 260/261",
-          "D-107 QA 262",
-          "D-108 the 10 merges"
-        ]
-      },
-      "session_uuid": "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
-      "checkout": "sia-planner",
-      "first_rev": 276
-    },
-    {
-      "seat": "planner",
       "pick_up": "Planner session 158, ~23:0xZ 2026-10-02. T-233 CODE IS MERGED (D-114: #343-#346 on Aaron's word after QA 263 ACCEPT; master 8df2abcf; master push CI was in progress at writing, so check it). T-233 stays OPEN until DEPLOYED and SERVED: (1) update the desktop and QA PC serving trees to master and read back HEAD + build SHA (Aaron's act, or clark's on his word; the planner reads by SSH only); (2) set usage_file: per seat; (3) a fresh-session /start on each machine shows the serving line first and a real Usage line. Then retire the /START AUDIT GAPS watch-out. T-234 (P2) carries QA 263's F1-F7 test gaps. D-110's queue (T-191 is now largely done by T-233; re-read before dispatching) stays HELD under the weekly hold (97% at 22:2xZ; Aaron's lift covered T-233 only). Seats: sia-forge parked after T-233 (its handoff docs/loops/t233-developer-handoff.md is merged); sia-builder free. Hourly status to clark is dropped (D-113), but a status prompt still fired at 22:22Z from an unknown source; that question is open with Aaron.",
       "watch_out": [
         "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
@@ -5409,6 +5370,59 @@
       "session_uuid": "6646f34e-175c-4a4e-a39b-a2878070946b",
       "checkout": "sia-planner",
       "first_rev": 376
+    },
+    {
+      "seat": "planner",
+      "pick_up": "A4 for T-245 is PARKED until Aaron opens and closes ONE interactive Cursor chat on the desktop (clark forwards the UTC time); then read the claim files, greeting and counts per the T-245 note (s168) and rule. #576 merged as 378687d5; main tree rebuilt to aa386568. Still queued: #595 T-257 (SG-1 when grok-audit names its head and CI passes), then #579 T-253, #580 T-252, #588 T-256 r2 for Aaron's word, update-branch each just before its own merge. After A4: the D-148 recall-effect analysis (docs/loops/recall-effect-design-2026-10-11.md). The /end skills-audit proposal for Aaron is docs/loops/end-skills-audit-proposal-2026-10-11.md (#598, merged); three decisions are pending with him via clark.",
+      "watch_out": [
+        "Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk.",
+        "SG-1 needs a review naming the EXACT head: update-branch BEFORE posting a review job.",
+        "A loaded desktop plus a clone under %TEMP% gives about 8 environmental reds by construction (cli-flags R185-8, r3 R7, briefing F4, suite-run-meta lease, q6 timeouts): compare against base in the SAME clone before calling any of them a regression; CI is the full-suite gate.",
+        "Headless cursor-agent -p on the desktop fired no session hooks (s168, one run): it cannot carry a hook live check.",
+        "atlas-ops records-pr.sh: pass the message file as C:/... not /c/... (git cannot read the MSYS path), and a failed run leaves the branch checked out; detach before retrying.",
+        "Headless CC / desktop one-offs have no hub key: dispatch text inside the brief and an ABSOLUTE reply path; run logs are UTF-16."
+      ],
+      "open_questions": [
+        "T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.",
+        "/end skills audit (#598): in-session vs headless; does D-149 cover seat -ops edits without a per-script ask; is /end expected at every seat close.",
+        "T-258/T-259/T-260: next CC briefs after A4; T-259 first."
+      ],
+      "session": 168,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#579",
+            "qa_status": "accepted",
+            "note": "T-253 72f384a3; Aaron merge; update-branch first"
+          },
+          {
+            "ref": "#580",
+            "qa_status": "accepted",
+            "note": "T-252 4f607a6f; Aaron merge; update-branch first"
+          },
+          {
+            "ref": "#588",
+            "qa_status": "accepted",
+            "note": "T-256 r2 49899106; Aaron merge; update-branch first"
+          },
+          {
+            "ref": "#595",
+            "qa_status": "in_progress",
+            "note": "T-257 da164982 tests-only; SG-1 on grok-audit APPROVE + CI"
+          }
+        ],
+        "frozen_sha": null,
+        "questions_for_aaron": [
+          "T-194 option (a)/(b)/(c)",
+          "/end skills audit: 3 decisions (#598)"
+        ],
+        "rulings": [
+          "s168: #576 post-merge reds ENVIRONMENTAL (base A/B in same clone), rebuild may go; A4 parked (headless -p fires no session hooks on the desktop)"
+        ]
+      },
+      "session_uuid": "f21ca920-a048-4990-935f-42f102efc85f",
+      "checkout": "sia-planner",
+      "first_rev": 392
     }
   ],
   "sessions": [
@@ -5435,14 +5449,6 @@
       "seat": "developer",
       "checkout": "sia-builder",
       "first_rev": 263
-    },
-    {
-      "n": 157,
-      "date": "2026-10-02",
-      "uuid": "39e26a1b-efc1-4c5b-a1ac-6386cb2e23ff",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 276
     },
     {
       "n": 158,
@@ -5523,6 +5529,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 376
+    },
+    {
+      "n": 168,
+      "date": "2026-10-11",
+      "uuid": "f21ca920-a048-4990-935f-42f102efc85f",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 392
     }
   ]
 }
