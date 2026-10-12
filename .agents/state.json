@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 400,
+  "revision": 401,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1848,11 +1848,11 @@
       "id": "T-262",
       "title": "/end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)",
       "priority": "P1",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "Per docs/loops/end-skills-audit-proposal-2026-10-11.md and D-152. After T-154. The brief must flag clark's inferred defaults (in-session; /end expected at every seat close; seat -ops edits need no per-script ask) so Aaron can veto them. Kill criterion as an acceptance row: cut after 20 /end runs with no script a later session called.",
+      "note": "Per docs/loops/end-skills-audit-proposal-2026-10-11.md and D-152. After T-154. The brief must flag clark's inferred defaults (in-session; /end expected at every seat close; seat -ops edits need no per-script ask) so Aaron can veto them. Kill criterion as an acceptance row: cut after 20 /end runs with no script a later session called. — s168 2026-10-12: PART 1 DONE. Brief docs/loops/t262-skills-audit-extractor-brief.md (#609); planner prototype on 5 real atlas transcripts (1,076 shell calls) dropped sequence detection (all git-fetch adjacency noise) and the proposal's substring coverage (marked git fetch covered while run 163x by hand). Build e3e76df7 ACCEPT with 4 deviations accepted (cli-args sort position, assignment-only segment skip, throw for no-transcript, blank lines skipped); fix-1 (docs/loops/t262-fix-1-task.md) killed surviving mutants M4/M6 (SA-9 UUID-named subagent file, new SA-3b), 31/31. #610 merged at 2a78e12f on Aaron's word, pinned 6f011e87 (patch-id 001f70bd = reviewed 40ceb026). Live check on the main-tree build: `node build/cli.js skills-audit .` in sia-planner exits 0, seat atlas, 211 shell calls, 20 rows, scripts called: records-pr.sh x14, tree-sync.sh x8, pr-wait.sh x3, relay-check.mjs x3, reply-wait.sh x2, state.mjs x2, hub.sh x1, pr-refresh.sh x1. PART 2 (end.md step 1b + Cursor twin + SessionEnd unaudited flag) waits on Aaron's veto of the three D-152 inferences (seat -ops edits without per-script ask; audit in-session; /end at every close). Kill criterion stays: cut after 20 /end runs with no audit-led script called by a later session; the `scripts called:` line is the instrument.",
       "note_by": [
         "f21ca920-a048-4990-935f-42f102efc85f"
       ],
