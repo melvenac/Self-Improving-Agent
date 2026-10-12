@@ -151,6 +151,7 @@ export function checkCiStatus(projectRoot: string, run: CommandRunner = execRunn
   const r = run("gh", ["run", "list", "--branch", branch, "--limit", "1", "--json", "databaseId,conclusion,headSha,status"], projectRoot);
   if (!r.ok) {
     const why = /ENOENT|not found/i.test(r.error) ? "gh is not installed"
+      : /point to a known GitHub host|no git remotes found/i.test(r.error) ? "no GitHub remote — this repository's remotes are not on GitHub"
       : /auth|login|token|HTTP 401/i.test(r.error) ? "gh is not authenticated"
       : `gh failed: ${r.error.split("\n")[0]}`;
     return { name, report: true, severity: "skip", message: `skipped — ${why}; conclusion: unknown (absent is not green)` };
