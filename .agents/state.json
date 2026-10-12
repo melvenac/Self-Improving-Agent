@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 413,
+  "revision": 414,
   "project": {
     "name": "self-improving-agent"
   },
@@ -772,13 +772,13 @@
       "id": "T-188",
       "title": "sync's ci-status check reads gh's 'gh auth login' hint in a clone whose origin is not GitHub as 'gh is not authenticated'",
       "priority": "P3",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 100,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Session 100. QA 102's Open 6: checks-state.ts:146's /auth|login|token|HTTP 401/ matches the hint. It reports a false reason for a legitimate skip. Minor; predates the importer work. — s168: brief docs/loops/t188-ci-status-remote-brief.md. gh's real errors were captured on the desktop: a non-GitHub remote gives 'none of the git remotes ... point to a known GitHub host ... please use `gh auth login`'; no remote gives 'no git remotes found'. A new branch before the auth regex names 'no GitHub remote'. — s168: BUILT, PR #620 at b164fdf9; C1/C2/C4 red at commit 1; mutant red; 26/26 local. CI RED: s4-guards S4-9.2 (no skip added) fails on C4's `it.skip` when gh is absent. That is the planner's brief error. Fix: docs/loops/t188-fix-1-task.md (plain it(), asserting 'gh is not installed' when gh is absent). — s168: fix 1 READY, planner ACCEPT. PR #620 head bce21e24 (fix 1 0f23de76 + fix 1b), test file only, no skip; CI test SUCCESS; the S4-9.2 guard green. Accepted deviation (two commits): CI's gh is installed but unauthenticated, and gh checks auth before remotes, so C4 there gets 'not authenticated'. C4's gh-present branch now accepts either message. Consequence, recorded: C4 is now a real-gh smoke row and no longer kills the reorder mutant; C1/C2 (exact gh text through the stub) are the guard. BEHIND: pr-refresh before merge. src change, so it needs Aaron's word ('merge SIA #620').",
+      "note": "Session 100. QA 102's Open 6: checks-state.ts:146's /auth|login|token|HTTP 401/ matches the hint. It reports a false reason for a legitimate skip. Minor; predates the importer work. — s168: brief docs/loops/t188-ci-status-remote-brief.md. gh's real errors were captured on the desktop: a non-GitHub remote gives 'none of the git remotes ... point to a known GitHub host ... please use `gh auth login`'; no remote gives 'no git remotes found'. A new branch before the auth regex names 'no GitHub remote'. — s168: BUILT, PR #620 at b164fdf9; C1/C2/C4 red at commit 1; mutant red; 26/26 local. CI RED: s4-guards S4-9.2 (no skip added) fails on C4's `it.skip` when gh is absent. That is the planner's brief error. Fix: docs/loops/t188-fix-1-task.md (plain it(), asserting 'gh is not installed' when gh is absent). — s168: fix 1 READY, planner ACCEPT. PR #620 head bce21e24 (fix 1 0f23de76 + fix 1b), test file only, no skip; CI test SUCCESS; the S4-9.2 guard green. Accepted deviation (two commits): CI's gh is installed but unauthenticated, and gh checks auth before remotes, so C4 there gets 'not authenticated'. C4's gh-present branch now accepts either message. Consequence, recorded: C4 is now a real-gh smoke row and no longer kills the reorder mutant; C1/C2 (exact gh text through the stub) are the guard. BEHIND: pr-refresh before merge. src change, so it needs Aaron's word ('merge SIA #620'). — s168: #620 merged on Aaron's word (\"merge SIA #620\") at 57dd36c8, pinned to head d3463c9b (patch-id 8a226a22 = reviewed bce21e24, fix 1 + 1b: C4 asserts both sides of gh presence, no it.skip). CI test SUCCESS. Live check after clark's main-tree rebuild.",
       "note_by": null,
-      "closed_rev": null
+      "closed_rev": 414
     },
     {
       "id": "T-189",
@@ -1707,17 +1707,17 @@
       "id": "T-252",
       "title": "BRIEFING-FIX follow-ups (grok re-review r2 F1-F4): guard null projects[] entries in fleetProjectKey; a BF-F7 case that reaches describeFleet's catch (so M9 dies); no 'seats none +K more' when seats exist but don't fit; handleStart's fallback names the real default fleet.json path",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 165,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "From docs/loops/briefing-fix-review-r2.md (grok-sia-review, delta 19cb1e5f..3ded135d, 0 blocking, 0 major). The planner ruled it ACCEPT-level, with these 4 tracked rather than a round 4 (s165). F2: `projects:[null]` makes fleetProjectKey throw, and describeFleet's catch then shows 'FLEET: unavailable' for every seat. It degrades and is not fatal, but it is the same class as r1 F2. F3: mutant 9 (describeFleet's try/catch removed) stays GREEN, because the shape guards stop every BF-F7 input before the catch; add `{\"projects\":[null]}` as a BF-F7 case. — s167: PR #580 grok-audit job 73 APPROVE at 6e3374d5 (0 HIGH/MED/LOW, 3 INFO: fleetFallback's 'never throws' reads err.message unguarded; verifiedAt 0 reads as absent; T252-7 checks wiring by source text). Planner ACCEPT; branch updated to 4f607a6f (patch-id identical, src/tests unchanged). Merge needs Aaron (code PR). — s168: #580 (head 4f607a6f) is DIRTY. T-154 (#602) moved handleStart's body from server.ts to session-start/start-report.ts, and the planner's trial merge shows server.ts as the only conflict. Task docs/loops/t252-merge-fix-task.md: merge origin/master into the branch, take master's server.ts, and apply #580's 2-line fleetFallback change in start-report.ts. T252-6 tests fleetFallback directly, so the call site is checked by grep, as in the reviewed original. — s168: T-252-mf came back BLOCKED. The local merge 7d9ecc34 in the desktop %TEMP%/t252-mf-wt is clean: one conflict, both greps right, tsc 0. But T252-7 reads src/server.ts to pin the call site, which the planner missed when it said no test pins it. Ruling: option (a). T252-7 reads start-report.ts; it is a path change in #580's own new test. Task docs/loops/t252-mf-fix-1-task.md (desktop, continue in that clone; includes a bite proof). — s168: T-252-mf-fix-1 READY, planner ACCEPT. #580 head a1ea7495 = merge 7d9ecc34 + the T252-7 path change. 20/20 (t252 8, t154 12), tsc 0; the bite went red on T252-7 with the old inline fallback; the diff against master is exactly fleet.ts, start-report.ts and the t252 test; CI test SUCCESS. BEHIND master: pr-refresh before merge. Merge needs Aaron's word ('merge SIA #580'). The reviewed change is #580's grok-reviewed F1-F4, carried across the T-154 move.",
+      "note": "From docs/loops/briefing-fix-review-r2.md (grok-sia-review, delta 19cb1e5f..3ded135d, 0 blocking, 0 major). The planner ruled it ACCEPT-level, with these 4 tracked rather than a round 4 (s165). F2: `projects:[null]` makes fleetProjectKey throw, and describeFleet's catch then shows 'FLEET: unavailable' for every seat. It degrades and is not fatal, but it is the same class as r1 F2. F3: mutant 9 (describeFleet's try/catch removed) stays GREEN, because the shape guards stop every BF-F7 input before the catch; add `{\"projects\":[null]}` as a BF-F7 case. — s167: PR #580 grok-audit job 73 APPROVE at 6e3374d5 (0 HIGH/MED/LOW, 3 INFO: fleetFallback's 'never throws' reads err.message unguarded; verifiedAt 0 reads as absent; T252-7 checks wiring by source text). Planner ACCEPT; branch updated to 4f607a6f (patch-id identical, src/tests unchanged). Merge needs Aaron (code PR). — s168: #580 (head 4f607a6f) is DIRTY. T-154 (#602) moved handleStart's body from server.ts to session-start/start-report.ts, and the planner's trial merge shows server.ts as the only conflict. Task docs/loops/t252-merge-fix-task.md: merge origin/master into the branch, take master's server.ts, and apply #580's 2-line fleetFallback change in start-report.ts. T252-6 tests fleetFallback directly, so the call site is checked by grep, as in the reviewed original. — s168: T-252-mf came back BLOCKED. The local merge 7d9ecc34 in the desktop %TEMP%/t252-mf-wt is clean: one conflict, both greps right, tsc 0. But T252-7 reads src/server.ts to pin the call site, which the planner missed when it said no test pins it. Ruling: option (a). T252-7 reads start-report.ts; it is a path change in #580's own new test. Task docs/loops/t252-mf-fix-1-task.md (desktop, continue in that clone; includes a bite proof). — s168: T-252-mf-fix-1 READY, planner ACCEPT. #580 head a1ea7495 = merge 7d9ecc34 + the T252-7 path change. 20/20 (t252 8, t154 12), tsc 0; the bite went red on T252-7 with the old inline fallback; the diff against master is exactly fleet.ts, start-report.ts and the t252 test; CI test SUCCESS. BEHIND master: pr-refresh before merge. Merge needs Aaron's word ('merge SIA #580'). The reviewed change is #580's grok-reviewed F1-F4, carried across the T-154 move. — s168: #580 merged on Aaron's word (\"merge SIA #580\") at 5d61f3dd, pinned to head 25bf0376 (patch-id 41570b7f = reviewed a1ea7495, merge-fix + T252-7 path to start-report.ts). CI test SUCCESS. Live check after clark's main-tree rebuild.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd",
         "6646f34e-175c-4a4e-a39b-a2878070946b",
         "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 414
     },
     {
       "id": "T-253",
