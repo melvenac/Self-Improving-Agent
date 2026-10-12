@@ -43,13 +43,16 @@ describe("ci-status reads gh's no-GitHub-remote hint as a remote problem, not au
     expect(r.message).toBe("skipped — gh is not authenticated; conclusion: unknown (absent is not green)");
   });
 
-  const c4 = ghOnPath() ? it : it.skip;
-  c4("C4 (real gh): a repo whose only remote is not GitHub", () => {
+  it("C4 (real gh): a repo whose only remote is not GitHub", () => {
     const dir = mkdtempSync(join(tmpdir(), "t188-"));
     execFileSync("git", ["init", "-q"], { cwd: dir });
     execFileSync("git", ["remote", "add", "origin", "file:///nonexistent/x.git"], { cwd: dir });
     const r = checkCiStatus(dir);
     expect(r.severity).toBe("skip");
-    expect(r.message).toContain("no GitHub remote");
+    if (ghOnPath()) {
+      expect(r.message).toContain("no GitHub remote");
+    } else {
+      expect(r.message).toBe("skipped — gh is not installed; conclusion: unknown (absent is not green)");
+    }
   });
 });
