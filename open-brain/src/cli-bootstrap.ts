@@ -186,7 +186,7 @@ if (hasAgents) {
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ", META mode" : ""})`);
   const cliPath = fileURLToPath(new URL("./cli.js", import.meta.url)).replace(/\\/g, "/");
   const cwdPath = cwd.replace(/\\/g, "/");
-  const offendingPath = [cliPath, cwdPath].find((p) => p.includes("'"));
+  const offendingPath = [cliPath, cwdPath].find((p) => /['‘’‚‛]/.test(p));
   lines.push(
     offendingPath === undefined
       ? `CLI start (no open-brain MCP): node '${cliPath}' start '${cwdPath}'`
