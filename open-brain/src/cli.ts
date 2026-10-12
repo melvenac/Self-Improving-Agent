@@ -300,6 +300,25 @@ if (command === "sync") {
     console.log(`Left ${result.skippedForeign.length} hand-written note(s) in Topics/ untouched:`);
     for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
   }
+} else if (command === "skills-audit") {
+  const opts = parseOrRefuse(COMMAND_SPECS.skillsAudit, args.slice(1));
+  const { auditSkills, renderAudit } = await import("./pipelines/skills-audit/index.js");
+  const { homedir } = await import("node:os");
+
+  const lastArg = opts.value("--last");
+  const last = lastArg !== undefined ? Number(lastArg) : 5;
+  if (!Number.isInteger(last) || last < 1) {
+    console.error(`Invalid --last: expected a positive integer, got "${lastArg}".`);
+    process.exit(1);
+  }
+
+  try {
+    const report = auditSkills({ projectDir: resolve(opts.directory ?? "."), home: homedir(), session: opts.value("--session"), last });
+    console.log(opts.has("--json") ? JSON.stringify(report, null, 2) : renderAudit(report));
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
 } else if (command === "detach") {
   // C3's concrete first piece: "return the tree to detached after a push." It had
   // been run by hand more than twenty times, which is exactly the shape C3
@@ -667,6 +686,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     "    Limits: an older MCP build may still hold the store during the run; a 0-byte or non-knowledge SQLite file may be accepted with its path printed; --dry-run may create empty -wal/-shm siblings.",
   );
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
+  console.log("  skills-audit [--session <uuid>] [--last <n>] [--json] [dir]   Read-only: shell commands this session repeated (T-262)");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft|--commit [--accept-stale]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
   console.log("  state erasures [dir]                          Records a committed write removed that another session had added (T-163)");
