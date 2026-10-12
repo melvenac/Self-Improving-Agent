@@ -50,7 +50,8 @@ describe("ci-status reads gh's no-GitHub-remote hint as a remote problem, not au
     const r = checkCiStatus(dir);
     expect(r.severity).toBe("skip");
     if (ghOnPath()) {
-      expect(r.message).toContain("no GitHub remote");
+      // gh checks auth before it looks at remotes, so an unauthenticated gh (CI) never reaches the remote hint
+      expect([NO_REMOTE_MESSAGE, "skipped — gh is not authenticated; conclusion: unknown (absent is not green)"]).toContain(r.message);
     } else {
       expect(r.message).toBe("skipped — gh is not installed; conclusion: unknown (absent is not green)");
     }
