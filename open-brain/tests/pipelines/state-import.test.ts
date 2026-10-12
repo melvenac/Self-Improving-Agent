@@ -324,13 +324,13 @@ describe("state import parsing rules (unit)", () => {
   });
 
   it("next-session rules: pick_up text, watch_out bullets, open_questions bullets (empty when absent), other sections reported", () => {
-    const rep: ImportReport["handoff"] = { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [] };
+    const rep: ImportReport["handoff"] = { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [], not_imported: [] };
     const h = importHandoff("# H\n\n## Pick up here (x)\n\nDo this.\nThen that.\n\n### Refs\n\n- a\n\n### Watch out for\n\n- one\n- two\n", 55, rep);
     // seat "developer" is a DOCUMENTED ASSUMPTION, not a discovered fact: the
     // prose slot does not say whose it is, and the single slot was written by
     // /end, which was the developer's command.
     expect(h).toEqual({ seat: "developer", pick_up: "Do this.\nThen that.", watch_out: ["one", "two"], open_questions: [], session: 55, loop_state: null, session_uuid: null, checkout: null, first_rev: null });
-    expect(rep).toEqual({ pick_up_lines: 2, watch_out: 2, open_questions: 0, sections_not_imported: ["Refs"] });
+    expect(rep).toEqual({ pick_up_lines: 2, watch_out: 2, open_questions: 0, sections_not_imported: ["Refs"], not_imported: [] });
     expect(importHandoff(null, 55, rep)).toEqual({ seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: 55, loop_state: null, session_uuid: null, checkout: null, first_rev: null });
   });
 
