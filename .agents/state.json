@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 402,
+  "revision": 413,
   "project": {
     "name": "self-improving-agent"
   },
@@ -772,11 +772,12 @@
       "id": "T-188",
       "title": "sync's ci-status check reads gh's 'gh auth login' hint in a clone whose origin is not GitHub as 'gh is not authenticated'",
       "priority": "P3",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 100,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 100. QA 102's Open 6: checks-state.ts:146's /auth|login|token|HTTP 401/ matches the hint. It reports a false reason for a legitimate skip. Minor; predates the importer work.",
+      "note": "Session 100. QA 102's Open 6: checks-state.ts:146's /auth|login|token|HTTP 401/ matches the hint. It reports a false reason for a legitimate skip. Minor; predates the importer work. — s168: brief docs/loops/t188-ci-status-remote-brief.md. gh's real errors were captured on the desktop: a non-GitHub remote gives 'none of the git remotes ... point to a known GitHub host ... please use `gh auth login`'; no remote gives 'no git remotes found'. A new branch before the auth regex names 'no GitHub remote'. — s168: BUILT, PR #620 at b164fdf9; C1/C2/C4 red at commit 1; mutant red; 26/26 local. CI RED: s4-guards S4-9.2 (no skip added) fails on C4's `it.skip` when gh is absent. That is the planner's brief error. Fix: docs/loops/t188-fix-1-task.md (plain it(), asserting 'gh is not installed' when gh is absent). — s168: fix 1 READY, planner ACCEPT. PR #620 head bce21e24 (fix 1 0f23de76 + fix 1b), test file only, no skip; CI test SUCCESS; the S4-9.2 guard green. Accepted deviation (two commits): CI's gh is installed but unauthenticated, and gh checks auth before remotes, so C4 there gets 'not authenticated'. C4's gh-present branch now accepts either message. Consequence, recorded: C4 is now a real-gh smoke row and no longer kills the reorder mutant; C1/C2 (exact gh text through the stub) are the guard. BEHIND: pr-refresh before merge. src change, so it needs Aaron's word ('merge SIA #620').",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -1603,17 +1604,17 @@
       "id": "T-245",
       "title": "#437 Option A: replace the lock cascade with a simple wx claim and accept rare doubles, after making the two non-idempotent hook stages idempotent (handoff-marker append, SessionStart git fetch); plus make ob_end idempotent",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 163,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Opened planner s163, decision PENDING with Aaron (he asked 'what would go simpler look like', then for the idempotency check). cursor-builder IDEMPOTENCY-CHECK at origin/master (builder room k575sfwr, turn 109) found that a doubled hook run is close to harmless: the vault summary is a no-op (date+project slug); hook-path auto-feedback, invocations and shadow are no-ops; topics regenerate; session proof, active slot and ob_set_session overwrite; the session log is reused. Only two stages misbehave: (1) .agents/SESSIONS/.missing-handoff.jsonl gets a duplicate line (handoff-guard.ts:178-182): append only if this session_id is absent; (2) SessionStart repeats git fetch (tree-currency.ts:119-142): skip when the sia-fetch-ok marker is younger than the claim TTL. Separately, ob_end run twice duplicates feedback_log rows, inflates knowledge_index counters (db-v2.ts:902-905, 510-524) and appends duplicate shadow JSONL lines (shadow/index.ts:177-178): UPSERT on (session_uuid, knowledge_id), and dedupe shadow lines by session_uuid. Option A = those fixes + a simple wx claim (fresh means skip, stale means unlink and retry once). Planner leans to Option A over accepting r10's cascade; Option B (a SQLite-row claim in a BEGIN IMMEDIATE transaction) is the safe alternative if any double ever matters. — s167: Aaron chose Option A (D-146); #437 and #425 closed. Brief docs/loops/t245-option-a-brief.md (W1 hook-claim.ts wx claim, Cursor payloads only, TTL 120 s, fail-open; W2 handoff marker once per session; W3 recentFetchOk reuses a fetch younger than the TTL; W4 hasSuppliedFeedback skips the duplicate event row and counter; W5 appendShadowLog one line per session). 7 mutants; acceptance A1-A4 (A3 a Grok review, A4 live in a Cursor seat). Base a37eaf59 unless the dispatch names another. Seat cursor-builder, launched by clark. — s167: r4 at 2ce8eeb5 (PR #576). CC Opus review at 5d4276c7 returned CHANGES; the planner took R4-1 (pin hasSuppliedFeedback's session and 'supplied' filters: ID-3b/3c), R4-2 (a claimed run releases the opposite kind's claim so a real resume is not swallowed: releaseHookClaim, HC-10/11), R4-3 (TTL boundary HC-9). Not taken: stale-path race (bounded, D-146), untested fail-open arms. r4 verified first-hand: src diff is exactly the brief, 18 files 197 tests, mutants MA/MB/MD/MR killed, MW survived as expected (A4), CI test pass. Planner ACCEPT; merge needs Aaron naming #576; A4 live after merge. — s167: grok-sia-review's hook double-run idempotency audit (static, at b142886, room k57c639j) arrived after r4. Effect on T-245: F3 (stale-path race) is the race already NOT taken; F4 (a real resume/new end inside 120 s is skipped) is what r4's releaseHookClaim fixes. F2: the SessionEnd HOOK passes no entryRatings and no shadowLogPath to sessionEndV2, so W4/W5 cannot fire from the hook; they guard ob_end/other callers only (still correct, rationale was overstated). NEW for A4: F4's tail says the claim is gated on payload.cursor_version, so if one of Cursor's two hook copies (the Claude-compatible settings.json one) sends no cursor_version, that copy is never claimed and both run every time. A4 must show both doubled payloads carry cursor_version (or one claim file per doubled pair). — s168: #576 MERGED on Aaron's word as 378687d5 (pinned head 5326448b, patch-id b9a1d830 = reviewed 2ce8eeb5). Clark's post-merge fresh clone (loaded desktop, under %TEMP%) showed 11 reds; the planner ruled them environmental, not regressions. 8 were identical at base 85e7e1ac in a fresh clone. The 5 merge-only ones were timeouts: q6 x4 and r3 R2 x2 passed on re-run, and import-cmds L3 and the cursor-hook-compat runSync test passed at BOTH SHAs in one fresh clone (39.7 s merge vs 39.3 s base). The SG-1 rebuild went: main tree c23fff60 -> aa386568, build-info aa38656. A4 NOT DONE, PARKED until Aaron is back. HEADLESS FINDING (one run, one machine): on the desktop, `cursor-agent -p --trust` (no --model; Cursor default stayed claude-sonnet-5-5) in a scratch SIA clone at 2026-10-12T02:24:53Z fired NO session hooks. There was no ~/.claude/open-brain/hook-claims dir, no new by-pid proof, no session log, no hook text in the model's context, and feedback_log stayed at 695. Neither the user-level ~/.cursor/hooks.json sessionStart nor the Claude-compat ~/.claude/settings.json copies ran. Contrast: T-235 P2-2 saw sessionStart fire under -p on the QA PC with PROJECT-level .cursor/hooks.json. So a headless run cannot carry A4 here. A4 route queued with Aaron via clark: one INTERACTIVE Cursor chat in any SIA checkout on the desktop (the only machine whose build has 378687d5), opened and closed, UTC time sent. Then the planner reads the claim files start-/end-<id>, the greeting (one SESSION_START_SKIPPED line expected), and the feedback_log/.missing-handoff counts. Both doubled payloads carrying cursor_version = one claim file per doubled pair plus a SKIPPED line; a full double greeting with no SKIPPED = F4, which moves T-258 up. — s168 2026-10-12 A4 attempt 2: Aaron ran an INTERACTIVE cursor-agent CLI chat (`agent`, v2026.10.01-e373342, Claude Sonnet 5.5) in ~/Worktrees/sia-builder on the desktop, said hello, closed it (Cursor session dab08b2d, 12:59Z). Planner baseline at 12:51:55Z. Result: NO SIA hook fired: no ~/.claude/open-brain/hook-claims dir, no new by-pid proof, no end-record, no new session log; the Cursor transcript holds only the user turn and reply. No Cursor-originated hook record exists on this desktop at any time. ~/.cursor/hooks.json has only sessionStart (cli-bootstrap.js --ide cursor); sia-builder has no .claude/settings.json. So the cursor-agent CLI, interactive or headless, cannot carry A4. The doubled hook must come from the Cursor EDITOR app, which is not at its default install path on the desktop. Asked Aaron whether the Cursor app exists on any machine; if not, A4 closes as NOT TESTABLE and the claim stays as defence-in-depth (fail-open, Cursor-payload-only).",
+      "note": "Opened planner s163, decision PENDING with Aaron (he asked 'what would go simpler look like', then for the idempotency check). cursor-builder IDEMPOTENCY-CHECK at origin/master (builder room k575sfwr, turn 109) found that a doubled hook run is close to harmless: the vault summary is a no-op (date+project slug); hook-path auto-feedback, invocations and shadow are no-ops; topics regenerate; session proof, active slot and ob_set_session overwrite; the session log is reused. Only two stages misbehave: (1) .agents/SESSIONS/.missing-handoff.jsonl gets a duplicate line (handoff-guard.ts:178-182): append only if this session_id is absent; (2) SessionStart repeats git fetch (tree-currency.ts:119-142): skip when the sia-fetch-ok marker is younger than the claim TTL. Separately, ob_end run twice duplicates feedback_log rows, inflates knowledge_index counters (db-v2.ts:902-905, 510-524) and appends duplicate shadow JSONL lines (shadow/index.ts:177-178): UPSERT on (session_uuid, knowledge_id), and dedupe shadow lines by session_uuid. Option A = those fixes + a simple wx claim (fresh means skip, stale means unlink and retry once). Planner leans to Option A over accepting r10's cascade; Option B (a SQLite-row claim in a BEGIN IMMEDIATE transaction) is the safe alternative if any double ever matters. — s167: Aaron chose Option A (D-146); #437 and #425 closed. Brief docs/loops/t245-option-a-brief.md (W1 hook-claim.ts wx claim, Cursor payloads only, TTL 120 s, fail-open; W2 handoff marker once per session; W3 recentFetchOk reuses a fetch younger than the TTL; W4 hasSuppliedFeedback skips the duplicate event row and counter; W5 appendShadowLog one line per session). 7 mutants; acceptance A1-A4 (A3 a Grok review, A4 live in a Cursor seat). Base a37eaf59 unless the dispatch names another. Seat cursor-builder, launched by clark. — s167: r4 at 2ce8eeb5 (PR #576). CC Opus review at 5d4276c7 returned CHANGES; the planner took R4-1 (pin hasSuppliedFeedback's session and 'supplied' filters: ID-3b/3c), R4-2 (a claimed run releases the opposite kind's claim so a real resume is not swallowed: releaseHookClaim, HC-10/11), R4-3 (TTL boundary HC-9). Not taken: stale-path race (bounded, D-146), untested fail-open arms. r4 verified first-hand: src diff is exactly the brief, 18 files 197 tests, mutants MA/MB/MD/MR killed, MW survived as expected (A4), CI test pass. Planner ACCEPT; merge needs Aaron naming #576; A4 live after merge. — s167: grok-sia-review's hook double-run idempotency audit (static, at b142886, room k57c639j) arrived after r4. Effect on T-245: F3 (stale-path race) is the race already NOT taken; F4 (a real resume/new end inside 120 s is skipped) is what r4's releaseHookClaim fixes. F2: the SessionEnd HOOK passes no entryRatings and no shadowLogPath to sessionEndV2, so W4/W5 cannot fire from the hook; they guard ob_end/other callers only (still correct, rationale was overstated). NEW for A4: F4's tail says the claim is gated on payload.cursor_version, so if one of Cursor's two hook copies (the Claude-compatible settings.json one) sends no cursor_version, that copy is never claimed and both run every time. A4 must show both doubled payloads carry cursor_version (or one claim file per doubled pair). — s168: #576 MERGED on Aaron's word as 378687d5 (pinned head 5326448b, patch-id b9a1d830 = reviewed 2ce8eeb5). Clark's post-merge fresh clone (loaded desktop, under %TEMP%) showed 11 reds; the planner ruled them environmental, not regressions. 8 were identical at base 85e7e1ac in a fresh clone. The 5 merge-only ones were timeouts: q6 x4 and r3 R2 x2 passed on re-run, and import-cmds L3 and the cursor-hook-compat runSync test passed at BOTH SHAs in one fresh clone (39.7 s merge vs 39.3 s base). The SG-1 rebuild went: main tree c23fff60 -> aa386568, build-info aa38656. A4 NOT DONE, PARKED until Aaron is back. HEADLESS FINDING (one run, one machine): on the desktop, `cursor-agent -p --trust` (no --model; Cursor default stayed claude-sonnet-5-5) in a scratch SIA clone at 2026-10-12T02:24:53Z fired NO session hooks. There was no ~/.claude/open-brain/hook-claims dir, no new by-pid proof, no session log, no hook text in the model's context, and feedback_log stayed at 695. Neither the user-level ~/.cursor/hooks.json sessionStart nor the Claude-compat ~/.claude/settings.json copies ran. Contrast: T-235 P2-2 saw sessionStart fire under -p on the QA PC with PROJECT-level .cursor/hooks.json. So a headless run cannot carry A4 here. A4 route queued with Aaron via clark: one INTERACTIVE Cursor chat in any SIA checkout on the desktop (the only machine whose build has 378687d5), opened and closed, UTC time sent. Then the planner reads the claim files start-/end-<id>, the greeting (one SESSION_START_SKIPPED line expected), and the feedback_log/.missing-handoff counts. Both doubled payloads carrying cursor_version = one claim file per doubled pair plus a SKIPPED line; a full double greeting with no SKIPPED = F4, which moves T-258 up. — s168 2026-10-12 A4 attempt 2: Aaron ran an INTERACTIVE cursor-agent CLI chat (`agent`, v2026.10.01-e373342, Claude Sonnet 5.5) in ~/Worktrees/sia-builder on the desktop, said hello, closed it (Cursor session dab08b2d, 12:59Z). Planner baseline at 12:51:55Z. Result: NO SIA hook fired: no ~/.claude/open-brain/hook-claims dir, no new by-pid proof, no end-record, no new session log; the Cursor transcript holds only the user turn and reply. No Cursor-originated hook record exists on this desktop at any time. ~/.cursor/hooks.json has only sessionStart (cli-bootstrap.js --ide cursor); sia-builder has no .claude/settings.json. So the cursor-agent CLI, interactive or headless, cannot carry A4. The doubled hook must come from the Cursor EDITOR app, which is not at its default install path on the desktop. Asked Aaron whether the Cursor app exists on any machine; if not, A4 closes as NOT TESTABLE and the claim stays as defence-in-depth (fail-open, Cursor-payload-only). — s168: A4 CLOSED AS NOT TESTABLE on the machines we run. The Cursor EDITOR app is installed on neither the desktop (only %LOCALAPPDATA%\\cursor-agent; Roaming\\Cursor holds the CLI's prompt history) nor the QA PC (clark, remote check: no %LOCALAPPDATA%\\Programs\\cursor\\Cursor.exe, no Uninstall entry in HKCU or HKLM, only cursor-agent). The cursor-agent CLI fires no SIA hook (attempt 2). The wx claim stays as defence-in-depth: fail-open, and it claims only payloads carrying cursor_version. Reopen if a Cursor editor install appears. Residuals are T-258.",
       "note_by": [
         "d43a0485-7166-4db2-9ca2-eacde1f63101",
         "6646f34e-175c-4a4e-a39b-a2878070946b",
         "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 407
     },
     {
       "id": "T-246",
@@ -1648,15 +1649,16 @@
       "id": "T-248",
       "title": "state import takes the project name from package.json with no override, and nothing can change project.name after --commit: add a --name flag to --draft (or an ob_state set_project op)",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 165,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Found in the Makerspace import (s165, Maker Q1): package.json name 'rename' became 'Project: rename'. The workaround was the designed draft review point, a hand-edit of state.draft.json's project.name before --commit (runCommit re-validates the draft, state-import/index.ts:1053-1057). A project whose package.json name is wrong, and which must not touch site files (A4), has no other route.",
+      "note": "Found in the Makerspace import (s165, Maker Q1): package.json name 'rename' became 'Project: rename'. The workaround was the designed draft review point, a hand-edit of state.draft.json's project.name before --commit (runCommit re-validates the draft, state-import/index.ts:1053-1057). A project whose package.json name is wrong, and which must not touch site files (A4), has no other route. — s168: shipped in #579 with T-253 (state import --name), merged at 876050bb on Aaron's word. Live check of `state import --draft --name` pending the main-tree rebuild.",
       "note_by": [
-        "367df9c3-ef6b-47f0-be31-1f60993dddcd"
+        "367df9c3-ef6b-47f0-be31-1f60993dddcd",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 412
     },
     {
       "id": "T-249",
@@ -1709,10 +1711,11 @@
       "opened_session": 165,
       "closed_session": null,
       "supersedes": null,
-      "note": "From docs/loops/briefing-fix-review-r2.md (grok-sia-review, delta 19cb1e5f..3ded135d, 0 blocking, 0 major). The planner ruled it ACCEPT-level, with these 4 tracked rather than a round 4 (s165). F2: `projects:[null]` makes fleetProjectKey throw, and describeFleet's catch then shows 'FLEET: unavailable' for every seat. It degrades and is not fatal, but it is the same class as r1 F2. F3: mutant 9 (describeFleet's try/catch removed) stays GREEN, because the shape guards stop every BF-F7 input before the catch; add `{\"projects\":[null]}` as a BF-F7 case. — s167: PR #580 grok-audit job 73 APPROVE at 6e3374d5 (0 HIGH/MED/LOW, 3 INFO: fleetFallback's 'never throws' reads err.message unguarded; verifiedAt 0 reads as absent; T252-7 checks wiring by source text). Planner ACCEPT; branch updated to 4f607a6f (patch-id identical, src/tests unchanged). Merge needs Aaron (code PR).",
+      "note": "From docs/loops/briefing-fix-review-r2.md (grok-sia-review, delta 19cb1e5f..3ded135d, 0 blocking, 0 major). The planner ruled it ACCEPT-level, with these 4 tracked rather than a round 4 (s165). F2: `projects:[null]` makes fleetProjectKey throw, and describeFleet's catch then shows 'FLEET: unavailable' for every seat. It degrades and is not fatal, but it is the same class as r1 F2. F3: mutant 9 (describeFleet's try/catch removed) stays GREEN, because the shape guards stop every BF-F7 input before the catch; add `{\"projects\":[null]}` as a BF-F7 case. — s167: PR #580 grok-audit job 73 APPROVE at 6e3374d5 (0 HIGH/MED/LOW, 3 INFO: fleetFallback's 'never throws' reads err.message unguarded; verifiedAt 0 reads as absent; T252-7 checks wiring by source text). Planner ACCEPT; branch updated to 4f607a6f (patch-id identical, src/tests unchanged). Merge needs Aaron (code PR). — s168: #580 (head 4f607a6f) is DIRTY. T-154 (#602) moved handleStart's body from server.ts to session-start/start-report.ts, and the planner's trial merge shows server.ts as the only conflict. Task docs/loops/t252-merge-fix-task.md: merge origin/master into the branch, take master's server.ts, and apply #580's 2-line fleetFallback change in start-report.ts. T252-6 tests fleetFallback directly, so the call site is checked by grep, as in the reviewed original. — s168: T-252-mf came back BLOCKED. The local merge 7d9ecc34 in the desktop %TEMP%/t252-mf-wt is clean: one conflict, both greps right, tsc 0. But T252-7 reads src/server.ts to pin the call site, which the planner missed when it said no test pins it. Ruling: option (a). T252-7 reads start-report.ts; it is a path change in #580's own new test. Task docs/loops/t252-mf-fix-1-task.md (desktop, continue in that clone; includes a bite proof). — s168: T-252-mf-fix-1 READY, planner ACCEPT. #580 head a1ea7495 = merge 7d9ecc34 + the T252-7 path change. 20/20 (t252 8, t154 12), tsc 0; the bite went red on T252-7 with the old inline fallback; the diff against master is exactly fleet.ts, start-report.ts and the t252 test; CI test SUCCESS. BEHIND master: pr-refresh before merge. Merge needs Aaron's word ('merge SIA #580'). The reviewed change is #580's grok-reviewed F1-F4, carried across the T-154 move.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd",
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
+        "6646f34e-175c-4a4e-a39b-a2878070946b",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
       "closed_rev": null
     },
@@ -1720,16 +1723,17 @@
       "id": "T-253",
       "title": "state import drops a bullet's continuation lines silently: bullets() keeps only lines starting '- ' or '* ', and the report counts bullets only; join indented continuation lines and count un-imported lines",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 165,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Found in the Makerspace import (s165, via clark and Maker): two multi-line watch-outs lost their 2nd line. Code: state-import/index.ts:488. It applies to watch_out and open_questions. Maker restored the text from the archived next-session.md. This is the frogger F1 class: a summary that says fine while text was lost. — s167: PR #579 grok-audit job 72 APPROVE at 4349c14c (0 HIGH/MED, 1 LOW, 3 INFO); planner ACCEPT; branch updated to 72f384a3 (patch-id identical, src/tests unchanged), CI pass. Follow-ups, not blockers: renderImportReport index.ts:942 puts a not_imported line in single backticks, so a line with its own backtick breaks the span; index.ts:501 truncates not_imported text to 120 chars with no marker.",
+      "note": "Found in the Makerspace import (s165, via clark and Maker): two multi-line watch-outs lost their 2nd line. Code: state-import/index.ts:488. It applies to watch_out and open_questions. Maker restored the text from the archived next-session.md. This is the frogger F1 class: a summary that says fine while text was lost. — s167: PR #579 grok-audit job 72 APPROVE at 4349c14c (0 HIGH/MED, 1 LOW, 3 INFO); planner ACCEPT; branch updated to 72f384a3 (patch-id identical, src/tests unchanged), CI pass. Follow-ups, not blockers: renderImportReport index.ts:942 puts a not_imported line in single backticks, so a line with its own backtick breaks the span; index.ts:501 truncates not_imported text to 120 chars with no marker. — s168: MERGED on Aaron's word, typed in Atlas's window: 'PRs #579 and #588 merge when ready'. #579 (T-253 + T-248) merged at 876050bb, pinned to refreshed e1462bc3, CI SUCCESS. The patch-id differed from the reviewed 72f384a3 only through context lines: the planner compared the +/- lines of the PR's own diff before and after the refresh, and they are identical (467 lines). Main-tree rebuild requested from clark; live check pending.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd",
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
+        "6646f34e-175c-4a4e-a39b-a2878070946b",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 412
     },
     {
       "id": "T-254",
@@ -1764,29 +1768,31 @@
       "id": "T-256",
       "title": "/sync warns when a CODE commit on HEAD names a task that is still open (stale-open-task check)",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 167,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Opened planner s167. On 2026-10-11 the planner found T-200, T-233 and T-247 merged on master but still open, and nearly briefed one again. Check: newest 1500 non-merge commits, subjects only, \\bT-NNN\\b, code = touches a path outside docs/, .agents/ and *.md; open/in_progress warn; suppress with 'stays open after <sha7>' in the task note. Brief: docs/loops/t256-stale-open-task-check-brief.md (CC laptop one-off, D-150). Its prototype at 5b249bca hits T-168, T-235, T-046 and T-172 (T-172 is a cross-reference in a T-233 subject): triage those after merge. — s167: r1 at ed9bb254 (PR #588), CC Opus review CHANGES: a {\"tasks\":[null]} record throws TypeError and aborts /sync (filter outside the try); untested branches (no-open-task zero git calls, !log.ok, no tasks array, some-vs-every code path, word boundary, .MD case). Round 2 in the brief (base 9c0784f3 after update-branch). The 4 hits at the head (T-046, T-168, T-235 real partials needing 'stays open after <sha7>'; T-172 noise) triage after merge.",
+      "note": "Opened planner s167. On 2026-10-11 the planner found T-200, T-233 and T-247 merged on master but still open, and nearly briefed one again. Check: newest 1500 non-merge commits, subjects only, \\bT-NNN\\b, code = touches a path outside docs/, .agents/ and *.md; open/in_progress warn; suppress with 'stays open after <sha7>' in the task note. Brief: docs/loops/t256-stale-open-task-check-brief.md (CC laptop one-off, D-150). Its prototype at 5b249bca hits T-168, T-235, T-046 and T-172 (T-172 is a cross-reference in a T-233 subject): triage those after merge. — s167: r1 at ed9bb254 (PR #588), CC Opus review CHANGES: a {\"tasks\":[null]} record throws TypeError and aborts /sync (filter outside the try); untested branches (no-open-task zero git calls, !log.ok, no tasks array, some-vs-every code path, word boundary, .MD case). Round 2 in the brief (base 9c0784f3 after update-branch). The 4 hits at the head (T-046, T-168, T-235 real partials needing 'stays open after <sha7>'; T-172 noise) triage after merge. — s168: MERGED on Aaron's word ('PRs #579 and #588 merge when ready'): #588 at 61690bdf, pinned to refreshed 82413352 (patch-id d0b47cdb = reviewed 49899106), CI SUCCESS. Live check of the /sync stale-open-task warning pending the main-tree rebuild.",
       "note_by": [
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
+        "6646f34e-175c-4a4e-a39b-a2878070946b",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 412
     },
     {
       "id": "T-257",
       "title": "Hook-spawning tests inherit the caller's CLAUDE_* env: end-fix-r3-pins R7 fails when the suite runs inside a Claude Code session",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 167,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Opened planner s167 from T-245 r4's CC one-off (2026-10-11): end-fix-r3-pins R7 failed identically at 2ce8eeb5, 5d4276c7 and b142886f when run from a headless Claude Code session, and passed 4/4 with every CLAUDE* var unset. Cause per the run: the session's own CLAUDE_PID / CLAUDE_CODE_SESSION_ID leak into the spawned hook. CI is green because CI has no such vars. With D-150 routing dev to CC, every CC dev run hits this: fix the tests (spawn hooks with a scrubbed env, or set the vars explicitly), not the runs. Find every test that spawns a hook entry and check it. — s167: built by a CC Sonnet one-off (desktop), PR #595 at f521c9b3, updated to da164982 before review (tests-only, 3 files). Reproduced first-hand in the run: R7 red at base with 13 host CLAUDE_* vars set (the run's own session id leaked into the hook), green at commit 2; M1-M4 red on their rows. Review posted to grok-audit (tests-only, so SG-1-eligible once the review names da164982 and CI passes). The run found two OTHER host leaks red at base and head, not CLAUDE_*: harness/config-channel.test.ts CA-4c reads the user's global git identity ('Aaron Melven / …' instead of 'HoH harness runtime'), and suite-run-meta.test.ts 'a lease already held by the same owner runs without take' (expected 2 to be 0). Also server.test.ts has an intermittent 5 s timeout (T-236 slice 2 briefing_budget) red at base. Follow-up: T-260.",
+      "note": "Opened planner s167 from T-245 r4's CC one-off (2026-10-11): end-fix-r3-pins R7 failed identically at 2ce8eeb5, 5d4276c7 and b142886f when run from a headless Claude Code session, and passed 4/4 with every CLAUDE* var unset. Cause per the run: the session's own CLAUDE_PID / CLAUDE_CODE_SESSION_ID leak into the spawned hook. CI is green because CI has no such vars. With D-150 routing dev to CC, every CC dev run hits this: fix the tests (spawn hooks with a scrubbed env, or set the vars explicitly), not the runs. Find every test that spawns a hook entry and check it. — s167: built by a CC Sonnet one-off (desktop), PR #595 at f521c9b3, updated to da164982 before review (tests-only, 3 files). Reproduced first-hand in the run: R7 red at base with 13 host CLAUDE_* vars set (the run's own session id leaked into the hook), green at commit 2; M1-M4 red on their rows. Review posted to grok-audit (tests-only, so SG-1-eligible once the review names da164982 and CI passes). The run found two OTHER host leaks red at base and head, not CLAUDE_*: harness/config-channel.test.ts CA-4c reads the user's global git identity ('Aaron Melven / …' instead of 'HoH harness runtime'), and suite-run-meta.test.ts 'a lease already held by the same owner runs without take' (expected 2 to be 0). Also server.test.ts has an intermittent 5 s timeout (T-236 slice 2 briefing_budget) red at base. Follow-up: T-260. — s168: closed in the record. #595 merged 2026-10-12T03:18Z at 28e41ff6 (head 7b5a513e); it was left open in the record after the merge. The follow-up reds are T-260.",
       "note_by": [
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
+        "6646f34e-175c-4a4e-a39b-a2878070946b",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 403
     },
     {
       "id": "T-258",
@@ -1806,29 +1812,31 @@
       "id": "T-259",
       "title": "/sync hangs for 6+ minutes in the record-erasure check (git cat-file --batch-check) on the real repo root",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 167,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Opened planner s167 from the T-256 CC Opus review (2026-10-11, desktop): runSync on the real SIA root did not finish within 6+ minutes; the process tree showed it blocked in git cat-file --batch-check spawned by record-erasure.ts:213 (called at sync/index.ts:138), before T-256's check runs. T-256 round 1's dev run also saw cursor-hook-compat 'wired into runSync' time out at 120 s at both base and head on the desktop: same cause likely. Pre-existing, not T-256's. Find why --batch-check blocks (stdin never closed? one call per revision over the whole state.json history?) and bound it.",
+      "note": "Opened planner s167 from the T-256 CC Opus review (2026-10-11, desktop): runSync on the real SIA root did not finish within 6+ minutes; the process tree showed it blocked in git cat-file --batch-check spawned by record-erasure.ts:213 (called at sync/index.ts:138), before T-256's check runs. T-256 round 1's dev run also saw cursor-hook-compat 'wired into runSync' time out at 120 s at both base and head on the desktop: same cause likely. Pre-existing, not T-256's. Find why --batch-check blocks (stdin never closed? one call per revision over the whole state.json history?) and bound it. — s168: planner measured the cause on the desktop at d2208ae5. It is the process count, not a stuck pipe: 2,533 commits, 785 state.json steps; --batch-check itself takes 0.27 s; scanErasures then spawns `cat-file -p` per blob (361) and `merge-base` per merge step (424), at about 75-86 ms each. scanErasures took 60 s; `state erasures` took 115 s (output sha256 f8592bcc…43bf). Brief docs/loops/t259-erasure-scan-brief.md: one `cat-file --batch` per phase; merge-base only when a new pure mergeNeedsBase() says erasuresInMerge would read base; output must hash-equal the old CLI's on d2208ae5; under 15 s. — s168: BUILT, planner ACCEPT. PR #615 at fe7435c6d905e2b9958b1291ecc1cd33d13dee6d (QA PC CC Sonnet one-off 11:22-11:29; clark copied the reply to ~/Worktrees/t259-reply.md). Real history on d2208ae5: old CLI 24 s, new CLI 3 s, and both SHA256 F8592BCC…43BF, equal to the planner's capture. The 'against this repository's history' row took 2.6 s. M1/M2/M3 red on their rows (M1 includes the existing 'reported once' row). 23/23, tsc 0, CI green. Accepted deviations: the ES-6 fixture fix (session numbers) landed in commit 2 because amend is forbidden; ES-5 was already green at commit 1 (old code also spawns exactly one merge-base there); the cursor-hook-compat path in the brief was wrong (it is tests/pipelines/sync/cursor-hook-compat.test.ts: 9 passed, the runSync row 10.7 s, so its old 120 s timeouts are gone with this fix). Planner diff review: mergeNeedsBase mirrors erasuresInMerge's inBase condition exactly; loadBlobs relies on --batch's input-order output and maps 'missing' to null. PR is BEHIND: pr-refresh just before merge. Merge needs Aaron's word. — s168: MERGED on Aaron's word ('Then 615'): #615 at e960a5a0, pinned to the refreshed 4cebd292 (patch-id b3f6583f = reviewed fe7435c6). Main tree rebuilt at e960a5a0. Planner live check on the main build: `state erasures` on sia-planner exit 0 in 6 s, where 115 s was measured this morning (2540 commits, 792 steps).",
       "note_by": [
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
+        "6646f34e-175c-4a4e-a39b-a2878070946b",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 407
     },
     {
       "id": "T-260",
       "title": "Tests that read the developer machine: config-channel CA-4c reads the global git identity; suite-run-meta same-owner lease; server.test.ts 5 s timeout",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 167,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Opened planner s167 from T-257's CC run (2026-10-11, desktop): red at both 843d8d18 and the T-257 head, so not caused by it. (1) harness/config-channel.test.ts CA-4c got the user's global git user.name/email instead of 'HoH harness runtime': set GIT_CONFIG_GLOBAL/GIT_CONFIG_NOSYSTEM (or the identity) in the test. (2) suite-run-meta.test.ts 'cli: a lease already held by the same owner runs without take' expected 2 to be 0: likely a real lease or owner on the developer machine. (3) server.test.ts T-236 slice 2 briefing_budget: 5 s timeout, flaky on a loaded desktop. CI is green on all three; they cost every local dev run a re-check.",
+      "note": "Opened planner s167 from T-257's CC run (2026-10-11, desktop): red at both 843d8d18 and the T-257 head, so not caused by it. (1) harness/config-channel.test.ts CA-4c got the user's global git user.name/email instead of 'HoH harness runtime': set GIT_CONFIG_GLOBAL/GIT_CONFIG_NOSYSTEM (or the identity) in the test. (2) suite-run-meta.test.ts 'cli: a lease already held by the same owner runs without take' expected 2 to be 0: likely a real lease or owner on the developer machine. (3) server.test.ts T-236 slice 2 briefing_budget: 5 s timeout, flaky on a loaded desktop. CI is green on all three; they cost every local dev run a re-check. — s168: brief docs/loops/t260-host-reds-brief.md (tests only, desktop). H3 = a 60 s timeout on the one row. H1/H2 diagnose first; a src cause is reported, not fixed. Planner's read for H1: the desktop identity is only in ~/.gitconfig and there is no system user.*, so the leak path is unknown. — s168: BUILT, planner ACCEPT for H2+H3. PR #621 at edff7b77 (desktop one-off). H2: cli-suite-run.ts helperMissing() needs ~/machine-lease.ps1 on win32, and it is absent on the desktop; the row now points MACHINE_LEASE_PS1 at an empty stub (3x green, bite proven). H3: 60 s timeout (it measured 5.4-6.0 s against the 5 s default). H1 is a SRC-CAUSE, correctly not papered over: src/harness/git.ts runtimeGitEnv passes inherited GIT_AUTHOR_*/GIT_COMMITTER_* through to the runtime's git, and those env vars beat -c user.name/email. The desktop launcher's env carries all four. Opened T-263. CA-4c stays red on the desktop until T-263 lands. Merge needs Aaron's word (tests). — s168: MERGED on Aaron's word, typed in Atlas's window: 'merge SIA #621'. The planner ran pr-refresh: edff7b77 -> 86c6bb7e, patch-id f1224a05 identical, CI test SUCCESS. Merged pinned (--match-head-commit 86c6bb7e) at 2b287ecf. Tests only, so no rebuild. H2 and H3 fixed; H1 continues as T-263, and CA-4c stays red on the desktop until T-263 lands.",
       "note_by": [
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
+        "6646f34e-175c-4a4e-a39b-a2878070946b",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 410
     },
     {
       "id": "T-261",
@@ -1852,7 +1860,21 @@
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "Per docs/loops/end-skills-audit-proposal-2026-10-11.md and D-152. After T-154. The brief must flag clark's inferred defaults (in-session; /end expected at every seat close; seat -ops edits need no per-script ask) so Aaron can veto them. Kill criterion as an acceptance row: cut after 20 /end runs with no script a later session called. — s168 2026-10-12: PART 1 DONE. Brief docs/loops/t262-skills-audit-extractor-brief.md (#609); planner prototype on 5 real atlas transcripts (1,076 shell calls) dropped sequence detection (all git-fetch adjacency noise) and the proposal's substring coverage (marked git fetch covered while run 163x by hand). Build e3e76df7 ACCEPT with 4 deviations accepted (cli-args sort position, assignment-only segment skip, throw for no-transcript, blank lines skipped); fix-1 (docs/loops/t262-fix-1-task.md) killed surviving mutants M4/M6 (SA-9 UUID-named subagent file, new SA-3b), 31/31. #610 merged at 2a78e12f on Aaron's word, pinned 6f011e87 (patch-id 001f70bd = reviewed 40ceb026). Live check on the main-tree build: `node build/cli.js skills-audit .` in sia-planner exits 0, seat atlas, 211 shell calls, 20 rows, scripts called: records-pr.sh x14, tree-sync.sh x8, pr-wait.sh x3, relay-check.mjs x3, reply-wait.sh x2, state.mjs x2, hub.sh x1, pr-refresh.sh x1. PART 2 (end.md step 1b + Cursor twin + SessionEnd unaudited flag) waits on Aaron's veto of the three D-152 inferences (seat -ops edits without per-script ask; audit in-session; /end at every close). Kill criterion stays: cut after 20 /end runs with no audit-led script called by a later session; the `scripts called:` line is the instrument.",
+      "note": "Per docs/loops/end-skills-audit-proposal-2026-10-11.md and D-152. After T-154. The brief must flag clark's inferred defaults (in-session; /end expected at every seat close; seat -ops edits need no per-script ask) so Aaron can veto them. Kill criterion as an acceptance row: cut after 20 /end runs with no script a later session called. — s168 2026-10-12: PART 1 DONE. Brief docs/loops/t262-skills-audit-extractor-brief.md (#609); planner prototype on 5 real atlas transcripts (1,076 shell calls) dropped sequence detection (all git-fetch adjacency noise) and the proposal's substring coverage (marked git fetch covered while run 163x by hand). Build e3e76df7 ACCEPT with 4 deviations accepted (cli-args sort position, assignment-only segment skip, throw for no-transcript, blank lines skipped); fix-1 (docs/loops/t262-fix-1-task.md) killed surviving mutants M4/M6 (SA-9 UUID-named subagent file, new SA-3b), 31/31. #610 merged at 2a78e12f on Aaron's word, pinned 6f011e87 (patch-id 001f70bd = reviewed 40ceb026). Live check on the main-tree build: `node build/cli.js skills-audit .` in sia-planner exits 0, seat atlas, 211 shell calls, 20 rows, scripts called: records-pr.sh x14, tree-sync.sh x8, pr-wait.sh x3, relay-check.mjs x3, reply-wait.sh x2, state.mjs x2, hub.sh x1, pr-refresh.sh x1. PART 2 (end.md step 1b + Cursor twin + SessionEnd unaudited flag) waits on Aaron's veto of the three D-152 inferences (seat -ops edits without per-script ask; audit in-session; /end at every close). Kill criterion stays: cut after 20 /end runs with no audit-led script called by a later session; the `scripts called:` line is the instrument. — s168: Aaron 'no veto' (D-153). Part 2 brief docs/loops/t262-part2-end-audit-brief.md: /end step 1b (both .claude copies plus the Cursor twin with --runtime cursor); skills-audit reads Cursor transcripts (~/.cursor/projects/<key>/agent-transcripts/<uuid>/<uuid>.jsonl, Shell tool_use, key = path with non-alphanumeric runs replaced by '-'); --seat (clark's ~/Worktrees has no .agents, so its stamp.sh x107 showed as by-hand); --transcript; the SessionEnd hook writes a once-per-session SKILLS AUDIT NOT RUN notice, shown in the next greeting. clark updates the user-level ~/.claude/commands/end.md after merge (it is already stale: no record gate). — s168: PART 2 BUILT, planner ACCEPT. PR #617 at 22e4b1c03c622ed5ddd93381b1b44c50803e7502 (desktop CC Sonnet one-off; reply %TEMP%/t262p2-reply.md). Red run 12/14 (H-5/H-6 green as absence rows); M1-M6 each red on its row; 9 files 183/183; tsc 0; CI green. Live: `--runtime cursor` on sia-forge gave seat forge, 13 shell calls, '· cursor'; `--seat clark ~/Worktrees` gave stamp.sh x117 as script, plus 9 other clark-ops scripts called. Deviations accepted: (1) the H fixtures name the transcript <uuid1>.jsonl; (2) a named --transcript file that is not uuid-named still counts as this session; (3) the brief's '??' were mojibake for '·' and '×'; (4) the usage line has a plain '|'; (5) reply file name; (6) the hook tests set KNOWLEDGE_V2_DB to a temp path. Planner review of the diff: the hook block is an isolated try/catch after work-after-end, guarded by .agents and an existing transcript; the notice reads before it appends. IMPACT HIGH = the SessionEnd hook path; covered by r3/r4 pins, handoff-guard and H-1..H-6. FOLLOW-UPS, not blocking: (a) the Cursor copy says a skipped audit is named in the next greeting, but Cursor fires no SessionEnd hook on our machines (T-245 A4), so that sentence is untrue under Cursor (planner's brief error); fix in a docs touch; (b) a stray doc comment ('Throws an Error…') now sits above the TranscriptFile interface; (c) one full vitest run printed vitest's 'unhandled errors' line once, not reproduced on re-run; (d) post-merge: clark copies .claude/commands/end.md to the user-level ~/.claude/commands/end.md, and the planner live-checks the hook on a real session close. Merge needs Aaron's word. — s168: PART 2 MERGED on Aaron's word ('merge SIA #617'): #617 at 2d771340, pinned to the refreshed 4d0b999c (patch-id 64bd61b9 = reviewed 22e4b1c0). Main tree rebuilt at e960a5a0. clark copied .claude/commands/end.md to the user-level ~/.claude/commands/end.md (cmp identical, old copy archived). Planner live check on the main build: skills-audit in sia-planner exit 0 (seat atlas, ops atlas-ops, 305 shell calls); `--runtime cursor` on sia-builder exit 0 ('· cursor'). STILL OPEN: (1) the hook's audited/unaudited line on a real session close; the planner runs /end step 1b at this session's close, and the next planner greeting must NOT show SKILLS AUDIT NOT RUN for f21ca920; (2) the Cursor end.md copy wrongly says a skipped audit is named in the next greeting (no SessionEnd under Cursor); a docs fix; (3) the kill criterion: 20 /end runs. — s168: stays open after 79d43ba: part 2 is merged, but the hook's audited line on a real session close, the Cursor end.md wording fix and the 20-run kill criterion remain.",
+      "note_by": [
+        "f21ca920-a048-4990-935f-42f102efc85f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-263",
+      "title": "Harness runtime git inherits the caller's GIT_AUTHOR_*/GIT_COMMITTER_* env, so its commits carry the caller's identity, not 'HoH harness runtime' (layer 0 leak; config-channel CA-4c red on the desktop)",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 168,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found by T-260's desktop one-off (s168). src/harness/git.ts:176-183 runtimeGitEnv strips REDIRECTING_GIT_VARS (GIT_CONFIG*, GIT_DIR, ...) but keeps GIT_AUTHOR_NAME/EMAIL and GIT_COMMITTER_NAME/EMAIL. Git gives these precedence over -c user.name/user.email, so a caller whose env carries them (the desktop launcher does) has the runtime commit under the caller's identity. Experiment: with the four vars unset, CA-4c passes; with only GIT_AUTHOR_NAME=x set, the author is 'x'. Fix in src: drop GIT_AUTHOR_*/GIT_COMMITTER_* (and GIT_AUTHOR_DATE/GIT_COMMITTER_DATE? decide) in runtimeGitEnv when !machineRead. CA-4c is the existing test that proves it; add a row that sets the vars explicitly so CI sees it too.",
       "note_by": [
         "f21ca920-a048-4990-935f-42f102efc85f"
       ],
@@ -4826,6 +4848,12 @@
       "title": "Aaron 10-11: agrees to (1) shrinking the seat -ops skills into a short index plus reference files and (2) agents adding their repeated steps to their own skills at /end (the planner's skills-audit proposal, docs/loops/end-skills-audit-proposal-2026-10-11.md)",
       "date": "2026-10-11",
       "note": "VERIFIED TYPED (SG-1, relay-check.mjs): clark's window, transcript 851d449c, queue-operation at 2026-10-12T03:23:57Z: 'You have two bullet points under what would actually help orchestration. Shrinking the op skills into a short index plus reference files is the first bullet point. The second one is agents adding their repeated steps to their own skills at end, Atlas's proposal. Then you say both reduce how often the planners need me. I agree with both those points.' INFERRED BY CLARK, NOT AARON'S WORDS, and open to his veto: (a) a seat adding scripts or notes to its OWN -ops skill needs no per-script ask (new skills still go through the skill gate); (b) the audit runs in-session, not in a hook spawning claude -p; (c) /end is expected at every seat close. Build per the proposal: a deterministic `open-brain skills-audit` extractor, /end step 1b, and the SessionEnd hook only flagging an unaudited session (T-262). The atlas-ops restructure comes after T-154 lands."
+    },
+    {
+      "id": "D-153",
+      "title": "Aaron 10-12: no veto on clark's three D-152 inferences: (a) a seat edits its own -ops skill with no per-script ask, (b) the skills audit runs in-session at /end, (c) /end is expected at every seat close",
+      "date": "2026-10-12",
+      "note": "VERIFIED TYPED (SG-1): clark's window, transcript 99f4f3f7, user turn at 2026-10-12T16:08:03Z: 'no veto', answering the planner's question relayed by clark. Unblocks T-262 part 2 (docs/loops/t262-part2-end-audit-brief.md)."
     }
   ],
   "handoffs": [
@@ -5414,49 +5442,39 @@
     },
     {
       "seat": "planner",
-      "pick_up": "T-154 is DONE: #602 merged at 926cd3dc on Aaron's word, main tree rebuilt, planner live check PASS in bash and PowerShell, closed at rev 399. atlas-ops is restructured per D-152 (SKILL.md index + reference/*.md, scripts unchanged; a live-check recipe added to reference/prs.md). NEXT: brief T-262 (/end skills audit; the extractor first, per docs/loops/end-skills-audit-proposal-2026-10-11.md) and flag the D-152 inferred defaults for Aaron's veto; then T-259 first among T-258/T-259/T-260; T-261 (physical core/memory split) is P3, after. A4 for T-245 waits on Aaron's interactive Cursor chat. Queued for Aaron: #579 T-253, #580 T-252, #588 T-256 r2. Re-confirm GO/HOLD when clark sends the v1.22.7 QA PC waker restart time.",
+      "pick_up": "Session 168 (Atlas). Merged today: #610 T-262 part 1, #617 T-262 part 2, #615 T-259, #621 T-260, #579 T-253+T-248, #588 T-256; main tree at 61690bdf. Live checks on the main build all pass: state erasures 6 s (was 115 s); skills-audit claude+cursor; `state import --name` refuses a doubled --name; sync's open-task-commits warns on 5 tasks. Closed: T-154, T-245 (A4 not testable: no Cursor editor on any machine), T-257, T-259, T-260, T-253, T-248, T-256. Waiting on Aaron's word: #580 T-252 (accepted at a1ea7495) and #620 T-188 (accepted at bce21e24); pr-refresh each just before its own merge. Aaron merges in Atlas's window too ('merge SIA #621' came here). NEXT: (1) triage the 4 open-task-commits warnings (T-046, T-168, T-172, T-235): close with evidence or add 'stays open after <sha7>'; (2) T-258 (end-record-guard idempotency residuals), now unblocked by #617; (3) T-263 harness runtimeGitEnv identity leak (P3); (4) the T-262 Cursor end.md wording fix plus the stray doc comment; (5) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later.",
       "watch_out": [
-        "Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk; prove the PR's own diff unchanged by patch-id; wait for the CI run on the NEW head (update-branch cancels the old one; checks show nothing for a moment).",
-        "A review must name the EXACT head: update-branch BEFORE launching a review.",
-        "A loaded desktop plus a clone under %TEMP% gives environmental reds by construction (cli-flags R185-8, briefing QA 263 F4, suite-run-meta lease, end-fix timeouts): A/B against base in the SAME clone before calling any regression; CI is the full-suite gate.",
-        "Headless cursor-agent -p on the desktop fired no session hooks (s168, one run): it cannot carry a hook live check.",
-        "atlas-ops scripts under Git Bash: pass Windows-form paths to node and git (cygpath -m), not /c/...; records-pr.sh leaves a branch on failure, so detach before retrying; tree-sync refuses with an untracked docs file, so land or move it first.",
-        "Shell quoting for an agent-run command line: single quotes are literal in both PowerShell and bash, but the escape for an embedded ' differs, and PowerShell also treats U+2018-201B as single quotes: refuse rather than escape.",
-        "After T-154 adopted projects print 'OLD /start in this project: run bootstrap install-commands' until reinstalled; expected, not a regression."
+        "The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.",
+        "A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff (old merge-base..old head vs master..new head) before calling for a re-review (#579, s168).",
+        "Reply files: launchers also write an uppercase <TAG>-reply.md copy in %TEMP%; check both names.",
+        "Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it (T-188, s168). CI's gh is installed but unauthenticated.",
+        "Before saying no test pins a call site, grep the PR's own new test file for the old path (T-252-mf, s168).",
+        "Desktop one-off launchers set GIT_AUTHOR_*/GIT_COMMITTER_*; config-channel CA-4c stays red locally until T-263.",
+        "ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task."
       ],
-      "open_questions": [
-        "T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.",
-        "D-152 inferences open to Aaron's veto: seat -ops edits need no per-script ask; the audit runs in-session; /end expected at every seat close.",
-        "T-258/T-259/T-260: next CC briefs after T-262; T-259 first."
-      ],
+      "open_questions": [],
       "session": 168,
       "loop_state": {
         "open_prs": [
           {
-            "ref": "#579",
-            "qa_status": "accepted",
-            "note": "T-253 72f384a3; Aaron merge; update-branch first"
-          },
-          {
             "ref": "#580",
             "qa_status": "accepted",
-            "note": "T-252 4f607a6f; Aaron merge; update-branch first"
+            "note": "T-252, planner ACCEPT at a1ea7495; needs Aaron's word"
           },
           {
-            "ref": "#588",
+            "ref": "#620",
             "qa_status": "accepted",
-            "note": "T-256 r2 49899106; Aaron merge; update-branch first"
+            "note": "T-188, planner ACCEPT at bce21e24; needs Aaron's word"
           }
         ],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "T-194 option (a)/(b)/(c)",
-          "D-152 inferred defaults (veto)",
-          "A4: one interactive Cursor chat on the desktop, UTC time via clark",
-          "#579/#580/#588 merge word"
+          "merge SIA #580",
+          "merge SIA #620",
+          "T-194: (a), (b) or (c)"
         ],
         "rulings": [
-          "s168: #576 post-merge reds environmental; #595 SG-1 merged; D-151 T-154 CLI route; T-154 ACCEPT, fix-1, fix-2 ACCEPT; #602 merged 926cd3dc, live check PASS, T-154 closed; D-152 verified typed; T-261, T-262 opened; atlas-ops restructured"
+          "D-153: no veto on the D-152 inferences"
         ]
       },
       "session_uuid": "f21ca920-a048-4990-935f-42f102efc85f",

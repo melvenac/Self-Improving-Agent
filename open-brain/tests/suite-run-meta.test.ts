@@ -395,11 +395,16 @@ describe("T-168 suite meta", () => {
       SUITE_LEASE_STATUS_EXIT: "10",
       SUITE_LEASE_STATUS_OUT: "lease=held pid=100 started=t",
     });
+    // On win32 the CLI refuses when ~/machine-lease.ps1 is absent (helperMissing), which the
+    // status fixture does not bypass; point it at a stub so the row does not depend on the machine.
+    const helper = join(dir, "machine-lease.ps1");
+    writeFileSync(helper, "");
     const owned = spawnSync(process.execPath, [TSX, CLI, "--owner-pid", "100", "--meta", join(dir, "held.json")], {
       encoding: "utf8",
       cwd: dir,
       env: {
         ...process.env,
+        MACHINE_LEASE_PS1: helper,
         SUITE_CENSUS_FIXTURE: join(dir, "presence.json"),
         SUITE_VITEST_JSON: join(dir, "vitest.json"),
         SUITE_VITEST_EXIT: "0",

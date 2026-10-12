@@ -35,6 +35,7 @@ import {
 } from "./checks.js";
 import { checkCiStatus, checkStateViews, checkMergeMarkers } from "./checks-state.js";
 import { checkRecordErasure } from "./record-erasure.js";
+import { checkOpenTaskCommits } from "./open-task-commits.js";
 import { checkWorktreeLayout } from "./worktree-layout.js";
 import { checkHubSeats } from "./hub-seats.js";
 import { checkCursorStartParity } from "./start-parity.js";
@@ -135,6 +136,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkStateViews(options.projectRoot));
   // T163-2: no committed write removed a record another session added.
   checks.push(checkRecordErasure(options.projectRoot));
+  // T-256: an open task that a code commit on HEAD already names.
+  checks.push(checkOpenTaskCommits(options.projectRoot));
   checks.push(checkCiStatus(options.projectRoot));
   checks.push(checkMergeMarkers(options.projectRoot));
   // T-183: does the greeting still fit one tool result? Prints its count every run.
