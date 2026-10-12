@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 410,
+  "revision": 411,
   "project": {
     "name": "self-improving-agent"
   },
@@ -776,7 +776,7 @@
       "opened_session": 100,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 100. QA 102's Open 6: checks-state.ts:146's /auth|login|token|HTTP 401/ matches the hint. It reports a false reason for a legitimate skip. Minor; predates the importer work. — s168: brief docs/loops/t188-ci-status-remote-brief.md. gh's real errors were captured on the desktop: a non-GitHub remote gives 'none of the git remotes ... point to a known GitHub host ... please use `gh auth login`'; no remote gives 'no git remotes found'. A new branch before the auth regex names 'no GitHub remote'. — s168: BUILT, PR #620 at b164fdf9; C1/C2/C4 red at commit 1; mutant red; 26/26 local. CI RED: s4-guards S4-9.2 (no skip added) fails on C4's `it.skip` when gh is absent. That is the planner's brief error. Fix: docs/loops/t188-fix-1-task.md (plain it(), asserting 'gh is not installed' when gh is absent).",
+      "note": "Session 100. QA 102's Open 6: checks-state.ts:146's /auth|login|token|HTTP 401/ matches the hint. It reports a false reason for a legitimate skip. Minor; predates the importer work. — s168: brief docs/loops/t188-ci-status-remote-brief.md. gh's real errors were captured on the desktop: a non-GitHub remote gives 'none of the git remotes ... point to a known GitHub host ... please use `gh auth login`'; no remote gives 'no git remotes found'. A new branch before the auth regex names 'no GitHub remote'. — s168: BUILT, PR #620 at b164fdf9; C1/C2/C4 red at commit 1; mutant red; 26/26 local. CI RED: s4-guards S4-9.2 (no skip added) fails on C4's `it.skip` when gh is absent. That is the planner's brief error. Fix: docs/loops/t188-fix-1-task.md (plain it(), asserting 'gh is not installed' when gh is absent). — s168: fix 1 READY, planner ACCEPT. PR #620 head bce21e24 (fix 1 0f23de76 + fix 1b), test file only, no skip; CI test SUCCESS; the S4-9.2 guard green. Accepted deviation (two commits): CI's gh is installed but unauthenticated, and gh checks auth before remotes, so C4 there gets 'not authenticated'. C4's gh-present branch now accepts either message. Consequence, recorded: C4 is now a real-gh smoke row and no longer kills the reorder mutant; C1/C2 (exact gh text through the stub) are the guard. BEHIND: pr-refresh before merge. src change, so it needs Aaron's word ('merge SIA #620').",
       "note_by": null,
       "closed_rev": null
     },
