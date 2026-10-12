@@ -18,7 +18,7 @@ import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } fr
 import { oldStartCommandWarning } from "../bootstrap/index.js";
 import { describeLatestBrief } from "./latest-brief.js";
 import { describeReadsOwed } from "./reads-owed.js";
-import { describeFleet } from "./fleet.js";
+import { describeFleet, fleetFallback } from "./fleet.js";
 import { formatScanCounts } from "./scan-counts.js";
 
 /**
@@ -267,9 +267,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         try {
           return describeFleet(projectRoot, projectName, process.env, startNow);
         } catch (err) {
-          const path = process.env.FLEET_JSON ?? "fleet.json";
-          const line = `FLEET: unavailable (${path}: invalid shape: ${(err instanceof Error ? err.message : String(err)).split("\n")[0]})`;
-          return { legacy: [line], budget: line };
+          return fleetFallback(err, process.env);
         }
       })(),
       workingTree: describeWorkingTree(projectRoot),
