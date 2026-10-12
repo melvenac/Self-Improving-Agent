@@ -155,7 +155,7 @@ describe("t262 part 2", { timeout: TIMEOUT }, () => {
       });
     const payloadFor = (t: string) => ({ session_id: U(1), transcript_path: t, hook_event_name: "SessionEnd" });
     const transcript = (extra: unknown[] = [], fetches = 3): string => {
-      const p = join(home, "t.jsonl");
+      const p = join(home, `${U(1)}.jsonl`);
       writeFileSync(p, jsonl([...times(fetches, () => sh("git fetch")), sh("git log"), ...extra]));
       return p;
     };

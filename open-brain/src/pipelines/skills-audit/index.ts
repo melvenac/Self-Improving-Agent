@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { readAgentIdentity } from "../session-start/agent-identity.js";
 import { deriveProjectKey } from "../session-start/session-discovery.js";
 
@@ -28,7 +28,11 @@ const SCRIPT_RUNNERS = new Set(["node", "bash", "sh", "python", "tsx", "pwsh", "
 const SUBCOMMAND_WORDS: Record<string, number> = { gh: 2, git: 1, npm: 1, npx: 1 };
 const SCRIPT_TOKEN = /\.(m?js|cjs|ts|sh|py|ps1)['"]?$/;
 const UUID_FILE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jsonl$/;
+const UUID_NAME = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const HIT_THRESHOLD = 3;
+
+/** Cursor's project key: every run of non-alphanumerics becomes one `-`, ends trimmed. */
+const projectKey = (dir: string): string => dir.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 const stripPath = (token: string): string => token.replace(/^.*[\\/]/, "");
 
@@ -60,7 +64,9 @@ export function commandKeys(command: string): string[] {
   return keys;
 }
 
-export function readShellCommands(file: string): { commands: string[]; unparsed: number } {
+export type AuditRuntime = "claude" | "cursor";
+
+export function readShellCommands(file: string, runtime: AuditRuntime = "claude"): { commands: string[]; unparsed: number } {
   const commands: string[] = [];
   let unparsed = 0;
   for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
@@ -70,6 +76,16 @@ export function readShellCommands(file: string): { commands: string[]; unparsed:
       entry = JSON.parse(line);
     } catch {
       unparsed++;
+      continue;
+    }
+    if (runtime === "cursor") {
+      // Cursor lines carry no `type`: {"role":"assistant","message":{"content":[...]}}.
+      if (entry?.role !== "assistant" || !Array.isArray(entry.message?.content)) continue;
+      for (const item of entry.message.content) {
+        if (item?.type === "tool_use" && item.name === "Shell" && typeof item.input?.command === "string") {
+          commands.push(item.input.command);
+        }
+      }
       continue;
     }
     if (entry?.type !== "assistant" || entry.isSidechain === true || !Array.isArray(entry.message?.content)) continue;
@@ -87,6 +103,10 @@ export interface AuditOptions {
   home: string;
   session?: string;
   last?: number;
+  seat?: string;
+  runtime?: AuditRuntime;
+  /** Absolute path to one transcript file; it is this session and `session` is ignored. */
+  transcript?: string;
 }
 
 export interface AuditRow {
@@ -98,6 +118,7 @@ export interface AuditRow {
 }
 
 export interface AuditReport {
+  runtime: AuditRuntime;
   seat: string | null;
   opsDir: string | null;
   transcriptDir: string;
@@ -130,33 +151,80 @@ function countKeys(commands: string[]): Map<string, number> {
 }
 
 /** Throws an Error whose message is the CLI's stderr line when there is nothing to read. */
+interface TranscriptFile {
+  name: string;
+  path: string;
+  mtime: number;
+}
+
+const byNewest = (a: TranscriptFile, b: TranscriptFile): number =>
+  b.mtime - a.mtime || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+
+/** Claude Code: `<dir>/<uuid>.jsonl`. Cursor: `<dir>/<uuid>/<uuid>.jsonl`, nothing deeper. */
+function listTranscripts(dir: string, runtime: AuditRuntime): TranscriptFile[] {
+  const out: TranscriptFile[] = [];
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (runtime === "claude") {
+      if (!e.isFile() || !UUID_FILE.test(e.name)) continue;
+      const path = join(dir, e.name);
+      out.push({ name: e.name, path, mtime: statSync(path).mtimeMs });
+    } else {
+      if (!e.isDirectory() || !UUID_NAME.test(e.name)) continue;
+      const path = join(dir, e.name, `${e.name}.jsonl`);
+      if (existsSync(path)) out.push({ name: `${e.name}.jsonl`, path, mtime: statSync(path).mtimeMs });
+    }
+  }
+  return out.sort(byNewest);
+}
+
 export function auditSkills(opts: AuditOptions): AuditReport {
-  const seat = readAgentIdentity(opts.projectDir)?.name.toLowerCase() ?? null;
+  const runtime: AuditRuntime = opts.runtime ?? "claude";
+  const seat = opts.seat?.trim().toLowerCase() || (readAgentIdentity(opts.projectDir)?.name.toLowerCase() ?? null);
   const candidate = seat ? join(opts.home, ".claude", "skills", `${seat}-ops`) : null;
   const opsDir = candidate && existsSync(candidate) ? candidate : null;
 
-  const projects = join(opts.home, ".claude", "projects");
-  const expected = deriveProjectKey(opts.projectDir).toLowerCase();
-  const dirName = existsSync(projects) ? readdirSync(projects).find((d) => d.toLowerCase() === expected) : undefined;
-  const transcriptDir = dirName ? join(projects, dirName) : null;
-  const files = transcriptDir
-    ? readdirSync(transcriptDir, { withFileTypes: true })
-        .filter((e) => e.isFile() && UUID_FILE.test(e.name))
-        .map((e) => ({ name: e.name, mtime: statSync(join(transcriptDir, e.name)).mtimeMs }))
-        .sort((a, b) => b.mtime - a.mtime || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-    : [];
+  const projects = join(opts.home, runtime === "cursor" ? ".cursor" : ".claude", "projects");
+  let transcriptDir: string | null;
+  if (opts.transcript !== undefined) {
+    const holder = dirname(opts.transcript);
+    transcriptDir = runtime === "cursor" ? dirname(holder) : holder;
+  } else if (runtime === "cursor") {
+    const expected = projectKey(opts.projectDir).toLowerCase();
+    const dirName = existsSync(projects) ? readdirSync(projects).find((d) => d.toLowerCase() === expected) : undefined;
+    transcriptDir = dirName ? join(projects, dirName, "agent-transcripts") : null;
+  } else {
+    const expected = deriveProjectKey(opts.projectDir).toLowerCase();
+    const dirName = existsSync(projects) ? readdirSync(projects).find((d) => d.toLowerCase() === expected) : undefined;
+    transcriptDir = dirName ? join(projects, dirName) : null;
+  }
+  const files = transcriptDir && existsSync(transcriptDir) ? listTranscripts(transcriptDir, runtime) : [];
+  if (opts.transcript !== undefined && existsSync(opts.transcript)) {
+    // A named file is this session even when its name is not a uuid.
+    const want = resolve(opts.transcript).toLowerCase();
+    if (!files.some((f) => resolve(f.path).toLowerCase() === want)) {
+      const name = basename(opts.transcript);
+      files.unshift({ name, path: opts.transcript, mtime: statSync(opts.transcript).mtimeMs });
+    }
+  }
   if (!transcriptDir || files.length === 0) {
     throw new Error(`skills-audit: no transcripts for ${opts.projectDir} under ${projects}`);
   }
 
-  const start = opts.session === undefined ? 0 : files.findIndex((f) => f.name === `${opts.session}.jsonl`);
-  if (start === -1) {
-    throw new Error(`skills-audit: no transcript ${opts.session}.jsonl in ${transcriptDir}`);
+  let start: number;
+  if (opts.transcript !== undefined) {
+    const want = resolve(opts.transcript).toLowerCase();
+    start = files.findIndex((f) => resolve(f.path).toLowerCase() === want);
+    if (start === -1) throw new Error(`skills-audit: no transcript ${opts.transcript} in ${transcriptDir}`);
+  } else {
+    start = opts.session === undefined ? 0 : files.findIndex((f) => f.name === `${opts.session}.jsonl`);
+    if (start === -1) {
+      throw new Error(`skills-audit: no transcript ${opts.session}.jsonl in ${transcriptDir}`);
+    }
   }
   const picked = files.slice(start, start + Math.max(1, opts.last ?? 5));
 
   const perFile = picked.map((f) => {
-    const read = readShellCommands(join(transcriptDir, f.name));
+    const read = readShellCommands(f.path, runtime);
     return { read, counts: countKeys(read.commands) };
   });
   const [current] = perFile;
@@ -193,6 +261,7 @@ export function auditSkills(opts: AuditOptions): AuditReport {
   scriptsCalled.sort((a, b) => b.count - a.count || (a.script < b.script ? -1 : a.script > b.script ? 1 : 0));
 
   return {
+    runtime,
     seat,
     opsDir,
     transcriptDir,
@@ -210,7 +279,7 @@ export function renderAudit(report: AuditReport): string {
   const byHand = report.rows.filter((r) => r.status === "by-hand").length;
   const script = report.rows.length - byHand;
   const lines = [
-    `skills-audit: seat ${report.seat ?? "none"} · ops ${report.opsDir ?? "none"} · session ${report.session.slice(0, 8)} · window ${report.window.length} sessions · ${report.shellCalls} shell calls · ${report.unparsed} unparsed lines`,
+    `skills-audit: seat ${report.seat ?? "none"} · ops ${report.opsDir ?? "none"} · session ${report.session.slice(0, 8)} · window ${report.window.length} sessions · ${report.shellCalls} shell calls · ${report.unparsed} unparsed lines${report.runtime === "cursor" ? " · cursor" : ""}`,
     "this  sess  window  status   key",
     ...report.rows.map(
       (r) => `${String(r.thisSession).padStart(4)}  ${String(r.sessions).padStart(4)}  ${String(r.windowTotal).padStart(6)}  ${r.status.padEnd(7)}  ${r.key}`,

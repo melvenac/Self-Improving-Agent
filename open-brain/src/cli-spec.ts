@@ -35,7 +35,7 @@ export const COMMAND_SPECS = {
   skillsAudit: {
     name: "skills-audit",
     booleans: ["--json"],
-    values: { "--session": "both", "--last": "both" },
+    values: { "--session": "both", "--last": "both", "--seat": "both", "--runtime": "both" },
     positionals: "directory",
   },
   scrubTriggerFires: {
