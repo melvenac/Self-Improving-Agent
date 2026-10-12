@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 409,
+  "revision": 410,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1824,16 +1824,16 @@
       "id": "T-260",
       "title": "Tests that read the developer machine: config-channel CA-4c reads the global git identity; suite-run-meta same-owner lease; server.test.ts 5 s timeout",
       "priority": "P3",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 167,
-      "closed_session": null,
+      "closed_session": 168,
       "supersedes": null,
-      "note": "Opened planner s167 from T-257's CC run (2026-10-11, desktop): red at both 843d8d18 and the T-257 head, so not caused by it. (1) harness/config-channel.test.ts CA-4c got the user's global git user.name/email instead of 'HoH harness runtime': set GIT_CONFIG_GLOBAL/GIT_CONFIG_NOSYSTEM (or the identity) in the test. (2) suite-run-meta.test.ts 'cli: a lease already held by the same owner runs without take' expected 2 to be 0: likely a real lease or owner on the developer machine. (3) server.test.ts T-236 slice 2 briefing_budget: 5 s timeout, flaky on a loaded desktop. CI is green on all three; they cost every local dev run a re-check. — s168: brief docs/loops/t260-host-reds-brief.md (tests only, desktop). H3 = a 60 s timeout on the one row. H1/H2 diagnose first; a src cause is reported, not fixed. Planner's read for H1: the desktop identity is only in ~/.gitconfig and there is no system user.*, so the leak path is unknown. — s168: BUILT, planner ACCEPT for H2+H3. PR #621 at edff7b77 (desktop one-off). H2: cli-suite-run.ts helperMissing() needs ~/machine-lease.ps1 on win32, and it is absent on the desktop; the row now points MACHINE_LEASE_PS1 at an empty stub (3x green, bite proven). H3: 60 s timeout (it measured 5.4-6.0 s against the 5 s default). H1 is a SRC-CAUSE, correctly not papered over: src/harness/git.ts runtimeGitEnv passes inherited GIT_AUTHOR_*/GIT_COMMITTER_* through to the runtime's git, and those env vars beat -c user.name/email. The desktop launcher's env carries all four. Opened T-263. CA-4c stays red on the desktop until T-263 lands. Merge needs Aaron's word (tests).",
+      "note": "Opened planner s167 from T-257's CC run (2026-10-11, desktop): red at both 843d8d18 and the T-257 head, so not caused by it. (1) harness/config-channel.test.ts CA-4c got the user's global git user.name/email instead of 'HoH harness runtime': set GIT_CONFIG_GLOBAL/GIT_CONFIG_NOSYSTEM (or the identity) in the test. (2) suite-run-meta.test.ts 'cli: a lease already held by the same owner runs without take' expected 2 to be 0: likely a real lease or owner on the developer machine. (3) server.test.ts T-236 slice 2 briefing_budget: 5 s timeout, flaky on a loaded desktop. CI is green on all three; they cost every local dev run a re-check. — s168: brief docs/loops/t260-host-reds-brief.md (tests only, desktop). H3 = a 60 s timeout on the one row. H1/H2 diagnose first; a src cause is reported, not fixed. Planner's read for H1: the desktop identity is only in ~/.gitconfig and there is no system user.*, so the leak path is unknown. — s168: BUILT, planner ACCEPT for H2+H3. PR #621 at edff7b77 (desktop one-off). H2: cli-suite-run.ts helperMissing() needs ~/machine-lease.ps1 on win32, and it is absent on the desktop; the row now points MACHINE_LEASE_PS1 at an empty stub (3x green, bite proven). H3: 60 s timeout (it measured 5.4-6.0 s against the 5 s default). H1 is a SRC-CAUSE, correctly not papered over: src/harness/git.ts runtimeGitEnv passes inherited GIT_AUTHOR_*/GIT_COMMITTER_* through to the runtime's git, and those env vars beat -c user.name/email. The desktop launcher's env carries all four. Opened T-263. CA-4c stays red on the desktop until T-263 lands. Merge needs Aaron's word (tests). — s168: MERGED on Aaron's word, typed in Atlas's window: 'merge SIA #621'. The planner ran pr-refresh: edff7b77 -> 86c6bb7e, patch-id f1224a05 identical, CI test SUCCESS. Merged pinned (--match-head-commit 86c6bb7e) at 2b287ecf. Tests only, so no rebuild. H2 and H3 fixed; H1 continues as T-263, and CA-4c stays red on the desktop until T-263 lands.",
       "note_by": [
         "6646f34e-175c-4a4e-a39b-a2878070946b",
         "f21ca920-a048-4990-935f-42f102efc85f"
       ],
-      "closed_rev": null
+      "closed_rev": 410
     },
     {
       "id": "T-261",
