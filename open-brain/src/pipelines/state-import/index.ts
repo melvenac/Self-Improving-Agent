@@ -48,10 +48,12 @@ const STATUSES: Status[] = ["open", "in_progress", "blocked", "done"];
 
 export interface UnparsedLine { line: number; text: string; reason: string }
 export interface SupersededLink { from: string; from_line: number; to: string; to_line: number }
+/** T-253: a non-blank line under `Watch out` or `Open questions` that is neither a bullet nor indented under one. */
+export interface HandoffLineNotImported { line: number; section: "watch_out" | "open_questions"; text: string }
 
 export interface ImportReport {
-  /** `name_from: "folder"` when there is no package.json name (R-BF-9): the draft says so. */
-  project: { name: string; version: string; name_from: "package.json" | "folder" };
+  /** `name_from: "folder"` when there is no package.json name (R-BF-9); `"flag"` when --name gave it (T-248). */
+  project: { name: string; version: string; name_from: "package.json" | "folder" | "flag" };
   current_session: number;
   migration_date: string;
   staleness: StalenessReport;
@@ -80,7 +82,7 @@ export interface ImportReport {
   };
   /** DECISIONS.md holds bytes that cannot be read; it is not judged, so this names it rather than blocks (R4-5). */
   decisions_unreadable: DecisionsUnreadable | null;
-  handoff: { pick_up_lines: number; watch_out: number; open_questions: number; sections_not_imported: string[] };
+  handoff: { pick_up_lines: number; watch_out: number; open_questions: number; sections_not_imported: string[]; not_imported: HandoffLineNotImported[] };
   last_session: { n: number; date: string; uuid: string | null; file: string; unreadable: string | null; date_why: string };
   /**
    * Always 0. Prose files carry no verified claims or gaps in a form the
@@ -485,8 +487,22 @@ function sectionBody(lines: string[], startIdx: number): string[] {
   return out;
 }
 
-function bullets(body: string[]): string[] {
-  return body.filter((l) => /^\s*[-*] /.test(l)).map((l) => l.replace(/^\s*[-*] /, "").trim());
+/**
+ * T-253: a bullet's indented continuation lines join it with one space (a watch-out is one line: handoff-caps.ts).
+ * Every other non-blank line in the section goes to `notImported`; none is dropped silently. A blank line does not
+ * end a bullet. A reported line does, so an indented line after it is reported too.
+ */
+function bullets(body: string[], firstLine: number, section: HandoffLineNotImported["section"], notImported: HandoffLineNotImported[]): string[] {
+  const out: string[] = [];
+  let open = false;
+  body.forEach((raw, k) => {
+    if (/^\s*[-*] /.test(raw)) { out.push(raw.replace(/^\s*[-*] /, "").trim()); open = true; return; }
+    if (raw.trim() === "") return;
+    if (open && /^\s+\S/.test(raw)) { out[out.length - 1] = `${out[out.length - 1]} ${raw.trim()}`; return; }
+    notImported.push({ line: firstLine + k, section, text: raw.trim().slice(0, 120) });
+    open = false;
+  });
+  return out;
 }
 
 /**
@@ -511,10 +527,10 @@ export function importHandoff(text: string | null, current: number, report: Impo
       handoff.pick_up = body.join("\n");
       report.pick_up_lines = body.length;
     } else if (/^Watch out\b/i.test(title)) {
-      handoff.watch_out = bullets(sectionBody(lines, i));
+      handoff.watch_out = bullets(sectionBody(lines, i), i + 2, "watch_out", report.not_imported);
       report.watch_out = handoff.watch_out.length;
     } else if (/^Open questions\b/i.test(title)) {
-      handoff.open_questions = bullets(sectionBody(lines, i));
+      handoff.open_questions = bullets(sectionBody(lines, i), i + 2, "open_questions", report.not_imported);
       report.open_questions = handoff.open_questions.length;
     } else {
       report.sections_not_imported.push(title);
@@ -740,7 +756,7 @@ function lineCount(text: string | null): number {
   return text ? text.split(/\r?\n/).length : 0;
 }
 
-export function buildImportDraft(projectRoot: string, today: string, templateDir = defaultTemplateDir()): ImportDraft {
+export function buildImportDraft(projectRoot: string, today: string, templateDir = defaultTemplateDir(), opts: { name?: string } = {}): ImportDraft {
   const root = resolve(projectRoot);
   const pkg = readJson<{ name?: string; version?: string }>(join(root, "package.json"));
   const { paths, texts, undecodable, readAs, encodings } = readInputs(root);
@@ -749,9 +765,11 @@ export function buildImportDraft(projectRoot: string, today: string, templateDir
   const current = last.n;
 
   const report: ImportReport = {
-    project: pkg?.name
-      ? { name: pkg.name, version: pkg.version ?? "0.0.0", name_from: "package.json" }
-      : { name: basename(root), version: pkg?.version ?? "0.0.0", name_from: "folder" },
+    project: opts.name !== undefined
+      ? { name: opts.name, version: pkg?.version ?? "0.0.0", name_from: "flag" }
+      : pkg?.name
+        ? { name: pkg.name, version: pkg.version ?? "0.0.0", name_from: "package.json" }
+        : { name: basename(root), version: pkg?.version ?? "0.0.0", name_from: "folder" },
     current_session: current,
     migration_date: today,
     staleness: detectStaleness(texts, last, undecodable, readAs, encodings),
@@ -772,7 +790,7 @@ export function buildImportDraft(projectRoot: string, today: string, templateDir
     objective: { found: false, preview: "" },
     decisions: { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] },
     decisions_unreadable: null,
-    handoff: { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [] },
+    handoff: { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [], not_imported: [] },
     last_session: last,
     verified_imported: 0,
     gaps_imported: 0,
@@ -856,6 +874,8 @@ export function planSummaryRemoval(text: string): { text: string; report: NonNul
 // ---------------------------------------------------------------------------
 
 export const ACCEPT_STALE_FLAG = "--accept-stale";
+/** T-248: overrides the project name the draft takes from package.json or the folder. --draft only. */
+export const NAME_FLAG = "--name";
 
 /** The report's first section: staleness goes where a reviewer reads first. */
 export function renderStaleness(s: StalenessReport): string[] {
@@ -882,6 +902,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   L.push(`# state.json import report — ${mode} (${r.migration_date})`, "");
   L.push(...renderStaleness(r.staleness), "");
   if (r.project.name_from === "folder") L.push(`Project name: \`${r.project.name}\` is the folder's name: there is no package.json name. It can be changed later; nothing else depends on package.json.`, "");
+  if (r.project.name_from === "flag") L.push(`Project name: \`${r.project.name}\` was given with ${NAME_FLAG}. It replaces the package.json or folder name.`, "");
   L.push(`Project: ${r.project.name} v${r.project.version} · current session ${r.current_session} (from ${r.last_session.file}) · retention: every imported done item (closed before the record existed, closed_rev null) is dropped once ${DONE_RETENTION_SESSIONS} sessions have written to the record, unless its id is cited in the tracked tree`, "");
   L.push("## Sources", "");
   for (const [k, s] of Object.entries(r.sources)) L.push(`- ${k}: \`${s.path}\` — ${s.present ? `${s.lines} lines` : "ABSENT"}`);
@@ -917,6 +938,8 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   if (r.decisions_unreadable) { L.push("", "**Not read in full:**"); for (const l of describeDecisionsUnreadable(r.decisions_unreadable)) L.push(`- ${l}`); }
   L.push("", "## Handoff (next-session.md)", "");
   L.push(`pick_up: ${r.handoff.pick_up_lines} lines · watch_out: ${r.handoff.watch_out} bullets · open_questions: ${r.handoff.open_questions} bullets`);
+  L.push(`Lines NOT imported under Watch out / Open questions: ${r.handoff.not_imported.length}`);
+  for (const n of r.handoff.not_imported) L.push(`- line ${n.line} (${n.section}): \`${n.text}\``);
   if (r.handoff.sections_not_imported.length) { L.push("", "Sections NOT imported (they stay in the snapshot):"); for (const s of r.handoff.sections_not_imported) L.push(`- ${s}`); }
   L.push("", "## Verified and gaps", "", `verified[]: ${r.verified_imported} · gaps[]: ${r.gaps_imported}. The prose files carry none in a form the importer reads, and it invents none. Record them with ob_state after the commit.`);
   L.push("", "## Last session", "", `Session ${r.last_session.n} — ${r.last_session.date} — uuid ${r.last_session.uuid ?? "none"} (${r.last_session.file})`);
@@ -983,11 +1006,13 @@ function refuseHalfRestored(root: string): void {
 
 export interface DraftResult { draftPath: string; reportPath: string; draft: ImportDraft; validation: { ok: true } | { ok: false; error: string } }
 
-export function runDraft(projectRoot: string, today: string): DraftResult {
+export function runDraft(projectRoot: string, today: string, opts: { name?: string } = {}): DraftResult {
   const root = resolve(projectRoot);
   refuseHalfRestored(root);
   if (existsSync(join(root, STATE_REL))) throw new Error(`${STATE_REL} already exists — the importer runs once; nothing written`);
-  const draft = buildImportDraft(root, today);
+  const name = opts.name?.trim();
+  if (name === "") throw new Error(`${NAME_FLAG} is empty — nothing written`);
+  const draft = buildImportDraft(root, today, defaultTemplateDir(), { name });
   const validation = StateSchema.safeParse(draft.state);
   const v = validation.success ? { ok: true as const } : { ok: false as const, error: `${validation.error.issues[0].path.join(".") || "$"}: ${validation.error.issues[0].message}` };
   const draftPath = join(root, DRAFT_REL);

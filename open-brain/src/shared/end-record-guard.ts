@@ -524,6 +524,52 @@ export function takeRecordOkNotices(projectDir: string): string[] {
   }
 }
 
+const SKILLS_AUDIT_MARKER = ".skills-audit-unaudited.jsonl";
+const SKILLS_AUDIT_SHOWN = ".skills-audit-unaudited.shown.jsonl";
+
+/** T-262-2: names a session that closed without /end's skills audit. Reads before it appends (T-258 F1). */
+export function recordSkillsAuditNotice(projectDir: string, sessionId: string, message: string): void {
+  try {
+    const path = storePath(projectDir, SKILLS_AUDIT_MARKER);
+    if (existsSync(path)) {
+      for (const line of readFileSync(path, "utf8").split(/\r?\n/)) {
+        if (!line.trim()) continue;
+        try {
+          if ((JSON.parse(line) as { session?: unknown }).session === sessionId) return;
+        } catch {
+          /* an unreadable line names no session */
+        }
+      }
+    }
+    appendFileSync(path, JSON.stringify({ at: new Date().toISOString(), session: sessionId, message }) + "\n");
+  } catch {
+    /* best effort */
+  }
+}
+
+export function takeSkillsAuditNotices(projectDir: string): string[] {
+  const path = storePath(projectDir, SKILLS_AUDIT_MARKER);
+  if (!existsSync(path)) return [];
+  try {
+    const out: string[] = [];
+    const text = readFileSync(path, "utf8");
+    for (const line of text.split(/\r?\n/)) {
+      if (!line.trim()) continue;
+      try {
+        const m = (JSON.parse(line) as { message?: unknown }).message;
+        if (typeof m === "string") out.push(m);
+      } catch {
+        out.push(`SKILLS AUDIT (unreadable marker line): ${line.slice(0, 200)}`);
+      }
+    }
+    appendEndRecordShownCapped(storePath(projectDir, SKILLS_AUDIT_SHOWN), text);
+    unlinkSync(path);
+    return out;
+  } catch {
+    return [];
+  }
+}
+
 export function describeWorkAfterEnd(work: SessionWorkScan, since: string): string {
   const tagPart = work.tags.length ? `, tags ${work.tags.join(", ")}` : "";
   const verPart = work.versionBump ? ", package.json version changed" : "";

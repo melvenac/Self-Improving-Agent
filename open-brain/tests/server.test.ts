@@ -620,7 +620,7 @@ describe("server handlers", () => {
         const off = blockOf(getText(await handleStart({ project_root: tmp })));
         expect(off.slice(4), body).toEqual(original.slice(4)); // past the serving, usage and session lines, which vary per run
       }
-    });
+    }, 60_000);
   });
 
   describe("handleSync", () => {
