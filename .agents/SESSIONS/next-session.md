@@ -1,38 +1,44 @@
-<!-- generated from .agents/state.json rev 389 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 392 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 166)_
+## planner [sia-planner] _(written session 168)_
 
 ### Pick up here
 
-(1) CLOSE T-255 on A3: Maker, after an explicit /mcp reconnect open-brain, runs /start. It should print 'Build c23fff6 · current', the note 'Session_57.md was already taken and was not overwritten; this session's log is Session_58.md', and Session_58 must carry a Session ID line; a 2nd ob_start prints the reuse marker. Then Maker deletes Session_57.md (A4). As of s166's end there was no Session_58 in makerspace-planner. (2) D-143 small fixes only; support Maker. (3) D-144: no Claude except planners. Aaron stopped all work 10-09 ~23:3x CDT; resume late 10-10.
+A4 for T-245 is PARKED until Aaron opens and closes ONE interactive Cursor chat on the desktop (clark forwards the UTC time); then read the claim files, greeting and counts per the T-245 note (s168) and rule. #576 merged as 378687d5; main tree rebuilt to aa386568. Still queued: #595 T-257 (SG-1 when grok-audit names its head and CI passes), then #579 T-253, #580 T-252, #588 T-256 r2 for Aaron's word, update-branch each just before its own merge. After A4: the D-148 recall-effect analysis (docs/loops/recall-effect-design-2026-10-11.md). The /end skills-audit proposal for Aaron is docs/loops/end-skills-audit-proposal-2026-10-11.md (#598, merged); three decisions are pending with him via clark.
 
 ### Watch out
 
-- D-144 (Aaron 10-09): no Claude Code except planners. Dev goes to Cursor (cursor-builder, room k575sfwr9wcx3r8fw83g3bc00x8fmar3); QA goes to Grok bots (grok-sia-review room k57c639j4wkyp3y3vhfxxytn1s8fsdx6; grok-audit room k575fscdqd291tgnpg51yttgbh8frzq8, which also takes 'MAKERSPACE JOB:'). A gate that needs Claude goes to clark, then Aaron.
-- A rebuild reaches no running seat until that seat runs an explicit /mcp reconnect open-brain AFTER the rebuild time. /clear keeps the old process. T-254 (merged 5d633411) makes processes started after that rebuild report STALE PROCESS on the build line.
-- Records PRs move master. Land them only AFTER clark merges the code PR in flight, or that PR goes BEHIND (D-117) and needs another update-branch plus CI run.
-- Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md. Restate items 6 (single-process tests plus a cap) and 17 (PID-only kills) in the dispatch. Run every mutant first-hand: builders have skipped mutants and posted empty diffs.
+- Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk.
+- SG-1 needs a review naming the EXACT head: update-branch BEFORE posting a review job.
+- A loaded desktop plus a clone under %TEMP% gives about 8 environmental reds by construction (cli-flags R185-8, r3 R7, briefing F4, suite-run-meta lease, q6 timeouts): compare against base in the SAME clone before calling any of them a regression; CI is the full-suite gate.
+- Headless cursor-agent -p on the desktop fired no session hooks (s168, one run): it cannot carry a hook live check.
+- atlas-ops records-pr.sh: pass the message file as C:/... not /c/... (git cannot read the MSYS path), and a failed run leaves the branch checked out; detach before retrying.
+- Headless CC / desktop one-offs have no hub key: dispatch text inside the brief and an ABSOLUTE reply path; run logs are UTF-16.
 
 ### Open questions
 
-- Aaron (via clark): a post-freeze recall-trigger loop? (under D-143, small fixes only)
-- Aaron (via clark): #437 r10 or T-245 Option A? (parked)
+- T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.
+- /end skills audit (#598): in-session vs headless; does D-149 cover seat -ops edits without a per-script ask; is /end expected at every seat close.
+- T-258/T-259/T-260: next CC briefs after A4; T-259 first.
 
 ### Loop state
 
 **Open PRs:** 
-- #437 — QA: in_progress — PARKED (D-130)
-- #425 — QA: accepted — PARKED (D-130)
-- #470 — QA: in_progress — PARKED (D-130) with #463 #465
+- #579 — QA: accepted — T-253 72f384a3; Aaron merge; update-branch first
+- #580 — QA: accepted — T-252 4f607a6f; Aaron merge; update-branch first
+- #588 — QA: accepted — T-256 r2 49899106; Aaron merge; update-branch first
+- #595 — QA: in_progress — T-257 da164982 tests-only; SG-1 on grok-audit APPROVE + CI
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** _None._
+**Questions pending for Aaron:** 
+- T-194 option (a)/(b)/(c)
+- /end skills audit: 3 decisions (#598)
 
 **Rulings made mid-loop:** 
-- s166: T-250 merged f64ff7c6 CLOSED (A3 passed on Maker); T-254 STALE PROCESS build line merged 5d633411 CLOSED (F1-F5 follow-ups); T-255 session log id + next-free-number merged c23fff60, open until A3; D-144 no CC except planners; #545 live PASS; grok-audit P4 forwarded to clark; P3 forwarded to Maker (tie-breaks done, Maker T-090..093).
+- s168: #576 post-merge reds ENVIRONMENTAL (base A/B in same clone), rebuild may go; A4 parked (headless -p fires no session hooks on the desktop)
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -104,8 +110,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 167 — 2026-10-11 — planner [sia-planner] — `6646f34e-175c-4a4e-a39b-a2878070946b` (14 writing session(s) in the record)
+Session 168 — 2026-10-11 — planner [sia-planner] — `f21ca920-a048-4990-935f-42f102efc85f` (14 writing session(s) in the record)
