@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 397 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 398 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,19 +6,20 @@
 
 ### Pick up here
 
-T-154 (#602): Opus re-check of F1-F3 at f0da2c65 (clark launches). On ACCEPT plus CI green clark merges pinned (Aaron typed 'Yes, merge 602.', verified) and rebuilds the main tree. Then the planner verifies live: in a checkout with .agents/, the SessionStart hook prints the single-quoted 'CLI start (no open-brain MCP):' line and running it prints the Briefing. Then: restructure atlas-ops into a short SKILL.md index plus reference/<task>.md (scripts unchanged; D-152), then brief T-262 (/end skills audit; flag clark's inferred defaults for Aaron's veto). A4 for T-245 still waits on Aaron's interactive Cursor chat (clark forwards the UTC time). Queued for Aaron's word: #579 T-253, #580 T-252, #588 T-256 r2 (update-branch each just before its merge).
+T-154 (#602) is ready at 12f1bb98 (planner ACCEPT through fix-2, CI green): it waits for Aaron's word in the morning on the planner's recommendation to merge with no third Opus round. When clark says REBUILT: the live check in a checkout with .agents/ (the SessionStart hook prints `CLI start (no open-brain MCP): node '<path>/build/cli.js' start '<cwd>'`; running it prints the Briefing with `Session ID: none — CLI start...`), then close T-154. Then: restructure atlas-ops into a short SKILL.md index plus reference/<task>.md (scripts unchanged; D-152), then brief T-262 (/end skills audit; flag clark's inferred defaults for veto). A4 for T-245 waits on Aaron's interactive Cursor chat. Queued for Aaron: #579 T-253, #580 T-252, #588 T-256 r2.
 
 ### Watch out
 
-- Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk; prove the PR's own diff unchanged by patch-id.
+- Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk; prove the PR's own diff unchanged by patch-id; wait for the CI run on the NEW head (update-branch cancels the old one; checks show nothing for a moment).
 - A review must name the EXACT head: update-branch BEFORE launching a review.
 - A loaded desktop plus a clone under %TEMP% gives environmental reds by construction (cli-flags R185-8, briefing QA 263 F4, suite-run-meta lease, end-fix timeouts): A/B against base in the SAME clone before calling any regression; CI is the full-suite gate.
 - Headless cursor-agent -p on the desktop fired no session hooks (s168, one run): it cannot carry a hook live check.
 - atlas-ops scripts under Git Bash: pass Windows-form paths to node and git (cygpath -m), not /c/...; records-pr.sh leaves a branch on failure, so detach before retrying; tree-sync refuses with an untracked docs file, so land or move it first.
-- Shell quoting for an agent-run command line: single quotes are literal in both PowerShell and bash, but the escape for an embedded ' differs ('' vs '\''), so refuse rather than escape.
+- Shell quoting for an agent-run command line: single quotes are literal in both PowerShell and bash, but the escape for an embedded ' differs, and PowerShell also treats U+2018-201B as single quotes: refuse rather than escape.
 
 ### Open questions
 
+- #602: merge with no third Opus round (planner recommends yes), via clark in the morning.
 - T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.
 - D-152 inferences open to Aaron's veto: seat -ops edits need no per-script ask; the audit runs in-session; /end expected at every seat close.
 - T-258/T-259/T-260: next CC briefs after T-154 and T-262; T-259 first.
@@ -26,7 +27,7 @@ T-154 (#602): Opus re-check of F1-F3 at f0da2c65 (clark launches). On ACCEPT plu
 ### Loop state
 
 **Open PRs:** 
-- #602 — QA: accepted — T-154 f0da2c65; Opus re-check F1-F3 then clark merges pinned (Aaron typed yes)
+- #602 — QA: accepted — T-154 12f1bb98; CI green; Aaron's word (no third Opus round)
 - #579 — QA: accepted — T-253 72f384a3; Aaron merge; update-branch first
 - #580 — QA: accepted — T-252 4f607a6f; Aaron merge; update-branch first
 - #588 — QA: accepted — T-256 r2 49899106; Aaron merge; update-branch first
@@ -34,11 +35,12 @@ T-154 (#602): Opus re-check of F1-F3 at f0da2c65 (clark launches). On ACCEPT plu
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- #602 merge, no third Opus round
 - T-194 option (a)/(b)/(c)
 - D-152 inferred defaults (veto)
 
 **Rulings made mid-loop:** 
-- s168: #576 post-merge reds environmental; #595 SG-1 merged; D-151 T-154 CLI route; T-154 ACCEPT plus fix-1 ACCEPT (F2 fixed by single-quote + refuse, not '' doubling); D-152 verified typed; T-261, T-262 opened
+- s168: #576 post-merge reds environmental; #595 SG-1 merged; D-151 T-154 CLI route; T-154 ACCEPT, fix-1 ACCEPT, fix-2 ACCEPT (F2: single-quote + refuse incl. U+2018-201B); D-152 verified typed; T-261, T-262 opened
 
 ## developer [sia-builder] _(written session 156)_
 
