@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 393 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 394 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -35,6 +35,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-225** Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text
 - [ ] **T-235** Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps
 - [~] **T-245** #437 Option A: replace the lock cascade with a simple wx claim and accept rare doubles, after making the two non-idempotent hook stages idempotent (handoff-marker append, SessionStart git fetch); plus make ob_end idempotent
+- [ ] **T-262** /end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)
 
 ## P2
 
