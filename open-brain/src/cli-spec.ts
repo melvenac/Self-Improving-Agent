@@ -32,6 +32,12 @@ export const COMMAND_SPECS = {
     values: { "--min": "equals" },
     positionals: "none",
   },
+  skillsAudit: {
+    name: "skills-audit",
+    booleans: ["--json"],
+    values: { "--session": "both", "--last": "both" },
+    positionals: "directory",
+  },
   scrubTriggerFires: {
     name: "scrub-trigger-fires",
     booleans: ["--dry-run"],
