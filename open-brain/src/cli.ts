@@ -191,7 +191,7 @@ if (command === "sync") {
 
   // T-154: the same report ob_start returns, from a module with no memory imports.
   const { renderStartReport } = await import("./pipelines/session-start/start-report.js");
-  const r = await renderStartReport({ projectRoot, proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" } });
+  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" } });
   console.log(r.text);
   process.exitCode = r.isError ? 1 : 0;
 } else if (command === "relocate") {

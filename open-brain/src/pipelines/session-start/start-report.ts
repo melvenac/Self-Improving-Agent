@@ -31,6 +31,8 @@ export interface StartReportInput {
   proven: { id: string | null; reason?: string };
   servingBuildDir?: string;
   stateBudgetLines?: number;
+  /** Names the calling process in the partner-presence header. */
+  callerLabel: string;
 }
 
 export interface StartReport {
@@ -204,7 +206,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
   const presence = await describeHubPresence({
     projectRoot,
     identity: roles.seat,
-    callerLabel: "open-brain MCP server",
+    callerLabel: input.callerLabel,
   });
   if (presence.lines.length > 0) {
     lines.push("");

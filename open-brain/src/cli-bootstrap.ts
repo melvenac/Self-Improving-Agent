@@ -185,7 +185,13 @@ const hasMeta = hasAgents && existsSync(join(cwd, ".agents", "META"));
 if (hasAgents) {
   lines.push(`Project detected: ${cwd} (.agents/ found${hasMeta ? ", META mode" : ""})`);
   const cliPath = fileURLToPath(new URL("./cli.js", import.meta.url)).replace(/\\/g, "/");
-  lines.push(`CLI start (no open-brain MCP): node "${cliPath}" start "${cwd}"`);
+  const cwdPath = cwd.replace(/\\/g, "/");
+  const offendingPath = [cliPath, cwdPath].find((p) => p.includes("'"));
+  lines.push(
+    offendingPath === undefined
+      ? `CLI start (no open-brain MCP): node '${cliPath}' start '${cwdPath}'`
+      : `CLI start (no open-brain MCP): unavailable — a path contains a single quote: ${offendingPath}`,
+  );
 } else {
   lines.push("No .agents/ detected — general session.");
 }

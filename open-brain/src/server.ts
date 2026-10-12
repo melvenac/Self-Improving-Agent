@@ -222,6 +222,7 @@ export async function handleStart(args: StartArgs): Promise<ToolResponse> {
     const r = await renderStartReport({
       projectRoot: resolve(args.project_root ?? "."),
       proven,
+      callerLabel: "open-brain MCP server",
       servingBuildDir: args.serving_build_dir,
       stateBudgetLines: args.state_budget_lines,
     });

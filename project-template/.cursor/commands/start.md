@@ -49,7 +49,7 @@ already exists for the registered session id it is **reused**, and the session l
 check: if it is absent on a second call, a duplicate log was created and something is wrong with
 session registration.
 
-**No open-brain MCP tools in this session** (no `ob_start` in your tool list, or the server failed to start): run the command on the hook's `CLI start (no open-brain MCP):` line with your shell. It prints the same report `ob_start` returns, Briefing block included, from the same code (T-154). Use its output exactly as you would `ob_start`'s, and say in FLAGS that this session has no open-brain tools. If there is no such line in the hook output, say so in FLAGS and stop.
+**No open-brain MCP tools in this session** (no `ob_start` in your tool list, or the server failed to start): run the command on the hook's `CLI start (no open-brain MCP):` line with your shell, **once per session**. It prints the same report `ob_start` returns, Briefing block included, from the same code (T-154), with two differences: it proves no session (`Session ID: none — …`), and it creates a new session log on every run instead of reusing one. On a repeat `/start`, reuse the output you already have; a missing reuse note is expected on this route and is not a registration fault. Say in FLAGS that this session has no open-brain tools. If the hook printed no such line, or the line says `unavailable`, say so in FLAGS and stop.
 
 **What it returns depends on `state.json`, and the two shapes are different. Read whichever you got;
 do not assume.**
