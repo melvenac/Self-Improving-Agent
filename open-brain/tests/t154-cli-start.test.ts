@@ -1,10 +1,23 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, readFileSync, rmSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
 import { spawnSync, execFileSync } from "node:child_process";
 import { handleStart } from "../src/server.js";
+import { renderStartReport } from "../src/pipelines/session-start/start-report.js";
+
+const presenceCalls: Array<Record<string, unknown>> = [];
+vi.mock("../src/pipelines/session-start/hub-presence.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/pipelines/session-start/hub-presence.js")>();
+  return {
+    ...actual,
+    describeHubPresence: async (opts: Record<string, unknown>) => {
+      presenceCalls.push(opts);
+      return { lines: [], sourceRel: null, charCount: 0 };
+    },
+  };
+});
 
 /**
  * T-154: `open-brain start` prints the same report `ob_start` returns, from a
@@ -20,7 +33,7 @@ const repoRoot = resolve(import.meta.dirname, "../..");
 const denyOptions = `--import=${pathToFileURL(denyPath).href}`;
 
 const W3 =
-  "**No open-brain MCP tools in this session** (no `ob_start` in your tool list, or the server failed to start): run the command on the hook's `CLI start (no open-brain MCP):` line with your shell. It prints the same report `ob_start` returns, Briefing block included, from the same code (T-154). Use its output exactly as you would `ob_start`'s, and say in FLAGS that this session has no open-brain tools. If there is no such line in the hook output, say so in FLAGS and stop.";
+  "**No open-brain MCP tools in this session** (no `ob_start` in your tool list, or the server failed to start): run the command on the hook's `CLI start (no open-brain MCP):` line with your shell, **once per session**. It prints the same report `ob_start` returns, Briefing block included, from the same code (T-154), with two differences: it proves no session (`Session ID: none — …`), and it creates a new session log on every run instead of reusing one. On a repeat `/start`, reuse the output you already have; a missing reuse note is expected on this route and is not a registration fault. Say in FLAGS that this session has no open-brain tools. If the hook printed no such line, or the line says `unavailable`, say so in FLAGS and stop.";
 
 const TIMEOUT = 120_000;
 
@@ -137,19 +150,47 @@ describe("T-154 CLI start route", { timeout: TIMEOUT }, () => {
     expect(r.stdout).toContain("STATE RECORD REFUSED");
   });
 
-  it("CS-5: the hook prints the CLI command for this checkout", () => {
-    const dir = fixture();
+  function hookLines(dir: string): string[] {
     const env = { ...process.env, HOME: home, USERPROFILE: home, OPEN_BRAIN_ACTIVE_SESSION: join(home, "slot", "active-session.json") };
     const r = spawnSync(process.execPath, [tsxCli, hookEntry], { cwd: dir, input: JSON.stringify({}), encoding: "utf8", env, timeout: 90_000 });
     expect(r.status).toBe(0);
-    const out = (r.stdout ?? "").split("\n").map((l) => l.replace(/\r$/, ""));
-    const re = /^CLI start \(no open-brain MCP\): node "[^"]+\/cli\.js" start "(.+)"$/;
+    return (r.stdout ?? "").split("\n").map((l) => l.replace(/\r$/, ""));
+  }
+
+  function namedFixture(name: string): string {
+    const dir = join(temp("t154-named-"), name);
+    mkdirSync(join(dir, ".agents"), { recursive: true });
+    return dir;
+  }
+
+  it("CS-5: the hook prints the CLI command for this checkout", () => {
+    const dir = fixture();
+    const out = hookLines(dir);
+    const re = /^CLI start \(no open-brain MCP\): node '([^']+\/cli\.js)' start '([^']+)'$/;
     const hits = out.filter((l) => re.test(l));
     expect(hits).toHaveLength(1);
     const detected = out.find((l) => l.startsWith("Project detected: "));
     expect(detected).toBeDefined();
     const printedCwd = detected!.slice("Project detected: ".length).replace(/ \(\.agents\/ found.*$/, "");
-    expect(hits[0].match(re)![1]).toBe(printedCwd);
+    expect(hits[0].match(re)![2]).toBe(printedCwd.replace(/\\/g, "/"));
+  });
+
+  it("CS-5b: a dollar sign in the path is single-quoted, never double-quoted", () => {
+    const dir = namedFixture("t154 $proj");
+    const line = hookLines(dir).find((l) => l.startsWith("CLI start (no open-brain MCP):"));
+    expect(line).toBeDefined();
+    expect(line!).toContain("start '");
+    expect(line!).toMatch(/start '[^']*t154 \$proj'$/);
+    expect(line!).not.toContain('"');
+  });
+
+  it("CS-5c: a single quote in the path prints no runnable command", () => {
+    const dir = namedFixture("t154 it's");
+    const out = hookLines(dir);
+    const prefix = "CLI start (no open-brain MCP): ";
+    const unavailable = out.filter((l) => l.startsWith(prefix + "unavailable — a path contains a single quote:"));
+    expect(unavailable).toHaveLength(1);
+    expect(out.filter((l) => l.startsWith(prefix + "node"))).toHaveLength(0);
   });
 
   it("CS-6: all three start.md copies carry the paragraph, identically", () => {
@@ -163,5 +204,20 @@ describe("T-154 CLI start route", { timeout: TIMEOUT }, () => {
       const hits = text.split("\n").filter((l) => l === W3);
       expect(hits, f).toHaveLength(1);
     }
+  });
+
+  it("CS-7: renderStartReport passes input.callerLabel to describeHubPresence", async () => {
+    const dir = fixture();
+    presenceCalls.length = 0;
+    await renderStartReport({ projectRoot: dir, proven: { id: null, reason: "t" }, callerLabel: "T154-LABEL" });
+    expect(presenceCalls).toHaveLength(1);
+    expect(presenceCalls[0].callerLabel).toBe("T154-LABEL");
+  });
+
+  it("CS-7b: each caller names itself", () => {
+    const cliSrc = readFileSync(join(import.meta.dirname, "../src/cli.ts"), "utf8");
+    const serverSrc = readFileSync(join(import.meta.dirname, "../src/server.ts"), "utf8");
+    expect(cliSrc).toContain('callerLabel: "open-brain CLI (start)"');
+    expect(serverSrc).toContain('callerLabel: "open-brain MCP server"');
   });
 });
