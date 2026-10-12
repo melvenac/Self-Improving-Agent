@@ -193,6 +193,15 @@ describe("T-154 CLI start route", { timeout: TIMEOUT }, () => {
     expect(out.filter((l) => l.startsWith(prefix + "node"))).toHaveLength(0);
   });
 
+  it("CS-5d: a typographic single quote in the path prints no runnable command", () => {
+    const dir = namedFixture("t154 o’brien");
+    const out = hookLines(dir);
+    const prefix = "CLI start (no open-brain MCP): ";
+    const unavailable = out.filter((l) => l.startsWith(prefix + "unavailable — a path contains a single quote:"));
+    expect(unavailable).toHaveLength(1);
+    expect(out.filter((l) => l.startsWith(prefix + "node"))).toHaveLength(0);
+  });
+
   it("CS-6: all three start.md copies carry the paragraph, identically", () => {
     const files = [
       ".claude/commands/start.md",
