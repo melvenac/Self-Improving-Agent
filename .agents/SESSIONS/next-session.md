@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 412 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 413 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,41 +6,37 @@
 
 ### Pick up here
 
-T-154 is DONE: #602 merged at 926cd3dc on Aaron's word, main tree rebuilt, planner live check PASS in bash and PowerShell, closed at rev 399. atlas-ops is restructured per D-152 (SKILL.md index + reference/*.md, scripts unchanged; a live-check recipe added to reference/prs.md). NEXT: brief T-262 (/end skills audit; the extractor first, per docs/loops/end-skills-audit-proposal-2026-10-11.md) and flag the D-152 inferred defaults for Aaron's veto; then T-259 first among T-258/T-259/T-260; T-261 (physical core/memory split) is P3, after. A4 for T-245 waits on Aaron's interactive Cursor chat. Queued for Aaron: #579 T-253, #580 T-252, #588 T-256 r2. Re-confirm GO/HOLD when clark sends the v1.22.7 QA PC waker restart time.
+Session 168 (Atlas). Merged today: #610 T-262 part 1, #617 T-262 part 2, #615 T-259, #621 T-260, #579 T-253+T-248, #588 T-256; main tree at 61690bdf. Live checks on the main build all pass: state erasures 6 s (was 115 s); skills-audit claude+cursor; `state import --name` refuses a doubled --name; sync's open-task-commits warns on 5 tasks. Closed: T-154, T-245 (A4 not testable: no Cursor editor on any machine), T-257, T-259, T-260, T-253, T-248, T-256. Waiting on Aaron's word: #580 T-252 (accepted at a1ea7495) and #620 T-188 (accepted at bce21e24); pr-refresh each just before its own merge. Aaron merges in Atlas's window too ('merge SIA #621' came here). NEXT: (1) triage the 4 open-task-commits warnings (T-046, T-168, T-172, T-235): close with evidence or add 'stays open after <sha7>'; (2) T-258 (end-record-guard idempotency residuals), now unblocked by #617; (3) T-263 harness runtimeGitEnv identity leak (P3); (4) the T-262 Cursor end.md wording fix plus the stray doc comment; (5) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later.
 
 ### Watch out
 
-- Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk; prove the PR's own diff unchanged by patch-id; wait for the CI run on the NEW head (update-branch cancels the old one; checks show nothing for a moment).
-- A review must name the EXACT head: update-branch BEFORE launching a review.
-- A loaded desktop plus a clone under %TEMP% gives environmental reds by construction (cli-flags R185-8, briefing QA 263 F4, suite-run-meta lease, end-fix timeouts): A/B against base in the SAME clone before calling any regression; CI is the full-suite gate.
-- Headless cursor-agent -p on the desktop fired no session hooks (s168, one run): it cannot carry a hook live check.
-- atlas-ops scripts under Git Bash: pass Windows-form paths to node and git (cygpath -m), not /c/...; records-pr.sh leaves a branch on failure, so detach before retrying; tree-sync refuses with an untracked docs file, so land or move it first.
-- Shell quoting for an agent-run command line: single quotes are literal in both PowerShell and bash, but the escape for an embedded ' differs, and PowerShell also treats U+2018-201B as single quotes: refuse rather than escape.
-- After T-154 adopted projects print 'OLD /start in this project: run bootstrap install-commands' until reinstalled; expected, not a regression.
+- The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.
+- A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff (old merge-base..old head vs master..new head) before calling for a re-review (#579, s168).
+- Reply files: launchers also write an uppercase <TAG>-reply.md copy in %TEMP%; check both names.
+- Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it (T-188, s168). CI's gh is installed but unauthenticated.
+- Before saying no test pins a call site, grep the PR's own new test file for the old path (T-252-mf, s168).
+- Desktop one-off launchers set GIT_AUTHOR_*/GIT_COMMITTER_*; config-channel CA-4c stays red locally until T-263.
+- ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task.
 
 ### Open questions
 
-- T-194: Aaron to choose (a) Aaron approves each PR, (b) a planner bot account, or (c) block force-push + require CI, no approval. Planner recommends (c) now, (b) later.
-- D-152 inferences open to Aaron's veto: seat -ops edits need no per-script ask; the audit runs in-session; /end expected at every seat close.
-- T-258/T-259/T-260: next CC briefs after T-262; T-259 first.
+_None._
 
 ### Loop state
 
 **Open PRs:** 
-- #579 — QA: accepted — T-253 72f384a3; Aaron merge; update-branch first
-- #580 — QA: accepted — T-252 4f607a6f; Aaron merge; update-branch first
-- #588 — QA: accepted — T-256 r2 49899106; Aaron merge; update-branch first
+- #580 — QA: accepted — T-252, planner ACCEPT at a1ea7495; needs Aaron's word
+- #620 — QA: accepted — T-188, planner ACCEPT at bce21e24; needs Aaron's word
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- T-194 option (a)/(b)/(c)
-- D-152 inferred defaults (veto)
-- A4: one interactive Cursor chat on the desktop, UTC time via clark
-- #579/#580/#588 merge word
+- merge SIA #580
+- merge SIA #620
+- T-194: (a), (b) or (c)
 
 **Rulings made mid-loop:** 
-- s168: #576 post-merge reds environmental; #595 SG-1 merged; D-151 T-154 CLI route; T-154 ACCEPT, fix-1, fix-2 ACCEPT; #602 merged 926cd3dc, live check PASS, T-154 closed; D-152 verified typed; T-261, T-262 opened; atlas-ops restructured
+- D-153: no veto on the D-152 inferences
 
 ## developer [sia-builder] _(written session 156)_
 
