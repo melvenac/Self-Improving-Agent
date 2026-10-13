@@ -17,6 +17,7 @@
  * decide, the item is reported, never guessed silently.
  */
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { basename, join, relative, resolve } from "node:path";
 import { defaultTemplateDir } from "../bootstrap/index.js";
 import {
@@ -37,6 +38,7 @@ import { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS } from "../../shared/import-outp
 export { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS };
 export const DRAFT_REL = ".agents/state.draft.json";
 export const REPORT_REL = ".agents/state.import-report.md";
+export const DRAFT_INPUTS_REL = ".agents/state.draft.inputs.json";
 export const SNAPSHOT_PREFIX = "pre-state-migration-";
 
 type Status = Task["status"];
@@ -874,6 +876,7 @@ export function planSummaryRemoval(text: string): { text: string; report: NonNul
 // ---------------------------------------------------------------------------
 
 export const ACCEPT_STALE_FLAG = "--accept-stale";
+export const ACCEPT_CHANGED_FLAG = "--accept-changed";
 /** T-248: overrides the project name the draft takes from package.json or the folder. --draft only. */
 export const NAME_FLAG = "--name";
 
@@ -1020,7 +1023,33 @@ export function runDraft(projectRoot: string, today: string, opts: { name?: stri
   mkdirSync(join(root, ".agents"), { recursive: true });
   writeFileSync(draftPath, serializeState(draft.state), "utf-8");
   writeFileSync(reportPath, renderImportReport(draft.report, "draft") + (v.ok ? "\nDraft validates against StateSchema.\n" : `\nDRAFT DOES NOT VALIDATE: ${v.error}\n`), "utf-8");
+  writeFileSync(join(root, DRAFT_INPUTS_REL), JSON.stringify({ inputs: hashInputs(root) }, null, 2) + "\n", "utf-8");
   return { draftPath, reportPath, draft, validation: v };
+}
+
+/** sha256 of each input's raw bytes, keyed by relative path; null when the file does not exist (T-184). */
+export function hashInputs(root: string): Record<string, string | null> {
+  const out: Record<string, string | null> = {};
+  for (const rel of Object.values(INPUT_REL)) {
+    const p = join(root, rel);
+    out[rel] = existsSync(p) ? createHash("sha256").update(readFileSync(p)).digest("hex") : null;
+  }
+  return out;
+}
+
+/** The input record --draft wrote; null when it is missing or not `{ inputs: Record<string, string|null> }`. */
+function readDraftInputs(root: string): Record<string, string | null> | null {
+  const p = join(root, DRAFT_INPUTS_REL);
+  if (!existsSync(p)) return null;
+  try {
+    const j = JSON.parse(readFileSync(p, "utf-8"));
+    const inputs = j?.inputs;
+    if (inputs === null || typeof inputs !== "object" || Array.isArray(inputs)) return null;
+    for (const v of Object.values(inputs)) if (v !== null && typeof v !== "string") return null;
+    return inputs as Record<string, string | null>;
+  } catch {
+    return null;
+  }
 }
 
 export interface SnapshotResult { dir: string; files: number }
@@ -1068,9 +1097,13 @@ export interface CommitResult {
   decisions_unreadable: DecisionsUnreadable | null;
   /** The latest session log, including when its bytes could not be read (QA 153 D1). */
   last_session: ImportReport["last_session"];
+  /** Inputs that changed since --draft, committed anyway under --accept-changed; empty otherwise (T-184). */
+  accepted_changed: string[];
+  /** The draft has no input record, so whether an input changed since --draft was not checked (T-184). */
+  inputs_unrecorded: boolean;
 }
 
-export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean } = {}): CommitResult {
+export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean; acceptChanged?: boolean } = {}): CommitResult {
   const root = resolve(projectRoot);
   refuseHalfRestored(root);
   const statePath = join(root, STATE_REL);
@@ -1080,6 +1113,25 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   const parsed = parseState(readFileSync(draftPath, "utf-8"));
   if (!parsed.ok) throw new Error(`${DRAFT_REL} does not validate at ${parsed.error} — nothing written`);
   if (parsed.data.revision !== 0) throw new Error(`${DRAFT_REL} revision must be 0 (is ${parsed.data.revision}) — nothing written`);
+
+  // T-184: an input edited after --draft is not in the draft. Refuse before anything is written.
+  let changed: string[] = [];
+  let inputs_unrecorded = false;
+  const recorded = readDraftInputs(root);
+  if (recorded === null) {
+    inputs_unrecorded = true;
+  } else {
+    const now = hashInputs(root);
+    for (const rel of Object.values(INPUT_REL)) {
+      const was = recorded[rel] ?? null;
+      const is = now[rel];
+      if (was === is) continue;
+      changed.push(was === null ? `${rel} added` : is === null ? `${rel} removed` : `${rel} changed`);
+    }
+  }
+  if (changed.length > 0 && opts.acceptChanged !== true) {
+    throw new Error(`${changed.length} input(s) changed since --draft: ${changed.join("; ")}. The draft holds their OLD content. Nothing written. Re-run --draft and review it again, or pass ${ACCEPT_CHANGED_FLAG} to commit the draft as it stands`);
+  }
 
   // 0. T-180: a stale input refuses before anything is written, including the snapshot.
   const onDisk = readInputs(root);
@@ -1146,7 +1198,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
 
     // 5. Move the draft and the report into the snapshot.
     const moved: string[] = [];
-    for (const rel of [DRAFT_REL, REPORT_REL]) {
+    for (const rel of [DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL]) {
       const from = join(root, rel);
       if (!existsSync(from)) continue;
       const to = join(snapshot.dir, rel.replace(/^\.agents\//, ""));
@@ -1167,7 +1219,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   if (aside) rmSync(aside, { recursive: true, force: true });
   const decisionsText = onDisk.texts.decisions;
   const decisions_unreadable = decisionsText !== null && onDisk.undecodable.decisions ? decisionsUnreadable(decisionsText, onDisk.undecodable.decisions, parsed.data.decisions.map((d) => d.id)) : null;
-  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable, last_session };
+  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable, last_session, accepted_changed: changed, inputs_unrecorded };
 }
 
 /**

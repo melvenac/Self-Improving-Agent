@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, cpSync, rmSync, readFileSync, existsSync, appendFileSync, readdirSync } from "node:fs";
+import { mkdtempSync, cpSync, rmSync, readFileSync, existsSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnAsync } from "../spawn-async.js";
@@ -69,15 +69,8 @@ describe("T-184: --commit notices an input that changed after --draft", () => {
     const r = api.runCommit(root, TODAY, { version: "0.30.0" });
     expect(r.accepted_changed).toEqual([]);
     expect(r.inputs_unrecorded).toBe(false);
-    const snaps = readdirSync(join(root, ".agents")).filter((n) => n !== "state.json");
-    const found = snaps.some((n) => {
-      try {
-        return existsSync(join(root, ".agents", n, "state.draft.inputs.json"));
-      } catch {
-        return false;
-      }
-    });
-    expect(found).toBe(true);
+    expect(existsSync(join(r.snapshot.dir, "state.draft.inputs.json"))).toBe(true);
+    expect(existsSync(join(root, INPUTS_REL))).toBe(false);
   });
 
   it("D5: a draft with no input record commits and says so", () => {
