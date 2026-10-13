@@ -202,4 +202,58 @@ describe("T-251: role-file stubs, the handoff seat, and the inputs record", () =
     expect(r.verify.ok).toBe(false); // the CLI exits `r.verify.ok ? 0 : 1`
     expect(r.verify.problems).toEqual([".agents/state.draft.inputs.json: must stay local, but git would track it"]);
   });
+
+  // T-278: the T-251 lines no row above reached (docs/loops/t278-role-stub-mutants-brief.md).
+  it("K1: a template missing a stub is reported as missing, not thrown, and the stub is not written", () => {
+    const root = importProject();
+    const partial = tmp("t278-template-");
+    realFs.mkdirSync(path.join(partial, ".agents/roles"), { recursive: true });
+    realFs.copyFileSync(path.join(templateDir, ".agents/roles/shared.md"), path.join(partial, ".agents/roles/shared.md"));
+    si.runDraft(root, TODAY);
+    const r = si.runCommit(root, TODAY, { templateDir: partial });
+    expect(r.role_stubs).toEqual({
+      installed: [".agents/roles/shared.md"],
+      kept: [],
+      missing: [".agents/roles/planner.md", ".agents/roles/developer.md", ".agents/roles/qa.md"],
+    });
+    expect(realFs.existsSync(path.join(root, ".agents/roles/planner.md"))).toBe(false);
+  });
+
+  it("K2: the draft's report carries the handoff seat line, declared and assumed", () => {
+    const report = (root: string) => {
+      si.runDraft(root, TODAY);
+      return realFs.readFileSync(path.join(root, si.REPORT_REL), "utf8").split(/\r?\n/);
+    };
+    expect(report(importProject(declare("planner")))).toContain("Handoff seat: planner (the role .agents/AGENT.md or AGENT.local.md declares)");
+    expect(report(importProject(null))).toContain("Handoff seat: developer, ASSUMED: no role is declared in .agents/AGENT.local.md or AGENT.md");
+  });
+
+  describe("the CLI (spawned as bootstrap-fix-r3 spawns it)", () => {
+    const cliEntry = path.join(import.meta.dirname, "../../src/cli.ts");
+    const tsxCli = path.join(import.meta.dirname, "../../node_modules/tsx/dist/cli.mjs");
+    const cli = (...args: string[]) => {
+      const home = tmp("t278-home-");
+      const env = { ...process.env, HOME: home, USERPROFILE: home, KNOWLEDGE_V2_DB: path.join(home, "knowledge-v2.db") };
+      const r = cp.spawnSync(process.execPath, [tsxCli, cliEntry, ...args], { encoding: "utf8", env });
+      return { status: r.status, lines: `${r.stdout}${r.stderr}`.split(/\r?\n/) };
+    };
+
+    it("K3: `state import --draft` prints the handoff seat line", () => {
+      const root = importProject(declare("planner"));
+      const r = cli("state", "import", "--draft", root);
+      expect(r.status, r.lines.join("\n")).toBe(0);
+      expect(r.lines).toContain("Handoff seat: planner (the role .agents/AGENT.md or AGENT.local.md declares)");
+    }, 180_000);
+
+    it("K4: `state import --commit` prints the Role files line, installed and kept", () => {
+      const root = importProject(declare("planner"));
+      realFs.mkdirSync(path.join(root, ".agents/roles"), { recursive: true });
+      realFs.writeFileSync(path.join(root, ".agents/roles/planner.md"), "# mine\n");
+      const d = cli("state", "import", "--draft", root);
+      expect(d.status, d.lines.join("\n")).toBe(0);
+      const r = cli("state", "import", "--commit", root);
+      expect(r.status, r.lines.join("\n")).toBe(0);
+      expect(r.lines).toContain("Role files: installed .agents/roles/shared.md, .agents/roles/developer.md, .agents/roles/qa.md · kept .agents/roles/planner.md");
+    }, 180_000);
+  });
 });
