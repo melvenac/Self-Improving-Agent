@@ -149,9 +149,12 @@ describe("P4: rendering", () => {
       const lines = b.renderBriefing(input({ budget, problem: PROBLEM }));
       const at = lines.indexOf("OBJECTIVE");
       expect(at).toBeGreaterThan(0);
-      expect(lines[at - 1]).toBe(PROBLEM);
-      if (!budget) expect(lines[at - 2], "one blank line before PROBLEM").toBe("");
-      if (!budget) expect(lines[at - 3]).not.toBe("");
+      if (budget) expect(lines[at - 1]).toBe(PROBLEM);
+      else {
+        // The default layout separates sections with one blank line: "", PROBLEM, "", OBJECTIVE.
+        expect(lines.slice(at - 3, at + 1)).toEqual(["", PROBLEM, "", "OBJECTIVE"]);
+        expect(lines[at - 4]).not.toBe("");
+      }
       expect(lines.filter((l) => l.startsWith("PROBLEM")).length).toBe(1);
     });
 
