@@ -9,6 +9,7 @@ import * as ps from "../src/shared/process-session.js";
 const CLAUDE_EXE = String.raw`C:\Users\me\.local\bin\claude.exe --print`;
 const U = "f21ca920-0000-4000-8000-000000000268";
 const P = process.pid;
+const Q = process.ppid;
 
 type Row = { pid: number; ppid: number; commandLine: string };
 
@@ -23,6 +24,7 @@ const BROKEN: Row[] = [
 ];
 
 let start: string;
+let qStart: string;
 let dirs: string[] = [];
 
 function proofDir(proofs: Array<{ pid: number; session_id: string; proc_start: string; ide?: string }>): string {
@@ -44,6 +46,9 @@ beforeAll(() => {
   const s = ps.processStartTime(P);
   if (s === null) throw new Error("processStartTime(process.pid) is null");
   start = s;
+  const q = ps.processStartTime(Q);
+  if (q === null) throw new Error("processStartTime(process.ppid) is null");
+  qStart = q;
 });
 
 afterEach(() => {
@@ -87,16 +92,16 @@ describe("T-268 owner from the session proof named by CLAUDE_CODE_SESSION_ID", (
     expect(live.reason).toContain(`the proof for ${U.slice(0, 8)} names pid ${P}, which is not claude.exe`);
   });
 
-  it("S5: two proofs naming the session have no owner", () => {
+  it("S5: two live claude.exe proofs naming the session have no owner", () => {
     const dir = proofDir([
       { pid: P, session_id: U, proc_start: start },
-      { pid: 4_000_000, session_id: U, proc_start: "win:2" },
+      { pid: Q, session_id: U, proc_start: qStart },
     ]);
-    const rows = [...BROKEN, { pid: P, ppid: 1, commandLine: CLAUDE_EXE }];
+    const rows = [...BROKEN, { pid: P, ppid: 1, commandLine: CLAUDE_EXE }, { pid: Q, ppid: 1, commandLine: CLAUDE_EXE }];
     const live = owner.liveOwnerProbe(10, tableOf(rows), { CLAUDE_CODE_SESSION_ID: U }, dir);
     expect(live.pid).toBeNull();
     expect(live.source).toBe("none");
-    expect(live.reason).toContain(`2 proofs name session ${U.slice(0, 8)}`);
+    expect(live.reason).toContain(`2 live proofs name session ${U.slice(0, 8)}`);
   });
 
   it("S6: a chain that reaches claude.exe wins over a matching proof", () => {
@@ -117,5 +122,36 @@ describe("T-268 owner from the session proof named by CLAUDE_CODE_SESSION_ID", (
     const live = owner.liveOwnerProbe(10, tableOf(rows), { CLAUDE_PID: String(P) }, dir);
     expect(live.pid).toBeNull();
     expect(live.source).toBe("none");
+  });
+
+  it("S8: a dead proof beside the live one leaves the live one as the owner", () => {
+    const dir = proofDir([
+      { pid: P, session_id: U, proc_start: start },
+      { pid: 4_000_000, session_id: U, proc_start: "win:2" },
+    ]);
+    const rows = [...BROKEN, { pid: P, ppid: 1, commandLine: CLAUDE_EXE }];
+    const live = owner.liveOwnerProbe(10, tableOf(rows), { CLAUDE_CODE_SESSION_ID: U }, dir);
+    expect(live).toEqual({ pid: P, source: "claude-session", reason: null });
+  });
+
+  it("S9: two dead proofs have no owner", () => {
+    const dir = proofDir([
+      { pid: 4_000_000, session_id: U, proc_start: "win:2" },
+      { pid: 4_000_001, session_id: U, proc_start: "win:3" },
+    ]);
+    const live = owner.liveOwnerProbe(10, tableOf(BROKEN), { CLAUDE_CODE_SESSION_ID: U }, dir);
+    expect(live.pid).toBeNull();
+    expect(live.source).toBe("none");
+    expect(live.reason?.endsWith(`2 proofs name session ${U.slice(0, 8)}, and none names a running claude.exe`)).toBe(true);
+  });
+
+  it("S10: a live proof that is not claude.exe beside a live claude.exe leaves the claude.exe as the owner", () => {
+    const dir = proofDir([
+      { pid: P, session_id: U, proc_start: start },
+      { pid: Q, session_id: U, proc_start: qStart },
+    ]);
+    const rows = [...BROKEN, { pid: P, ppid: 1, commandLine: CLAUDE_EXE }, { pid: Q, ppid: 1, commandLine: "node.exe vitest" }];
+    const live = owner.liveOwnerProbe(10, tableOf(rows), { CLAUDE_CODE_SESSION_ID: U }, dir);
+    expect(live).toEqual({ pid: P, source: "claude-session", reason: null });
   });
 });
