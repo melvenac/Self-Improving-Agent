@@ -77,6 +77,7 @@ export const OpSchema = z.discriminatedUnion("op", [
   z.strictObject({ op: z.literal("add_gap"), id: z.string().optional(), what: z.string().min(1), evidence: z.string(), recommended_update: z.string() }),
   z.strictObject({ op: z.literal("update_gap"), id: z.string(), what: z.string().min(1).optional(), evidence: z.string().optional(), recommended_update: z.string().optional() }),
   z.strictObject({ op: z.literal("close_gap"), id: z.string() }),
+  z.strictObject({ op: z.literal("reopen_gap"), id: z.string(), evidence: z.string().min(1) }),
   z.strictObject({
     op: z.literal("add_decision"),
     id: z.string().optional(),
@@ -652,6 +653,18 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       g.closed_rev = ctx.rev;
       ctx.notes.push(`close_gap ${op.id}: tombstone kept (status closed, closed_session ${session}, closed_rev ${ctx.rev})`);
       return { ok: true, id: op.id };
+    }
+    case "reopen_gap": {
+      // T-275: a recurrence reopens the same gap instead of filing a new id (as reopen_task does for a task).
+      const g = s.gaps.find((x) => x.id === op.id);
+      if (!g) return { ok: false, error: `unknown gap ${op.id}` };
+      if (g.status !== "closed") return { ok: false, error: `gap ${op.id} is not closed; nothing to reopen` };
+      ctx.notes.push(`reopen_gap ${op.id}: status open (was closed session ${g.closed_session}, rev ${g.closed_rev})`);
+      g.status = "open";
+      g.closed_session = null;
+      g.closed_rev = null;
+      g.evidence = `${g.evidence}${NOTE_JOIN}s${session} reopened: ${op.evidence}`;
+      return { ok: true, id: g.id };
     }
     case "add_decision": {
       const id = op.id ?? nextId("D", s.decisions.map((d) => d.id));
