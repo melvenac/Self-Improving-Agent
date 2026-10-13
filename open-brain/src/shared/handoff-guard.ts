@@ -38,7 +38,7 @@
 import { appendFileSync, existsSync, openSync, readSync, closeSync, readFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
-import { appendEndRecordShownCapped, checkRecordUpdated, scanSessionWork } from "./end-record-guard.js";
+import { appendEndRecordShownCapped, checkRecordUpdated, claimMarker, scanSessionWork } from "./end-record-guard.js";
 import { endRecordProjectDir } from "./end-record-store.js";
 import { readState } from "./state-writer.js";
 
@@ -236,17 +236,19 @@ export function takeMissingHandoffNotices(projectDir: string): string[] {
   const legacyPath = join(projectDir, MARKER_REL);
   let moved = "";
   try {
-    if (existsSync(legacyPath)) {
-      const legacyText = readFileSync(legacyPath, "utf8");
+    const legacyClaimed = claimMarker(legacyPath);
+    if (legacyClaimed !== null) {
+      const legacyText = readFileSync(legacyClaimed, "utf8");
       out.push(...parseMissingHandoffLines(legacyText));
       moved += legacyText;
-      unlinkSync(legacyPath);
+      unlinkSync(legacyClaimed);
     }
-    if (existsSync(storePath)) {
-      const text = readFileSync(storePath, "utf8");
+    const storeClaimed = claimMarker(storePath);
+    if (storeClaimed !== null) {
+      const text = readFileSync(storeClaimed, "utf8");
       out.push(...parseMissingHandoffLines(text));
       moved += text;
-      unlinkSync(storePath);
+      unlinkSync(storeClaimed);
     }
     if (moved) {
       appendEndRecordShownCapped(join(endRecordProjectDir(projectDir), MISSING_HANDOFF_SHOWN_STORE), moved);
