@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 427 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 428 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -29,9 +29,9 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-225** Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text
 - [ ] **T-235** Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps
 - [~] **T-262** /end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)
-- [ ] **T-265** The recall trigger's status-read element fires only on a $? read of a trimmed pipeline (D-148's data-named change; 299 precision 6.4%)
+- [~] **T-265** The recall trigger's status-read element fires only on a $? read of a trimmed pipeline (D-148's data-named change; 299 precision 6.4%)
 - [~] **T-267** The transcript folder follows Claude Code's own rule (skills-audit fails on a home with a space, e.g. the QA PC), and git runs without a shell
-- [ ] **T-268** test:heavy's owner from Git Bash: when the Win32 parent chain breaks, fall back to the session proof named by CLAUDE_CODE_SESSION_ID (never CLAUDE_PID)
+- [~] **T-268** test:heavy's owner from Git Bash: when the Win32 parent chain breaks, fall back to the session proof named by CLAUDE_CODE_SESSION_ID (never CLAUDE_PID)
 
 ## P2
 

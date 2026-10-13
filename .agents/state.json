@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 427,
+  "revision": 428,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1916,13 +1916,14 @@
       "id": "T-265",
       "title": "The recall trigger's status-read element fires only on a $? read of a trimmed pipeline (D-148's data-named change; 299 precision 6.4%)",
       "priority": "P1",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "s168, from T-264 (D-148: 'no new code unless the data says so'; the data says so). query.ts:110-117 fires the status element on /\\$\\?|\\$\\{?PIPESTATUS/ anywhere in the command by design; T-264 found 85% of 299's injections on already-compliant commands. Brief: docs/loops/t265-trigger-precision-brief.md (desktop Opus one-off, base 50c112d7): isUnsafeStatusRead (PIPESTATUS never; $? only after a trimmer pipeline; heredoc bodies and single-quoted text inert except ssh's remote command; pipefail respected), ported from T-264's VIOLATING classifier; one negatives.test.ts:69 expectation updated; acceptance by replay on the real fires: every VIOLATING anchor still injects, COMPLIANT injections fall >= 80%. — s168 follow-up idea (not in T-265's scope): the hook's relevance floor in open-brain/src/trigger/policies/recall-trigger.json is 8.0, measured when the store held 599 entries; it holds 654 now and the file itself says the floor 'must be re-measured'. After T-265 lands, re-measure it on the T-264 replay data (precision and recall per floor value).",
+      "note": "s168, from T-264 (D-148: 'no new code unless the data says so'; the data says so). query.ts:110-117 fires the status element on /\\$\\?|\\$\\{?PIPESTATUS/ anywhere in the command by design; T-264 found 85% of 299's injections on already-compliant commands. Brief: docs/loops/t265-trigger-precision-brief.md (desktop Opus one-off, base 50c112d7): isUnsafeStatusRead (PIPESTATUS never; $? only after a trimmer pipeline; heredoc bodies and single-quoted text inert except ssh's remote command; pipefail respected), ported from T-264's VIOLATING classifier; one negatives.test.ts:69 expectation updated; acceptance by replay on the real fires: every VIOLATING anchor still injects, COMPLIANT injections fall >= 80%. — s168 follow-up idea (not in T-265's scope): the hook's relevance floor in open-brain/src/trigger/policies/recall-trigger.json is 8.0, measured when the store held 599 entries; it holds 654 now and the file itself says the floor 'must be re-measured'. After T-265 lands, re-measure it on the T-264 replay data (precision and recall per floor value). — — s169: clark launched it (desktop, Opus 5.5, base 50c112d7). READY 9ccc00a0 PR #662, 2 commits: tests (red); the ruling plus the one negatives.test.ts:69 expectation. Planner review, first-hand at 9ccc00a0: the diff is exactly the brief's 3 files; only the status-read element changed (its test is the exported pure isUnsafeStatusRead; terms still exit/code; the trimmer element, queryStore, floor and policy unchanged); the comment cites T-264. Reply: base 62/62; red 13/13; tsc 0; t265 13/13; trigger + t235 suites 75/75; mutants M1-M4 red. Replay on a read-only live-DB snapshot (counts only): VIOLATING 71/71 still inject; COMPLIANT 898 → 3 (−99.7%); NOT_APPLICABLE 81 → 0; precision 6.8% [5.4, 8.4] → 95.9% [88.7, 98.6] (Wilson 95%). Acceptance MET. CI test SUCCESS. Ruled: the 3 remaining COMPLIANT injections read $? straight after a trimmed pipeline while also reading PIPESTATUS elsewhere; the ruling counts that $? as unsafe and it stays (T-264's classifier is the coarser rule). Nits for a later task, each of which can only miss an injection: a here-string <<<word read as a heredoc tag; { …; } brace groups; x=$(… | tail) assignments; set +o pipefail counted as pipefail. ACCEPTED to clark (s169) and on Aaron's merge list; the merge needs his word (src). The floor re-measure (the s168 idea above) follows the merge.",
       "note_by": [
-        "f21ca920-a048-4990-935f-42f102efc85f"
+        "f21ca920-a048-4990-935f-42f102efc85f",
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
       ],
       "closed_rev": null
     },
@@ -1958,13 +1959,14 @@
       "id": "T-268",
       "title": "test:heavy's owner from Git Bash: when the Win32 parent chain breaks, fall back to the session proof named by CLAUDE_CODE_SESSION_ID (never CLAUDE_PID)",
       "priority": "P1",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "s168, from the planner's live check of T-168 (#653): Claude Code's Bash tool on Windows runs Git Bash, whose bash.exe parent (the MSYS launcher) has exited, so the walk cannot reach claude.exe and test:heavy refuses for a CC seat using Bash. The tool env carries CLAUDE_CODE_SESSION_ID, equal to the SessionStart proof by-pid/<claude pid>.json (verified: f21ca920 / 25484). Brief: docs/loops/t268-owner-from-session-proof-brief.md (desktop Opus one-off, base 5a858fd9): fallback only after the walk finds nothing; exactly one proof for the id, ide claude, start time equal (not reused), command line claude.exe; source 'claude-session'; the refusal names why the fallback did not apply; a REQUIRED nested-launch measurement that a nested claude -p sees a DIFFERENT CLAUDE_CODE_SESSION_ID (else BLOCKED: inherited like CLAUDE_PID).",
+      "note": "s168, from the planner's live check of T-168 (#653): Claude Code's Bash tool on Windows runs Git Bash, whose bash.exe parent (the MSYS launcher) has exited, so the walk cannot reach claude.exe and test:heavy refuses for a CC seat using Bash. The tool env carries CLAUDE_CODE_SESSION_ID, equal to the SessionStart proof by-pid/<claude pid>.json (verified: f21ca920 / 25484). Brief: docs/loops/t268-owner-from-session-proof-brief.md (desktop Opus one-off, base 5a858fd9): fallback only after the walk finds nothing; exactly one proof for the id, ide claude, start time equal (not reused), command line claude.exe; source 'claude-session'; the refusal names why the fallback did not apply; a REQUIRED nested-launch measurement that a nested claude -p sees a DIFFERENT CLAUDE_CODE_SESSION_ID (else BLOCKED: inherited like CLAUDE_PID). — — s169: clark LAUNCHED it 11:19 CDT (desktop one-off, base 5a858fd9, brief at a634ed8a); the planner's reply waiter is running.",
       "note_by": [
-        "f21ca920-a048-4990-935f-42f102efc85f"
+        "f21ca920-a048-4990-935f-42f102efc85f",
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
       ],
       "closed_rev": null
     }
