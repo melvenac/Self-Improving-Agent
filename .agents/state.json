@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 417,
+  "revision": 418,
   "project": {
     "name": "self-improving-agent"
   },
@@ -725,11 +725,12 @@
       "id": "T-184",
       "title": "state import: an input changed between --draft and --commit commits the DRAFT's content with no note (QA 102 PROBE-7): record each input's hash in the draft and have --commit refuse or say so when one differs",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 100,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 100. QA 102's Open 4 and the round-1 handoff's limit 5: bumping a marker after --draft lets a stale draft through with no acknowledgement and commits the draft's text, not the fixed file's. Not in importer round 2 (docs/loops/importer-fixes-round-2-brief.md, 'Not in round 2').",
+      "note": "Session 100. QA 102's Open 4 and the round-1 handoff's limit 5: bumping a marker after --draft lets a stale draft through with no acknowledgement and commits the draft's text, not the fixed file's. Not in importer round 2 (docs/loops/importer-fixes-round-2-brief.md, 'Not in round 2'). — s168: BUILT overnight (desktop CC Sonnet one-off; brief docs/loops/t184-draft-inputs-brief.md, fix docs/loops/t184-fix-1-task.md). First run BLOCKED correctly at step 8: two V5 rows in tests/pipelines/state-import.test.ts assert the exact files --draft adds and --commit moves (planner's brief gap; lesson 662). Fix 1 approved adding .agents/state.draft.inputs.json to both lists. PR #638 at 6717da4e, planner ACCEPT: --draft writes sha256 of the 5 inputs' raw bytes; --commit compares before step 0 and refuses on changed/added/removed unless --accept-changed; a missing or unreadable record is reported (inputs_unrecorded), not refused; the record moves into the snapshot; CLI flag, --draft refusal, prints, usage. D1-D7 red then green; 33 files 245 tests; M1-M3 red; CI green. Follow-up, not blocking: bootstrap FUTURE_LOCAL does not list the new file (local anyway under the .agents allowlist). Merge needs Aaron's word.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -5443,24 +5444,49 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 168 (Atlas). Merged today: #610 T-262 part 1, #617 T-262 part 2, #615 T-259, #621 T-260, #579 T-253+T-248, #588 T-256, then on Aaron's word #580 T-252 (5d61f3dd) and #620 T-188 (57dd36c8); main tree rebuilt by clark at 57dd36c8 and both live-checked (scratch clone, throwaway DB). Closed: T-154, T-245, T-257, T-259, T-260, T-253, T-248, T-256, T-252, T-188. OVERNIGHT (Aaron via clark: code-only work to READY/ACCEPT, no merge/rebuild): three desktop CC Sonnet one-off briefs on base 10034c5a, on master via #631 (448531c5), launch lines sent to clark: docs/loops/t263-runtime-identity-brief.md (reply %TEMP%/t263-reply.md), docs/loops/t262-fix-2-task.md (reply %TEMP%/t262-fix-2-reply.md; the template-personal-names ISSUE #617 introduced, the Cursor end.md wording, the stray doc comment), docs/loops/t258-notice-races-brief.md (reply %TEMP%/t258-reply.md). NEXT: (1) review each reply and PR (READY line, red run, mutants, name-only diff, CI), ACCEPT to clark; merges need Aaron's word; (2) triage the open-task-commits warnings (T-046, T-168, T-172, T-235): close with evidence or add 'stays open after <sha7>'; (3) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later. After T-262 fix 2 merges, clark recopies ~/.claude/commands/end.md and the Cursor user-level commands.",
+      "pick_up": "Session 168 (Atlas). Merged today: #610, #617 (T-262), #615 (T-259), #621 (T-260), #579 (T-253+T-248), #588 (T-256), #580 (T-252), #620 (T-188); main tree rebuilt by clark at 57dd36c8, all live-checked. OVERNIGHT (Aaron via clark: code-only to READY/ACCEPT, no merge/rebuild) - four desktop CC Sonnet one-offs, all planner ACCEPT, CI green, each waiting on Aaron's word: #633 T-262 fix 2 (92d13f41; template names, Cursor wording, doc comment), #634 T-258 (86f41ba7; doubled-hook residuals), #635 T-263 (c37be9f3; runtime identity, makes CA-4c green on the desktop), #638 T-184 (6717da4e; --commit notices inputs changed after --draft). On each 'merge SIA #N': bash $S/pr-refresh.sh N <reviewed-sha>, then bash $S/pr-merge.sh N <new-head>, one at a time (each merge sends the rest BEHIND); clark rebuilds after #634/#635/#638 (src); after #633 clark recopies ~/.claude/commands/end.md and the Cursor user-level end.md + harness-audit.md; then close the task with the live check. NEXT after merges: (1) triage open-task-commits warnings (T-046, T-168, T-172, T-235); (2) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later; (3) T-184 follow-up: bootstrap FUTURE_LOCAL lists state.draft.inputs.json.",
       "watch_out": [
         "The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.",
-        "A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff (old merge-base..old head vs master..new head) before calling for a re-review (#579, s168).",
-        "Right after a merge GitHub reports the next PR UNKNOWN; pr-refresh now waits that out (s168 #620 first run gave a false PROOF FAILED).",
-        "Reply files: launchers also write an uppercase <TAG>-reply.md copy in %TEMP%; check both names.",
-        "Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it (T-188, s168). CI's gh is installed but unauthenticated.",
-        "Before saying no test pins a call site, grep the PR's own new test file for the old path (T-252-mf, s168).",
-        "Desktop one-off launchers set GIT_AUTHOR_*/GIT_COMMITTER_*; config-channel CA-4c stays red locally until T-263 merges.",
-        "sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level ~/.claude and ~/.cursor command copies differ from the template), not a code regression.",
+        "A brief that adds a new output file must name the existing rows that assert the EXACT output list (T-184 BLOCKED on two V5 rows; lesson 662).",
+        "A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff before calling for a re-review (#579, s168).",
+        "Right after a merge GitHub reports the next PR UNKNOWN; pr-refresh now waits that out.",
+        "Reply files: launchers write T-<n>-<tag>-reply.md (the tag's name) besides the brief's t<n>-reply.md; reply-wait.sh now checks both forms. One-off runs may work in clark's ~/Worktrees/oneoff-<TAG> folder instead of a %TEMP% clone.",
+        "Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it. CI's gh is installed but unauthenticated.",
+        "Desktop one-off launchers set GIT_AUTHOR_*/GIT_COMMITTER_*; config-channel CA-4c stays red locally until #635 merges.",
+        "sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level command copies differ from the template), not a code regression.",
         "ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task."
       ],
       "open_questions": [],
       "session": 168,
       "loop_state": {
-        "open_prs": [],
+        "open_prs": [
+          {
+            "ref": "#633",
+            "qa_status": "accepted",
+            "note": "T-262 fix 2 at 92d13f41; needs Aaron's word"
+          },
+          {
+            "ref": "#634",
+            "qa_status": "accepted",
+            "note": "T-258 at 86f41ba7; needs Aaron's word"
+          },
+          {
+            "ref": "#635",
+            "qa_status": "accepted",
+            "note": "T-263 at c37be9f3; needs Aaron's word"
+          },
+          {
+            "ref": "#638",
+            "qa_status": "accepted",
+            "note": "T-184 at 6717da4e; needs Aaron's word"
+          }
+        ],
         "frozen_sha": null,
         "questions_for_aaron": [
+          "merge SIA #633",
+          "merge SIA #634",
+          "merge SIA #635",
+          "merge SIA #638",
           "T-194: (a), (b) or (c)"
         ],
         "rulings": [
@@ -5579,7 +5605,7 @@
     },
     {
       "n": 168,
-      "date": "2026-10-12",
+      "date": "2026-10-13",
       "uuid": "f21ca920-a048-4990-935f-42f102efc85f",
       "seat": "planner",
       "checkout": "sia-planner",
