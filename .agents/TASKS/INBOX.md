@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 439 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 440 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -45,6 +45,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-274** Re-measure the recall trigger's relevance floor (8.0, measured at 599 entries) on the T-264 replay data now that T-265 narrowed the status element
 - [~] **T-275** ob_state cannot reopen a closed gap: update_gap refuses `status` and there is no reopen_gap (reopen_task and reopen_verified exist)
 - [ ] **T-276** A seat without Remote Control has no Claude-Session id to write, and ob_end still counts its commits as missing the trailer: fall back to the transcript's own session id
+- [ ] **T-281** T-161 follow-ups: the Cursor path's transcript check before a Cursor seat relies on it, the budgeted briefing's line cap, and the two untested pushes
+- [ ] **T-282** state-render.test.ts T183-3 builds expected lines by string concatenation, so an object-form open question or watch-out in the live record fails CI
 
 ## P3
 

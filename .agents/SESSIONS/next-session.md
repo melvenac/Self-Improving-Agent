@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 439 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 440 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,40 +6,40 @@
 
 ### Pick up here
 
-Session 170 (Atlas) ROLLED 2026-10-13 ~16:1x CDT on Aaron's 'ready to roll?', during the max-parallel day (until the 00:00 weekly reset). MERGED on Aaron's words (typed in clark's window, relay-check verified), one at a time with pr-refresh (patch-id = the reviewed head, clark's merge tree = the CI-tested tree): #669 T-022 (28043a55), #672 T-251 (1fdd88d4), #677 T-270 (c1975286). Main rebuilt c1975286; the three live checks PASS; all three closed. #687 T-278 (tests only) merged 55413153 under SG-1/D-135 and closed. WAITING ON AARON (clark holds one ask; merge in this order, pr-refresh just before each): #678 T-159 (accepted r2 4474f062), #673 T-243 (accepted r2 df92decc), #685 T-275 (accepted 4ef4bdde). RUNNING on the desktop: the Opus second reviews of T-172 (#676, r2 778048db; reply C:/Users/melve/AppData/Local/Temp/t172-review-reply.md) and T-161 (#688, 5a9443ab; reply .../t161-review-reply.md). Rule on each (read the cited lines at the reviewed SHA before taking a finding), then ACCEPT to clark for Aaron's word, or write an r2 amendment. AFTER the merge batch and ONE sia-rebuild: run node ~/Worktrees/s170-livechecks/batch2-livecheck.mjs <merge sha40> (T-159, T-243, T-275; its dry run on the old build fails every new-behaviour check, so it discriminates), send clark one PASS/FAIL line each, and close the tasks. NEXT briefs: T-271 (after #685 merges, same file), T-276 (after #688 merges; design in its note), T-272, T-279, T-280; P0 T-024 waits on Aaron (his store). QA PC OFF for a RAM upgrade since ~14:3x CDT (Aaron, told via Relay for clark): SIA gave GO for its wakers' restart at v1.22.13; on the restart confirm each waker polls (G-058) and no SIA turn replays; then the owed QA PC live checks (T-267 on the home with a space; the T-268/T-168 CC half) and the T-168 Cursor half; T-196 HB-1's rewrite is checked against a live Cursor turn then.
+Session 170 (Atlas) ROLLED 2026-10-13 ~16:4x CDT on Aaron's 'ready to roll?'. FIRST, THE MERGE TRAIN: Aaron's word is GIVEN and VERIFIED (typed 21:33:00Z in clark's window, relay-check): 'SIA merges #678/#673/#685/#688 · A2A v1.22.14 release, go'. One at a time: pr-refresh.sh <pr> <reviewed head> (#678 4474f062 T-159, then #673 df92decc T-243, then #685 4ef4bdde T-275, then #688 5a9443ab T-161), send clark each refreshed head with CI green, wait for MERGED, then the next. ONE sia-rebuild after the last; then live checks: node ~/Worktrees/s170-livechecks/batch2-livecheck.mjs <merge sha40> (T-159, T-243, T-275; its dry run on the old build fails every new-behaviour check), plus a T-161 check to write (the built renderStartReport with a proven session whose transcriptPath is missing prints NO TRANSCRIPT in the header and the Briefing; an existing file prints nothing), one PASS/FAIL line each to clark, then close the four tasks. SECOND: T-172 (#676) review came back CHANGES (F1 HIGH: npm install rewrites package-lock.json, the restore fails exit 4; F2-F5 in T-172's note): rule from C:/Users/melve/AppData/Local/Temp/t172-review-reply.md first-hand and write amendment-2. Earlier today: #669 T-022, #672 T-251, #677 T-270 merged and live-checked (closed); #687 T-278 merged under SG-1 (closed). NEXT briefs: T-282 (tests only, small), T-281 (T-161 follow-ups), T-271 (after #685 merges), T-276 (after #688 merges; design in its note), T-272, T-279, T-280; P0 T-024 waits on Aaron. QA PC OFF for a RAM upgrade (Aaron, told via Relay for clark): SIA gave GO for its wakers' restart at v1.22.13 (confirm each polls, G-058, and no SIA turn replays), then the owed QA PC live checks (T-267, the T-268/T-168 CC half) and the T-168 Cursor half; T-281's Cursor check and T-196 HB-1's rewrite also wait for the Cursor seats. SIA gave GO for A2A-Hub v1.22.14 on tcm (Relay's D-033 notice).
 
 ### Watch out
 
-- Master has no branch protection: records and docs PRs merge by hand (pr-keep-current.sh merges a CLEAN .agents/docs-only PR, pinned, and prints 'merged #n' on exit: seen live on #679); code PRs need Aaron's word.
+- Master has no branch protection: records and docs PRs merge by hand (pr-keep-current.sh merges a CLEAN .agents/docs-only PR, pinned, and prints 'merged #n' on exit; it exits 0 even when it gives up after 30 min, so read its last line); code PRs need Aaron's word.
 - Merges go one at a time: pr-refresh.sh just before each PR's own merge. A records or docs PR that merges between a refresh and its merge breaks clark's merge-tree gate, so land records only when no code merge is mid-sequence.
 - SG-1 (D-135): config, rule-text and tests-only PRs merge on green CI pinned to the head, with no QA gate and no Aaron word (T-278, #687). Code needs a QA ACCEPT from a judge other than the builder, and today Aaron's word too.
+- Write handoff open questions and watch-outs as plain strings until T-282 lands: state-render.test.ts T183-3 reads the live record and fails CI on the object form (#690's first CI run).
 - T-270's mechanism: Windows PowerShell 5.1's console cp437 best-fit turns → • § ¶ into raw C0 bytes on the pipe to Node; ConvertTo-Json escapes real control characters (knowledge 693). Entry 685 states the falsified mechanism: forget it only on Aaron's word. A live-reproduction step in a brief must be one the planner ran first-hand on the mechanism (atlas-ops briefs.md).
 - Dry-run every post-merge live-check script against the pre-merge build: each new-behaviour check must FAIL there (knowledge 694; s170 caught three script bugs that way before any merge).
-- This seat's open-brain server and every running seat's are stale (build 399121c): /mcp reconnect open-brain is Aaron's act, and T-022's replace-on-write serves no session until it happens. Clark re-runs relocate --worktrees as a dry run after the reconnects.
+- Every running seat's open-brain server is stale (build 399121c): /mcp reconnect open-brain is Aaron's act; until then T-022's replace-on-write serves no session. Clark re-runs relocate --worktrees as a dry run after the reconnects.
 - A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED.
-- Verify every relayed merge word in clark's transcript with relay-check.mjs, which is LITERAL by default since s170 (a '+' read as a regex missed Aaron's own word); approval is a snapshot of the PRs he named.
-- Laptop runs: npm ci may leave better-sqlite3 without its native binding (npm 11 skipping install scripts); npm rebuild better-sqlite3 fixes it. Briefs now ask for a binding check (atlas-ops briefs.md); clark adds one to laptop runs.
+- Verify every relayed merge word in clark's transcript with relay-check.mjs, LITERAL by default since s170 (a '+' read as a regex missed Aaron's own word); approval is a snapshot of the PRs he named.
+- Laptop runs: npm ci may leave better-sqlite3 without its native binding (npm 11 skipping install scripts); npm rebuild better-sqlite3 fixes it. Briefs ask for a binding check (atlas-ops briefs.md).
 - The repo is PUBLIC (D-090): transcripts, command text, paths and session ids stay outside it. The s170 probes and live-check scripts live in ~/Worktrees/s170-livechecks/.
 
 ### Open questions
 
-- Does T-161's NO TRANSCRIPT line break the budgeted briefing layout's line cap? Its Opus review answers it.
-- D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement.
+- Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 answers it with one live Cursor /start when the QA PC is back.
+- Planner, D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement.
 
 ### Loop state
 
 **Open PRs:** 
-- #678 — QA: accepted — T-159 r2 at 4474f062 (the Opus review's S1-S9 and F3 taken); needs 'merge SIA #678', first in the batch; pr-refresh before it
-- #673 — QA: accepted — T-243 r2 at df92decc (SECURITY.md now true: the hub GET, two project writes, every override); needs 'merge SIA #673', second
-- #685 — QA: accepted — T-275 at 4ef4bdde (reopen_gap); needs 'merge SIA #685', third
-- #688 — QA: in_progress — T-161 at 5a9443ab: planner-accepted; Opus second review running (t161-review-reply.md); then Aaron's word
-- #676 — QA: in_progress — T-172 r2 at 778048db: planner-accepted; Opus second review running (t172-review-reply.md, a hard gate: main-rebuild rebuilds the serving checkout); then Aaron's word
+- #678 — QA: accepted — T-159 r2 at 4474f062; Aaron's word GIVEN 21:33:00Z (verified); merge FIRST, pr-refresh before it
+- #673 — QA: accepted — T-243 r2 at df92decc; word GIVEN; merge second
+- #685 — QA: accepted — T-275 at 4ef4bdde; word GIVEN; merge third
+- #688 — QA: accepted — T-161 at 5a9443ab; Opus review ACCEPT (follow-ups T-281); word GIVEN; merge fourth
+- #676 — QA: in_progress — T-172 r2 at 778048db: Opus review CHANGES (F1 HIGH npm install rewrites package-lock.json, restore exit 4); next planner rules it and writes amendment-2
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- merge SIA #678 (T-159), then #673 (T-243), then #685 (T-275): clark holds one ask
-- after their Opus reviews: merge SIA #688 (T-161) and #676 (T-172)
+- after T-172's amendment-2 and its READY: merge SIA #676
 - T-194: (a), (b) or (c); planner recommends (c) now, (b) later
 - T-024 (P0): may the planner rewrite knowledge entries 184 and 303 (they cite deleted knowledge-mcp paths) to say 'retired'?
 - may the planner ob_forget knowledge entry 685 (its mechanism is falsified; 693 corrects it)?
@@ -48,12 +48,12 @@ Session 170 (Atlas) ROLLED 2026-10-13 ~16:1x CDT on Aaron's 'ready to roll?', du
 - via clark: one shared fetch-first docs/records PR script set instead of a new prism-ops; do factual CLAUDE.md seat-table edits need his word in the seat's window?
 
 **Rulings made mid-loop:** 
-- 2026-10-13 19:28:15Z Aaron (clark's window, relay-check verified): 'merge SIA #669 + #672 after the new Atlas refreshes them (rec yes)'
-- 2026-10-13 19:47:42Z Aaron (clark's window, verified): 'merge SIA #677'
+- 2026-10-13 21:33:00Z Aaron (clark's window, relay-check verified): 'SIA merges #678/#673/#685/#688 · A2A v1.22.14 release, go'
+- 2026-10-13 19:28:15Z Aaron (verified): 'merge SIA #669 + #672 after the new Atlas refreshes them (rec yes)'; 19:47:42Z (verified): 'merge SIA #677'
 - 2026-10-13 ~14:3x CDT Aaron (told via Relay for clark): the QA PC goes off for a RAM upgrade; SIA's GO for the wakers' restart sent to clark
-- s170 planner: T-196 HB-1, e21e71af not merged (stale: ob_start does not print planner.md in full each session; foreground listeners block); rewrite when the Cursor seats are back
-- s170 planner: T-251's install-commands allowlist question ruled no change; its surviving mutants killed by T-278
-- s170 planner: T-159 and T-243 review findings taken as r2s before the merge; T-275 and T-278 needed no Opus round
+- s170 planner: GO to clark for A2A-Hub v1.22.14 on tcm (Relay's D-033 notice)
+- s170 planner: T-196 HB-1, e21e71af not merged (stale); rewrite when the Cursor seats are back
+- s170 planner: T-251's install-commands allowlist question ruled no change; T-159 and T-243 review findings taken as r2s before the merge; T-161's review findings to T-281 after the merge
 
 ## developer [sia-builder] _(written session 156)_
 
