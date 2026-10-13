@@ -7,6 +7,7 @@ import {
   noteBody,
   splitStateLog,
   replaceStateNote,
+  type ExperienceInput,
 } from '../../vault-writer.js';
 import { indexKnowledge, type FactKind } from '../../db-v2.js';
 
@@ -80,7 +81,7 @@ export function store(input: StoreInput): StoreResult {
   const { db, vaultDir, key, tags, content, project } = input;
   const source = input.source ?? 'ob_store';
 
-  const vaultPath = writeExperience(vaultDir, {
+  const note: ExperienceInput = {
     key,
     tags,
     content,
@@ -91,7 +92,8 @@ export function store(input: StoreInput): StoreResult {
     neutral: 0,
     project,
     source,
-  });
+  };
+  const vaultPath = writeExperience(vaultDir, note);
 
   // `writeExperience` refuses to overwrite, so an existing note means this key
   // was already stored. Callers must report that rather than treat it as a
@@ -133,18 +135,7 @@ export function store(input: StoreInput): StoreResult {
       }
 
       const demotedAt = new Date().toISOString();
-      replaceStateNote(known.vault_path, {
-        key,
-        tags,
-        content,
-        created: demotedAt,
-        maturity: 'progenitor',
-        helpful: 0,
-        harmful: 0,
-        neutral: 0,
-        project,
-        source,
-      }, demotedAt);
+      replaceStateNote(known.vault_path, note, demotedAt);
 
       try {
         indexKnowledge(db, {
