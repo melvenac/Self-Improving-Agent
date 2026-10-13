@@ -77,6 +77,7 @@ const CLASSIFIED: ReadonlyArray<{ file: string; within: string; why: string }> =
   { file: "checks.ts", within: "runCheck", why: "the deterministic checks (R15: constructed env)" },
   { file: "process.ts", within: "runBounded", why: "the role process (constructed env, no shell)" },
   { file: "process.ts", within: "killTree", why: "taskkill /T on the timeout path (win32)" },
+  { file: "process.ts", within: "probeVersion", why: "claude --version at preflight (T-182): constructed env, no shell, bounded" },
 ];
 
 function classify(sites: SpawnSite[]): { git: SpawnSite[]; unclassified: SpawnSite[] } {
@@ -101,8 +102,8 @@ describe("CA-4b / R16 — one git spawn site, every other spawn named", () => {
   it("the candidate's source has exactly one git spawn site, in git.ts's spawnGit, and no unclassified spawn", () => {
     const sites = realSites();
     const { git, unclassified } = classify(sites);
-    // A check must prove it looked: the walk found the three classified sites too.
-    expect(sites.length).toBeGreaterThanOrEqual(4);
+    // A check must prove it looked: the walk found the four classified sites too.
+    expect(sites.length).toBeGreaterThanOrEqual(5);
     expect(git.map((s) => `${s.file}:${s.within}`)).toEqual(["git.ts:spawnGit"]);
     expect(unclassified, JSON.stringify(unclassified)).toEqual([]);
   });

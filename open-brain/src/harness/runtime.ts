@@ -214,6 +214,7 @@ export type FailureCode =
   | "remote-configured"
   | "include-at-base"
   | "role-unresolvable"
+  | "role-version-unsupported"
   | "git-dirs-unresolvable"
   | "unsafe-config-at-base"
   | "link-at-base"
@@ -536,6 +537,14 @@ function preflightUnderPin(config: LoopConfig, processRoles: readonly RoleName[]
         const role = config.roles[r];
         if (!isProcessRole(role)) continue;
         const p = role.preflight();
+        if (!p.ok && p.kind === "unsupported") {
+          throw new LoopRefused(
+            "role-version-unsupported",
+            [r],
+            `refusing to start loop ${config.loop}: the ${r} role cannot be launched — ${p.reason}. ` +
+              `Refused before any tag, commit or artefact.`,
+          );
+        }
         if (!p.ok) {
           throw new LoopRefused(
             "role-unresolvable",
