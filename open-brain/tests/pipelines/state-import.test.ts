@@ -11,6 +11,7 @@ import {
   importDecisions,
   importHandoff,
   DRAFT_REL,
+  DRAFT_INPUTS_REL,
   REPORT_REL,
   STATE_REL,
   type ImportReport,
@@ -73,7 +74,7 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     const r = runDraft(root, TODAY);
     expect(r.validation).toEqual({ ok: true });
     const after = tree(root);
-    expect([...after.keys()].filter((k) => !before.has(k)).sort()).toEqual([DRAFT_REL, REPORT_REL]);
+    expect([...after.keys()].filter((k) => !before.has(k)).sort()).toEqual([DRAFT_REL, DRAFT_INPUTS_REL, REPORT_REL].sort());
     for (const [k, v] of before) expect(after.get(k)!.equals(v)).toBe(true);
 
     const parsed = parseState(readFileSync(join(root, DRAFT_REL), "utf-8"));
@@ -198,7 +199,7 @@ describe("state import (Loop 4 C1) on a fixture built from this repo's prose fil
     // Draft + report moved into the snapshot.
     expect(existsSync(join(root, DRAFT_REL))).toBe(false);
     expect(existsSync(join(root, REPORT_REL))).toBe(false);
-    expect(r.moved.sort()).toEqual([`${snapRel}/state.draft.json`, `${snapRel}/state.import-report.md`].sort());
+    expect(r.moved.sort()).toEqual([`${snapRel}/state.draft.json`, `${snapRel}/state.draft.inputs.json`, `${snapRel}/state.import-report.md`].sort());
 
     // Second commit refuses; so does a re-draft.
     expect(() => runCommit(root, TODAY)).toThrow(/already exists — the importer runs once/);
