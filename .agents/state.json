@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 426,
+  "revision": 427,
   "project": {
     "name": "self-improving-agent"
   },
@@ -709,11 +709,11 @@
       "id": "T-182",
       "title": "The claude adapter passes --permission-prompts, which tcm's installed Claude Code lacks (2.1.282 on the QA PC has it): declare a minimum Claude Code version, make CA-9 name the installed and required versions, and decide whether tcm's claude is updated",
       "priority": "P1",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 100,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 100. Found by developer 103's A9 CI: CA-9 red on every tcm run (redcheck 36095548004 with no product change; code 36095775536), 'flag --permission-prompts is gone'. roles.ts:310 and :350 pass it. tcm's help (printed in the CI log) also lacks --permission-prompt-tool, --restricted and --system-prompt-snapshot, so it is most likely OLDER than 2.1.282 (inference; tcm not read, which needs Aaron's word). Ruled outside A9 (rulings-16 thread; A9 brief freeze message). Hosted runners have no claude, so CA-9 skipped there, which is why A2-A8 never showed it. A role launched on tcm's claude would fail on the flag. Updating tcm's Claude Code is Aaron's call (his machine). — s168: brief docs/loops/t182-claude-min-version-brief.md (#644), launched by clark (desktop, Opus 5.5, base 304d5639). Planner ruling: MIN_CLAUDE_CODE_VERSION 2.1.282 (lowest measured, QA 104), refused at preflight before any tag (new FailureCode role-version-unsupported, one classified spawn probeVersion); CA-9 parses option lines and names installed, required and every missing flag. Updating tcm's claude stays Aaron's call. — s168 CORRECTION to the rev 421 note: QUEUED at clark (desktop at its 6-core limit; the laptop held Relay's L29), not launched. Status back to open until it starts.",
+      "note": "Session 100. Found by developer 103's A9 CI: CA-9 red on every tcm run (redcheck 36095548004 with no product change; code 36095775536), 'flag --permission-prompts is gone'. roles.ts:310 and :350 pass it. tcm's help (printed in the CI log) also lacks --permission-prompt-tool, --restricted and --system-prompt-snapshot, so it is most likely OLDER than 2.1.282 (inference; tcm not read, which needs Aaron's word). Ruled outside A9 (rulings-16 thread; A9 brief freeze message). Hosted runners have no claude, so CA-9 skipped there, which is why A2-A8 never showed it. A role launched on tcm's claude would fail on the flag. Updating tcm's Claude Code is Aaron's call (his machine). — s168: brief docs/loops/t182-claude-min-version-brief.md (#644), launched by clark (desktop, Opus 5.5, base 304d5639). Planner ruling: MIN_CLAUDE_CODE_VERSION 2.1.282 (lowest measured, QA 104), refused at preflight before any tag (new FailureCode role-version-unsupported, one classified spawn probeVersion); CA-9 parses option lines and names installed, required and every missing flag. Updating tcm's claude stays Aaron's call. — s168 CORRECTION to the rev 421 note: QUEUED at clark (desktop at its 6-core limit; the laptop held Relay's L29), not launched. Status back to open until it starts. — — s169: clark launched it (desktop, Opus 5.5, base 304d5639). READY c21eb651 PR #660, 3 commits: tests (red); the ruling; RegExp.exec→String.match so the CA-4b spawn scanner does not count the version parse as a spawn (scanner unchanged). Planner review, first-hand at c21eb651: the diff is exactly the brief's 7-file list; src matches the ruling item by item (probeVersion options, MIN 2.1.282 + doc, option-line parse, preflightCheck outside resolve with the constructed env, Preflight.kind, role-version-unsupported with the exact message, no literal in runtime.ts); all 10 adapter flags parse from option lines in the 2.1.296 fixture, which holds nothing machine-specific. Reply: red 6/7 (CONTROL green at base, expected); tsc 0; t182 7/7; 51 harness files green in 5 batches (687 passed, 0 failed); CA-9 passed on the desktop's 2.1.296; mutants M1-M4 red. CI test SUCCESS. Deviations accepted: spawn-sites floor 4→5; base run partial (600 s tool cap; the post-change run is complete and green). ACCEPTED to clark (s169); merge needs Aaron's word (src). Nit for a later task: a probeVersion spawn error or timeout reports `--version printed \"\"` without naming the error. Updating tcm's claude stays Aaron's call.",
       "note_by": null,
       "closed_rev": null
     },
@@ -5026,42 +5026,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Planner session 158, ~23:0xZ 2026-10-02. T-233 CODE IS MERGED (D-114: #343-#346 on Aaron's word after QA 263 ACCEPT; master 8df2abcf; master push CI was in progress at writing, so check it). T-233 stays OPEN until DEPLOYED and SERVED: (1) update the desktop and QA PC serving trees to master and read back HEAD + build SHA (Aaron's act, or clark's on his word; the planner reads by SSH only); (2) set usage_file: per seat; (3) a fresh-session /start on each machine shows the serving line first and a real Usage line. Then retire the /START AUDIT GAPS watch-out. T-234 (P2) carries QA 263's F1-F7 test gaps. D-110's queue (T-191 is now largely done by T-233; re-read before dispatching) stays HELD under the weekly hold (97% at 22:2xZ; Aaron's lift covered T-233 only). Seats: sia-forge parked after T-233 (its handoff docs/loops/t233-developer-handoff.md is merged); sia-builder free. Hourly status to clark is dropped (D-113), but a status prompt still fired at 22:22Z from an unknown source; that question is open with Aaron.",
-      "watch_out": [
-        "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
-        "BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.",
-        "A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`. '=' commits plus a trivial conflict line may go on as reviewed (#294, #302 did); anything else gets a narrow re-QA. A moved head needs a fresh approval if Aaron's word pinned the old SHA (#295 now).",
-        "CI (T-227, #310): GitHub-hosted ubuntu-latest, fetch-depth 0, a few minutes per run; push runs ONLY on master; a branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is an opt-in (tcm=true).",
-        "STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).",
-        "QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).",
-        "RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.",
-        "REPORTING TO CLARK (D-113, Aaron 2026-10-02 ~21:45Z, AMENDS D-077): the hourly status cadence is DROPPED; create NO status cron at /start. Message `clark` on EVENTS only: verdicts, merges (the one-line D-063 notice), blocks, READY TO ROLL, plus one line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner). Clark reads the dashboard's planner rows for status. If `clark` is not in ListAgents, skip the send. CARRY THIS ITEM FORWARD VERBATIM at every roll until T-233 removes status_cron from seat data.",
-        "DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.",
-        "VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.",
-        "JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.",
-        "/START AUDIT GAPS (clark's HoH audits of sessions 156 and 158's starts, ~/Worktrees/hoh-startup-audit.md; do NOT repeat; CARRY VERBATIM AT EVERY ROLL until T-233 ships AND is served on every machine, then retire it): (0) CHECK THE SERVING TREE FIRST: ~/Projects/Self-Improving-Agent's HEAD vs origin/master on THIS machine (it was 599 behind on the desktop and 429 on the QA PC on 2026-10-02, which is why most items below regressed). If it is behind, say so on the first line and ask Aaron to update it. (1) NO status cron (D-113 dropped D-077's cadence; amended at rev 297). (2) The session number is the RECORD's next session (last n + 1), not ob_start's per-checkout 'Session #N' (T-164; state it yourself if the serving build is stale, T-172). (3) 'Latest brief' is the newest *brief* by DATE (ls -t docs/loops/*brief*), not by loop number or sort -V; a developer handoff is not a brief (T-210). (4) Read C:\\Users\\melve\\slots.json usageLevel at /start (home root, NOT ~/Worktrees; also the dashboard slots panel; live numbers are quota.claude in http://100.124.212.87:4100/api/sessions) and state the level in the OBJECTIVE line — e.g. RED + weekly 95% means the dispatch is held. (5) git fetch BEFORE the greeting when the tree is behind origin/master. (6) Do not print answered open questions. (7) Do every residual read, including .agents/SYSTEM/domains.json. (8) Count gaps from state.json gaps[], not a truncated render. (9) ob_start returns ~50 KB here (T-183): extract the State block to the scratchpad and read it in parts."
-      ],
-      "open_questions": [],
-      "session": 158,
-      "loop_state": {
-        "open_prs": [],
-        "frozen_sha": null,
-        "questions_for_aaron": [
-          "Deploy T-233: update the desktop and QA PC serving trees to master 8df2abcf, and set usage_file: per seat?",
-          "A status prompt fired at 22:22Z after D-113 dropped the cadence; where is it from, and should it be removed or should D-113 be amended?"
-        ],
-        "rulings": [
-          "D-112 T-233 first loop",
-          "D-113 status cron dropped",
-          "D-114 T-233 batch merged"
-        ]
-      },
-      "session_uuid": "ae490afb-211a-42c7-b82e-292e88d0a9f4",
-      "checkout": "sia-planner",
-      "first_rev": 294
-    },
-    {
-      "seat": "planner",
       "pick_up": "Planner session 159 at its roll point. Next: (1) #376 (T-203, QA 266 ACCEPT at 09f82a12) is being re-merged with master by sia-infra; range-diff the new head against 09f82a12, then ask Aaron via clark 'Merge #376 at <new head>?'. (2) Book QA 267 for #387 + #388 (test-only, frozen) plus the T-236 slices when they land. (3) Rule the T-236 slice PRs. Seats: sia-infra (desktop CC) and sia-forge (QA PC CC) are on T-236; sia-builder (QA PC CC) is blocked on cursor-agent (T-235 P2-2).",
       "watch_out": [
         "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
@@ -5607,14 +5571,6 @@
       "first_rev": 263
     },
     {
-      "n": 158,
-      "date": "2026-10-02",
-      "uuid": "ae490afb-211a-42c7-b82e-292e88d0a9f4",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 294
-    },
-    {
       "n": 159,
       "date": "2026-10-03",
       "uuid": "e05907a8-86cf-436b-bee3-ce6f2214e02e",
@@ -5693,6 +5649,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 392
+    },
+    {
+      "n": 169,
+      "date": "2026-10-13",
+      "uuid": "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 427
     }
   ]
 }
