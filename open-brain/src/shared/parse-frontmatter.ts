@@ -38,7 +38,7 @@ function parseInlineArrayInner(inner: string): string[] {
       }
       const chunk = rest.slice(0, i + 1);
       items.push(JSON.parse(chunk) as string);
-      rest = rest.slice(i + 1);
+      rest = rest.slice(i + 1).trimStart();
       if (rest.startsWith(",")) rest = rest.slice(1);
       continue;
     }
