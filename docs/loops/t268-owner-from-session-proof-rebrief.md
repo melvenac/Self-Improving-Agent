@@ -27,6 +27,14 @@ round-1 ruling, not a safety. (How a session comes to have two proofs was not me
 process keeps its id, which would do it. The fix does not depend on the cause.) The safety the rule was for stays:
 the fallback never picks between two LIVE candidates.
 
+**Correction (Atlas, s169, after round 2 came back READY):** "one pid is alive" above was measured with
+`process.kill(pid, 0)`, which only says that SOME process holds the pid. Re-checked with this rule's own two checks
+(the proof's `proc_start` and a `claude.exe` command line, through the main tree's `processStartTime` and Win32
+table), every "alive" pid in the duplicate groups is a REUSED pid (one is now `conhost.exe`): no session live at the
+time of the check had a stale twin, so round 1 would have refused none of them that day. What the data does support:
+4 sessions in about 16 days were live in a second process while the first process's proof was still on disk, and
+round 1 would have refused each of them during that second life. The ruling stands; the evidence was overstated.
+
 ## Ruling (exact; paths under `open-brain/`)
 
 1. **`src/suite-owner.ts`, `ownerFromSessionProof` only.** Collect every proof whose `session_id` equals
