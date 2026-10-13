@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 440,
+  "revision": 441,
   "project": {
     "name": "self-improving-agent"
   },
@@ -5738,7 +5738,7 @@
       "seat": "planner",
       "pick_up": "Session 170 (Atlas) ROLLED 2026-10-13 ~16:4x CDT on Aaron's 'ready to roll?'. FIRST, THE MERGE TRAIN: Aaron's word is GIVEN and VERIFIED (typed 21:33:00Z in clark's window, relay-check): 'SIA merges #678/#673/#685/#688 · A2A v1.22.14 release, go'. One at a time: pr-refresh.sh <pr> <reviewed head> (#678 4474f062 T-159, then #673 df92decc T-243, then #685 4ef4bdde T-275, then #688 5a9443ab T-161), send clark each refreshed head with CI green, wait for MERGED, then the next. ONE sia-rebuild after the last; then live checks: node ~/Worktrees/s170-livechecks/batch2-livecheck.mjs <merge sha40> (T-159, T-243, T-275; its dry run on the old build fails every new-behaviour check), plus a T-161 check to write (the built renderStartReport with a proven session whose transcriptPath is missing prints NO TRANSCRIPT in the header and the Briefing; an existing file prints nothing), one PASS/FAIL line each to clark, then close the four tasks. SECOND: T-172 (#676) review came back CHANGES (F1 HIGH: npm install rewrites package-lock.json, the restore fails exit 4; F2-F5 in T-172's note): rule from C:/Users/melve/AppData/Local/Temp/t172-review-reply.md first-hand and write amendment-2. Earlier today: #669 T-022, #672 T-251, #677 T-270 merged and live-checked (closed); #687 T-278 merged under SG-1 (closed). NEXT briefs: T-282 (tests only, small), T-281 (T-161 follow-ups), T-271 (after #685 merges), T-276 (after #688 merges; design in its note), T-272, T-279, T-280; P0 T-024 waits on Aaron. QA PC OFF for a RAM upgrade (Aaron, told via Relay for clark): SIA gave GO for its wakers' restart at v1.22.13 (confirm each polls, G-058, and no SIA turn replays), then the owed QA PC live checks (T-267, the T-268/T-168 CC half) and the T-168 Cursor half; T-281's Cursor check and T-196 HB-1's rewrite also wait for the Cursor seats. SIA gave GO for A2A-Hub v1.22.14 on tcm (Relay's D-033 notice).",
       "watch_out": [
-        "Master has no branch protection: records and docs PRs merge by hand (pr-keep-current.sh merges a CLEAN .agents/docs-only PR, pinned, and prints 'merged #n' on exit; it exits 0 even when it gives up after 30 min, so read its last line); code PRs need Aaron's word.",
+        "Master has no branch protection: records and docs PRs merge by hand (pr-keep-current.sh merges a CLEAN .agents/docs-only PR, pinned, prints 'merged #n' on exit, and exits 2 when it gives up after 30 min; read its exit unpiped, because a '| tail' wrapper reports tail's 0, as s170 found). Code PRs need Aaron's word.",
         "Merges go one at a time: pr-refresh.sh just before each PR's own merge. A records or docs PR that merges between a refresh and its merge breaks clark's merge-tree gate, so land records only when no code merge is mid-sequence.",
         "SG-1 (D-135): config, rule-text and tests-only PRs merge on green CI pinned to the head, with no QA gate and no Aaron word (T-278, #687). Code needs a QA ACCEPT from a judge other than the builder, and today Aaron's word too.",
         "Write handoff open questions and watch-outs as plain strings until T-282 lands: state-render.test.ts T183-3 reads the live record and fails CI on the object form (#690's first CI run).",
@@ -5752,7 +5752,7 @@
       ],
       "open_questions": [
         "Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 answers it with one live Cursor /start when the QA PC is back.",
-        "Planner, D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement."
+        "Planner, D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement; s170 then repeated the mistake once more (pr-keep-current's exit read through '| tail')."
       ],
       "session": 170,
       "loop_state": {

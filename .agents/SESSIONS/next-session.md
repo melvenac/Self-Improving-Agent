@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 440 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 441 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -10,7 +10,7 @@ Session 170 (Atlas) ROLLED 2026-10-13 ~16:4x CDT on Aaron's 'ready to roll?'. FI
 
 ### Watch out
 
-- Master has no branch protection: records and docs PRs merge by hand (pr-keep-current.sh merges a CLEAN .agents/docs-only PR, pinned, and prints 'merged #n' on exit; it exits 0 even when it gives up after 30 min, so read its last line); code PRs need Aaron's word.
+- Master has no branch protection: records and docs PRs merge by hand (pr-keep-current.sh merges a CLEAN .agents/docs-only PR, pinned, prints 'merged #n' on exit, and exits 2 when it gives up after 30 min; read its exit unpiped, because a '| tail' wrapper reports tail's 0, as s170 found). Code PRs need Aaron's word.
 - Merges go one at a time: pr-refresh.sh just before each PR's own merge. A records or docs PR that merges between a refresh and its merge breaks clark's merge-tree gate, so land records only when no code merge is mid-sequence.
 - SG-1 (D-135): config, rule-text and tests-only PRs merge on green CI pinned to the head, with no QA gate and no Aaron word (T-278, #687). Code needs a QA ACCEPT from a judge other than the builder, and today Aaron's word too.
 - Write handoff open questions and watch-outs as plain strings until T-282 lands: state-render.test.ts T183-3 reads the live record and fails CI on the object form (#690's first CI run).
@@ -25,7 +25,7 @@ Session 170 (Atlas) ROLLED 2026-10-13 ~16:4x CDT on Aaron's 'ready to roll?'. FI
 ### Open questions
 
 - Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 answers it with one live Cursor /start when the QA PC is back.
-- Planner, D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement.
+- Planner, D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement; s170 then repeated the mistake once more (pr-keep-current's exit read through '| tail').
 
 ### Loop state
 
