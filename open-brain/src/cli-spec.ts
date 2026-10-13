@@ -22,7 +22,7 @@ export const COMMAND_SPECS = {
   },
   relocate: {
     name: "relocate",
-    booleans: ["--apply"],
+    booleans: ["--apply", "--worktrees"],
     values: { "--from": "both", "--to": "both" },
     positionals: "none",
   },

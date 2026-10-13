@@ -1,5 +1,5 @@
-import { resolve, join } from "node:path";
-import { existsSync, readdirSync } from "node:fs";
+import { resolve, join, dirname, basename } from "node:path";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 
 export function canonicalizeProjectDir(p?: string | null): string | null {
@@ -39,6 +39,57 @@ export function projectDisplayName(rawProjectDir?: string | null, fallback = "Ge
   if (!rawProjectDir) return fallback;
   const segments = rawProjectDir.replace(/[/\\]+$/, "").split(/[/\\]/).filter(Boolean);
   return segments.pop() || fallback;
+}
+
+/** First line of a small git metadata file, CR stripped; "" when it cannot be read. */
+function readGitLine(file: string): string {
+  try {
+    return readFileSync(file, "utf8").split("\n")[0]!.replace(/\r$/, "").trim();
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * T-249: the main worktree a linked worktree belongs to, from git's own files.
+ *
+ * A linked worktree's `.git` is a FILE, `gitdir: <repo>/.git/worktrees/<name>`,
+ * and that gitdir's `commondir` points back at the shared `<repo>/.git`. Without
+ * this, every worktree of one repo was a project of its own: knowledge stored in
+ * sia-forge never reached a recall scoped from the main tree.
+ *
+ * Reads files only, never spawns git and never throws. Anything that is not
+ * plainly a linked worktree comes back unchanged: no `.git` file (a normal repo,
+ * or no repo), no `commondir` (a submodule or a separate git dir), a common dir
+ * not named `.git` (a bare repo). Parent directories are NOT walked: a nested
+ * project without its own `.git` stays its own project.
+ */
+export function mainWorktreeRoot(rawDir: string): string {
+  try {
+    if (!rawDir || !rawDir.trim()) return rawDir;
+    const dotGit = join(rawDir, ".git");
+    if (!existsSync(dotGit) || !statSync(dotGit).isFile()) return rawDir;
+    const m = /^gitdir:\s*(.+)$/.exec(readGitLine(dotGit));
+    if (!m) return rawDir;
+    const gitdir = resolve(rawDir, m[1]!);
+    const commondirFile = join(gitdir, "commondir");
+    if (!existsSync(commondirFile)) return rawDir;
+    const commonDir = resolve(gitdir, readGitLine(commondirFile));
+    if (basename(commonDir) !== ".git") return rawDir;
+    return dirname(commonDir);
+  } catch {
+    return rawDir;
+  }
+}
+
+/** The repository a directory belongs to, as an identity key (T-249). */
+export function projectIdentity(raw: string): string {
+  return canonicalizeProjectDir(mainWorktreeRoot(raw)) ?? raw;
+}
+
+/** The repository's display name for a directory (T-249). */
+export function projectIdentityName(raw: string, fallback?: string): string {
+  return projectDisplayName(mainWorktreeRoot(raw), fallback);
 }
 
 /**
