@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import { existsSync, readdirSync, readFileSync, appendFileSync } from "fs";
+import { existsSync, readdirSync, readFileSync, appendFileSync, openSync, closeSync, statSync, unlinkSync } from "fs";
 import { join, basename } from "path";
 import { homedir } from "os";
 
@@ -32,7 +32,11 @@ export interface InvocationLogResult {
   unreadableSessions: number;
   /** T-048: events read whose append to the log failed. */
   appendFailures: number;
+  /** T-258 F6: another SessionEnd held the log lock; nothing was read or written. */
+  lockedOut?: true;
 }
+
+const LOCK_STALE_MS = 10 * 60_000;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -107,100 +111,131 @@ export function logInvocations(sessionsDbDir: string = SESSIONS_DB_DIR, logPath:
     return { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0 };
   }
 
-  // Read already-logged session IDs
-  const loggedSessions = new Set<string>();
-  if (existsSync(logPath)) {
-    try {
-      const lines = readFileSync(logPath, "utf8").split("\n").filter(Boolean);
-      for (const line of lines) {
+  const lockPath = `${logPath}.lock`;
+  let lockFd: number | null = null;
+  try {
+    lockFd = openSync(lockPath, "wx");
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "EEXIST") {
+      let stale = false;
+      try { stale = Date.now() - statSync(lockPath).mtimeMs > LOCK_STALE_MS; } catch { /* lock vanished */ }
+      if (stale) {
+        try { unlinkSync(lockPath); } catch { /* another process took it over */ }
         try {
-          const entry = JSON.parse(line) as { session?: string };
-          if (entry.session) loggedSessions.add(entry.session);
-        } catch { /* skip malformed lines */ }
+          lockFd = openSync(lockPath, "wx");
+        } catch (retryErr) {
+          if ((retryErr as NodeJS.ErrnoException).code === "EEXIST") {
+            return { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0, lockedOut: true };
+          }
+        }
+      } else {
+        return { logged: 0, skippedSessions: 0, unreadableSessions: 0, appendFailures: 0, lockedOut: true };
       }
-    } catch { /* file read error — proceed without dedup */ }
+    }
+    // any other open error: proceed without a lock
   }
 
-  const dbFiles = readdirSync(sessionsDbDir).filter((f) => f.endsWith(".db"));
-  let totalLogged = 0;
-  let skippedSessions = 0;
-  let unreadableSessions = 0;
-  let appendFailures = 0;
+  try {
+    // Read already-logged session IDs
+    const loggedSessions = new Set<string>();
+    if (existsSync(logPath)) {
+      try {
+        const lines = readFileSync(logPath, "utf8").split("\n").filter(Boolean);
+        for (const line of lines) {
+          try {
+            const entry = JSON.parse(line) as { session?: string };
+            if (entry.session) loggedSessions.add(entry.session);
+          } catch { /* skip malformed lines */ }
+        }
+      } catch { /* file read error — proceed without dedup */ }
+    }
 
-  for (const file of dbFiles) {
-    const filePath = join(sessionsDbDir, file);
-    let sessionDb: Database.Database | null = null;
-    try {
-      sessionDb = new Database(filePath, { readonly: true });
+    const dbFiles = readdirSync(sessionsDbDir).filter((f) => f.endsWith(".db"));
+    let totalLogged = 0;
+    let skippedSessions = 0;
+    let unreadableSessions = 0;
+    let appendFailures = 0;
 
-      const hasEvents = sessionDb
-        .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='session_events'")
-        .get();
-      if (!hasEvents) { sessionDb.close(); continue; }
+    for (const file of dbFiles) {
+      const filePath = join(sessionsDbDir, file);
+      let sessionDb: Database.Database | null = null;
+      try {
+        sessionDb = new Database(filePath, { readonly: true });
 
-      const meta = sessionDb
-        .prepare("SELECT session_id, project_dir FROM session_meta LIMIT 1")
-        .get() as SessionMeta | undefined;
+        const hasEvents = sessionDb
+          .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='session_events'")
+          .get();
+        if (!hasEvents) { sessionDb.close(); continue; }
 
-      if (!meta || loggedSessions.has(meta.session_id)) {
-        sessionDb.close();
-        if (meta) skippedSessions++;
-        continue;
-      }
+        const meta = sessionDb
+          .prepare("SELECT session_id, project_dir FROM session_meta LIMIT 1")
+          .get() as SessionMeta | undefined;
 
-      const invocations = sessionDb
-        .prepare(
-          "SELECT type, data, created_at FROM session_events WHERE type IN ('skill', 'mcp') OR (type = 'user_prompt' AND data LIKE '/%') ORDER BY id"
-        )
-        .all() as InvocationEvent[];
-      sessionDb.close();
-
-      const project = projectFromDir(meta.project_dir);
-      const seenCommands = new Set<string>();
-
-      for (const inv of invocations) {
-        const rawData = (inv.data || "").trim();
-        if (!rawData) continue;
-
-        let invType: "skill" | "mcp" | "command";
-        let name: string;
-
-        if (inv.type === "skill") {
-          invType = "skill";
-          name = rawData;
-          seenCommands.add(name);
-        } else if (inv.type === "mcp") {
-          invType = "mcp";
-          name = rawData.split(":")[0].trim();
-        } else if (inv.type === "user_prompt" && rawData.startsWith("/")) {
-          const cmdMatch = rawData.match(/^\/(\S+)/);
-          if (!cmdMatch) continue;
-          name = cmdMatch[1];
-          if (seenCommands.has(name)) continue;
-          invType = "command";
-        } else {
+        if (!meta || loggedSessions.has(meta.session_id)) {
+          sessionDb.close();
+          if (meta) skippedSessions++;
           continue;
         }
 
-        const entry: InvocationEntry = {
-          ts: inv.created_at,
-          type: invType,
-          name,
-          session: meta.session_id,
-          project,
-        };
+        const invocations = sessionDb
+          .prepare(
+            "SELECT type, data, created_at FROM session_events WHERE type IN ('skill', 'mcp') OR (type = 'user_prompt' AND data LIKE '/%') ORDER BY id"
+          )
+          .all() as InvocationEvent[];
+        sessionDb.close();
 
-        try {
-          appendFileSync(logPath, JSON.stringify(entry) + "\n");
-          totalLogged++;
-        } catch { appendFailures++; }
+        const project = projectFromDir(meta.project_dir);
+        const seenCommands = new Set<string>();
+
+        for (const inv of invocations) {
+          const rawData = (inv.data || "").trim();
+          if (!rawData) continue;
+
+          let invType: "skill" | "mcp" | "command";
+          let name: string;
+
+          if (inv.type === "skill") {
+            invType = "skill";
+            name = rawData;
+            seenCommands.add(name);
+          } else if (inv.type === "mcp") {
+            invType = "mcp";
+            name = rawData.split(":")[0].trim();
+          } else if (inv.type === "user_prompt" && rawData.startsWith("/")) {
+            const cmdMatch = rawData.match(/^\/(\S+)/);
+            if (!cmdMatch) continue;
+            name = cmdMatch[1];
+            if (seenCommands.has(name)) continue;
+            invType = "command";
+          } else {
+            continue;
+          }
+
+          const entry: InvocationEntry = {
+            ts: inv.created_at,
+            type: invType,
+            name,
+            session: meta.session_id,
+            project,
+          };
+
+          try {
+            appendFileSync(logPath, JSON.stringify(entry) + "\n");
+            totalLogged++;
+          } catch { appendFailures++; }
+        }
+      } catch {
+        unreadableSessions++;
+        // A db that opened but could not be read must not stay open: on Windows it locks the file.
+        try { sessionDb?.close(); } catch { /* already closed */ }
       }
-    } catch {
-      unreadableSessions++;
-      // A db that opened but could not be read must not stay open: on Windows it locks the file.
-      try { sessionDb?.close(); } catch { /* already closed */ }
+    }
+
+    return { logged: totalLogged, skippedSessions, unreadableSessions, appendFailures };
+  } finally {
+    if (lockFd !== null) {
+      try { closeSync(lockFd); } catch { /* already closed */ }
+      try { unlinkSync(lockPath); } catch { /* already gone */ }
     }
   }
-
-  return { logged: totalLogged, skippedSessions, unreadableSessions, appendFailures };
 }
