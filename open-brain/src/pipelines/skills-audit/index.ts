@@ -150,7 +150,6 @@ function countKeys(commands: string[]): Map<string, number> {
   return counts;
 }
 
-/** Throws an Error whose message is the CLI's stderr line when there is nothing to read. */
 interface TranscriptFile {
   name: string;
   path: string;
@@ -177,6 +176,7 @@ function listTranscripts(dir: string, runtime: AuditRuntime): TranscriptFile[] {
   return out.sort(byNewest);
 }
 
+/** Throws an Error whose message is the CLI's stderr line when there is nothing to read. */
 export function auditSkills(opts: AuditOptions): AuditReport {
   const runtime: AuditRuntime = opts.runtime ?? "claude";
   const seat = opts.seat?.trim().toLowerCase() || (readAgentIdentity(opts.projectDir)?.name.toLowerCase() ?? null);
