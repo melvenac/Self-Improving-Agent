@@ -155,9 +155,12 @@ export type Win32TableResult =
 export function parseWin32ProcessTable(raw: string): Win32TableResult {
   const trimmed = raw.trim();
   if (!trimmed) return { ok: false, reason: "Win32 process table: empty stdout" };
+  // PowerShell 5.1's ConvertTo-Json can leave a control character raw in a CommandLine (T-270).
+  // A space, not deletion, so the tokens either side of it stay apart for isClaudeExeCommandLine.
+  const cleaned = trimmed.replace(/[\u0000-\u001f]/g, " ");
   let parsed: unknown;
   try {
-    parsed = JSON.parse(trimmed);
+    parsed = JSON.parse(cleaned);
   } catch (err) {
     return { ok: false, reason: `Win32 process table: unparseable JSON (${err instanceof Error ? err.message : String(err)})` };
   }
