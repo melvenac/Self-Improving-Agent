@@ -117,7 +117,7 @@ Every entry is one of two kinds, recorded in `knowledge_index.fact_kind`:
 - **State** — one current value that changes (a path, a version, a port). Wants *replacing*.
 - **Event** — a timestamped thing that happened (a gotcha, a decision). Wants *appending*.
 
-The update rules are opposites. `knowledge_index` can only append, so every changed state fact has left its predecessor live and recallable. **NULL means unclassified, not `event`.** Pass `kind` on `ob_store` — `effectiveKind` always prefers a recorded label over an inferred one.
+The update rules are opposites. A `state` stored again under the same key replaces its value, and the old value moves to the vault note's `## Log`; it replaces only a recorded `state` — never an event or an unlabelled entry — and a repeated `event` key is refused. **NULL means unclassified, not `event`.** Pass `kind` on `ob_store`: the label is only ever what the storer recorded.
 
 ### Skill Distillation
 

@@ -119,7 +119,7 @@ The 14 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_feed
 
 ## Recall
 
-`ob_recall` is FTS5 keyword search over the knowledge index, ranked by BM25 with recency decay and a failure boost. Knowledge content is markdown in a vault directory (`OPEN_BRAIN_VAULT_DIR`, default `~/Obsidian Vault v2`); `knowledge-v2.db` (override with `KNOWLEDGE_V2_DB`) holds the index, the recall and feedback logs, sessions and chunks. Entries carry a **`state` or `event` kind**: a state is one current value that wants replacing, an event is a timestamped thing that wants appending. Pass `kind` to `ob_store`.
+`ob_recall` is FTS5 keyword search over the knowledge index, ranked by BM25 with recency decay and a failure boost. Knowledge content is markdown in a vault directory (`OPEN_BRAIN_VAULT_DIR`, default `~/Obsidian Vault v2`); `knowledge-v2.db` (override with `KNOWLEDGE_V2_DB`) holds the index, the recall and feedback logs, sessions and chunks. Entries carry a **`state` or `event` kind**: a state is one current value, and a later `state` stored under the same key replaces it (the old value moves to the note's `## Log`); an event is a timestamped thing that is appended, and a repeated event key is refused. Pass `kind` to `ob_store`.
 
 ### The recall trigger
 
