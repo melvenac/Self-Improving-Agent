@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 434,
+  "revision": 435,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-13 (Aaron, clark's window, 08:53 CDT): max parallel until the weekly reset at 00:00: every code-only brief goes to clark as soon as it is pinned; desktop up to 4 CC runs, laptop 1, QA PC closed; Opus 5.5 allowed for builds; runs end at READY + PR; merges still need Aaron's word. Running: T-264, the D-148 recall-trigger effect measurement. Pending Aaron: T-194 approval mechanics (a)/(b)/(c); planner recommends (c) now, (b) later. Q1 and Q2 of s167 are answered (D-148, D-146).",
-    "since_session": 168
+    "text": "D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-13 (Aaron, clark's window, 08:53 CDT): max parallel until the weekly reset at 00:00: every code-only brief goes to clark as soon as it is pinned; runs end at READY + PR; merges still need Aaron's word. QA PC OFF since ~14:3x CDT 10-13 for a RAM upgrade (Aaron's call, told via Relay for clark; no ETA): code-only runs and Opus reviews go to the desktop and the laptop meanwhile; its wakers restart at v1.22.13 on clark's word (SIA GO given, s170). Pending Aaron: T-194 approval mechanics (a)/(b)/(c); planner recommends (c) now, (b) later.",
+    "since_session": 170
   },
   "tasks": [
     {
@@ -49,13 +49,13 @@
       "id": "T-022",
       "title": "Replace-on-write for `state` facts",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 48,
-      "closed_session": null,
+      "closed_session": 170,
       "supersedes": null,
-      "note": "the structural fix deferred from Session 48, and the half that actually stops rot rather than reporting it. A `state` write should replace its predecessor and demote the old value to a `## Log` section in the vault note; `event` keeps appending. The single place to change is `pipelines/store/index.ts` where `writeExperience` returning null currently ends the write. **Gated on real labels**: the classifier is ~50–60% precise on the state side, so replacing on an inferred label would archive history. Wait until `ob_store kind` has produced a meaningful number of recorded labels — `effectiveKind` already prefers them. (Session 48) — s168 planner triage: the gate is now MEASURABLE and effectively met. The recorded label is knowledge_index.fact_kind (db-v2.ts:145,263; storer-supplied only, f28247df). Live read-only count: 654 rows = 251 event / 19 state / 384 unlabelled; 270 of the 306 rows created since 2026-08-07 carry a label. The classifier and effectiveKind were cut in e05ad9a7, so a replace could only ever fire on a RECORDED state label: the risk the gate guarded is gone. Replace-on-write itself is not built (store/index.ts:72-77 still refuses; server.ts:873-877 appends). Next: research + brief (what is 'the predecessor' of a state fact: same key?). — s168: brief docs/loops/t022-state-replace-brief.md (#650), queued at clark. Research (read-only): predecessor = the same exact key AND the same note path, fact_kind 'state', not archived; 0 of the 19 live state rows share a key, so no existing row changes at deploy. Planner rulings: a state does not replace an unlabelled or event row; the row keeps its id (ratings attach to the new value); created_at is kept (known limit: a replaced value ranks as old); the Log is newest first under '### Replaced <ISO>'; the cross-scope re-point is T-266. — — s169: clark LAUNCHED it (desktop, Opus 5.5, brief 817f6985, base 50c112d7) on the OLD runner (G-001: its prompt's em-dashes arrived as '?'). READY 885b4f82 PR #669, 3 commits. Planner review, first-hand: the diff is on the brief's allowed list; the predecessor rule is exact (incoming state, the same key, a live state row, the note exists); an equal value returns unchanged and writes nothing; a replace writes a temp file and renames it into place, keeps the original created, logs newest first, then indexes only the new value on the same row id; an index failure after the note write throws and never replies Replaced; adoption indexes only the current value (CRLF and BOM safe); handleStore extracted with the schema's defaults unchanged; the replies and the kind text are as ruled, em-dashes intact. Reply: base 153/153; red 8/9 (R3 green at base, allowed); tsc 0; 162/162 at the head; mutants M1-M8 red. CI test SUCCESS at 885b4f82 (its 190cff63 run failed only retirements-live R-011, which the brief's test list missed; commit 3 fixed it by sharing one maturity seed and keeping R-011's pinned db-v2 comment line verbatim under a correction: T-273). ACCEPTED to clark (s169); NOT covered by Aaron's 17:50Z word: needs 'merge SIA #669 (T-022)'.",
+      "note": "the structural fix deferred from Session 48, and the half that actually stops rot rather than reporting it. A `state` write should replace its predecessor and demote the old value to a `## Log` section in the vault note; `event` keeps appending. The single place to change is `pipelines/store/index.ts` where `writeExperience` returning null currently ends the write. **Gated on real labels**: the classifier is ~50–60% precise on the state side, so replacing on an inferred label would archive history. Wait until `ob_store kind` has produced a meaningful number of recorded labels — `effectiveKind` already prefers them. (Session 48) — s168 planner triage: the gate is now MEASURABLE and effectively met. The recorded label is knowledge_index.fact_kind (db-v2.ts:145,263; storer-supplied only, f28247df). Live read-only count: 654 rows = 251 event / 19 state / 384 unlabelled; 270 of the 306 rows created since 2026-08-07 carry a label. The classifier and effectiveKind were cut in e05ad9a7, so a replace could only ever fire on a RECORDED state label: the risk the gate guarded is gone. Replace-on-write itself is not built (store/index.ts:72-77 still refuses; server.ts:873-877 appends). Next: research + brief (what is 'the predecessor' of a state fact: same key?). — s168: brief docs/loops/t022-state-replace-brief.md (#650), queued at clark. Research (read-only): predecessor = the same exact key AND the same note path, fact_kind 'state', not archived; 0 of the 19 live state rows share a key, so no existing row changes at deploy. Planner rulings: a state does not replace an unlabelled or event row; the row keeps its id (ratings attach to the new value); created_at is kept (known limit: a replaced value ranks as old); the Log is newest first under '### Replaced <ISO>'; the cross-scope re-point is T-266. — — s169: clark LAUNCHED it (desktop, Opus 5.5, brief 817f6985, base 50c112d7) on the OLD runner (G-001: its prompt's em-dashes arrived as '?'). READY 885b4f82 PR #669, 3 commits. Planner review, first-hand: the diff is on the brief's allowed list; the predecessor rule is exact (incoming state, the same key, a live state row, the note exists); an equal value returns unchanged and writes nothing; a replace writes a temp file and renames it into place, keeps the original created, logs newest first, then indexes only the new value on the same row id; an index failure after the note write throws and never replies Replaced; adoption indexes only the current value (CRLF and BOM safe); handleStore extracted with the schema's defaults unchanged; the replies and the kind text are as ruled, em-dashes intact. Reply: base 153/153; red 8/9 (R3 green at base, allowed); tsc 0; 162/162 at the head; mutants M1-M8 red. CI test SUCCESS at 885b4f82 (its 190cff63 run failed only retirements-live R-011, which the brief's test list missed; commit 3 fixed it by sharing one maturity seed and keeping R-011's pinned db-v2 comment line verbatim under a correction: T-273). ACCEPTED to clark (s169); NOT covered by Aaron's 17:50Z word: needs 'merge SIA #669 (T-022)'. — s170 CLOSED. Merged 28043a55 (#669, refreshed 46f9dd22, patch-id = the reviewed 885b4f82; trees equal; Aaron 19:28:15Z 'merge SIA #669 + #672 after the new Atlas refreshes them (rec yes)', relay-check verified); main rebuilt c1975286. LIVE CHECK PASS (main build server.js, temp HOME, store and vault): state K stored (id 1); a second value replies 'Replaced state ... the previous value moved to \"## Log\" (2026-10-13) in the vault note and is no longer recalled'; the old token is not recalled; the same value again replies 'Unchanged — ... Nothing was written.'; a repeated event replies 'Not stored —'. Running seats serve it only after /mcp reconnect open-brain.",
       "note_by": null,
-      "closed_rev": null
+      "closed_rev": 435
     },
     {
       "id": "T-023",
@@ -444,7 +444,7 @@
       "opened_session": 76,
       "closed_session": null,
       "supersedes": null,
-      "note": "R22 (amendment 8 at 29766dc): the common case pays ~0.28 s on every Bash call (p95 277 ms not-asked vs 65 ms interpreter floor) because R16's census writes a fire row on every invocation, and that row is a write, so a not-asked call must load the native sqlite binding and open the store. Kept for one loop for the denominator. Fix shape named by the developer: append not-asked fires to the log the hook already writes and reconcile them into trigger_fires by the session-end hook that already runs, so the common case pays the interpreter floor and the three counts stay whole. First production numbers at close: not-asked 5 / silent 10 / injected 1 — ten recognised commands asked and got nothing, which the same table now makes askable (is the floor conservative or does it train seats to ignore a silent channel?). — s168: briefed: docs/loops/t159-not-asked-fast-path-brief.md (#654), queued at clark (launch-queue item 16, after T-243). Research (read-only): the cost on a not-asked call is mostly zod via the policy loader (110-150 ms), then policy.js, db-v2 and the better-sqlite3 wrapper; the native binding loads only at new Database(). Planner rulings: a separate pending .jsonl beside the DB (the failure log stays human-facing), canonical command only (A1 r5), reconcile in cli-session-end (before the vault exit, never creating the store) AND in ob_end (Cursor seats have no SessionEnd), claim by rename, NOT EXISTS on (session, created_at, command, state), the deadline clock starts after the dynamic imports. Out of scope: ob_stats census lag, zod on the asked path. — — s169: clark LAUNCHED it ~13:3x CDT (desktop, fixed runner; session oneoff-t-159 confirmed running). Clark raised handleEnd (ob_end) and cli-session-end (the SessionEnd hook) to HIGH: review that path first-hand at READY.",
+      "note": "R22 (amendment 8 at 29766dc): the common case pays ~0.28 s on every Bash call (p95 277 ms not-asked vs 65 ms interpreter floor) because R16's census writes a fire row on every invocation, and that row is a write, so a not-asked call must load the native sqlite binding and open the store. Kept for one loop for the denominator. Fix shape named by the developer: append not-asked fires to the log the hook already writes and reconcile them into trigger_fires by the session-end hook that already runs, so the common case pays the interpreter floor and the three counts stay whole. First production numbers at close: not-asked 5 / silent 10 / injected 1 — ten recognised commands asked and got nothing, which the same table now makes askable (is the floor conservative or does it train seats to ignore a silent channel?). — s168: briefed: docs/loops/t159-not-asked-fast-path-brief.md (#654), queued at clark (launch-queue item 16, after T-243). Research (read-only): the cost on a not-asked call is mostly zod via the policy loader (110-150 ms), then policy.js, db-v2 and the better-sqlite3 wrapper; the native binding loads only at new Database(). Planner rulings: a separate pending .jsonl beside the DB (the failure log stays human-facing), canonical command only (A1 r5), reconcile in cli-session-end (before the vault exit, never creating the store) AND in ob_end (Cursor seats have no SessionEnd), claim by rename, NOT EXISTS on (session, created_at, command, state), the deadline clock starts after the dynamic imports. Out of scope: ob_stats census lag, zod on the asked path. — — s169: clark LAUNCHED it ~13:3x CDT (desktop, fixed runner; session oneoff-t-159 confirmed running). Clark raised handleEnd (ob_end) and cli-session-end (the SessionEnd hook) to HIGH: review that path first-hand at READY. — s170: READY 689df661 PR #678 (desktop one-off, base 1395fd75; 8 deviations stated, none silent: N1's spy uses the async module.register because registerHooks' sync resolve cannot reach tsx; `started` now begins after the dynamic imports and the policy load; ob_end dry_run prints 'not reconciled (dry run)'). Planner ACCEPT: the diff is the ruling, run.ts changes its comment only, 9 allowed files, 7 of 7 mutants killed, CI pass, the not-asked hook runs at p50 117 ms against a 132 ms interpreter floor (base 415 ms); the reconcile's NOT EXISTS uses idx_trigger_fires_session (live store, 35,591 rows). Opus second review RUNNING on the desktop (tag t159-review; body C:/Users/melve/AppData/Local/Temp/T-159-opus-review-body.md; reply t159-review-reply.md). Merge needs Aaron's word after the review, with pr-refresh first.",
       "note_by": null,
       "closed_rev": null
     },
@@ -595,7 +595,7 @@
       "opened_session": 78,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154. — FINDING, planner session 150 (from T-201's stop): StateSchema is z.strictObject at every level, so ANY new field written to master's record blinds every checkout whose build predates it, including the main tree that serves every session's MCP server. T-158 (merged d5dfa74) already added optional GapSchema fields (status, closed_session, closed_rev). The first close_gap tombstone that reaches master will therefore make every not-yet-rebuilt build fail to parse the record. It is dormant until then, and it is a real reason for this task: the serving build must be rebuilt when a schema-changing merge lands, and a refusing command must say so. Until it ships: rebuild the main tree (npm install, not npm ci) before the first close_gap after d5dfa74, and tell the QA PC's main checkout the same. — s168 planner triage: half 1 DONE (4d19938/#345 serving-build line with its distance from origin/master; refined by #373 SERVED_PATHS). Stays open after 4d19938 for half 2: one refusing command that updates the main checkout, rebuilds and verifies it. Today's stand-in is clark's untracked clark-ops/scripts/sia-rebuild.sh (refuses a SHA not on master, backs up, checks out, npm ci when the lockfile changed, rebuilds, prints build-info) but it does not refuse a dirty tree, does not read build freshness back against origin/master, and does not list which sessions must reconnect. — s168: half 2 briefed: docs/loops/t172-main-rebuild-brief.md (#650), queued at clark: open-brain main-rebuild [<sha>] [--dry-run] [--no-fetch] (refusals in order: linked worktree, dirty tree, HEAD commits origin lacks, fetch failure, sha not on origin/master, not ahead of the BUILD STAMP, a better-sqlite3 change in the lock, npm not found); backup under the git common dir; npm install only on a lock change, never ci; V1 stamp, V2 import, V3 freshness 'current'; restore on failure (exit 3/4); RECONNECT list from live by-pid proofs. The coordinator was told of four defects in its stand-in sia-rebuild.sh (npm ci on a lock change; 'already at' by HEAD; build exit ignored with no restore; --help exits 1 hidden by | head) and will patch it until T-172 replaces it. — — s169: clark LAUNCHED half 2 at 13:10 CDT (desktop, Opus 5.5, base 50c112d7) on the OLD runner: non-ASCII in its prompt arrived as '?'. At READY, check the three '·' strings against the brief on master (L53's regex and STALE line, L60's 'REBUILT: serving build <sha7> · current (fetch <time>).'). Expect update-branch conflicts at refresh: sync/checks.ts (changed by T-267) and cli.ts / cli-spec.ts (changed by T-249).",
+      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154. — FINDING, planner session 150 (from T-201's stop): StateSchema is z.strictObject at every level, so ANY new field written to master's record blinds every checkout whose build predates it, including the main tree that serves every session's MCP server. T-158 (merged d5dfa74) already added optional GapSchema fields (status, closed_session, closed_rev). The first close_gap tombstone that reaches master will therefore make every not-yet-rebuilt build fail to parse the record. It is dormant until then, and it is a real reason for this task: the serving build must be rebuilt when a schema-changing merge lands, and a refusing command must say so. Until it ships: rebuild the main tree (npm install, not npm ci) before the first close_gap after d5dfa74, and tell the QA PC's main checkout the same. — s168 planner triage: half 1 DONE (4d19938/#345 serving-build line with its distance from origin/master; refined by #373 SERVED_PATHS). Stays open after 4d19938 for half 2: one refusing command that updates the main checkout, rebuilds and verifies it. Today's stand-in is clark's untracked clark-ops/scripts/sia-rebuild.sh (refuses a SHA not on master, backs up, checks out, npm ci when the lockfile changed, rebuilds, prints build-info) but it does not refuse a dirty tree, does not read build freshness back against origin/master, and does not list which sessions must reconnect. — s168: half 2 briefed: docs/loops/t172-main-rebuild-brief.md (#650), queued at clark: open-brain main-rebuild [<sha>] [--dry-run] [--no-fetch] (refusals in order: linked worktree, dirty tree, HEAD commits origin lacks, fetch failure, sha not on origin/master, not ahead of the BUILD STAMP, a better-sqlite3 change in the lock, npm not found); backup under the git common dir; npm install only on a lock change, never ci; V1 stamp, V2 import, V3 freshness 'current'; restore on failure (exit 3/4); RECONNECT list from live by-pid proofs. The coordinator was told of four defects in its stand-in sia-rebuild.sh (npm ci on a lock change; 'already at' by HEAD; build exit ignored with no restore; --help exits 1 hidden by | head) and will patch it until T-172 replaces it. — — s169: clark LAUNCHED half 2 at 13:10 CDT (desktop, Opus 5.5, base 50c112d7) on the OLD runner: non-ASCII in its prompt arrived as '?'. At READY, check the three '·' strings against the brief on master (L53's regex and STALE line, L60's 'REBUILT: serving build <sha7> · current (fetch <time>).'). Expect update-branch conflicts at refresh: sync/checks.ts (changed by T-267) and cli.ts / cli-spec.ts (changed by T-249). — s170: r1 BLOCKED at 634f7a8d PR #676 (a 36-row main-rebuild file, 7 of 7 mutants after a third commit, the 8 allowed files): CI failed S4-9.2, 'stale allowance for open-brain/tests/cli-flags.test.ts: expected 19 -> 18, found 19 -> 19'. The brief's main-rebuild --dry-rn row restores the base count, so the guard is right. #676 also conflicts with master in checks.ts's import block. G-001 check: its three '·' strings match the brief byte for byte. Ruling: docs/loops/t172-main-rebuild-brief-amendment-1.md (retire the cli-flags allowance; S4-9.2b tests a two-entry fixture; merge master c1975286 keeping all three imports; keep the typo row). Opus second review at the r2 READY.",
       "note_by": null,
       "closed_rev": null
     },
@@ -1593,28 +1593,14 @@
       "opened_session": 163,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner s163 from grok-audit's and grok-sia-review's open-brain security audits at f7a7ee80, triaged by cursor-builder (turn 88: A1-A6 real; A3, A6 and A1 fixed in #484). These items were judged low or trust-boundary-by-design and left out of #484 on purpose. — s168: brief docs/loops/t243-audit-lows-brief.md (#647), QUEUED at clark. Planner rulings: L1 withholds the parser message; Y1 single-quoted YAML; P1 normalizeProject uses slugify; A2/A4/A5 documented in SECURITY.md 'Trust boundaries' (ob_start/ob_sync shell-equivalent in project_root) with three false lines corrected; health-checks.ts:34 execSync is a separate follow-up. — — s169: clark LAUNCHED it ~13:3x CDT (desktop, fixed runner; session oneoff-t-243 confirmed running).",
+      "note": "Opened planner s163 from grok-audit's and grok-sia-review's open-brain security audits at f7a7ee80, triaged by cursor-builder (turn 88: A1-A6 real; A3, A6 and A1 fixed in #484). These items were judged low or trust-boundary-by-design and left out of #484 on purpose. — s168: brief docs/loops/t243-audit-lows-brief.md (#647), QUEUED at clark. Planner rulings: L1 withholds the parser message; Y1 single-quoted YAML; P1 normalizeProject uses slugify; A2/A4/A5 documented in SECURITY.md 'Trust boundaries' (ob_start/ob_sync shell-equivalent in project_root) with three false lines corrected; health-checks.ts:34 execSync is a separate follow-up. — — s169: clark LAUNCHED it ~13:3x CDT (desktop, fixed runner; session oneoff-t-243 confirmed running). — s170: READY 89b2bf3d PR #673 (desktop one-off, base 304d5639; 3 commits: the Y1 fixture's maturity 'progenitor' tripped R-011's live check in CI and became 'proven'). Planner ACCEPT: exactly the 5 allowed files, 4 of 4 mutants, CI pass. Opus second review RUNNING on the desktop (tag t243-review; body C:/Users/melve/AppData/Local/Temp/T-243-opus-review-body.md; reply t243-review-reply.md). #673 and #678 both edit cli-recall-trigger.ts, in separate hunks. The runner's follow-up is T-280.",
       "note_by": [
         "d43a0485-7166-4db2-9ca2-eacde1f63101",
         "f21ca920-a048-4990-935f-42f102efc85f",
-        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
       ],
       "closed_rev": null
-    },
-    {
-      "id": "T-244",
-      "title": "planner-watch misses peer turns: diff on each room's newest turn number, not unread, and keep prev in memory per process (shared STATE file across instances)",
-      "priority": "P2",
-      "status": "done",
-      "opened_session": 163,
-      "closed_session": 167,
-      "supersedes": null,
-      "note": "Opened planner s163. Between 12:07 and 13:30 CDT 2026-10-06 the watcher fired no NEW TURN for grok-sia-review's #437 r6 review, grok-research's SIA-R1, or part of grok-audit's #484 review. Clark's diagnosis: STATE is one file per planner shared by every instance, and my own --inbox reads lower unread between ticks, so a peer post is netted out. The planner's 30-minute direct room sweep is the backstop until it's fixed. The script is scripts/planner-watch.mjs (PR #481); the fix is code and needs Aaron's word. —  s163 close: superseded nothing; still open. — s167 CLOSED, not built: nobody runs scripts/planner-watch.mjs (clark 2026-10-11: Relay uses room.sh's non-marking API read, clark its own hub-watch, the planner hub.sh --wait loops). The draft brief found hub-talk has no non-marking way to read a room's newest turn and sender, so a fix inside SIA would call the hub HTTP API directly, copying A2A-Hub's transport into SIA. Not worth it for an unused script. The script itself stays until a cleanup removes it (code change).",
-      "note_by": [
-        "d43a0485-7166-4db2-9ca2-eacde1f63101",
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
-      ],
-      "closed_rev": 385
     },
     {
       "id": "T-245",
@@ -1711,17 +1697,18 @@
       "id": "T-251",
       "title": "Adopted projects get role-file stubs and the right handoff seat: project-template ships minimal .agents/roles/{planner,developer,qa,shared}.md stubs (project-specific content, not SIA's), bootstrap/import installs them when absent, and state import seats the imported handoff from AGENT.md's role",
       "priority": "P2",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 165,
-      "closed_session": null,
+      "closed_session": 170,
       "supersedes": null,
-      "note": "s165 ruling, on clark's flags from Maker's first /start: role files are PER-REPO content. SIA's planner.md and shared.md carry SIA procedure and must not be copied, so Maker writes its own. The gap is that a new seat starts with NO role file. Also seen: the imported Makerspace handoff was seated as developer although AGENT.md says role: planner; clark has Maker re-seat it with ob_state set_handoff. A missing domains.json and a missing docs/loops brief are NORMAL for a non-SIA project: /start step 4 says skip absent residual reads, so they are not flags. — s168: brief docs/loops/t251-role-stubs-brief.md (#647, with the T-184 FUTURE_LOCAL follow-up folded in), QUEUED at clark. Planner rulings: four neutral stubs (shared.md carries a placeholder '## Hub transport' so the template's references resolve); stubs installed at --commit only, wx, never overwriting, inside migrate's rollback; a missing template stub is skipped and reported; the seat comes from readAgentIdentity (AGENT.local.md wins, as /start does), anything outside the closed set -> developer with assumed:true; ImportReport.handoff_seat is a new top-level field. — — s169: clark LAUNCHED it at 13:10 CDT (desktop, Opus 5.5, base 304d5639) on the OLD runner: every non-ASCII character in its prompt arrived as '?' (G-001; fixed in clark's runner at 13:2x). The brief's only non-ASCII in code spans is a § in a section reference and … placeholders: low risk; check at READY. — — s169: READY 89d47d9d PR #672 (2 commits). Planner review, first-hand: 13 files, all on the brief's list (the brief named a root .claude/commands/bootstrap.md that does not exist at base; the run edited the allowed template copy); the four stubs are 16-19 lines, open with the ruled sentence, name no one, and shared.md has the Hub transport section; importSeat reads the role as /start does and seats only an exact seat name, else developer, assumed; a planner handoff gets an empty loop_state; the stub install sits inside migrate() after the render (the existing rollback covers it) with wx; the draft constants moved to shared/import-outputs.ts with no import cycle and FUTURE_LOCAL names the inputs file; the gitignore lines and bootstrap.md are as ruled. Reply: base 260/260; red 14/14; tsc 0; t251 14/14; mutants M1-M6 red; sync template-personal-names and command-parity pass. The second run had one time-out (state-import-leftovers R4-5 D12, a CLI-spawn row with its own 30 s cap, 93 s under host load); green alone (8 s) and in CI. CI test SUCCESS. ACCEPTED to clark PENDING the Opus second review on the QA PC (body C:/Users/melve/AppData/Local/Temp/T-251-opus-review-body.md; reply copied to C:/Users/melve/Worktrees/t251-review-reply.md). If that review returns ACCEPT or only NITS, clark adds 'merge SIA #672 (T-251)' to Aaron's list. Out-of-scope follow-ups the run named: the template AGENT.md's placeholder roles (builder | researcher | reviewer) are not seat names; AGENT.md is not among the hashed draft inputs; the template's hub-room.mdc and start.md cite shared.md § Hub transport with SIA-specific text.",
+      "note": "s165 ruling, on clark's flags from Maker's first /start: role files are PER-REPO content. SIA's planner.md and shared.md carry SIA procedure and must not be copied, so Maker writes its own. The gap is that a new seat starts with NO role file. Also seen: the imported Makerspace handoff was seated as developer although AGENT.md says role: planner; clark has Maker re-seat it with ob_state set_handoff. A missing domains.json and a missing docs/loops brief are NORMAL for a non-SIA project: /start step 4 says skip absent residual reads, so they are not flags. — s168: brief docs/loops/t251-role-stubs-brief.md (#647, with the T-184 FUTURE_LOCAL follow-up folded in), QUEUED at clark. Planner rulings: four neutral stubs (shared.md carries a placeholder '## Hub transport' so the template's references resolve); stubs installed at --commit only, wx, never overwriting, inside migrate's rollback; a missing template stub is skipped and reported; the seat comes from readAgentIdentity (AGENT.local.md wins, as /start does), anything outside the closed set -> developer with assumed:true; ImportReport.handoff_seat is a new top-level field. — — s169: clark LAUNCHED it at 13:10 CDT (desktop, Opus 5.5, base 304d5639) on the OLD runner: every non-ASCII character in its prompt arrived as '?' (G-001; fixed in clark's runner at 13:2x). The brief's only non-ASCII in code spans is a § in a section reference and … placeholders: low risk; check at READY. — — s169: READY 89d47d9d PR #672 (2 commits). Planner review, first-hand: 13 files, all on the brief's list (the brief named a root .claude/commands/bootstrap.md that does not exist at base; the run edited the allowed template copy); the four stubs are 16-19 lines, open with the ruled sentence, name no one, and shared.md has the Hub transport section; importSeat reads the role as /start does and seats only an exact seat name, else developer, assumed; a planner handoff gets an empty loop_state; the stub install sits inside migrate() after the render (the existing rollback covers it) with wx; the draft constants moved to shared/import-outputs.ts with no import cycle and FUTURE_LOCAL names the inputs file; the gitignore lines and bootstrap.md are as ruled. Reply: base 260/260; red 14/14; tsc 0; t251 14/14; mutants M1-M6 red; sync template-personal-names and command-parity pass. The second run had one time-out (state-import-leftovers R4-5 D12, a CLI-spawn row with its own 30 s cap, 93 s under host load); green alone (8 s) and in CI. CI test SUCCESS. ACCEPTED to clark PENDING the Opus second review on the QA PC (body C:/Users/melve/AppData/Local/Temp/T-251-opus-review-body.md; reply copied to C:/Users/melve/Worktrees/t251-review-reply.md). If that review returns ACCEPT or only NITS, clark adds 'merge SIA #672 (T-251)' to Aaron's list. Out-of-scope follow-ups the run named: the template AGENT.md's placeholder roles (builder | researcher | reviewer) are not seat names; AGENT.md is not among the hashed draft inputs; the template's hub-room.mdc and start.md cite shared.md § Hub transport with SIA-specific text. — s170 CLOSED. Opus second review VERDICT ACCEPT at 89d47d9d (claude-opus-5-5; C:/Users/melve/Worktrees/t251-review-reply.md). The planner read its cited lines at that SHA: no defect; its three surviving mutants are test gaps, now T-278. Merged 1fdd88d4 (#672, refreshed de7dbac7, patch-id = the reviewed head; trees equal; Aaron 19:28:15Z, verified); main rebuilt c1975286. LIVE CHECK PASS (main build cli.js, temp HOME, a copy of tests/fixtures-import holding its own planner.md): state import --draft then --commit exit 0; 'Role files: installed .agents/roles/shared.md, .agents/roles/developer.md, .agents/roles/qa.md · kept .agents/roles/planner.md'; planner.md byte for byte unchanged; the three stubs equal the main tree's template; the draft prints 'Handoff seat: planner (the role .agents/AGENT.md or AGENT.local.md declares)'. The first run's seat FAIL was the check reading --commit's output; the line is in the draft.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd",
         "f21ca920-a048-4990-935f-42f102efc85f",
-        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
       ],
-      "closed_rev": null
+      "closed_rev": 435
     },
     {
       "id": "T-252",
@@ -1992,15 +1979,16 @@
       "id": "T-270",
       "title": "A Win32 process table load fails while ANY process's command line holds a raw control character (0x1A): Windows PowerShell 5.1's ConvertTo-Json leaves it unescaped, so test:heavy and Cursor session proofs fail closed machine-wide",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 169,
-      "closed_session": null,
+      "closed_session": 170,
       "supersedes": null,
-      "note": "s169, planner live check of T-268 on the desktop (2026-10-13 ~18:36Z): `SUITE_DRY_RUN=1 node <main>/build/cli-suite-run.js` refused with 'Win32 process table: unparseable JSON (Bad control character in string literal in JSON at position 130167)'. Reproduced with the loader's own command (`Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress`, open-brain/src/shared/process-session.ts:206): raw 0x1A (SUB) at two offsets, in the command lines of two bash.exe processes under ANOTHER session's claude.exe (a running Bash tool command; 0x1A is most likely a character Windows could not map). Callers that fail closed while such a process exists: liveOwnerProbe (suite-owner.ts:147: every test:heavy on the machine) and resolveCursorAgentHost (process-session.ts:278: the SessionStart proof of Cursor seats). Fix (deterministic): in the table parser (process-session.ts ~:154-160), replace every raw U+0000-U+001F in the payload with a space (or a \\u00XX escape) before JSON.parse; a row whose command line held one still matches claude.exe / cursor-agent patterns. Test with a payload holding raw 0x1A, 0x07 and 0x1B inside a CommandLine string. Then retry T-268's live check. — — s169: brief docs/loops/t270-table-control-chars-brief.md merged as docs PR #674 (7a993a39); launch line sent to clark for the QA PC (base ff9492d6). Its step 4 reproduces the failure live with one sleeper process whose command line holds a raw 0x1A.",
+      "note": "s169, planner live check of T-268 on the desktop (2026-10-13 ~18:36Z): `SUITE_DRY_RUN=1 node <main>/build/cli-suite-run.js` refused with 'Win32 process table: unparseable JSON (Bad control character in string literal in JSON at position 130167)'. Reproduced with the loader's own command (`Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress`, open-brain/src/shared/process-session.ts:206): raw 0x1A (SUB) at two offsets, in the command lines of two bash.exe processes under ANOTHER session's claude.exe (a running Bash tool command; 0x1A is most likely a character Windows could not map). Callers that fail closed while such a process exists: liveOwnerProbe (suite-owner.ts:147: every test:heavy on the machine) and resolveCursorAgentHost (process-session.ts:278: the SessionStart proof of Cursor seats). Fix (deterministic): in the table parser (process-session.ts ~:154-160), replace every raw U+0000-U+001F in the payload with a space (or a \\u00XX escape) before JSON.parse; a row whose command line held one still matches claude.exe / cursor-agent patterns. Test with a payload holding raw 0x1A, 0x07 and 0x1B inside a CommandLine string. Then retry T-268's live check. — — s169: brief docs/loops/t270-table-control-chars-brief.md merged as docs PR #674 (7a993a39); launch line sent to clark for the QA PC (base ff9492d6). Its step 4 reproduces the failure live with one sleeper process whose command line holds a raw 0x1A. — s170 CLOSED. READY 03ebed68 PR #677 (QA PC one-off; its step 4 NOT REPRODUCED, see below); planner ACCEPT; merged c1975286 (refreshed 461bbcb6, patch-id = the reviewed head; trees equal; Aaron 19:47:42Z 'merge SIA #677', relay-check verified); main rebuilt c1975286. ROOT CAUSE CORRECTED, first-hand on the desktop: ConvertTo-Json escapes control characters (\\u001a) on BOTH PCs (PS 5.1.19041.6456, CLR 4.0.30319.42000). The raw C0 bytes are made on the PowerShell-to-Node pipe by the console's OEM cp437 best-fit encoder: → 0x1A, ← 0x1B, ↑ 0x18, ↓ 0x19, ↔ 0x1D, • 0x07, § 0x15, ¶ 0x14, ☺ 0x01, ► 0x10 (other non-ASCII: U+FFFD or a best-fit ASCII). So any process whose command line held an arrow or a bullet broke the table on every Windows host, and the brief's raw-0x1A sleeper could never reproduce (the brief now carries a Correction section). LIVE CHECK PASS (main build c1975286, desktop): a payload built inside PowerShell with [char]0x2192 arrives with a raw 0x1A and parses (2 rows, ppid kept); the live table loads (561 rows). The reply's mutant section was lost to grep's binary detection; M1 = the pasted red run, M2 and M3 are red by construction (C2 and C8 read). Follow-up: T-279.",
       "note_by": [
-        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
       ],
-      "closed_rev": null
+      "closed_rev": 435
     },
     {
       "id": "T-271",
@@ -2097,6 +2085,48 @@
       "note": "s169, reported by Prism (session 2): agent-dashboard's /start showed no 'Latest brief' line and the brief was found by hand. Scan docs/loop-*-brief.md as well, or make the brief glob a project setting; keep SIA's rule (newest by git commit date).",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-278",
+      "title": "Kill T-251's three surviving mutants: a template missing a stub is reported, not thrown; the draft's and the CLI's seat lines (with ASSUMED) and the Role files line are asserted",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 170,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "From the T-251 Opus second review (s170, at 89d47d9d; reply C:/Users/melve/Worktrees/t251-review-reply.md), confirmed by the planner at that SHA. M-a: state-import/index.ts:1238 (`{ role_stubs.missing.push(rel); continue; }` replaced by a throw) survives, because no test runs runCommit with a templateDir that lacks a stub (the only `missing` assertion, t251-role-stubs.test.ts:131, is empty). M-b: :970, deleting `L.push(describeHandoffSeat(r.handoff_seat))`, survives. M-c: cli.ts:689, deleting the seat console.log, survives; cli.ts:713's 'Role files:' line is untested. Tests only, so SG-1 lets it merge on a pinned review and green CI. Weigh as a design question in the same brief: install-commands' dirty-path allowlist now includes ROLE_STUB_RELS (bootstrap/index.ts:326,340), so an owner's uncommitted edit to a tracked role file no longer blocks install-commands, and step 8 lists it as an expected stub. NITS, not tasks: a dangling symlink at a stub path rolls back with a raw EEXIST; rollback changes kept files' mtime; on a case-sensitive filesystem Planner.md gets a second planner.md; describeHandoffSeat could name the one file that answered.",
+      "note_by": [
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-279",
+      "title": "Read the Win32 process table through an ASCII-safe pipe, and correct T-270's comment and test docstring: the C0 bytes come from the console's cp437 best-fit encoding, not ConvertTo-Json",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 170,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s170 root cause (see T-270's note): Windows PowerShell 5.1 writes its stdout in the console OEM code page 437 with .NET best-fit, so → • § ¶ ← ↑ ↓ ↔ ☺ ► arrive as C0 bytes, and non-ASCII without a cp437 glyph arrives as U+FFFD (· and ✓ seen live). T-270 makes the parse survive by turning C0 into spaces, but command lines are still read lossily. Fix shape to weigh: escape every non-ASCII character to \\uXXXX inside PowerShell before it writes (a regex replace on ConvertTo-Json's output; 5.1 has no -EscapeHandling), so the pipe carries ASCII only; or set [Console]::OutputEncoding to UTF-8 (it can throw with no console). Keep T-270's replacement as defence in depth. Correct process-session.ts's T-270 comment and the t270 test file's docstring. Prove the trigger first with the scratchpad pattern (build the input inside PowerShell, capture what Node receives): atlas-ops briefs.md, s170.",
+      "note_by": [
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-280",
+      "title": "health-checks.ts:34 runs execSync with the vault path inside a shell string: move it to execFileSync with an argument array",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 170,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found by the T-243 runner (s170): open-brain/src/pipelines/session-start/health-checks.ts:34 builds a shell command around the vault path, so a path holding shell metacharacters or a quote is interpreted by the shell. The path is the user's own (OPEN_BRAIN_VAULT_DIR or the default), so the risk is a wrong command more than an attack. Check the other execSync sites under session-start in the same brief.",
+      "note_by": [
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
       ],
       "closed_rev": null
     }
@@ -5158,62 +5188,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Planner session 159 at its roll point. Next: (1) #376 (T-203, QA 266 ACCEPT at 09f82a12) is being re-merged with master by sia-infra; range-diff the new head against 09f82a12, then ask Aaron via clark 'Merge #376 at <new head>?'. (2) Book QA 267 for #387 + #388 (test-only, frozen) plus the T-236 slices when they land. (3) Rule the T-236 slice PRs. Seats: sia-infra (desktop CC) and sia-forge (QA PC CC) are on T-236; sia-builder (QA PC CC) is blocked on cursor-agent (T-235 P2-2).",
-      "watch_out": [
-        "USAGE RULES (Aaron, ~/Worktrees/usage-winddown-rules.md; level in slots.json usageLevel, clark announces): AMBER = small LIGHT tasks only, QA cap 2; RED (>=85% of 5-hour) = devs finish the current step then park, planners rule and merge only; STOP (90%) = everyone parks until the reset. WEEKLY: >=95% no new QA, tasks or dispatches; >=98% wind down (every seat pushes WIP and a merged or in-record handoff and parks). Roll points: devs 50% context left, planners 40%, clark 30%; a roll needs the handoff MERGED or in the record, then READY TO ROLL to clark, then Aaron runs /clear + /start.",
-        "BATCH QA + BACKLOG GATE + ONE APPROVAL PER BATCH (Aaron, standing): 4-6 related code PRs per QA run, with a scratch merge-order row; devs open NO new code PRs while 6 or more await QA; one AskUserQuestion per accepted batch naming every PR, then merge each pinned with --match-head-commit after re-checking head == QA'd SHA, CI green and not DIRTY. An approval comes from Aaron in the planner's window, or in clark's window recorded first-hand by clark (the D-103/D-108 route), and covers only the PRs and SHAs it names.",
-        "A HEAD THAT MOVED AFTER QA is not what QA accepted: review `git range-diff <old-base>..<qa'd> <new-base>..<new>`. '=' commits plus a trivial conflict line may go on as reviewed (#294, #302 did); anything else gets a narrow re-QA. A moved head needs a fresh approval if Aaron's word pinned the old SHA (#295 now).",
-        "CI (T-227, #310): GitHub-hosted ubuntu-latest, fetch-depth 0, a few minutes per run; push runs ONLY on master; a branch without a PR gets no CI unless `gh workflow run CI --ref <branch>`; per-PR concurrency cancels only superseded commits; tcm self-hosted is an opt-in (tcm=true).",
-        "STANDING MERGE RULE: a PR whose diff is ONLY docs/**, *.md or .agents record files merges without asking once 'test' is green or skipped, pinned; check scope with `git diff --name-only origin/master...<head>` (gh pr diff fails over 20,000 lines). A test, script, package.json or config file takes it out of scope. Send clark a one-line D-063 notice per merge. Open seats' docs-only handoff branches as PRs yourself and merge them (the roll rule).",
-        "QA DISPATCHES: the DISPATCH_SHA must contain every file (git cat-file -e); each QA number gets its own push helper EDITED BY HAND, with all five refusals tested; any dispatch reading real config forbids copying values (G-051); a batch merge-order row names the real conflicting import line (it was node:fs, not node:path, in B2).",
-        "RULINGS IN FORCE for /sync checks (D-104, D-106, D-107): any input not checked caps the result at WARN; malformed entries in every source are not-checked; named skips inside a pass are legitimate only for url servers, an absent settings.json (named), bare builtin heads, and non-command hook types; containers are T-231.",
-        "REPORTING TO CLARK (D-113, Aaron 2026-10-02 ~21:45Z, AMENDS D-077): the hourly status cadence is DROPPED; create NO status cron at /start. Message `clark` on EVENTS only: verdicts, merges (the one-line D-063 notice), blocks, READY TO ROLL, plus one line per hoh-checklist item as it becomes completable, regresses or is blocked (C:\\Users\\melve\\Worktrees\\hoh-checklist.md, read-only for the planner). Clark reads the dashboard's planner rows for status. If `clark` is not in ListAgents, skip the send.",
-        "DESKTOP QA and the QA PC: while slots.json shows DESKTOP-UGEKR74 = 'QA RUNNING' the planner stays LIGHT on this desktop; on the QA PC one HEAVY job at a time and a 1.5 GB RAM gate, so dev seats run ONE test file per vitest invocation.",
-        "VERIFY BEFORE RULING: read the load-bearing rows yourself (regex bytes via cat -A, record counts, range-diffs, run ids). A seat's 'idle' may mean waiting on CI. Never route a classifier-denied act through another seat.",
-        "JEV: calibration 1 is COMPLETE (D-100): G_done as built rejects everything, so it stays shadow with no threshold change; G_qa is uncalibratable as built; calibration 2 needs T-225 first.",
-        "DEV SEATS ARE CLAUDE CODE (Aaron via clark, 2026-10-03 ~04:0x CDT): until the A2A hub and waker are proven with Loop 8b, SIA devs run as CC Sonnet seats reached by native SendMessage (sia-infra-1d on the desktop; sia-forge and sia-builder [67472b] on the QA PC over Remote Control, where delivery is unconfirmed until they ack); Cursor seats are parked (handoffs #368-#370). Builds are Sonnet, so QA is Opus on Plumb (builder != judge), launched by clark from a dispatch the planner merges. Run `setup.mjs` live checks yourself under a scratch HOME (QA's permission layer refuses them; see docs/loops/qa-264-row7c-planner.md)."
-      ],
-      "open_questions": [
-        "Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.",
-        "Retire the dormant hub name `forge` (QA PC key valid, 39 unread)? The planner reads its 39 turns first; any retirement goes to Relay with Aaron's word (D-115)."
-      ],
-      "session": 159,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#376",
-            "qa_status": "accepted",
-            "note": "T-203, QA 266 ACCEPT at 09f82a12; DIRTY after the 5 merges, sia-infra re-merging master; range-diff before asking Aaron"
-          },
-          {
-            "ref": "#387",
-            "qa_status": "not_started",
-            "note": "T-232 follow-up (test-only), frozen 9d1ed0c5, CI green"
-          },
-          {
-            "ref": "#388",
-            "qa_status": "not_started",
-            "note": "T-229 follow-up (test-only), frozen 913a5a43"
-          }
-        ],
-        "frozen_sha": null,
-        "questions_for_aaron": [
-          "Merge #376 at its new head (after the range-diff)?",
-          "Recover killed session 5b3338ac / catch-up task?"
-        ],
-        "rulings": [
-          "Merged on Aaron's word: #373, #372, #371, #374, #377, #378, #379, #382",
-          "Closed: T-152, T-234, T-229, T-230, T-231, T-232",
-          "T-236 dispatched in two slices",
-          "D-116 T-202 approved"
-        ]
-      },
-      "session_uuid": "e05907a8-86cf-436b-bee3-ce6f2214e02e",
-      "checkout": "sia-planner",
-      "first_rev": 300
-    },
-    {
-      "seat": "planner",
       "pick_up": "On QA 272's verdict: one ask to Aaron for #415, #420 and #421 (use mergeone: update-branch, first parent = QA'd SHA, patch-id equal). Rule builder's P2-3 plan; collect forge's P2-4 and infra's P2-6 PRs for QA 273. Re-arm one hub --wait per room after every reply.",
       "watch_out": [
         "CURSOR SEATS (Aaron 2026-10-03/04): all SIA dev runs as Cursor seats on the QA PC, each woken by its own waker. Rooms: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. Send: HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as atlas --session <room> --say \"...\"; listen: same with --wait --wait-timeout 3500 in the background; it exits on each reply, so re-arm. The Claude Code seats take no new work. sia-infra-1d (desktop) retires on Aaron's word; its desktop checkout shares the basename sia-infra with the QA PC's (one record instance), so it writes nothing to ob_state.",
@@ -5755,14 +5729,6 @@
       "first_rev": 263
     },
     {
-      "n": 159,
-      "date": "2026-10-03",
-      "uuid": "e05907a8-86cf-436b-bee3-ce6f2214e02e",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 300
-    },
-    {
       "n": 160,
       "date": "2026-10-04",
       "uuid": "766a2128-4c5f-4b3f-93b7-3f9a88c1e594",
@@ -5841,6 +5807,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 427
+    },
+    {
+      "n": 170,
+      "date": "2026-10-13",
+      "uuid": "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 435
     }
   ]
 }
