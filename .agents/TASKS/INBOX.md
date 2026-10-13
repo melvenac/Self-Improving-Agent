@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 430 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 431 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -43,7 +43,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-174** Win32 job-object launcher so the role's whole process tree is killed on a NORMAL exit too (R22's named limit on Windows)
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
-- [ ] **T-249** Project identity resolves a worktree to its repo (the git common dir): one project per repo for knowledge-DB session scoping and the vault display name, with `open-brain relocate` folding the existing split history
+- [~] **T-249** Project identity resolves a worktree to its repo (the git common dir): one project per repo for knowledge-DB session scoping and the vault display name, with `open-brain relocate` folding the existing split history
 - [ ] **T-251** Adopted projects get role-file stubs and the right handoff seat: project-template ships minimal .agents/roles/{planner,developer,qa,shared}.md stubs (project-specific content, not SIA's), bootstrap/import installs them when absent, and state import seats the imported handoff from AGENT.md's role
 - [ ] **T-266** Same key in a different scope silently re-points the row: indexKnowledge's ON CONFLICT(key) moves the row to the new note and overwrites its content for EVERY kind, orphaning the old note
 
