@@ -871,12 +871,28 @@ server.tool(
     scope: z.enum(["global", "project"]).optional().default("global").describe("Scope: global or project"),
     project_dir: z.string().optional().describe("Project directory (only when scope is 'project')"),
     kind: z.enum(["state", "event"]).optional().describe(
-      "'state' = one current value that changes (a path, a version, an owner) — replace it. " +
-      "'event' = a timestamped thing that happened (a gotcha, a decision, a lesson) — append it. " +
-      "Recorded for reconciliation; storing still appends either way."
+      "'state' = one current value that changes (a path, a version, an owner): a later 'state' write to the SAME key replaces it, and the old value moves to the note's ## Log. " +
+      "'event' = a timestamped thing that happened (a gotcha, a decision, a lesson): append it; a repeated key is refused."
     ),
   },
-  async ({ content, key, tags, source, scope, project_dir, kind }) => {
+  async (args) => handleStore(args)
+);
+
+export interface StoreArgs {
+  content: string;
+  key?: string;
+  tags?: string[];
+  source?: string;
+  scope?: "global" | "project";
+  project_dir?: string;
+  kind?: "state" | "event";
+}
+
+/** ob_store, exported so its replies are testable without the transport (T-022). */
+export async function handleStore(args: StoreArgs): Promise<ToolResponse> {
+  const { content, key, tags, project_dir, kind } = args;
+  const source = args.source ?? "manual";
+  const scope = args.scope ?? "global";
     // Refuse a body that ran past its own close. Eight entries were stored this
     // way on 2026-08-31; four of them lost their tags to the swallowed argument
     // and nothing noticed for a month.
@@ -943,13 +959,40 @@ server.tool(
       };
     }
 
+    if (result.replaced) {
+      return {
+        content: [{
+          type: "text" as const,
+          text:
+            `Replaced state "${effectiveKey}" (id: ${result.replaced.id})${scopeLabel} — the previous value moved to "## Log" ` +
+            `(${result.replaced.demotedAt.slice(0, 10)}) in the vault note and is no longer recalled.\n  Vault: ${result.vaultPath}`,
+        }],
+      };
+    }
+
+    if (result.unchanged) {
+      const same = v2db.prepare(`SELECT id FROM knowledge_index WHERE key = ?`)
+        .get(effectiveKey) as { id: number } | undefined;
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Unchanged — state "${effectiveKey}" (id: ${same?.id ?? "?"}) already holds this value. Nothing was written.`,
+        }],
+      };
+    }
+
     if (result.vaultPath === null) {
+      // A state over a row that is not a state: say what it is, so the refusal
+      // does not read as "use another key" when the real answer is the kind.
+      const kindNote = kind === "state" && result.existingKind !== undefined && result.existingKind !== "state"
+        ? ` It is stored as ${result.existingKind ?? "unlabelled"}; kind "state" replaces only a state.`
+        : "";
       return {
         content: [{
           type: "text" as const,
           text:
             `Not stored — "${effectiveKey}" already exists in the vault${scopeLabel}. ` +
-            `Nothing was written. Store under a different key, or use ob_forget first if you meant to replace it.`,
+            `Nothing was written. Store under a different key, or use ob_forget first if you meant to replace it.${kindNote}`,
         }],
       };
     }
@@ -961,8 +1004,7 @@ server.tool(
     return {
       content: [{ type: "text" as const, text: `Stored knowledge (id: ${row?.id ?? "?"}) with key "${effectiveKey}"${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}${kindLabel}` }],
     };
-  }
-);
+}
 
 /** First few meaningful words of the content, as a fallback key. */
 function deriveKey(content: string): string {

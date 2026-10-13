@@ -356,9 +356,9 @@ export function openV2Database(dbPath: string): Database.Database {
  * nothing marking which is current — and `ob_recall` may return either.
  * Replacing an event destroys history that cannot be recovered.
  *
- * `knowledge_index` can only append, so today every changed state fact leaves
- * its predecessor live and recallable. Recording the kind is the first step;
- * acting on it at write time is deliberately not yet done.
+ * T-022: the store pipeline acts on a RECORDED `state`: stored again under the
+ * same key over a live `state` row, it replaces that row's value in place and
+ * the old value moves to the note's `## Log`. Every other repeat is refused.
  */
 export type FactKind = 'state' | 'event';
 
@@ -527,8 +527,9 @@ export function updateFeedbackV2(db: Database.Database, vaultPath: string, ratin
 }
 
 /**
- * Archive an entry's note and drop its index row, without destroying the note
- * (the helper `ob_forget` uses; apoptosis, which once also called it, is cut).
+ * Archive an entry's note and mark its index row archived, without destroying
+ * the note. Nothing calls it now: apoptosis, its caller, is cut, and `ob_forget`
+ * archives the note itself and DELETES the row.
  *
  * Replaces the `DELETE FROM knowledge_index` this path used to run. The delete
  * was unsafe for a reason the schema makes structural: neither `feedback_log`
