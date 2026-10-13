@@ -13,6 +13,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  renameSync,
   statSync,
   unlinkSync,
   writeFileSync,
@@ -501,12 +502,27 @@ export function recordRecordOkNotice(projectDir: string, sessionId: string, reas
   }
 }
 
+/**
+ * T-258 F5: take a marker file atomically. The rename succeeds for exactly one caller; an overlapping
+ * SessionStart gets null and prints nothing. The caller reads and unlinks the returned path.
+ */
+export function claimMarker(path: string): string | null {
+  const claimed = `${path}.claim-${process.pid}-${Date.now()}`;
+  try {
+    renameSync(path, claimed);
+    return claimed;
+  } catch {
+    return null;
+  }
+}
+
 export function takeRecordOkNotices(projectDir: string): string[] {
   const path = storePath(projectDir, RECORD_OK_MARKER);
-  if (!existsSync(path)) return [];
+  const claimed = claimMarker(path);
+  if (claimed === null) return [];
   try {
     const out: string[] = [];
-    const text = readFileSync(path, "utf8");
+    const text = readFileSync(claimed, "utf8");
     for (const line of text.split(/\r?\n/)) {
       if (!line.trim()) continue;
       try {
@@ -517,7 +533,7 @@ export function takeRecordOkNotices(projectDir: string): string[] {
       }
     }
     appendEndRecordShownCapped(storePath(projectDir, RECORD_OK_SHOWN), text);
-    unlinkSync(path);
+    unlinkSync(claimed);
     return out;
   } catch {
     return [];
@@ -549,10 +565,11 @@ export function recordSkillsAuditNotice(projectDir: string, sessionId: string, m
 
 export function takeSkillsAuditNotices(projectDir: string): string[] {
   const path = storePath(projectDir, SKILLS_AUDIT_MARKER);
-  if (!existsSync(path)) return [];
+  const claimed = claimMarker(path);
+  if (claimed === null) return [];
   try {
     const out: string[] = [];
-    const text = readFileSync(path, "utf8");
+    const text = readFileSync(claimed, "utf8");
     for (const line of text.split(/\r?\n/)) {
       if (!line.trim()) continue;
       try {
@@ -563,7 +580,7 @@ export function takeSkillsAuditNotices(projectDir: string): string[] {
       }
     }
     appendEndRecordShownCapped(storePath(projectDir, SKILLS_AUDIT_SHOWN), text);
-    unlinkSync(path);
+    unlinkSync(claimed);
     return out;
   } catch {
     return [];
@@ -586,6 +603,18 @@ export function describeWorkAfterEnd(work: SessionWorkScan, since: string): stri
 export function recordWorkAfterEnd(projectDir: string, sessionId: string, message: string, work: SessionWorkScan): void {
   try {
     const path = storePath(projectDir, WORK_AFTER_MARKER);
+    // T-258 F1: a doubled SessionEnd writes the same line once.
+    if (existsSync(path)) {
+      for (const line of readFileSync(path, "utf8").split(/\r?\n/)) {
+        if (!line.trim()) continue;
+        try {
+          const row = JSON.parse(line) as { session?: unknown; message?: unknown };
+          if (row.session === sessionId && row.message === message) return;
+        } catch {
+          /* an unreadable line names nothing */
+        }
+      }
+    }
     appendFileSync(
       path,
       JSON.stringify({
@@ -603,10 +632,11 @@ export function recordWorkAfterEnd(projectDir: string, sessionId: string, messag
 
 export function takeWorkAfterEndNotices(projectDir: string): string[] {
   const path = storePath(projectDir, WORK_AFTER_MARKER);
-  if (!existsSync(path)) return [];
+  const claimed = claimMarker(path);
+  if (claimed === null) return [];
   try {
     const out: string[] = [];
-    const text = readFileSync(path, "utf8");
+    const text = readFileSync(claimed, "utf8");
     for (const line of text.split(/\r?\n/)) {
       if (!line.trim()) continue;
       try {
@@ -617,7 +647,7 @@ export function takeWorkAfterEndNotices(projectDir: string): string[] {
       }
     }
     appendEndRecordShownCapped(storePath(projectDir, WORK_AFTER_SHOWN), text);
-    unlinkSync(path);
+    unlinkSync(claimed);
     return out;
   } catch {
     return [];

@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 415,
+  "revision": 418,
   "project": {
     "name": "self-improving-agent"
   },
@@ -725,11 +725,12 @@
       "id": "T-184",
       "title": "state import: an input changed between --draft and --commit commits the DRAFT's content with no note (QA 102 PROBE-7): record each input's hash in the draft and have --commit refuse or say so when one differs",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 100,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 100. QA 102's Open 4 and the round-1 handoff's limit 5: bumping a marker after --draft lets a stale draft through with no acknowledgement and commits the draft's text, not the fixed file's. Not in importer round 2 (docs/loops/importer-fixes-round-2-brief.md, 'Not in round 2').",
+      "note": "Session 100. QA 102's Open 4 and the round-1 handoff's limit 5: bumping a marker after --draft lets a stale draft through with no acknowledgement and commits the draft's text, not the fixed file's. Not in importer round 2 (docs/loops/importer-fixes-round-2-brief.md, 'Not in round 2'). — s168: BUILT overnight (desktop CC Sonnet one-off; brief docs/loops/t184-draft-inputs-brief.md, fix docs/loops/t184-fix-1-task.md). First run BLOCKED correctly at step 8: two V5 rows in tests/pipelines/state-import.test.ts assert the exact files --draft adds and --commit moves (planner's brief gap; lesson 662). Fix 1 approved adding .agents/state.draft.inputs.json to both lists. PR #638 at 6717da4e, planner ACCEPT: --draft writes sha256 of the 5 inputs' raw bytes; --commit compares before step 0 and refuses on changed/added/removed unless --accept-changed; a missing or unreadable record is reported (inputs_unrecorded), not refused; the record moves into the snapshot; CLI flag, --draft refusal, prints, usage. D1-D7 red then green; 33 files 245 tests; M1-M3 red; CI green. Follow-up, not blocking: bootstrap FUTURE_LOCAL does not list the new file (local anyway under the .agents allowlist). Merge needs Aaron's word.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -1798,13 +1799,14 @@
       "id": "T-258",
       "title": "Doubled-hook residuals outside T-245: work-after-end marker has no per-session dedupe; take*Notices and logInvocations are check-then-write",
       "priority": "P3",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 167,
       "closed_session": null,
       "supersedes": null,
-      "note": "Opened planner s167 from grok-sia-review's idempotency audit at b142886 (room k57c639j). F1 [major as written, P3 after T-245]: cli-session-end.ts:155-159 recordWorkAfterEnd -> end-record-guard.ts:543 appendFileSync with no read-before-write, so a doubled SessionEnd that reaches it writes 2 identical lines and the next greeting shows WORK AFTER /end twice. With T-245's claim a doubled end skips before :159, so this only bites when the claim misses (stale-path race, or a payload without cursor_version). Fix: W2's session dedupe applied to recordWorkAfterEnd. F5 [minor]: handoff-guard.ts:236-238 and end-record-guard.ts:574 take*Notices read-then-unlink, so two overlapping SessionStarts can both print the notices. F6 [minor]: invocation-logger.ts:111/:144 dedupe by read-then-append, so overlapping (not sequential) SessionEnds duplicate invocation rows. All three only matter when T-245's claim fails; rank after T-245 A4.",
+      "note": "Opened planner s167 from grok-sia-review's idempotency audit at b142886 (room k57c639j). F1 [major as written, P3 after T-245]: cli-session-end.ts:155-159 recordWorkAfterEnd -> end-record-guard.ts:543 appendFileSync with no read-before-write, so a doubled SessionEnd that reaches it writes 2 identical lines and the next greeting shows WORK AFTER /end twice. With T-245's claim a doubled end skips before :159, so this only bites when the claim misses (stale-path race, or a payload without cursor_version). Fix: W2's session dedupe applied to recordWorkAfterEnd. F5 [minor]: handoff-guard.ts:236-238 and end-record-guard.ts:574 take*Notices read-then-unlink, so two overlapping SessionStarts can both print the notices. F6 [minor]: invocation-logger.ts:111/:144 dedupe by read-then-append, so overlapping (not sequential) SessionEnds duplicate invocation rows. All three only matter when T-245's claim fails; rank after T-245 A4. — s168: BUILT overnight (brief docs/loops/t258-notice-races-brief.md). PR #634 at 86f41ba7, planner ACCEPT: F1 dedupe on session+message; claimMarker (rename) in all four take*; invocation-log wx lock, one stale retry at 10 min, non-EEXIST proceeds unlocked, released in finally (a lock-out loses nothing: the next SessionEnd rescans all dbs). Red R1/R3/R5/R6; M1-M5 each red; 7 files 55 tests; CI green. Deviation accepted: worked in the launch folder oneoff-T-258, not a %TEMP% clone. Merge needs Aaron's word; pr-refresh first, clark rebuilds (hook paths).",
       "note_by": [
-        "6646f34e-175c-4a4e-a39b-a2878070946b"
+        "6646f34e-175c-4a4e-a39b-a2878070946b",
+        "f21ca920-a048-4990-935f-42f102efc85f"
       ],
       "closed_rev": null
     },
@@ -1860,7 +1862,7 @@
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "Per docs/loops/end-skills-audit-proposal-2026-10-11.md and D-152. After T-154. The brief must flag clark's inferred defaults (in-session; /end expected at every seat close; seat -ops edits need no per-script ask) so Aaron can veto them. Kill criterion as an acceptance row: cut after 20 /end runs with no script a later session called. — s168 2026-10-12: PART 1 DONE. Brief docs/loops/t262-skills-audit-extractor-brief.md (#609); planner prototype on 5 real atlas transcripts (1,076 shell calls) dropped sequence detection (all git-fetch adjacency noise) and the proposal's substring coverage (marked git fetch covered while run 163x by hand). Build e3e76df7 ACCEPT with 4 deviations accepted (cli-args sort position, assignment-only segment skip, throw for no-transcript, blank lines skipped); fix-1 (docs/loops/t262-fix-1-task.md) killed surviving mutants M4/M6 (SA-9 UUID-named subagent file, new SA-3b), 31/31. #610 merged at 2a78e12f on Aaron's word, pinned 6f011e87 (patch-id 001f70bd = reviewed 40ceb026). Live check on the main-tree build: `node build/cli.js skills-audit .` in sia-planner exits 0, seat atlas, 211 shell calls, 20 rows, scripts called: records-pr.sh x14, tree-sync.sh x8, pr-wait.sh x3, relay-check.mjs x3, reply-wait.sh x2, state.mjs x2, hub.sh x1, pr-refresh.sh x1. PART 2 (end.md step 1b + Cursor twin + SessionEnd unaudited flag) waits on Aaron's veto of the three D-152 inferences (seat -ops edits without per-script ask; audit in-session; /end at every close). Kill criterion stays: cut after 20 /end runs with no audit-led script called by a later session; the `scripts called:` line is the instrument. — s168: Aaron 'no veto' (D-153). Part 2 brief docs/loops/t262-part2-end-audit-brief.md: /end step 1b (both .claude copies plus the Cursor twin with --runtime cursor); skills-audit reads Cursor transcripts (~/.cursor/projects/<key>/agent-transcripts/<uuid>/<uuid>.jsonl, Shell tool_use, key = path with non-alphanumeric runs replaced by '-'); --seat (clark's ~/Worktrees has no .agents, so its stamp.sh x107 showed as by-hand); --transcript; the SessionEnd hook writes a once-per-session SKILLS AUDIT NOT RUN notice, shown in the next greeting. clark updates the user-level ~/.claude/commands/end.md after merge (it is already stale: no record gate). — s168: PART 2 BUILT, planner ACCEPT. PR #617 at 22e4b1c03c622ed5ddd93381b1b44c50803e7502 (desktop CC Sonnet one-off; reply %TEMP%/t262p2-reply.md). Red run 12/14 (H-5/H-6 green as absence rows); M1-M6 each red on its row; 9 files 183/183; tsc 0; CI green. Live: `--runtime cursor` on sia-forge gave seat forge, 13 shell calls, '· cursor'; `--seat clark ~/Worktrees` gave stamp.sh x117 as script, plus 9 other clark-ops scripts called. Deviations accepted: (1) the H fixtures name the transcript <uuid1>.jsonl; (2) a named --transcript file that is not uuid-named still counts as this session; (3) the brief's '??' were mojibake for '·' and '×'; (4) the usage line has a plain '|'; (5) reply file name; (6) the hook tests set KNOWLEDGE_V2_DB to a temp path. Planner review of the diff: the hook block is an isolated try/catch after work-after-end, guarded by .agents and an existing transcript; the notice reads before it appends. IMPACT HIGH = the SessionEnd hook path; covered by r3/r4 pins, handoff-guard and H-1..H-6. FOLLOW-UPS, not blocking: (a) the Cursor copy says a skipped audit is named in the next greeting, but Cursor fires no SessionEnd hook on our machines (T-245 A4), so that sentence is untrue under Cursor (planner's brief error); fix in a docs touch; (b) a stray doc comment ('Throws an Error…') now sits above the TranscriptFile interface; (c) one full vitest run printed vitest's 'unhandled errors' line once, not reproduced on re-run; (d) post-merge: clark copies .claude/commands/end.md to the user-level ~/.claude/commands/end.md, and the planner live-checks the hook on a real session close. Merge needs Aaron's word. — s168: PART 2 MERGED on Aaron's word ('merge SIA #617'): #617 at 2d771340, pinned to the refreshed 4d0b999c (patch-id 64bd61b9 = reviewed 22e4b1c0). Main tree rebuilt at e960a5a0. clark copied .claude/commands/end.md to the user-level ~/.claude/commands/end.md (cmp identical, old copy archived). Planner live check on the main build: skills-audit in sia-planner exit 0 (seat atlas, ops atlas-ops, 305 shell calls); `--runtime cursor` on sia-builder exit 0 ('· cursor'). STILL OPEN: (1) the hook's audited/unaudited line on a real session close; the planner runs /end step 1b at this session's close, and the next planner greeting must NOT show SKILLS AUDIT NOT RUN for f21ca920; (2) the Cursor end.md copy wrongly says a skipped audit is named in the next greeting (no SessionEnd under Cursor); a docs fix; (3) the kill criterion: 20 /end runs. — s168: stays open after 79d43ba: part 2 is merged, but the hook's audited line on a real session close, the Cursor end.md wording fix and the 20-run kill criterion remain.",
+      "note": "Per docs/loops/end-skills-audit-proposal-2026-10-11.md and D-152. After T-154. The brief must flag clark's inferred defaults (in-session; /end expected at every seat close; seat -ops edits need no per-script ask) so Aaron can veto them. Kill criterion as an acceptance row: cut after 20 /end runs with no script a later session called. — s168 2026-10-12: PART 1 DONE. Brief docs/loops/t262-skills-audit-extractor-brief.md (#609); planner prototype on 5 real atlas transcripts (1,076 shell calls) dropped sequence detection (all git-fetch adjacency noise) and the proposal's substring coverage (marked git fetch covered while run 163x by hand). Build e3e76df7 ACCEPT with 4 deviations accepted (cli-args sort position, assignment-only segment skip, throw for no-transcript, blank lines skipped); fix-1 (docs/loops/t262-fix-1-task.md) killed surviving mutants M4/M6 (SA-9 UUID-named subagent file, new SA-3b), 31/31. #610 merged at 2a78e12f on Aaron's word, pinned 6f011e87 (patch-id 001f70bd = reviewed 40ceb026). Live check on the main-tree build: `node build/cli.js skills-audit .` in sia-planner exits 0, seat atlas, 211 shell calls, 20 rows, scripts called: records-pr.sh x14, tree-sync.sh x8, pr-wait.sh x3, relay-check.mjs x3, reply-wait.sh x2, state.mjs x2, hub.sh x1, pr-refresh.sh x1. PART 2 (end.md step 1b + Cursor twin + SessionEnd unaudited flag) waits on Aaron's veto of the three D-152 inferences (seat -ops edits without per-script ask; audit in-session; /end at every close). Kill criterion stays: cut after 20 /end runs with no audit-led script called by a later session; the `scripts called:` line is the instrument. — s168: Aaron 'no veto' (D-153). Part 2 brief docs/loops/t262-part2-end-audit-brief.md: /end step 1b (both .claude copies plus the Cursor twin with --runtime cursor); skills-audit reads Cursor transcripts (~/.cursor/projects/<key>/agent-transcripts/<uuid>/<uuid>.jsonl, Shell tool_use, key = path with non-alphanumeric runs replaced by '-'); --seat (clark's ~/Worktrees has no .agents, so its stamp.sh x107 showed as by-hand); --transcript; the SessionEnd hook writes a once-per-session SKILLS AUDIT NOT RUN notice, shown in the next greeting. clark updates the user-level ~/.claude/commands/end.md after merge (it is already stale: no record gate). — s168: PART 2 BUILT, planner ACCEPT. PR #617 at 22e4b1c03c622ed5ddd93381b1b44c50803e7502 (desktop CC Sonnet one-off; reply %TEMP%/t262p2-reply.md). Red run 12/14 (H-5/H-6 green as absence rows); M1-M6 each red on its row; 9 files 183/183; tsc 0; CI green. Live: `--runtime cursor` on sia-forge gave seat forge, 13 shell calls, '· cursor'; `--seat clark ~/Worktrees` gave stamp.sh x117 as script, plus 9 other clark-ops scripts called. Deviations accepted: (1) the H fixtures name the transcript <uuid1>.jsonl; (2) a named --transcript file that is not uuid-named still counts as this session; (3) the brief's '??' were mojibake for '·' and '×'; (4) the usage line has a plain '|'; (5) reply file name; (6) the hook tests set KNOWLEDGE_V2_DB to a temp path. Planner review of the diff: the hook block is an isolated try/catch after work-after-end, guarded by .agents and an existing transcript; the notice reads before it appends. IMPACT HIGH = the SessionEnd hook path; covered by r3/r4 pins, handoff-guard and H-1..H-6. FOLLOW-UPS, not blocking: (a) the Cursor copy says a skipped audit is named in the next greeting, but Cursor fires no SessionEnd hook on our machines (T-245 A4), so that sentence is untrue under Cursor (planner's brief error); fix in a docs touch; (b) a stray doc comment ('Throws an Error…') now sits above the TranscriptFile interface; (c) one full vitest run printed vitest's 'unhandled errors' line once, not reproduced on re-run; (d) post-merge: clark copies .claude/commands/end.md to the user-level ~/.claude/commands/end.md, and the planner live-checks the hook on a real session close. Merge needs Aaron's word. — s168: PART 2 MERGED on Aaron's word ('merge SIA #617'): #617 at 2d771340, pinned to the refreshed 4d0b999c (patch-id 64bd61b9 = reviewed 22e4b1c0). Main tree rebuilt at e960a5a0. clark copied .claude/commands/end.md to the user-level ~/.claude/commands/end.md (cmp identical, old copy archived). Planner live check on the main build: skills-audit in sia-planner exit 0 (seat atlas, ops atlas-ops, 305 shell calls); `--runtime cursor` on sia-builder exit 0 ('· cursor'). STILL OPEN: (1) the hook's audited/unaudited line on a real session close; the planner runs /end step 1b at this session's close, and the next planner greeting must NOT show SKILLS AUDIT NOT RUN for f21ca920; (2) the Cursor end.md copy wrongly says a skipped audit is named in the next greeting (no SessionEnd under Cursor); a docs fix; (3) the kill criterion: 20 /end runs. — s168: stays open after 79d43ba: part 2 is merged, but the hook's audited line on a real session close, the Cursor end.md wording fix and the 20-run kill criterion remain. — s168: FIX 2 BUILT overnight (docs/loops/t262-fix-2-task.md). PR #633 at 92d13f41, planner ACCEPT: 'for the coordinator to take to the user' in all three end.md; Cursor copy says no SessionEnd hook names a skipped audit; harness-audit.md 'the user'; Throws comment on auditSkills. N1-N4 red then green, M1/M2 red; sync template-personal-names [pass]. Merge needs Aaron's word (one src comment + test); after merge clark recopies ~/.claude/commands/end.md and the Cursor user-level end.md + harness-audit.md.",
       "note_by": [
         "f21ca920-a048-4990-935f-42f102efc85f"
       ],
@@ -1870,11 +1872,11 @@
       "id": "T-263",
       "title": "Harness runtime git inherits the caller's GIT_AUTHOR_*/GIT_COMMITTER_* env, so its commits carry the caller's identity, not 'HoH harness runtime' (layer 0 leak; config-channel CA-4c red on the desktop)",
       "priority": "P3",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found by T-260's desktop one-off (s168). src/harness/git.ts:176-183 runtimeGitEnv strips REDIRECTING_GIT_VARS (GIT_CONFIG*, GIT_DIR, ...) but keeps GIT_AUTHOR_NAME/EMAIL and GIT_COMMITTER_NAME/EMAIL. Git gives these precedence over -c user.name/user.email, so a caller whose env carries them (the desktop launcher does) has the runtime commit under the caller's identity. Experiment: with the four vars unset, CA-4c passes; with only GIT_AUTHOR_NAME=x set, the author is 'x'. Fix in src: drop GIT_AUTHOR_*/GIT_COMMITTER_* (and GIT_AUTHOR_DATE/GIT_COMMITTER_DATE? decide) in runtimeGitEnv when !machineRead. CA-4c is the existing test that proves it; add a row that sets the vars explicitly so CI sees it too.",
+      "note": "Found by T-260's desktop one-off (s168). src/harness/git.ts:176-183 runtimeGitEnv strips REDIRECTING_GIT_VARS (GIT_CONFIG*, GIT_DIR, ...) but keeps GIT_AUTHOR_NAME/EMAIL and GIT_COMMITTER_NAME/EMAIL. Git gives these precedence over -c user.name/user.email, so a caller whose env carries them (the desktop launcher does) has the runtime commit under the caller's identity. Experiment: with the four vars unset, CA-4c passes; with only GIT_AUTHOR_NAME=x set, the author is 'x'. Fix in src: drop GIT_AUTHOR_*/GIT_COMMITTER_* (and GIT_AUTHOR_DATE/GIT_COMMITTER_DATE? decide) in runtimeGitEnv when !machineRead. CA-4c is the existing test that proves it; add a row that sets the vars explicitly so CI sees it too. — s168: BUILT overnight (desktop CC Sonnet one-off, brief docs/loops/t263-runtime-identity-brief.md). PR #635 at c37be9f3, planner ACCEPT: base proof CA-4c red under the real desktop env (author Aaron Melven), green after; IDENTITY_GIT_VARS first in runtimeGitEnv (machine read included), *_DATE kept; I1-I3 + CA-4c T-263 red then green; M1-M3 each red; 3 files 78 tests; CI green. Deviation accepted: the new row sits after CA-4c, not after R19. Merge needs Aaron's word; pr-refresh first, clark rebuilds.",
       "note_by": [
         "f21ca920-a048-4990-935f-42f102efc85f"
       ],
@@ -5442,24 +5444,49 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 168 (Atlas). Merged today: #610 T-262 part 1, #617 T-262 part 2, #615 T-259, #621 T-260, #579 T-253+T-248, #588 T-256, then on Aaron's word #580 T-252 (5d61f3dd) and #620 T-188 (57dd36c8); main tree rebuilt by clark at 57dd36c8. Live checks on 57dd36c8 (scratch clone, throwaway DB): FLEET with projects:null renders without throwing; missing and invalid-JSON fleet files name the real FLEET_JSON path; sync ci-status reports master's conclusion with a GitHub remote and 'skipped - no GitHub remote ... absent is not green' without one. Closed: T-154, T-245, T-257, T-259, T-260, T-253, T-248, T-256, T-252, T-188. NEXT: (1) triage the open-task-commits warnings (T-046, T-168, T-172, T-235): close with evidence or add 'stays open after <sha7>'; (2) T-258 (end-record-guard idempotency residuals); (3) T-263 harness runtimeGitEnv identity leak (P3); (4) T-262 fix brief: the Cursor end.md wording (a skipped audit is not named under Cursor), the stray doc comment, AND sync's template-personal-names ISSUE that #617 introduced: line 35 of project-template/.claude/commands/end.md and project-template/.cursor/commands/end.md says 'for clark to take to Aaron' (make it 'for the coordinator'); the harness-audit.md 'Aaron' hit predates #617; (5) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later.",
+      "pick_up": "Session 168 (Atlas). Merged today: #610, #617 (T-262), #615 (T-259), #621 (T-260), #579 (T-253+T-248), #588 (T-256), #580 (T-252), #620 (T-188); main tree rebuilt by clark at 57dd36c8, all live-checked. OVERNIGHT (Aaron via clark: code-only to READY/ACCEPT, no merge/rebuild) - four desktop CC Sonnet one-offs, all planner ACCEPT, CI green, each waiting on Aaron's word: #633 T-262 fix 2 (92d13f41; template names, Cursor wording, doc comment), #634 T-258 (86f41ba7; doubled-hook residuals), #635 T-263 (c37be9f3; runtime identity, makes CA-4c green on the desktop), #638 T-184 (6717da4e; --commit notices inputs changed after --draft). On each 'merge SIA #N': bash $S/pr-refresh.sh N <reviewed-sha>, then bash $S/pr-merge.sh N <new-head>, one at a time (each merge sends the rest BEHIND); clark rebuilds after #634/#635/#638 (src); after #633 clark recopies ~/.claude/commands/end.md and the Cursor user-level end.md + harness-audit.md; then close the task with the live check. NEXT after merges: (1) triage open-task-commits warnings (T-046, T-168, T-172, T-235); (2) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later; (3) T-184 follow-up: bootstrap FUTURE_LOCAL lists state.draft.inputs.json.",
       "watch_out": [
         "The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.",
-        "A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff (old merge-base..old head vs master..new head) before calling for a re-review (#579, s168).",
-        "Right after a merge GitHub reports the next PR UNKNOWN; pr-refresh now waits that out (s168 #620 first run gave a false PROOF FAILED).",
-        "Reply files: launchers also write an uppercase <TAG>-reply.md copy in %TEMP%; check both names.",
-        "Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it (T-188, s168). CI's gh is installed but unauthenticated.",
-        "Before saying no test pins a call site, grep the PR's own new test file for the old path (T-252-mf, s168).",
-        "Desktop one-off launchers set GIT_AUTHOR_*/GIT_COMMITTER_*; config-channel CA-4c stays red locally until T-263.",
-        "sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level ~/.claude and ~/.cursor command copies differ from the template), not a code regression.",
+        "A brief that adds a new output file must name the existing rows that assert the EXACT output list (T-184 BLOCKED on two V5 rows; lesson 662).",
+        "A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff before calling for a re-review (#579, s168).",
+        "Right after a merge GitHub reports the next PR UNKNOWN; pr-refresh now waits that out.",
+        "Reply files: launchers write T-<n>-<tag>-reply.md (the tag's name) besides the brief's t<n>-reply.md; reply-wait.sh now checks both forms. One-off runs may work in clark's ~/Worktrees/oneoff-<TAG> folder instead of a %TEMP% clone.",
+        "Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it. CI's gh is installed but unauthenticated.",
+        "Desktop one-off launchers set GIT_AUTHOR_*/GIT_COMMITTER_*; config-channel CA-4c stays red locally until #635 merges.",
+        "sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level command copies differ from the template), not a code regression.",
         "ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task."
       ],
       "open_questions": [],
       "session": 168,
       "loop_state": {
-        "open_prs": [],
+        "open_prs": [
+          {
+            "ref": "#633",
+            "qa_status": "accepted",
+            "note": "T-262 fix 2 at 92d13f41; needs Aaron's word"
+          },
+          {
+            "ref": "#634",
+            "qa_status": "accepted",
+            "note": "T-258 at 86f41ba7; needs Aaron's word"
+          },
+          {
+            "ref": "#635",
+            "qa_status": "accepted",
+            "note": "T-263 at c37be9f3; needs Aaron's word"
+          },
+          {
+            "ref": "#638",
+            "qa_status": "accepted",
+            "note": "T-184 at 6717da4e; needs Aaron's word"
+          }
+        ],
         "frozen_sha": null,
         "questions_for_aaron": [
+          "merge SIA #633",
+          "merge SIA #634",
+          "merge SIA #635",
+          "merge SIA #638",
           "T-194: (a), (b) or (c)"
         ],
         "rulings": [
@@ -5578,7 +5605,7 @@
     },
     {
       "n": 168,
-      "date": "2026-10-12",
+      "date": "2026-10-13",
       "uuid": "f21ca920-a048-4990-935f-42f102efc85f",
       "seat": "planner",
       "checkout": "sia-planner",
