@@ -16,6 +16,8 @@ import { settleGitNexusIndex, type GitNexusCheckOptions } from "./gitnexus-refre
 import { diffReferrerLineHashes, matchingLineHashes } from "./retirements-line-hash.js";
 import { parseFrontmatter } from "../../shared/parse-frontmatter.js";
 import { obsidianVaultDir } from "../../shared/paths.js";
+import { resolveDocPath } from "../../shared/doc-path.js";
+import { greetingFlag } from "../session-start/greeting-flags.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -80,19 +82,8 @@ export function syncReadmeVersion(
   return { name: "readme-version", severity: "fixed", message: `README version updated to v${version}`, autoFixed: true };
 }
 
-/**
- * Resolve a project document across the locations the framework supports.
- * `.agents/SYSTEM/` is the convention (matching checkSummary); `docs/` and the
- * repo root are legacy fallbacks so older layouts keep working.
- */
-export function resolveDocPath(projectRoot: string, filename: string): string | null {
-  const candidates = [
-    join(projectRoot, ".agents", "SYSTEM", filename),
-    join(projectRoot, "docs", filename),
-    join(projectRoot, filename),
-  ];
-  return candidates.find((p) => existsSync(p)) ?? null;
-}
+// T-167: the resolver lives in shared/ so /start's PROBLEM line resolves the PRD the same way; re-exported for every import.
+export { resolveDocPath } from "../../shared/doc-path.js";
 
 export function syncPrdVersion(
   version: string,
@@ -101,6 +92,16 @@ export function syncPrdVersion(
 ): CheckResult {
   const prdPath = resolveDocPath(projectRoot, "PRD.md");
   if (!prdPath) {
+    // T-167: where /start shows the problem statement (greeting.json `briefing_problem`), a missing PRD is an ISSUE.
+    // A repo that has not opted in (a fresh consumer install creates no PRD) keeps the warning.
+    if (greetingFlag(projectRoot, "briefing_problem")) {
+      return {
+        name: "prd-version",
+        severity: "issue",
+        message:
+          "PRD.md not found (.agents/SYSTEM/, docs/, repo root): this checkout has no problem statement, so /start cannot show what the project is for. If another checkout has it, it is untracked: add it to the .gitignore allowlist.",
+      };
+    }
     return { name: "prd-version", severity: "warn", message: "PRD.md not found" };
   }
 
