@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 433 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 434 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -46,6 +46,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-271** ob_state refusals list EVERY invalid field of the op at once, with the op's expected shape, instead of one field per attempt
 - [ ] **T-272** SIA bootstrap on a seat checkout moves the seat file aside and names the tracked AGENT.md after the folder (Prism lesson 671): reproduce, then fix
 - [ ] **T-274** Re-measure the recall trigger's relevance floor (8.0, measured at 599 entries) on the T-264 replay data now that T-265 narrowed the status element
+- [ ] **T-275** ob_state cannot reopen a closed gap: update_gap refuses `status` and there is no reopen_gap (reopen_task and reopen_verified exist)
+- [ ] **T-276** A seat without Remote Control has no Claude-Session id to write, and ob_end still counts its commits as missing the trailer: fall back to the transcript's own session id
 
 ## P3
 
@@ -55,6 +57,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-261** Physically split core and memory into separate packages (after T-154; D-151)
 - [ ] **T-269** SIA's SEATS line names the A2A waker's new alarm state (v1.22.13: a run older than WAKE_RUN_ALARM_MS) instead of printing state:unknown(alarm)
 - [ ] **T-273** After #669 (T-022) merges: rehash R-011's pinned lines and delete db-v2.ts's wrong archiveKnowledgeEntry parenthesis ('the helper ob_forget uses; …')
+- [ ] **T-277** ob_start's 'Latest brief:' line scans only docs/loops/, so a project that keeps briefs as docs/loop-*-brief.md (agent-dashboard) gets no line
 
 ## Done (last 3 sessions)
 

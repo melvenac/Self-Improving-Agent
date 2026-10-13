@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 433,
+  "revision": 434,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1715,7 +1715,7 @@
       "opened_session": 165,
       "closed_session": null,
       "supersedes": null,
-      "note": "s165 ruling, on clark's flags from Maker's first /start: role files are PER-REPO content. SIA's planner.md and shared.md carry SIA procedure and must not be copied, so Maker writes its own. The gap is that a new seat starts with NO role file. Also seen: the imported Makerspace handoff was seated as developer although AGENT.md says role: planner; clark has Maker re-seat it with ob_state set_handoff. A missing domains.json and a missing docs/loops brief are NORMAL for a non-SIA project: /start step 4 says skip absent residual reads, so they are not flags. — s168: brief docs/loops/t251-role-stubs-brief.md (#647, with the T-184 FUTURE_LOCAL follow-up folded in), QUEUED at clark. Planner rulings: four neutral stubs (shared.md carries a placeholder '## Hub transport' so the template's references resolve); stubs installed at --commit only, wx, never overwriting, inside migrate's rollback; a missing template stub is skipped and reported; the seat comes from readAgentIdentity (AGENT.local.md wins, as /start does), anything outside the closed set -> developer with assumed:true; ImportReport.handoff_seat is a new top-level field. — — s169: clark LAUNCHED it at 13:10 CDT (desktop, Opus 5.5, base 304d5639) on the OLD runner: every non-ASCII character in its prompt arrived as '?' (G-001; fixed in clark's runner at 13:2x). The brief's only non-ASCII in code spans is a § in a section reference and … placeholders: low risk; check at READY.",
+      "note": "s165 ruling, on clark's flags from Maker's first /start: role files are PER-REPO content. SIA's planner.md and shared.md carry SIA procedure and must not be copied, so Maker writes its own. The gap is that a new seat starts with NO role file. Also seen: the imported Makerspace handoff was seated as developer although AGENT.md says role: planner; clark has Maker re-seat it with ob_state set_handoff. A missing domains.json and a missing docs/loops brief are NORMAL for a non-SIA project: /start step 4 says skip absent residual reads, so they are not flags. — s168: brief docs/loops/t251-role-stubs-brief.md (#647, with the T-184 FUTURE_LOCAL follow-up folded in), QUEUED at clark. Planner rulings: four neutral stubs (shared.md carries a placeholder '## Hub transport' so the template's references resolve); stubs installed at --commit only, wx, never overwriting, inside migrate's rollback; a missing template stub is skipped and reported; the seat comes from readAgentIdentity (AGENT.local.md wins, as /start does), anything outside the closed set -> developer with assumed:true; ImportReport.handoff_seat is a new top-level field. — — s169: clark LAUNCHED it at 13:10 CDT (desktop, Opus 5.5, base 304d5639) on the OLD runner: every non-ASCII character in its prompt arrived as '?' (G-001; fixed in clark's runner at 13:2x). The brief's only non-ASCII in code spans is a § in a section reference and … placeholders: low risk; check at READY. — — s169: READY 89d47d9d PR #672 (2 commits). Planner review, first-hand: 13 files, all on the brief's list (the brief named a root .claude/commands/bootstrap.md that does not exist at base; the run edited the allowed template copy); the four stubs are 16-19 lines, open with the ruled sentence, name no one, and shared.md has the Hub transport section; importSeat reads the role as /start does and seats only an exact seat name, else developer, assumed; a planner handoff gets an empty loop_state; the stub install sits inside migrate() after the render (the existing rollback covers it) with wx; the draft constants moved to shared/import-outputs.ts with no import cycle and FUTURE_LOCAL names the inputs file; the gitignore lines and bootstrap.md are as ruled. Reply: base 260/260; red 14/14; tsc 0; t251 14/14; mutants M1-M6 red; sync template-personal-names and command-parity pass. The second run had one time-out (state-import-leftovers R4-5 D12, a CLI-spawn row with its own 30 s cap, 93 s under host load); green alone (8 s) and in CI. CI test SUCCESS. ACCEPTED to clark PENDING the Opus second review on the QA PC (body C:/Users/melve/AppData/Local/Temp/T-251-opus-review-body.md; reply copied to C:/Users/melve/Worktrees/t251-review-reply.md). If that review returns ACCEPT or only NITS, clark adds 'merge SIA #672 (T-251)' to Aaron's list. Out-of-scope follow-ups the run named: the template AGENT.md's placeholder roles (builder | researcher | reviewer) are not seat names; AGENT.md is not among the hashed draft inputs; the template's hub-room.mdc and start.md cite shared.md § Hub transport with SIA-specific text.",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd",
         "f21ca920-a048-4990-935f-42f102efc85f",
@@ -1996,7 +1996,7 @@
       "opened_session": 169,
       "closed_session": null,
       "supersedes": null,
-      "note": "s169, planner live check of T-268 on the desktop (2026-10-13 ~18:36Z): `SUITE_DRY_RUN=1 node <main>/build/cli-suite-run.js` refused with 'Win32 process table: unparseable JSON (Bad control character in string literal in JSON at position 130167)'. Reproduced with the loader's own command (`Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress`, open-brain/src/shared/process-session.ts:206): raw 0x1A (SUB) at two offsets, in the command lines of two bash.exe processes under ANOTHER session's claude.exe (a running Bash tool command; 0x1A is most likely a character Windows could not map). Callers that fail closed while such a process exists: liveOwnerProbe (suite-owner.ts:147: every test:heavy on the machine) and resolveCursorAgentHost (process-session.ts:278: the SessionStart proof of Cursor seats). Fix (deterministic): in the table parser (process-session.ts ~:154-160), replace every raw U+0000-U+001F in the payload with a space (or a \\u00XX escape) before JSON.parse; a row whose command line held one still matches claude.exe / cursor-agent patterns. Test with a payload holding raw 0x1A, 0x07 and 0x1B inside a CommandLine string. Then retry T-268's live check.",
+      "note": "s169, planner live check of T-268 on the desktop (2026-10-13 ~18:36Z): `SUITE_DRY_RUN=1 node <main>/build/cli-suite-run.js` refused with 'Win32 process table: unparseable JSON (Bad control character in string literal in JSON at position 130167)'. Reproduced with the loader's own command (`Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress`, open-brain/src/shared/process-session.ts:206): raw 0x1A (SUB) at two offsets, in the command lines of two bash.exe processes under ANOTHER session's claude.exe (a running Bash tool command; 0x1A is most likely a character Windows could not map). Callers that fail closed while such a process exists: liveOwnerProbe (suite-owner.ts:147: every test:heavy on the machine) and resolveCursorAgentHost (process-session.ts:278: the SessionStart proof of Cursor seats). Fix (deterministic): in the table parser (process-session.ts ~:154-160), replace every raw U+0000-U+001F in the payload with a space (or a \\u00XX escape) before JSON.parse; a row whose command line held one still matches claude.exe / cursor-agent patterns. Test with a payload holding raw 0x1A, 0x07 and 0x1B inside a CommandLine string. Then retry T-268's live check. — — s169: brief docs/loops/t270-table-control-chars-brief.md merged as docs PR #674 (7a993a39); launch line sent to clark for the QA PC (base ff9492d6). Its step 4 reproduces the failure live with one sleeper process whose command line holds a raw 0x1A.",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
       ],
@@ -2053,6 +2053,48 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s169, from T-265's s168 note: open-brain/src/trigger/policies/recall-trigger.json says the floor 'must be re-measured'; the store holds more entries now, and T-265 (merged 7b8c6e59) changed which queries reach queryStore. Read-only replay on a DB snapshot (as T-264/T-265 did): precision and recall per floor value for the VIOLATING class; aggregates only (D-090).",
+      "note_by": [
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-275",
+      "title": "ob_state cannot reopen a closed gap: update_gap refuses `status` and there is no reopen_gap (reopen_task and reopen_verified exist)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 169,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s169, reported by Prism (agent-dashboard planner, session 2): when G-001 recurred there (clark's first encoding fix was script-scoped), it had to be recorded as a new gap G-002 because a closed gap cannot be reopened. Add reopen_gap, mirroring reopen_task / reopen_verified, with a test.",
+      "note_by": [
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-276",
+      "title": "A seat without Remote Control has no Claude-Session id to write, and ob_end still counts its commits as missing the trailer: fall back to the transcript's own session id",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 169,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s169, reported by Prism (session 2) and planner-verified: Prism's session-1 transcript (656a5f8c) holds 0 bridge-session records (this Remote Control session's holds 100), so sessionIdsFromTranscript finds nothing and ob_end flagged 7 commits as missing Claude-Session. The count was structural, not a seat miss (the planner's Prism evaluation is corrected). Fix: when no bridge id exists, let the trailer check accept, and the attribution use, the transcript's own sessionId; test both kinds of transcript.",
+      "note_by": [
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-277",
+      "title": "ob_start's 'Latest brief:' line scans only docs/loops/, so a project that keeps briefs as docs/loop-*-brief.md (agent-dashboard) gets no line",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 169,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s169, reported by Prism (session 2): agent-dashboard's /start showed no 'Latest brief' line and the brief was found by hand. Scan docs/loop-*-brief.md as well, or make the brief glob a project setting; keep SIA's rule (newest by git commit date).",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
       ],
@@ -5636,14 +5678,15 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 169 (Atlas), 10-13, the max-parallel day (until the 00:00 weekly reset). MERGED on Aaron's word (typed 17:50:40Z in clark's window, verified with relay-check), one at a time: planner pr-refresh (patch-id = the reviewed diff, CI on the combined code), then clark merges pinned and checks merge tree == refreshed tree: #656 T-267 49cfd50e, #657 T-167 b4d11093, #660 T-182 91577f53, #662 T-265 7b8c6e59, #664 T-268 43e9cb01 (round 2: only proofs passing both checks count), #667 T-249 ff9492d6. Main rebuilt at ff9492d6. T-249 live fold applied by clark (backup first) and verified. Live checks PASS and closed: T-167, T-182, T-265, T-249. OWED: T-267 (QA PC), T-268 (blocked by T-270's 0x1A table failure; retry), T-168 lease check (QA PC). ACCEPTED, waiting on Aaron's word: #669 T-022 (P0). RUNNING on the desktop: T-251 and T-172 half 2 (old runner: check non-ASCII strings at READY), T-243, T-159 (HIGH SessionEnd path). ON EACH READY: read the reply, pr-src-diff, check scope against the brief and CI, then send clark the ACCEPT; merges follow the refresh-one-at-a-time loop above. NEXT briefs: T-270 (P1, small), T-161 (unblocked now that #657 is merged), T-271, T-272. Prism's session-1 evaluation: ~/Worktrees/prism-s1-evaluation-2026-10-13.md (outside the repo).",
+      "pick_up": "Session 169 (Atlas) ROLLED 2026-10-13 ~14:2x CDT on Aaron's 'ready to roll?', during the max-parallel day (until the 00:00 weekly reset). MERGED today on Aaron's word (typed 17:50:40Z in clark's window, verified with relay-check), one at a time (planner pr-refresh: patch-id = the reviewed diff and CI on the combined code; clark merges pinned and checks merge tree == refreshed tree): #656 T-267 49cfd50e, #657 T-167 b4d11093, #660 T-182 91577f53, #662 T-265 7b8c6e59, #664 T-268 43e9cb01, #667 T-249 ff9492d6. Main rebuilt at ff9492d6; the T-249 fold applied and verified. Live checks PASS and closed: T-167, T-182, T-265, T-249. OWED: T-267 and the T-268/T-168 CC half on the QA PC (write that live-check brief AFTER T-270 merges: T-267 needs the QA PC's home with a space; the T-268 owner probe needs T-270 if any process there holds 0x1A), and the T-168 Cursor half. Waiting on Aaron's word: #669 T-022 (P0, accepted) and #672 T-251 (accepted pending its Opus second review: reply at C:/Users/melve/Worktrees/t251-review-reply.md once clark copies it from the QA PC; rule on it). RUNNING (desktop): T-172 half 2 (old runner: check its three '·' strings against the brief at READY; expect update-branch conflicts in checks.ts, cli.ts and cli-spec.ts), T-243, T-159 (HIGH SessionEnd path). QUEUED on the QA PC at clark: T-270 (P1, brief 7a993a39), then Opus second reviews of T-172, T-243 and T-159 at READY (write one review body per READY, as T-251's). ON EACH READY: the reply, pr-src-diff, scope and CI, then ACCEPT to clark; merges by the refresh loop above. Records and docs PRs: master has NO branch protection now, so auto-merge never fires: merge your own records/docs PRs when green (standing go, pinned with --match-head-commit). NEXT briefs: the QA PC live-check one-off (after T-270), T-161 (unblocked), T-271, T-272, T-275, T-276. Prism's evaluation: ~/Worktrees/prism-s1-evaluation-2026-10-13.md (outside the repo; its trailer point corrected).",
       "watch_out": [
+        "Master has no branch protection (clark, 10-13): gh auto-merge never fires, so records and docs PRs sit OPEN CLEAN until merged by hand. Merge your own records/docs PRs when green (standing go) with --match-head-commit; code PRs still need Aaron's word.",
         "SIA merge gate: clark's merge-pinned fresh clone runs npm ci at the repo root, which fails for SIA, so it proves nothing. The gate is merge tree == the refreshed head's tree, which means CI ran on exactly what master now holds.",
-        "G-001 (clark's runners): prompts piped through Windows PowerShell 5.1 turned every non-ASCII character into '?' until ~13:2x CDT 10-13 (script-scoped $OutputEncoding). Runs launched before that (T-182, T-022, T-251, T-172) saw mangled em-dashes and '·': check every pinned non-ASCII string against the brief on master at READY.",
-        "A Win32 process table load fails while ANY process's command line holds a raw 0x1A: test:heavy and Cursor session proofs fail closed machine-wide until T-270.",
+        "G-001 (clark's runners): prompts piped through Windows PowerShell 5.1 turned every non-ASCII character into '?' until ~13:2x CDT 10-13 (script-scoped $OutputEncoding; fixed with $global:OutputEncoding). Runs launched before that (T-182, T-022, T-251, T-172) saw mangled characters: check every pinned non-ASCII string against the brief on master at READY.",
+        "A Win32 process table load fails while ANY process's command line holds a raw 0x1A: test:heavy and Cursor session proofs fail closed machine-wide until T-270 merges.",
         "process.kill(pid, 0) only says SOME process holds the pid, and Windows reuses pids within hours. Prove liveness with the rule's own checks (proc_start + image) before claiming a session is live (the s169 T-268 correction).",
         "Before pinning a brief: every IMPACT-TARGETS name must exist at the base; name test files by their real path; add retirements-live.test.ts when a touched file has R-011 pinned lines (atlas-ops briefs.md, s169).",
-        "Stale open-brain servers (every running seat until /mcp reconnect) still key knowledge and sessions by worktree; clark re-runs relocate --worktrees as a dry run after the reconnects.",
+        "Stale open-brain servers (every running seat until /mcp reconnect, this one included: build 399121c) still key knowledge and sessions by worktree; clark re-runs relocate --worktrees as a dry run after the reconnects.",
         "A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED or the oneoff session shows in ListAgents.",
         "Verify every relayed merge word in clark's transcript (relay-check.mjs: a typed user record, and the PR on the list he answered: approval is a snapshot).",
         "The repo is PUBLIC (D-090): measurement runs commit aggregates only; transcript text, command text, paths and session ids stay outside the repo (the Prism evaluation lives in ~/Worktrees)."
@@ -5655,19 +5698,27 @@
           {
             "ref": "#669",
             "qa_status": "accepted",
-            "note": "T-022 (P0) at 885b4f82; needs Aaron's word: 'merge SIA #669'; refresh before its merge"
+            "note": "T-022 (P0) at 885b4f82; needs Aaron's word 'merge SIA #669'; pr-refresh before its merge"
+          },
+          {
+            "ref": "#672",
+            "qa_status": "in_progress",
+            "note": "T-251 at 89d47d9d: planner-accepted, Opus second review running on the QA PC; then Aaron's word 'merge SIA #672'"
           }
         ],
         "frozen_sha": null,
         "questions_for_aaron": [
           "merge SIA #669 (T-022, P0)",
+          "merge SIA #672 (T-251), after its Opus second review",
           "T-194: (a), (b) or (c); planner recommends (c) now, (b) later",
           "optional: manual relocate --from/--to for the pruned worktrees sia-infra (14 sessions) and a2a-rivet (1): sessions only, no knowledge",
-          "via clark: one shared fetch-first docs/records PR script set instead of a new prism-ops; do factual CLAUDE.md seat-table edits need his word in the seat's window?"
+          "via clark: one shared fetch-first docs/records PR script set instead of a new prism-ops; do factual CLAUDE.md seat-table edits need his word in the seat's window?",
+          "/mcp reconnect open-brain in every running seat (stale servers since the ff9492d6 rebuild)"
         ],
         "rulings": [
           "2026-10-13 17:50:40Z Aaron (clark's window, verified typed): 'merge SIA #656 #657 #660 #662 #664 #667 + T-249 live fold'",
           "2026-10-13 ~17:2xZ Aaron (clark's window, as clark reported): restart the 4 QA PC wakers onto A2A v1.22.13",
+          "2026-10-13 ~18:4xZ Aaron (clark's window, as clark reported): push code-only jobs to the QA PC and measure it",
           "2026-10-13 18:11:05Z Aaron (Prism's window, verified typed): Atlas evaluates Prism's session-1 transcript",
           "D-153: no veto on the D-152 inferences",
           "2026-10-13 13:53Z Aaron (clark's window): do as much work in parallel as possible until the 00:00 reset"
