@@ -46,6 +46,8 @@
  * - Inherited environment variables that REDIRECT git (`GIT_DIR`,
  *   `GIT_CONFIG_PARAMETERS`, …) are removed, so a variable set in the shell
  *   that launched the runtime cannot point these calls somewhere else.
+ *   Inherited identity variables (GIT_AUTHOR_NAME/EMAIL, GIT_COMMITTER_NAME/EMAIL)
+ *   are removed too, because git ranks them above -c (T-263).
  *
  * **Limit, stated where the layers live:** these protect the RUNTIME's git
  * calls. A role's own git calls are the role's; what they leave behind is what
@@ -94,6 +96,13 @@ const REDIRECTING_GIT_VARS = /^GIT_(CONFIG(_.*)?|DIR|WORK_TREE|INDEX_FILE|COMMON
 
 /** The three variables that DEFINE the machine config — kept, and only, when reading it (R19). */
 const MACHINE_CONFIG_VARS = new Set(["GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM", "GIT_CONFIG_NOSYSTEM"]);
+
+/**
+ * Inherited IDENTITY variables. Git ranks them above `-c user.name/user.email`, so a caller whose environment
+ * sets them would sign the runtime's commits with its own name (T-263). Removed whoever set them, machine read
+ * included. The two *_DATE variables are kept: they do not change who signs.
+ */
+const IDENTITY_GIT_VARS = /^GIT_(AUTHOR|COMMITTER)_(NAME|EMAIL)$/;
 
 /**
  * Layer 1 as ENVIRONMENT (R17). `-c` reaches only the git process it is
@@ -175,6 +184,7 @@ export function runtimeGitEnv(
   const env: NodeJS.ProcessEnv = {};
   for (const [k, v] of Object.entries(base)) {
     const K = k.toUpperCase();
+    if (IDENTITY_GIT_VARS.test(K)) continue;
     if (machineRead && MACHINE_CONFIG_VARS.has(K)) {
       env[k] = v;
       continue;
