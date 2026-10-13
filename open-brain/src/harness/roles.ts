@@ -29,6 +29,7 @@ import { chooseEffort, loadEffortPolicy, type EffortChoice } from "./policies.js
 import {
   constructEnv,
   findOnPath,
+  probeVersion,
   resolveLauncher,
   runBounded,
   type LauncherResolution,
@@ -278,6 +279,12 @@ export interface RoleAdapter {
   readonly envAllow: readonly string[];
   /** Where this harness left the run's transcript, if it can be found. */
   transcriptFor?(sessionId: string, env: NodeJS.ProcessEnv): string | null;
+  /**
+   * A check on what `resolve` found, run at preflight, before any tag (T-182).
+   * A failure refuses the loop as `role-version-unsupported`, not as an
+   * unresolvable launcher: the launcher runs; it is the wrong one.
+   */
+  preflightCheck?(resolution: Extract<LauncherResolution, { ok: true }>, env: NodeJS.ProcessEnv): { ok: true } | { ok: false; reason: string };
 }
 
 /** A plain launcher and argument list. Resolved like any other launcher — a `.cmd` is never spawned as one. */
@@ -316,6 +323,61 @@ export const CLAUDE_ADAPTER_FLAGS: readonly string[] = [
 ];
 
 /**
+ * The lowest Claude Code version the claude adapter launches (T-182).
+ *
+ * The LOWEST version MEASURED with every flag above present: QA 104, on the QA
+ * PC, passed CA-9 on 2.1.282, and `docs/loops/qa-104/drive.ps1` ran it with
+ * `--effort`. It is not the version that introduced the flags — that was never
+ * measured. Lowering it needs a measurement, not a changelog reading.
+ */
+export const MIN_CLAUDE_CODE_VERSION = "2.1.282";
+
+/** The first non-empty line of `stdout`, trimmed; "" when there is none. */
+function firstLine(stdout: string): string {
+  return stdout.split(/\r?\n/).map((l) => l.trim()).find((l) => l !== "") ?? "";
+}
+
+/** `x.y.z` from `claude --version`'s first non-empty line, or null when that line is not a Claude Code version. */
+export function parseClaudeVersion(stdout: string): string | null {
+  const m = /^(\d+)\.(\d+)\.(\d+)(?: \(Claude Code\))?$/.exec(firstLine(stdout));
+  return m === null ? null : `${m[1]}.${m[2]}.${m[3]}`;
+}
+
+/** Whether `installed` >= `required`, both `x.y.z`, compared numerically part by part. */
+export function claudeVersionAtLeast(installed: string, required: string): boolean {
+  const a = installed.split(".").map(Number);
+  const b = required.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    if (a[i]! !== b[i]!) return a[i]! > b[i]!;
+  }
+  return true;
+}
+
+/**
+ * Every flag in `flags` that `claude --help` does not define, in list order.
+ *
+ * Option names are read from OPTION LINES only (two spaces, then the names). A
+ * flag named only in another option's description is not defined: on 2.1.296
+ * `--permission-prompt-tool` appears in a description and `--strict-mcp-config`
+ * in `--restricted`'s, which a substring check counts as present.
+ */
+export function missingClaudeFlags(help: string, flags: readonly string[] = CLAUDE_ADAPTER_FLAGS): string[] {
+  const defined = new Set<string>();
+  for (const line of help.split(/\r?\n/)) {
+    const m = /^ {2}(-{1,2}[^\s,]+(?:, -{1,2}[^\s,]+)*)/.exec(line);
+    if (m !== null) for (const name of m[1]!.split(", ")) defined.add(name);
+  }
+  return flags.filter((f) => !defined.has(f));
+}
+
+/** One line naming both versions and every missing flag — CA-9's failure message. */
+export function claudeFlagReport(installed: string | null, missing: readonly string[], versionStdout: string): string {
+  const was =
+    installed === null ? `installed unreadable (claude --version printed "${firstLine(versionStdout)}")` : `installed ${installed}`;
+  return `${was}, required >= ${MIN_CLAUDE_CODE_VERSION}, missing flag(s): ${missing.length === 0 ? "none" : missing.join(", ")}`;
+}
+
+/**
  * Claude Code, headless.
  *
  * Each flag is here for a reason the record can name:
@@ -332,9 +394,12 @@ export const CLAUDE_ADAPTER_FLAGS: readonly string[] = [
  * - `--session-id`: a runtime-chosen id, so the transcript can be found and
  *   its absence reported rather than guessed at.
  * - `--effort`: the level from the effort policy for this launch (T-173). It is
- *   always passed. A Claude Code that does not recognise the flag exits nonzero
- *   and the stage fails; that is the intended failure on an older CLI (T-182).
- *   There is no construction-time effort option.
+ *   always passed. There is no construction-time effort option.
+ *
+ * A Claude Code older than {@link MIN_CLAUDE_CODE_VERSION} lacks some of these
+ * flags. It is refused at preflight, by `preflightCheck` reading
+ * `claude --version`, before any tag (T-182) — not found late, as a stage that
+ * exits nonzero until the schema retries run out.
  */
 export function claudeAdapter(opts: ClaudeAdapterOptions = {}): RoleAdapter {
   return {
@@ -380,6 +445,28 @@ export function claudeAdapter(opts: ClaudeAdapterOptions = {}): RoleAdapter {
       }
       return null;
     },
+    preflightCheck: (resolution, env) => {
+      const r = probeVersion(resolution.executable, resolution.preArgs, env);
+      const stdout = typeof r.stdout === "string" ? r.stdout : "";
+      const installed = parseClaudeVersion(stdout);
+      if (installed === null) {
+        return {
+          ok: false,
+          reason:
+            `${resolution.resolvedFrom} --version printed ${JSON.stringify(firstLine(stdout))}, not a Claude Code version; ` +
+            `the claude adapter requires >= ${MIN_CLAUDE_CODE_VERSION}`,
+        };
+      }
+      if (!claudeVersionAtLeast(installed, MIN_CLAUDE_CODE_VERSION)) {
+        return {
+          ok: false,
+          reason:
+            `Claude Code ${installed} is installed at ${resolution.resolvedFrom}; ` +
+            `the claude adapter requires >= ${MIN_CLAUDE_CODE_VERSION}`,
+        };
+      }
+      return { ok: true };
+    },
   };
 }
 
@@ -415,7 +502,9 @@ export interface ProcessRoleOptions {
   policiesDir?: string;
 }
 
-export type Preflight = { ok: true; resolution: Extract<LauncherResolution, { ok: true }> } | { ok: false; reason: string };
+export type Preflight =
+  | { ok: true; resolution: Extract<LauncherResolution, { ok: true }> }
+  | { ok: false; kind: "unresolvable" | "unsupported"; reason: string };
 
 /** Whether a role is a process the runtime must bound, watch and record. */
 export function isProcessRole(r: RoleSession): r is ProcessRole {
@@ -450,11 +539,16 @@ export class ProcessRole implements RoleSession {
     return this.opts.parentEnv ?? process.env;
   }
 
-  /** Resolve the launcher. Called by the runtime BEFORE any tag; a failure refuses the loop, naming the path. */
+  /**
+   * Resolve the launcher, then run the adapter's check on it. Called by the
+   * runtime BEFORE any tag; a failure refuses the loop, naming the path.
+   */
   preflight(): Preflight {
     const env = constructEnv(this.parentEnv(), this.opts.adapter.envAllow, this.opts.envSet ?? {});
     const r = this.opts.adapter.resolve(env);
-    if (!r.ok) return { ok: false, reason: r.reason };
+    if (!r.ok) return { ok: false, kind: "unresolvable", reason: r.reason };
+    const check = this.opts.adapter.preflightCheck?.(r, env) ?? { ok: true };
+    if (!check.ok) return { ok: false, kind: "unsupported", reason: check.reason };
     this.resolution = r;
     return { ok: true, resolution: r };
   }
