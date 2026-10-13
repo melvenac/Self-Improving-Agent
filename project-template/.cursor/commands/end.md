@@ -35,14 +35,14 @@ For **each `by-hand` row**, do exactly one of these, in this session:
 1. **Script it.** Add or extend a script in your own `~/.claude/skills/<seat>-ops/scripts/` and run it once,
    live. Your own ops skill needs no per-script ask (D-152).
 2. **Propose it.** Anything outside your own ops skill (a shared skill, a `/sync` check, an `ob_state` op) is
-   one line in the step 4 report, for clark to take to Aaron. Never write it to a file or a queue.
+   one line in the step 4 report, for the coordinator to take to the user. Never write it to a file or a queue.
 3. **Drop it, with a reason.** To stop it returning, add the key to `audit-ignore.txt` in your ops directory
    as `<key> # <reason>`. If the reason is "already scripted and I did not use it", that is a lesson for
    step 2, keyed `MATCH: command: <key>`.
 
 `script` rows are your existing scripts at work; they need nothing. No rows: report `0 hits`. If the
-command exits 1, report its stderr line instead. A session that skips this step is named in the next
-greeting (`SKILLS AUDIT NOT RUN`).
+command exits 1, report its stderr line instead. Under Cursor no SessionEnd hook runs, so nothing names a
+session that skips this step: run it every time.
 
 ## 2. Store each one with its KEY
 

@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 415 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 418 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -42,7 +42,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-162** The element table's growth rule: the store cannot be consulted for act shapes the table does not name
 - [ ] **T-165** Evaluate an alternate harness/model as the DEVELOPER seat via T-155's shadow merge gate — the driver is a SECOND METER, not cost; Aaron's named candidate is DeepSeek v4.1 Flash
 - [ ] **T-174** Win32 job-object launcher so the role's whole process tree is killed on a NORMAL exit too (R22's named limit on Windows)
-- [ ] **T-184** state import: an input changed between --draft and --commit commits the DRAFT's content with no note (QA 102 PROBE-7): record each input's hash in the draft and have --commit refuse or say so when one differs
+- [~] **T-184** state import: an input changed between --draft and --commit commits the DRAFT's content with no note (QA 102 PROBE-7): record each input's hash in the draft and have --commit refuse or say so when one differs
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
@@ -52,9 +52,9 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 ## P3
 
 - [ ] **T-243** #484 LOW residuals and pre-existing audit lows: recall-trigger.log keeps a ~10-char excerpt of a malformed payload; single-quoted YAML tags keep their quotes; normalizeProject splits 'C++ Tools' oddly; A2 (repo-local .gitnexus/run.cjs runs on /sync), A4 (ob_start project_root trust), A5 (OPEN_BRAIN_VAULT_DIR override): document the trust boundaries
-- [ ] **T-258** Doubled-hook residuals outside T-245: work-after-end marker has no per-session dedupe; take*Notices and logInvocations are check-then-write
+- [~] **T-258** Doubled-hook residuals outside T-245: work-after-end marker has no per-session dedupe; take*Notices and logInvocations are check-then-write
 - [ ] **T-261** Physically split core and memory into separate packages (after T-154; D-151)
-- [ ] **T-263** Harness runtime git inherits the caller's GIT_AUTHOR_*/GIT_COMMITTER_* env, so its commits carry the caller's identity, not 'HoH harness runtime' (layer 0 leak; config-channel CA-4c red on the desktop)
+- [~] **T-263** Harness runtime git inherits the caller's GIT_AUTHOR_*/GIT_COMMITTER_* env, so its commits carry the caller's identity, not 'HoH harness runtime' (layer 0 leak; config-channel CA-4c red on the desktop)
 
 ## Done (last 3 sessions)
 
