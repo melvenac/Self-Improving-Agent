@@ -31,9 +31,12 @@
  * seat behind it (brief §3).
  */
 
+import { appendFileSync, readdirSync, readFileSync, renameSync, unlinkSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import type Database from "better-sqlite3";
 import { recordRecallEvent } from "../db-v2.js";
 import { formatCommandFireLog } from "./command-log.js";
+import { parsePendingFireLine } from "./pending-fires.js";
 
 /** The three states of one invocation. See the module header. */
 export type FireState = "not-asked" | "silent" | "injected";
@@ -112,6 +115,134 @@ export function recordFire(db: Database.Database, fire: FireRecord): void {
       for (const id of fire.injectedIds) bump.run(id);
     }
   })();
+}
+
+/**
+ * A claim file is removed only on a LATER run once it is at least this old: a
+ * hook that opened the pending file before the rename may still append to the
+ * claim, and the re-read before removal is what picks that line up.
+ */
+export const STALE_CLAIM_MS = 10 * 60 * 1000;
+
+export interface ReconcileResult {
+  inserted: number;
+  duplicate: number;
+  unreadable: number;
+}
+
+export interface ReconcileOptions {
+  /** The clock stale claims are judged against. Defaults to now. */
+  now?: Date;
+  /** Test seam: runs after the claimed text is read, where a late hook's append lands. */
+  afterClaim?: (claimedPath: string) => void;
+}
+
+const CLAIM_RE = /\.claim-\d+-(\d+)$/;
+
+/**
+ * T-159: move the hook's not-asked lines (pending-fires.ts) into
+ * `trigger_fires`. Every session's lines, since each carries its own session
+ * and time; at SessionEnd and at `ob_end`.
+ *
+ * The file is claimed by rename (the `claimMarker` shape), so two reconcilers
+ * never read the same live file and a hook appending afterwards starts a new
+ * one. A hook that opened the file BEFORE the rename writes into the claim
+ * instead, so a claim is kept and re-read, de-duplicated, by a later run once
+ * it is `STALE_CLAIM_MS` old, and only then removed. The insert is
+ * `WHERE NOT EXISTS` on the whole line, which makes a re-read, a re-append and
+ * two concurrent reconcilers all harmless. On a DB error nothing was
+ * committed, so the claimed text is appended back to the live file.
+ */
+export function reconcilePendingFires(
+  db: Database.Database,
+  path: string,
+  opts: ReconcileOptions = {},
+): ReconcileResult {
+  const nowMs = (opts.now ?? new Date()).getTime();
+  const result: ReconcileResult = { inserted: 0, duplicate: 0, unreadable: 0 };
+
+  // Claims from earlier runs, old enough that no hook can still be writing.
+  const stale: Array<{ path: string; text: string }> = [];
+  const prefix = `${basename(path)}.claim-`;
+  let names: string[] = [];
+  try {
+    names = readdirSync(dirname(path));
+  } catch {
+    /* no directory, so nothing pending */
+  }
+  for (const name of names) {
+    if (!name.startsWith(prefix)) continue;
+    const m = CLAIM_RE.exec(name);
+    if (!m || nowMs - Number(m[1]) < STALE_CLAIM_MS) continue;
+    const full = join(dirname(path), name);
+    try {
+      stale.push({ path: full, text: readFileSync(full, "utf-8") });
+    } catch {
+      /* another reconciler removed it */
+    }
+  }
+
+  let claimed: string | null = `${path}.claim-${process.pid}-${Date.now()}`;
+  try {
+    renameSync(path, claimed);
+  } catch {
+    claimed = null; // nothing pending, or another reconciler took it
+  }
+  const fresh = claimed ? readFileSync(claimed, "utf-8") : "";
+  if (claimed) opts.afterClaim?.(claimed);
+
+  const insert = db.prepare(
+    `INSERT INTO trigger_fires (session_uuid, command, query, state, injected_ids, created_at)
+     SELECT ?, ?, '', 'not-asked', '[]', ?
+      WHERE NOT EXISTS (
+        SELECT 1 FROM trigger_fires
+         WHERE session_uuid = ? AND created_at = ? AND command = ? AND state = 'not-asked')`,
+  );
+  const apply = (text: string, count: boolean): void => {
+    for (const line of text.split(/\r?\n/)) {
+      if (!line.trim()) continue;
+      const fire = parsePendingFireLine(line);
+      if (!fire) {
+        if (count) result.unreadable++;
+        continue;
+      }
+      const r = insert.run(fire.session_uuid, fire.command, fire.created_at, fire.session_uuid, fire.created_at, fire.command);
+      if (r.changes > 0) result.inserted++;
+      else if (count) result.duplicate++;
+    }
+  };
+
+  try {
+    db.transaction(() => {
+      apply(fresh, true);
+      // A stale claim was counted when it was claimed; only a late line in it is new.
+      for (const s of stale) apply(s.text, false);
+    }).immediate();
+  } catch (err) {
+    if (fresh) {
+      try {
+        appendFileSync(path, fresh.endsWith("\n") ? fresh : `${fresh}\n`, "utf-8");
+      } catch {
+        /* the claim file still holds it, and a later run re-reads it */
+      }
+    }
+    throw err;
+  }
+
+  for (const s of stale) {
+    try {
+      unlinkSync(s.path);
+    } catch {
+      /* already gone */
+    }
+  }
+  return result;
+}
+
+/** The one line SessionEnd and `ob_end` print for a reconcile. */
+export function formatReconcileLine(r: ReconcileResult): string {
+  if (r.inserted + r.duplicate + r.unreadable === 0) return "trigger fires: nothing pending";
+  return `trigger fires: ${r.inserted} not-asked fire(s) reconciled (${r.duplicate} already recorded, ${r.unreadable} unreadable line(s) not reconciled)`;
 }
 
 /** The three counts for one session — A8's census. */

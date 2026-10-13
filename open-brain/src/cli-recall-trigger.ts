@@ -34,15 +34,24 @@
  * itself is out of reach by then and cannot be affected either way.
  *
  * The log is `recall-trigger.log`, beside the store.
+ *
+ * ## The not-asked fast path (T-159)
+ *
+ * Half of all fires derive no query. Those load nothing heavy: the static
+ * imports below are node builtins, `deriveQuery` (whose module takes
+ * better-sqlite3 as a type only) and `pending-fires.ts`, and a not-asked fire
+ * is one appended line beside the store, reconciled into `trigger_fires` at
+ * SessionEnd and at `ob_end`. better-sqlite3, db-v2, the policy loader (zod)
+ * and run.js are imported only on the asked path. A static import of any of
+ * them here puts their load cost back on every Bash call.
  */
 
 import { appendFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
-import Database from "better-sqlite3";
-import { initTriggerFires } from "./db-v2.js";
-import { loadPolicy } from "./trigger/policy.js";
-import { runTrigger } from "./trigger/run.js";
+import type Database from "better-sqlite3";
+import { deriveQuery } from "./trigger/query.js";
+import { appendPendingNotAsked, pendingFiresPath } from "./trigger/pending-fires.js";
 
 const DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const LOG_PATH = process.env.RECALL_TRIGGER_LOG || join(dirname(DB_PATH), "recall-trigger.log");
@@ -89,8 +98,6 @@ function logFailure(what: string, err?: unknown): void {
 }
 
 async function main(): Promise<void> {
-  const started = Date.now();
-
   let raw = "";
   try {
     const chunks: Buffer[] = [];
@@ -129,14 +136,14 @@ async function main(): Promise<void> {
     return;
   }
 
-  let policy;
-  try {
-    // The directory override exists for A6's deadline case and for QA:
-    // pointing the hook at a different policy directory is how the floor and
-    // the deadline are changed WITHOUT a source change (ruling 5).
-    policy = loadPolicy(process.env.TRIGGER_POLICY_DIR || undefined);
-  } catch (err) {
-    logFailure("policy unreadable", err);
+  // T-159: AFTER the session check, so an unattributable fire is still
+  // dropped rather than written to the pending file.
+  if (deriveQuery(command) === "") {
+    try {
+      appendPendingNotAsked(pendingFiresPath(DB_PATH), { sessionUuid, command }, new Date());
+    } catch (err) {
+      logFailure("not-asked fire not recorded", err);
+    }
     return;
   }
 
@@ -149,6 +156,26 @@ async function main(): Promise<void> {
   let readDb: Database.Database | undefined;
   let writeDb: Database.Database | undefined;
   try {
+    // T-159: the asked path's modules, loaded only here (see the header).
+    const { default: Database } = await import("better-sqlite3");
+    const { initTriggerFires } = await import("./db-v2.js");
+    const { runTrigger } = await import("./trigger/run.js");
+    const { loadPolicy } = await import("./trigger/policy.js");
+
+    let policy;
+    try {
+      // The directory override exists for A6's deadline case and for QA:
+      // pointing the hook at a different policy directory is how the floor and
+      // the deadline are changed WITHOUT a source change (ruling 5).
+      policy = loadPolicy(process.env.TRIGGER_POLICY_DIR || undefined);
+    } catch (err) {
+      logFailure("policy unreadable", err);
+      return;
+    }
+
+    // The deadline clock starts after the imports, as it did when they were static.
+    const started = Date.now();
+
     // `fileMustExist` is the ONLY guard on an absent store, deliberately.
     // There was an existsSync check here too, and a mutant that turned this
     // flag off survived the whole file because the earlier check answered
