@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 422,
+  "revision": 423,
   "project": {
     "name": "self-improving-agent"
   },
@@ -53,7 +53,7 @@
       "opened_session": 48,
       "closed_session": null,
       "supersedes": null,
-      "note": "the structural fix deferred from Session 48, and the half that actually stops rot rather than reporting it. A `state` write should replace its predecessor and demote the old value to a `## Log` section in the vault note; `event` keeps appending. The single place to change is `pipelines/store/index.ts` where `writeExperience` returning null currently ends the write. **Gated on real labels**: the classifier is ~50–60% precise on the state side, so replacing on an inferred label would archive history. Wait until `ob_store kind` has produced a meaningful number of recorded labels — `effectiveKind` already prefers them. (Session 48) — s168 planner triage: the gate is now MEASURABLE and effectively met. The recorded label is knowledge_index.fact_kind (db-v2.ts:145,263; storer-supplied only, f28247df). Live read-only count: 654 rows = 251 event / 19 state / 384 unlabelled; 270 of the 306 rows created since 2026-08-07 carry a label. The classifier and effectiveKind were cut in e05ad9a7, so a replace could only ever fire on a RECORDED state label: the risk the gate guarded is gone. Replace-on-write itself is not built (store/index.ts:72-77 still refuses; server.ts:873-877 appends). Next: research + brief (what is 'the predecessor' of a state fact: same key?).",
+      "note": "the structural fix deferred from Session 48, and the half that actually stops rot rather than reporting it. A `state` write should replace its predecessor and demote the old value to a `## Log` section in the vault note; `event` keeps appending. The single place to change is `pipelines/store/index.ts` where `writeExperience` returning null currently ends the write. **Gated on real labels**: the classifier is ~50–60% precise on the state side, so replacing on an inferred label would archive history. Wait until `ob_store kind` has produced a meaningful number of recorded labels — `effectiveKind` already prefers them. (Session 48) — s168 planner triage: the gate is now MEASURABLE and effectively met. The recorded label is knowledge_index.fact_kind (db-v2.ts:145,263; storer-supplied only, f28247df). Live read-only count: 654 rows = 251 event / 19 state / 384 unlabelled; 270 of the 306 rows created since 2026-08-07 carry a label. The classifier and effectiveKind were cut in e05ad9a7, so a replace could only ever fire on a RECORDED state label: the risk the gate guarded is gone. Replace-on-write itself is not built (store/index.ts:72-77 still refuses; server.ts:873-877 appends). Next: research + brief (what is 'the predecessor' of a state fact: same key?). — s168: brief docs/loops/t022-state-replace-brief.md (#650), queued at clark. Research (read-only): predecessor = the same exact key AND the same note path, fact_kind 'state', not archived; 0 of the 19 live state rows share a key, so no existing row changes at deploy. Planner rulings: a state does not replace an unlabelled or event row; the row keeps its id (ratings attach to the new value); created_at is kept (known limit: a replaced value ranks as old); the Log is newest first under '### Replaced <ISO>'; the cross-scope re-point is T-266.",
       "note_by": null,
       "closed_rev": null
     },
@@ -321,12 +321,12 @@
     {
       "id": "T-146",
       "title": "Run the recency sweep at 0.01 / 0.02 / 0.04",
-      "priority": "P1",
+      "priority": "P3",
       "status": "open",
       "opened_session": 58,
       "closed_session": null,
       "supersedes": null,
-      "note": "Unblocked by Loop 7 C2: the sweep optimises session-start retrieval, and C2 keeps that path. ADR-028 refused 0.02 on one measured alternative beating one incumbent and recommended this sweep instead. Loop 6 established recency decay does real work (no_recency refuted, 11-22), so this is the one ranking input with evidence behind it. Run before any further ranking change. — Session 161: BLOCKED. Infra found the instrument, open-brain/scripts/shadow-backfill.mjs (the Loop 6 replay ADR-028 cites; strategies live 0.005, recency_0_01, recency_0_02 and recency_0_04 already exist), and ran it read-only on a backup of the QA PC's knowledge DB: 5 rows, 0 recall_log, 0 feedback_log, so eligible=0. The corpus is the desktop's DB. Questions with Aaron via clark: is T-146 still wanted after Loop 10's ranking rework, and may a DB copy go to the QA PC, or does it run on the desktop?",
+      "note": "Unblocked by Loop 7 C2: the sweep optimises session-start retrieval, and C2 keeps that path. ADR-028 refused 0.02 on one measured alternative beating one incumbent and recommended this sweep instead. Loop 6 established recency decay does real work (no_recency refuted, 11-22), so this is the one ranking input with evidence behind it. Run before any further ranking change. — Session 161: BLOCKED. Infra found the instrument, open-brain/scripts/shadow-backfill.mjs (the Loop 6 replay ADR-028 cites; strategies live 0.005, recency_0_01, recency_0_02 and recency_0_04 already exist), and ran it read-only on a backup of the QA PC's knowledge DB: 5 rows, 0 recall_log, 0 feedback_log, so eligible=0. The corpus is the desktop's DB. Questions with Aaron via clark: is T-146 still wanted after Loop 10's ranking rework, and may a DB copy go to the QA PC, or does it run on the desktop? — s168 PARKED, not run (planner ruling on a research agent's evidence). Loop 8 R2 (CHANGELOG 0.32.0) already swept 0.01/0.02/0.04 on 39 sessions: 0.01 won 19-12 (p=0.281), 0.02 19-15 (p=0.608), 0.04 20-15 (p=0.500); MRR and nDCG disagreed; 0.005 kept pending more sessions. Desktop DB 2026-10-13 (read-only): 49 eligible sessions under the replay's own rule (+9 since), inflow ~0-1/week; ~190 would be needed for 80% power at Loop 8's win rate. The premise moved too: session-start recall last logged 2026-09-25 (start-of-session injection suspended), and the dominant path, the recall trigger, ranks on raw bm25 (trigger/query.ts:151-157), so LIFECYCLE_CONFIG's recency constant affects only explicit ob_recall (31 queries from 7 sessions in October). Re-open at >= ~190 eligible sessions or with a proposed ranking change. The run shape, if wanted: build at a pinned SHA, db.backup snapshot into %TEMP%\\t146\\.claude\\open-brain\\, USERPROFILE override, node scripts/shadow-backfill.mjs, aggregates only, decision rule fixed before the run (p<0.017, MRR and precision agree, a peak not an edge).",
       "note_by": null,
       "closed_rev": null
     },
@@ -594,7 +594,7 @@
       "opened_session": 78,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154. — FINDING, planner session 150 (from T-201's stop): StateSchema is z.strictObject at every level, so ANY new field written to master's record blinds every checkout whose build predates it, including the main tree that serves every session's MCP server. T-158 (merged d5dfa74) already added optional GapSchema fields (status, closed_session, closed_rev). The first close_gap tombstone that reaches master will therefore make every not-yet-rebuilt build fail to parse the record. It is dormant until then, and it is a real reason for this task: the serving build must be rebuilt when a schema-changing merge lands, and a refusing command must say so. Until it ships: rebuild the main tree (npm install, not npm ci) before the first close_gap after d5dfa74, and tell the QA PC's main checkout the same. — s168 planner triage: half 1 DONE (4d19938/#345 serving-build line with its distance from origin/master; refined by #373 SERVED_PATHS). Stays open after 4d19938 for half 2: one refusing command that updates the main checkout, rebuilds and verifies it. Today's stand-in is clark's untracked clark-ops/scripts/sia-rebuild.sh (refuses a SHA not on master, backs up, checks out, npm ci when the lockfile changed, rebuilds, prints build-info) but it does not refuse a dirty tree, does not read build freshness back against origin/master, and does not list which sessions must reconnect.",
+      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154. — FINDING, planner session 150 (from T-201's stop): StateSchema is z.strictObject at every level, so ANY new field written to master's record blinds every checkout whose build predates it, including the main tree that serves every session's MCP server. T-158 (merged d5dfa74) already added optional GapSchema fields (status, closed_session, closed_rev). The first close_gap tombstone that reaches master will therefore make every not-yet-rebuilt build fail to parse the record. It is dormant until then, and it is a real reason for this task: the serving build must be rebuilt when a schema-changing merge lands, and a refusing command must say so. Until it ships: rebuild the main tree (npm install, not npm ci) before the first close_gap after d5dfa74, and tell the QA PC's main checkout the same. — s168 planner triage: half 1 DONE (4d19938/#345 serving-build line with its distance from origin/master; refined by #373 SERVED_PATHS). Stays open after 4d19938 for half 2: one refusing command that updates the main checkout, rebuilds and verifies it. Today's stand-in is clark's untracked clark-ops/scripts/sia-rebuild.sh (refuses a SHA not on master, backs up, checks out, npm ci when the lockfile changed, rebuilds, prints build-info) but it does not refuse a dirty tree, does not read build freshness back against origin/master, and does not list which sessions must reconnect. — s168: half 2 briefed: docs/loops/t172-main-rebuild-brief.md (#650), queued at clark: open-brain main-rebuild [<sha>] [--dry-run] [--no-fetch] (refusals in order: linked worktree, dirty tree, HEAD commits origin lacks, fetch failure, sha not on origin/master, not ahead of the BUILD STAMP, a better-sqlite3 change in the lock, npm not found); backup under the git common dir; npm install only on a lock change, never ci; V1 stamp, V2 import, V3 freshness 'current'; restore on failure (exit 3/4); RECONNECT list from live by-pid proofs. The coordinator was told of four defects in its stand-in sia-rebuild.sh (npm ci on a lock change; 'already at' by HEAD; build exit ignored with no restore; --help exits 1 hidden by | head) and will patch it until T-172 replaces it.",
       "note_by": null,
       "closed_rev": null
     },
@@ -1918,7 +1918,35 @@
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "s168, from T-264 (D-148: 'no new code unless the data says so'; the data says so). query.ts:110-117 fires the status element on /\\$\\?|\\$\\{?PIPESTATUS/ anywhere in the command by design; T-264 found 85% of 299's injections on already-compliant commands. Brief: docs/loops/t265-trigger-precision-brief.md (desktop Opus one-off, base 50c112d7): isUnsafeStatusRead (PIPESTATUS never; $? only after a trimmer pipeline; heredoc bodies and single-quoted text inert except ssh's remote command; pipefail respected), ported from T-264's VIOLATING classifier; one negatives.test.ts:69 expectation updated; acceptance by replay on the real fires: every VIOLATING anchor still injects, COMPLIANT injections fall >= 80%.",
+      "note": "s168, from T-264 (D-148: 'no new code unless the data says so'; the data says so). query.ts:110-117 fires the status element on /\\$\\?|\\$\\{?PIPESTATUS/ anywhere in the command by design; T-264 found 85% of 299's injections on already-compliant commands. Brief: docs/loops/t265-trigger-precision-brief.md (desktop Opus one-off, base 50c112d7): isUnsafeStatusRead (PIPESTATUS never; $? only after a trimmer pipeline; heredoc bodies and single-quoted text inert except ssh's remote command; pipefail respected), ported from T-264's VIOLATING classifier; one negatives.test.ts:69 expectation updated; acceptance by replay on the real fires: every VIOLATING anchor still injects, COMPLIANT injections fall >= 80%. — s168 follow-up idea (not in T-265's scope): the hook's relevance floor in open-brain/src/trigger/policies/recall-trigger.json is 8.0, measured when the store held 599 entries; it holds 654 now and the file itself says the floor 'must be re-measured'. After T-265 lands, re-measure it on the T-264 replay data (precision and recall per floor value).",
+      "note_by": [
+        "f21ca920-a048-4990-935f-42f102efc85f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-266",
+      "title": "Same key in a different scope silently re-points the row: indexKnowledge's ON CONFLICT(key) moves the row to the new note and overwrites its content for EVERY kind, orphaning the old note",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 168,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s168, found by the T-022 research (read-only, 399121cd): a write under an existing key but a different scope (global vs project, or another project) writes a second note, and indexKnowledge's ON CONFLICT(key) DO UPDATE (db-v2.ts:452-463) re-points vault_path and overwrites content: a silent replace for every kind, with no Log, and the old note is orphaned (still in the vault, no longer indexed). key and vault_path are both NOT NULL UNIQUE (db-v2.ts:121-122). Out of T-022's scope by ruling. Needs a design: refuse with a clear message, or scope the uniqueness (key + scope), plus a check for orphaned notes.",
+      "note_by": [
+        "f21ca920-a048-4990-935f-42f102efc85f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-267",
+      "title": "The transcript folder follows Claude Code's own rule (skills-audit fails on a home with a space, e.g. the QA PC), and git runs without a shell",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 168,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s168, found by research agents (read-only, 399121cd). B: deriveProjectKey (session-start/session-discovery.ts:6-11) replaces only :\\\\, :/ and slashes; Claude Code replaces EVERY non-alphanumeric with '-' (its 2.1.296 binary: e.replace(/[^a-zA-Z0-9]/g,\"-\"); all 141 desktop transcript folders match that rule ignoring drive case; the old rule misses '...smoke hookonly'). On the QA PC (home 'C:\\\\Users\\\\Aaron Melven') open-brain skills-audit (skills-audit/index.ts:196) finds no folder and throws for every seat, so D-152's /end audit cannot run there. A: health-checks.ts:34 interpolates the vault path (OPEN_BRAIN_VAULT_DIR) into an execSync shell string (cmd expands %VAR%; a trailing backslash escapes the quote). Brief: docs/loops/t267-folder-key-shellfree-brief.md (#651), queued at clark. Follow-up, not in scope: cli-suite-run.ts:243 spawnSync('npx', ..., {shell:true}) splits a path with a space (T-168 is changing that file).",
       "note_by": [
         "f21ca920-a048-4990-935f-42f102efc85f"
       ],
@@ -5492,17 +5520,15 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 168 (Atlas). Overnight PRs all MERGED 2026-10-13 on Aaron's 'Merge all' (typed 11:49Z in clark's window, verified in its transcript): #633 e5565ee5 (T-262 fix 2), #634 d368e44e (T-258), #635 50e1b223 (T-263), #638 399121cd (T-184), each pr-refreshed with patch-id unchanged and fresh-clone checked by clark. Clark rebuilt the main checkout at 399121cd and recopied end.md (CC + Cursor) and harness-audit.md. Planner live checks on 399121cd passed for all four; T-258, T-263, T-184 closed; T-262 open (20-run kill criterion + hook check). Relay's A2A v1.22.12 waker restart (#543): planner said GO for cursor-infra/cursor-builder, nothing SIA in flight on the QA PC. NEXT: (1) triage open-task-commits warnings (T-046, T-168, T-172, T-235); (2) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later; (3) T-184 follow-up: bootstrap FUTURE_LOCAL lists state.draft.inputs.json.",
+      "pick_up": "Session 168 (Atlas), 2026-10-13. Aaron (clark's window 08:53 CDT): max parallel until the weekly reset at 00:00; desktop CPU-bound (6 cores, clark launches as slots free from ~/Worktrees/launch-queue.md), laptop shared with Relay. Overnight PRs #633/#634/#635/#638 merged and live-checked (T-262 fix 2, T-258, T-263, T-184). D-148 DONE as T-264 (#648): 299 is the only entry ever injected; precision 6.4%; where warranted the next similar command follows 84% vs 29%; the data-named fix is T-265. RUNNING (desktop, Opus one-offs): T-167 (PRD problem statement in the briefing), T-168 (suite owner wired). QUEUED at clark in order: T-182, T-267, T-265, T-249 (laptop ok), T-022, T-251, T-172, T-243. Each ends at READY + PR: review the diff against its brief's name-only list, check CI, ACCEPT to clark, who puts 'merge SIA #N' on Aaron's list; merge procedure on Aaron's word: pr-refresh.sh N <reviewed-sha>, then clark merges pinned; rebuilds via clark (sia-rebuild.sh until T-172 lands). Research agents still out: T-159 (cheap not-asked path), T-206 (assignments sidecar protections). NEXT briefs: T-161 after T-167 merges (same files); T-159 and T-206 from their research; T-266 needs a design.",
       "watch_out": [
-        "The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.",
-        "A brief that adds a new output file must name the existing rows that assert the EXACT output list (T-184 BLOCKED on two V5 rows; lesson 662).",
-        "A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff before calling for a re-review (#579, s168).",
-        "Reply files: launchers write T-<n>-<tag>-reply.md (the tag's name) besides the brief's t<n>-reply.md; reply-wait.sh now checks both forms. One-off runs may work in clark's ~/Worktrees/oneoff-<TAG> folder instead of a %TEMP% clone.",
-        "Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it. CI's gh is installed but unauthenticated.",
-        "sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level command copies differ from the template), not a code regression.",
+        "The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 must run /end step 1b. If it does show, the T-262 hook's audited check is wrong.",
+        "Docs PRs and records PRs serialize on master's 'up to date' rule: each merge sends the others BEHIND; a records PR re-runs the full suite after every update (~4 min). Keep a background update-branch loop per open PR, or batch briefs into one PR.",
+        "clark launches ONLY when a slot frees: 'sent a launch line' is not 'launched'. Record a task in_progress only after clark says LAUNCHED (rev 421's note had to be corrected).",
+        "T-161 and T-167 edit the same briefing.ts/start-report.ts lines: brief T-161 on master after T-167 merges.",
+        "Brief rule kept today: name every existing exact-output row the change touches (lesson 662); allow an Opus builder to update ONLY rows that render this repo's real block or the named ones; anything else is BLOCKED.",
         "ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task.",
-        "Running seats need /mcp to reconnect open-brain after the 399121cd rebuild.",
-        "sia-forge stray reply files: delete them as the first step of the next sia-forge brief."
+        "The repo is PUBLIC (D-090): measurement runs commit aggregates only; transcript text, command text, paths and session ids stay in %TEMP% on the desktop."
       ],
       "open_questions": [],
       "session": 168,
@@ -5510,11 +5536,13 @@
         "open_prs": [],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "T-194: (a), (b) or (c)"
+          "T-194: (a), (b) or (c); planner recommends (c) now, (b) later",
+          "T-249 after merge: the live fold relocate --worktrees --apply on his knowledge DB (backup first; Relay's and Maker's worktree keys fold too)"
         ],
         "rulings": [
           "D-153: no veto on the D-152 inferences",
-          "2026-10-13 11:49Z: Aaron 'Merge all' (clark's window) covering #633 #634 #635 #638"
+          "2026-10-13 11:49Z: Aaron 'Merge all' (clark's window) covering #633 #634 #635 #638",
+          "2026-10-13 13:53Z: Aaron (clark's window): 'do as much work in parallel as possible' until the 00:00 reset"
         ]
       },
       "session_uuid": "f21ca920-a048-4990-935f-42f102efc85f",

@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 422 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 423 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -17,7 +17,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 
 ## P1
 
-- [ ] **T-146** Run the recency sweep at 0.01 / 0.02 / 0.04
 - [ ] **T-159** The trigger's cheap not-asked path — record a not-asked fire without opening the store
 - [ ] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
 - [ ] **T-166** GitNexus impact() missed a call site on the exact path under repair while reporting epistemic 'exact' - the MUST-run-impact rule is only as good as the resolver
@@ -31,6 +30,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-235** Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps
 - [~] **T-262** /end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)
 - [ ] **T-265** The recall trigger's status-read element fires only on a $? read of a trimmed pipeline (D-148's data-named change; 299 precision 6.4%)
+- [ ] **T-267** The transcript folder follows Claude Code's own rule (skills-audit fails on a home with a space, e.g. the QA PC), and git runs without a shell
 
 ## P2
 
@@ -45,9 +45,11 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
 - [ ] **T-249** Project identity resolves a worktree to its repo (the git common dir): one project per repo for knowledge-DB session scoping and the vault display name, with `open-brain relocate` folding the existing split history
 - [ ] **T-251** Adopted projects get role-file stubs and the right handoff seat: project-template ships minimal .agents/roles/{planner,developer,qa,shared}.md stubs (project-specific content, not SIA's), bootstrap/import installs them when absent, and state import seats the imported handoff from AGENT.md's role
+- [ ] **T-266** Same key in a different scope silently re-points the row: indexKnowledge's ON CONFLICT(key) moves the row to the new note and overwrites its content for EVERY kind, orphaning the old note
 
 ## P3
 
+- [ ] **T-146** Run the recency sweep at 0.01 / 0.02 / 0.04
 - [ ] **T-243** #484 LOW residuals and pre-existing audit lows: recall-trigger.log keeps a ~10-char excerpt of a malformed payload; single-quoted YAML tags keep their quotes; normalizeProject splits 'C++ Tools' oddly; A2 (repo-local .gitnexus/run.cjs runs on /sync), A4 (ob_start project_root trust), A5 (OPEN_BRAIN_VAULT_DIR override): document the trust boundaries
 - [ ] **T-261** Physically split core and memory into separate packages (after T-154; D-151)
 
