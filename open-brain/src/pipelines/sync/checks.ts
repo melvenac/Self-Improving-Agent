@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, accessSync, constants as fsConstants } from "node:fs";
 import { join, posix as pathPosix, win32 as pathWin32 } from "node:path";
 import { homedir } from "node:os";
-import { execSync, execFileSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import type { CheckResult, SyncRuntime } from "./types.js";
 import { parseSkillIndexRows } from "../../shared/skill-index.js";
 import { parseState, SeatName, schemaVersionAdvice, type State } from "../../shared/state-schema.js";
@@ -2009,7 +2009,7 @@ const SCANNED_EXT = /\.(md|ts|mts|cts|mjs|cjs|js|json|sh|ps1|yml|yaml|toml)$/;
 function listScannableFiles(root: string): FileListing {
   let why: string;
   try {
-    const out = execSync("git ls-files -z", { cwd: root, encoding: "buffer", stdio: ["ignore", "pipe", "ignore"] });
+    const out = execFileSync("git", ["ls-files", "-z"], { cwd: root, encoding: "buffer", stdio: ["ignore", "pipe", "ignore"] });
     const files = out.toString("utf8").split("\0").filter(Boolean);
     if (files.length > 0) return { files, source: "git", label: "listed by git ls-files", unreadable: [] };
     why = "git ls-files listed nothing";
