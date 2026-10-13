@@ -33,7 +33,7 @@ import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWrit
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
-import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
+import { resolvePaths, canonicalizeProjectDir, projectIdentity, projectIdentityName, obsidianVaultDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
 import { sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
 import {
@@ -61,6 +61,14 @@ const V2_DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "op
 // projects into the real vault — 57 `ob-server-*` files had accumulated there
 // since April before anyone noticed.
 const v2VaultDir = () => obsidianVaultDir();
+
+/**
+ * T-249: the knowledge key for a project dir is its REPOSITORY, so a linked
+ * worktree's entries and sessions join the main tree's. Per-checkout keys (the
+ * session slot, Summaries names, `working_dir:`) stay on canonicalizeProjectDir.
+ */
+const identityKey = (dir?: string | null): string | null =>
+  (dir && canonicalizeProjectDir(dir) ? projectIdentity(dir) : null);
 
 let _v2db: Database.Database | null = null;
 let _schemaSkew: SchemaSkew | null = null;
@@ -680,7 +688,7 @@ export async function handleSetSession(args: SetSessionArgs): Promise<ToolRespon
   // wiring had to be checked by hand every time.
   let persisted = false;
   try {
-    recordSession(getV2Db(), proven.id, canonicalizeProjectDir(project_dir));
+    recordSession(getV2Db(), proven.id, identityKey(project_dir));
     persisted = true;
   } catch {
     // Registration must not fail the session if the DB is unavailable.
@@ -719,7 +727,7 @@ export async function handleRecall(args: {
     purpose,
   } = args;
     const v2db = getV2Db();
-    const normalizedProject = canonicalizeProjectDir(project);
+    const normalizedProject = identityKey(project);
     const results: string[] = [];
 
     for (const query of queries) {
@@ -902,12 +910,12 @@ export async function handleStore(args: StoreArgs): Promise<ToolResponse> {
     }
 
     const v2db = getV2Db();
-    const effectiveProject = scope === "project" ? canonicalizeProjectDir(project_dir) : null;
+    const effectiveProject = scope === "project" ? identityKey(project_dir) : null;
     // From the raw dir, not `effectiveProject` — see projectDisplayName.
     let projectName = "General";
     if (effectiveProject) {
       try {
-        projectName = safeVaultPathSegment("project", projectDisplayName(project_dir));
+        projectName = safeVaultPathSegment("project", projectIdentityName(project_dir!));
       } catch (err) {
         const msg = err instanceof VaultPathRefusal ? err.message : String(err);
         return { content: [{ type: "text" as const, text: `ob_store refused: ${msg}` }], isError: true };
@@ -1137,7 +1145,7 @@ server.tool(
   },
   async ({ limit, project }) => {
     const v2db = getV2Db();
-    const normalizedProject = canonicalizeProjectDir(project);
+    const normalizedProject = identityKey(project);
 
     let sql = "SELECT id, key, content, tags, source, project_dir, created_at, maturity FROM knowledge_index WHERE archived_into IS NULL";
     const params: unknown[] = [];
@@ -1383,13 +1391,16 @@ export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolRespon
   const v2db = getV2Db();
   const now = new Date().toISOString();
   const date = now.slice(0, 10);
-  const normalizedProject = canonicalizeProjectDir(project_dir);
+  // T-249: the row, the file name and `project:` name the repository; `working_dir:`
+  // below keeps the checkout the chunk was written from.
+  const normalizedProject = identityKey(project_dir);
+  const workingDir = canonicalizeProjectDir(project_dir);
   // Same rule as ob_store: the canonical path is lowercased, so the display
   // name comes from the raw dir. Matches existing checkpoint filenames.
   let projectSlug = "general";
   if (normalizedProject) {
     try {
-      projectSlug = safeVaultPathSegment("project", projectDisplayName(project_dir, "general"));
+      projectSlug = safeVaultPathSegment("project", projectIdentityName(project_dir!, "general"));
     } catch (err) {
       const msg = err instanceof VaultPathRefusal ? err.message : String(err);
       return { content: [{ type: "text" as const, text: `ob_store_chunk refused: ${msg}` }], isError: true };
@@ -1413,7 +1424,7 @@ export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolRespon
     ...(session_id ? [`session: ${yamlScalar(session_id)}`] : []),
     ...(phase != null ? [`phase: ${phase}`] : []),
     `tags: ${yamlInlineArray(tagList)}`,
-    ...(normalizedProject ? [`working_dir: ${yamlScalar(normalizedProject)}`] : []),
+    ...(workingDir ? [`working_dir: ${yamlScalar(workingDir)}`] : []),
     "---",
   ].join("\n");
 

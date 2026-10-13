@@ -197,16 +197,61 @@ if (command === "sync") {
 } else if (command === "relocate") {
   // Parsed before the database is opened: a refusal must not have touched it.
   const opts = parseOrRefuse(COMMAND_SPECS.relocate, args.slice(1));
+  const from = opts.value("--from");
+  const to = opts.value("--to");
+  if (opts.has("--worktrees") && (from !== undefined || to !== undefined)) {
+    console.error("relocate refused: --worktrees finds its own folds and cannot be combined with --from/--to.\nNothing was run.");
+    process.exit(2);
+  }
+
   const { openV2Database } = await import("./db-v2.js");
-  const { planRelocate, applyRelocate, detectMissingProjects } = await import("./relocate.js");
+  const { planRelocate, applyRelocate, detectMissingProjects, planWorktreeFolds, unresolvableProjectDirs } = await import("./relocate.js");
   const { obsidianVaultDir } = await import("./shared/paths.js");
 
   const paths = resolvePaths(resolve("."));
   const db = openV2Database(paths.knowledgeV2Db);
   const vaultDir = obsidianVaultDir();
 
-  const from = opts.value("--from");
-  const to = opts.value("--to");
+  if (opts.has("--worktrees")) {
+    // T-249: every linked-worktree key, folded onto its repository.
+    const plans = planWorktreeFolds(db, vaultDir);
+    const unresolvable = unresolvableProjectDirs(db);
+    for (const u of unresolvable) console.log(`  unresolvable (not on disk): ${u}`);
+    if (plans.length === 0) {
+      console.log(`\nWorktree folds: nothing to fold.`);
+      process.exit(0);
+    }
+    console.log(`\nWorktree folds: ${plans.length}\n`);
+    for (const p of plans) {
+      console.log(`  ${p.fromCanonical}\n    →  ${p.toCanonical}`);
+      console.log(`    ${p.knowledgeRows} knowledge entries, ${p.sessionRows} sessions, ${p.noteMoves.length} notes → Experiences/${p.toDisplay}/`);
+      for (const c of p.collisions) console.log(`    name collision, NOT moved: ${c.from}`);
+    }
+    if (!opts.has("--apply")) {
+      console.log(`\nDry run. Re-run with --apply to make these changes.`);
+      process.exit(0);
+    }
+
+    // A fold rewrites keys across two tables; the backup is the undo.
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace("T", "-").slice(0, 15);
+    const backupPath = `${paths.knowledgeV2Db}.bak-${stamp}-relocate`;
+    try {
+      await db.backup(backupPath);
+    } catch (e) {
+      console.error(`relocate refused: backup to ${backupPath} failed (${e instanceof Error ? e.message : String(e)}). Nothing was changed.`);
+      process.exit(1);
+    }
+    console.log(`\nBackup: ${backupPath}`);
+
+    let failed = 0;
+    for (const p of plans) {
+      const result = applyRelocate(db, p);
+      console.log(`Applied ${p.fromCanonical}: ${result.knowledgeRows} entries, ${result.sessionRows} sessions, ${result.notesMoved} notes moved.`);
+      for (const f of result.noteFailures) console.log(`  FAILED to move ${f.path}: ${f.reason}`);
+      failed += result.noteFailures.length;
+    }
+    process.exit(failed > 0 ? 1 : 0);
+  }
 
   if (!from || !to) {
     // No arguments means "tell me what is wrong", not an error. The detector is
@@ -720,7 +765,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  sync [--check] [--score [--json]] [--history] [--retirements-rehash [--write]]");
   console.log("  start                                     Start a session");
   console.log("  end [--dry-run]                            End a session");
-  console.log("  relocate [--from <dir> --to <dir>] [--apply]  Fold a renamed project's history forward");
+  console.log("  relocate [--from <dir> --to <dir> | --worktrees] [--apply]  Fold a renamed project's or a worktree's history forward");
   console.log(
     "  scrub-trigger-fires [--db <path>] [--dry-run]  One-time rewrite of trigger_fires.command + VACUUM (stop the MCP server and close Claude Code sessions first)",
   );

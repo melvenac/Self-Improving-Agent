@@ -98,6 +98,123 @@ const lastPipelineStage = (command: string): string => {
   return (stages.length > 1 ? stages[stages.length - 1] : "").trim();
 };
 
+/** Drop heredoc bodies: their text is data for the receiving program, not shell. */
+const stripHeredocs = (command: string): string => {
+  const lines = command.split("\n");
+  const out: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    out.push(lines[i]);
+    const tags = [...lines[i].matchAll(/<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/g)].map((m) => m[2]);
+    for (const tag of tags) {
+      while (i + 1 < lines.length && lines[i + 1].trim() !== tag) i++;
+      if (i + 1 < lines.length) i++;
+    }
+  }
+  return out.join("\n");
+};
+
+interface Statement {
+  readonly stages: readonly string[];
+  /** The statement's text with single-quoted contents blanked: literal to this shell. */
+  readonly masked: string;
+}
+
+const stageProgram = (stage: string): string => {
+  const toks = stage.trim().split(/\s+/).filter(Boolean);
+  while (toks.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(toks[0])) toks.shift();
+  if (toks.length && (toks[0] === "command" || toks[0] === "env" || toks[0] === "xargs")) toks.shift();
+  const t = (toks[0] ?? "").replace(/\\/g, "/");
+  return t.slice(t.lastIndexOf("/") + 1).toLowerCase().replace(/\.exe$/, "");
+};
+
+/**
+ * Split a script into top-level statements (on unquoted `;`, newline, `&&`,
+ * `||`, `&`) and each statement into pipeline stages (on unquoted `|`). A bare
+ * `( ... )` subshell is transparent; a `$( ... )` substitution is kept whole.
+ * The single-quoted argument of `ssh` is returned in `remote`: it is the remote
+ * host's shell, so it is a script in its own right. Any other single-quoted
+ * string is inert.
+ */
+const splitStatements = (script: string): { stmts: Statement[]; remote: string[] } => {
+  const stmts: Statement[] = [];
+  const remote: string[] = [];
+  let stages = [""];
+  let masked = "";
+  let sq = false, dq = false, esc = false, sqBuf = "";
+  const parens: Array<"sub" | "grp"> = [];
+  const flush = () => {
+    if (stages.some((s) => s.trim()) || masked.trim()) stmts.push({ stages: stages.map((s) => s.trim()), masked });
+    stages = [""];
+    masked = "";
+  };
+  const add = (raw: string, m = raw) => {
+    stages[stages.length - 1] += raw;
+    masked += m;
+  };
+  for (let i = 0; i < script.length; i++) {
+    const c = script[i];
+    const n = script[i + 1];
+    if (esc) { add(c); esc = false; continue; }
+    if (sq) {
+      if (c === "'") {
+        sq = false;
+        if (stageProgram(stages[stages.length - 1]) === "ssh") remote.push(sqBuf);
+        add(c);
+      } else { sqBuf += c; add(c, " "); }
+      continue;
+    }
+    if (c === "\\") { add(c); esc = true; continue; }
+    if (dq) { if (c === '"') dq = false; add(c); continue; }
+    if (c === "'") { sq = true; sqBuf = ""; add(c); continue; }
+    if (c === '"') { dq = true; add(c); continue; }
+    const inSub = parens.includes("sub");
+    if (c === "(") {
+      parens.push(script[i - 1] === "$" || inSub ? "sub" : "grp");
+      if (parens[parens.length - 1] === "sub") add(c);
+      continue;
+    }
+    if (c === ")" && parens.length) {
+      if (parens.pop() === "sub") add(c);
+      continue;
+    }
+    if (inSub) { add(c); continue; }
+    if (c === ";" || c === "\n") { flush(); continue; }
+    if ((c === "&" && n === "&") || (c === "|" && n === "|")) { flush(); i++; continue; }
+    if (c === "&" && n !== ">" && script[i - 1] !== ">" && script[i - 1] !== "<") { flush(); continue; }
+    if (c === "|") { if (n === "&") i++; stages.push(""); masked += " "; continue; }
+    add(c);
+  }
+  flush();
+  return { stmts, remote };
+};
+
+const isTrimmerPipeline = (s: Statement): boolean =>
+  s.stages.length > 1 && (TRIMMERS as readonly string[]).includes(stageProgram(s.stages[s.stages.length - 1]));
+
+const scriptHasUnsafeRead = (stmts: readonly Statement[]): boolean =>
+  stmts.some(
+    (s, i) =>
+      i > 0 &&
+      /\$\?|\$\{\?\}/.test(s.masked) &&
+      isTrimmerPipeline(stmts[i - 1]) &&
+      !stmts.slice(0, i).some((p) => /\bpipefail\b/.test(p.masked)),
+  );
+
+/**
+ * True exactly when the command reads `$?` as the status of a pipeline whose
+ * last stage is a trimmer: the statement the `$?` follows is such a pipeline,
+ * and `set -o pipefail` is not in effect earlier in the same script. Heredoc
+ * bodies and single-quoted strings are not shell to this test, except the
+ * single-quoted argument of `ssh`, which is tested as the remote script.
+ *
+ * The semantics are T-264's VIOLATING class (`docs/loops/t264/measure.mjs`),
+ * ported rather than imported, narrowed to the ruling's trimmers and to `ssh`.
+ */
+export function isUnsafeStatusRead(command: string): boolean {
+  const { stmts, remote } = splitStatements(stripHeredocs(command));
+  return scriptHasUnsafeRead(stmts) || remote.some((r) => scriptHasUnsafeRead(splitStatements(r).stmts));
+}
+
 const ELEMENTS: readonly CommandElement[] = [
   {
     what: "a pipeline whose last stage is a trimmer",
@@ -108,11 +225,17 @@ const ELEMENTS: readonly CommandElement[] = [
     terms: ["tail"],
   },
   {
-    what: "a read of the shell's status variable",
-    // `$?` and `${PIPESTATUS[n]}` are both status reads; only the first is a
-    // mistake, and the entry that explains the difference is the one worth
-    // surfacing for either.
-    test: (command) => /\$\?|\$\{?PIPESTATUS/.test(command),
+    what: "a $? read of a pipeline whose last stage is a trimmer",
+    // This element used to fire on `$?` or `PIPESTATUS` anywhere in the
+    // command, on the reasoning that the entry explaining the difference was
+    // worth surfacing for either. T-264 (docs/loops/t264/result.md) measured
+    // that on 1,025 injected fires: only 6.4% landed on a real mistake, and 85%
+    // on commands that already read PIPESTATUS (171) or captured the status
+    // from a different statement (693). Where the mistake was real the next
+    // similar command used PIPESTATUS 84% of the time (26/31, against 2/7
+    // uninjected), so the injection works when warranted. T-265's ruling
+    // (D-148): fire only on the mistake itself.
+    test: isUnsafeStatusRead,
     terms: ["exit", "code"],
   },
 ];

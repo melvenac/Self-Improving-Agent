@@ -318,6 +318,13 @@ describe("T-168 suite meta", () => {
     expect(decideSuiteStart({ leaseExit: 0, census: idleCensus, controlledRerun: false }).refuse).toBe(false);
   });
 
+  // A chain with neither a cursor-agent host nor claude.exe. The owner now resolves live, so a
+  // row that must stay ownerless sets this; it also keeps the row off the real machine lease.
+  const NO_OWNER = {
+    SUITE_ANCESTRY: ancestry([{ pid: process.pid, ppid: 1, commandLine: "node.exe tsx cli-suite-run.ts" }]),
+    SUITE_OWNER_FROM: String(process.pid),
+  };
+
   function runCli(dir: string, extra: Record<string, string>) {
     const fixture = join(dir, "presence.json");
     const vitestJson = join(dir, "vitest.json");
@@ -358,7 +365,7 @@ describe("T-168 suite meta", () => {
 
   it("cli: lease exits 11 and 2 refuse", () => {
     const dir = mkdtempSync(join(tmpdir(), "t168-lease-"));
-    const eleven = runCli(dir, { SUITE_LEASE_EXIT: "11" });
+    const eleven = runCli(dir, { ...NO_OWNER, SUITE_LEASE_EXIT: "11" });
     const withOwner = (code: string, metaName: string) => spawnSync(
       process.execPath,
       [TSX, CLI, "--owner-pid", "100", "--meta", join(dir, metaName)],
@@ -373,7 +380,8 @@ describe("T-168 suite meta", () => {
         },
       },
     );
-    // runCli writes the fixtures. The owner-less call refuses before the lease code matters.
+    // runCli writes the fixtures. NO_OWNER keeps that call ownerless on any machine, so it
+    // refuses on the owner before the lease code matters.
     expect(eleven.r.status).toBe(2);
     const m11run = withOwner("11", "m11.json");
     const m2run = withOwner("2", "m2.json");
@@ -392,6 +400,7 @@ describe("T-168 suite meta", () => {
   it("cli: a lease already held by the same owner runs without take", () => {
     const dir = mkdtempSync(join(tmpdir(), "t168-held-"));
     const { r, written } = runCli(dir, {
+      ...NO_OWNER,
       SUITE_LEASE_STATUS_EXIT: "10",
       SUITE_LEASE_STATUS_OUT: "lease=held pid=100 started=t",
     });
@@ -425,7 +434,7 @@ describe("T-168 suite meta", () => {
 
   it("cli: a missing win32 helper refuses unless the opt-out is set", () => {
     const dir = mkdtempSync(join(tmpdir(), "t168-helper-"));
-    runCli(dir, {});
+    runCli(dir, { ...NO_OWNER });
     const missing = spawnSync(process.execPath, [TSX, CLI, "--owner-pid", "100", "--meta", join(dir, "miss.json")], {
       encoding: "utf8",
       cwd: dir,

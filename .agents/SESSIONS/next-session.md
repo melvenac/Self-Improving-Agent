@@ -1,24 +1,25 @@
-<!-- generated from .agents/state.json rev 421 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 434 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 168)_
+## planner [sia-planner] _(written session 169)_
 
 ### Pick up here
 
-Session 168 (Atlas). Overnight PRs all MERGED 2026-10-13 on Aaron's 'Merge all' (typed 11:49Z in clark's window, verified in its transcript): #633 e5565ee5 (T-262 fix 2), #634 d368e44e (T-258), #635 50e1b223 (T-263), #638 399121cd (T-184), each pr-refreshed with patch-id unchanged and fresh-clone checked by clark. Clark rebuilt the main checkout at 399121cd and recopied end.md (CC + Cursor) and harness-audit.md. Planner live checks on 399121cd passed for all four; T-258, T-263, T-184 closed; T-262 open (20-run kill criterion + hook check). Relay's A2A v1.22.12 waker restart (#543): planner said GO for cursor-infra/cursor-builder, nothing SIA in flight on the QA PC. NEXT: (1) triage open-task-commits warnings (T-046, T-168, T-172, T-235); (2) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later; (3) T-184 follow-up: bootstrap FUTURE_LOCAL lists state.draft.inputs.json.
+Session 169 (Atlas) ROLLED 2026-10-13 ~14:2x CDT on Aaron's 'ready to roll?', during the max-parallel day (until the 00:00 weekly reset). MERGED today on Aaron's word (typed 17:50:40Z in clark's window, verified with relay-check), one at a time (planner pr-refresh: patch-id = the reviewed diff and CI on the combined code; clark merges pinned and checks merge tree == refreshed tree): #656 T-267 49cfd50e, #657 T-167 b4d11093, #660 T-182 91577f53, #662 T-265 7b8c6e59, #664 T-268 43e9cb01, #667 T-249 ff9492d6. Main rebuilt at ff9492d6; the T-249 fold applied and verified. Live checks PASS and closed: T-167, T-182, T-265, T-249. OWED: T-267 and the T-268/T-168 CC half on the QA PC (write that live-check brief AFTER T-270 merges: T-267 needs the QA PC's home with a space; the T-268 owner probe needs T-270 if any process there holds 0x1A), and the T-168 Cursor half. Waiting on Aaron's word: #669 T-022 (P0, accepted) and #672 T-251 (accepted pending its Opus second review: reply at C:/Users/melve/Worktrees/t251-review-reply.md once clark copies it from the QA PC; rule on it). RUNNING (desktop): T-172 half 2 (old runner: check its three '·' strings against the brief at READY; expect update-branch conflicts in checks.ts, cli.ts and cli-spec.ts), T-243, T-159 (HIGH SessionEnd path). QUEUED on the QA PC at clark: T-270 (P1, brief 7a993a39), then Opus second reviews of T-172, T-243 and T-159 at READY (write one review body per READY, as T-251's). ON EACH READY: the reply, pr-src-diff, scope and CI, then ACCEPT to clark; merges by the refresh loop above. Records and docs PRs: master has NO branch protection now, so auto-merge never fires: merge your own records/docs PRs when green (standing go, pinned with --match-head-commit). NEXT briefs: the QA PC live-check one-off (after T-270), T-161 (unblocked), T-271, T-272, T-275, T-276. Prism's evaluation: ~/Worktrees/prism-s1-evaluation-2026-10-13.md (outside the repo; its trailer point corrected).
 
 ### Watch out
 
-- The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.
-- A brief that adds a new output file must name the existing rows that assert the EXACT output list (T-184 BLOCKED on two V5 rows; lesson 662).
-- A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff before calling for a re-review (#579, s168).
-- Reply files: launchers write T-<n>-<tag>-reply.md (the tag's name) besides the brief's t<n>-reply.md; reply-wait.sh now checks both forms. One-off runs may work in clark's ~/Worktrees/oneoff-<TAG> folder instead of a %TEMP% clone.
-- Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it. CI's gh is installed but unauthenticated.
-- sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level command copies differ from the template), not a code regression.
-- ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task.
-- Running seats need /mcp to reconnect open-brain after the 399121cd rebuild.
-- sia-forge stray reply files: delete them as the first step of the next sia-forge brief.
+- Master has no branch protection (clark, 10-13): gh auto-merge never fires, so records and docs PRs sit OPEN CLEAN until merged by hand. Merge your own records/docs PRs when green (standing go) with --match-head-commit; code PRs still need Aaron's word.
+- SIA merge gate: clark's merge-pinned fresh clone runs npm ci at the repo root, which fails for SIA, so it proves nothing. The gate is merge tree == the refreshed head's tree, which means CI ran on exactly what master now holds.
+- G-001 (clark's runners): prompts piped through Windows PowerShell 5.1 turned every non-ASCII character into '?' until ~13:2x CDT 10-13 (script-scoped $OutputEncoding; fixed with $global:OutputEncoding). Runs launched before that (T-182, T-022, T-251, T-172) saw mangled characters: check every pinned non-ASCII string against the brief on master at READY.
+- A Win32 process table load fails while ANY process's command line holds a raw 0x1A: test:heavy and Cursor session proofs fail closed machine-wide until T-270 merges.
+- process.kill(pid, 0) only says SOME process holds the pid, and Windows reuses pids within hours. Prove liveness with the rule's own checks (proc_start + image) before claiming a session is live (the s169 T-268 correction).
+- Before pinning a brief: every IMPACT-TARGETS name must exist at the base; name test files by their real path; add retirements-live.test.ts when a touched file has R-011 pinned lines (atlas-ops briefs.md, s169).
+- Stale open-brain servers (every running seat until /mcp reconnect, this one included: build 399121c) still key knowledge and sessions by worktree; clark re-runs relocate --worktrees as a dry run after the reconnects.
+- A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED or the oneoff session shows in ListAgents.
+- Verify every relayed merge word in clark's transcript (relay-check.mjs: a typed user record, and the PR on the list he answered: approval is a snapshot).
+- The repo is PUBLIC (D-090): measurement runs commit aggregates only; transcript text, command text, paths and session ids stay outside the repo (the Prism evaluation lives in ~/Worktrees).
 
 ### Open questions
 
@@ -26,16 +27,27 @@ _None._
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #669 — QA: accepted — T-022 (P0) at 885b4f82; needs Aaron's word 'merge SIA #669'; pr-refresh before its merge
+- #672 — QA: in_progress — T-251 at 89d47d9d: planner-accepted, Opus second review running on the QA PC; then Aaron's word 'merge SIA #672'
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- T-194: (a), (b) or (c)
+- merge SIA #669 (T-022, P0)
+- merge SIA #672 (T-251), after its Opus second review
+- T-194: (a), (b) or (c); planner recommends (c) now, (b) later
+- optional: manual relocate --from/--to for the pruned worktrees sia-infra (14 sessions) and a2a-rivet (1): sessions only, no knowledge
+- via clark: one shared fetch-first docs/records PR script set instead of a new prism-ops; do factual CLAUDE.md seat-table edits need his word in the seat's window?
+- /mcp reconnect open-brain in every running seat (stale servers since the ff9492d6 rebuild)
 
 **Rulings made mid-loop:** 
+- 2026-10-13 17:50:40Z Aaron (clark's window, verified typed): 'merge SIA #656 #657 #660 #662 #664 #667 + T-249 live fold'
+- 2026-10-13 ~17:2xZ Aaron (clark's window, as clark reported): restart the 4 QA PC wakers onto A2A v1.22.13
+- 2026-10-13 ~18:4xZ Aaron (clark's window, as clark reported): push code-only jobs to the QA PC and measure it
+- 2026-10-13 18:11:05Z Aaron (Prism's window, verified typed): Atlas evaluates Prism's session-1 transcript
 - D-153: no veto on the D-152 inferences
-- 2026-10-13 11:49Z: Aaron 'Merge all' (clark's window) covering #633 #634 #635 #638
+- 2026-10-13 13:53Z Aaron (clark's window): do as much work in parallel as possible until the 00:00 reset
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -111,4 +123,4 @@ _10 older handoff(s), superseded within their seat and checkout, are in state.js
 
 ## Last session
 
-Session 168 — 2026-10-13 — planner [sia-planner] — `f21ca920-a048-4990-935f-42f102efc85f` (14 writing session(s) in the record)
+Session 169 — 2026-10-13 — planner [sia-planner] — `fada3e0e-78ee-4afc-a280-d0cc17b55f57` (14 writing session(s) in the record)
