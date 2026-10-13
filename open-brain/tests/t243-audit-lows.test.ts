@@ -80,7 +80,7 @@ describe('Y1: single-quoted YAML', () => {
     const vault = mkdtempSync(join(tmpdir(), 't243-y1-'));
     try {
       const path = vaultWriter.writeExperience(vault, {
-        key: "'quoted'", tags: ['a'], content: 'c', created: '2026-10-13', maturity: 'progenitor',
+        key: "'quoted'", tags: ['a'], content: 'c', created: '2026-10-13', maturity: 'proven',
         helpful: 0, harmful: 0, neutral: 0, project: 'General', source: 'agent',
       });
       expect(path).not.toBeNull();
