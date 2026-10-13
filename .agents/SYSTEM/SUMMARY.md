@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 421 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 422 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-13 (Aaron, clark's window, 08:53 CDT): max parallel until the weekly reset at 00:00: every code-only brief goes to clark as soon as it is pinned; desktop up to 4 CC runs, laptop 1, QA PC closed; Opus 5.5 allowed for builds; runs end at READY + PR; merges still need Aaron's word. Running: T-264, the D-148 recall-trigger effect measurement. Pending Aaron: T-194 approval mechanics (a)/(b)/(c); planner recommends (c) now, (b) later. Q1 and Q2 of s167 are answered (D-148, D-146).
 
 ## What's working
