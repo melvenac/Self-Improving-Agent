@@ -98,7 +98,7 @@ End with a recommended fix list, ordered by impact.
 
 ### Phase 4: Fix (with approval)
 
-For each finding, propose a specific edit. Apply fixes only after Aaron approves. Re-run `ob_sync` after fixes to verify the structural checks still pass.
+For each finding, propose a specific edit. Apply fixes only after the user approves. Re-run `ob_sync` after fixes to verify the structural checks still pass.
 
 ## When to run
 
