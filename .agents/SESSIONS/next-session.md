@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 420 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 432 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,19 +6,18 @@
 
 ### Pick up here
 
-Session 168 (Atlas). Overnight PRs all MERGED 2026-10-13 on Aaron's 'Merge all' (typed 11:49Z in clark's window, verified in its transcript): #633 e5565ee5 (T-262 fix 2), #634 d368e44e (T-258), #635 50e1b223 (T-263), #638 399121cd (T-184), each pr-refreshed with patch-id unchanged and fresh-clone checked by clark. Clark rebuilt the main checkout at 399121cd and recopied end.md (CC + Cursor) and harness-audit.md. Planner live checks on 399121cd passed for all four; T-258, T-263, T-184 closed; T-262 open (20-run kill criterion + hook check). Relay's A2A v1.22.12 waker restart (#543): planner said GO for cursor-infra/cursor-builder, nothing SIA in flight on the QA PC. NEXT: (1) triage open-task-commits warnings (T-046, T-168, T-172, T-235); (2) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later; (3) T-184 follow-up: bootstrap FUTURE_LOCAL lists state.draft.inputs.json.
+Session 168 (Atlas) ROLLED 2026-10-13 ~11:00 CDT on Aaron's 'ready to roll?'. The max-parallel day (Aaron 08:53 CDT via clark: as much in parallel as possible until the 00:00 weekly reset) is still running: clark launches my briefs from ~/Worktrees/launch-queue.md as desktop slots free (6-core limit; laptop shared with Relay) and pings the planner on each READY. MERGED today: overnight #633 (T-262 fix 2), #634 (T-258), #635 (T-263), #638 (T-184); #648 (T-264 D-148 result, docs); #653 (T-168, merged 5a858fd9, main checkout rebuilt). ACCEPTED, waiting on Aaron's word: #656 (T-267, transcript folder rule + shell-free git) and #657 (T-167, PROBLEM line). RUNNING: T-182 (desktop). QUEUED at clark in order: T-265, T-268, T-249, T-022, T-251, T-172, T-243, T-159. ON EACH READY: read the reply (%TEMP%\T-<n>-reply.md or t<n>-reply.md; restart waiters with bash $S/reply-wait.sh t<n>-reply.md), read the src diff (gh pr diff N), check scope against the brief's name-only list and CI, then send clark 'ACCEPT T-<n>, PR #N at <sha40>' with the evidence; clark puts 'merge SIA #N' on Aaron's list. ON AARON'S MERGE WORD (verify it in clark's transcript be596ecd: typed, and the PR on the list he answered): bash $S/pr-refresh.sh N <reviewed-sha>, send clark 'REFRESHED #N <head40> patch-id ok', clark merges pinned and rebuilds, then the planner runs the live check and records it. LIVE CHECKS OWED: T-167 (after #657 merge + rebuild + /mcp reconnect: ob_start shows the PROBLEM line); T-267 (after #656: on the QA PC, open-brain skills-audit --seat <seat> <checkout> lists rows instead of throwing); T-168 lease check on the QA PC from one CC seat and one Cursor seat AFTER T-268 merges (a CC seat's Bash tool is refused until then); T-249 live fold needs Aaron's word after merge. NEXT briefs: T-161 on master after #657 merges (same briefing lines); T-266 needs a design; T-206 needs a rescope (P3).
 
 ### Watch out
 
-- The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.
-- A brief that adds a new output file must name the existing rows that assert the EXACT output list (T-184 BLOCKED on two V5 rows; lesson 662).
-- A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff before calling for a re-review (#579, s168).
-- Reply files: launchers write T-<n>-<tag>-reply.md (the tag's name) besides the brief's t<n>-reply.md; reply-wait.sh now checks both forms. One-off runs may work in clark's ~/Worktrees/oneoff-<TAG> folder instead of a %TEMP% clone.
-- Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it. CI's gh is installed but unauthenticated.
-- sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level command copies differ from the template), not a code regression.
-- ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task.
-- Running seats need /mcp to reconnect open-brain after the 399121cd rebuild.
-- sia-forge stray reply files: delete them as the first step of the next sia-forge brief.
+- Claude Code's Bash tool on Windows is Git Bash: a Win32 parent-chain walk from its children breaks at bash.exe (the MSYS launcher has exited). Run process-ancestry checks from the PowerShell tool, or use the session proof via CLAUDE_CODE_SESSION_ID (T-268). Never CLAUDE_PID (inherited in nested sessions).
+- A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED (rev 421 had to be corrected).
+- Docs and records PRs serialize on master's strict up-to-date rule: each merge sends the others BEHIND and a records PR re-runs the full suite (~4 min) after every update. Keep one background update-branch loop per open PR, or batch.
+- The repo is PUBLIC (D-090): measurement runs commit aggregates only; transcript text, command text, paths and session ids stay in the desktop %TEMP%.
+- Under 5-6 concurrent runs the desktop's local wide runs hit rows with their own hard caps (greeting-size T183-3 at 30 s, t048-r1b hook 10 s, vitest onTaskUpdate RPC timeouts): check the row alone and CI before calling it a regression.
+- T-161 and T-167 edit the same briefing.ts/start-report.ts lines: brief T-161 only after #657 merges.
+- Verify every relayed merge word in clark's transcript (typed user record, not a tool result; and the PR was on the list Aaron answered: approval is a snapshot).
+- ob_state refuses update_task on a done task: put post-close evidence in the handoff or a new task.
 
 ### Open questions
 
@@ -26,16 +25,23 @@ _None._
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #656 — QA: accepted — T-267 at 2cbcfda3; needs Aaron's word
+- #657 — QA: accepted — T-167 at c57419dd; needs Aaron's word
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- T-194: (a), (b) or (c)
+- merge SIA #656 (T-267)
+- merge SIA #657 (T-167)
+- T-194: (a), (b) or (c); planner recommends (c) now, (b) later
+- T-249 after merge: the live fold relocate --worktrees --apply on his knowledge DB (backup first; Relay's and Maker's worktree keys fold too)
 
 **Rulings made mid-loop:** 
 - D-153: no veto on the D-152 inferences
 - 2026-10-13 11:49Z: Aaron 'Merge all' (clark's window) covering #633 #634 #635 #638
+- 2026-10-13 13:53Z: Aaron (clark's window): 'do as much work in parallel as possible' until the 00:00 reset
+- 2026-10-13 15:20Z: Aaron 'merge all' (clark's window) covering SIA #653 (T-168)
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -107,8 +113,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 168 — 2026-10-13 — planner [sia-planner] — `f21ca920-a048-4990-935f-42f102efc85f` (14 writing session(s) in the record)
+Session 169 — 2026-10-13 — planner [sia-planner] — `fada3e0e-78ee-4afc-a280-d0cc17b55f57` (14 writing session(s) in the record)
