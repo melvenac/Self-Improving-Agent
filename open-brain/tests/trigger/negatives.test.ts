@@ -65,8 +65,9 @@ describe('A2 — commands the trigger says nothing about', () => {
     // condition in lastPipelineStage left all eleven rows green, so the word
     // PIPELINE in the module's own description of the shape was carried by
     // nothing. `tail -f` reading a file is not the G-039 act: no command's
-    // status is being hidden, because no command is upstream.
-    expect(deriveQuery('tail -f build.log; echo $?')).toBe('"exit" "code"');
+    // status is being hidden, because no command is upstream. Since T-265 the
+    // `$?` here is the command's own status, so the status element is silent too.
+    expect(deriveQuery('tail -f build.log; echo $?')).toBe('');
     expect(deriveQuery('tail -f build.log')).toBe('');
 
     // And the direction that must still fire, in the same test: the same

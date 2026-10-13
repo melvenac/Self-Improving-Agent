@@ -3,11 +3,11 @@ import { join } from "node:path";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
+// Claude Code's own rule for the ~/.claude/projects/<folder> name: every
+// non-alphanumeric character becomes "-" (one each, no collapsing, no trim).
+// Replacing only drive separators and slashes missed a home with a space.
 export function deriveProjectKey(projectPath: string): string {
-  return projectPath
-    .replace(/:\\/g, "--")
-    .replace(/:\//g, "--")
-    .replace(/[\\/]/g, "-");
+  return projectPath.replace(/[^a-zA-Z0-9]/g, "-");
 }
 
 export function discoverSessionUuid(projectPath: string, homePath: string): string | null {
