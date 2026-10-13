@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 425 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 426 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,17 +6,18 @@
 
 ### Pick up here
 
-Session 168 (Atlas), 2026-10-13. Aaron (clark's window 08:53 CDT): max parallel until the weekly reset at 00:00; desktop CPU-bound (6 cores, clark launches as slots free from ~/Worktrees/launch-queue.md), laptop shared with Relay. Overnight PRs #633/#634/#635/#638 merged and live-checked (T-262 fix 2, T-258, T-263, T-184). D-148 DONE as T-264 (#648): 299 is the only entry ever injected; precision 6.4%; where warranted the next similar command follows 84% vs 29%; the data-named fix is T-265. RUNNING (desktop, Opus one-offs): T-167 (PRD problem statement in the briefing), T-168 (suite owner wired). QUEUED at clark in order: T-182, T-267, T-265, T-249 (laptop ok), T-022, T-251, T-172, T-243. Each ends at READY + PR: review the diff against its brief's name-only list, check CI, ACCEPT to clark, who puts 'merge SIA #N' on Aaron's list; merge procedure on Aaron's word: pr-refresh.sh N <reviewed-sha>, then clark merges pinned; rebuilds via clark (sia-rebuild.sh until T-172 lands). Research agents still out: T-159 (cheap not-asked path), T-206 (assignments sidecar protections). NEXT briefs: T-161 after T-167 merges (same files); T-159 and T-206 from their research; T-266 needs a design.
+Session 168 (Atlas) ROLLED 2026-10-13 ~11:00 CDT on Aaron's 'ready to roll?'. The max-parallel day (Aaron 08:53 CDT via clark: as much in parallel as possible until the 00:00 weekly reset) is still running: clark launches my briefs from ~/Worktrees/launch-queue.md as desktop slots free (6-core limit; laptop shared with Relay) and pings the planner on each READY. MERGED today: overnight #633 (T-262 fix 2), #634 (T-258), #635 (T-263), #638 (T-184); #648 (T-264 D-148 result, docs); #653 (T-168, merged 5a858fd9, main checkout rebuilt). ACCEPTED, waiting on Aaron's word: #656 (T-267, transcript folder rule + shell-free git) and #657 (T-167, PROBLEM line). RUNNING: T-182 (desktop). QUEUED at clark in order: T-265, T-268, T-249, T-022, T-251, T-172, T-243, T-159. ON EACH READY: read the reply (%TEMP%\T-<n>-reply.md or t<n>-reply.md; restart waiters with bash $S/reply-wait.sh t<n>-reply.md), read the src diff (gh pr diff N), check scope against the brief's name-only list and CI, then send clark 'ACCEPT T-<n>, PR #N at <sha40>' with the evidence; clark puts 'merge SIA #N' on Aaron's list. ON AARON'S MERGE WORD (verify it in clark's transcript be596ecd: typed, and the PR on the list he answered): bash $S/pr-refresh.sh N <reviewed-sha>, send clark 'REFRESHED #N <head40> patch-id ok', clark merges pinned and rebuilds, then the planner runs the live check and records it. LIVE CHECKS OWED: T-167 (after #657 merge + rebuild + /mcp reconnect: ob_start shows the PROBLEM line); T-267 (after #656: on the QA PC, open-brain skills-audit --seat <seat> <checkout> lists rows instead of throwing); T-168 lease check on the QA PC from one CC seat and one Cursor seat AFTER T-268 merges (a CC seat's Bash tool is refused until then); T-249 live fold needs Aaron's word after merge. NEXT briefs: T-161 on master after #657 merges (same briefing lines); T-266 needs a design; T-206 needs a rescope (P3).
 
 ### Watch out
 
-- The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 must run /end step 1b. If it does show, the T-262 hook's audited check is wrong.
-- Docs PRs and records PRs serialize on master's 'up to date' rule: each merge sends the others BEHIND; a records PR re-runs the full suite after every update (~4 min). Keep a background update-branch loop per open PR, or batch briefs into one PR.
-- clark launches ONLY when a slot frees: 'sent a launch line' is not 'launched'. Record a task in_progress only after clark says LAUNCHED (rev 421's note had to be corrected).
-- T-161 and T-167 edit the same briefing.ts/start-report.ts lines: brief T-161 on master after T-167 merges.
-- Brief rule kept today: name every existing exact-output row the change touches (lesson 662); allow an Opus builder to update ONLY rows that render this repo's real block or the named ones; anything else is BLOCKED.
-- ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task.
-- The repo is PUBLIC (D-090): measurement runs commit aggregates only; transcript text, command text, paths and session ids stay in %TEMP% on the desktop.
+- Claude Code's Bash tool on Windows is Git Bash: a Win32 parent-chain walk from its children breaks at bash.exe (the MSYS launcher has exited). Run process-ancestry checks from the PowerShell tool, or use the session proof via CLAUDE_CODE_SESSION_ID (T-268). Never CLAUDE_PID (inherited in nested sessions).
+- A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED (rev 421 had to be corrected).
+- Docs and records PRs serialize on master's strict up-to-date rule: each merge sends the others BEHIND and a records PR re-runs the full suite (~4 min) after every update. Keep one background update-branch loop per open PR, or batch.
+- The repo is PUBLIC (D-090): measurement runs commit aggregates only; transcript text, command text, paths and session ids stay in the desktop %TEMP%.
+- Under 5-6 concurrent runs the desktop's local wide runs hit rows with their own hard caps (greeting-size T183-3 at 30 s, t048-r1b hook 10 s, vitest onTaskUpdate RPC timeouts): check the row alone and CI before calling it a regression.
+- T-161 and T-167 edit the same briefing.ts/start-report.ts lines: brief T-161 only after #657 merges.
+- Verify every relayed merge word in clark's transcript (typed user record, not a tool result; and the PR was on the list Aaron answered: approval is a snapshot).
+- ob_state refuses update_task on a done task: put post-close evidence in the handoff or a new task.
 
 ### Open questions
 
@@ -24,11 +25,15 @@ _None._
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #656 — QA: accepted — T-267 at 2cbcfda3; needs Aaron's word
+- #657 — QA: accepted — T-167 at c57419dd; needs Aaron's word
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- merge SIA #656 (T-267)
+- merge SIA #657 (T-167)
 - T-194: (a), (b) or (c); planner recommends (c) now, (b) later
 - T-249 after merge: the live fold relocate --worktrees --apply on his knowledge DB (backup first; Relay's and Maker's worktree keys fold too)
 
@@ -36,6 +41,7 @@ _None._
 - D-153: no veto on the D-152 inferences
 - 2026-10-13 11:49Z: Aaron 'Merge all' (clark's window) covering #633 #634 #635 #638
 - 2026-10-13 13:53Z: Aaron (clark's window): 'do as much work in parallel as possible' until the 00:00 reset
+- 2026-10-13 15:20Z: Aaron 'merge all' (clark's window) covering SIA #653 (T-168)
 
 ## developer [sia-builder] _(written session 156)_
 
