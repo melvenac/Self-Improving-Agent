@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import { join } from "path";
-import { execSync } from "child_process";
+import { execFileSync } from "node:child_process";
 import { obsidianVaultDir } from "../../shared/paths.js";
 
 export interface HealthWarning {
@@ -27,11 +27,11 @@ export function runHealthChecks(homePath: string): HealthCheckResult {
   const vaultPath = obsidianVaultDir(homePath);
   if (existsSync(join(vaultPath, ".git"))) {
     try {
-      // Suppress git's stderr via stdio, not a `2>/dev/null` redirect: execSync
-      // runs through cmd.exe on Windows, where /dev/null is not a path, so the
-      // redirect printed "The system cannot find the path specified." on every
-      // SessionStart while failing to suppress anything.
-      const lastCommit = execSync(`git -C "${vaultPath}" log -1 --format=%ct`, {
+      // execFileSync, no shell: the vault path (OPEN_BRAIN_VAULT_DIR when set)
+      // reaches git as one literal argument. Interpolated into a shell string,
+      // cmd expanded `%VAR%` inside it and a trailing backslash escaped the
+      // closing quote. git's stderr is suppressed via stdio, not a redirect.
+      const lastCommit = execFileSync("git", ["-C", vaultPath, "log", "-1", "--format=%ct"], {
         encoding: "utf-8",
         stdio: ["ignore", "pipe", "ignore"],
       }).trim();
