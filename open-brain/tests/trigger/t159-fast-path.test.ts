@@ -92,7 +92,7 @@ describe('N1 — the not-asked fast path loads nothing heavy', () => {
       dbV2: seen.resolved.some((x) => /\/src\/db-v2\.(ts|js)$/.test(x.url)),
       policy: seen.resolved.some((x) => /\/src\/trigger\/policy\.(ts|js)$/.test(x.url)),
     };
-    return { r, heavy, dbPath, resolvedCount: seen.resolved.length };
+    return { r, heavy, dbPath, resolvedCount: seen.resolved.length, resolved: seen.resolved };
   }
 
   it('git status --porcelain: exit 0, silent, nothing heavy, one pending line, no store; G-039 does load them', async () => {
@@ -110,6 +110,17 @@ describe('N1 — the not-asked fast path loads nothing heavy', () => {
     expect(control.r.status).toBe(0);
     expect(control.heavy).toEqual({ native: true, bsqlite: true, zod: true, dbV2: true, policy: true });
     expect(fs.existsSync(control.dbPath)).toBe(false);
+  }, SPAWN_TIMEOUT);
+
+  it('N1b: from the hook entry on, every specifier resolves to a node: builtin or one of the four fast-path modules', async () => {
+    const { r, resolved } = await spied('git status --porcelain');
+    expect(r.status).toBe(0);
+    // What precedes the entry is the tsx loader itself (and the spy), not the hook.
+    const entry = resolved.findIndex((x) => /\/src\/cli-recall-trigger\.(ts|js)$/.test(x.url));
+    expect(entry).toBeGreaterThanOrEqual(0);
+    const allowed = /\/src\/(cli-recall-trigger|trigger\/query|trigger\/pending-fires|trigger\/command-log)\.(ts|js)$/;
+    const outside = resolved.slice(entry).filter((x) => !x.url.startsWith('node:') && !allowed.test(x.url));
+    expect(outside).toEqual([]);
   }, SPAWN_TIMEOUT);
 });
 
@@ -278,6 +289,72 @@ describe('N4-N6 — reconcilePendingFires', () => {
     expect(third.inserted).toBe(0);
     expect(allRows()).toHaveLength(5);
   });
+
+  it('N6b: on the real clock, a reconcile right after one that kept a claim leaves the claim alone', () => {
+    fs.writeFileSync(p, `${three.join('\n')}\n`);
+    let claimedPath = '';
+    const first = F.reconcilePendingFires(db, p, {
+      afterClaim: (c: string) => {
+        claimedPath = c;
+        fs.appendFileSync(c, `${line('D', '2026-10-13T10:00:02.000Z')}\n`);
+      },
+    });
+    expect(first.inserted).toBe(3);
+    expect(fs.existsSync(claimedPath)).toBe(true);
+
+    const second = F.reconcilePendingFires(db, p); // no `now`: the claim is seconds old
+    expect(second.inserted).toBe(0);
+    expect(fs.existsSync(claimedPath)).toBe(true);
+    expect(allRows()).toHaveLength(3);
+  });
+
+  it('N6c: the stale re-read counts no duplicate and no unreadable line beside its inserts', () => {
+    fs.writeFileSync(p, `${three.join('\n')}\n`);
+    F.reconcilePendingFires(db, p, {
+      afterClaim: (c: string) => {
+        fs.appendFileSync(p, `${line('C', '2026-10-13T10:00:01.000Z')}\n`);
+        fs.appendFileSync(c, `${line('D', '2026-10-13T10:00:02.000Z')}\n`);
+      },
+    });
+    const later = new Date(Date.now() + F.STALE_CLAIM_MS + 1000);
+    expect(F.reconcilePendingFires(db, p, { now: later })).toEqual({ inserted: 2, duplicate: 0, unreadable: 0 });
+  });
+
+  it('N8: a DB error throws, puts the claimed lines back in the live file, keeps the claim and writes no row', () => {
+    db.exec(`CREATE TRIGGER t159_abort BEFORE INSERT ON trigger_fires BEGIN SELECT RAISE(ABORT, 'induced'); END;`);
+    const text = `${three.join('\n')}\n`;
+    fs.writeFileSync(p, text);
+    let claimedPath = '';
+    expect(() => F.reconcilePendingFires(db, p, { afterClaim: (c: string) => (claimedPath = c) })).toThrow(/induced/);
+    expect(readLines(p)).toEqual(three);
+    expect(claimedPath).not.toBe('');
+    expect(fs.existsSync(claimedPath)).toBe(true);
+    expect(allRows()).toHaveLength(0);
+  });
+
+  it('N11: only ENOENT from the claim rename means nothing pending; EPERM throws and leaves the live file', () => {
+    const text = `${three.join('\n')}\n`;
+    fs.writeFileSync(p, text);
+    const failing = (code: string) => () => {
+      throw Object.assign(new Error(`${code}: induced rename failure`), { code });
+    };
+    expect(() => F.reconcilePendingFires(db, p, { rename: failing('EPERM') })).toThrow(/EPERM/);
+    expect(fs.readFileSync(p, 'utf-8')).toBe(text);
+    expect(allRows()).toHaveLength(0);
+
+    expect(F.reconcilePendingFires(db, p, { rename: failing('ENOENT') })).toEqual({ inserted: 0, duplicate: 0, unreadable: 0 });
+    expect(fs.readFileSync(p, 'utf-8')).toBe(text);
+    expect(allRows()).toHaveLength(0);
+  });
+});
+
+describe('N10 — parsePendingFireLine refuses what the hook never writes', () => {
+  it('a time without milliseconds, and a fifth key, are both null', () => {
+    expect(pf.parsePendingFireLine(line('A', '2026-10-13T12:00:00.000Z'))).not.toBeNull(); // the control
+    expect(pf.parsePendingFireLine(line('A', '2026-10-13T12:00:00Z'))).toBeNull();
+    const five = JSON.stringify({ session_uuid: 'A', created_at: '2026-10-13T12:00:00.000Z', command: 'git', state: 'not-asked', extra: 1 });
+    expect(pf.parsePendingFireLine(five)).toBeNull();
+  });
 });
 
 describe('N7 — end to end: the hook, then SessionEnd; and ob_end', () => {
@@ -333,5 +410,47 @@ describe('N7 — end to end: the hook, then SessionEnd; and ob_end', () => {
     db.close();
     expect(n).toBe(2);
     expect(fs.existsSync(p)).toBe(false);
+  }, SPAWN_TIMEOUT);
+
+  it('N7c: a store that refuses the insert — SessionEnd exits 0, says NOT RECONCILED, and carries on', async () => {
+    const dbPath = path.join(dir, 'store', 'knowledge-v2.db');
+    fs.mkdirSync(path.dirname(dbPath));
+    freshStore(dbPath);
+    const w = new Database(dbPath);
+    w.exec(`CREATE TRIGGER t159_abort BEFORE INSERT ON trigger_fires BEGIN SELECT RAISE(ABORT, 'induced'); END;`);
+    w.close();
+    const env = { KNOWLEDGE_V2_DB: dbPath, RECALL_TRIGGER_LOG: path.join(dir, 'store', 'recall-trigger.log') };
+
+    await runHook(shell('git status', 'n7c-X'), env);
+    await runHook(shell('ls -la', 'n7c-X'), env);
+    await runHook(bash('git log --oneline', 'n7c-Y'), env);
+    expect(readLines(pendingFile(dbPath))).toHaveLength(3);
+
+    const end = await sessionEnd(env, 'n7c-Y');
+    expect(end.status).toBe(0);
+    const failed = end.stdout.indexOf('[session-end] trigger fires NOT RECONCILED: ');
+    const next = end.stdout.indexOf('[session-end] v2 vault not found, skipping.');
+    expect(failed).toBeGreaterThanOrEqual(0);
+    expect(next).toBeGreaterThan(failed);
+    expect(readLines(pendingFile(dbPath))).toHaveLength(3);
+  }, SPAWN_TIMEOUT);
+
+  it('N9: a dry-run ob_end leaves the pending file byte for byte and says it did not reconcile', async () => {
+    const dbPath = process.env.KNOWLEDGE_V2_DB!;
+    if (!fs.existsSync(dbPath)) freshStore(dbPath);
+    const p = pendingFile(dbPath);
+    const text = `${line('n9-dry', '2026-10-13T11:30:00.001Z')}\n${line('n9-dry', '2026-10-13T11:30:00.002Z', 'ls')}\n`;
+    fs.writeFileSync(p, text);
+    try {
+      const res = await server.handleEnd({ project_root: dir, session_summary: 't159 n9', dry_run: true });
+      expect(res.content[0].text).toContain('trigger fires: not reconciled (dry run)');
+      expect(fs.readFileSync(p, 'utf-8')).toBe(text);
+      const db = new Database(dbPath, { readonly: true });
+      const n = (db.prepare("SELECT COUNT(*) AS n FROM trigger_fires WHERE session_uuid = 'n9-dry'").get() as { n: number }).n;
+      db.close();
+      expect(n).toBe(0);
+    } finally {
+      fs.rmSync(p, { force: true });
+    }
   }, SPAWN_TIMEOUT);
 });
