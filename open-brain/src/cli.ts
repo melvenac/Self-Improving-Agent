@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { runSync } from "./pipelines/sync/index.js";
 import {
   scoreConfigStructure,
@@ -364,6 +365,16 @@ detach REFUSED: ${r.error}`);
   console.log(`
 HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " (detached)"} -> ${r.headAfter?.slice(0, 7)} (detached)`);
   process.exit(0);
+} else if (command === "main-rebuild") {
+  // T-172 half 2: update, rebuild and verify the checkout whose build serves every session, or refuse and change
+  // nothing. The tree is the one THIS CLI was built in (<tree>/open-brain/build/cli.js), not the cwd: it is the
+  // build that serves. The module is loaded here, before anything is changed; it imports nothing lazily after that.
+  const opts = parseOrRefuse(COMMAND_SPECS.mainRebuild, args.slice(1));
+  const { mainRebuild, defaultDeps } = await import("./pipelines/main-rebuild/index.js");
+  const tree = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const r = await mainRebuild(tree, { positionals: opts.positionals, dryRun: opts.has("--dry-run"), noFetch: opts.has("--no-fetch") }, defaultDeps());
+  for (const line of r.lines) (r.exitCode === 0 || r.exitCode === 5 ? console.log : console.error)(line);
+  process.exit(r.exitCode);
 } else if (command === "bootstrap") {
   // /bootstrap's deterministic half (bootstrap-fix BF-3/4/6). The directory is
   // taken literally, never walked up: a fresh project may not be a repository
@@ -735,6 +746,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  state migrate [--seat <planner|developer|qa>] [--last-session-seat <seat>] [--keep-revision] [--dry-run] <file...>   (--seat and --last-session-seat: v1 records only)");
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
+  console.log("  main-rebuild [<sha>] [--dry-run] [--no-fetch]  Update, rebuild and verify the main checkout's serving build, or refuse (T-172)");
   console.log("  bootstrap check [--json] [dir]                Read-only: git, CLAUDE.md and .agents/ as /bootstrap needs them");
   console.log("  bootstrap move-residue [dir]                  Move a residue .agents/ under .agents/archive/ (never deletes)");
   console.log("  bootstrap scaffold [--json] [dir]             Copy the fresh-install files from project-template/ and verify tracking");

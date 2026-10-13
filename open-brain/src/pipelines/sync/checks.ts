@@ -16,6 +16,7 @@ import { settleGitNexusIndex, type GitNexusCheckOptions } from "./gitnexus-refre
 import { diffReferrerLineHashes, matchingLineHashes } from "./retirements-line-hash.js";
 import { parseFrontmatter } from "../../shared/parse-frontmatter.js";
 import { obsidianVaultDir } from "../../shared/paths.js";
+import { isMainCheckout } from "../../shared/main-checkout.js";
 
 /**
  * Slash-command files that are deliberately NOT mirrored, with the reason.
@@ -2449,24 +2450,6 @@ function inspectGitNexusIndex(projectRoot: string): CheckResult {
  * An unstamped build is reported as UNKNOWN rather than fresh — a build that
  * predates the stamp cannot be vouched for, and saying so is the point.
  */
-/**
- * Is this the main checkout, or a linked worktree?
- *
- * `--absolute-git-dir` and `--git-common-dir` are the SAME path in the main
- * checkout and differ in a linked worktree, where the git dir is
- * `<common>/worktrees/<name>`. Measured across all three trees here.
- *
- * Returns null when git cannot answer, and the caller then says nothing about
- * consequences rather than guessing one.
- */
-function isMainCheckout(projectRoot: string): boolean | null {
-  const gitDir = gitOut(projectRoot, ["rev-parse", "--path-format=absolute", "--absolute-git-dir"]);
-  const commonDir = gitOut(projectRoot, ["rev-parse", "--path-format=absolute", "--git-common-dir"]);
-  if (gitDir === null || commonDir === null) return null;
-  const norm = (p: string) => p.replace(/\\/g, "/").replace(/\/+$/, "").toLowerCase();
-  return norm(gitDir) === norm(commonDir);
-}
-
 /**
  * What a stale build actually costs, WHERE THE CHECK IS RUNNING.
  *

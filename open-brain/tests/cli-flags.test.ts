@@ -214,6 +214,17 @@ describe("detach", () => {
   }, 120_000);
 });
 
+describe("main-rebuild", () => {
+  // T-172: a typo must never fall through to a real rebuild. The parse refuses before the tree is even named.
+  it("main-rebuild --dry-rn refuses with exit 2 and runs nothing", () => {
+    const r = cli(root, "main-rebuild", "--dry-rn", "--no-fetch");
+    expectRefusal(r, "--dry-rn");
+    expect(r.stderr).toContain("--dry-run");
+    expect(r.stdout + r.stderr).not.toContain("main-rebuild REFUSED");
+    expect(r.stdout + r.stderr).not.toContain("REBUILT");
+  }, 120_000);
+});
+
 describe("state migrate", () => {
   function v1File(name = "state.json"): string {
     const f = join(root, name);

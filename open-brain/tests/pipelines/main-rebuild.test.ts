@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statS
 import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
+import { rm } from "node:fs/promises";
 import * as mr from "../../src/pipelines/main-rebuild/index.js";
 import { describeServingBuild } from "../../src/pipelines/session-start/serving-build.js";
 
@@ -21,8 +22,13 @@ beforeEach(() => {
   root = mkdtempSync(join(TMP, "t172-mr-"));
 });
 
-afterEach(() => {
-  rmSync(root, { recursive: true, force: true });
+// G-042: vitest does not yield between the tests of one file, and every git call here is a synchronous spawn. An async
+// rm and a macrotask per fixture step let the worker answer its reporter, or the run exits 1 on
+// `Timeout calling "onTaskUpdate"` with every test green.
+const tick = (): Promise<void> => new Promise((r) => setImmediate(r));
+
+afterEach(async () => {
+  await rm(root, { recursive: true, force: true });
 });
 
 function git(cwd: string, ...args: string[]): string {
@@ -57,7 +63,7 @@ function commitAll(cwd: string, msg: string): string {
   return git(cwd, "rev-parse", "HEAD");
 }
 
-function fixture(): Fixture {
+async function fixture(): Promise<Fixture> {
   const origin = join(root, "origin.git");
   const seed = join(root, "seed");
   const main = join(root, "main");
@@ -75,15 +81,20 @@ function fixture(): Fixture {
   writeFileSync(join(seed, "open-brain", "package-lock.json"), lock("4.0.0", "11.0.0"));
   writeFileSync(join(seed, "open-brain", "src", "a.ts"), "export const a = 1;\n");
   const c1 = commitAll(seed, "C1");
+  await tick();
   writeFileSync(join(seed, "open-brain", "package-lock.json"), lock("4.1.0", "11.0.0"));
   const c2 = commitAll(seed, "C2 lock");
+  await tick();
   writeFileSync(join(seed, "open-brain", "src", "a.ts"), "export const a = 3;\n");
   const c3 = commitAll(seed, "C3 src");
+  await tick();
   git(seed, "remote", "add", "origin", origin);
   git(seed, "push", "-q", "origin", "master");
+  await tick();
   execFileSync("git", ["clone", "-q", origin, main], { stdio: ["ignore", "pipe", "pipe"] });
   git(main, "config", "user.email", "t@example.com");
   git(main, "config", "user.name", "T");
+  await tick();
   return { origin, seed, main, c1, c2, c3, proofDir };
 }
 
@@ -193,7 +204,7 @@ function expectRefused(r: mr.MainRebuildResult, reason: RegExp | string, exitCod
 
 describe("R1: a linked worktree is refused", () => {
   it("refusal 1, HEAD unchanged, npm never called", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     const wt = join(root, "wt");
     git(f.main, "worktree", "add", "-q", "--detach", wt, f.c2);
@@ -208,7 +219,7 @@ describe("R1: a linked worktree is refused", () => {
 
 describe("R2: a dirty tree is refused", () => {
   it("a tracked edit: refusal 2 names the path, no backup directory", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     writeFileSync(join(f.main, "open-brain", "src", "a.ts"), "edited\n");
     const fk = fakes(f.main);
@@ -220,7 +231,7 @@ describe("R2: a dirty tree is refused", () => {
   });
 
   it("an untracked file counts: refusal 2 names it", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     mkdirSync(join(f.main, "notes"));
     writeFileSync(join(f.main, "notes", "new.txt"), "x\n");
@@ -234,7 +245,7 @@ describe("R2: a dirty tree is refused", () => {
 
 describe("R3: only merged code, and no commits stranded", () => {
   it("an unpushed local SHA: refusal 5", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     git(f.main, "checkout", "-q", "-b", "local");
     writeFileSync(join(f.main, "open-brain", "src", "a.ts"), "local\n");
@@ -247,7 +258,7 @@ describe("R3: only merged code, and no commits stranded", () => {
   });
 
   it("an origin/feature-only SHA: refusal 5", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     git(f.seed, "checkout", "-q", "-b", "feature");
     writeFileSync(join(f.seed, "open-brain", "src", "a.ts"), "feature\n");
@@ -261,7 +272,7 @@ describe("R3: only merged code, and no commits stranded", () => {
   });
 
   it("HEAD with commits origin/master lacks: refusal 3", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     writeFileSync(join(f.main, "open-brain", "src", "a.ts"), "ahead\n");
     const ahead = commitAll(f.main, "ahead");
@@ -272,7 +283,7 @@ describe("R3: only merged code, and no commits stranded", () => {
   });
 
   it("a failed fetch: refusal 4, naming --no-fetch", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     git(f.main, "remote", "set-url", "origin", join(root, "no-such-origin.git"));
     const fk = fakes(f.main);
@@ -284,7 +295,7 @@ describe("R3: only merged code, and no commits stranded", () => {
 
 describe("R4: compared against the build stamp, not HEAD", () => {
   it("build at C1, HEAD at C3, <sha> C3: proceeds", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     const fk = fakes(f.main);
     const r = await mr.mainRebuild(f.main, { positionals: [f.c3], noFetch: true, proofDir: f.proofDir }, fk.deps);
@@ -293,7 +304,7 @@ describe("R4: compared against the build stamp, not HEAD", () => {
   });
 
   it("build at C2, <sha> C1: not ahead", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c2);
     const fk = fakes(f.main);
     const r = await mr.mainRebuild(f.main, { positionals: [f.c1], noFetch: true, proofDir: f.proofDir }, fk.deps);
@@ -302,7 +313,7 @@ describe("R4: compared against the build stamp, not HEAD", () => {
   });
 
   it("<sha> equal to the build: nothing to do, exit 0", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c3);
     const fk = fakes(f.main);
     const r = await mr.mainRebuild(f.main, { positionals: [f.c3], noFetch: true, proofDir: f.proofDir }, fk.deps);
@@ -311,7 +322,7 @@ describe("R4: compared against the build stamp, not HEAD", () => {
   });
 
   it("no stamp: refused", async () => {
-    const f = fixture();
+    const f = await fixture();
     mkdirSync(buildDir(f.main), { recursive: true });
     writeFileSync(join(buildDir(f.main), "index.js"), "x\n");
     const fk = fakes(f.main);
@@ -322,7 +333,7 @@ describe("R4: compared against the build stamp, not HEAD", () => {
 
 describe("R5: npm install only when the manifest changed since the BUILT commit; never ci", () => {
   it("a src-only change: npm runs exactly build", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c2);
     const fk = fakes(f.main);
     const r = await mr.mainRebuild(f.main, { positionals: [f.c3], noFetch: true, proofDir: f.proofDir }, fk.deps);
@@ -331,7 +342,7 @@ describe("R5: npm install only when the manifest changed since the BUILT commit;
   });
 
   it("a lock change: install then build, both in open-brain", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     const fk = fakes(f.main);
     await mr.mainRebuild(f.main, { positionals: [f.c2], noFetch: true, proofDir: f.proofDir }, fk.deps);
@@ -340,7 +351,7 @@ describe("R5: npm install only when the manifest changed since the BUILT commit;
   });
 
   it("HEAD already past the lock change, the build older: install still runs", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     expect(git(f.main, "rev-parse", "HEAD")).toBe(f.c3);
     const fk = fakes(f.main);
@@ -351,7 +362,7 @@ describe("R5: npm install only when the manifest changed since the BUILT commit;
   });
 
   it("a better-sqlite3 version change in the lock: refusal 7", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c3);
     writeFileSync(join(f.seed, "open-brain", "package-lock.json"), lock("4.1.0", "12.1.0"));
     const c4 = commitAll(f.seed, "C4 sqlite");
@@ -366,7 +377,7 @@ describe("R5: npm install only when the manifest changed since the BUILT commit;
   });
 
   it("npm cannot be located: refusal 8", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     const fk = fakes(f.main);
     const r = await mr.mainRebuild(f.main, { positionals: [f.c3], noFetch: true, proofDir: f.proofDir }, { ...fk.deps, npm: null });
@@ -376,7 +387,7 @@ describe("R5: npm install only when the manifest changed since the BUILT commit;
 
 describe("R6: the happy path", () => {
   it("HEAD detached at <sha>, stamp <sha>, V3 current, the backup holds the OLD stamp, at most 3 backups", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     const old = snapshot(buildDir(f.main));
     const bk = backupsDir(f.main);
@@ -422,7 +433,7 @@ describe("R6: the happy path", () => {
   });
 
   it("STALE after the build: keep it, exit 5", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     const fk = fakes(f.main, { v3: (s) => `Build ${s} · STALE: 2 code commits behind → ask Aaron to update` });
     const r = await mr.mainRebuild(f.main, { positionals: [f.c3], noFetch: true, proofDir: f.proofDir }, fk.deps);
@@ -433,7 +444,7 @@ describe("R6: the happy path", () => {
   });
 
   it("garbage from V3: restore, exit 3", async () => {
-    const f = fixture();
+    const f = await fixture();
     git(f.main, "checkout", "-q", "--detach", f.c2);
     setBuild(f.main, f.c1);
     const old = snapshot(buildDir(f.main));
@@ -448,7 +459,7 @@ describe("R6: the happy path", () => {
 
 describe("R7: the build's exit code is not the verdict; a failure restores HEAD and build/", () => {
   it("a build that exits 0 but leaves the OLD stamp: exit 3, build/ byte-equal, HEAD restored", async () => {
-    const f = fixture();
+    const f = await fixture();
     git(f.main, "checkout", "-q", "--detach", f.c2);
     setBuild(f.main, f.c1);
     const old = snapshot(buildDir(f.main));
@@ -463,7 +474,7 @@ describe("R7: the build's exit code is not the verdict; a failure restores HEAD 
   });
 
   it("a build that exits 1 after writing junk.js: exit 3, build/ byte-equal, HEAD restored, install re-run", async () => {
-    const f = fixture();
+    const f = await fixture();
     git(f.main, "checkout", "-q", "--detach", f.c2);
     setBuild(f.main, f.c1);
     const old = snapshot(buildDir(f.main));
@@ -487,7 +498,7 @@ describe("R8: RECONNECT lists exactly the live sessions", () => {
     );
 
   it("live, reused pid, dead, unreadable: one RECONNECT line, for the live one", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c2);
     writeProof(f.proofDir, 101, "win:1", "aaaaaaaa-1111-1111-1111-111111111111", "C--proj-live");
     writeProof(f.proofDir, 102, "win:2", "bbbbbbbb-2222-2222-2222-222222222222", "C--proj-reused");
@@ -506,7 +517,7 @@ describe("R8: RECONNECT lists exactly the live sessions", () => {
   });
 
   it("none live: RECONNECT: no live session found", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c2);
     writeProof(f.proofDir, 102, "win:2", "bbbbbbbb-2222-2222-2222-222222222222", "C--proj-reused");
     const fk = fakes(f.main, { startTimes: { 102: "win:999" }, table: new Map([[202, server(202, 102)]]) });
@@ -521,7 +532,7 @@ describe("R8: RECONNECT lists exactly the live sessions", () => {
 
 describe("R9: --dry-run", () => {
   it("prints the plan and changes nothing", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     const head = git(f.main, "rev-parse", "HEAD");
     const old = snapshot(buildDir(f.main));
@@ -552,7 +563,7 @@ describe("R10: static imports only", () => {
 
 describe("usage", () => {
   it("more than one positional is refused", async () => {
-    const f = fixture();
+    const f = await fixture();
     setBuild(f.main, f.c1);
     const fk = fakes(f.main);
     const r = await mr.mainRebuild(f.main, { positionals: [f.c2, f.c3], noFetch: true, proofDir: f.proofDir }, fk.deps);
