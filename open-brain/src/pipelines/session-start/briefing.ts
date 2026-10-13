@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { join, isAbsolute } from "node:path";
+import { join, isAbsolute, relative, sep } from "node:path";
+import { resolveDocPath } from "../../shared/doc-path.js";
 import { TaskPriority, isOpenGap, newestHandoffPerInstance, ownHandoff, questionOwner, questionResolvedBy, questionText, watchExpires, watchText } from "../../shared/state-schema.js";
 import type { State, Seat, WatchOut } from "../../shared/state-schema.js";
 import { HANDOFF_CAPS } from "../../shared/handoff-caps.js";
@@ -63,6 +64,11 @@ export interface BriefingInput {
   readsOwed?: string;
   /** When set, legacy block before PICK UP HERE; budget line after SEATS when printed. */
   fleet?: { legacy: string[]; budget: string };
+  /**
+   * T-167, OPT-IN per repo (greeting.json `briefing_problem`), default OFF. describeProblemStatement()'s line, printed
+   * immediately above OBJECTIVE in both layouts. Null or absent prints nothing, so every other render is byte-identical.
+   */
+  problem?: string | null;
 }
 
 /** PICK UP HERE when the reader's seat resolved and no handoff is its own. */
@@ -120,6 +126,7 @@ export function renderBriefing(i: BriefingInput): string[] {
       : `Drift detected (${i.drift.length}): ${i.drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`).join("; ")}`,
   );
 
+  if (i.problem) out.push("", i.problem);
   out.push("", "OBJECTIVE");
   out.push(s.objective ? `${s.objective.text} (since session ${s.objective.since_session})` : "none");
 
@@ -180,8 +187,11 @@ export function renderBriefing(i: BriefingInput): string[] {
  * T-236 slice 2: the budgeted layout. OPT-IN; `renderBriefing` above is the default and does not call any of this.
  * ------------------------------------------------------------------------- */
 
-/** What the budgeted briefing must fit in: ~4 KB and ~30 lines (T-236 (f)). A test renders the worst case against both. */
-export const BRIEFING_BUDGET = { lines: 30, chars: 4096 } as const;
+/**
+ * What the budgeted briefing must fit in: ~4 KB and ~30 lines (T-236 (f)), plus the one PROBLEM line T-167 adds (a line and at
+ * most ~330 characters). A test renders the worst case against both.
+ */
+export const BRIEFING_BUDGET = { lines: 31, chars: 4400 } as const;
 
 /** Per-section caps. Each section ends with `+N more: <pointer>` when it cuts, never silently. */
 const CAPS = { objective: 400, next: 2, watch: HANDOFF_CAPS.watchOuts, watchChars: HANDOFF_CAPS.watchOutChars, waiting: 2, open: 2, question: 160, drift: 160, blocked: 3 } as const;
@@ -220,6 +230,7 @@ function renderBudgeted(i: BriefingInput): string[] {
       : cut(`Drift detected (${i.drift.length}): ${i.drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`).join("; ")}`, CAPS.drift);
   out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision} · ${drift}`);
 
+  if (i.problem) out.push(i.problem);
   out.push("OBJECTIVE", s.objective ? `${cut(s.objective.text, CAPS.objective)} (since session ${s.objective.since_session})` : "none");
 
   // (d) NEXT only when the objective NAMES task ids, and then exactly those. The backlog's order is not a plan.
@@ -320,6 +331,39 @@ const why = (err: unknown): string => {
   const e = err as { stderr?: string; message?: string };
   return (e.stderr?.trim().split("\n")[0] || e.message || String(err)).split("\n")[0]!;
 };
+
+const PROBLEM_CLIP = 300;
+
+/**
+ * T-167: what the project is for, as one line: the first paragraph of the PRD's `## Problem Statement` section, in the PRD's
+ * own words. HTML comments are removed first; a paragraph that starts with `|` is a table and never the statement. The
+ * template's `**Problem Statement:**` field form is not parsed: it reports the no-heading line, visibly. Never throws.
+ */
+export function describeProblemStatement(projectRoot: string): string {
+  try {
+    const path = resolveDocPath(projectRoot, "PRD.md");
+    if (path === null) return "PROBLEM: not shown (no PRD.md in .agents/SYSTEM/, docs/ or the repo root)";
+    const rel = relative(projectRoot, path).split(sep).join("/");
+    const lines = readFileSync(path, "utf8").replace(/<!--[\s\S]*?-->/g, "").split(/\r?\n/);
+    const head = lines.findIndex((l) => /^##\s+Problem Statement\s*$/.test(l));
+    if (head < 0) return `PROBLEM: not shown (${rel} has no "## Problem Statement" heading)`;
+    const after = lines.slice(head + 1);
+    const end = after.findIndex((l) => /^#{1,2}\s/.test(l));
+    const section = end < 0 ? after : after.slice(0, end);
+    let para: string[] = [];
+    for (const line of [...section, ""]) {
+      if (line.trim() !== "") {
+        para.push(line);
+        continue;
+      }
+      if (para.length > 0 && !para[0]!.trimStart().startsWith("|")) return `PROBLEM (${rel}): ${cut(para.join(" "), PROBLEM_CLIP)}`;
+      para = [];
+    }
+    return `PROBLEM: not shown (${rel}'s "## Problem Statement" section is empty)`;
+  } catch (err) {
+    return `PROBLEM: not checked (${why(err)})`;
+  }
+}
 
 /** `Working tree: clean`, or `N uncommitted: path, path, ...`. Never silent: a git failure is `not checked`. */
 export function describeWorkingTree(projectRoot: string): string {
