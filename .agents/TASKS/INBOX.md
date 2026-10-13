@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 431 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 432 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -53,6 +53,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
 - [ ] **T-243** #484 LOW residuals and pre-existing audit lows: recall-trigger.log keeps a ~10-char excerpt of a malformed payload; single-quoted YAML tags keep their quotes; normalizeProject splits 'C++ Tools' oddly; A2 (repo-local .gitnexus/run.cjs runs on /sync), A4 (ob_start project_root trust), A5 (OPEN_BRAIN_VAULT_DIR override): document the trust boundaries
 - [ ] **T-261** Physically split core and memory into separate packages (after T-154; D-151)
+- [ ] **T-269** SIA's SEATS line names the A2A waker's new alarm state (v1.22.13: a run older than WAKE_RUN_ALARM_MS) instead of printing state:unknown(alarm)
 
 ## Done (last 3 sessions)
 
