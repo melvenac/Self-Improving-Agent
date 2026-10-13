@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 420 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 424 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,19 +6,17 @@
 
 ### Pick up here
 
-Session 168 (Atlas). Overnight PRs all MERGED 2026-10-13 on Aaron's 'Merge all' (typed 11:49Z in clark's window, verified in its transcript): #633 e5565ee5 (T-262 fix 2), #634 d368e44e (T-258), #635 50e1b223 (T-263), #638 399121cd (T-184), each pr-refreshed with patch-id unchanged and fresh-clone checked by clark. Clark rebuilt the main checkout at 399121cd and recopied end.md (CC + Cursor) and harness-audit.md. Planner live checks on 399121cd passed for all four; T-258, T-263, T-184 closed; T-262 open (20-run kill criterion + hook check). Relay's A2A v1.22.12 waker restart (#543): planner said GO for cursor-infra/cursor-builder, nothing SIA in flight on the QA PC. NEXT: (1) triage open-task-commits warnings (T-046, T-168, T-172, T-235); (2) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later; (3) T-184 follow-up: bootstrap FUTURE_LOCAL lists state.draft.inputs.json.
+Session 168 (Atlas), 2026-10-13. Aaron (clark's window 08:53 CDT): max parallel until the weekly reset at 00:00; desktop CPU-bound (6 cores, clark launches as slots free from ~/Worktrees/launch-queue.md), laptop shared with Relay. Overnight PRs #633/#634/#635/#638 merged and live-checked (T-262 fix 2, T-258, T-263, T-184). D-148 DONE as T-264 (#648): 299 is the only entry ever injected; precision 6.4%; where warranted the next similar command follows 84% vs 29%; the data-named fix is T-265. RUNNING (desktop, Opus one-offs): T-167 (PRD problem statement in the briefing), T-168 (suite owner wired). QUEUED at clark in order: T-182, T-267, T-265, T-249 (laptop ok), T-022, T-251, T-172, T-243. Each ends at READY + PR: review the diff against its brief's name-only list, check CI, ACCEPT to clark, who puts 'merge SIA #N' on Aaron's list; merge procedure on Aaron's word: pr-refresh.sh N <reviewed-sha>, then clark merges pinned; rebuilds via clark (sia-rebuild.sh until T-172 lands). Research agents still out: T-159 (cheap not-asked path), T-206 (assignments sidecar protections). NEXT briefs: T-161 after T-167 merges (same files); T-159 and T-206 from their research; T-266 needs a design.
 
 ### Watch out
 
-- The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.
-- A brief that adds a new output file must name the existing rows that assert the EXACT output list (T-184 BLOCKED on two V5 rows; lesson 662).
-- A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff before calling for a re-review (#579, s168).
-- Reply files: launchers write T-<n>-<tag>-reply.md (the tag's name) besides the brief's t<n>-reply.md; reply-wait.sh now checks both forms. One-off runs may work in clark's ~/Worktrees/oneoff-<TAG> folder instead of a %TEMP% clone.
-- Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it. CI's gh is installed but unauthenticated.
-- sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level command copies differ from the template), not a code regression.
+- The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 must run /end step 1b. If it does show, the T-262 hook's audited check is wrong.
+- Docs PRs and records PRs serialize on master's 'up to date' rule: each merge sends the others BEHIND; a records PR re-runs the full suite after every update (~4 min). Keep a background update-branch loop per open PR, or batch briefs into one PR.
+- clark launches ONLY when a slot frees: 'sent a launch line' is not 'launched'. Record a task in_progress only after clark says LAUNCHED (rev 421's note had to be corrected).
+- T-161 and T-167 edit the same briefing.ts/start-report.ts lines: brief T-161 on master after T-167 merges.
+- Brief rule kept today: name every existing exact-output row the change touches (lesson 662); allow an Opus builder to update ONLY rows that render this repo's real block or the named ones; anything else is BLOCKED.
 - ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task.
-- Running seats need /mcp to reconnect open-brain after the 399121cd rebuild.
-- sia-forge stray reply files: delete them as the first step of the next sia-forge brief.
+- The repo is PUBLIC (D-090): measurement runs commit aggregates only; transcript text, command text, paths and session ids stay in %TEMP% on the desktop.
 
 ### Open questions
 
@@ -31,11 +29,13 @@ _None._
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- T-194: (a), (b) or (c)
+- T-194: (a), (b) or (c); planner recommends (c) now, (b) later
+- T-249 after merge: the live fold relocate --worktrees --apply on his knowledge DB (backup first; Relay's and Maker's worktree keys fold too)
 
 **Rulings made mid-loop:** 
 - D-153: no veto on the D-152 inferences
 - 2026-10-13 11:49Z: Aaron 'Merge all' (clark's window) covering #633 #634 #635 #638
+- 2026-10-13 13:53Z: Aaron (clark's window): 'do as much work in parallel as possible' until the 00:00 reset
 
 ## developer [sia-builder] _(written session 156)_
 

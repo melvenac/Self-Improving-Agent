@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 420 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 424 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-13 (Aaron, clark's window, 08:53 CDT): max parallel until the weekly reset at 00:00: every code-only brief goes to clark as soon as it is pinned; desktop up to 4 CC runs, laptop 1, QA PC closed; Opus 5.5 allowed for builds; runs end at READY + PR; merges still need Aaron's word. Running: T-264, the D-148 recall-trigger effect measurement. Pending Aaron: T-194 approval mechanics (a)/(b)/(c); planner recommends (c) now, (b) later. Q1 and Q2 of s167 are answered (D-148, D-146).
 
 ## What's working
@@ -88,14 +88,12 @@
 
 ## What's broken
 
-- Gap G-001: Cursor start.md/end.md copies are not on ob_start/ob_state
 - Gap G-002: The repo's .claude/ is gitignored; mirror policy for slash commands is undecided
 - Gap G-003: SESSION_TEMPLATE.md's pre-session checklist is still pre-state.json: it tells the session to read SUMMARY.md, INBOX.md and ENTITIES.md by hand. As of session 62 that does not merely duplicate ob_start's work — it instructs the thing RULES.md agent-rule 1 now forbids, since with a valid state.json the ## State render REPLACES those four files. SESSION_TEMPLATE.md was inside Loop 11's audit set and was deliberately NOT repaired, to hold scope after the loop's subject was complete; recorded here rather than left as an intention. One-line fix.
 - Gap G-004: vault-index-parity warns on one unindexed Checkpoints note
 - Gap G-005: DECISIONS.md is both the prose ADR log and the decisions[] index
 - Gap G-007: `open-brain state import --commit` is denied by the auto-mode permission classifier inside an agent session ("Irreversible Local Destruction"); the one-shot migration must be run by the human
 - Gap G-008: ob_start's prose baseline (24,888 words) vs the rev-0 render (7,360 words) was measured on a temp copy, not the live repo, because handleStart creates a session log per call
-- Gap G-009: R4 is Claude-only: project-template/.cursor/commands/start.md still instructs writing .recalled-entries.json, so for a Cursor user the file still accumulates across sessions
 - Gap G-010: The op vocabulary cannot subsequently change some of what it records, and closing destroys rather than marks. Three parts, as of session 61. (1) SHARPEST: close_gap splices the entry out of the array — state-writer.ts:292, s.gaps.splice(idx, 1) — with no closed_session, no status and no tombstone, so closing a gap destroys its text, evidence and reasoning in the same motion. G-018's evidence, including the 'Progenitor' vs lowercase 'progenitor' case mismatch across 519/25/14 rows, left the record this way at rev 16 and survives only at 6af5592. (2) STILL TRUE: decisions are add-only, and verified has add_verified and reopen_verified but no amend. The 13-op vocabulary contains no update_decision and no update_verified. (3) RESOLVED, recorded rather than deleted: 'project.version has no op at all' is moot — Loop 8 R3 / ADR-027 removed the field (state-schema.ts:44-50; state.json's project now carries name only), as V-022 records. 'gaps have add and close but no update' is false — update_gap exists at state-writer.ts:59, :273, :282, as V-017 records. This amendment is itself made with update_gap, which is the clause it retires.
 - Gap G-011: The shadow-recall harness cannot currently answer any question about the maturity constants, in backfill OR in production
 - Gap G-013: feedback_log holds only 31% of the non-neutral ratings the live counters know about (154 of 496), so any replay reconstructing maturity from it systematically under-promotes and cannot answer questions about maturity boosts.
@@ -164,9 +162,9 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 
 - [P0] T-022 Replace-on-write for `state` facts
 - [P0] T-024 Rewrite the two genuine `obsolete-reference` hits
-- [P0] T-031 Add agent attribution to sessions
-- [P0] T-044 The slot needs an OWNER, not just a timestamp
-- [P0] T-046 Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
+- [P0] T-160 Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
+- [P0] T-194 Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
+- [P0] T-196 The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
 
 ## Decisions
 
