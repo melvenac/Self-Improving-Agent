@@ -87,9 +87,11 @@ export function ownerFromFlag(raw: string): ResolvedOwner {
 }
 
 /**
- * The fallback: exactly one proof in proofDir whose session_id is
- * CLAUDE_CODE_SESSION_ID and whose ide is "claude", naming (by file name) a
- * pid that started at the proof's proc_start and is claude.exe.
+ * The fallback: exactly one proof that passes both checks. A proof matches
+ * when its session_id is CLAUDE_CODE_SESSION_ID and its ide is "claude"; it
+ * passes when the pid it names (by file name) started at the proof's
+ * proc_start and is claude.exe. Failing proofs do not count, so a stale proof
+ * never refuses a live session; two passing proofs have no owner.
  */
 function ownerFromSessionProof(
   env: NodeJS.ProcessEnv,
@@ -111,13 +113,20 @@ function ownerFromSessionProof(
     if (proof?.session_id === id && proof.ide === "claude") matches.push({ pid: Number(m[1]), procStart: proof.proc_start });
   }
   if (matches.length === 0) return none(`no session proof for CLAUDE_CODE_SESSION_ID ${id8}`);
-  if (matches.length > 1) return none(`${matches.length} proofs name session ${id8}`);
-  const { pid, procStart } = matches[0];
-  const start = processStartTime(pid);
-  if (start === null || start !== procStart) return none(`the proof for ${id8} names pid ${pid}, which is not running (or was reused)`);
-  const row = readRow(pid);
-  if (!row || !isClaudeExeCommandLine(row.commandLine)) return none(`the proof for ${id8} names pid ${pid}, which is not claude.exe`);
-  return { pid, source: "claude-session", reason: null };
+  const checked = matches.map(({ pid, procStart }) => {
+    const start = processStartTime(pid);
+    const running = start !== null && start === procStart;
+    const row = readRow(pid);
+    const claude = row !== null && isClaudeExeCommandLine(row.commandLine);
+    return { pid, running, claude };
+  });
+  const survivors = checked.filter((c) => c.running && c.claude);
+  if (survivors.length === 1) return { pid: survivors[0].pid, source: "claude-session", reason: null };
+  if (survivors.length > 1) return none(`${survivors.length} live proofs name session ${id8}`);
+  if (checked.length > 1) return none(`${checked.length} proofs name session ${id8}, and none names a running claude.exe`);
+  const { pid, running } = checked[0];
+  if (!running) return none(`the proof for ${id8} names pid ${pid}, which is not running (or was reused)`);
+  return none(`the proof for ${id8} names pid ${pid}, which is not claude.exe`);
 }
 
 /**
