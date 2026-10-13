@@ -4,7 +4,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawnSync } from "node:child_process";
 import { isStateRecord, whyNotARecord } from "../../shared/state-record.js";
-import { STATE_IMPORT_COMMIT_OUTPUTS } from "../../shared/import-outputs.js";
+import { STATE_IMPORT_COMMIT_OUTPUTS, DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL } from "../../shared/import-outputs.js";
 
 /**
  * `/bootstrap`'s deterministic half (docs/loops/bootstrap-fix-brief.md,
@@ -537,6 +537,10 @@ export const SCAFFOLD_FILES: readonly ScaffoldFile[] = [
   { path: ".agents/SYSTEM/SUMMARY.md", from: ".agents/SYSTEM/SUMMARY.md", tracked: true, why: "the project summary; its marked region is rendered from the record" },
   { path: ".agents/SESSIONS/SESSION_TEMPLATE.md", from: ".agents/SESSIONS/SESSION_TEMPLATE.md", tracked: false, why: "the shape of each per-session log, and session logs are local" },
   { path: ".agents/AGENT.md", from: null, tracked: true, why: "declares this checkout is not a seat (role: none), so /start says so instead of NO SEAT IDENTITY RESOLVED" },
+  { path: ".agents/roles/shared.md", from: ".agents/roles/shared.md", tracked: true, why: "a starting stub of the rules every seat follows; tracked so every clone has it (T-251)" },
+  { path: ".agents/roles/planner.md", from: ".agents/roles/planner.md", tracked: true, why: "a starting stub of the planner seat's role file" },
+  { path: ".agents/roles/developer.md", from: ".agents/roles/developer.md", tracked: true, why: "a starting stub of the developer seat's role file" },
+  { path: ".agents/roles/qa.md", from: ".agents/roles/qa.md", tracked: true, why: "a starting stub of the qa seat's role file" },
   { path: ".claude/commands/start.md", from: ".claude/commands/start.md", tracked: true, why: "/start — travels with the project, so a clone on another machine has it" },
   { path: ".claude/commands/end.md", from: ".claude/commands/end.md", tracked: true, why: "/end — store the session's lessons" },
   { path: ".claude/commands/task.md", from: ".claude/commands/task.md", tracked: true, why: "/task — pick up the next priority" },
@@ -551,7 +555,7 @@ export const MERGED_FILES = [
 
 /** Paths git must treat a given way once the import has run; checked with `git check-ignore`, which needs no file. */
 const FUTURE_TRACKED = [".agents/state.json", ".agents/SESSIONS/next-session.md"];
-const FUTURE_LOCAL = [".agents/SESSIONS/Session_1.md", ".agents/archive/x", ".agents/state.draft.json", ".agents/state.import-report.md"];
+const FUTURE_LOCAL = [".agents/SESSIONS/Session_1.md", ".agents/archive/x", DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL];
 
 export interface ScaffoldResult {
   root: string;

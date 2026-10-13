@@ -18,10 +18,11 @@
  */
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync, rmSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { basename, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { defaultTemplateDir } from "../bootstrap/index.js";
 import {
   StateSchema,
+  SeatName,
   parseState,
   serializeState,
   lastSession,
@@ -30,15 +31,14 @@ import {
   type Verified,
   type Gap,
   type Decision,
+  type Seat,
 } from "../../shared/state-schema.js";
 import { applyStateOps, DONE_RETENTION_SESSIONS } from "../../shared/state-writer.js";
 import { readJson } from "../../shared/fs-utils.js";
-import { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS } from "../../shared/import-outputs.js";
+import { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS, DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL, ROLE_STUB_RELS } from "../../shared/import-outputs.js";
+import { readAgentIdentity } from "../session-start/agent-identity.js";
 
-export { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS };
-export const DRAFT_REL = ".agents/state.draft.json";
-export const REPORT_REL = ".agents/state.import-report.md";
-export const DRAFT_INPUTS_REL = ".agents/state.draft.inputs.json";
+export { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS, DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL, ROLE_STUB_RELS };
 export const SNAPSHOT_PREFIX = "pre-state-migration-";
 
 type Status = Task["status"];
@@ -85,6 +85,8 @@ export interface ImportReport {
   /** DECISIONS.md holds bytes that cannot be read; it is not judged, so this names it rather than blocks (R4-5). */
   decisions_unreadable: DecisionsUnreadable | null;
   handoff: { pick_up_lines: number; watch_out: number; open_questions: number; sections_not_imported: string[]; not_imported: HandoffLineNotImported[] };
+  /** T-251: the seat the handoff was given, the role the project declares, and whether the seat had to be assumed. */
+  handoff_seat: ImportSeat;
   last_session: { n: number; date: string; uuid: string | null; file: string; unreadable: string | null; date_why: string };
   /**
    * Always 0. Prose files carry no verified claims or gaps in a form the
@@ -517,8 +519,10 @@ function bullets(body: string[], firstLine: number, section: HandoffLineNotImpor
  * would put an unattributed handoff under a seat and leave no trace of the
  * guess, so the assumption is recorded in the report instead.
  */
-export function importHandoff(text: string | null, current: number, report: ImportReport["handoff"]): State["handoffs"][number] {
-  const handoff: State["handoffs"][number] = { seat: "developer", pick_up: "", watch_out: [], open_questions: [], session: current, loop_state: null, session_uuid: null, checkout: null, first_rev: null };
+export function importHandoff(text: string | null, current: number, report: ImportReport["handoff"], seat: Seat = "developer"): State["handoffs"][number] {
+  // A planner handoff must carry loop_state (StateSchema); an import has nothing to put in it.
+  const loop_state = seat === "planner" ? { open_prs: [], frozen_sha: null, questions_for_aaron: [], rulings: [] } : null;
+  const handoff: State["handoffs"][number] = { seat, pick_up: "", watch_out: [], open_questions: [], session: current, loop_state, session_uuid: null, checkout: null, first_rev: null };
   if (!text) return handoff;
   const lines = text.split(/\r?\n/);
   const headings = lines.map((l, i) => ({ l, i })).filter(({ l }) => /^#{2,6} /.test(l));
@@ -539,6 +543,28 @@ export function importHandoff(text: string | null, current: number, report: Impo
     }
   }
   return handoff;
+}
+
+export interface ImportSeat { seat: Seat; declared_role: string | null; assumed: boolean }
+
+/**
+ * T-251: the seat the imported handoff belongs to, from the role the project
+ * declares, read as `/start` reads it (AGENT.local.md wins over AGENT.md). Only
+ * an exact seat name counts; anything else (no declaration, `none`, a role that
+ * is not a seat, a different case) keeps the developer assumption above, and
+ * the report says it was assumed.
+ */
+export function importSeat(root: string): ImportSeat {
+  const declared_role = readAgentIdentity(root)?.role ?? null;
+  const parsed = SeatName.safeParse(declared_role);
+  return parsed.success ? { seat: parsed.data, declared_role, assumed: false } : { seat: "developer", declared_role, assumed: true };
+}
+
+/** The one line the report and the draft CLI print for the handoff's seat (T-251). */
+export function describeHandoffSeat(s: ImportSeat): string {
+  if (!s.assumed) return `Handoff seat: ${s.seat} (the role .agents/AGENT.md or AGENT.local.md declares)`;
+  const why = s.declared_role === null ? "no role is declared in .agents/AGENT.local.md or AGENT.md" : `the declared role "${s.declared_role}" is not a seat (planner, developer or qa)`;
+  return `Handoff seat: ${s.seat}, ASSUMED: ${why}`;
 }
 
 function adrNotImported(u: DecisionsUnreadable): string {
@@ -793,6 +819,7 @@ export function buildImportDraft(projectRoot: string, today: string, templateDir
     decisions: { imported: 0, date_from_line: 0, date_partial: [], date_unknown: 0, skipped: [] },
     decisions_unreadable: null,
     handoff: { pick_up_lines: 0, watch_out: 0, open_questions: 0, sections_not_imported: [], not_imported: [] },
+    handoff_seat: importSeat(root),
     last_session: last,
     verified_imported: 0,
     gaps_imported: 0,
@@ -804,7 +831,7 @@ export function buildImportDraft(projectRoot: string, today: string, templateDir
   report.objective = { found: objective !== null, preview };
   const decisions = texts.decisions ? importDecisions(texts.decisions, today, report.decisions) : [];
   if (texts.decisions && undecodable.decisions) report.decisions_unreadable = decisionsUnreadable(texts.decisions, undecodable.decisions, decisions.map((d) => d.id));
-  const handoff = importHandoff(texts.next, current, report.handoff);
+  const handoff = importHandoff(texts.next, current, report.handoff, report.handoff_seat.seat);
   const verified: Verified[] = [];
   const gaps: Gap[] = [];
   report.verified_imported = verified.length;
@@ -940,6 +967,7 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   if (r.decisions.skipped.length) { L.push("", "Skipped:"); for (const s of r.decisions.skipped) L.push(`- line ${s.line}: ${s.reason} — \`${s.heading}\``); }
   if (r.decisions_unreadable) { L.push("", "**Not read in full:**"); for (const l of describeDecisionsUnreadable(r.decisions_unreadable)) L.push(`- ${l}`); }
   L.push("", "## Handoff (next-session.md)", "");
+  L.push(describeHandoffSeat(r.handoff_seat));
   L.push(`pick_up: ${r.handoff.pick_up_lines} lines · watch_out: ${r.handoff.watch_out} bullets · open_questions: ${r.handoff.open_questions} bullets`);
   L.push(`Lines NOT imported under Watch out / Open questions: ${r.handoff.not_imported.length}`);
   for (const n of r.handoff.not_imported) L.push(`- line ${n.line} (${n.section}): \`${n.text}\``);
@@ -1101,9 +1129,11 @@ export interface CommitResult {
   accepted_changed: string[];
   /** The draft has no input record, so whether an input changed since --draft was not checked (T-184). */
   inputs_unrecorded: boolean;
+  /** T-251: role-file stubs copied from project-template, the project's own kept, and any the template lacks. */
+  role_stubs: { installed: string[]; kept: string[]; missing: string[] };
 }
 
-export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean; acceptChanged?: boolean } = {}): CommitResult {
+export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean; acceptChanged?: boolean; templateDir?: string } = {}): CommitResult {
   const root = resolve(projectRoot);
   refuseHalfRestored(root);
   const statePath = join(root, STATE_REL);
@@ -1196,6 +1226,21 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
     const r = applyStateOps(root, { session: lastSession(parsed.data)?.n ?? 0, expected_revision: 0, ops: [], render: true, version: opts.version });
     if (!r.ok) throw new Error(`render after commit refused: ${r.error}`);
 
+    // 4b. T-251: the role-file stubs a project lacks. A role file the project
+    // already has is its own and is never touched; `wx` makes an overwrite
+    // impossible rather than merely unintended.
+    const templateDir = opts.templateDir ?? defaultTemplateDir();
+    const role_stubs: CommitResult["role_stubs"] = { installed: [], kept: [], missing: [] };
+    for (const rel of ROLE_STUB_RELS) {
+      const dest = join(root, rel);
+      if (existsSync(dest)) { role_stubs.kept.push(rel); continue; }
+      const stub = join(templateDir, rel);
+      if (!existsSync(stub)) { role_stubs.missing.push(rel); continue; }
+      mkdirSync(dirname(dest), { recursive: true });
+      writeFileSync(dest, readFileSync(stub), { flag: "wx" });
+      role_stubs.installed.push(rel);
+    }
+
     // 5. Move the draft and the report into the snapshot.
     const moved: string[] = [];
     for (const rel of [DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL]) {
@@ -1205,7 +1250,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
       renameSync(from, to);
       moved.push(relative(root, to).replace(/\\/g, "/"));
     }
-    return { summary, rendered: r.rendered, moved };
+    return { summary, rendered: r.rendered, moved, role_stubs };
   };
 
   let done: ReturnType<typeof migrate>;
@@ -1219,7 +1264,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
   if (aside) rmSync(aside, { recursive: true, force: true });
   const decisionsText = onDisk.texts.decisions;
   const decisions_unreadable = decisionsText !== null && onDisk.undecodable.decisions ? decisionsUnreadable(decisionsText, onDisk.undecodable.decisions, parsed.data.decisions.map((d) => d.id)) : null;
-  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable, last_session, accepted_changed: changed, inputs_unrecorded };
+  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable, last_session, accepted_changed: changed, inputs_unrecorded, role_stubs: done.role_stubs };
 }
 
 /**
