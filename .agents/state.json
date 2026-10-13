@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 430,
+  "revision": 431,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1679,14 +1679,15 @@
       "id": "T-249",
       "title": "Project identity resolves a worktree to its repo (the git common dir): one project per repo for knowledge-DB session scoping and the vault display name, with `open-brain relocate` folding the existing split history",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 165,
       "closed_session": null,
       "supersedes": null,
-      "note": "s165: SIA's own sessions carry 7 project_dir values, one per checkout (sia-planner 25, main 18, sia-forge 16, ...), because canonicalizeProjectDir only normalises slashes and case, and projectDisplayName takes the last path segment. The Makerspace planner moved to ~/Worktrees/makerspace-planner (Aaron, via clark, 2026-10-09), so its vault folder becomes 'makerspace-planner'. The record (state.json) does NOT split: it is tracked, and sessions[] stores the checkout. — s168: brief docs/loops/t249-worktree-identity-brief.md (#645), launched by clark on the laptop (Opus 5.5, base 304d5639). mainWorktreeRoot reads .git/commondir (no spawn); the 5 MCP tool sites switch to projectIdentity, the slot/end-record/checkout/Summaries sites must not; relocate --worktrees (dry run default, --apply backs up first). Planner-measured live: 16 knowledge rows under worktree keys vs 72 main; 123 sessions under 11 worktree keys. The live fold needs Aaron's word after merge; tell Relay and Maker (their keys fold too). — s168 CORRECTION to the rev 421 note: QUEUED at clark (the laptop was running Relay's L29), not launched. Status back to open until it starts.",
+      "note": "s165: SIA's own sessions carry 7 project_dir values, one per checkout (sia-planner 25, main 18, sia-forge 16, ...), because canonicalizeProjectDir only normalises slashes and case, and projectDisplayName takes the last path segment. The Makerspace planner moved to ~/Worktrees/makerspace-planner (Aaron, via clark, 2026-10-09), so its vault folder becomes 'makerspace-planner'. The record (state.json) does NOT split: it is tracked, and sessions[] stores the checkout. — s168: brief docs/loops/t249-worktree-identity-brief.md (#645), launched by clark on the laptop (Opus 5.5, base 304d5639). mainWorktreeRoot reads .git/commondir (no spawn); the 5 MCP tool sites switch to projectIdentity, the slot/end-record/checkout/Summaries sites must not; relocate --worktrees (dry run default, --apply backs up first). Planner-measured live: 16 knowledge rows under worktree keys vs 72 main; 123 sessions under 11 worktree keys. The live fold needs Aaron's word after merge; tell Relay and Maker (their keys fold too). — s168 CORRECTION to the rev 421 note: QUEUED at clark (the laptop was running Relay's L29), not launched. Status back to open until it starts. — — s169: clark LAUNCHED it (desktop, Opus 5.5, brief 208b3615, base 304d5639). READY 2953937d PR #667 (2 commits). Planner review, first-hand: 6 of the 7 allowed files (tests/shared/cli-args.test.ts checks against the flag spec, so it needed no edit; the brief had its path wrong); no must-not file touched (cli-bootstrap slot, end-record, db-v2 migration, planRelocate, state-schema checkoutOf, Summaries names, fleet); mainWorktreeRoot reads files only and never throws; server.ts switches exactly the ruled sites to identityKey, and working_dir: keeps the checkout; every project_dir reader in src checked: only ob_recall and ob_list scope by it (both switched), and sessions is otherwise read by uuid only; relocate --worktrees refuses --from/--to before the DB opens, backs up before --apply, and a second apply prints 'nothing to fold'. Reply: base 366/366 (19 files); red 13/16 (3 must-not rows green at base); tsc 0; t249 16/16; second run 366/366, extra stay-green files 87/87; mutants M1-M6 red. CI test SUCCESS. Fold condition is projectIdentity(v) !== canonicalizeProjectDir(v) (keeps planRelocate off non-canonical spellings), accepted. Nits for a later task: the WT-5 slot row cannot catch M5 alone (the end-record row does); ob_list's identity scope has no dedicated test. ACCEPTED to clark (s169); merge needs Aaron's word (src, HIGH session-start path). Merge and the live fold belong close together: in between, a recall from a worktree misses that worktree's pre-T-249 entries (about 16 rows) until the fold. Before the live fold, tell Relay and Maker (their worktree keys fold too).",
       "note_by": [
         "367df9c3-ef6b-47f0-be31-1f60993dddcd",
-        "f21ca920-a048-4990-935f-42f102efc85f"
+        "f21ca920-a048-4990-935f-42f102efc85f",
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
       ],
       "closed_rev": null
     },
