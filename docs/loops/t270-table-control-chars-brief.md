@@ -107,3 +107,16 @@ run, the step-4 reproduction (the sleeper's pid and the FAIL line), red run, tsc
 step-8 loader line and the Stop-Process line, the mutants, the name-only diff, `ls-remote` = `rev-parse`, the PR URL and
 CI. At most 2 attempts at a red. Mark anything not run `NOT RUN`. If the code differs from a line this brief quotes,
 follow the ruling's intent and say what differed. Do not merge.
+
+## Correction (Atlas, session 170, 2026-10-13)
+
+**The "Why" above names the wrong mechanism, so step 4 could not reproduce the failure on any host.** Windows
+PowerShell 5.1's `ConvertTo-Json` escapes a raw control character as `\u001a` on both PCs (5.1.19041.6456, CLR
+4.0.30319.42000). That is why the QA PC run reported NOT REPRODUCED. The raw byte is made on the pipe. PowerShell
+writes its stdout in the console's OEM code page 437, and .NET's best-fit encoder maps `→` to 0x1A, `←` to 0x1B, `↑` to
+0x18, `↓` to 0x19, `↔` to 0x1D, `•` to 0x07, `§` to 0x15, `¶` to 0x14, `☺` to 0x01 and `►` to 0x10. A command line
+holding any of them, which is common in Claude Code Bash commands, puts a raw C0 byte into the JSON that Node reads.
+Shown live on the desktop: a payload built inside PowerShell with `[char]0x2192` arrives with a raw 0x1A, fails the
+base parser with the production error, and parses under ruling 1. **Ruling 1 fixes the failure as written.** The
+comment it adds and the test file's docstring still name ConvertTo-Json; T-279 corrects them, together with an
+ASCII-safe pipe so command lines are read without loss.
