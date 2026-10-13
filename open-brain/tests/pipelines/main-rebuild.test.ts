@@ -463,7 +463,8 @@ describe("R7: the build's exit code is not the verdict; a failure restores HEAD 
     git(f.main, "checkout", "-q", "--detach", f.c2);
     setBuild(f.main, f.c1);
     const old = snapshot(buildDir(f.main));
-    const fk = fakes(f.main, { build: "leave-old-stamp" });
+    // V3 is made to vouch for <sha>, so only V1 (the stamp read back) can see that this build did not build it.
+    const fk = fakes(f.main, { build: "leave-old-stamp", v3: () => `Build ${f.c3.slice(0, 7)} · current` });
     const r = await mr.mainRebuild(f.main, { positionals: [f.c3], noFetch: true, proofDir: f.proofDir }, fk.deps);
     const t = text(r);
     expect(r.exitCode, t).toBe(3);
