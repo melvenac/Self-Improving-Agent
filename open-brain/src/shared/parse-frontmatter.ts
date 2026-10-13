@@ -13,6 +13,8 @@ export function parseFrontmatterScalar(value: string): string {
       return v.slice(1, -1);
     }
   }
+  // YAML single-quoted form: no escapes except `''` for a literal quote.
+  if (v.length >= 2 && v.startsWith("'") && v.endsWith("'")) return v.slice(1, -1).replace(/''/g, "'");
   return v;
 }
 
@@ -37,6 +39,25 @@ function parseInlineArrayInner(inner: string): string[] {
       const chunk = rest.slice(0, i + 1);
       items.push(JSON.parse(chunk) as string);
       rest = rest.slice(i + 1);
+      if (rest.startsWith(",")) rest = rest.slice(1);
+      continue;
+    }
+    if (rest.startsWith("'")) {
+      // Closes at a `'` not followed by another: `''` is an escaped quote.
+      let i = 1;
+      while (i < rest.length) {
+        if (rest[i] === "'") {
+          if (rest[i + 1] === "'") {
+            i += 2;
+            continue;
+          }
+          break;
+        }
+        i++;
+      }
+      if (i >= rest.length) throw new Error("unterminated single-quoted item");
+      items.push(rest.slice(1, i).replace(/''/g, "'"));
+      rest = rest.slice(i + 1).trimStart();
       if (rest.startsWith(",")) rest = rest.slice(1);
       continue;
     }
@@ -81,7 +102,7 @@ export function parseFrontmatter(raw: string): Record<string, unknown> {
     }
 
     const scalar = parseFrontmatterScalar(value);
-    if (/^-?\d+(\.\d+)?$/.test(scalar) && !value.startsWith('"')) {
+    if (/^-?\d+(\.\d+)?$/.test(scalar) && !value.startsWith('"') && !value.startsWith("'")) {
       result[key] = Number(scalar);
       continue;
     }
