@@ -135,6 +135,8 @@ export interface ReconcileOptions {
   now?: Date;
   /** Test seam: runs after the claimed text is read, where a late hook's append lands. */
   afterClaim?: (claimedPath: string) => void;
+  /** Test seam: the claim's rename. Defaults to `renameSync`; used for the claim only. */
+  rename?: (from: string, to: string) => void;
 }
 
 const CLAIM_RE = /\.claim-\d+-(\d+)$/;
@@ -184,9 +186,14 @@ export function reconcilePendingFires(
 
   let claimed: string | null = `${path}.claim-${process.pid}-${Date.now()}`;
   try {
-    renameSync(path, claimed);
-  } catch {
-    claimed = null; // nothing pending, or another reconciler took it
+    (opts.rename ?? renameSync)(path, claimed);
+  } catch (err) {
+    // ENOENT alone means nothing pending (or another reconciler took it). Any
+    // other code — EPERM, EBUSY from a handle without FILE_SHARE_DELETE — means
+    // lines are waiting that this run cannot claim, so it must not say "nothing
+    // pending": the caller prints NOT RECONCILED and a later run retries.
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+    claimed = null;
   }
   const fresh = claimed ? readFileSync(claimed, "utf-8") : "";
   if (claimed) opts.afterClaim?.(claimed);

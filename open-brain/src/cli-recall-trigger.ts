@@ -173,7 +173,9 @@ async function main(): Promise<void> {
       return;
     }
 
-    // The deadline clock starts after the imports, as it did when they were static.
+    // The deadline clock starts after the imports, as it did when they were
+    // static. It also leaves out the stdin read, the payload parse and
+    // `loadPolicy`, all of which run before it.
     const started = Date.now();
 
     // `fileMustExist` is the ONLY guard on an absent store, deliberately.
