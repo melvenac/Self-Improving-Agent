@@ -339,7 +339,7 @@ function firstLine(stdout: string): string {
 
 /** `x.y.z` from `claude --version`'s first non-empty line, or null when that line is not a Claude Code version. */
 export function parseClaudeVersion(stdout: string): string | null {
-  const m = /^(\d+)\.(\d+)\.(\d+)(?: \(Claude Code\))?$/.exec(firstLine(stdout));
+  const m = firstLine(stdout).match(/^(\d+)\.(\d+)\.(\d+)(?: \(Claude Code\))?$/);
   return m === null ? null : `${m[1]}.${m[2]}.${m[3]}`;
 }
 
@@ -364,7 +364,7 @@ export function claudeVersionAtLeast(installed: string, required: string): boole
 export function missingClaudeFlags(help: string, flags: readonly string[] = CLAUDE_ADAPTER_FLAGS): string[] {
   const defined = new Set<string>();
   for (const line of help.split(/\r?\n/)) {
-    const m = /^ {2}(-{1,2}[^\s,]+(?:, -{1,2}[^\s,]+)*)/.exec(line);
+    const m = line.match(/^ {2}(-{1,2}[^\s,]+(?:, -{1,2}[^\s,]+)*)/);
     if (m !== null) for (const name of m[1]!.split(", ")) defined.add(name);
   }
   return flags.filter((f) => !defined.has(f));
