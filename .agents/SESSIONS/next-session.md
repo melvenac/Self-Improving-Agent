@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 418 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 419 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,19 +6,19 @@
 
 ### Pick up here
 
-Session 168 (Atlas). Merged today: #610, #617 (T-262), #615 (T-259), #621 (T-260), #579 (T-253+T-248), #588 (T-256), #580 (T-252), #620 (T-188); main tree rebuilt by clark at 57dd36c8, all live-checked. OVERNIGHT (Aaron via clark: code-only to READY/ACCEPT, no merge/rebuild) - four desktop CC Sonnet one-offs, all planner ACCEPT, CI green, each waiting on Aaron's word: #633 T-262 fix 2 (92d13f41; template names, Cursor wording, doc comment), #634 T-258 (86f41ba7; doubled-hook residuals), #635 T-263 (c37be9f3; runtime identity, makes CA-4c green on the desktop), #638 T-184 (6717da4e; --commit notices inputs changed after --draft). On each 'merge SIA #N': bash $S/pr-refresh.sh N <reviewed-sha>, then bash $S/pr-merge.sh N <new-head>, one at a time (each merge sends the rest BEHIND); clark rebuilds after #634/#635/#638 (src); after #633 clark recopies ~/.claude/commands/end.md and the Cursor user-level end.md + harness-audit.md; then close the task with the live check. NEXT after merges: (1) triage open-task-commits warnings (T-046, T-168, T-172, T-235); (2) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later; (3) T-184 follow-up: bootstrap FUTURE_LOCAL lists state.draft.inputs.json.
+Session 168 (Atlas). Overnight PRs all MERGED 2026-10-13 on Aaron's 'Merge all' (typed 11:49Z in clark's window, verified in its transcript): #633 e5565ee5 (T-262 fix 2), #634 d368e44e (T-258), #635 50e1b223 (T-263), #638 399121cd (T-184), each pr-refreshed with patch-id unchanged and fresh-clone checked by clark. Clark rebuilt the main checkout at 399121cd and recopied end.md (CC + Cursor) and harness-audit.md. Planner live checks on 399121cd passed for all four; T-258, T-263, T-184 closed; T-262 open (20-run kill criterion + hook check). Relay's A2A v1.22.12 waker restart (#543): planner said GO for cursor-infra/cursor-builder, nothing SIA in flight on the QA PC. NEXT: (1) triage open-task-commits warnings (T-046, T-168, T-172, T-235); (2) T-194: Aaron picks (a)/(b)/(c); planner recommends (c) now, (b) later; (3) T-184 follow-up: bootstrap FUTURE_LOCAL lists state.draft.inputs.json.
 
 ### Watch out
 
 - The FIRST planner greeting after s168 must NOT show 'SKILLS AUDIT NOT RUN' for session f21ca920: s168 ran /end step 1b. If it does, the T-262 hook's audited check is wrong.
 - A brief that adds a new output file must name the existing rows that assert the EXACT output list (T-184 BLOCKED on two V5 rows; lesson 662).
 - A patch-id mismatch after pr-refresh can be context-only: compare the +/- lines of the PR's own diff before calling for a re-review (#579, s168).
-- Right after a merge GitHub reports the next PR UNKNOWN; pr-refresh now waits that out.
 - Reply files: launchers write T-<n>-<tag>-reply.md (the tag's name) besides the brief's t<n>-reply.md; reply-wait.sh now checks both forms. One-off runs may work in clark's ~/Worktrees/oneoff-<TAG> folder instead of a %TEMP% clone.
 - Briefs must not use it.skip/skipIf anywhere: the s4-guards S4-9.2 guard fails CI on it. CI's gh is installed but unauthenticated.
-- Desktop one-off launchers set GIT_AUTHOR_*/GIT_COMMITTER_*; config-channel CA-4c stays red locally until #635 merges.
 - sync --check on the desktop: mirror-parity is an environmental ISSUE (user-level command copies differ from the template), not a code regression.
 - ob_state refuses update_task on a done task: put post-close evidence in the handoff or in a new task.
+- Running seats need /mcp to reconnect open-brain after the 399121cd rebuild.
+- sia-forge stray reply files: delete them as the first step of the next sia-forge brief.
 
 ### Open questions
 
@@ -26,23 +26,16 @@ _None._
 
 ### Loop state
 
-**Open PRs:** 
-- #633 — QA: accepted — T-262 fix 2 at 92d13f41; needs Aaron's word
-- #634 — QA: accepted — T-258 at 86f41ba7; needs Aaron's word
-- #635 — QA: accepted — T-263 at c37be9f3; needs Aaron's word
-- #638 — QA: accepted — T-184 at 6717da4e; needs Aaron's word
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- merge SIA #633
-- merge SIA #634
-- merge SIA #635
-- merge SIA #638
 - T-194: (a), (b) or (c)
 
 **Rulings made mid-loop:** 
 - D-153: no veto on the D-152 inferences
+- 2026-10-13 11:49Z: Aaron 'Merge all' (clark's window) covering #633 #634 #635 #638
 
 ## developer [sia-builder] _(written session 156)_
 
