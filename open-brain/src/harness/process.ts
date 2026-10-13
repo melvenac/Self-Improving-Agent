@@ -21,8 +21,9 @@
  * bound, or outlives a role that exited normally, is not tracked here (U3).
  */
 
-import { spawn, spawnSync } from "node:child_process";
+import { spawn, spawnSync, type SpawnSyncReturns } from "node:child_process";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { basename, delimiter, dirname, extname, join, resolve } from "node:path";
 
 /* ------------------------------------------------------------------------- *
@@ -246,6 +247,27 @@ export function killTree(pid: number): string {
   } catch (err) {
     return `could not signal process group ${pid}: ${(err as Error).message}`;
   }
+}
+
+/**
+ * `<launcher> --version`, at preflight (T-182). Synchronous because the
+ * runtime's refusals are thrown synchronously, before any tag. No shell, the
+ * constructed environment, a neutral working directory and a bound.
+ */
+export function probeVersion(
+  executable: string,
+  preArgs: readonly string[],
+  env: NodeJS.ProcessEnv,
+): SpawnSyncReturns<string> {
+  return spawnSync(executable, [...preArgs, "--version"], {
+    env,
+    cwd: tmpdir(),
+    shell: false,
+    windowsHide: true,
+    encoding: "utf-8",
+    timeout: 30_000,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 }
 
 /**

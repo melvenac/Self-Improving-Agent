@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 420 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 434 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
@@ -8,8 +8,8 @@ D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the b
 
 ## Top tasks
 
-- [ ] **T-022** [P0] Replace-on-write for `state` facts
+- [~] **T-022** [P0] Replace-on-write for `state` facts
 - [ ] **T-024** [P0] Rewrite the two genuine `obsolete-reference` hits
-- [ ] **T-031** [P0] Add agent attribution to sessions
-- [ ] **T-044** [P0] The slot needs an OWNER, not just a timestamp
-- [ ] **T-046** [P0] Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
+- [ ] **T-160** [P0] Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
+- [ ] **T-194** [P0] Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
+- [ ] **T-196** [P0] The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
