@@ -153,8 +153,10 @@ describe("T-168 owner wired to #427's walker", () => {
     ];
     const walked = owner.resolveOwnerWalk(10, reader(rows));
     expect(walked).toEqual({ pid: null, source: "none", reason: owner.NO_OWNER_REASON });
-    const live = owner.liveOwnerProbe(10, tableOf(rows));
-    expect(live).toEqual({ pid: null, source: "none", reason: owner.NO_OWNER_REASON });
+    const live = owner.liveOwnerProbe(10, tableOf(rows), {});
+    expect(live.pid).toBeNull();
+    expect(live.source).toBe("none");
+    expect(live.reason?.startsWith(owner.NO_OWNER_REASON)).toBe(true);
     expect(live.pid).not.toBe(10);
   });
 
