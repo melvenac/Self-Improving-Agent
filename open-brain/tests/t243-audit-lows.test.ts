@@ -90,6 +90,22 @@ describe('Y1: single-quoted YAML', () => {
       rmSync(vault, { recursive: true, force: true });
     }
   });
+
+  it("Y1b: a space before the comma after a single-quoted item adds no empty item", () => {
+    expect(frontmatter.parseFrontmatter(['---', "tags: ['a' , 'b']", '---'].join('\n')).tags).toEqual(['a', 'b']);
+  });
+
+  it("Y1c: a lone single quote stays raw", () => {
+    expect(frontmatter.parseFrontmatter(['---', "k: '", '---'].join('\n')).k).toBe("'");
+  });
+
+  it("Y1d: a doubled quote in a single-quoted scalar is one quote", () => {
+    expect(frontmatter.parseFrontmatter(['---', "k: 'it''s'", '---'].join('\n')).k).toBe("it's");
+  });
+
+  it('Y1e: a space before the comma after a double-quoted item adds no empty item', () => {
+    expect(frontmatter.parseFrontmatter(['---', 'tags: ["a" , "b"]', '---'].join('\n')).tags).toEqual(['a', 'b']);
+  });
 });
 
 describe('P1: one project slug', () => {
@@ -121,6 +137,31 @@ describe('P1: one project slug', () => {
       rmSync(vault, { recursive: true, force: true });
     }
   });
+
+  it('P1b: a non-ASCII project is one lower-case topic, and its spaces become hyphens', () => {
+    const vault = mkdtempSync(join(tmpdir(), 't243-p1b-'));
+    const db = new Database(':memory:');
+    try {
+      dbV2.initSchemaV2(db);
+      for (let d = 1; d <= 5; d++) {
+        vaultWriter.writeSummary(vault, {
+          sessionId: `s-${d}`, project: d <= 3 ? 'ПРОЕКТ' : 'проект', date: `2026-09-0${d}`, content: 'notes',
+        });
+      }
+      vaultWriter.writeSummary(vault, { sessionId: 's-6', project: '项目 项目', date: '2026-09-06', content: 'notes' });
+
+      const plans = topics.planTopics(db, vault, { min: 5 });
+      const byTag = new Map(plans.map((p) => [p.tag, p.links]));
+
+      expect(byTag.get('проект')).toHaveLength(5);
+      expect(byTag.has('ПРОЕКТ')).toBe(false);
+      expect(byTag.has('项目-项目')).toBe(true);
+      expect(byTag.has('项目 项目')).toBe(false);
+    } finally {
+      db.close();
+      rmSync(vault, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('D1: trust boundaries are written down', () => {
@@ -133,5 +174,19 @@ describe('D1: trust boundaries are written down', () => {
       expect(security).toContain(needle);
     }
     expect(security).not.toContain('No network calls');
+  });
+
+  it('D1b: SECURITY.md names the hub fetch, the second write and every override', () => {
+    const security = readFileSync(
+      fileURLToPath(new URL('../../.agents/SYSTEM/SECURITY.md', import.meta.url)),
+      'utf-8',
+    );
+    for (const needle of [
+      'X-Agent-Key', 'HUB_URL', 'A2A_KEY_DIR', 'OPEN_BRAIN_SCORE_HISTORY', 'OPEN_BRAIN_SHADOW_LOG',
+      'CLAUDE_PROJECT_DIR', '.missing-handoff.jsonl',
+    ]) {
+      expect(security).toContain(needle);
+    }
+    expect(security).not.toContain('everything else is local file I/O');
   });
 });
