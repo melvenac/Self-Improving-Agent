@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 436 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 437 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -16,7 +16,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 ## P1
 
 - [~] **T-159** The trigger's cheap not-asked path — record a not-asked fire without opening the store
-- [ ] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
+- [~] **T-161** /start must assert a transcript exists for the session's own uuid — the CLAUDE_CODE_CHILD_SESSION check would be a permanent false positive
 - [ ] **T-166** GitNexus impact() missed a call site on the exact path under repair while reporting epistemic 'exact' - the MUST-run-impact rule is only as good as the resolver
 - [~] **T-168** 'Run the full suite alone' must become a check: assert peer idleness before the run and refuse or flag when a peer is busy
 - [ ] **T-170** Memory is LOOKUP by default and INJECTION only on a deterministic match against the act; fix the WRITE side first, so every stored lesson carries the key (command pattern, path or error string) that would have caught the mistake
@@ -43,7 +43,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-271** ob_state refusals list EVERY invalid field of the op at once, with the op's expected shape, instead of one field per attempt
 - [ ] **T-272** SIA bootstrap on a seat checkout moves the seat file aside and names the tracked AGENT.md after the folder (Prism lesson 671): reproduce, then fix
 - [ ] **T-274** Re-measure the recall trigger's relevance floor (8.0, measured at 599 entries) on the T-264 replay data now that T-265 narrowed the status element
-- [ ] **T-275** ob_state cannot reopen a closed gap: update_gap refuses `status` and there is no reopen_gap (reopen_task and reopen_verified exist)
+- [~] **T-275** ob_state cannot reopen a closed gap: update_gap refuses `status` and there is no reopen_gap (reopen_task and reopen_verified exist)
 - [ ] **T-276** A seat without Remote Control has no Claude-Session id to write, and ob_end still counts its commits as missing the trailer: fall back to the transcript's own session id
 - [ ] **T-278** Kill T-251's three surviving mutants: a template missing a stub is reported, not thrown; the draft's and the CLI's seat lines (with ASSUMED) and the Role files line are asserted
 
