@@ -1,5 +1,6 @@
-import { mkdirSync, writeFileSync, existsSync, renameSync } from "fs";
-import { join, dirname, relative, isAbsolute } from "path";
+import { mkdirSync, writeFileSync, existsSync, renameSync, readFileSync } from "fs";
+import { join, dirname, relative, isAbsolute, basename } from "path";
+import { parseFrontmatter } from "./shared/parse-frontmatter.js";
 import {
   joinUnderVaultDir,
   safeVaultPathSegment,
@@ -121,15 +122,8 @@ export function archiveVaultNote(vaultDir: string, vaultPath: string | null): st
   return dest;
 }
 
-export function writeExperience(
-  vaultDir: string,
-  input: ExperienceInput
-): string | null {
-  const filePath = experiencePath(vaultDir, input.project, input.key);
-
-  if (existsSync(filePath)) return null;
-
-  const frontmatter = [
+export function experienceFrontmatter(input: ExperienceInput): string {
+  return [
     "---",
     `key: ${yamlScalar(input.key)}`,
     `tags: ${yamlInlineArray(input.tags)}`,
@@ -142,13 +136,71 @@ export function writeExperience(
     `source: ${yamlScalar(input.source)}`,
     "---",
   ].join("\n");
+}
 
-  const fileContent = `${frontmatter}\n\n${input.content}\n`;
+export function writeExperience(
+  vaultDir: string,
+  input: ExperienceInput
+): string | null {
+  const filePath = experiencePath(vaultDir, input.project, input.key);
+
+  if (existsSync(filePath)) return null;
+
+  const fileContent = `${experienceFrontmatter(input)}\n\n${input.content}\n`;
 
   mkdirSync(dirname(filePath), { recursive: true });
   writeFileSync(filePath, fileContent, "utf-8");
 
   return filePath;
+}
+
+// ─── state notes (T-022) ─────────────────────────────────────────────────────
+
+/**
+ * A note's body: everything after its frontmatter, BOM stripped, CRLF or LF.
+ * A note with no frontmatter is all body.
+ */
+export function noteBody(raw: string): string {
+  const text = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
+  return /^---\r?\n[\s\S]*?\r?\n---(?:\r?\n)?([\s\S]*)$/.exec(text)?.[1] ?? text;
+}
+
+/**
+ * Split a state note's body into its current value and its `## Log`.
+ *
+ * The log starts at the first line that is exactly `## Log`; `log` is what
+ * follows that heading. A body with no log is all current. Lines come back
+ * LF-joined whatever the file used.
+ */
+export function splitStateLog(body: string): { current: string; log: string } {
+  const lines = (body.charCodeAt(0) === 0xfeff ? body.slice(1) : body).split(/\r?\n/);
+  const at = lines.indexOf("## Log");
+  if (at === -1) return { current: lines.join("\n"), log: "" };
+  return { current: lines.slice(0, at).join("\n"), log: lines.slice(at + 1).join("\n") };
+}
+
+/**
+ * Rewrite a state note with a new current value, demoting the previous one to
+ * the top of its `## Log` (newest first). The frontmatter carries the new tags
+ * and source but the note's ORIGINAL `created`. Written to a temp file in the
+ * same directory and renamed into place, so a crash never leaves half a note.
+ */
+export function replaceStateNote(path: string, input: ExperienceInput, demotedAt: string): void {
+  const raw = readFileSync(path, "utf-8");
+  const created = parseFrontmatter(raw).created;
+  const { current, log } = splitStateLog(noteBody(raw));
+
+  const frontmatter = experienceFrontmatter({
+    ...input,
+    created: created === undefined ? input.created : String(created),
+  });
+  const older = log.trim();
+  const entries = `### Replaced ${demotedAt}\n\n${current.trim()}${older ? `\n\n${older}` : ""}`;
+  const fileContent = `${frontmatter}\n\n${input.content}\n\n## Log\n\n${entries}\n`;
+
+  const tmp = join(dirname(path), `.${basename(path)}.${process.pid}.${Date.now()}.tmp`);
+  writeFileSync(tmp, fileContent, "utf-8");
+  renameSync(tmp, path);
 }
 
 // ─── writeFailure ────────────────────────────────────────────────────────────

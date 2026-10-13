@@ -17,7 +17,7 @@ describe("project-template/.agents", () => {
     expect(existsSync(join(templateDir, ".agents", "state.json"))).toBe(false);
   });
 
-  it("the template's gitignore (shipped without the dot) tracks exactly the five state files and AGENT.md", () => {
+  it("the template's gitignore (shipped without the dot) tracks exactly the five state files, AGENT.md and the role files (T-251)", () => {
     const text = readFileSync(join(templateDir, "gitignore"), "utf-8");
     const rules = text.split(/\r?\n/).filter((l) => l.startsWith("/.agents") || l.startsWith("!/.agents"));
     expect(rules).toEqual([
@@ -34,6 +34,9 @@ describe("project-template/.agents", () => {
       "!/.agents/SYSTEM/",
       "/.agents/SYSTEM/*",
       "!/.agents/SYSTEM/SUMMARY.md",
+      "!/.agents/roles/",
+      "/.agents/roles/*",
+      "!/.agents/roles/*.md",
     ]);
     // The repo root carries the same block (C4, both places).
     const rootLines = readFileSync(join(templateDir, "..", ".gitignore"), "utf-8").split(/\r?\n/);

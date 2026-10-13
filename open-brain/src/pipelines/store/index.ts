@@ -1,6 +1,14 @@
 import Database from 'better-sqlite3';
 import { existsSync, readFileSync } from 'fs';
-import { writeExperience, writeFailure, experiencePath } from '../../vault-writer.js';
+import {
+  writeExperience,
+  writeFailure,
+  experiencePath,
+  noteBody,
+  splitStateLog,
+  replaceStateNote,
+  type ExperienceInput,
+} from '../../vault-writer.js';
 import { indexKnowledge, type FactKind } from '../../db-v2.js';
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
@@ -46,19 +54,34 @@ export interface StoreResult {
    * content they passed was persisted, and it was not — the file won.
    */
   adopted?: boolean;
+  /** A recorded `state` replaced its predecessor's value in place (T-022). */
+  replaced?: { id: number; demotedAt: string };
+  /** On a refusal over an indexed note: that row's `fact_kind` (null = unlabelled). */
+  existingKind?: string | null;
+  /** A `state` re-stored with the value it already holds: nothing was written. */
+  unchanged?: true;
+}
+
+interface KnownRow {
+  id: number;
+  key: string;
+  vault_path: string;
+  fact_kind: string | null;
+  archived_into: number | null;
 }
 
 // ─── store ───────────────────────────────────────────────────────────────────
 
 /**
  * Vault-first storage: write .md to vault, then index metadata in SQLite.
- * Returns null vaultPath if entry already exists (dedup).
+ * Returns null vaultPath if entry already exists (dedup), except that a
+ * recorded `state` re-stored under its own key replaces its value (T-022).
  */
 export function store(input: StoreInput): StoreResult {
   const { db, vaultDir, key, tags, content, project } = input;
   const source = input.source ?? 'ob_store';
 
-  const vaultPath = writeExperience(vaultDir, {
+  const note: ExperienceInput = {
     key,
     tags,
     content,
@@ -69,15 +92,19 @@ export function store(input: StoreInput): StoreResult {
     neutral: 0,
     project,
     source,
-  });
+  };
+  const vaultPath = writeExperience(vaultDir, note);
 
   // `writeExperience` refuses to overwrite, so an existing note means this key
   // was already stored. Callers must report that rather than treat it as a
-  // write — and this is the exact line replace-on-write for `state` facts will
-  // have to change, once the classification has been shown correct on the live
-  // corpus.
+  // write — with one exception (T-022): a RECORDED `state` stored again under
+  // its own key replaces its value, and the old value moves to the note's
+  // `## Log`. Only when the incoming kind is `state` AND the row indexing the
+  // note has exactly this key, is itself a `state`, and is not archived. A state
+  // never replaces an event or an unlabelled row. The row keeps its id and its
+  // `created_at`, so its ratings and recall history attach to the new value.
   //
-  // Unless the note is unindexed. The vault is documented vault-first, yet a
+  // Or unless the note is unindexed. The vault is documented vault-first, yet a
   // file with no index row had no way in: `ob_store` refused, so the only route
   // was a hand-written SQL insert. That is the gap that let 10 notes sit in the
   // vault feeding `skill-scan` while `ob_recall` could not see them. An existing
@@ -90,15 +117,52 @@ export function store(input: StoreInput): StoreResult {
   if (vaultPath === null) {
     const existing = experiencePath(vaultDir, project, key);
     const known = db
-      .prepare("SELECT id FROM knowledge_index WHERE LOWER(REPLACE(vault_path, '\\', '/')) = ?")
-      .get(existing.replace(/\\/g, "/").toLowerCase());
+      .prepare("SELECT id, key, vault_path, fact_kind, archived_into FROM knowledge_index WHERE LOWER(REPLACE(vault_path, '\\', '/')) = ?")
+      .get(existing.replace(/\\/g, "/").toLowerCase()) as KnownRow | undefined;
 
-    if (known || !existsSync(existing)) {
+    if (known) {
+      const replaces =
+        input.factKind === 'state' &&
+        known.key === key &&
+        known.fact_kind === 'state' &&
+        known.archived_into === null &&
+        existsSync(known.vault_path);
+      if (!replaces) return { vaultPath: null, existingKind: known.fact_kind };
+
+      const current = splitStateLog(noteBody(readFileSync(known.vault_path, "utf-8"))).current;
+      if (current.trim() === content.trim()) {
+        return { vaultPath: known.vault_path, unchanged: true };
+      }
+
+      const demotedAt = new Date().toISOString();
+      replaceStateNote(known.vault_path, note, demotedAt);
+
+      try {
+        indexKnowledge(db, {
+          vaultPath: known.vault_path,
+          key,
+          tags: tags.join(','),
+          content,
+          source,
+          projectDir: input.projectDir ?? undefined,
+          factKind: 'state',
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        throw new Error(`state "${key}": the vault note was rewritten but the index update failed (${msg}); the index still holds the previous value`);
+      }
+
+      return { vaultPath: known.vault_path, replaced: { id: known.id, demotedAt } };
+    }
+
+    if (!existsSync(existing)) {
       return { vaultPath: null };
     }
 
+    // A note that already carries a `## Log` is indexed by its current value
+    // only: the log is what the note says is no longer true.
     const raw = readFileSync(existing, "utf-8");
-    const body = /^---\n[\s\S]*?\n---\n?([\s\S]*)$/.exec(raw)?.[1]?.trim() ?? raw.trim();
+    const body = splitStateLog(noteBody(raw)).current.trim();
 
     indexKnowledge(db, {
       vaultPath: existing,
