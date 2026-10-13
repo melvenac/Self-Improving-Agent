@@ -232,6 +232,25 @@ describe("candidate A — the config/hooks channel", { timeout: 120_000 }, () =>
       }
     });
 
+    it("CA-4c T-263: the runtime's commits carry its identity when the caller's env sets GIT_AUTHOR_*/GIT_COMMITTER_*", async () => {
+      prepareFilterTarget();
+      const restore = withEnv({
+        GIT_AUTHOR_NAME: "Caller",
+        GIT_AUTHOR_EMAIL: "caller@x.invalid",
+        GIT_COMMITTER_NAME: "Caller",
+        GIT_COMMITTER_EMAIL: "caller@x.invalid",
+      });
+      try {
+        const r = await runLoop({ ...withDeveloper(touchA), developerAllowlist: ["a.txt", "artifacts/iterations/t001/"] });
+        expect(r.failure, r.failure?.reason).toBeNull();
+        expect(rawGit(repo.root, ["log", "-1", "--format=%an%n%ae%n%cn%n%ce", r.candidateSha!])).toBe(
+          "HoH harness runtime\nharness-runtime@sia.invalid\nHoH harness runtime\nharness-runtime@sia.invalid",
+        );
+      } finally {
+        restore();
+      }
+    });
+
     it("CA-4c R19: the generated file carries ONLY allowlisted non-program keys, never the planted ones", async () => {
       const globalFile = join(tmp.dir, "global.gitconfig");
       writeFileSync(
