@@ -6,17 +6,28 @@
  * and falls back to the nearest claude.exe. On Windows the walk reads one
  * Win32 process table. Tests inject the walk through resolveOwnerWalk or
  * resolveOwnerFromAncestry.
+ *
+ * T-268: when the walk finds no owner (Git Bash on Windows: bash's parent, the
+ * MSYS launcher, has already exited, so the chain ends before claude.exe), the
+ * session proof named by CLAUDE_CODE_SESSION_ID supplies it. A nested claude
+ * gets its own CLAUDE_CODE_SESSION_ID (measured, T-268); CLAUDE_PID is still
+ * never read.
  */
 
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { resolvePaths } from "./shared/paths.js";
 import {
+  byPidDir,
   findCursorAgentHostPid,
   loadWin32ProcessTable,
+  processStartTime,
   readProcessParent,
   type ProcessParentInfo,
   type Win32TableResult,
 } from "./shared/process-session.js";
 
-export type OwnerSource = "cursor-agent" | "claude.exe" | "flag" | "none";
+export type OwnerSource = "cursor-agent" | "claude.exe" | "claude-session" | "flag" | "none";
 
 export interface AncestorRow {
   pid: number;
@@ -76,12 +87,62 @@ export function ownerFromFlag(raw: string): ResolvedOwner {
 }
 
 /**
+ * The fallback: exactly one proof that passes both checks. A proof matches
+ * when its session_id is CLAUDE_CODE_SESSION_ID and its ide is "claude"; it
+ * passes when the pid it names (by file name) started at the proof's
+ * proc_start and is claude.exe. Failing proofs do not count, so a stale proof
+ * never refuses a live session; two passing proofs have no owner.
+ */
+function ownerFromSessionProof(
+  env: NodeJS.ProcessEnv,
+  proofDir: string,
+  readRow: (pid: number) => ProcessParentInfo | null,
+): ResolvedOwner {
+  const none = (why: string): ResolvedOwner => ({ pid: null, source: "none", reason: `${NO_OWNER_REASON}; ${why}` });
+  const id = env.CLAUDE_CODE_SESSION_ID;
+  if (!id) return none("no CLAUDE_CODE_SESSION_ID");
+  const id8 = id.slice(0, 8);
+  let names: string[];
+  try { names = readdirSync(proofDir); } catch { names = []; }
+  const matches: Array<{ pid: number; procStart: unknown }> = [];
+  for (const name of names) {
+    const m = /^(\d+)\.json$/.exec(name);
+    if (!m) continue;
+    let proof: { session_id?: unknown; ide?: unknown; proc_start?: unknown };
+    try { proof = JSON.parse(readFileSync(join(proofDir, name), "utf-8")); } catch { continue; }
+    if (proof?.session_id === id && proof.ide === "claude") matches.push({ pid: Number(m[1]), procStart: proof.proc_start });
+  }
+  if (matches.length === 0) return none(`no session proof for CLAUDE_CODE_SESSION_ID ${id8}`);
+  const checked = matches.map(({ pid, procStart }) => {
+    const start = processStartTime(pid);
+    const running = start !== null && start === procStart;
+    const row = readRow(pid);
+    const claude = row !== null && isClaudeExeCommandLine(row.commandLine);
+    return { pid, running, claude };
+  });
+  const survivors = checked.filter((c) => c.running && c.claude);
+  if (survivors.length === 1) return { pid: survivors[0].pid, source: "claude-session", reason: null };
+  if (survivors.length > 1) return none(`${survivors.length} live proofs name session ${id8}`);
+  if (checked.length > 1) return none(`${checked.length} proofs name session ${id8}, and none names a running claude.exe`);
+  const { pid, running } = checked[0];
+  if (!running) return none(`the proof for ${id8} names pid ${pid}, which is not running (or was reused)`);
+  return none(`the proof for ${id8} names pid ${pid}, which is not claude.exe`);
+}
+
+/**
  * Production binding. startPid is only where the walk starts (process.ppid);
  * it is never the owner by default, and CLAUDE_PID is never read (a nested
  * session inherits the outer one's). On win32, or when loadTable is passed,
  * the table is loaded once; readProcessParent would reload it per step.
+ * Only when the walk finds no owner does the session proof apply (T-268).
  */
-export function liveOwnerProbe(startPid: number, loadTable?: () => Win32TableResult): ResolvedOwner {
+export function liveOwnerProbe(
+  startPid: number,
+  loadTable?: () => Win32TableResult,
+  env: NodeJS.ProcessEnv = process.env,
+  proofDir?: string,
+): ResolvedOwner {
+  let readRow: (pid: number) => ProcessParentInfo | null = readProcessParent;
   if (loadTable !== undefined || process.platform === "win32") {
     const loaded = (loadTable ?? loadWin32ProcessTable)();
     if (!loaded.ok) {
@@ -90,7 +151,9 @@ export function liveOwnerProbe(startPid: number, loadTable?: () => Win32TableRes
         : `Win32 process table: ${loaded.reason}`;
       return { pid: null, source: "none", reason };
     }
-    return resolveOwnerWalk(startPid, (p) => loaded.table.get(p) ?? null);
+    readRow = (p) => loaded.table.get(p) ?? null;
   }
-  return resolveOwnerWalk(startPid, readProcessParent);
+  const walked = resolveOwnerWalk(startPid, readRow);
+  if (walked.pid !== null) return walked;
+  return ownerFromSessionProof(env, proofDir ?? byPidDir(resolvePaths(process.cwd()).activeSession), readRow);
 }
