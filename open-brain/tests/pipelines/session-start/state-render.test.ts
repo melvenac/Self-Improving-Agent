@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderState, newestGapFirst, VERIFIED_FULL_TEXT, GAP_CLIP } from "../../../src/pipelines/session-start/state-render.js";
-import { newestHandoffPerInstance, newestHandoffForSeat } from "../../../src/shared/state-schema.js";
-import type { State } from "../../../src/shared/state-schema.js";
+import { newestHandoffPerInstance, newestHandoffForSeat, questionText, questionResolvedBy, watchText } from "../../../src/shared/state-schema.js";
+import type { Handoff, State } from "../../../src/shared/state-schema.js";
 import { readRepoRecord } from "../../helpers/repo-record.js";
 
 /**
@@ -316,6 +316,46 @@ describe("renderState — R183-1 the loop state and other seats' lines are not c
 });
 
 /**
+ * T-282: the lines renderOneHandoff prints for one handoff's items, derived through the schema's own accessors. Concatenating
+ * an entry printed "    - [object Object]" for every object-form watch-out ({text, expires?}) and open question
+ * ({text, owner?, resolved_by?}), and failed CI on records PR #690. A resolved question is omitted and counted (T-233 B).
+ */
+function expectItemsVerbatim(lines: string[], h: Handoff): void {
+  for (const w of h.watch_out) expect(lines).toContain(`    - ${watchText(w)}`);
+  const open = h.open_questions.filter((q) => questionResolvedBy(q) === null);
+  for (const q of open) expect(lines).toContain(`    - ${questionText(q)}`);
+  const resolved = h.open_questions.length - open.length;
+  if (resolved > 0) expect(lines).toContain(`    (${resolved} resolved, not shown)`);
+}
+
+describe("renderState — T-282 object-form watch-outs and open questions render as their text", () => {
+  const h: Handoff = {
+    ...state.handoffs[0]!,
+    watch_out: ["W-plain", { text: "W-object" }, { text: "W-expires", expires: 999 }],
+    open_questions: [
+      "Q-plain",
+      { text: "Q-object" },
+      { text: "Q-owned", owner: "aaron" },
+      { text: "Q-resolved", resolved_by: "D-001" },
+      { text: "Q-resolved-owned", resolved_by: "PR #1", owner: "aaron" },
+    ],
+  };
+  const lines = renderState({ ...state, handoffs: [h] } as unknown as State, "x", { seat: "developer" });
+
+  it("prints each watch-out and unresolved question as its text, and counts the resolved ones (the shared helper)", () => {
+    expectItemsVerbatim(lines, h);
+  });
+
+  it("states the same lines literally, so a wrong helper cannot pass", () => {
+    for (const t of ["W-plain", "W-object", "W-expires", "Q-plain", "Q-object", "Q-owned"]) expect(lines).toContain(`    - ${t}`);
+    expect(lines).toContain("    (2 resolved, not shown)");
+    expect(lines).not.toContain("    - Q-resolved");
+    expect(lines).not.toContain("    - Q-resolved-owned");
+    expect(lines.filter((l) => l.includes("[object Object]"))).toEqual([]);
+  });
+});
+
+/**
  * T183-3: the render against THIS repository's own record. Every handoff
  * watch-out and open question is byte-identical to state.json's (start.md: never
  * summarise it, never drop items for length), and the tasks and objective are
@@ -339,7 +379,7 @@ describe("renderState — T183-3 the real record's handoffs are verbatim", () =>
   for (const h of ownEntries) {
     it(`renders the ${h.seat} seat's watch-outs and open questions as whole lines, byte-identical`, () => {
       const lines = renderState(real, "x", { seat: h.seat });
-      for (const w of [...h.watch_out, ...h.open_questions]) expect(lines).toContain(`    - ${w}`);
+      expectItemsVerbatim(lines, h);
       expect(lines).toContain(`  pick up: ${h.pick_up}`);
     });
 

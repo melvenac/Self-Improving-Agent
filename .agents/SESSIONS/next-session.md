@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 442 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 446 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,36 +6,48 @@
 
 ### Pick up here
 
-Session 170 (Atlas) resumed after the roll on clark's MAX USAGE relay (Aaron 01:20Z and 01:24Z, verified: 'use as much as we can before the reset ... GO GO GO'). DONE tonight: the SIA train merged and was live-checked: #678 T-159 6fa4b592, #673 T-243 26dc0cee, #685 T-275 7bdf2483, #688 T-161 7d9215b2; main rebuilt 7d9215b2; all four PASS and closed. QUEUED on the QA PC chain (clark, Opus, one clone at a time; clark fetches replies with qapc-reply.sh): T-172 r3 (amendment-2, PR #676), T-269, T-277, T-282, then T-283, T-276, T-266, T-273 (briefs on master at b7bf4c06 and 9d93d837). On each READY: read the reply first-hand, review the PR (pr-src-diff.sh), route QA to a judge other than the builder (Grok bots for the first pass, or an Opus headless review), then Aaron's word naming the PR (T-282 is tests only and merges under SG-1 on green CI). HELD: T-274 is desktop-only (it reads the live DB and transcripts); clark launches it alone when the desktop has headroom. DRAFTING (research-only forks): T-271 (base 7bdf2483) and T-281 (after #688; must not edit start-report.ts or transcript-check.ts, which T-276 owns). NOT YET DRAFTED: T-279 (prove the cp437 mechanism through a SIM line, never a desktop run) and T-272. Records tonight: T-280 closed (done by T-267); T-283 opened (the heavy suite's vitest path splits on the QA PC's space); T-284 (a deterministic commit-msg trailer hook) and T-285 (ob_store_chunk's raw UNIQUE error) opened; T-268 closed on a Git Bash live check; T-168's QA PC lease check still owed.
+Session 170 (Atlas) ROLLED 2026-10-13 ~22:1x CDT on Aaron's 'ready to roll? run end after you write your handoff', after a MAX USAGE night (Aaron 01:20Z/01:24Z, verified). DONE tonight: the SIA train (#678 T-159, #673 T-243, #685 T-275, #688 T-161) merged, main rebuilt 7d9215b2, live checks PASS, closed; T-274 measured and merged (#699) and ruled into T-286; 14 briefs and 2 amendments landed. FIRST: review the 7 READYs first-hand, one at a time (clark's copy of each reply is ~/Worktrees/<tag>-reply.md; then pr-src-diff.sh <pr>): T-269 #702 a5eec8d9, T-277 #704 5baed1b5, T-282 #703 ba38d32e (tests only: SG-1 merges it on green CI after the planner's ACCEPT), T-266 #701 ee701cf3, T-273 #697 9b6e76c5, T-271 #708 39adb0b4, T-281 #707 ac4e7b3f. For each code PR: the planner's ACCEPT, plus an Opus second review if wanted (clark launches a review-body file on the QA PC; %TEMP%/t272-opus-review-body.md is the template), then Aaron's word naming the PR via clark; merge one at a time with pr-refresh.sh before each, then one sia-rebuild and the live checks. T-272 #705 bc0d5991 has the planner's ACCEPT; its Opus review is RUNNING (reply to ~/Worktrees/t272-review-reply.md); then ask 'merge SIA #705'. RUNNING on the QA PC: T-172 r3 (PR #676), T-276, T-286. BLOCKED, then amended: T-283 (#698) and T-279 (#700), both on S4-9.2; amendment-1 for each is in docs PR #711; clark merges it and launches both r2s. The desktop rule stands: no npm, vitest, tsc or build on the desktop; at most 2 research-only subagents.
 
 ### Watch out
 
 - Aaron (via clark, 2026-10-13 ~20:5x CDT): the desktop CPU hit 100%. Run NO npm, vitest, tsc or build on the desktop; at most 2 subagents, research only; a brief that needs a pre-ship simulation sends clark a SIM line (repo, sha40, folder, exact command, what to report) for the QA PC, or ships without it.
 - Overlaps managed tonight: T-283 got its own module and test file to stay clear of T-269's cli-suite-run.ts import (line 22) and its suite-run-meta.test.ts rows; T-281 must not touch start-report.ts or transcript-check.ts (T-276's hunks); T-266 does not edit db-v2.ts (T-273 does); T-276 and T-271 touch server.ts in different functions. The second of two neighbouring PRs to merge may still need a conflict fix at its refresh.
+- S4-9.2 (tests/harness/s4-guards.test.ts, ruled session 157) forbids any added skip, todo, skipIf or runIf under open-brain/tests. A platform-specific row branches inside itself (const win = process.platform === "win32", as tests/pipelines/sync/mcp-command-paths.test.ts does) and asserts something true on each platform. T-283 and T-279 each lost a round to briefs that said skipIf/runIf.
 - Master has no branch protection: records and docs PRs merge by hand (clark's docs-merge.sh, or pr-keep-current.sh for a CLEAN .agents/docs-only PR, pinned; it exits 2 when it gives up after 30 min; read its exit unpiped, because a '| tail' wrapper reports tail's 0). Code PRs need Aaron's word naming them.
 - Merges go one at a time: pr-refresh.sh just before each PR's own merge. A records or docs PR that merges between a refresh and its merge breaks clark's merge-tree gate, so land docs and records only in the gaps.
 - SG-1 (D-135): config, rule-text and tests-only PRs merge on green CI pinned to the head, with no QA gate and no Aaron word. Code needs a QA ACCEPT from a judge other than the builder, and Aaron's word too.
 - Write handoff open questions and watch-outs as plain strings until T-282 lands: state-render.test.ts T183-3 reads the live record and fails CI on the object form.
 - Every running seat's open-brain server predates the 7d9215b2 rebuild: /mcp reconnect open-brain is Aaron's act (clark is asking him).
 - Dry-run every post-merge live-check script against the pre-merge build: each new-behaviour check must FAIL there (knowledge 694; tonight's t161-livecheck failed check 2 on c1975286 and passed on 7d9215b2).
-- A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED (tonight's eight are QUEUED, not launched).
+- A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED or RUNNING (tonight's twelve were recorded only after clark confirmed all twelve RUNNING; t283's first launch aborted before cloning).
 - Verify every relayed merge word in clark's transcript with relay-check.mjs (literal by default); approval is a snapshot of the PRs he named.
 - T-270's mechanism: Windows PowerShell 5.1's console cp437 best-fit turns arrows and bullets into raw C0 bytes on the pipe to Node (knowledge 693; entry 685 is falsified: forget it only on Aaron's word).
 - The repo is PUBLIC (D-090): transcripts, command text, paths and session ids stay outside it. The s170 live-check scripts live in ~/Worktrees/s170-livechecks/.
 
 ### Open questions
 
-- Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 (drafting) drops the Cursor path's transcriptPath until one live Cursor /start proves the file exists at the first tool call.
+- Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 (READY, #707) withholds an ide:cursor proof's transcriptPath until one live Cursor /start proves the file exists at the first tool call.
 - Planner, D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement.
 
 ### Loop state
 
 **Open PRs:** 
-- #676 — QA: in_progress — T-172 r2 at 778048db; the Opus review's CHANGES ruled, every finding accepted; amendment-2 (docs/loops/t172-main-rebuild-brief-amendment-2.md) is queued on the QA PC chain as r3
+- #676 — QA: in_progress — T-172 r3 (amendment-2) RUNNING on the QA PC
+- #705 — QA: accepted — T-272 at bc0d5991: planner ACCEPT; Opus second review RUNNING; then ask merge SIA #705
+- #702 — QA: in_progress — T-269 READY a5eec8d9, not yet reviewed by the planner
+- #704 — QA: in_progress — T-277 READY 5baed1b5, not yet reviewed
+- #703 — QA: in_progress — T-282 READY ba38d32e, tests only (SG-1), not yet reviewed
+- #701 — QA: in_progress — T-266 READY ee701cf3, not yet reviewed
+- #697 — QA: in_progress — T-273 READY 9b6e76c5, not yet reviewed
+- #708 — QA: in_progress — T-271 READY 39adb0b4, not yet reviewed
+- #707 — QA: in_progress — T-281 READY ac4e7b3f, not yet reviewed
+- #698 — QA: in_progress — T-283 r1 BLOCKED on S4-9.2 at 96f72acf; amendment-1 in docs PR #711, r2 to launch
+- #700 — QA: in_progress — T-279 r1 BLOCKED on S4-9.2 at 77313347; amendment-1 in docs PR #711, r2 to launch
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- merge SIA #705 (T-272), after its Opus review comes back
 - after T-172's amendment-2 and its READY: merge SIA #676
 - T-194: (a), (b) or (c); planner recommends (c) now, (b) later
 - T-024 (P0): may the planner rewrite knowledge entries 184 and 303 (they cite deleted knowledge-mcp paths) to say 'retired'?
@@ -51,6 +63,7 @@ Session 170 (Atlas) resumed after the roll on clark's MAX USAGE relay (Aaron 01:
 - s170 planner: T-172's Opus review ruled, every finding accepted (amendment-2, #691); T-266 ruled (A), refuse; T-269 keeps W2 (the census counts alarm run_too_long and orphan_run as busy); T-274 changes no src (a floor change is a separate PR); T-280 closed as done by T-267
 - s170 planner: T-196 HB-1, e21e71af not merged (stale); rewrite when the Cursor seats are back
 - s170 planner: T-251's install-commands allowlist question ruled no change; T-161's review findings went to T-281
+- s170 planner: T-286 ruled option (B): the status element carries "tail", so every asking query is "tail" "exit" "code" and the floor stays 8.0 (margin 5.81); S4-9.2 stands, and T-283 and T-279 were amended to branch inside the row
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -122,8 +135,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 170 — 2026-10-13 — planner [sia-planner] — `0a40685b-edbc-4c79-be9f-dcd4963428e7` (14 writing session(s) in the record)
+Session 171 — 2026-10-13 — planner [sia-planner] — `13042431-247e-4dad-9477-507e43fc7916` (14 writing session(s) in the record)
