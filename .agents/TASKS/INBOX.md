@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 443 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 444 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -43,7 +43,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [~] **T-281** T-161 follow-ups: the Cursor path's transcript check before a Cursor seat relies on it, the budgeted briefing's line cap, and the two untested pushes
 - [~] **T-282** state-render.test.ts T183-3 builds expected lines by string concatenation, so an object-form open question or watch-out in the live record fails CI
 - [~] **T-283** The heavy suite's vitest JSON path splits on a space: cli-suite-run.ts passes an absolute --outputFile through shell:true, so on the QA PC (home with a space) the suite's counts are lost
-- [ ] **T-286** The recall trigger asks the store only when the query carries the status element (a TRIM-only query never queries), then the floor drops from 8.0 to 6.0
+- [~] **T-286** The recall trigger asks the store only when the query carries the status element (a TRIM-only query never queries), then the floor drops from 8.0 to 6.0
 
 ## P3
 
