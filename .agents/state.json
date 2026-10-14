@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 462,
+  "revision": 463,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2288,15 +2288,15 @@
       "id": "T-290",
       "title": "Trigger parser follow-ups from T-288's Opus review: backslash-newline after |, a redirected } group close, split shell flags before -c, $(sh -c ...), ksh",
       "priority": "P3",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 171,
-      "closed_session": null,
+      "closed_session": 171,
       "supersedes": null,
-      "note": "s171. Brief docs/loops/t290-trigger-parser-followups-brief.md (#735). LAUNCH ONLY AFTER #728 (T-288) MERGES: its base must contain T-288. Planner pre-check on scratch copies (T-288's 94e53055 + these rulings, via the repo's tsx): U9-U15 safe at T-288 and unsafe with the rulings; S9-S12 and T-288's U1-U8/S1-S8 keep their verdicts; mutants M1-M5 each flip exactly their own rows. Out of scope (on T-288's note): F2-F4 rare false positives and the double-quoted bash -c \"... \\$?\" form. — s171: LAUNCHED by clark on the QA PC (claude -p Opus, base 1d1a6549 which contains T-288's merge; brief embedded). Reply path C:/Users/melve/Worktrees/t290-reply.md on the QA PC, copied back to the desktop by clark. Ends READY with a PR; needs a planner review plus Aaron's word naming the PR. — s171: READY as #738 at ccffaf52. Planner ACCEPT first-hand at that head: src is rulings 1-3 byte-for-byte (the doc comment became a 2-line block), test rows exactly U9-U15/S9-S12, commit 1 red on exactly U9-U15, commit 2 green (14 files/145 tests, tsc 0), M1-M5 each flip only their own rows, CI test SUCCESS. Code PR: waiting on Aaron's word naming #738 (asked via clark). Live check ready outside the repo; its unsafe half proven FAIL on 1d1a6549.",
+      "note": "s171. Brief docs/loops/t290-trigger-parser-followups-brief.md (#735). LAUNCH ONLY AFTER #728 (T-288) MERGES: its base must contain T-288. Planner pre-check on scratch copies (T-288's 94e53055 + these rulings, via the repo's tsx): U9-U15 safe at T-288 and unsafe with the rulings; S9-S12 and T-288's U1-U8/S1-S8 keep their verdicts; mutants M1-M5 each flip exactly their own rows. Out of scope (on T-288's note): F2-F4 rare false positives and the double-quoted bash -c \"... \\$?\" form. — s171: LAUNCHED by clark on the QA PC (claude -p Opus, base 1d1a6549 which contains T-288's merge; brief embedded). Reply path C:/Users/melve/Worktrees/t290-reply.md on the QA PC, copied back to the desktop by clark. Ends READY with a PR; needs a planner review plus Aaron's word naming the PR. — s171: READY as #738 at ccffaf52. Planner ACCEPT first-hand at that head: src is rulings 1-3 byte-for-byte (the doc comment became a 2-line block), test rows exactly U9-U15/S9-S12, commit 1 red on exactly U9-U15, commit 2 green (14 files/145 tests, tsc 0), M1-M5 each flip only their own rows, CI test SUCCESS. Code PR: waiting on Aaron's word naming #738 (asked via clark). Live check ready outside the repo; its unsafe half proven FAIL on 1d1a6549. — s171: merged #738 at bcd4dca0 on Aaron's word (17:33:47Z via clark, verified in clark's transcript; no Opus second review requested), refreshed to afee0659 (patch-id = reviewed ccffaf52). Main rebuilt at bcd4dca0. Live PASS: U9/U10/U12/U14/U15 ask \"tail\" \"exit\" \"code\", S9/S10/S12 ask nothing; the unsafe half was proven FAIL on 1d1a6549 first. Still out of scope (recorded on T-288): F2 function-definition, F3 echo sh -c, F4 comment ending in |, double-quoted bash -c.",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
-      "closed_rev": null
+      "closed_rev": 463
     }
   ],
   "verified": [
