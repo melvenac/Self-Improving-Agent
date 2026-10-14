@@ -37,7 +37,7 @@ import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
 import { resolvePaths, canonicalizeProjectDir, projectIdentity, projectIdentityName, obsidianVaultDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
-import { sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
+import { sessionStartFromTranscript, sessionTrailerIds, structuralTrailerNote, type TrailerIdSource } from "./shared/handoff-guard.js";
 import {
   OLD_LAYOUT_LINE,
   isOldLayoutProject,
@@ -360,12 +360,14 @@ function readParentSessionProof(): ProcessSessionProof | null {
   }
 }
 
-function endSessionWindow(projectRoot: string, sessionId: string): { since: string | null; sessionIds: string[] } {
+function endSessionWindow(projectRoot: string, sessionId: string): { since: string | null; sessionIds: string[]; trailerSource: TrailerIdSource } {
   const proof = readParentSessionProof();
   const since = proof?.transcript_path ? sessionStartFromTranscript(proof.transcript_path) : null;
-  let sessionIds = proof?.transcript_path ? sessionIdsFromTranscript(proof.transcript_path) : [];
-  if (sessionIds.length === 0 && sessionId) sessionIds = [sessionId];
-  return { since, sessionIds };
+  // T-276 r2: the same reader as the SessionEnd hook, so a bridge record past the transcript's head is found and
+  // ob_end and the hook agree on whether this session has a Remote Control id.
+  const trailer = sessionTrailerIds(proof?.transcript_path, sessionId);
+  const sessionIds = trailer.ids.length > 0 ? trailer.ids : sessionId ? [sessionId] : [];
+  return { since, sessionIds, trailerSource: trailer.source };
 }
 
 export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
@@ -387,7 +389,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
           `Pass record_ok with a reason to note that in the next greeting.`,
       );
     } else {
-      const { since, sessionIds } = endSessionWindow(projectRoot, endedId);
+      const { since, sessionIds, trailerSource } = endSessionWindow(projectRoot, endedId);
       const evaluation = evaluateEndRecord(projectRoot, since, endedId, sessionIds);
       const record = checkRecordUpdated(projectRoot, since, endedId, sessionIds);
       const sinceAnchor = since ?? "session start (unknown)";
@@ -419,8 +421,10 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
           preamble.push(`RECORD OK: closing without a matching record — ${recordOkReason}`);
         }
         if (evaluation.work.unattributed > 0) {
+          // T-276: the transcript names this session and carries no Remote Control id (sessionTrailerIds, as the hook reads it).
+          const noRemoteControl = trailerSource === "session";
           preamble.push(
-            `${evaluation.work.unattributed} commit(s) in the window carry no Claude-Session trailer (UNATTRIBUTED, not counted)`,
+            `${evaluation.work.unattributed} commit(s) in the window carry no Claude-Session trailer (UNATTRIBUTED, not counted)${noRemoteControl ? structuralTrailerNote(endedId) : ""}`,
           );
         }
       }

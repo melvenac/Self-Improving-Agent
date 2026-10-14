@@ -25,7 +25,7 @@ import { resolveSessionId } from "./shared/active-session.js";
 import { HOOK_CLAIM_TTL_MS, claimHookRun, releaseHookClaim, shouldClaimHookRun } from "./shared/hook-claim.js";
 import { byPidDir, removeProcessSession } from "./shared/process-session.js";
 import { resolvePaths } from "./shared/paths.js";
-import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
+import { checkSessionHandoff, describeMissing, recordMissingHandoff, sessionStartFromTranscript, sessionTrailerIds, structuralTrailerNote } from "./shared/handoff-guard.js";
 import { readState } from "./shared/state-writer.js";
 import {
   describeWorkAfterEnd,
@@ -112,10 +112,11 @@ try {
     } else if (!id) {
       console.log("[session-end] handoff check NOT RUN: the payload carried no session id");
     } else {
+      const trailer = sessionTrailerIds(hookPayload.transcript_path, id);
       const check = checkSessionHandoff(
         dir,
         sessionStartFromTranscript(hookPayload.transcript_path),
-        sessionIdsFromTranscript(hookPayload.transcript_path),
+        trailer.ids,
         id,
       );
       if (check.status === "missing") {
@@ -132,7 +133,7 @@ try {
             : "no handoff or record update for this session";
         const unPart =
           check.unattributed > 0
-            ? `; ${check.unattributed} commit(s) in the window carry no Claude-Session trailer: UNATTRIBUTED, not counted for any seat`
+            ? `; ${check.unattributed} commit(s) in the window carry no Claude-Session trailer: UNATTRIBUTED, not counted for any seat${trailer.source === "session" ? structuralTrailerNote(id) : ""}`
             : "";
         console.log(`[session-end] handoff check: ${noHandoff}${unPart}`);
       }
@@ -147,7 +148,8 @@ try {
   const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
   if (existsSync(join(dir, ".agents"))) {
     const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
-    const transcriptIds = sessionIdsFromTranscript(hookPayload.transcript_path);
+    const trailer = sessionTrailerIds(hookPayload.transcript_path, id);
+    const transcriptIds = trailer.ids;
     const statePath = join(dir, ".agents", "state.json");
     const stateRead = existsSync(statePath) ? readState(dir) : null;
     const stateUnreadable = stateRead && !stateRead.ok ? stateRead.error : null;
@@ -177,6 +179,8 @@ try {
               recordWorkAfterEnd(dir, stamp.session, msg, work);
             } else if (work.commits > 0) {
               console.log(`[session-end] work-after-end check: ${work.commits} commit(s) after ob_end and record updated`);
+            } else if (work.unattributed > 0) {
+              console.log(`[session-end] work-after-end check: no attributed commits after ob_end; ${work.unattributed} commit(s) after ob_end carry no Claude-Session trailer (UNATTRIBUTED)${trailer.source === "session" ? structuralTrailerNote(id) : ""}`);
             } else {
               console.log("[session-end] work-after-end check: no commits after ob_end");
             }
