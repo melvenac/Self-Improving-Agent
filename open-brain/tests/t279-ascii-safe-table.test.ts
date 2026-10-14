@@ -27,6 +27,8 @@ function escapeLikePowerShell(json: string): string {
 }
 
 describe("T-279 the Win32 process table crosses the PowerShell pipe as printable ASCII", () => {
+  const win = process.platform === "win32";
+
   it("A1: asciiSafeJsonCommand wraps the pipeline in ConvertTo-Json -Compress and escapes every char outside 0x20-0x7E", () => {
     expect(ps.asciiSafeJsonCommand("P")).toBe(
       "[regex]::Replace((P | ConvertTo-Json -Compress), '[^\\x20-\\x7E]', [System.Text.RegularExpressions.MatchEvaluator]{ param($m) '\\u{0:x4}' -f [int][char]$m.Value })",
@@ -60,9 +62,17 @@ describe("T-279 the Win32 process table crosses the PowerShell pipe as printable
     expect(src).not.toContain('"Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress"');
   });
 
-  it.runIf(process.platform === "win32")(
-    "W1: a synthetic row read through the production spawn arrives as printable ASCII and parses back exactly; unescaped it does not",
+  it(
+    "W1: on win32 a synthetic row read through the production spawn arrives as printable ASCII and parses back exactly (unescaped it does not); elsewhere the spawn throws and the loader refuses",
     async () => {
+      if (!win) {
+        // No Windows PowerShell here (S4-9.2: no runIf): the production spawn throws, and the loader fails closed.
+        expect(() => ps.readWin32ProcessTableStdout("Get-Date")).toThrow();
+        const refused = ps.loadWin32ProcessTable();
+        expect(refused.ok).toBe(false);
+        if (!refused.ok) expect(refused.reason).toMatch(/^Win32 process table: /);
+        return;
+      }
       const lit = BMP.map((cp) => `[char]0x${cp.toString(16)}`).join("+") + `+[char]::ConvertFromUtf32(0x${ASTRAL.toString(16)})`;
       const synth = `[pscustomobject]@{ProcessId=7;ParentProcessId=1;CommandLine=('a '+${lit}+' b')} | Select-Object ProcessId,ParentProcessId,CommandLine`;
       await tick();
@@ -85,7 +95,13 @@ describe("T-279 the Win32 process table crosses the PowerShell pipe as printable
     },
   );
 
-  it.runIf(process.platform === "win32")("W2: the real table reads as printable ASCII and loads", async () => {
+  it("W2: on win32 the real table reads as printable ASCII and loads; elsewhere the loader refuses", async () => {
+    if (!win) {
+      const refused = ps.loadWin32ProcessTable();
+      expect(refused.ok).toBe(false);
+      if (!refused.ok) expect(refused.reason).toMatch(/^Win32 process table: /);
+      return;
+    }
     await tick();
     const out = ps.readWin32ProcessTableStdout();
     await tick();
