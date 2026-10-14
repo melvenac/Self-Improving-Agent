@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 471 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 472 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,18 +6,17 @@
 
 ### Pick up here
 
-Session 171 (Atlas), 10-13 22:2x -> 10-14 ~15:xx CDT. DONE: 19 PRs merged on Aaron's words (relay-check verified) or SG-1, the last four #727 #728 #738 #744; main rebuilt to bcd4dca0 (current; #744 was rule text, no rebuild); every merged code change live-checked, each check proven to FAIL on the pre-merge build first (scripts in ~/Worktrees/s171-livechecks/). On Aaron's 10-14 go (via clark): D-154 (T-194 option c now, b later), T-024 closed (entries 184/303 rewritten to 'retired' in vault + DB), T-166 closed (CLAUDE.md impact() lower-bound sentence), 15 stale PRs #463-#519 closed with branches kept. Nothing running, nothing READY. NEXT: (1) T-194: re-base r7 (loop/t194-planner-hook 71ea3101) onto master and brief it as the courtesy layer (D-147 option 3, D-154). (2) T-291 (P3, tests-only, SG-1): brief the two CI flakes (latest-brief.test.ts rmSync ENOTEMPTY; vitest-worker onTaskUpdate timeout). (3) Aaron's two answers via clark: T-168 seat (planner recommends resolve from the checkout, refuse when unresolved, no default) and 'forget knowledge entry 685?' (rec yes); act on each when clark relays it, verified in clark's transcript.
+Session 171 (Atlas), 10-13 22:2x -> 10-14 ~16:xx CDT. Main is at 1aebb121 (rebuilt; running seats need /mcp reconnect open-brain). Today on Aaron's words or SG-1: #727 #728 #738 #744 #749 #752 merged; T-285 T-288 T-290 T-166 T-024 T-291 closed; D-154 (T-194 option c now, b later); 15 stale PRs #463-#519 closed; every merged code change live-checked (scripts in ~/Worktrees/s171-livechecks/, each proven to FAIL before its merge). T-194: the r7 planner hook is on master INERT (not registered). Nothing running, nothing READY. NEXT: (1) T-293 (P1): rule how the hook and the atlas-ops scripts fit before any registration ask (replay: every `bash <atlas-ops script>` and a records/ push are denied; docs/ pushes pass); read git.ts's push rule and grant.ts first; the replay script is ~/Worktrees/t194-replay.mjs rev 2. (2) Aaron's two answers via clark (T-168 seat; forget entry 685); act on each when relayed, verified in clark's transcript. (3) P2/P3 backlog.
 
 ### Watch out
 
-- Desktop rule (Aaron 10-13): no npm, vitest, tsc or build on the desktop. Planner pre-checks run node + the repo's tsx on scratch copies only (scratchpad t288sim/), which fits it.
-- Simulate a brief's MUTANTS as well as its rows before dispatch (memory feedback_simulate_brief_predictions). T-290 did this and landed in one round.
-- A builder reply with an EMPTY result block is not evidence (T-285 r1's M1/M2): re-run and paste before an ACCEPT.
-- T-168: the Cursor half of the QA PC lease check is still owed, and the seat default is waiting on Aaron.
-- Running seats need /mcp reconnect open-brain after each rebuild (main is at bcd4dca0).
-- A records-only PR can fail CI on a T-291 flake (latest-brief ENOTEMPTY or a vitest-worker onTaskUpdate timeout) with every test passed: read the failure, then rerun the failed job.
-- Knowledge-entry edits (T-024 style): ob_store refuses an existing non-state key; the vault note and the knowledge_index row were edited with the same exact-substring replace (FTS follows via trigger ki_au). Back both up first.
-- The repo is PUBLIC (D-090): live-check scripts, reply files and review bodies live outside it (~/Worktrees/, %TEMP%).
+- Desktop rule (Aaron 10-13): no npm, vitest, tsc or build on the desktop. Planner pre-checks run node + git (+ the repo's tsx) on scratch copies only.
+- The Bash tool collapses doubled backslashes in heredoc and command text: write any script holding regex escapes with the Write tool, never a heredoc (s171: a skip-scan sim silently found 0 hits).
+- Simulate a brief's rows AND mutants before dispatch (memory feedback_simulate_brief_predictions); also check what the shipped tests READ (T-194's brief missed two rows files the QA tests load).
+- S4-9.2 (tests/harness/s4-guards.test.ts) refuses any skip/skipIf added since 2448a6ea; the only exceptions are ALLOWED_PLATFORM_SKIPS (exact line, stale if unused). Nit owed: its new row's title starts 'S4-9.2b' like an existing row.
+- A records-only PR can fail CI on T-292's vitest-worker onTaskUpdate timeout with every test passed: read the failure, rerun the failed job, and note the sighting on T-292.
+- Running seats need /mcp reconnect open-brain after each rebuild (main is at 1aebb121).
+- The repo is PUBLIC (D-090): live-check scripts, replay scripts, reply files and review bodies live outside it (~/Worktrees/, %TEMP%).
 
 ### Open questions
 
