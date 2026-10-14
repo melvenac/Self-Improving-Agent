@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 /**
@@ -13,20 +13,38 @@ import { join } from "node:path";
  *
  * Returns the line to print, or null when there is no brief (the caller omits the line). When git
  * itself cannot answer it returns a line saying so: "no brief" and "could not look" are different facts.
+ *
+ * T-277: a project may keep its briefs directly under docs/ instead, as `loop-<x>-brief.md`, `-rebrief` or an
+ * `-amendment-N` of either (agent-dashboard does, and its /start had no line). Those count too, by the same
+ * commit-date rule across both places. Only the `loop-` prefix counts there, so `docs/design-brief.md` is not one.
  */
 export const BRIEF_DIR = "docs/loops";
+/** T-277: briefs kept directly under docs/ (not in a subdirectory), named `loop-<x>-brief.md`, `-rebrief` or an `-amendment-N`. */
+export const ROOT_BRIEF_DIR = "docs";
+export const ROOT_BRIEF_NAME = /^loop-.+-(re)?brief(-amendment-\d+)?\.md$/;
+
+function rootBriefOnDisk(projectRoot: string): boolean {
+  const docs = join(projectRoot, ROOT_BRIEF_DIR);
+  if (!existsSync(docs)) return false;
+  try {
+    return readdirSync(docs).some((name) => ROOT_BRIEF_NAME.test(name));
+  } catch {
+    return false;
+  }
+}
 
 function latestBriefSelection(projectRoot: string): { path: string; date: string } | null {
   const run = (args: string[]): string =>
     execFileSync("git", args, { cwd: projectRoot, encoding: "utf-8", maxBuffer: 1 << 26, stdio: ["ignore", "pipe", "pipe"] }).replace(/\r\n/g, "\n");
-  if (!existsSync(join(projectRoot, BRIEF_DIR))) return null;
+  if (!existsSync(join(projectRoot, BRIEF_DIR)) && !rootBriefOnDisk(projectRoot)) return null;
   const present = new Set(
-    run(["ls-tree", "-r", "--name-only", "HEAD", "--", `${BRIEF_DIR}/`])
+    run(["ls-tree", "-r", "--name-only", "HEAD", "--", `${ROOT_BRIEF_DIR}/`])
       .split("\n")
       .filter((p) => isBrief(p)),
   );
   if (present.size === 0) return null;
-  const log = run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${BRIEF_DIR}/`]);
+  const rootBriefs = [...present].filter((p) => !p.startsWith(`${BRIEF_DIR}/`));
+  const log = run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${BRIEF_DIR}/`, ...rootBriefs]);
   const latest = new Map<string, string>();
   let date = "";
   for (const line of log.split("\n")) {
@@ -69,5 +87,6 @@ export const BRIEF_NAME = /(^|-)(re)?brief(-amendment-\d+)?\.md$/;
 
 export function isBrief(path: string): boolean {
   const base = path.split("/").pop() ?? "";
-  return path.startsWith(`${BRIEF_DIR}/`) && BRIEF_NAME.test(base);
+  if (path.startsWith(`${BRIEF_DIR}/`)) return BRIEF_NAME.test(base);
+  return path === `${ROOT_BRIEF_DIR}/${base}` && ROOT_BRIEF_NAME.test(base);
 }
