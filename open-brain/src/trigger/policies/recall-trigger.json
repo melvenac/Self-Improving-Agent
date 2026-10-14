@@ -2,5 +2,5 @@
   "relevance_floor": 8.0,
   "max_injected": 1,
   "deadline_ms": 2000,
-  "provenance": "relevance_floor measured 2026-09-20 against the live store at 599 entries: the query \"tail\" \"exit\" \"code\" scored 14.01 / 12.29 / 10.62 for the three genuinely relevant entries and 6.83 / 6.03 for the two irrelevant ones; 8.0 sits in that gap. bm25 is corpus-relative (Loop 16 R19, amendment 5 at 6da5fa9), so this cut moves as the store grows and must be re-measured, not assumed."
+  "provenance": "relevance_floor re-measured 2026-10-14 against the live store at 695 entries (T-274, docs/loops/t274/result.md). Since T-286 the only query the trigger asks is \"tail\" \"exit\" \"code\"; its top hit is entry 299 at 13.81, so 8.0 clears it by 5.81. A trimmer pipeline with no $? read asks nothing (T-286), so TRIM's old top hit (entry 642 at 7.92) no longer bears on the floor. bm25 is corpus-relative (Loop 16 R19), so this cut moves as the store grows and must be re-measured, not assumed."
 }

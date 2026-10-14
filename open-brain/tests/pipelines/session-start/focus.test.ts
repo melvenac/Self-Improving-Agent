@@ -248,3 +248,12 @@ describe("T-240 r2 another seat missing runtime", () => {
     expect(formatPartnerLine({ label: "Builder", hub_as: "cursor-builder", session_id: "x" }, [agent], "missing")).not.toContain("not polling");
   });
 });
+
+describe("T-269 SEATS live state for an alarm", () => {
+  it("F1 a cursor-runtime alarm prints the hub's reason, and alarm alone without one", () => {
+    expect(liveStateForHubAgent("cursor", { name: "forge", seat: { seatState: "alarm", alarmReason: "run_too_long" }, rooms: [] })).toBe(
+      "alarm(run_too_long)",
+    );
+    expect(liveStateForHubAgent("cursor", { name: "forge", seat: { seatState: "alarm" }, rooms: [] })).toBe("alarm");
+  });
+});

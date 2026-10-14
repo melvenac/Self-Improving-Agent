@@ -250,6 +250,21 @@ describe("BF-R: READS OWED", () => {
     expect(line).toContain(" · +2 more");
     expect(line.split(" · ").length).toBeLessThanOrEqual(7);
   });
+
+  it("BF-R5 (T-277): a docs-root brief, with no docs/loops, is owed like one under docs/loops", () => {
+    const root = tmp("bf-r5-");
+    git(root, "init", "-q", "-b", "main");
+    git(root, "config", "user.email", "t@example.com");
+    git(root, "config", "user.name", "T");
+    mkdirSync(join(root, "docs"), { recursive: true });
+    writeFileSync(join(root, "docs", "loop-7-brief.md"), "# brief\n", "utf8");
+    gitAt(root, "2026-10-01T12:00:00", "add", "-A");
+    gitAt(root, "2026-10-01T12:00:00", "commit", "-q", "-m", "seed");
+    const state = stateWithSessions([]);
+    const line = describeReadsOwed(root, state, 5, "developer", "sia-forge");
+    expect(line).toMatch(/^READS OWED \(\d+\): /);
+    expect(line).toContain("docs/loop-7-brief.md");
+  });
 });
 
 describe("BF-F: Fleet block", () => {
