@@ -112,6 +112,15 @@ describe('N1 — the not-asked fast path loads nothing heavy', () => {
     expect(fs.existsSync(control.dbPath)).toBe(false);
   }, SPAWN_TIMEOUT);
 
+  it('T-286: a trimmer pipeline with no $? read takes the same fast path: nothing heavy, one pending line, no store', async () => {
+    const { r, heavy, dbPath } = await spied('git log --oneline | tail -5');
+    expect(r.status).toBe(0);
+    expect(r.stdout).toBe('');
+    expect(heavy).toEqual({ native: false, bsqlite: false, zod: false, dbV2: false, policy: false });
+    expect(readLines(pendingFile(dbPath))).toHaveLength(1);
+    expect(fs.existsSync(dbPath)).toBe(false);
+  }, SPAWN_TIMEOUT);
+
   it('N1b: from the hook entry on, every specifier resolves to a node: builtin or one of the four fast-path modules', async () => {
     const { r, resolved } = await spied('git status --porcelain');
     expect(r.status).toBe(0);
