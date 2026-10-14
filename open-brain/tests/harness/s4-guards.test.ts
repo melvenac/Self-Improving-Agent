@@ -59,7 +59,6 @@ const countTests = (text: string): number => (text.match(/^\s*(?:it|test)(?:\.ea
  */
 export interface TestLossAllowance { file: string; before: number; after: number; reason: string }
 export const ALLOWED_TEST_LOSSES: readonly TestLossAllowance[] = [
-  { file: "open-brain/tests/cli-flags.test.ts", before: 19, after: 18, reason: "T-215 / R-011: backfill-success-rate.mjs deleted; maturity-ordering test proved nothing" },
   { file: "open-brain/tests/ranking.test.ts", before: 11, after: 9, reason: "T-215 / R-011: backfill-success-rate.mjs deleted; maturity-ordering test proved nothing. T-152 / R-011 (atlas-sia ruling, session 160): success-rate tie row deleted, its successRate was never stored" },
 ];
 
@@ -206,7 +205,12 @@ describe("slice four guards", { timeout: 120_000 }, () => {
   });
 
   it("S4-9.2b the allowance table: the allowed pair passes, a third loss fails, a stale or filename-only entry fails", () => {
-    const table = ALLOWED_TEST_LOSSES;
+    // A fixture, not the live table: this row tests testCountFindings, and the live table shrinks as losses are
+    // restored (T-172 restored cli-flags.test.ts to its base count).
+    const table: readonly TestLossAllowance[] = [
+      { file: "open-brain/tests/fixture-a.test.ts", before: 19, after: 18, reason: "fixture" },
+      { file: "open-brain/tests/fixture-b.test.ts", before: 11, after: 9, reason: "fixture" },
+    ];
     const [x, y] = table;
     const pair = [{ file: x.file, before: x.before, after: x.after }, { file: y.file, before: y.before, after: y.after }];
     expect(testCountFindings(pair, table)).toEqual([]);
