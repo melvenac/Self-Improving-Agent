@@ -9,6 +9,8 @@
  *   concurrency, read-modify-write). Mismatch refuses, naming both values.
  * - Every op validates its own arguments and refuses an unknown id. One
  *   failing op fails the batch; nothing is written.
+ * - A refused op's message lists every issue of it, and of up to four later invalid ops, each with its expected
+ *   shape from op-shape.ts (T-271). A semantic refusal (an unknown id) still names its one op.
  * - The result must pass `StateSchema` before it is written.
  * - Retention: done tasks older than DONE_RETENTION_SESSIONS are dropped on
  *   every write (git is the history). Verified / gaps / decisions are not
@@ -41,6 +43,7 @@ import {
 } from "./state-schema.js";
 import { readJson } from "./fs-utils.js";
 import { handoffCapViolations } from "./handoff-caps.js";
+import { describeShape } from "./op-shape.js";
 import {
   renderInbox,
   renderTaskFile,
@@ -115,6 +118,87 @@ const RETIRED_FIELDS: Record<string, Record<string, string>> = {
   update_task: { note: "`note` is retired on update_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)" },
   close_task: { note: "`note` is retired on close_task (T-171): it replaced the whole note silently. Use append_note to add to the note, or replace_note to replace it (reported, and refused on another session's text unless replace_other_sessions: true)" },
 };
+
+/** The most zod issues one invalid op lists, and the most invalid ops one refusal describes (T-271). */
+export const ISSUES_SHOWN_MAX = 8;
+export const OPS_SHOWN_MAX = 5;
+
+let opShapeCache: Map<string, string> | null = null;
+/** Every op name and its expected shape, in OpSchema order, derived on first use (T-271). */
+function opShapes(): Map<string, string> {
+  if (opShapeCache === null) {
+    const m = new Map<string, string>();
+    for (const option of OpSchema.options) {
+      const name = [...option.shape.op.values][0] as string;
+      let line: string;
+      try {
+        line = describeShape(option);
+      } catch (err) {
+        line = `(shape unavailable: ${err instanceof Error ? err.message : String(err)})`;
+      }
+      m.set(name, line);
+    }
+    opShapeCache = m;
+  }
+  return opShapeCache;
+}
+
+/** T-271: an op's expected shape, derived from OpSchema; null for a name OpSchema does not have. */
+export function opShape(name: string): string | null {
+  return opShapes().get(name) ?? null;
+}
+
+/** T-271: the op names OpSchema accepts, in its order. */
+export function opNames(): string[] {
+  return [...opShapes().keys()];
+}
+
+const issuePath = (path: readonly PropertyKey[]): string => (path.length ? path.map(String).join(".") : "$");
+
+function issuesLine(i: number, name: string, issues: ReadonlyArray<{ path: PropertyKey[]; message: string }>): string {
+  const shown = issues.slice(0, ISSUES_SHOWN_MAX).map((is) => `${issuePath(is.path)}: ${is.message}`);
+  const more = issues.length - shown.length;
+  return `  ops[${i}] ${name}: ${issues.length} ${issues.length === 1 ? "issue" : "issues"}: ${shown.join("; ")}${more > 0 ? `; and ${more} more` : ""}`;
+}
+
+function expectsLine(i: number, name: string): string {
+  const shape = opShape(name);
+  return shape === null ? `  ops[${i}] op must be one of: ${opNames().join(", ")}` : `  ops[${i}] ${name} expects: ${shape}`;
+}
+
+type OpCheck = { ok: true; data: StateOp } | { ok: false; head: string; lines: string[] };
+
+/**
+ * T-271: one op's pre-apply checks, in their existing order: a retired op, a retired field, then the schema.
+ * `head` is the refusal's first line exactly as it was before T-271. `lines` add every issue and the op's shape.
+ */
+function checkOp(raw: unknown, i: number): OpCheck {
+  const opName = (raw as { op?: unknown } | null)?.op;
+  const name = typeof opName === "string" ? opName : "?";
+  if (typeof opName === "string" && opName in RETIRED_OPS) {
+    return { ok: false, head: `ops[${i}] (${opName}): ${RETIRED_OPS[opName]}`, lines: [] };
+  }
+  if (typeof opName === "string" && opName in RETIRED_FIELDS) {
+    const present = Object.keys(RETIRED_FIELDS[opName]).filter((f) => f in (raw as object));
+    if (present.length > 0) {
+      const rest = Object.fromEntries(Object.entries(raw as object).filter(([k]) => !present.includes(k)));
+      const r = OpSchema.safeParse(rest);
+      return {
+        ok: false,
+        head: `ops[${i}] (${opName}): ${RETIRED_FIELDS[opName][present[0]]}`,
+        lines: [...(r.success ? [] : [issuesLine(i, name, r.error.issues)]), expectsLine(i, name)],
+      };
+    }
+  }
+  const v = OpSchema.safeParse(raw);
+  if (v.success) return { ok: true, data: v.data };
+  const first = v.error.issues[0];
+  return {
+    ok: false,
+    head: `ops[${i}] invalid at ${issuePath(first.path)}: ${first.message}`,
+    lines: [...(v.error.issues.length > 1 ? [issuesLine(i, name, v.error.issues)] : []), expectsLine(i, name)],
+  };
+}
 
 /**
  * Retention for the per-session arrays (handoffs, sessions): an entry is
@@ -320,24 +404,28 @@ export function applyStateOps(projectRoot: string, options: ApplyStateOptions): 
   const ctx: OpContext = { session: effectiveSession, firstRev, rev: before + 1, uuid, checkout, removedGaps, notes, noteChanges, gapScan, handoffCaps: options.handoff_caps === true };
 
   for (let i = 0; i < options.ops.length; i++) {
-    const opName = (options.ops[i] as { op?: unknown } | null)?.op;
-    if (typeof opName === "string" && opName in RETIRED_OPS) {
-      return refuse(before, `ops[${i}] (${opName}): ${RETIRED_OPS[opName]}`);
-    }
-    if (typeof opName === "string" && opName in RETIRED_FIELDS) {
-      for (const [field, why] of Object.entries(RETIRED_FIELDS[opName])) {
-        if (field in (options.ops[i] as object)) return refuse(before, `ops[${i}] (${opName}): ${why}`);
+    const c = checkOp(options.ops[i], i);
+    if (!c.ok) {
+      // T-271: every later op that fails the same checks is described too, up to OPS_SHOWN_MAX ops in all.
+      const out = [c.head, ...c.lines];
+      let described = 1;
+      let notShown = 0;
+      for (let j = i + 1; j < options.ops.length; j++) {
+        const later = checkOp(options.ops[j], j);
+        if (later.ok) continue;
+        if (described < OPS_SHOWN_MAX) {
+          out.push(`  ${later.head}`, ...later.lines);
+          described++;
+        } else {
+          notShown++;
+        }
       }
+      if (notShown > 0) out.push(`  and ${notShown} more invalid op(s) not shown`);
+      return refuse(before, out.join("\n"));
     }
-    const v = OpSchema.safeParse(options.ops[i]);
-    if (!v.success) {
-      const issue = v.error.issues[0];
-      const path = issue.path.length ? issue.path.map(String).join(".") : "$";
-      return refuse(before, `ops[${i}] invalid at ${path}: ${issue.message}`);
-    }
-    const r = applyOne(next, v.data, ctx);
-    if (!r.ok) return refuse(before, `ops[${i}] (${v.data.op}): ${r.error}`);
-    applied.push({ op: v.data.op, id: r.id });
+    const r = applyOne(next, c.data, ctx);
+    if (!r.ok) return refuse(before, `ops[${i}] (${c.data.op}): ${r.error}`);
+    applied.push({ op: c.data.op, id: r.id });
   }
 
   // Loop 4 R3: an empty batch is a re-render, not a write. The revision does
