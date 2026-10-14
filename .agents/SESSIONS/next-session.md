@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 464 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 465 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,46 +6,40 @@
 
 ### Pick up here
 
-Session 171 (Atlas), 10-13 22:2x -> 10-14 ~03:xx CDT; Aaron asleep from ~01:00 CDT ('Get as much done as you can without me'). DONE: 15 code/test PRs merged on Aaron's words (relay-check verified) or SG-1: #705 #702 #697 #707 #701 #708 #717 #704 #712 #698 #700 #676 #710 #721 #731; main rebuilt 17247b06 -> 4651ca9e -> 7b1b42a9; every merged change live-checked (each check proven to FAIL on the pre-merge build first; scripts in ~/Worktrees/s171-livechecks/). Closed: T-172 T-266 T-267 T-269 T-271 T-272 T-273 T-276 T-277 T-279 T-281 T-283 T-286 T-287 T-289. FIRST in the morning: Aaron's word for 'merge SIA #727' (T-285, head 08274ae8, planner ACCEPT; Opus ACCEPT at 2bba8db7, its F1/F2 closed in r3) and 'merge SIA #728' (T-288, head 94e53055, planner + Opus ACCEPT). pr-refresh each before its merge, ONE sia-rebuild, then `node ~/Worktrees/s171-livechecks/morning-livecheck.mjs <sha40>` (both checks proven to FAIL on 7b1b42a9). After #728 merges: send clark the T-290 launch line (brief docs/loops/t290-trigger-parser-followups-brief.md, pre-checked; its base must contain T-288).
+Session 171 (Atlas), 10-13 22:2x -> 10-14 ~13:xx CDT. DONE: 18 code/test PRs merged on Aaron's words (relay-check verified) or SG-1: #705 #702 #697 #707 #701 #708 #717 #704 #712 #698 #700 #676 #710 #721 #731 #727 #728 #738; main rebuilt 17247b06 -> 4651ca9e -> 7b1b42a9 -> 1d1a6549 -> bcd4dca0 (current); every merged change live-checked, each check proven to FAIL on the pre-merge build first (scripts in ~/Worktrees/s171-livechecks/). Closed: T-172 T-266 T-267 T-269 T-271 T-272 T-273 T-276 T-277 T-279 T-281 T-283 T-285 T-286 T-287 T-288 T-289 T-290. Nothing running, nothing READY. NEXT: T-291 (P3, tests-only, SG-1): latest-brief.test.ts afterAll rmSync ENOTEMPTY flake; brief it after checking whether handleStart leaves a git child behind, then dispatch to the QA PC via clark. Then Aaron's open questions below, and the P2/P3 backlog.
 
 ### Watch out
 
 - Desktop rule (Aaron 10-13): no npm, vitest, tsc or build on the desktop. Planner pre-checks run node + the repo's tsx on scratch copies only (scratchpad t288sim/), which fits it.
-- Simulate a brief's MUTANTS as well as its rows before dispatch (memory feedback_simulate_brief_predictions). In s171, T-276 lost three rounds and T-288/T-271 each had a wrong mutant prediction, every one caught by the builder.
+- Simulate a brief's MUTANTS as well as its rows before dispatch (memory feedback_simulate_brief_predictions). T-290 did this and landed in one round.
 - A builder reply with an EMPTY result block is not evidence (T-285 r1's M1/M2): re-run and paste before an ACCEPT.
 - T-168: cli-suite-run.ts:210 defaults the seat to cursor-builder when no --seat/SUITE_SEAT is given, so any un-flagged run takes the lease and reads the census under cursor-builder's key. Design question for Aaron; the Cursor half of the lease check is still owed.
-- Running seats need /mcp reconnect open-brain after each rebuild (main is at 7b1b42a9; this planner reconnected once, before the 4651ca9e and 7b1b42a9 rebuilds).
+- Running seats need /mcp reconnect open-brain after each rebuild (main is at bcd4dca0).
+- A records-only PR can fail CI on T-291's flake: read the failing file; if it is latest-brief.test.ts ENOTEMPTY with every test passed, rerun the failed job.
 - The repo is PUBLIC (D-090): live-check scripts, reply files and review bodies live outside it (~/Worktrees/, %TEMP%).
 
 ### Open questions
 
 - Aaron: T-194 (a)/(b)/(c); planner recommends (c) now, (b) later.
 - Aaron: T-024 may the planner rewrite knowledge entries 184 and 303 to say 'retired'? And may it ob_forget entry 685 (falsified; 693 corrects it)?
-- Aaron: T-166 proposal (on its note): a CLAUDE.md sentence above the gitnexus marker making impact() a lower bound and grep-listed callers the fallback; no build in s171 ran GitNexus.
+- Aaron: T-166 proposal (on its note): a CLAUDE.md sentence above the gitnexus marker making impact() a lower bound and grep-listed callers the fallback.
 - Aaron: T-168's default seat: resolve from the checkout, or require --seat and refuse without it?
 - Aaron: close the stale mutant and JEV-CAL-2 PRs from 10-06/10-07 (#463-#519, about 13)?
 
 ### Loop state
 
-**Open PRs:** 
-- #727 — QA: accepted — T-285 at 08274ae8: planner ACCEPT (r3), Opus ACCEPT at 2bba8db7 (F1/F2 closed in r3); waits for Aaron's word
-- #728 — QA: accepted — T-288 at 94e53055: planner + Opus ACCEPT; waits for Aaron's word; T-290 launches after it merges
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- merge SIA #727 (T-285) and merge SIA #728 (T-288): one rebuild for both
 - T-194 (a)/(b)/(c)
 - T-024 entries 184/303 rewrite; ob_forget entry 685
-- T-166 CLAUDE.md impact() proposal
-- T-168 default seat design
+- T-166 CLAUDE.md impact() lower-bound sentence
+- T-168 default seat
 - close stale PRs #463-#519
 
-**Rulings made mid-loop:** 
-- s171: Aaron 03:28:48Z 'merge SIA #705 + #702 + #701 + #697 + #708 + #707' and 04:02:07Z 'merge SIA #704 + #712 + #698 + #700 + #676 (+ #710 on its review ACCEPT)', both relay-check verified in clark's window; #710 merged only after a fresh Opus re-review ACCEPT (clark's and the planner's reading of 'its review').
-- s171: Aaron typed in Atlas's window ~01:0x CDT 'Go ahead with T287 rebuild' = #721 merge + rebuild (done, 7b1b42a9).
-- s171 planner: T-276's endSessionWindow freeze (R3) reversed in amendment-1; F3 fixture and MX6 prediction corrected in amendments 2-3.
-- s171 planner: T-277 F1/F2 -> T-287 (done); T-286 F2 -> T-288; T-288 F1/F5 -> T-290; F2-F4 recorded, not fixed.
+**Rulings made mid-loop:** _None._
 
 ## developer [sia-builder] _(written session 156)_
 
