@@ -113,4 +113,29 @@ describe("T-272: bootstrap in a seat checkout", { timeout: 60_000 }, () => {
     expect(r.verify.ok).toBe(false);
     expect(r.verify.problems).toEqual([".agents/AGENT.local.md: must stay local, but git would track it"]);
   });
+
+  it("S7: a TRACKED seat file with an edit is still an uncommitted change (only an untracked one is dropped)", () => {
+    const { wt } = seatCheckout();
+    git(wt, "add", "-f", ".agents/AGENT.local.md");
+    git(wt, "commit", "-q", "-m", "track the seat file");
+    fs.appendFileSync(path.join(wt, ".agents", "AGENT.local.md"), "edited\n");
+    expect(bs.inspectProject(wt, templateDir).git).toEqual({ kind: "root", commits: true, dirty: [" M .agents/AGENT.local.md"], empty: false });
+  });
+
+  it("S8: a DIRECTORY named AGENT.local.md is residue, and its file is an uncommitted change", () => {
+    const { wt } = seatCheckout();
+    fs.rmSync(path.join(wt, ".agents", "AGENT.local.md"));
+    fs.mkdirSync(path.join(wt, ".agents", "AGENT.local.md"));
+    fs.writeFileSync(path.join(wt, ".agents", "AGENT.local.md", "x"), "x\n");
+    const ins = bs.inspectProject(wt, templateDir);
+    expect(ins.agents).toEqual({ kind: "residue", entries: ["AGENT.local.md/"] });
+    expect(ins.git).toEqual({ kind: "root", commits: true, dirty: ["?? .agents/AGENT.local.md/x"], empty: false });
+  });
+
+  it("S9: an untracked AGENT.local.md outside .agents/ is still an uncommitted change", () => {
+    const { wt } = seatCheckout();
+    fs.mkdirSync(path.join(wt, "notes"));
+    fs.writeFileSync(path.join(wt, "notes", "AGENT.local.md"), "x\n");
+    expect(bs.inspectProject(wt, templateDir).git).toEqual({ kind: "root", commits: true, dirty: ["?? notes/AGENT.local.md"], empty: false });
+  });
 });
