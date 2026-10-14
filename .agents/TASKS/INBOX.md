@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 456 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 459 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -43,6 +43,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-284** A commit-msg hook appends the Claude-Session trailer from the session's own id, so attribution never depends on the agent writing it
 - [~] **T-285** ob_store_chunk's plain INSERT raises a raw UNIQUE error when its key already exists
 - [~] **T-288** Recall trigger parser gaps from T-286's Opus review: a trailing | continues the line, a { ... } group is transparent like ( ... ), and bash/sh -c '...' is a script like ssh
+- [ ] **T-290** Trigger parser follow-ups from T-288's Opus review: backslash-newline after |, a redirected } group close, split shell flags before -c, $(sh -c ...), ksh
 
 ## Done (last 3 sessions)
 
