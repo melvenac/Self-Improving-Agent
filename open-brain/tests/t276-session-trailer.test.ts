@@ -66,6 +66,16 @@ function lateBridge(dir: string): string {
   return p;
 }
 
+/** T-276 r3: a late bridge whose FIRST record is short, as a real transcript's is, so the head still holds the session start. */
+function lateBridgeShortHead(dir: string): string {
+  const p = join(dir, "late-bridge-short-head.jsonl");
+  writeFileSync(
+    p,
+    `{"timestamp":"${START}","sessionId":"${U}"}\n{"type":"user","pad":"${"x".repeat(300000)}"}\n{"type":"bridge-session","bridgeSessionId":"cse_${ME}"}\n`,
+  );
+  return p;
+}
+
 function hook(dir: string, payload: Record<string, unknown>): string {
   const r = spawnSync(process.execPath, [tsxCli, hookEntry], {
     cwd: dir,
@@ -215,6 +225,32 @@ describe("T-276: session trailer ids", { timeout: 180_000 }, () => {
     expect(body).toContain("(UNATTRIBUTED, not counted)");
     expect(body).not.toContain("no Remote Control id");
   });
+
+  it("F3 (r2): a late-bridge Remote Control session's ob_end UNATTRIBUTED line has no note, as the hook says", async () => {
+    initOldLayoutRepo(dir);
+    proveSessionWithTranscript(dir, lateBridgeShortHead(dir));
+    commitAt(dir, DURING, "src/a.ts", "url trailer", ME_TRAILER);
+    commitAt(dir, DURING, "src/b.ts", "no trailer", null);
+    touchNextSession(dir, DURING);
+    const body = text(await handleEnd({ project_root: dir, session_id: U, dry_run: true }));
+    expect(body).toContain("1 commit(s) in the window carry no Claude-Session trailer (UNATTRIBUTED, not counted)");
+    expect(body).not.toContain("no Remote Control id");
+  });
+
+  it("E3 (r2): work after ob_end with no trailer in a Remote Control session is UNATTRIBUTED with no note", async () => {
+    initOldLayoutRepo(dir);
+    const tr = rc(dir);
+    proveSessionWithTranscript(dir, tr);
+    touchNextSession(dir, DURING);
+    const abs = resolve(dir);
+    await handleEnd({ project_root: abs, session_id: U, dry_run: false, session_summary: "s" });
+    const stampAt = readObEndStamp(abs)?.ob_end_at;
+    expect(stampAt).toBeTruthy();
+    commitAt(dir, new Date(Date.parse(stampAt!) + 2000).toISOString(), "src/after.ts", "after ob_end", null);
+    const out = hook(dir, { session_id: U, transcript_path: tr });
+    expect(out).toContain("[session-end] work-after-end check: no attributed commits after ob_end; 1 commit(s) after ob_end carry no Claude-Session trailer (UNATTRIBUTED)");
+    expect(out).not.toContain("no Remote Control id");
+  });
 });
 
 describe("C2: renderStartReport prints COMMIT TRAILER in the header, not the Briefing", { timeout: 120_000 }, () => {
@@ -270,5 +306,20 @@ describe("C2: renderStartReport prints COMMIT TRAILER in the header, not the Bri
       callerLabel: "T276",
     } as Parameters<typeof sr.renderStartReport>[0]);
     expect(withRc.text).not.toContain("COMMIT TRAILER");
+  });
+
+  it("C3 (r2): the log-skipped branch (no .agents/SESSIONS/) also prints COMMIT TRAILER right after Session ID", async () => {
+    const tmpDir = tmp("t276-tx-");
+    const dir = fixture();
+    rmSync(join(dir, ".agents", "SESSIONS"), { recursive: true, force: true });
+    const r = await sr.renderStartReport({
+      projectRoot: dir,
+      proven: { id: U, pid: 4242, transcriptPath: nonRc(tmpDir) },
+      callerLabel: "T276",
+    } as Parameters<typeof sr.renderStartReport>[0]);
+    const { header } = split(r.text);
+    const at = header.findIndex((l) => l.startsWith("Session ID:"));
+    expect(at).toBeGreaterThan(-1);
+    expect(header[at + 1]).toBe(COMMIT_TRAILER_LINE);
   });
 });
