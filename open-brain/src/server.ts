@@ -29,6 +29,8 @@ import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger, type RecallPurpose } from "./db-v2.js";
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
+import { formatReconcileLine, reconcilePendingFires } from "./trigger/fires.js";
+import { pendingFiresPath } from "./trigger/pending-fires.js";
 import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
@@ -425,6 +427,19 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     }
     const v2db = getV2Db();
 
+    // T-159: a Cursor seat has no SessionEnd hook, so its not-asked trigger
+    // fires are reconciled here. A failure is one line, never a failed ob_end.
+    let fireLine: string;
+    if (args.dry_run) {
+      fireLine = "trigger fires: not reconciled (dry run)";
+    } else {
+      try {
+        fireLine = formatReconcileLine(reconcilePendingFires(v2db, pendingFiresPath(V2_DB_PATH)));
+      } catch (err) {
+        fireLine = `trigger fires NOT RECONCILED: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`;
+      }
+    }
+
     // recall_log is authoritative when the session is known; the file is only
     // consulted when it names this same session. See resolveRecalledIds.
     // No named id means the proven one. end.md calls ob_end that way, and a
@@ -488,7 +503,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
     return {
       content: [{
         type: "text",
-        text: `${head}Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged (${result.invocations.skippedSessions} already logged, ${result.invocations.unreadableSessions} unreadable, ${result.invocations.appendFailures} append failed)\n${shadowLine}\n\n${shadowReport}`,
+        text: `${head}Session End:\n  Summary: ${result.summary.written ? "written" : "skipped"}${result.summary.selfGenerated ? " (self-generated)" : ""}\n${originLine}\n  Feedback: ${result.feedback.processed} entries rated\n  Invocations: ${result.invocations.logged} logged (${result.invocations.skippedSessions} already logged, ${result.invocations.unreadableSessions} unreadable, ${result.invocations.appendFailures} append failed)\n  ${fireLine}\n${shadowLine}\n\n${shadowReport}`,
       }],
     };
   } catch (err) {
