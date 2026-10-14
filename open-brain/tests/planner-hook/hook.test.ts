@@ -75,7 +75,8 @@ describe("PH-1 — artifact writes denied", () => {
     const r = runPlannerHook(payload(tool, input));
     expect(r.decision).toBe("deny");
     expect(r.reason).toContain('planner.md, "Authority"');
-    expect(r.reason).toContain(input.file_path ?? input.notebook_path);
+    const target = input as { file_path?: string; notebook_path?: string };
+    expect(r.reason).toContain(target.file_path ?? target.notebook_path);
   });
 });
 
