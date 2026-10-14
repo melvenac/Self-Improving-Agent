@@ -8,7 +8,7 @@
  * now refuses for one of THOSE reasons is "superseded by r7" and is counted and listed, not hidden.
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { makeFixture, type Fixture } from "./r5-fixture.js";
@@ -25,7 +25,10 @@ interface Row {
   construct: string | null;
 }
 
-const ROWS: Row[] = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../../../docs/loops/t194-r7/qa241-rows.json"), "utf8"));
+// The rows file stays on loop/t194-planner-hook with the rest of docs/loops/t194-r7/ (T-194 ship brief); without it the two
+// row suites skip, and the redirect probes below (written out in this file) still run.
+const ROWS_PATH = join(dirname(fileURLToPath(import.meta.url)), "../../../docs/loops/t194-r7/qa241-rows.json");
+const ROWS: Row[] = existsSync(ROWS_PATH) ? JSON.parse(readFileSync(ROWS_PATH, "utf8")) : [];
 const R7_NARROWING = /command not allowed|non-ASCII character|git\/gh config through the environment|environment variable that changes|a path, not a bare command|node is allowed only as|curl option|rg option|ssh option|scp option/;
 
 let fx: Fixture;
@@ -47,7 +50,7 @@ async function run(row: Row): Promise<{ decision: string; reason: string; fetche
 
 const isP0 = (o: { decision: string; reason: string }): boolean => o.decision === "deny" && o.reason.includes(GATE_PREFIX);
 
-describe("QA 241: probe-r6.mjs (the targeted probes)", () => {
+describe.skipIf(ROWS.length === 0)("QA 241: probe-r6.mjs (the targeted probes)", () => {
   it("every row is decided as the property requires", async () => {
     const rows = ROWS.filter((r) => r.source === "probe-r6");
     const wrong: string[] = [];
@@ -84,7 +87,7 @@ describe("QA 241: probe-r6.mjs (the targeted probes)", () => {
   }, 120_000);
 });
 
-describe("QA 241: gen-p0.mjs (what P0 must refuse, and what must parse)", () => {
+describe.skipIf(ROWS.length === 0)("QA 241: gen-p0.mjs (what P0 must refuse, and what must parse)", () => {
   it("every REFUSED case is refused with `not statically parseable` and names its construct", async () => {
     const rows = ROWS.filter((r) => r.source === "gen-p0" && r.kind === "refused");
     const wrong: string[] = [];
