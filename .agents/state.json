@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 453,
+  "revision": 456,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2220,7 +2220,7 @@
       "opened_session": 170,
       "closed_session": null,
       "supersedes": null,
-      "note": "s170, from the T-266 research fork: open-brain/src/server.ts:1452-1457 at 7bdf2483 inserts into knowledge_index with no ON CONFLICT, so a chunk stored under an existing key fails with SQLite's raw UNIQUE constraint message instead of a clear refusal like T-266's. Out of T-266's scope by ruling. — s171: brief docs/loops/t285-chunk-key-refusal-brief.md (#725); LAUNCHED by clark on the QA PC (Opus, base fc1fd551); reply ~/Worktrees/t285-reply.md. Ends READY + PR; the merge waits for Aaron's word.",
+      "note": "s170, from the T-266 research fork: open-brain/src/server.ts:1452-1457 at 7bdf2483 inserts into knowledge_index with no ON CONFLICT, so a chunk stored under an existing key fails with SQLite's raw UNIQUE constraint message instead of a clear refusal like T-266's. Out of T-266's scope by ruling. — s171: brief docs/loops/t285-chunk-key-refusal-brief.md (#725); LAUNCHED by clark on the QA PC (Opus, base fc1fd551); reply ~/Worktrees/t285-reply.md. Ends READY + PR; the merge waits for Aaron's word. — s171: r1 READY 2bba8db7 (#727). Planner read: src = ruling verbatim; red set K1-K3 as predicted; M3 killed (also K2/K4, since the handler's own fresh file then trips existsSync: correct). NOT YET ACCEPTED: r1's reply has EMPTY result blocks for M1 and M2, so no evidence they were killed. Amendment-1 (#732): re-run M1/M2 in the r1 clone and paste, no commit; t285-r2 to launch. — s171 planner ACCEPT at 2bba8db7 (#727): t285-r2 (no commit) pasted the mutant evidence: M1 (heldKey block deleted) -> K1, K2 red (2 failed | 2 passed); M2 (existsSync dropped) -> K3 red (1 failed | 3 passed); M3 earlier killed all four. Opus second review requested (body %TEMP%/t285-opus-review-body.md; reply ~/Worktrees/t285-review-reply.md). The merge needs Aaron's word. — s171: Opus second review VERDICT ACCEPT at 2bba8db7 (~/Worktrees/t285-review-reply.md): F1 the heldPath query is exact while vault_path carries case/slash variants (T-266 normalises); F2 no row pins the 'indexed as entry N' arm. Planner closes both before the merge ask: amendment-2 (#733): one normalised query + rows K5/K6, in the r1 clone; pre-checked (both keys slugify to foo-bar-<tag>; a variant misses on an exact match and hits once normalised). t285-r3 launch line sent.",
       "note_by": [
         "0a40685b-edbc-4c79-be9f-dcd4963428e7",
         "13042431-247e-4dad-9477-507e43fc7916"
@@ -2264,7 +2264,7 @@
       "opened_session": 171,
       "closed_session": null,
       "supersedes": null,
-      "note": "s171, from the T-286 Opus second review at 5f1c5412. After T-286, these literal $? mistakes derive NO query (before, a sub-floor \"tail\"): (1) `npm test 2>&1 |\\n  tail -5\\necho $?`: splitStatements flushes on a newline after a dangling | (query.ts:115); (2) `{ cmd | tail -5; }; echo $?`: the } is its own statement (query.ts:115,:133); (3) `bash -c 'cmd | tail -5; echo $?'` (also wsl bash -c, docker exec sh -c): only ssh's quoted argument is a script (query.ts:95). Also `cmd | tail -5 && echo ok` and `if cmd | tail -5; then` mask the status with no $? text (outside T-264's class). Fix in docs/loops/t264/measure.mjs too, or the miss stays invisible to a re-measure. Do after T-286 (#712) merges. — s171: brief docs/loops/t288-trigger-parser-gaps-brief.md (#725); planner pre-checked the U/S table against a patched scratch copy of query.ts (base: U1-U8 read safe; patched: every row as predicted). LAUNCHED by clark on the QA PC (Opus, base fc1fd551); reply ~/Worktrees/t288-reply.md. Ends READY + PR; the merge waits for Aaron's word.",
+      "note": "s171, from the T-286 Opus second review at 5f1c5412. After T-286, these literal $? mistakes derive NO query (before, a sub-floor \"tail\"): (1) `npm test 2>&1 |\\n  tail -5\\necho $?`: splitStatements flushes on a newline after a dangling | (query.ts:115); (2) `{ cmd | tail -5; }; echo $?`: the } is its own statement (query.ts:115,:133); (3) `bash -c 'cmd | tail -5; echo $?'` (also wsl bash -c, docker exec sh -c): only ssh's quoted argument is a script (query.ts:95). Also `cmd | tail -5 && echo ok` and `if cmd | tail -5; then` mask the status with no $? text (outside T-264's class). Fix in docs/loops/t264/measure.mjs too, or the miss stays invisible to a re-measure. Do after T-286 (#712) merges. — s171: brief docs/loops/t288-trigger-parser-gaps-brief.md (#725); planner pre-checked the U/S table against a patched scratch copy of query.ts (base: U1-U8 read safe; patched: every row as predicted). LAUNCHED by clark on the QA PC (Opus, base fc1fd551); reply ~/Worktrees/t288-reply.md. Ends READY + PR; the merge waits for Aaron's word. — s171: r1 READY b4ffeb57 (#728). Planner read: src = rulings 1-3 verbatim; U1-U8 red then green; M1-M3 killed; 133/133 on the wider list. The brief's M4 prediction was wrong: M4 (INNER_SHELL_C unanchored) survived; the builder's probe `bash -c 'true' 'npm test | tail -5; echo $?'` (second arg is $0) kills it; planner re-checked against a patched copy (fixed: safe, query ''; M4: unsafe). M5 ruled equivalent (builder's reasoning). Amendment-1 (#732): row S8 as a 3rd commit in the r1 clone, then push; t288-r2 to launch. Planner lesson: simulate the MUTANTS too, not only the rows. — s171 planner ACCEPT at 94e53055 (#728): r2 added exactly row S8; M4 now turns S8 red alone; 16/16; CI pass. Opus second review RUNNING (body %TEMP%/t288-opus-review-body.md; reply ~/Worktrees/t288-review-reply.md). The merge needs Aaron's word.",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
@@ -2274,15 +2274,15 @@
       "id": "T-289",
       "title": "npm run test:heavy leaves suite-run-meta.json (and suite-vitest.json) untracked in open-brain/: ignore both",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 171,
-      "closed_session": null,
+      "closed_session": 171,
       "supersedes": null,
-      "note": "s171, from the QA PC verification (qapc-verify at fc1fd551): a SUITE_DRY_RUN=1 run in a clean clone left `?? open-brain/suite-run-meta.json`; git check-ignore matches neither it nor T-283's suite-vitest.json. Brief docs/loops/t289-suite-outputs-ignored-brief.md (#729): two .gitignore lines plus a 3-row test (config + test, SG-1). Planner pre-check: base check-ignore exits 1 for both; with the two lines as an excludes file, 0 for both and 1 for package.json.",
+      "note": "s171, from the QA PC verification (qapc-verify at fc1fd551): a SUITE_DRY_RUN=1 run in a clean clone left `?? open-brain/suite-run-meta.json`; git check-ignore matches neither it nor T-283's suite-vitest.json. Brief docs/loops/t289-suite-outputs-ignored-brief.md (#729): two .gitignore lines plus a 3-row test (config + test, SG-1). Planner pre-check: base check-ignore exits 1 for both; with the two lines as an excludes file, 0 for both and 1 for package.json. — Closed s171: #731 merged under SG-1 as 8d24296a (clark; trees equal; refreshed head 0b56be0c, patch-id unchanged from the reviewed 297b62a1). Planner ACCEPT: diff = ruling verbatim; two rows red then green; mutant killed; CI pass. Live check against master's .gitignore (as an excludes file): suite-run-meta.json -> ignored (0), suite-vitest.json -> ignored (0), package.json -> not (1).",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
-      "closed_rev": null
+      "closed_rev": 456
     }
   ],
   "verified": [
