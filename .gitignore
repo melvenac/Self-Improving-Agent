@@ -105,3 +105,6 @@ open-brain/build/
 # word. docs/HOH-JEV.md is the binding guide and names where it diverges from this file (its
 # section 6); this file is kept so the divergences can be checked against their source.
 !/docs/hoh_jev.md
+# T-289: written into open-brain/ by `npm run test:heavy` (cli-suite-run.ts, suite-vitest.ts); run outputs, never tracked.
+/open-brain/suite-run-meta.json
+/open-brain/suite-vitest.json
