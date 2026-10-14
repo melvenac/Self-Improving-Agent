@@ -19,7 +19,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { agentsFromPresenceBody, decideSuiteStart, readCensus, resolveSeatKeyPath, type CensusResult } from "./suite-census.js";
+import { agentsFromPresenceBody, decideSuiteStart, isBusySeat, readCensus, resolveSeatKeyPath, type CensusResult } from "./suite-census.js";
 import { buildSuiteMeta, leaseStatusFromExit, vitestCountsFromJson } from "./suite-run-meta.js";
 import {
   ownerFromFlag,
@@ -197,7 +197,7 @@ async function censusFromEnv(hubUrl: string, keyPath: string | undefined): Promi
       };
     }
     const busySia = agents
-      .filter((a) => a.seatState === "working")
+      .filter((a) => isBusySeat(a))
       .map((a) => a.name)
       .filter((name) => SIA_SEATS.includes(name) || name.endsWith("-waker"));
     return { source: "hub-presence", timestamp: stamped, available: true, reason: null, agents, busySia: [...new Set(busySia)], samples: 2 };

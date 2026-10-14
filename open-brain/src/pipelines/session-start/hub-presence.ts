@@ -35,6 +35,8 @@ export interface PresenceRoom {
 
 export interface PresenceSeatRow {
   seatState?: string;
+  /** A2A-Hub presence.ts:22 (v1.22.13). Printed only with seatState "alarm" (T-269). */
+  alarmReason?: string;
 }
 
 export interface PresenceAgent {
@@ -162,7 +164,7 @@ function formatHubListenerLine(partner: HubPartnerSeat, agent: PresenceAgent): s
 
 function formatWakerSeatLine(partner: HubPartnerSeat, agent: PresenceAgent | undefined): string {
   if (!agent) return `${partner.label}: absent`;
-  return `${partner.label}: ${formatHubSeatState(agent.seat?.seatState)}`;
+  return `${partner.label}: ${formatHubSeatState(agent.seat?.seatState, agent.seat?.alarmReason)}`;
 }
 
 export function formatPartnerLine(
@@ -182,7 +184,7 @@ export function formatPartnerLine(
 export function liveStateForHubAgent(runtime: HubRuntime | undefined, agent: PresenceAgent | undefined): string | null {
   if (runtime === "missing") return RUNTIME_MISSING_IN_SEAT_MAP;
   if (!agent) return "absent";
-  if (runtime === "cursor") return formatHubSeatState(agent.seat?.seatState);
+  if (runtime === "cursor") return formatHubSeatState(agent.seat?.seatState, agent.seat?.alarmReason);
   const rooms = agent.rooms ?? [];
   if (!rooms.length) return "hub listener:absent";
   if (rooms.some((r) => r.pollingNow)) return "hub listener:polling";
