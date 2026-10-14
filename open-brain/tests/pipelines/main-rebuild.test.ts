@@ -709,7 +709,14 @@ describe("F1: the tracked manifests are put back after every install", () => {
     git(f.main, "checkout", "-q", "--detach", f.c1);
     setBuild(f.main, f.c1);
     const fk = fakes(f.main, { lockRewrite: true, installExit: 1 });
-    const r = await mr.mainRebuild(f.main, { positionals: [f.c3], noFetch: true, proofDir: f.proofDir }, fk.deps);
+    let putBacks = 0;
+    const r = await mr.mainRebuild(f.main, { positionals: [f.c3], noFetch: true, proofDir: f.proofDir }, {
+      ...fk.deps,
+      git: (args, cwd) =>
+        args[0] === "checkout" && args.includes("open-brain/package-lock.json") && ++putBacks === 1
+          ? { status: 1, stdout: "", stderr: "error: simulated put-back failure" }
+          : fk.deps.git(args, cwd),
+    });
     const t = text(r);
     expect(r.exitCode, t).toBe(3);
     expect(t).toContain("main-rebuild FAILED at npm install: npm error code ERESOLVE");
