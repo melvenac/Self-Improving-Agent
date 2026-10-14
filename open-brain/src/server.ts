@@ -605,7 +605,7 @@ server.tool(
 
 server.tool(
   "ob_state",
-  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, update_gap, close_gap, reopen_gap, add_decision (optional standing:true), set_standing, set_objective, set_handoff). Every write records this session (its registered uuid) in sessions[]; set_handoff writes THIS session's handoff and cannot touch another session's, and refuses when no session is registered. end_session is retired (schema v3, T-163). Task notes (T-171): update_task and close_task take append_note (adds) or replace_note (replaces) — never `note`, which is refused; a replace that would remove another session's text, or text with no recorded author, is refused unless the op also sets replace_other_sessions: true; every note change is printed with its sizes, dry run included. Atomic: all ops apply or none. Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
+  "Write .agents/state.json through typed operations (open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, update_gap, close_gap, reopen_gap, add_decision (optional standing:true), set_standing, set_objective, set_handoff). Every write records this session (its registered uuid) in sessions[]; set_handoff writes THIS session's handoff and cannot touch another session's, and refuses when no session is registered. end_session is retired (schema v3, T-163). Task notes (T-171): update_task and close_task take append_note (adds) or replace_note (replaces) — never `note`, which is refused; a replace that would remove another session's text, or text with no recorded author, is refused unless the op also sets replace_other_sessions: true; every note change is printed with its sizes, dry run included. Atomic: all ops apply or none. A refusal lists every invalid field of an invalid op (8 at most per op, 5 ops at most) and prints that op's expected shape, or the op names for an unknown op (T-271). Requires the file to exist and expected_revision to match; bumps revision, applies done-task retention, and regenerates INBOX.md, task.md, next-session.md and the marked region of SUMMARY.md. An empty ops array with render: true re-renders the views without touching state.json or its revision.",
   {
     project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
     session: z.number().int().min(0).describe("Current session number — stamped on opened/closed/verified items"),
@@ -889,7 +889,7 @@ server.tool(
 // --- ob_store ---
 server.tool(
   "ob_store",
-  "Store a piece of knowledge. By default stored globally. Set scope to 'project' and pass project_dir to scope it.",
+  "Store a piece of knowledge. By default stored globally. Set scope to 'project' and pass project_dir to scope it. A key is unique across every scope: a key another scope (or a chunk) already holds is refused, not moved.",
   {
     content: z.string().describe("The knowledge to store"),
     key: z.string().optional().describe("Short label for easy retrieval"),
@@ -1004,6 +1004,20 @@ export async function handleStore(args: StoreArgs): Promise<ToolResponse> {
         content: [{
           type: "text" as const,
           text: `Unchanged — state "${effectiveKey}" (id: ${same?.id ?? "?"}) already holds this value. Nothing was written.`,
+        }],
+      };
+    }
+
+    if (result.keyHeldBy) {
+      const held = result.keyHeldBy;
+      const heldScope = held.projectDir ? `project: ${held.projectDir}` : "global";
+      return {
+        content: [{
+          type: "text" as const,
+          text:
+            `Not stored — key "${effectiveKey}" already belongs to entry ${held.id} (${heldScope}) at ${held.vaultPath}. ` +
+            `A key is unique across every scope, so storing it${scopeLabel} would move that entry and orphan its note. ` +
+            `Nothing was written. Store under a different key, or use ob_forget (id: ${held.id}) first if you meant to move it.`,
         }],
       };
     }

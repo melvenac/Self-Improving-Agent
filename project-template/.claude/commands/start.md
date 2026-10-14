@@ -93,7 +93,7 @@ between seats is A2A (direct cross-session messages), which arrives on its own a
 
 **What a session start DOES need to read is the durable half, and it is in the repo:** the newest
 brief, which `ob_start` names for you on its `Latest brief: <path> (<date>)` line (the newest
-brief in `docs/loops/`, a file named `*brief.md`, `*rebrief.md` or an `-amendment-N` of either, by git commit date; do not pick one by loop number or by file name).
+brief in `docs/loops/`, or at the docs root as `docs/loop-*-brief.md`, a file named `*brief.md`, `*rebrief.md` or an `-amendment-N` of either, by git commit date; do not pick one by loop number or by file name).
 If that line is absent there is no brief to read. Read any boundary report the brief or the handoff
 names. Decisions live in `.agents/state.json` `decisions[]` and already reached you through `ob_start`.
 

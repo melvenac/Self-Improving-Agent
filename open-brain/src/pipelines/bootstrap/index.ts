@@ -1,10 +1,11 @@
 import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, copyFileSync, writeFileSync, renameSync, realpathSync, rmdirSync, rmSync, unlinkSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawnSync } from "node:child_process";
 import { isStateRecord, whyNotARecord } from "../../shared/state-record.js";
 import { STATE_IMPORT_COMMIT_OUTPUTS, DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL } from "../../shared/import-outputs.js";
+import { projectIdentityName } from "../../shared/paths.js";
 
 /**
  * `/bootstrap`'s deterministic half (docs/loops/bootstrap-fix-brief.md,
@@ -107,6 +108,13 @@ export function oldStartCommandWarning(projectRoot: string, templateDir = defaul
 /** The heading bootstrap appends to an owner's CLAUDE.md, and the one `check` looks for. */
 export const SIA_SECTION_HEADING = "## Self-Improving Agent (SIA)";
 
+/**
+ * T-272: a seat checkout's own identity file. The template gitignore's `/.agents/*` rule keeps it local, and /start
+ * reads it before AGENT.md. It is never residue and never a change for the owner to commit, so bootstrap leaves it
+ * where it is: moving it aside unseated the checkout (Prism, 10-13).
+ */
+export const SEAT_FILE = "AGENT.local.md";
+
 export function inspectProject(projectRoot: string, templateDir = defaultTemplateDir()): ProjectInspection {
   const root = resolve(projectRoot);
   const git = gitState(root);
@@ -129,7 +137,8 @@ function gitState(root: string): GitState {
     // first line's leading space (` D path` would read as `D path`).
     const porcelain = gitRaw(root, ["status", "--porcelain", "--untracked-files=all"]) ?? "";
     const dirty = porcelain.split("\n").filter(Boolean)
-      .filter((l) => !(l.startsWith("?? ") && l.slice(3).replace(/^"|"$/g, "").startsWith(".agents/archive/")));
+      .filter((l) => !(l.startsWith("?? ") && l.slice(3).replace(/^"|"$/g, "").startsWith(".agents/archive/")))
+      .filter((l) => !(l.startsWith("?? ") && l.slice(3).replace(/^"|"$/g, "") === `.agents/${SEAT_FILE}`));
     // Nothing but .agents/ to commit: an empty project, whose first commit has to be --allow-empty.
     const empty = !commits && dirty.every((l) => l.slice(3).replace(/^"|"$/g, "").startsWith(".agents/"));
     return { kind: "root", commits, dirty, empty };
@@ -171,8 +180,10 @@ function agentsState(root: string, templateDir = defaultTemplateDir()): AgentsSt
   // `archive/` is never residue: it is where things are set aside, the template
   // gitignore keeps it local, and nothing reads it as state. Counting it moved
   // an earlier residue folder INTO the next one (QA 135 D5).
+  // The seat file (SEAT_FILE) is never residue either: it is this checkout's identity, local by design (T-272).
   const entries = readdirSync(agents)
     .filter((n) => !(n === "archive" && statSync(join(agents, n)).isDirectory()))
+    .filter((n) => !(n === SEAT_FILE && statSync(join(agents, n)).isFile()))
     .map((n) => (statSync(join(agents, n)).isDirectory() ? `${n}/` : n))
     .sort();
   return entries.length === 0 ? { kind: "empty" } : { kind: "residue", entries };
@@ -555,7 +566,7 @@ export const MERGED_FILES = [
 
 /** Paths git must treat a given way once the import has run; checked with `git check-ignore`, which needs no file. */
 const FUTURE_TRACKED = [".agents/state.json", ".agents/SESSIONS/next-session.md"];
-const FUTURE_LOCAL = [".agents/SESSIONS/Session_1.md", ".agents/archive/x", DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL];
+const FUTURE_LOCAL = [".agents/SESSIONS/Session_1.md", ".agents/archive/x", `.agents/${SEAT_FILE}`, DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL];
 
 export interface ScaffoldResult {
   root: string;
@@ -591,7 +602,7 @@ export function scaffold(projectRoot: string, templateDir = defaultTemplateDir()
     if (existsSync(dest)) { skipped.push({ path: f.path, reason: "already exists — never overwritten" }); continue; }
     mkdirSync(dirname(dest), { recursive: true });
     if (f.from === null) {
-      writeFileSync(dest, agentMd(basename(root)), "utf8");
+      writeFileSync(dest, agentMd(projectIdentityName(root)), "utf8");
       written.push({ path: f.path, tracked: f.tracked, action: "generated", from: null, why: f.why });
     } else {
       copyFileSync(join(templateDir, f.from), dest);
