@@ -265,7 +265,7 @@ describe("slice four guards", { timeout: 120_000 }, () => {
     expect(testCountFindings(rows, ALLOWED_TEST_LOSSES)).toEqual([]);
   });
 
-  it("S4-9.2b a platform-skip allowance matches one added line exactly, and an unused one is stale", () => {
+  it("S4-9.2c a platform-skip allowance matches one added line exactly, and an unused one is stale", () => {
     const gate = `  it.${"sk"}${"ipIf"}(process.platform !== "win32")("w", () => {`;
     const allow = [{ line: gate.trim(), reason: "row" }];
     expect(skipFindings([gate], allow)).toEqual([]);
