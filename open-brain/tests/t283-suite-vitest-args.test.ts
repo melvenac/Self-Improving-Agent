@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { delimiter, join } from "node:path";
 import { SUITE_VITEST_REPORT, suiteVitestArgs } from "../src/suite-vitest.js";
 
 describe("T-283 the vitest arguments carry no path", () => {
@@ -25,16 +25,23 @@ describe("T-283 the vitest arguments carry no path", () => {
     expect(src).not.toContain('"--outputFile", jsonOut');
   });
 
-  it.skipIf(process.platform !== "win32")("P4: under shell:true from a cwd with a space, the arguments arrive intact", () => {
+  it("P4 (the mechanism, on every platform): under shell:true from a cwd with a space, the arguments arrive intact", () => {
     const root = mkdtempSync(join(tmpdir(), "t283-"));
     const cwd = join(root, "dir with space");
     mkdirSync(cwd);
     writeFileSync(join(root, "argv.cjs"), "console.log(JSON.stringify(process.argv.slice(2)));\n");
     mkdirSync(join(root, "bin"));
-    writeFileSync(join(root, "bin", "npx.cmd"), `@"${process.execPath}" "${join(root, "argv.cjs")}" %*\r\n`);
+    const win = process.platform === "win32";
+    if (win) {
+      writeFileSync(join(root, "bin", "npx.cmd"), `@"${process.execPath}" "${join(root, "argv.cjs")}" %*\r\n`);
+    } else {
+      const npx = join(root, "bin", "npx");
+      writeFileSync(npx, `#!/bin/sh\nexec "${process.execPath}" "${join(root, "argv.cjs")}" "$@"\n`);
+      chmodSync(npx, 0o755);
+    }
     const env: NodeJS.ProcessEnv = { ...process.env };
     const pathKey = Object.keys(env).find((k) => k.toUpperCase() === "PATH") ?? "Path";
-    env[pathKey] = join(root, "bin") + ";" + (env[pathKey] ?? "");
+    env[pathKey] = join(root, "bin") + delimiter + (env[pathKey] ?? "");
 
     const r = spawnSync("npx", suiteVitestArgs(), { encoding: "utf8", shell: true, cwd, env });
     expect(JSON.parse(r.stdout.trim())).toEqual(suiteVitestArgs());
