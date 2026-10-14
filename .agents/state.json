@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 460,
+  "revision": 461,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2288,11 +2288,11 @@
       "id": "T-290",
       "title": "Trigger parser follow-ups from T-288's Opus review: backslash-newline after |, a redirected } group close, split shell flags before -c, $(sh -c ...), ksh",
       "priority": "P3",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 171,
       "closed_session": null,
       "supersedes": null,
-      "note": "s171. Brief docs/loops/t290-trigger-parser-followups-brief.md (#735). LAUNCH ONLY AFTER #728 (T-288) MERGES: its base must contain T-288. Planner pre-check on scratch copies (T-288's 94e53055 + these rulings, via the repo's tsx): U9-U15 safe at T-288 and unsafe with the rulings; S9-S12 and T-288's U1-U8/S1-S8 keep their verdicts; mutants M1-M5 each flip exactly their own rows. Out of scope (on T-288's note): F2-F4 rare false positives and the double-quoted bash -c \"... \\$?\" form.",
+      "note": "s171. Brief docs/loops/t290-trigger-parser-followups-brief.md (#735). LAUNCH ONLY AFTER #728 (T-288) MERGES: its base must contain T-288. Planner pre-check on scratch copies (T-288's 94e53055 + these rulings, via the repo's tsx): U9-U15 safe at T-288 and unsafe with the rulings; S9-S12 and T-288's U1-U8/S1-S8 keep their verdicts; mutants M1-M5 each flip exactly their own rows. Out of scope (on T-288's note): F2-F4 rare false positives and the double-quoted bash -c \"... \\$?\" form. — s171: LAUNCHED by clark on the QA PC (claude -p Opus, base 1d1a6549 which contains T-288's merge; brief embedded). Reply path C:/Users/melve/Worktrees/t290-reply.md on the QA PC, copied back to the desktop by clark. Ends READY with a PR; needs a planner review plus Aaron's word naming the PR.",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
