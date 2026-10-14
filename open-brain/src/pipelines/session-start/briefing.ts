@@ -50,14 +50,16 @@ export interface BriefingInput {
    * T-199, OPT-IN per repo (greeting.json `missing_handoff`), default OFF. The one-line notice that this checkout's last session
    * wrote the record and left no handoff, or that the check could not run. Null or absent prints nothing, so every other render is
    * byte-identical. The legacy layout prints it as its own line after the pick-up; the budgeted layout has no spare line (it is
-   * exactly at its cap), so it is APPENDED to the pick-up line, which is never cut after the append.
+   * exactly at its cap, and T-281 keeps it there), so it is APPENDED to the pick-up line, which is never cut after the append.
    */
   missingHandoff?: string | null;
   /** IMPORT-CMDS C4: valid record but project `.claude/commands/start.md` is not SIA's copy. */
   oldStartCommand?: string | null;
   /**
-   * T-161: describeTranscript()'s line, when the proven session has no transcript on disk. Printed on its own line after the
-   * serving line and oldStartCommand, in both layouts. Null or absent prints nothing, so every other render is byte-identical.
+   * T-161: describeTranscript()'s line, when the proven session has no transcript on disk. The legacy layout prints it on its own
+   * line after the serving line and oldStartCommand. The budgeted layout has no spare line and too few spare chars for it, so it
+   * appends TRANSCRIPT_BUDGET_NOTE to the session line instead (T-281); the full line stays in the start report's header, under
+   * `Session ID:`. Null or absent prints nothing, so every other render is byte-identical.
    */
   transcript?: string | null;
   /**
@@ -199,6 +201,12 @@ export function renderBriefing(i: BriefingInput): string[] {
  */
 export const BRIEFING_BUDGET = { lines: 31, chars: 4400 } as const;
 
+/**
+ * T-281: what the budgeted layout prints for T-161's NO TRANSCRIPT line, appended to the session line. The full line, with the
+ * session id, the path and the advice, is in the start report's header under `Session ID:`.
+ */
+export const TRANSCRIPT_BUDGET_NOTE = "NO TRANSCRIPT (T-161): /end cannot see this session";
+
 /** Per-section caps. Each section ends with `+N more: <pointer>` when it cuts, never silently. */
 const CAPS = { objective: 400, next: 2, watch: HANDOFF_CAPS.watchOuts, watchChars: HANDOFF_CAPS.watchOutChars, waiting: 2, open: 2, question: 160, drift: 160, blocked: 3 } as const;
 /** Budgeted layout only: one `STANDING RULES (N): id id …` line; whole ids drop before `+K more`. */
@@ -228,14 +236,15 @@ function renderBudgeted(i: BriefingInput): string[] {
   const s = i.state;
   const out: string[] = [BRIEFING_START, i.serving];
   if (i.oldStartCommand) out.push(i.oldStartCommand);
-  if (i.transcript) out.push(i.transcript);
   out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
   const drift =
     i.drift.length === 0
       ? "Drift: none"
       : cut(`Drift detected (${i.drift.length}): ${i.drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`).join("; ")}`, CAPS.drift);
-  out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision} · ${drift}`);
+  const sessionLine = `${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision} · ${drift}`;
+  // T-281: T-161's line rides the session line as a fixed note, so an alarm state costs no line and stays inside the char cap.
+  out.push(i.transcript ? `${sessionLine} · ${TRANSCRIPT_BUDGET_NOTE}` : sessionLine);
 
   if (i.problem) out.push(i.problem);
   out.push("OBJECTIVE", s.objective ? `${cut(s.objective.text, CAPS.objective)} (since session ${s.objective.since_session})` : "none");
