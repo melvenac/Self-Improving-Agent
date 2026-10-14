@@ -4,8 +4,13 @@
  *
  * This is the whole decision in one function so that the hook entry point has
  * no judgement of its own — the entry point reads stdin, calls this, prints.
- * The three states of R16 are produced here and nowhere else, so there is one
- * place where "was the store asked" is answered.
+ *
+ * T-159: the hook no longer reaches this for a not-asked fire. It checks
+ * `deriveQuery` itself and appends the fire to the pending file
+ * (pending-fires.ts), which `reconcilePendingFires` moves into
+ * `trigger_fires` later, so it never loads the store for half its calls. The
+ * not-asked branch below stays for in-process callers and tests, and it
+ * records the same row the reconcile does.
  */
 
 import type Database from "better-sqlite3";
