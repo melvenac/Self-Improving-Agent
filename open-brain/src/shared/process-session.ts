@@ -124,7 +124,7 @@ export function removeProcessSession(dir: string, claudePid: number, sessionId: 
 }
 
 export type ProvenSession =
-  | { id: string; pid: number }
+  | { id: string; pid: number; transcriptPath?: string }
   | { id: null; reason: string };
 
 export type ProcessParentInfo = { pid: number; ppid: number; commandLine: string };
@@ -351,7 +351,7 @@ function proveSessionAtKey(
       reason: `the session proof ${path} was written for a process that started at ${String(proof.proc_start)}, and the cursor-agent host ${keyPid} started at ${keyStart}: a reused pid`,
     };
   }
-  return { id: proof.session_id, pid: keyPid };
+  return { id: proof.session_id, pid: keyPid, ...(typeof proof.transcript_path === "string" && proof.transcript_path ? { transcriptPath: proof.transcript_path } : {}) };
 }
 
 function proveSessionClaude(dir: string, parentPid: number, parentStart: string | null): ProvenSession {
@@ -381,7 +381,7 @@ function proveSessionClaude(dir: string, parentPid: number, parentStart: string 
   if (proof.proc_start !== parentStart) {
     return { id: null, reason: `the session proof ${path} was written for a process that started at ${String(proof.proc_start)}, and this server's parent ${parentPid} started at ${parentStart}: a reused pid` };
   }
-  return { id: proof.session_id, pid: parentPid };
+  return { id: proof.session_id, pid: parentPid, ...(typeof proof.transcript_path === "string" && proof.transcript_path ? { transcriptPath: proof.transcript_path } : {}) };
 }
 
 /**
