@@ -15,12 +15,12 @@ import { describeLatestBrief } from "../../../src/pipelines/session-start/latest
 
 const made: string[] = [];
 afterAll(() => {
-  for (const d of made) rmSync(d, { recursive: true, force: true });
+  for (const d of made) rmSync(d, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
 });
 
 function git(root: string, args: string[], date?: string): void {
   const env = { ...process.env, ...(date ? { GIT_AUTHOR_DATE: date, GIT_COMMITTER_DATE: date } : {}) };
-  execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.invalid", "-c", "commit.gpgsign=false", ...args], { cwd: root, env, stdio: "ignore" });
+  execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.invalid", "-c", "commit.gpgsign=false", "-c", "maintenance.auto=false", "-c", "gc.auto=0", ...args], { cwd: root, env, stdio: "ignore" });
 }
 
 function repo(): string {
