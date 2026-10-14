@@ -1447,6 +1447,36 @@ export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolRespon
   const fileName = `${date}-${projectSlug}-${slug}${phaseStr}.md`;
   const vaultPath = join(v2VaultDir(), categoryDir, fileName);
 
+  // T-285: key and vault_path are UNIQUE in knowledge_index (db-v2.ts). A chunk whose key or whose file another entry
+  // already holds would fail the INSERT below with SQLite's raw message, after its file was written. Refuse first,
+  // naming the holder, and write nothing.
+  const heldKey = v2db.prepare("SELECT id, vault_path, project_dir FROM knowledge_index WHERE key = ?").get(key) as
+    | { id: number; vault_path: string; project_dir: string | null }
+    | undefined;
+  if (heldKey) {
+    const scope = heldKey.project_dir ? `project: ${heldKey.project_dir}` : "global";
+    return {
+      content: [{
+        type: "text" as const,
+        text: `ob_store_chunk refused: key "${key}" already belongs to entry ${heldKey.id} (${scope}) at ${heldKey.vault_path}. A key is unique across every scope and kind. Nothing was written. Store under a different key, or use ob_forget (id: ${heldKey.id}) first if you meant to replace it.`,
+      }],
+      isError: true,
+    };
+  }
+  const heldPath = v2db.prepare("SELECT id, key FROM knowledge_index WHERE vault_path = ?").get(vaultPath) as
+    | { id: number; key: string }
+    | undefined;
+  if (heldPath || existsSync(vaultPath)) {
+    const holder = heldPath ? `entry ${heldPath.id} (key "${heldPath.key}")` : "a file no entry indexes";
+    return {
+      content: [{
+        type: "text" as const,
+        text: `ob_store_chunk refused: ${vaultPath} is already ${heldPath ? "indexed as " : "on disk as "}${holder}. Nothing was written. Use a different key or a phase.`,
+      }],
+      isError: true,
+    };
+  }
+
   const tagList = [category, ...(tags || [])];
   const frontmatter = [
     "---",
