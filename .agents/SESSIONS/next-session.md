@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 442 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 443 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-Session 170 (Atlas) resumed after the roll on clark's MAX USAGE relay (Aaron 01:20Z and 01:24Z, verified: 'use as much as we can before the reset ... GO GO GO'). DONE tonight: the SIA train merged and was live-checked: #678 T-159 6fa4b592, #673 T-243 26dc0cee, #685 T-275 7bdf2483, #688 T-161 7d9215b2; main rebuilt 7d9215b2; all four PASS and closed. QUEUED on the QA PC chain (clark, Opus, one clone at a time; clark fetches replies with qapc-reply.sh): T-172 r3 (amendment-2, PR #676), T-269, T-277, T-282, then T-283, T-276, T-266, T-273 (briefs on master at b7bf4c06 and 9d93d837). On each READY: read the reply first-hand, review the PR (pr-src-diff.sh), route QA to a judge other than the builder (Grok bots for the first pass, or an Opus headless review), then Aaron's word naming the PR (T-282 is tests only and merges under SG-1 on green CI). HELD: T-274 is desktop-only (it reads the live DB and transcripts); clark launches it alone when the desktop has headroom. DRAFTING (research-only forks): T-271 (base 7bdf2483) and T-281 (after #688; must not edit start-report.ts or transcript-check.ts, which T-276 owns). NOT YET DRAFTED: T-279 (prove the cp437 mechanism through a SIM line, never a desktop run) and T-272. Records tonight: T-280 closed (done by T-267); T-283 opened (the heavy suite's vitest path splits on the QA PC's space); T-284 (a deterministic commit-msg trailer hook) and T-285 (ob_store_chunk's raw UNIQUE error) opened; T-268 closed on a Git Bash live check; T-168's QA PC lease check still owed.
+Session 170 (Atlas) resumed after the roll on clark's MAX USAGE relay (Aaron 01:20Z and 01:24Z, verified: 'use as much as we can before the reset ... GO GO GO'). DONE tonight: the SIA train merged and live-checked (#678 T-159 6fa4b592, #673 T-243 26dc0cee, #685 T-275 7bdf2483, #688 T-161 7d9215b2; main rebuilt 7d9215b2; all four PASS and closed); T-274 measured and merged (#699, 1f436507; ruling: T-286). RUNNING on the QA PC (clark, Opus; one watcher reports each READY to clark, who forwards the reply path): T-172 r3 (PR #676), T-269, T-277, T-282, T-283, T-276, T-266, T-273, T-271, T-281, T-279, T-272. On each READY: read the reply first-hand, review the PR (pr-src-diff.sh), route QA to a judge other than the builder (Grok bots for the first pass, or an Opus headless review), then Aaron's word naming the PR (T-282 is tests only and merges under SG-1 on green CI). DRAFTING (research-only fork): T-286, deriveQuery asks the store only with the status element (TRIM alone never queries), then the floor drops 8.0 to 6.0. Records tonight: T-280 and T-268 closed; T-283, T-284, T-285 and T-286 opened; T-168's QA PC lease check still owed.
 
 ### Watch out
 
@@ -18,20 +18,20 @@ Session 170 (Atlas) resumed after the roll on clark's MAX USAGE relay (Aaron 01:
 - Write handoff open questions and watch-outs as plain strings until T-282 lands: state-render.test.ts T183-3 reads the live record and fails CI on the object form.
 - Every running seat's open-brain server predates the 7d9215b2 rebuild: /mcp reconnect open-brain is Aaron's act (clark is asking him).
 - Dry-run every post-merge live-check script against the pre-merge build: each new-behaviour check must FAIL there (knowledge 694; tonight's t161-livecheck failed check 2 on c1975286 and passed on 7d9215b2).
-- A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED (tonight's eight are QUEUED, not launched).
+- A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED or RUNNING (tonight's twelve were recorded only after clark confirmed all twelve RUNNING; t283's first launch aborted before cloning).
 - Verify every relayed merge word in clark's transcript with relay-check.mjs (literal by default); approval is a snapshot of the PRs he named.
 - T-270's mechanism: Windows PowerShell 5.1's console cp437 best-fit turns arrows and bullets into raw C0 bytes on the pipe to Node (knowledge 693; entry 685 is falsified: forget it only on Aaron's word).
 - The repo is PUBLIC (D-090): transcripts, command text, paths and session ids stay outside it. The s170 live-check scripts live in ~/Worktrees/s170-livechecks/.
 
 ### Open questions
 
-- Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 (drafting) drops the Cursor path's transcriptPath until one live Cursor /start proves the file exists at the first tool call.
+- Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 (running) withholds an ide:cursor proof's transcriptPath until one live Cursor /start proves the file exists at the first tool call.
 - Planner, D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement.
 
 ### Loop state
 
 **Open PRs:** 
-- #676 — QA: in_progress — T-172 r2 at 778048db; the Opus review's CHANGES ruled, every finding accepted; amendment-2 (docs/loops/t172-main-rebuild-brief-amendment-2.md) is queued on the QA PC chain as r3
+- #676 — QA: in_progress — T-172 r2 at 778048db; the Opus review's CHANGES ruled, every finding accepted; amendment-2 (docs/loops/t172-main-rebuild-brief-amendment-2.md) is RUNNING on the QA PC as r3
 
 **SHA frozen for QA:** _None._
 
@@ -48,7 +48,7 @@ Session 170 (Atlas) resumed after the roll on clark's MAX USAGE relay (Aaron 01:
 - 2026-10-14 01:20:41Z and 01:24:41Z Aaron (clark's window, relay-check verified): 'Weekly is about to reset. Let's use as much as we can before the reset.' and 'All planners have been rolled, idle, ready to work. GO GO GO!'
 - 2026-10-13 ~20:5x CDT Aaron (told via clark): the desktop CPU is at 100% ('this pc can't handle parallel agents'): no npm, vitest, tsc or build on the desktop; at most 2 subagents
 - 2026-10-13 21:33:00Z Aaron (clark's window, relay-check verified): 'SIA merges #678/#673/#685/#688 · A2A v1.22.14 release, go' (all four merged tonight)
-- s170 planner: T-172's Opus review ruled, every finding accepted (amendment-2, #691); T-266 ruled (A), refuse; T-269 keeps W2 (the census counts alarm run_too_long and orphan_run as busy); T-274 changes no src (a floor change is a separate PR); T-280 closed as done by T-267
+- s170 planner: T-172's Opus review ruled, every finding accepted (amendment-2, #691); T-266 ruled (A), refuse; T-269 keeps W2 (the census counts alarm run_too_long and orphan_run as busy); T-274 changes no src (a floor change is a separate PR); T-280 closed as done by T-267; T-274's result ruled into T-286
 - s170 planner: T-196 HB-1, e21e71af not merged (stale); rewrite when the Cursor seats are back
 - s170 planner: T-251's install-commands allowlist question ruled no change; T-161's review findings went to T-281
 
