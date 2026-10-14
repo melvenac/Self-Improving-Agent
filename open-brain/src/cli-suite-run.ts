@@ -28,6 +28,7 @@ import {
   type AncestorRow,
   type ResolvedOwner,
 } from "./suite-owner.js";
+import { SUITE_VITEST_REPORT, suiteVitestArgs } from "./suite-vitest.js";
 
 const SIA_SEATS = ["atlas", "cursor-builder", "forge", "cursor-infra", "cursor-qa"];
 
@@ -241,8 +242,9 @@ async function main(): Promise<void> {
         vitestExit = 0;
         counts = { passed: 0, failed: 0, errors: 0 };
       } else {
-        const jsonOut = join(process.cwd(), "suite-vitest.json");
-        const r = spawnSync("npx", ["vitest", "run", "--reporter=json", "--outputFile", jsonOut], {
+        // T-283: shell:true joins arguments unquoted, so the report name is relative; jsonOut stays absolute for the read.
+        const jsonOut = join(process.cwd(), SUITE_VITEST_REPORT);
+        const r = spawnSync("npx", suiteVitestArgs(), {
           encoding: "utf8",
           shell: true,
           cwd: process.cwd(),
