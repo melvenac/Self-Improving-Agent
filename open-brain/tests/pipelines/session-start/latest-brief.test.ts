@@ -37,6 +37,22 @@ function commit(root: string, file: string, date: string, body = "x"): void {
   git(root, ["commit", "-q", "-m", `add ${file}`], date);
 }
 
+// T-277: a repository with NO docs/loops directory, and a commit helper that takes a repo-relative path.
+function bareRepo(): string {
+  const root = mkdtempSync(join(tmpdir(), "latest-brief-"));
+  made.push(root);
+  git(root, ["init", "-q"]);
+  return root;
+}
+
+function commitAt(root: string, rel: string, date: string, body = "x"): void {
+  const parts = rel.split("/");
+  mkdirSync(join(root, ...parts.slice(0, -1)), { recursive: true });
+  writeFileSync(join(root, ...parts), `${body}\n${date}\n`);
+  git(root, ["add", "-A"]);
+  git(root, ["commit", "-q", "-m", `add ${rel}`], date);
+}
+
 describe("describeLatestBrief — T-210", () => {
   it("T210-1: the higher loop number is OLDER, so the newer commit date wins", () => {
     const root = repo();
@@ -163,5 +179,91 @@ describe("describeLatestBrief — T-210", () => {
     expect(withBrief.filter((l) => l.startsWith("Latest brief:"))).toHaveLength(1);
     const without = (await handleStart({ project_root: project(false) })).content[0]!.text;
     expect(without).not.toContain("Latest brief");
+  });
+});
+
+describe("describeLatestBrief — T-277 briefs at the docs root (docs/loop-*-brief.md)", () => {
+  it("T277-1: a project with briefs only at the docs root gets a line", () => {
+    const root = bareRepo();
+    commitAt(root, "docs/loop-2-brief.md", "2026-10-01T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBe("Latest brief: docs/loop-2-brief.md (2026-10-01)");
+  });
+
+  it("T277-2a: both places, the docs-root brief is newer, and it wins", () => {
+    const root = bareRepo();
+    commitAt(root, "docs/loops/t1-brief.md", "2026-09-01T12:00:00+00:00");
+    commitAt(root, "docs/loop-2-brief.md", "2026-10-01T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBe("Latest brief: docs/loop-2-brief.md (2026-10-01)");
+  });
+
+  it("T277-2b: both places, the docs/loops brief is newer, and it wins", () => {
+    const root = bareRepo();
+    commitAt(root, "docs/loop-2-brief.md", "2026-09-01T12:00:00+00:00");
+    commitAt(root, "docs/loops/t9-brief.md", "2026-10-05T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBe("Latest brief: docs/loops/t9-brief.md (2026-10-05)");
+  });
+
+  it.each([
+    "loop-3-brief.md",
+    "loop-3-rebrief.md",
+    "loop-14-brief-amendment-3.md",
+    "loop-16-rebrief-amendment-2.md",
+    "loop-17a-brief.md",
+  ])("T277-3 kept: docs/%s is a brief", (name) => {
+    const root = bareRepo();
+    commitAt(root, "docs/loop-1-brief.md", "2026-09-01T12:00:00+00:00");
+    commitAt(root, `docs/${name}`, "2026-09-20T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBe(`Latest brief: docs/${name} (2026-09-20)`);
+  });
+
+  it.each([
+    "loop-12-brief-part-b.md",
+    "loop-1-amendment-1.md",
+    "loop-9-addendum-2.md",
+    "design-brief.md", // only the loop- prefix counts at the docs root
+    "brief.md",
+    "loop-9-brief.md.orig",
+    "sub/loop-3-brief.md", // a subdirectory of docs/ other than docs/loops is not the docs root
+  ])("T277-4 excluded: docs/%s is not a brief, even when newer than one", (name) => {
+    const root = bareRepo();
+    commitAt(root, "docs/loop-1-brief.md", "2026-09-01T12:00:00+00:00");
+    commitAt(root, `docs/${name}`, "2026-09-20T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBe("Latest brief: docs/loop-1-brief.md (2026-09-01)");
+  });
+
+  it("T277-5a: a docs folder with no brief in either place is omitted", () => {
+    const root = bareRepo();
+    commitAt(root, "docs/README.md", "2026-09-01T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBeNull();
+  });
+
+  it("T277-5b: a docs folder with no brief is omitted even outside a git repository", () => {
+    const root = mkdtempSync(join(tmpdir(), "latest-brief-"));
+    made.push(root);
+    mkdirSync(join(root, "docs"), { recursive: true });
+    writeFileSync(join(root, "docs", "README.md"), "x");
+    expect(describeLatestBrief(root)).toBeNull();
+  });
+
+  it("T277-5c: a docs-root brief outside a git repository says not determined, as docs/loops does (T210-6)", () => {
+    const root = mkdtempSync(join(tmpdir(), "latest-brief-"));
+    made.push(root);
+    mkdirSync(join(root, "docs"), { recursive: true });
+    writeFileSync(join(root, "docs", "loop-1-brief.md"), "x");
+    expect(describeLatestBrief(root)).toMatch(/^Latest brief: not determined \(/);
+  });
+
+  it("T277-6: ob_start prints the docs-root brief", async () => {
+    const NL = "\n";
+    const root = bareRepo();
+    writeFileSync(join(root, "package.json"), JSON.stringify({ version: "1.0.0" }));
+    for (const d of ["SYSTEM", "TASKS", "SESSIONS"]) mkdirSync(join(root, ".agents", d), { recursive: true });
+    writeFileSync(join(root, ".agents", "SYSTEM", "SUMMARY.md"), `# Summary${NL}`);
+    writeFileSync(join(root, ".agents", "TASKS", "INBOX.md"), `# Inbox${NL}`);
+    writeFileSync(join(root, ".agents", "TASKS", "task.md"), `# Task${NL}`);
+    writeFileSync(join(root, ".agents", "SESSIONS", "next-session.md"), `# Handoff${NL}`);
+    commitAt(root, "docs/loop-3-brief.md", "2026-09-02T12:00:00+00:00");
+    const lines = (await handleStart({ project_root: root })).content[0]!.text.split(NL);
+    expect(lines.filter((l) => l.startsWith("Latest brief:"))).toEqual(["Latest brief: docs/loop-3-brief.md (2026-09-02)"]);
   });
 });
