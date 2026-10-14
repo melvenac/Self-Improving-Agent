@@ -14,7 +14,7 @@ import { describeHubPresence } from "./hub-presence.js";
 import { countWords, estimateTokens, STATE_JSON_REL } from "./state-reader.js";
 import { renderState, missingHandoffLine } from "./state-render.js";
 import { describeServingBuild } from "./serving-build.js";
-import { renderBriefing, describeUsage, describeWorkingTree, describeSkills } from "./briefing.js";
+import { renderBriefing, describeUsage, describeWorkingTree, describeSkills, describeProblemStatement } from "./briefing.js";
 import { oldStartCommandWarning } from "../bootstrap/index.js";
 import { describeLatestBrief } from "./latest-brief.js";
 import { describeReadsOwed } from "./reads-owed.js";
@@ -288,6 +288,8 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         ? missingHandoffLine(sj.data, { projectRoot, sessionUuid: proven.id, seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null })
         : null,
       oldStartCommand: oldStartCommandWarning(projectRoot),
+      // T-167, opt-in: the PRD's own problem statement, one line above OBJECTIVE.
+      problem: greetingFlag(projectRoot, "briefing_problem") ? describeProblemStatement(projectRoot) : null,
     }));
   } else {
     // F3: an unknown schema_version REFUSES, with no prose fallback.

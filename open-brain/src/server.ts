@@ -35,7 +35,7 @@ import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWrit
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
-import { resolvePaths, canonicalizeProjectDir, projectDisplayName, obsidianVaultDir } from "./shared/paths.js";
+import { resolvePaths, canonicalizeProjectDir, projectIdentity, projectIdentityName, obsidianVaultDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
 import { sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
 import {
@@ -63,6 +63,14 @@ const V2_DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "op
 // projects into the real vault — 57 `ob-server-*` files had accumulated there
 // since April before anyone noticed.
 const v2VaultDir = () => obsidianVaultDir();
+
+/**
+ * T-249: the knowledge key for a project dir is its REPOSITORY, so a linked
+ * worktree's entries and sessions join the main tree's. Per-checkout keys (the
+ * session slot, Summaries names, `working_dir:`) stay on canonicalizeProjectDir.
+ */
+const identityKey = (dir?: string | null): string | null =>
+  (dir && canonicalizeProjectDir(dir) ? projectIdentity(dir) : null);
 
 let _v2db: Database.Database | null = null;
 let _schemaSkew: SchemaSkew | null = null;
@@ -695,7 +703,7 @@ export async function handleSetSession(args: SetSessionArgs): Promise<ToolRespon
   // wiring had to be checked by hand every time.
   let persisted = false;
   try {
-    recordSession(getV2Db(), proven.id, canonicalizeProjectDir(project_dir));
+    recordSession(getV2Db(), proven.id, identityKey(project_dir));
     persisted = true;
   } catch {
     // Registration must not fail the session if the DB is unavailable.
@@ -734,7 +742,7 @@ export async function handleRecall(args: {
     purpose,
   } = args;
     const v2db = getV2Db();
-    const normalizedProject = canonicalizeProjectDir(project);
+    const normalizedProject = identityKey(project);
     const results: string[] = [];
 
     for (const query of queries) {
@@ -886,12 +894,28 @@ server.tool(
     scope: z.enum(["global", "project"]).optional().default("global").describe("Scope: global or project"),
     project_dir: z.string().optional().describe("Project directory (only when scope is 'project')"),
     kind: z.enum(["state", "event"]).optional().describe(
-      "'state' = one current value that changes (a path, a version, an owner) — replace it. " +
-      "'event' = a timestamped thing that happened (a gotcha, a decision, a lesson) — append it. " +
-      "Recorded for reconciliation; storing still appends either way."
+      "'state' = one current value that changes (a path, a version, an owner): a later 'state' write to the SAME key replaces it, and the old value moves to the note's ## Log. " +
+      "'event' = a timestamped thing that happened (a gotcha, a decision, a lesson): append it; a repeated key is refused."
     ),
   },
-  async ({ content, key, tags, source, scope, project_dir, kind }) => {
+  async (args) => handleStore(args)
+);
+
+export interface StoreArgs {
+  content: string;
+  key?: string;
+  tags?: string[];
+  source?: string;
+  scope?: "global" | "project";
+  project_dir?: string;
+  kind?: "state" | "event";
+}
+
+/** ob_store, exported so its replies are testable without the transport (T-022). */
+export async function handleStore(args: StoreArgs): Promise<ToolResponse> {
+  const { content, key, tags, project_dir, kind } = args;
+  const source = args.source ?? "manual";
+  const scope = args.scope ?? "global";
     // Refuse a body that ran past its own close. Eight entries were stored this
     // way on 2026-08-31; four of them lost their tags to the swallowed argument
     // and nothing noticed for a month.
@@ -901,12 +925,12 @@ server.tool(
     }
 
     const v2db = getV2Db();
-    const effectiveProject = scope === "project" ? canonicalizeProjectDir(project_dir) : null;
+    const effectiveProject = scope === "project" ? identityKey(project_dir) : null;
     // From the raw dir, not `effectiveProject` — see projectDisplayName.
     let projectName = "General";
     if (effectiveProject) {
       try {
-        projectName = safeVaultPathSegment("project", projectDisplayName(project_dir));
+        projectName = safeVaultPathSegment("project", projectIdentityName(project_dir!));
       } catch (err) {
         const msg = err instanceof VaultPathRefusal ? err.message : String(err);
         return { content: [{ type: "text" as const, text: `ob_store refused: ${msg}` }], isError: true };
@@ -958,13 +982,40 @@ server.tool(
       };
     }
 
+    if (result.replaced) {
+      return {
+        content: [{
+          type: "text" as const,
+          text:
+            `Replaced state "${effectiveKey}" (id: ${result.replaced.id})${scopeLabel} — the previous value moved to "## Log" ` +
+            `(${result.replaced.demotedAt.slice(0, 10)}) in the vault note and is no longer recalled.\n  Vault: ${result.vaultPath}`,
+        }],
+      };
+    }
+
+    if (result.unchanged) {
+      const same = v2db.prepare(`SELECT id FROM knowledge_index WHERE key = ?`)
+        .get(effectiveKey) as { id: number } | undefined;
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Unchanged — state "${effectiveKey}" (id: ${same?.id ?? "?"}) already holds this value. Nothing was written.`,
+        }],
+      };
+    }
+
     if (result.vaultPath === null) {
+      // A state over a row that is not a state: say what it is, so the refusal
+      // does not read as "use another key" when the real answer is the kind.
+      const kindNote = kind === "state" && result.existingKind !== undefined && result.existingKind !== "state"
+        ? ` It is stored as ${result.existingKind ?? "unlabelled"}; kind "state" replaces only a state.`
+        : "";
       return {
         content: [{
           type: "text" as const,
           text:
             `Not stored — "${effectiveKey}" already exists in the vault${scopeLabel}. ` +
-            `Nothing was written. Store under a different key, or use ob_forget first if you meant to replace it.`,
+            `Nothing was written. Store under a different key, or use ob_forget first if you meant to replace it.${kindNote}`,
         }],
       };
     }
@@ -976,8 +1027,7 @@ server.tool(
     return {
       content: [{ type: "text" as const, text: `Stored knowledge (id: ${row?.id ?? "?"}) with key "${effectiveKey}"${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}${kindLabel}` }],
     };
-  }
-);
+}
 
 /** First few meaningful words of the content, as a fallback key. */
 function deriveKey(content: string): string {
@@ -1110,7 +1160,7 @@ server.tool(
   },
   async ({ limit, project }) => {
     const v2db = getV2Db();
-    const normalizedProject = canonicalizeProjectDir(project);
+    const normalizedProject = identityKey(project);
 
     let sql = "SELECT id, key, content, tags, source, project_dir, created_at, maturity FROM knowledge_index WHERE archived_into IS NULL";
     const params: unknown[] = [];
@@ -1356,13 +1406,16 @@ export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolRespon
   const v2db = getV2Db();
   const now = new Date().toISOString();
   const date = now.slice(0, 10);
-  const normalizedProject = canonicalizeProjectDir(project_dir);
+  // T-249: the row, the file name and `project:` name the repository; `working_dir:`
+  // below keeps the checkout the chunk was written from.
+  const normalizedProject = identityKey(project_dir);
+  const workingDir = canonicalizeProjectDir(project_dir);
   // Same rule as ob_store: the canonical path is lowercased, so the display
   // name comes from the raw dir. Matches existing checkpoint filenames.
   let projectSlug = "general";
   if (normalizedProject) {
     try {
-      projectSlug = safeVaultPathSegment("project", projectDisplayName(project_dir, "general"));
+      projectSlug = safeVaultPathSegment("project", projectIdentityName(project_dir!, "general"));
     } catch (err) {
       const msg = err instanceof VaultPathRefusal ? err.message : String(err);
       return { content: [{ type: "text" as const, text: `ob_store_chunk refused: ${msg}` }], isError: true };
@@ -1386,7 +1439,7 @@ export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolRespon
     ...(session_id ? [`session: ${yamlScalar(session_id)}`] : []),
     ...(phase != null ? [`phase: ${phase}`] : []),
     `tags: ${yamlInlineArray(tagList)}`,
-    ...(normalizedProject ? [`working_dir: ${yamlScalar(normalizedProject)}`] : []),
+    ...(workingDir ? [`working_dir: ${yamlScalar(workingDir)}`] : []),
     "---",
   ].join("\n");
 

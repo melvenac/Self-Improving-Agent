@@ -227,8 +227,8 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
   };
   const drift = Array.from({ length: 6 }, (_, i) => ({ field: `field${i}`, expected: "e".repeat(80), actual: "a".repeat(80), fixed: false })) as BriefingInput["drift"];
 
-  it("the budget constants are the brief's: ~4 KB and ~30 lines", () => {
-    expect(BRIEFING_BUDGET).toEqual({ lines: 30, chars: 4096 });
+  it("the budget constants are the brief's: ~4 KB and ~30 lines, plus T-167's one PROBLEM line", () => {
+    expect(BRIEFING_BUDGET).toEqual({ lines: 31, chars: 4400 });
   });
 
   it("WORST CASE: every section past its cap, long everything, drift, a stale serving line and a long usage line, still fits", () => {
@@ -260,7 +260,7 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
   });
 
-  it("WORST CASE with EVERY flag on (FOCUS + SEATS + a MISSING_HANDOFF_MAX_CHARS T-199 notice + handoff_by_checkout): still 30 lines and 4096 chars", () => {
+  it("WORST CASE with EVERY flag on (FOCUS + SEATS + a MISSING_HANDOFF_MAX_CHARS T-199 notice + handoff_by_checkout + a clipped T-167 PROBLEM line): still fits BRIEFING_BUDGET", () => {
     // T-239 merged with T-236 (c) and T-199: one PICK UP block carries all three. FOCUS on the header, this checkout's own
     // handoff (picked over a NEWER sibling's) on the body line, the notice appended to it. Built with the real producers.
     const raw = structuredClone(SIA);
@@ -309,6 +309,8 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
       },
       missingHandoff: notice,
       ownCheckout: "sia-infra",
+      // T-167: the longest PROBLEM line describeProblemStatement can print (a 300-character clip of a longer statement).
+      problem: `PROBLEM (.agents/SYSTEM/PRD.md): ${"p".repeat(300)}… (100000 chars)`,
     });
     const { lines: count, chars } = size(lines);
     const at = lines.findIndex((l) => l.startsWith("PICK UP HERE"));
@@ -317,6 +319,7 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     expect(lines[at + 1]!.endsWith(` · ${notice}`)).toBe(true);
     expect(lines.join("\n")).not.toContain("SIBLING");
     expect(lines.some((l) => l.startsWith("SEATS: "))).toBe(true);
+    expect(lines.some((l) => l.startsWith("PROBLEM ("))).toBe(true);
     expect(count, `${count} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
     expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
   });

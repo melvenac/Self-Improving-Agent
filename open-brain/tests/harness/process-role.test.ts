@@ -16,9 +16,13 @@ import { symlinkSyncOrSkip } from "./symlink-or-skip.js";
 import { join } from "node:path";
 import { runLoop, LoopRefused, type LoopConfig } from "../../src/harness/runtime.js";
 import {
-  CLAUDE_ADAPTER_FLAGS,
   claudeAdapter,
+  claudeFlagReport,
+  claudeVersionAtLeast,
   commandAdapter,
+  MIN_CLAUDE_CODE_VERSION,
+  missingClaudeFlags,
+  parseClaudeVersion,
   ProcessRole,
   StubPlanner,
   StubQa,
@@ -311,14 +315,22 @@ describe("candidate A — a role that is a real process", { timeout: 180_000 }, 
     );
 
     it.skipIf(findOnPath("claude", process.env) === null)(
-      "CA-9: every flag the claude adapter passes exists in the installed `claude --help` (skipped where claude is absent)",
+      "CA-9: the installed claude is >= the declared minimum and defines every flag the adapter passes (skipped where claude is absent)",
       () => {
         const res = claudeAdapter().resolve(process.env);
         expect(res.ok).toBe(true);
         if (!res.ok) return;
-        const help = spawnSync(res.executable, [...res.preArgs, "--help"], { encoding: "utf-8", shell: false, timeout: 60_000 });
+        const run = (arg: string) => spawnSync(res.executable, [...res.preArgs, arg], { encoding: "utf-8", shell: false, timeout: 60_000 });
+        const version = run("--version");
+        const help = run("--help");
         expect(help.status).toBe(0);
-        for (const f of CLAUDE_ADAPTER_FLAGS) expect(help.stdout, `flag ${f} is gone`).toContain(f);
+        const installed = parseClaudeVersion(version.stdout ?? "");
+        const missing = missingClaudeFlags(help.stdout ?? "");
+        const report = claudeFlagReport(installed, missing, version.stdout ?? "");
+        expect(
+          installed !== null && claudeVersionAtLeast(installed, MIN_CLAUDE_CODE_VERSION) && missing.length === 0,
+          report,
+        ).toBe(true);
       },
     );
   });

@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 /**
- * T-168 heavy-suite wrapper. Resolves the D-119 owner, takes the machine lease
- * (Windows, when the helper exists), reads hub presence twice, writes
+ * T-168 heavy-suite wrapper. Resolves the D-119 owner live (liveOwnerProbe:
+ * #427's cursor-agent host walk, else the nearest claude.exe), takes the machine
+ * lease (Windows, when the helper exists), reads hub presence twice, writes
  * suite-run-meta.json, then runs vitest. Refuses when there is no owner and
  * no --owner-pid, on any lease take exit other than 0, or when
  * OPEN_BRAIN_CONTROLLED_RERUN=1 and a SIA seat (or its waker) is working or
- * the census is unavailable. Never uses process.ppid as the owner.
+ * the census is unavailable. process.ppid is only where the walk starts.
  *
  * Tests inject SUITE_CENSUS_FIXTURE (JSON file of two presence bodies),
  * SUITE_ANCESTRY (JSON ancestor rows), SUITE_OWNER_FROM (walk start for that table), SUITE_LEASE_EXIT, SUITE_LEASE_STATUS_EXIT,
  * SUITE_LEASE_HELPER=missing, SUITE_LEASE_OPT_OUT=1, and SUITE_VITEST_JSON so
- * this file does not call the hub or powershell.
+ * this file does not call the hub or the lease helper. Without SUITE_ANCESTRY or
+ * --owner-pid the owner walk reads the real process table.
  */
 
 import { spawnSync } from "node:child_process";
@@ -21,8 +23,8 @@ import { agentsFromPresenceBody, decideSuiteStart, readCensus, resolveSeatKeyPat
 import { buildSuiteMeta, leaseStatusFromExit, vitestCountsFromJson } from "./suite-run-meta.js";
 import {
   ownerFromFlag,
+  liveOwnerProbe,
   resolveOwnerFromAncestry,
-  unboundOwnerProbe,
   type AncestorRow,
   type ResolvedOwner,
 } from "./suite-owner.js";
@@ -149,7 +151,7 @@ function resolveOwner(): ResolvedOwner {
     const start = startRaw !== undefined && startRaw !== "" ? Number(startRaw) : process.ppid;
     return resolveOwnerFromAncestry(start, Array.isArray(parsed) ? parsed : []);
   }
-  return unboundOwnerProbe();
+  return liveOwnerProbe(process.ppid);
 }
 
 async function censusFromEnv(hubUrl: string, keyPath: string | undefined): Promise<CensusResult> {
