@@ -1463,7 +1463,8 @@ export async function handleStoreChunk(args: StoreChunkArgs): Promise<ToolRespon
       isError: true,
     };
   }
-  const heldPath = v2db.prepare("SELECT id, key FROM knowledge_index WHERE vault_path = ?").get(vaultPath) as
+  // T-285 r3: compared case- and slash-insensitively, as T-266's keyHeldElsewhere does: vault_path carries both forms.
+  const heldPath = v2db.prepare("SELECT id, key FROM knowledge_index WHERE lower(replace(vault_path, char(92), '/')) = lower(replace(?, char(92), '/'))").get(vaultPath) as
     | { id: number; key: string }
     | undefined;
   if (heldPath || existsSync(vaultPath)) {
