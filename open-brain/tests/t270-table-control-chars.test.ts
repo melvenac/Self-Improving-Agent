@@ -6,8 +6,10 @@ import * as owner from "../src/suite-owner.js";
 type Win32Row = { ProcessId: number; ParentProcessId: number; CommandLine: string };
 
 /**
- * Windows PowerShell 5.1's ConvertTo-Json can leave a control character raw
- * inside a string (T-270). JSON.stringify escapes it, so put the raw one back.
+ * A raw control character inside a CommandLine string (T-270). Windows PowerShell 5.1's ConvertTo-Json escapes
+ * control characters; the raw byte came from the console's cp437 best-fit encoder on the pipe (→ arrives as 0x1A).
+ * The read now escapes to ASCII (T-279); these rows keep the parse's defence in depth. JSON.stringify escapes the
+ * character, so put the raw one back.
  */
 function rawPayload(rows: Win32Row | Win32Row[], codes: number[]): string {
   let json = JSON.stringify(rows);
