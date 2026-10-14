@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 472,
+  "revision": 473,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2331,11 +2331,11 @@
       "id": "T-293",
       "title": "Planner hook vs the atlas-ops scripts: registering r7 today would deny the planner's records/docs flow",
       "priority": "P1",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 171,
       "closed_session": null,
       "supersedes": null,
-      "note": "s171, from the T-194 replay on #749 (rev 2, absolute paths): the r7 hook DENIES every `bash <atlas-ops script>` (records-pr.sh, docs-pr.sh, pr-refresh.sh, pr-keep-current.sh, tree-sync.sh) as 'not statically parseable' (it parses only bash -c '<string>'), and `git push origin records/<branch>` as needing a grant, while `git push origin docs/<branch>` passes. Registration (Aaron's hand) must wait for a ruling on the fit. Options to weigh: (a) the hook allows exactly the named skill scripts by absolute path (but a script outside the repo can push or merge, so this moves trust to the skill directory); (b) the scripts' outward steps become hook-visible commands the planner runs itself (push, gh pr create), so the hook judges each one; (c) records/ pushes get the same treatment as docs/ pushes (why they differ is to be read in git.ts's push rule). Read git.ts's push allow rule and the grant design before briefing. The merge guarantee does not depend on this: it is GitHub's ruleset (D-147, D-154).",
+      "note": "s171, from the T-194 replay on #749 (rev 2, absolute paths): the r7 hook DENIES every `bash <atlas-ops script>` (records-pr.sh, docs-pr.sh, pr-refresh.sh, pr-keep-current.sh, tree-sync.sh) as 'not statically parseable' (it parses only bash -c '<string>'), and `git push origin records/<branch>` as needing a grant, while `git push origin docs/<branch>` passes. Registration (Aaron's hand) must wait for a ruling on the fit. Options to weigh: (a) the hook allows exactly the named skill scripts by absolute path (but a script outside the repo can push or merge, so this moves trust to the skill directory); (b) the scripts' outward steps become hook-visible commands the planner runs itself (push, gh pr create), so the hook judges each one; (c) records/ pushes get the same treatment as docs/ pushes (why they differ is to be read in git.ts's push rule). Read git.ts's push allow rule and the grant design before briefing. The merge guarantee does not depend on this: it is GitHub's ruleset (D-147, D-154). — s171: ruled and briefed (docs/loops/t293-hook-scripts-brief.md, #757): bash <file.sh> [args] is allowed on the same terms as the already-allowed node <file.js> [args] (no option before the script, .sh only); records/ joins the standing push branches. Pre-simulated outside the repo on scratch copies via tsx: rows A1-A5 allow / D1-D10 deny (master denies all 15); mutants M1-M5 each flip only their named rows; 0 flips across 2096 QA 237/241 Bash+PowerShell rows; exactly one flip in the r6/r7 case tables (bash script.sh, ruled to become sh script.sh). LAUNCHED by clark on the QA PC 16:08 CDT at base c522deae. At registration time the atlas-ops skill must call scripts by literal path: `bash $S/x.sh` stays refused (D9: a variable expansion).",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
