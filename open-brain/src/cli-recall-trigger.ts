@@ -115,12 +115,13 @@ async function main(): Promise<void> {
   let payload: Record<string, unknown>;
   try {
     payload = JSON.parse(raw) as Record<string, unknown>;
-  } catch (err) {
+  } catch {
     // Unlike SessionStart (F4), a malformed payload here is NOT a refusal
     // with a non-zero exit: this hook runs after every tool call, and a host
     // that malforms payloads would turn a memory feature into a wall of
-    // stderr in front of the model. Logged and dropped.
-    logFailure("payload is not valid JSON", err);
+    // stderr in front of the model. Logged and dropped. The parser's message
+    // is NOT logged: it quotes the payload (T-243).
+    logFailure(`payload is not valid JSON (${raw.length} chars; parser message withheld: it quotes the payload)`);
     return;
   }
 
