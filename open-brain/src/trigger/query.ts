@@ -217,6 +217,7 @@ export function isUnsafeStatusRead(command: string): boolean {
 
 const ELEMENTS: readonly CommandElement[] = [
   {
+    // Since T-286 this element adds no term of its own: deriveQuery asks only when the status element is present, and that element's terms already include "tail".
     what: "a pipeline whose last stage is a trimmer",
     test: (command) => {
       const last = lastPipelineStage(command);
@@ -236,7 +237,8 @@ const ELEMENTS: readonly CommandElement[] = [
     // uninjected), so the injection works when warranted. T-265's ruling
     // (D-148): fire only on the mistake itself.
     test: isUnsafeStatusRead,
-    terms: ["exit", "code"],
+    // T-286: the read follows a trimmer pipeline by construction, so the query names the whole mistake, "tail" included.
+    terms: ["tail", "exit", "code"],
   },
 ];
 
@@ -247,6 +249,10 @@ const ELEMENTS: readonly CommandElement[] = [
  * the caller must treat as "ask nothing", not as "ask for everything".
  */
 export function deriveQuery(command: string): string {
+  // T-286: ask only about the mistake itself. A trimmer pipeline with no $? read of it is not the act (T-274
+  // measured 14,023 such fires with no VIOLATING one), so a command without the status element derives no query
+  // and takes T-159's not-asked path, never opening the store.
+  if (!isUnsafeStatusRead(command)) return "";
   const terms: string[] = [];
   for (const element of ELEMENTS) {
     if (!element.test(command)) continue;
