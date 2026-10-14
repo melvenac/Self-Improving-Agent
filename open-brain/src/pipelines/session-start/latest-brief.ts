@@ -44,7 +44,11 @@ function latestBriefSelection(projectRoot: string): { path: string; date: string
   );
   if (present.size === 0) return null;
   const rootBriefs = [...present].filter((p) => !p.startsWith(`${BRIEF_DIR}/`));
-  const log = run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${BRIEF_DIR}/`, ...rootBriefs]);
+  // T-287: one glob pathspec for the docs root, not one argument per brief: argv stays constant however many briefs
+  // there are (Windows refuses a spawn near 32 KB of arguments). `present` already filters the names, and a glob `*`
+  // never crosses a `/`, so only docs-root files match.
+  const rootSpec = rootBriefs.length > 0 ? [`:(glob)${ROOT_BRIEF_DIR}/loop-*.md`] : [];
+  const log = run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${BRIEF_DIR}/`, ...rootSpec]);
   const latest = new Map<string, string>();
   let date = "";
   for (const line of log.split("\n")) {

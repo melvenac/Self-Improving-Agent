@@ -266,4 +266,28 @@ describe("describeLatestBrief — T-277 briefs at the docs root (docs/loop-*-bri
     const lines = (await handleStart({ project_root: root })).content[0]!.text.split(NL);
     expect(lines.filter((l) => l.startsWith("Latest brief:"))).toEqual(["Latest brief: docs/loop-3-brief.md (2026-09-02)"]);
   });
+
+  it("T287-1: 2,000 docs-root briefs still give a line (one glob pathspec, not 2,000 arguments)", () => {
+    const root = bareRepo();
+    mkdirSync(join(root, "docs"), { recursive: true });
+    for (let i = 0; i < 2000; i++) writeFileSync(join(root, "docs", `loop-${String(i).padStart(4, "0")}-brief.md`), `${i}\n`);
+    git(root, ["add", "-A"]);
+    git(root, ["commit", "-q", "-m", "2000 briefs"], "2026-10-01T12:00:00+00:00");
+    expect(describeLatestBrief(root)).toBe("Latest brief: docs/loop-1999-brief.md (2026-10-01)");
+  }, 120_000);
+
+  it("T287-2: outside git, a docs/ holding only a non-brief loop- file is no line (rootBriefOnDisk's name test)", () => {
+    const root = mkdtempSync(join(tmpdir(), "latest-brief-"));
+    made.push(root);
+    mkdirSync(join(root, "docs"), { recursive: true });
+    writeFileSync(join(root, "docs", "loop-notes.md"), "x");
+    expect(describeLatestBrief(root)).toBeNull();
+  });
+
+  it("T287-3: outside git, a docs that is a FILE is no line (rootBriefOnDisk's catch)", () => {
+    const root = mkdtempSync(join(tmpdir(), "latest-brief-"));
+    made.push(root);
+    writeFileSync(join(root, "docs"), "x");
+    expect(describeLatestBrief(root)).toBeNull();
+  });
 });
