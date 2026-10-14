@@ -112,27 +112,47 @@ describe("P3: renderBriefing places the line in both layouts", () => {
     ...over,
   } as b.BriefingInput);
 
+  it("default: the line comes right after the serving line", () => {
+    const lines = b.renderBriefing(input({ transcript: LINE }));
+    const at = lines.indexOf(SERVING);
+    expect(at).toBeGreaterThan(-1);
+    expect(lines[at + 1]).toBe(LINE);
+    expect(lines.filter((l) => l === LINE)).toHaveLength(1);
+  });
+
+  it("default: with oldStartCommand set too, the line comes right after it", () => {
+    const lines = b.renderBriefing(input({ oldStartCommand: OLD, transcript: LINE }));
+    const at = lines.indexOf(SERVING);
+    expect(lines.slice(at, at + 3)).toEqual([SERVING, OLD, LINE]);
+  });
+
+  it("budgeted (T-281): no line of its own; the session line ends with TRANSCRIPT_BUDGET_NOTE, and the line count is unchanged", () => {
+    const without = b.renderBriefing(input({ budget: true }));
+    const lines = b.renderBriefing(input({ budget: true, transcript: LINE }));
+    expect(b.TRANSCRIPT_BUDGET_NOTE).toBe("NO TRANSCRIPT (T-161): /end cannot see this session");
+    expect(lines).toHaveLength(without.length);
+    expect(lines.some((l) => l.includes("NO TRANSCRIPT: session"))).toBe(false);
+    const at = without.findIndex((l) => l.startsWith("Session 161 — "));
+    expect(at).toBeGreaterThan(-1);
+    expect(lines[at]).toBe(`${without[at]} · ${b.TRANSCRIPT_BUDGET_NOTE}`);
+    expect(lines.filter((l) => l.includes("NO TRANSCRIPT"))).toHaveLength(1);
+  });
+
+  it("budgeted (T-281): with oldStartCommand set too, the lines above the session line are unchanged and the note still rides it", () => {
+    const lines = b.renderBriefing(input({ budget: true, oldStartCommand: OLD, transcript: LINE }));
+    const at = lines.indexOf(SERVING);
+    expect(lines.slice(at, at + 3)).toEqual([SERVING, OLD, "Usage: GREEN → dispatches open"]);
+    expect(lines[at + 3]!.startsWith("Session 161 — ")).toBe(true);
+    expect(lines[at + 3]!.endsWith(` · ${b.TRANSCRIPT_BUDGET_NOTE}`)).toBe(true);
+  });
+
   for (const budget of [false, true]) {
     const layout = budget ? "budgeted" : "default";
 
-    it(`${layout}: the line comes right after the serving line`, () => {
-      const lines = b.renderBriefing(input({ budget, transcript: LINE } as Partial<b.BriefingInput>));
-      const at = lines.indexOf(SERVING);
-      expect(at).toBeGreaterThan(-1);
-      expect(lines[at + 1]).toBe(LINE);
-      expect(lines.filter((l) => l === LINE)).toHaveLength(1);
-    });
-
-    it(`${layout}: with oldStartCommand set too, the line comes right after it`, () => {
-      const lines = b.renderBriefing(input({ budget, oldStartCommand: OLD, transcript: LINE } as Partial<b.BriefingInput>));
-      const at = lines.indexOf(SERVING);
-      expect(lines.slice(at, at + 3)).toEqual([SERVING, OLD, LINE]);
-    });
-
     it(`${layout}: transcript absent or null renders exactly as without the field`, () => {
       const without = b.renderBriefing(input({ budget }));
-      expect(b.renderBriefing(input({ budget, transcript: null } as Partial<b.BriefingInput>))).toEqual(without);
-      expect(b.renderBriefing(input({ budget, transcript: undefined } as Partial<b.BriefingInput>))).toEqual(without);
+      expect(b.renderBriefing(input({ budget, transcript: null }))).toEqual(without);
+      expect(b.renderBriefing(input({ budget, transcript: undefined }))).toEqual(without);
       expect(without.some((l) => l.startsWith("NO TRANSCRIPT"))).toBe(false);
     });
   }
@@ -168,7 +188,7 @@ describe("P4: renderStartReport names a missing transcript in the header and the
       projectRoot: dir,
       proven: { id: SELF, pid: 4242, transcriptPath: missing },
       callerLabel: "T161",
-    } as Parameters<typeof sr.renderStartReport>[0]);
+    });
     const { header, briefing } = split(r.text);
     const at = header.findIndex((l) => l.startsWith("Session ID:"));
     expect(at).toBeGreaterThan(-1);
@@ -184,8 +204,57 @@ describe("P4: renderStartReport names a missing transcript in the header and the
       projectRoot: dir,
       proven: { id: SELF, pid: 4242, transcriptPath: present },
       callerLabel: "T161",
-    } as Parameters<typeof sr.renderStartReport>[0]);
+    });
     split(r.text);
     expect(r.text).not.toContain("NO TRANSCRIPT");
+  });
+
+  it("T-281: the log-skipped branch (no .agents/SESSIONS/) prints NO TRANSCRIPT right after Session ID, and in the Briefing", async () => {
+    const dir = fixture();
+    rmSync(join(dir, ".agents", "SESSIONS"), { recursive: true, force: true });
+    const missing = join(tmp("t161-tx-"), "gone.jsonl");
+    const r = await sr.renderStartReport({
+      projectRoot: dir,
+      proven: { id: SELF, pid: 4242, transcriptPath: missing },
+      callerLabel: "T161",
+    });
+    const { header, briefing } = split(r.text);
+    expect(header).toContain("Session log: no .agents/SESSIONS/ dir — log not created");
+    const at = header.findIndex((l) => l.startsWith("Session ID:"));
+    expect(at).toBeGreaterThan(-1);
+    expect(header[at + 1]).toBe(ruled(SELF, missing));
+    expect(briefing).toContain(ruled(SELF, missing));
+  });
+});
+
+describe("T-281 C: an ide:cursor proof's transcript_path is withheld until a live Cursor /start proves the file", () => {
+  const CURSOR_TX = "C:/t/agent-transcripts/x/x.jsonl";
+  const HOST_CMD = String.raw`C:\AppData\Local\cursor-agent\versions\2026.10.01-e373342\node.exe C:\AppData\Local\cursor-agent\versions\2026.10.01-e373342\index.js`;
+
+  it("C1: the direct-parent read gives exactly { id, pid } for an ide:cursor proof, with or without cursorWalk", () => {
+    const d = tmp();
+    writeFileSync(join(d, "4242.json"), JSON.stringify({ session_id: SELF, claude_pid: 4242, proc_start: "s", ide: "cursor", transcript_path: CURSOR_TX }));
+    expect(ps.proveSession(d, 4242, "s")).toStrictEqual({ id: SELF, pid: 4242 });
+    expect(ps.proveSession(d, 4242, "s", { cursorWalk: true, readParent: () => null })).toStrictEqual({ id: SELF, pid: 4242 });
+  });
+
+  it("C2: the cursor-agent host walk gives exactly { id, pid } for an ide:cursor proof that carries transcript_path", () => {
+    const host = process.ppid;
+    const wrapper = process.pid;
+    const hostStart = ps.processStartTime(host);
+    expect(hostStart).not.toBeNull();
+    const chain: Record<number, ps.ProcessParentInfo> = {
+      [wrapper]: { pid: wrapper, ppid: host, commandLine: "powershell.exe wrapper" },
+      [host]: { pid: host, ppid: 1, commandLine: HOST_CMD },
+    };
+    const d = tmp();
+    ps.writeProcessSession(d, { session_id: SELF, claude_pid: host, proc_start: hostStart!, ide: "cursor", written_at: "", transcript_path: CURSOR_TX });
+    expect(ps.proveSession(d, wrapper, ps.processStartTime(wrapper), { cursorWalk: true, readParent: (p) => chain[p] ?? null })).toStrictEqual({ id: SELF, pid: host });
+  });
+
+  it("C3: an ide:claude proof still carries its transcript_path", () => {
+    const d = tmp();
+    writeFileSync(join(d, "4242.json"), JSON.stringify({ session_id: SELF, claude_pid: 4242, proc_start: "s", ide: "claude", transcript_path: "C:/t/x.jsonl" }));
+    expect(ps.proveSession(d, 4242, "s")).toStrictEqual({ id: SELF, pid: 4242, transcriptPath: "C:/t/x.jsonl" });
   });
 });
