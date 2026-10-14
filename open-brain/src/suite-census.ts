@@ -4,7 +4,8 @@
  *
  * Contract (atlas s161, hub v1.17 seat state): GET {hub}/a2a/agents/presence
  * with header X-Agent-Key. Busy is agents[].seat.seatState === "working",
- * including a waker seat. No key, unreachable hub, or a body without
+ * or "alarm" with alarmReason run_too_long or orphan_run (A2A-Hub v1.22.13:
+ * the run is still going; T-269), including a waker seat. No key, unreachable hub, or a body without
  * seat.seatState is "census unavailable: …", never idle.
  */
 
@@ -41,6 +42,15 @@ export function resolveSeatKeyPath(input: {
 export interface CensusAgent {
   name: string;
   seatState: string;
+  alarmReason?: string;
+}
+
+/** A2A-Hub v1.22.13 publishes a run still going as alarm: run_too_long (seat-waker.mjs:294-296) and orphan_run (live PIDs of an earlier waker's run, waker/orphan.mjs:8-15). */
+export const BUSY_ALARM_REASONS: readonly string[] = ["run_too_long", "orphan_run"];
+
+/** Busy: seatState working, or alarm with a reason that means a run is still going (T-269). */
+export function isBusySeat(agent: CensusAgent): boolean {
+  return agent.seatState === "working" || (agent.seatState === "alarm" && agent.alarmReason !== undefined && BUSY_ALARM_REASONS.includes(agent.alarmReason));
 }
 
 export interface CensusResult {
@@ -106,10 +116,13 @@ export function agentsFromPresenceBody(body: unknown): { ok: true; agents: Censu
   for (const row of agents) {
     if (row === null || typeof row !== "object") continue;
     const name = (row as { name?: unknown }).name;
-    const seat = (row as { seat?: { seatState?: unknown } }).seat;
+    const seat = (row as { seat?: { seatState?: unknown; alarmReason?: unknown } }).seat;
     const seatState = seat && typeof seat.seatState === "string" ? seat.seatState : undefined;
     if (seatState) sawSeatState = true;
-    if (typeof name === "string" && seatState) out.push({ name, seatState });
+    if (typeof name === "string" && seatState) {
+      if (seat && typeof seat.alarmReason === "string") out.push({ name, seatState, alarmReason: seat.alarmReason });
+      else out.push({ name, seatState });
+    }
   }
   if (!sawSeatState) return { ok: false, reason: "census unavailable: presence body has no seat.seatState" };
   return { ok: true, agents: out };
@@ -119,7 +132,7 @@ function siaBusy(agents: CensusAgent[], siaSeatNames: readonly string[]): string
   const sia = new Set(siaSeatNames);
   const busy: string[] = [];
   for (const agent of agents) {
-    if (agent.seatState !== "working") continue;
+    if (!isBusySeat(agent)) continue;
     const wakerOf = agent.name.endsWith("-waker") ? agent.name.slice(0, -"-waker".length) : null;
     const isSia = sia.has(agent.name) || (wakerOf !== null && sia.has(wakerOf));
     const isWaker = agent.name.endsWith("-waker");
@@ -132,7 +145,7 @@ function mergeAgents(a: CensusAgent[], b: CensusAgent[]): CensusAgent[] {
   const byName = new Map<string, CensusAgent>();
   for (const row of [...a, ...b]) {
     const prev = byName.get(row.name);
-    if (!prev || row.seatState === "working") byName.set(row.name, row);
+    if (!prev || isBusySeat(row)) byName.set(row.name, row);
   }
   return [...byName.values()];
 }
