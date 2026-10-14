@@ -9,6 +9,7 @@ import { readRepoRecord } from "../../helpers/repo-record.js";
 import { roleFileFromGreetingSource } from "../../helpers/role-source.js";
 import type { State } from "../../../src/shared/state-schema.js";
 import { formatPartnerLine, presenceBlockUpperBound, type HubPartnerSeat } from "../../../src/pipelines/session-start/hub-presence.js";
+import { ALARM_REASON_MAX } from "../../../src/pipelines/session-start/hub-seat-state.js";
 
 /**
  * T-183, row T183-4: the `greeting-size` detector, validated against a known
@@ -331,6 +332,8 @@ describe("greeting-size — T-198 presence bound", () => {
         formatPartnerLine(p, [{ name: p.hub_as, rooms: [] }], runtime),
         formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "owes_reply" }, rooms: [] }], "cursor"),
         formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "mystery" }, rooms: [] }], "cursor"),
+        formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "alarm", alarmReason: "x".repeat(ALARM_REASON_MAX) }, rooms: [] }], "cursor"),
+        formatPartnerLine(p, [{ name: p.hub_as, seat: { seatState: "alarm", alarmReason: "Not A Token" }, rooms: [] }], "cursor"),
       ];
       for (const pollingNow of [true, false]) {
         for (const unread of [0, 999]) {

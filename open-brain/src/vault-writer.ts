@@ -203,16 +203,23 @@ export function replaceStateNote(path: string, input: ExperienceInput, demotedAt
   renameSync(tmp, path);
 }
 
+/**
+ * Where a failure note for this key lives. Exported so `storeFailure` can check
+ * the key against it before writing (T-266).
+ */
+export function failurePath(vaultDir: string, project: string, key: string): string {
+  const projectSeg = safeVaultPathSegment("project", project);
+  const experiencesDir = join(vaultDir, "Experiences");
+  return joinUnderVaultDir(experiencesDir, projectSeg, `failure-${slugify(key)}.md`);
+}
+
 // ─── writeFailure ────────────────────────────────────────────────────────────
 
 export function writeFailure(
   vaultDir: string,
   input: FailureInput
 ): string | null {
-  const keySlug = slugify(input.key);
-  const projectSeg = safeVaultPathSegment("project", input.project);
-  const experiencesDir = join(vaultDir, "Experiences");
-  const filePath = joinUnderVaultDir(experiencesDir, projectSeg, `failure-${keySlug}.md`);
+  const filePath = failurePath(vaultDir, input.project, input.key);
 
   if (existsSync(filePath)) return null;
 

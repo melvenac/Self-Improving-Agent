@@ -527,11 +527,9 @@ export function updateFeedbackV2(db: Database.Database, vaultPath: string, ratin
 }
 
 /**
- * Archive an entry's note and mark its index row archived, without destroying
- * the note. No caller remains: `ob_forget` archives the note itself and
- * DELETES the row. The old parenthesis below is kept verbatim only because
- * R-011 pins its line hash; its first half was wrong:
- * (the helper `ob_forget` uses; apoptosis, which once also called it, is cut).
+ * Mark an entry's index row archived, without touching its note. No caller
+ * remains: `ob_forget` archives the note itself and DELETES the row, and
+ * apoptosis, which once called it, is cut.
  *
  * Replaces the `DELETE FROM knowledge_index` this path used to run. The delete
  * was unsafe for a reason the schema makes structural: neither `feedback_log`
