@@ -127,13 +127,16 @@ const stageProgram = (stage: string): string => {
   return t.slice(t.lastIndexOf("/") + 1).toLowerCase().replace(/\.exe$/, "");
 };
 
+/** T-288: the text before a single quote ends in an inner shell's `-c` (bash -c, bash -lc, wsl bash -c, docker exec app sh -c). */
+const INNER_SHELL_C = /(^|[\s/\\])(bash|sh|zsh|dash)(\.exe)?\s+-[A-Za-z]*c[A-Za-z]*\s*$/i;
+
 /**
  * Split a script into top-level statements (on unquoted `;`, newline, `&&`,
  * `||`, `&`) and each statement into pipeline stages (on unquoted `|`). A bare
  * `( ... )` subshell is transparent; a `$( ... )` substitution is kept whole.
- * The single-quoted argument of `ssh` is returned in `remote`: it is the remote
- * host's shell, so it is a script in its own right. Any other single-quoted
- * string is inert.
+ * The single-quoted argument of `ssh`, or of an inner shell's `-c` (T-288), is
+ * returned in `remote`: it is another shell's script, so it is a script in its
+ * own right. Any other single-quoted string is inert.
  */
 const splitStatements = (script: string): { stmts: Statement[]; remote: string[] } => {
   const stmts: Statement[] = [];
@@ -141,6 +144,7 @@ const splitStatements = (script: string): { stmts: Statement[]; remote: string[]
   let stages = [""];
   let masked = "";
   let sq = false, dq = false, esc = false, sqBuf = "";
+  let sqStart = 0;
   const parens: Array<"sub" | "grp"> = [];
   const flush = () => {
     if (stages.some((s) => s.trim()) || masked.trim()) stmts.push({ stages: stages.map((s) => s.trim()), masked });
@@ -158,14 +162,15 @@ const splitStatements = (script: string): { stmts: Statement[]; remote: string[]
     if (sq) {
       if (c === "'") {
         sq = false;
-        if (stageProgram(stages[stages.length - 1]) === "ssh") remote.push(sqBuf);
+        const stage = stages[stages.length - 1];
+        if (stageProgram(stage) === "ssh" || INNER_SHELL_C.test(stage.slice(0, sqStart))) remote.push(sqBuf);
         add(c);
       } else { sqBuf += c; add(c, " "); }
       continue;
     }
     if (c === "\\") { add(c); esc = true; continue; }
     if (dq) { if (c === '"') dq = false; add(c); continue; }
-    if (c === "'") { sq = true; sqBuf = ""; add(c); continue; }
+    if (c === "'") { sq = true; sqBuf = ""; sqStart = stages[stages.length - 1].length; add(c); continue; }
     if (c === '"') { dq = true; add(c); continue; }
     const inSub = parens.includes("sub");
     if (c === "(") {
@@ -178,6 +183,8 @@ const splitStatements = (script: string): { stmts: Statement[]; remote: string[]
       continue;
     }
     if (inSub) { add(c); continue; }
+    // T-288: a newline right after an unquoted `|` continues the pipeline (sh reads `cmd |\n tail` as one pipeline).
+    if (c === "\n" && stages.length > 1 && stages[stages.length - 1].trim() === "") { add(" "); continue; }
     if (c === ";" || c === "\n") { flush(); continue; }
     if ((c === "&" && n === "&") || (c === "|" && n === "|")) { flush(); i++; continue; }
     if (c === "&" && n !== ">" && script[i - 1] !== ">" && script[i - 1] !== "<") { flush(); continue; }
@@ -191,21 +198,26 @@ const splitStatements = (script: string): { stmts: Statement[]; remote: string[]
 const isTrimmerPipeline = (s: Statement): boolean =>
   s.stages.length > 1 && (TRIMMERS as readonly string[]).includes(stageProgram(s.stages[s.stages.length - 1]));
 
-const scriptHasUnsafeRead = (stmts: readonly Statement[]): boolean =>
-  stmts.some(
+// T-288: a statement that is only `}` closes a `{ ...; }` group, whose status is its last command's: skip it, as a
+// `( ... )` subshell is already transparent.
+const scriptHasUnsafeRead = (all: readonly Statement[]): boolean => {
+  const stmts = all.filter((s) => s.masked.trim() !== "}");
+  return stmts.some(
     (s, i) =>
       i > 0 &&
       /\$\?|\$\{\?\}/.test(s.masked) &&
       isTrimmerPipeline(stmts[i - 1]) &&
       !stmts.slice(0, i).some((p) => /\bpipefail\b/.test(p.masked)),
   );
+};
 
 /**
  * True exactly when the command reads `$?` as the status of a pipeline whose
  * last stage is a trimmer: the statement the `$?` follows is such a pipeline,
  * and `set -o pipefail` is not in effect earlier in the same script. Heredoc
  * bodies and single-quoted strings are not shell to this test, except the
- * single-quoted argument of `ssh`, which is tested as the remote script.
+ * single-quoted argument of `ssh` or of `bash/sh -c` (T-288), which is tested
+ * as that shell's script.
  *
  * The semantics are T-264's VIOLATING class (`docs/loops/t264/measure.mjs`),
  * ported rather than imported, narrowed to the ruling's trimmers and to `ssh`.
