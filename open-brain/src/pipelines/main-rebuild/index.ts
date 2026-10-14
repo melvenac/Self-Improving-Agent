@@ -63,6 +63,7 @@ export interface MainRebuildResult {
 export const BACKUPS_KEPT = 3;
 
 const BACKUPS_DIR = "open-brain-build-backups";
+const BACKUP_NAME = /^[0-9a-f]{7}-\d{8}T\d{9}Z$/;
 const BUILD_TIMEOUT_MS = 600_000;
 
 const runner =
@@ -124,7 +125,28 @@ class StepFailure extends Error {
 }
 
 const firstLine = (s: string): string => s.trim().split(/\r?\n/).find((l) => l.trim() !== "")?.trim() ?? "";
-const cause = (r: Run): string => r.error ?? (firstLine(r.stderr) || firstLine(r.stdout) || `exit ${r.status}`);
+
+const CAUSE_MAX = 300;
+/** The first line naming an error (stdout first: tsc writes its errors there, and npm's own "npm error" lines go to
+ *  stderr), joined to the next line when it ends with ":" (git names the blocking file there). Else the first line. */
+function errorLine(s: string): string {
+  const ls = s.split(/\r?\n/).map((l) => l.trim());
+  const i = ls.findIndex((l) => /\berror\b/i.test(l));
+  if (i < 0) return "";
+  const next = ls.slice(i + 1).find((l) => l !== "");
+  return ls[i]!.endsWith(":") && next !== undefined ? `${ls[i]} ${next}` : ls[i]!;
+}
+export function runCause(r: Run): string {
+  const c = r.error ?? (errorLine(r.stdout) || errorLine(r.stderr) || firstLine(r.stderr) || firstLine(r.stdout) || `exit ${r.status}`);
+  return c.length > CAUSE_MAX ? `${c.slice(0, CAUSE_MAX - 1)}…` : c;
+}
+
+/** V2's child: import the new server.js, then construct a Database through the build's own dependency (better-sqlite3
+ *  loads its native binding in the constructor, not on import; T-172 r3, F2). */
+export function v2Args(serverUrl: string): string[] {
+  const u = JSON.stringify(serverUrl);
+  return ["--input-type=module", "-e", `import ${u}; import { createRequire } from "node:module"; const Database = createRequire(${u})("better-sqlite3"); new Database(":memory:").close();`];
+}
 
 /** `<built7>-<UTC>`, sortable by its time part. */
 const utcStamp = (d: Date): string => d.toISOString().replace(/[-:]/g, "").replace(".", "");
@@ -179,6 +201,7 @@ function liveSessions(proofDir: string, deps: MainRebuildDeps): { sessions: Live
       continue;
     }
     if (typeof proof.claude_pid !== "number" || typeof proof.session_id !== "string" || typeof proof.proc_start !== "string") continue;
+    if (Number(n.slice(0, -".json".length)) !== proof.claude_pid) continue;
     const start = deps.startTimeOf(proof.claude_pid);
     if (start === null || start !== proof.proc_start) continue;
     if (!runsServer(proof.claude_pid)) continue;
@@ -196,6 +219,9 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
     return { exitCode, lines };
   };
   const git = (args: string[]): Run => deps.git(args, tree);
+  // F1 (T-172 r3): npm 10.9.8 strips the "libc" fields newer npm writes, so any install dirties the tracked lock.
+  const MANIFESTS = ["open-brain/package.json", "open-brain/package-lock.json"];
+  const cleanManifests = (): Run => git(["checkout", "-q", "--", ...MANIFESTS]);
   const gitText = (args: string[]): string | null => {
     const r = git(args);
     return r.status === 0 && !r.error ? r.stdout.trim() : null;
@@ -207,6 +233,7 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
     return refuse(`takes at most one <sha>, got ${positionals.map((p) => `"${p}"`).join(", ")}.`, 2);
   }
   const target = positionals[0];
+  if (target !== undefined && target.startsWith("-")) return refuse(`"${target}" is not a commit: a <sha> never starts with "-".`, 2);
   const label7 = (s: string | undefined): string => (s === undefined ? SERVING_UPSTREAM : /^[0-9a-f]{40}$/i.test(s) ? s.slice(0, 7) : s);
 
   // 1. Only the main checkout's build serves.
@@ -222,11 +249,24 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
 
   // 2. A clean tree, untracked files included.
   const status = git(["status", "--porcelain=v1", "--untracked-files=all"]);
-  if (status.status !== 0) return refuse(`git status failed (${cause(status)}).`);
+  if (status.status !== 0) return refuse(`git status failed (${runCause(status)}).`);
   const dirty = status.stdout.split(/\r?\n/).filter((l) => l.trim() !== "").map((l) => l.slice(3));
   if (dirty.length > 0) {
     return refuse(
       `the working tree is not clean, so the build would be stamped ${label7(target)} while carrying changes that are not in it: ${dirty.join(", ")}`,
+    );
+  }
+
+  // 2b. A flag that hides a tracked file's changes from git status (T-172 r3, F4).
+  const flags = git(["ls-files", "-v"]);
+  if (flags.status !== 0 || flags.error) return refuse(`git ls-files failed (${runCause(flags)}).`);
+  const hidden = flags.stdout
+    .split(/\r?\n/)
+    .filter((l) => /^(S|[a-z]) /.test(l))
+    .map((l) => `${l.slice(2)} (${l[0] === "S" ? "skip-worktree" : l[0] === "s" ? "skip-worktree, assume-unchanged" : "assume-unchanged"})`);
+  if (hidden.length > 0) {
+    return refuse(
+      `git hides changes to ${hidden.length} tracked file(s), so the build could be stamped ${label7(target)} while carrying changes that are not in it: ${hidden.join(", ")}. Clear the flag with git update-index --no-skip-worktree or --no-assume-unchanged.`,
     );
   }
 
@@ -291,7 +331,7 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
 
   // The plan.
   const manifest = git(["diff", "--quiet", built, sha, "--", "open-brain/package.json", "open-brain/package-lock.json"]);
-  if (manifest.status !== 0 && manifest.status !== 1) return refuse(`git cannot compare the manifests of ${built7} and ${sha7} (${cause(manifest)}).`);
+  if (manifest.status !== 0 && manifest.status !== 1) return refuse(`git cannot compare the manifests of ${built7} and ${sha7} (${runCause(manifest)}).`);
   const install = manifest.status === 1;
   const common = gitText(["rev-parse", "--path-format=absolute", "--git-common-dir"]);
   if (common === null) return refuse("git cannot name the common git directory for the backup.");
@@ -322,7 +362,7 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
   lines.push(`Backed up open-brain/build (stamp ${built7}) to ${backup}`);
   try {
     const old = readdirSync(backupRoot)
-      .filter((n) => n !== basename(backup))
+      .filter((n) => n !== basename(backup) && BACKUP_NAME.test(n))
       .sort((a, b) => backupTime(b).localeCompare(backupTime(a)));
     for (const n of old.slice(BACKUPS_KEPT - 1)) rmSync(join(backupRoot, n), { recursive: true, force: true });
   } catch {
@@ -334,31 +374,32 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
   try {
     // Step 2.
     const co = git(["checkout", "-q", "--detach", sha]);
-    if (co.status !== 0 || co.error) throw new StepFailure("checkout", cause(co));
+    if (co.status !== 0 || co.error) throw new StepFailure("checkout", runCause(co));
     // Step 3: install, never ci. A running server holds better_sqlite3.node, which ci would delete.
     if (install) {
       installed = true;
       const r = npm(["install"], ob);
-      if (r.status !== 0 || r.error) throw new StepFailure("npm install", cause(r));
+      const c = cleanManifests();
+      if (r.status !== 0 || r.error) throw new StepFailure("npm install", runCause(r));
+      if (c.status !== 0 || c.error) throw new StepFailure("npm install", `could not put back the tracked manifests: ${runCause(c)}`);
     }
     // Step 4.
     const b = npm(["run", "build"], ob);
-    if (b.status !== 0 || b.error) throw new StepFailure("npm run build", cause(b));
+    if (b.status !== 0 || b.error) throw new StepFailure("npm run build", runCause(b));
     // V1: the stamp, read back from disk. A build that exits 0 over the old stamp did not build this commit.
     const stamped = readStampedCommit(build);
     if (stamped !== sha) throw new StepFailure("V1 (stamp)", `build-info.json says ${stamped === null ? "no commit" : stamped.slice(0, 7)}, not ${sha7}`);
-    // V2: a fresh process imports the server; importing loads the native binding and does not start it. A static
-    // import in the child loads it exactly as an awaited dynamic one would, and this source keeps no dynamic import.
+    // V2: a fresh process imports the server AND opens an in-memory database: the binding loads in the constructor.
     const serverUrl = pathToFileURL(join(build, "server.js")).href;
-    const v2 = deps.node(["--input-type=module", "-e", `import ${JSON.stringify(serverUrl)};`], ob);
-    if (v2.status !== 0 || v2.error) throw new StepFailure("V2 (import server.js)", cause(v2));
+    const v2 = deps.node(v2Args(serverUrl), ob);
+    if (v2.status !== 0 || v2.error) throw new StepFailure("V2 (import server.js, open a database)", runCause(v2));
     // V3: a fresh process runs the NEW build's serving-build line.
     const sbUrl = pathToFileURL(join(build, "pipelines", "session-start", "serving-build.js")).href;
     const v3 = deps.node(
       ["--input-type=module", "-e", `import { describeServingBuild } from ${JSON.stringify(sbUrl)}; console.log(describeServingBuild());`],
       ob,
     );
-    if (v3.status !== 0 || v3.error) throw new StepFailure("V3 (serving build)", cause(v3));
+    if (v3.status !== 0 || v3.error) throw new StepFailure("V3 (serving build)", runCause(v3));
     const line = firstLine(v3.stdout);
     verdict = classifyServingLine(line, sha7);
     if (verdict.kind === "other") throw new StepFailure("V3 (serving build)", `the serving-build line is not current: ${line || "(empty)"}`);
@@ -368,20 +409,24 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
     lines.push(`main-rebuild FAILED at ${step}: ${why}`);
     // The restore, in order: HEAD, build/, install, then the stamp read back.
     try {
+      const c0 = cleanManifests();
+      if (c0.status !== 0 || c0.error) throw new Error(`git checkout -- open-brain/package*.json: ${runCause(c0)}`);
       const back = git(oldBranch !== null ? ["checkout", "-q", oldBranch] : ["checkout", "-q", "--detach", oldHead]);
-      if (back.status !== 0 || back.error) throw new Error(`git checkout ${oldBranch ?? oldHead.slice(0, 7)}: ${cause(back)}`);
+      if (back.status !== 0 || back.error) throw new Error(`git checkout ${oldBranch ?? oldHead.slice(0, 7)}: ${runCause(back)}`);
       if (gitText(["rev-parse", "HEAD"]) !== oldHead) throw new Error(`HEAD is not ${oldHead.slice(0, 7)} after the checkout`);
       rmSync(build, { recursive: true, force: true });
       cpSync(backup, build, { recursive: true });
       if (installed) {
         const r = npm(["install"], ob);
-        if (r.status !== 0 || r.error) throw new Error(`npm install: ${cause(r)}`);
+        if (r.status !== 0 || r.error) throw new Error(`npm install: ${runCause(r)}`);
+        const c1 = cleanManifests();
+        if (c1.status !== 0 || c1.error) throw new Error(`git checkout -- open-brain/package*.json: ${runCause(c1)}`);
       }
       const back7 = readStampedCommit(build);
       if (back7 !== built) throw new Error(`the restored stamp is ${back7 === null ? "missing" : back7.slice(0, 7)}, not ${built7}`);
     } catch (restoreErr) {
       lines.push(
-        `RESTORE FAILED: ${restoreErr instanceof Error ? restoreErr.message : String(restoreErr)}. Hooks and new MCP servers in EVERY session will fail. By hand: git checkout --detach ${oldHead}; copy ${backup} to open-brain/build. Tell Aaron.`,
+        `RESTORE FAILED: ${restoreErr instanceof Error ? restoreErr.message : String(restoreErr)}. Hooks and new MCP servers in EVERY session will fail. By hand: git checkout -- open-brain/package.json open-brain/package-lock.json; git checkout ${oldBranch ?? `--detach ${oldHead}`}; copy ${backup} to open-brain/build. Tell Aaron.`,
       );
       return { exitCode: 4, lines };
     }
@@ -389,7 +434,9 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
     return { exitCode: 3, lines };
   }
 
-  if (verdict.kind === "stale") {
+  if (verdict.kind === "stale" && target !== undefined) {
+    lines.push(`REBUILT: serving build ${sha7} as asked · ${verdict.codeCommits} code commit(s) behind ${SERVING_UPSTREAM} (fetch ${fetchTime}).`);
+  } else if (verdict.kind === "stale") {
     lines.push(`REBUILT ${sha7}, but ${SERVING_UPSTREAM} now has ${verdict.codeCommits} code commits past it: run main-rebuild again.`);
   } else {
     lines.push(`REBUILT: serving build ${sha7} · current (fetch ${fetchTime}).`);
@@ -407,5 +454,5 @@ export async function mainRebuild(tree: string, opts: MainRebuildOptions, deps: 
   }
   if (tableNote !== null) lines.push(tableNote);
   lines.push("Sessions with no proof are not listed; their greeting says STALE PROCESS until they reconnect.");
-  return { exitCode: verdict.kind === "stale" ? 5 : 0, lines };
+  return { exitCode: verdict.kind === "stale" && target === undefined ? 5 : 0, lines };
 }
