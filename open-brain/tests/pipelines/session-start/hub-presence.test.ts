@@ -171,6 +171,23 @@ describe("T-198 hub presence at /start (r2)", () => {
     expect(block.lines.join("\n")).toContain("forge: state:unknown(bogus)");
   });
 
+  it("T-269 P1 a cursor-runtime partner in alarm prints the hub's reason", async () => {
+    const body = {
+      agents: [
+        {
+          name: "forge",
+          rooms: [{ sessionId: FORGE_ROOM, unread: 0, pollingNow: true, pollAgeMs: 1000 }],
+          seat: { seatState: "alarm", alarmReason: "run_too_long" },
+        },
+        { name: "cursor-infra", rooms: [{ sessionId: INFRA_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }] },
+        { name: "cursor-builder", rooms: [{ sessionId: BUILDER_ROOM, unread: 0, pollingNow: false, pollAgeMs: 0 }] },
+      ],
+    };
+    const { fetchFn } = fixtureFetch(body);
+    const block = await describe_(fetchFn);
+    expect(block.lines.join("\n")).toContain("forge: alarm(run_too_long)");
+  });
+
   describe("T-237 pollAgeMs null is A2A's 'no wait-poll in the window', not a malformed body", () => {
     it("T237-1 a room with pollAgeMs null is accepted, and the other rooms render normally", async () => {
       const { fetchFn } = fixtureFetch(roster({
