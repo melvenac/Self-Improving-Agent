@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 448,
+  "revision": 449,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2079,17 +2079,17 @@
       "id": "T-276",
       "title": "A seat without Remote Control has no Claude-Session id to write, and ob_end still counts its commits as missing the trailer: fall back to the transcript's own session id",
       "priority": "P2",
-      "status": "in_progress",
+      "status": "done",
       "opened_session": 169,
-      "closed_session": null,
+      "closed_session": 171,
       "supersedes": null,
-      "note": "s169, reported by Prism (session 2) and planner-verified: Prism's session-1 transcript (656a5f8c) holds 0 bridge-session records (this Remote Control session's holds 100), so sessionIdsFromTranscript finds nothing and ob_end flagged 7 commits as missing Claude-Session. The count was structural, not a seat miss (the planner's Prism evaluation is corrected). Fix: when no bridge id exists, let the trailer check accept, and the attribution use, the transcript's own sessionId; test both kinds of transcript. — s170 planner research (not briefed): SIA's src never tells a seat what trailer to write; Claude Code's attribution reminder adds the 'Claude-Session: https://claude.ai/code/session_<X>' line only for a Remote Control session, so a non-RC seat's commits carry no trailer and count as UNATTRIBUTED. The guards match trailer text against the bridge ids sessionIdsFromTranscript reads (handoff-guard.ts:106, the cse_<X> of the bridge-session records); server.ts endSessionWindow already falls back to [sessionId] when there are none, cli-session-end.ts's E4 (around :147) does not (sessionIdsOk then says 'could not be read'). Fix shape: (1) one helper beside sessionIdsFromTranscript, bridge ids or else the transcript's own session uuid, used by server.ts and both cli-session-end checks; (2) a writing side, a conditional ob_start line for a session with no bridge id ('end every commit with Claude-Session: <uuid>'), which touches start-report.ts and briefing.ts, so brief it AFTER #688 (T-161) merges; (3) the UNATTRIBUTED line says when the cause is structural (no Remote Control). Test both kinds of transcript. — s170: briefed: docs/loops/t276-non-rc-session-trailer-brief.md (base 7d9215b2): sessionTrailerIds falls back to the session's own uuid when a transcript record names it and no bridge id exists (whole-file read when the head has none: Remote Control can start mid-session); both cli-session-end checks use it; ob_start prints one COMMIT TRAILER line outside the Briefing. Queued on the QA PC chain. Deterministic follow-up: T-284. — s170: LAUNCHED on the QA PC (clark, Opus, pinned 9d93d837); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s171 planner ACCEPT at 1d855c87 (#710): the 5 src files exactly as ruled R1-R4; M1-M9 red (M3 also A1/C1, explained correctly); CI test pass; merges clean with master, #701 and #708. Opus second review LAUNCHED (body %TEMP%/t276-opus-review-body.md; reply ~/Worktrees/t276-review-reply.md). In Aaron's second merge ask. — s171: r2 BLOCKED (F3's fixture padded the first line; amendment-2 #719 adds lateBridgeShortHead). r3 BLOCKED (MX6 bites only on a 'none' source; amendment-3 #722 adds row F4 as a 4th commit in the r3 clone oneoff-t276-r3 at 610f13ba, then pushes). r4 launch line sent to clark. Aaron's word covers #710 only on the planner's ACCEPT of the final round.",
+      "note": "s169, reported by Prism (session 2) and planner-verified: Prism's session-1 transcript (656a5f8c) holds 0 bridge-session records (this Remote Control session's holds 100), so sessionIdsFromTranscript finds nothing and ob_end flagged 7 commits as missing Claude-Session. The count was structural, not a seat miss (the planner's Prism evaluation is corrected). Fix: when no bridge id exists, let the trailer check accept, and the attribution use, the transcript's own sessionId; test both kinds of transcript. — s170 planner research (not briefed): SIA's src never tells a seat what trailer to write; Claude Code's attribution reminder adds the 'Claude-Session: https://claude.ai/code/session_<X>' line only for a Remote Control session, so a non-RC seat's commits carry no trailer and count as UNATTRIBUTED. The guards match trailer text against the bridge ids sessionIdsFromTranscript reads (handoff-guard.ts:106, the cse_<X> of the bridge-session records); server.ts endSessionWindow already falls back to [sessionId] when there are none, cli-session-end.ts's E4 (around :147) does not (sessionIdsOk then says 'could not be read'). Fix shape: (1) one helper beside sessionIdsFromTranscript, bridge ids or else the transcript's own session uuid, used by server.ts and both cli-session-end checks; (2) a writing side, a conditional ob_start line for a session with no bridge id ('end every commit with Claude-Session: <uuid>'), which touches start-report.ts and briefing.ts, so brief it AFTER #688 (T-161) merges; (3) the UNATTRIBUTED line says when the cause is structural (no Remote Control). Test both kinds of transcript. — s170: briefed: docs/loops/t276-non-rc-session-trailer-brief.md (base 7d9215b2): sessionTrailerIds falls back to the session's own uuid when a transcript record names it and no bridge id exists (whole-file read when the head has none: Remote Control can start mid-session); both cli-session-end checks use it; ob_start prints one COMMIT TRAILER line outside the Briefing. Queued on the QA PC chain. Deterministic follow-up: T-284. — s170: LAUNCHED on the QA PC (clark, Opus, pinned 9d93d837); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s171 planner ACCEPT at 1d855c87 (#710): the 5 src files exactly as ruled R1-R4; M1-M9 red (M3 also A1/C1, explained correctly); CI test pass; merges clean with master, #701 and #708. Opus second review LAUNCHED (body %TEMP%/t276-opus-review-body.md; reply ~/Worktrees/t276-review-reply.md). In Aaron's second merge ask. — s171: r2 BLOCKED (F3's fixture padded the first line; amendment-2 #719 adds lateBridgeShortHead). r3 BLOCKED (MX6 bites only on a 'none' source; amendment-3 #722 adds row F4 as a 4th commit in the r3 clone oneoff-t276-r3 at 610f13ba, then pushes). r4 launch line sent to clark. Aaron's word covers #710 only on the planner's ACCEPT of the final round. — Closed s171: r4 READY d0b7c003 (planner ACCEPT; r3 src = amendment-1 ruling 1 verbatim; F4 kills MX6); Opus re-review ACCEPT at d0b7c003 (all three round-1 findings closed, no regression); Aaron's word '+ #710 on its review ACCEPT' met; #710 merged 4651ca9e (trees equal); main rebuilt 4651ca9e; live check PASS (sessionTrailerIds gives source 'session' for a transcript naming itself with no bridge id) and the 14 earlier checks still PASS on 4651ca9e. Lesson: three of T-276's four rounds blocked on the planner's amendments (a fixture, a mutant prediction), each caught by the builder's probe.",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
         "0a40685b-edbc-4c79-be9f-dcd4963428e7",
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
-      "closed_rev": null
+      "closed_rev": 449
     },
     {
       "id": "T-277",
@@ -2246,7 +2246,7 @@
       "opened_session": 171,
       "closed_session": null,
       "supersedes": null,
-      "note": "s171, from the T-277 Opus second review at 5baed1b5. F1: latest-brief.ts:47 '...rootBriefs' grows argv with the brief count; 1,000 committed docs/loop-*-brief*.md give 'Latest brief: not determined (git: spawnSync git ENAMETOOLONG)' and READS OWED drops the brief; 400 briefs 295 ms vs 69 ms at base. Fix suggested by the review: a single `:(glob)docs/loop-*.md` pathspec (present already filters names). F2: mutants S3 (catch return true) and S5 (name test -> startsWith('loop-')) survive; failing inputs: a non-git dir whose docs/ holds only loop-notes.md, or docs is a file. Do after T-277 (#704) merges. — s171: brief docs/loops/t287-latest-brief-glob-pathspec-brief.md (#720), LAUNCHED by clark on the QA PC at base 90f8c8d6; reply ~/Worktrees/t287-reply.md.",
+      "note": "s171, from the T-277 Opus second review at 5baed1b5. F1: latest-brief.ts:47 '...rootBriefs' grows argv with the brief count; 1,000 committed docs/loop-*-brief*.md give 'Latest brief: not determined (git: spawnSync git ENAMETOOLONG)' and READS OWED drops the brief; 400 briefs 295 ms vs 69 ms at base. Fix suggested by the review: a single `:(glob)docs/loop-*.md` pathspec (present already filters names). F2: mutants S3 (catch return true) and S5 (name test -> startsWith('loop-')) survive; failing inputs: a non-git dir whose docs/ holds only loop-notes.md, or docs is a file. Do after T-277 (#704) merges. — s171: brief docs/loops/t287-latest-brief-glob-pathspec-brief.md (#720), LAUNCHED by clark on the QA PC at base 90f8c8d6; reply ~/Worktrees/t287-reply.md. — s171: READY 991fa60e (#721); planner ACCEPT (src = ruling verbatim; T287-1 red at base with ENAMETOOLONG on the QA PC; M1-M3 red; M4 equivalent as predicted; CI pass; merges clean). Waiting on Aaron's word via clark ('merge SIA #721'); then its own rebuild and a live check of 2,000 docs-root briefs.",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
@@ -5999,7 +5999,7 @@
     },
     {
       "n": 171,
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "uuid": "13042431-247e-4dad-9477-507e43fc7916",
       "seat": "planner",
       "checkout": "sia-planner",
