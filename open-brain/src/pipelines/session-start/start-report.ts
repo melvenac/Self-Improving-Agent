@@ -14,7 +14,7 @@ import { describeHubPresence } from "./hub-presence.js";
 import { countWords, estimateTokens, STATE_JSON_REL } from "./state-reader.js";
 import { renderState, missingHandoffLine } from "./state-render.js";
 import { describeServingBuild } from "./serving-build.js";
-import { describeTranscript } from "./transcript-check.js";
+import { describeCommitTrailer, describeTranscript } from "./transcript-check.js";
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills, describeProblemStatement } from "./briefing.js";
 import { oldStartCommandWarning } from "../bootstrap/index.js";
 import { describeLatestBrief } from "./latest-brief.js";
@@ -107,6 +107,7 @@ export async function renderStartReport(input: StartReportInput): Promise<StartR
     : `Session ID: ${result.session.sessionId ?? "discovery failed"}`;
   // T-161: one line when the proven session has no transcript on disk; null (nothing printed) otherwise.
   const transcript = describeTranscript(proven);
+  const commitTrailer = describeCommitTrailer(proven);
 
   const lines: string[] = [];
 
@@ -166,10 +167,12 @@ export async function renderStartReport(input: StartReportInput): Promise<StartR
     lines.push(`Log: ${result.session.logPath}`);
     lines.push(sessionIdLine);
     if (transcript) lines.push(transcript);
+    if (commitTrailer) lines.push(commitTrailer);
   } else if (result.session.skippedReason) {
     lines.push(`\nSession log: ${result.session.skippedReason}`);
     lines.push(sessionIdLine);
     if (transcript) lines.push(transcript);
+    if (commitTrailer) lines.push(commitTrailer);
   }
 
   if (result.health.warnings.length > 0) {

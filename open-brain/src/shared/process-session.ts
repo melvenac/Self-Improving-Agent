@@ -155,7 +155,8 @@ export type Win32TableResult =
 export function parseWin32ProcessTable(raw: string): Win32TableResult {
   const trimmed = raw.trim();
   if (!trimmed) return { ok: false, reason: "Win32 process table: empty stdout" };
-  // PowerShell 5.1's ConvertTo-Json can leave a control character raw in a CommandLine (T-270).
+  // Defence in depth (T-270): a raw C0 byte once reached this parse. ConvertTo-Json escapes control characters;
+  // the console's cp437 best-fit encoder on the pipe made them (→ as 0x1A), and the read now escapes to ASCII (T-279).
   // A space, not deletion, so the tokens either side of it stay apart for isClaudeExeCommandLine.
   const cleaned = trimmed.replace(/[\u0000-\u001f]/g, " ");
   let parsed: unknown;
@@ -199,15 +200,25 @@ export function loadWin32ProcessTable(run: () => string = readWin32ProcessTableS
   }
 }
 
-function readWin32ProcessTableStdout(): string {
+/** The one CIM query the table reads. */
+export const WIN32_TABLE_PIPELINE = "Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine";
+
+/**
+ * PowerShell text that serialises `pipeline` with ConvertTo-Json -Compress, then escapes every UTF-16 code unit
+ * outside printable ASCII (0x20-0x7E) to \uXXXX, so only ASCII crosses the pipe (T-279). Windows PowerShell 5.1
+ * writes stdout in the console's OEM code page (437) with .NET best-fit: unescaped, → reaches Node as the C0 byte
+ * 0x1A, · as 0xFA (decoded as U+FFFD) and an emoji as "??". JSON.parse turns the escapes back into the exact
+ * string, an astral character's two surrogate escapes included. 5.1's ConvertTo-Json has no -EscapeHandling.
+ */
+export function asciiSafeJsonCommand(pipeline: string): string {
+  return `[regex]::Replace((${pipeline} | ConvertTo-Json -Compress), '[^\\x20-\\x7E]', [System.Text.RegularExpressions.MatchEvaluator]{ param($m) '\\u{0:x4}' -f [int][char]$m.Value })`;
+}
+
+/** Production reads WIN32_TABLE_PIPELINE; a Windows test passes a synthetic pipeline through the same spawn. */
+export function readWin32ProcessTableStdout(pipeline: string = WIN32_TABLE_PIPELINE): string {
   return execFileSync(
     "powershell.exe",
-    [
-      "-NoProfile",
-      "-NonInteractive",
-      "-Command",
-      "Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Compress",
-    ],
+    ["-NoProfile", "-NonInteractive", "-Command", asciiSafeJsonCommand(pipeline)],
     { encoding: "utf-8", timeout: 60_000, stdio: ["ignore", "pipe", "ignore"], windowsHide: true },
   );
 }

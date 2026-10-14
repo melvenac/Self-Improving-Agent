@@ -50,6 +50,12 @@ export const COMMAND_SPECS = {
     values: {},
     positionals: "directory",
   },
+  mainRebuild: {
+    name: "main-rebuild",
+    booleans: ["--dry-run", "--no-fetch"],
+    values: {},
+    positionals: "any",
+  },
   stateShow: {
     name: "state show",
     booleans: ["--json"],
