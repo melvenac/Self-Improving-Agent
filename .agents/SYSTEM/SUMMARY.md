@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 467 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 468 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-13 (Aaron, clark's window, 08:53 CDT): max parallel until the weekly reset at 00:00: every code-only brief goes to clark as soon as it is pinned; runs end at READY + PR; merges still need Aaron's word. QA PC OFF since ~14:3x CDT 10-13 for a RAM upgrade (Aaron's call, told via Relay for clark; no ETA): code-only runs and Opus reviews go to the desktop and the laptop meanwhile; its wakers restart at v1.22.13 on clark's word (SIA GO given, s170). Pending Aaron: T-194 approval mechanics (a)/(b)/(c); planner recommends (c) now, (b) later.
 
 ## What's working
@@ -161,10 +161,10 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 ## What's next
 
 - [P0] T-160 Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
-- [P0] T-194 Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
 - [P0] T-196 The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
 - [P1] T-170 Memory is LOOKUP by default and INJECTION only on a deterministic match against the act; fix the WRITE side first, so every stored lesson carries the key (command pattern, path or error string) that would have caught the mistake
 - [P1] T-181 Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing
+- [P1] T-202 The planner learns when a seat comes online: each seat worktree's SessionStart reports seat, checkout SHA, record rev and runtime (Claude Code or Cursor CLI) to the planner seat, deterministically
 
 ## Decisions
 
