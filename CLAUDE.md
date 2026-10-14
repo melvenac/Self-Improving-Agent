@@ -87,6 +87,10 @@ are detached or will be.
 The index lives in **one** checkout, so `gitnexus-index` **skips with a reason** in every other
 worktree. A skip there is not a pass.
 
+**`impact()` is a lower bound (T-166).** In a checkout without a current index, or for a nullable or
+indirect call, list callers by grep and say which instrument you used. A grep caller that `impact()`
+did not name makes the risk UNKNOWN.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
