@@ -28,6 +28,7 @@ const SAFE: Array<[string, string]> = [
   ['S5', "bash -c 'set -o pipefail; npm test | tail -5; echo $?'"],
   ['S6', "grep -c 'x | tail; echo $?' f.txt"],
   ['S7', "printf '%s\\n' a |\n  wc -l"],
+  ['S8', "bash -c 'true' 'npm test | tail -5; echo $?'"],
 ];
 
 describe('T-288: the parser reads three more shapes of the $? mistake', () => {
