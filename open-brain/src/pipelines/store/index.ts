@@ -4,6 +4,7 @@ import {
   writeExperience,
   writeFailure,
   experiencePath,
+  failurePath,
   noteBody,
   splitStateLog,
   replaceStateNote,
@@ -60,6 +61,11 @@ export interface StoreResult {
   existingKind?: string | null;
   /** A `state` re-stored with the value it already holds: nothing was written. */
   unchanged?: true;
+  /**
+   * T-266: the key already belongs to a row indexing a DIFFERENT note (another
+   * scope, another project, or a chunk). Nothing was written.
+   */
+  keyHeldBy?: { id: number; vaultPath: string; projectDir: string | null };
 }
 
 interface KnownRow {
@@ -68,6 +74,25 @@ interface KnownRow {
   vault_path: string;
   fact_kind: string | null;
   archived_into: number | null;
+}
+
+/**
+ * T-266: the row holding `key` when it indexes a note other than `target`.
+ * Paths compare slash- and case-insensitively, as the dedup lookup in `store`
+ * does. Undefined when no row holds the key, or the row is this note's own.
+ */
+function keyHeldElsewhere(
+  db: Database.Database,
+  key: string,
+  target: string,
+): { id: number; vaultPath: string; projectDir: string | null } | undefined {
+  const row = db
+    .prepare("SELECT id, vault_path, project_dir FROM knowledge_index WHERE key = ?")
+    .get(key) as { id: number; vault_path: string; project_dir: string | null } | undefined;
+  if (!row) return undefined;
+  const norm = (p: string) => p.replace(/\\/g, "/").toLowerCase();
+  if (norm(row.vault_path) === norm(target)) return undefined;
+  return { id: row.id, vaultPath: row.vault_path, projectDir: row.project_dir };
 }
 
 // ─── store ───────────────────────────────────────────────────────────────────
@@ -80,6 +105,15 @@ interface KnownRow {
 export function store(input: StoreInput): StoreResult {
   const { db, vaultDir, key, tags, content, project } = input;
   const source = input.source ?? 'ob_store';
+
+  // T-266: `key` is UNIQUE across every scope (db-v2.ts knowledge_index), so a
+  // key that another scope, another project or a chunk already holds would
+  // reach indexKnowledge's ON CONFLICT(key), which re-points that row to this
+  // note, overwrites its content and leaves its own note unindexed. Refuse
+  // before any file is written. A row holding this key at THIS note's path (a
+  // T-022 state replace, a duplicate, an adoption) passes untouched.
+  const held = keyHeldElsewhere(db, key, experiencePath(vaultDir, project, key));
+  if (held) return { vaultPath: null, keyHeldBy: held };
 
   const note: ExperienceInput = {
     key,
@@ -198,6 +232,10 @@ export function store(input: StoreInput): StoreResult {
  */
 export function storeFailure(input: StoreFailureInput): StoreResult {
   const { db, vaultDir, key, tags, attempted, whyFailed, whatWorked, project } = input;
+
+  // T-266: the same refusal as `store`, on the key this function indexes.
+  const held = keyHeldElsewhere(db, `failure-${key}`, failurePath(vaultDir, project, key));
+  if (held) return { vaultPath: null, keyHeldBy: held };
 
   const vaultPath = writeFailure(vaultDir, {
     key,

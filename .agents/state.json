@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 442,
+  "revision": 446,
   "project": {
     "name": "self-improving-agent"
   },
@@ -596,7 +596,7 @@
       "opened_session": 78,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154. — FINDING, planner session 150 (from T-201's stop): StateSchema is z.strictObject at every level, so ANY new field written to master's record blinds every checkout whose build predates it, including the main tree that serves every session's MCP server. T-158 (merged d5dfa74) already added optional GapSchema fields (status, closed_session, closed_rev). The first close_gap tombstone that reaches master will therefore make every not-yet-rebuilt build fail to parse the record. It is dormant until then, and it is a real reason for this task: the serving build must be rebuilt when a schema-changing merge lands, and a refusing command must say so. Until it ships: rebuild the main tree (npm install, not npm ci) before the first close_gap after d5dfa74, and tell the QA PC's main checkout the same. — s168 planner triage: half 1 DONE (4d19938/#345 serving-build line with its distance from origin/master; refined by #373 SERVED_PATHS). Stays open after 4d19938 for half 2: one refusing command that updates the main checkout, rebuilds and verifies it. Today's stand-in is clark's untracked clark-ops/scripts/sia-rebuild.sh (refuses a SHA not on master, backs up, checks out, npm ci when the lockfile changed, rebuilds, prints build-info) but it does not refuse a dirty tree, does not read build freshness back against origin/master, and does not list which sessions must reconnect. — s168: half 2 briefed: docs/loops/t172-main-rebuild-brief.md (#650), queued at clark: open-brain main-rebuild [<sha>] [--dry-run] [--no-fetch] (refusals in order: linked worktree, dirty tree, HEAD commits origin lacks, fetch failure, sha not on origin/master, not ahead of the BUILD STAMP, a better-sqlite3 change in the lock, npm not found); backup under the git common dir; npm install only on a lock change, never ci; V1 stamp, V2 import, V3 freshness 'current'; restore on failure (exit 3/4); RECONNECT list from live by-pid proofs. The coordinator was told of four defects in its stand-in sia-rebuild.sh (npm ci on a lock change; 'already at' by HEAD; build exit ignored with no restore; --help exits 1 hidden by | head) and will patch it until T-172 replaces it. — — s169: clark LAUNCHED half 2 at 13:10 CDT (desktop, Opus 5.5, base 50c112d7) on the OLD runner: non-ASCII in its prompt arrived as '?'. At READY, check the three '·' strings against the brief on master (L53's regex and STALE line, L60's 'REBUILT: serving build <sha7> · current (fetch <time>).'). Expect update-branch conflicts at refresh: sync/checks.ts (changed by T-267) and cli.ts / cli-spec.ts (changed by T-249). — s170: r1 BLOCKED at 634f7a8d PR #676 (a 36-row main-rebuild file, 7 of 7 mutants after a third commit, the 8 allowed files): CI failed S4-9.2, 'stale allowance for open-brain/tests/cli-flags.test.ts: expected 19 -> 18, found 19 -> 19'. The brief's main-rebuild --dry-rn row restores the base count, so the guard is right. #676 also conflicts with master in checks.ts's import block. G-001 check: its three '·' strings match the brief byte for byte. Ruling: docs/loops/t172-main-rebuild-brief-amendment-1.md (retire the cli-flags allowance; S4-9.2b tests a two-entry fixture; merge master c1975286 keeping all three imports; keep the typo row). Opus second review at the r2 READY. — s170: r2 LAUNCHED on the desktop from master 2534856e (clark, pid 11484, reply t172-r2-reply.md). — s170: r2 READY 778048db PR #676 (desktop; reply C:/Users/melve/AppData/Local/Temp/t172-r2-reply.md). Planner ACCEPT on the r2: the red at the head was the stale allowance; commit 1 is the ruling verbatim; the merge of c1975286 resolved checks.ts's imports exactly as ruled (cli.ts and cli-spec.ts auto-merged); tsc 0; 22 files, 433/433; M1 and M2 red; exactly the 9 files; CI pass at 778048db. Cosmetic: git kept its '# Conflicts:' paragraph after the merge commit's trailer. Opus second review (hard gate) body: C:/Users/melve/AppData/Local/Temp/T-172-opus-review-body.md, whole PR c1975286..778048db, first check the never-exercised default npm/git/node runners (a .cmd spawned without a shell throws EINVAL on Node 22 for Windows). — s170: Opus second review VERDICT CHANGES at 778048db (C:/Users/melve/AppData/Local/Temp/t172-review-reply.md; read it first-hand before ruling). Per clark's summary: F1 (HIGH) npm install rewrites package-lock.json on this host, so the restore then fails with exit 4; F2 (MEDIUM) V2 does not load the native binding; F3 (MEDIUM) pruning deletes real backups when the backups directory holds other entries; F4 (LOW) refusal 2 misses skip-worktree and assume-unchanged edits; F5 (MEDIUM, tests) six mutants of the changed src survive the four named test files. NOT RULED by s170 (rolled): the next planner rules from the review at 778048db and writes docs/loops/t172-main-rebuild-brief-amendment-2.md. #676 stays out of the merge batch until then. — s170: the Opus second review at 778048db came back CHANGES; the planner accepted every finding: F1 HIGH (npm 10.9.8 strips the lock's libc fields, so every install dirties package-lock.json and a failed restore exits 4), F2 (V2 never loads the binding: better-sqlite3 loads it in the constructor), F3 (pruning deletes real backups beside other entries), F4 (skip-worktree/assume-unchanged edits slip past refusal 2), F5 (mutants MA-MF), plus four nits. Amendment-2: docs/loops/t172-main-rebuild-brief-amendment-2.md (#691, b7bf4c06); V2's new check proven first-hand on Node 22 in the scratchpad. Queued on the QA PC chain as r3.",
+      "note": "Session 78, raised by Aaron's question ('so we need to rebuild after every loop and make sure the mcp server is on latest?'). The answer today is yes, by hand: after any merge touching open-brain/src, update the main checkout to master, rebuild, and have every open session run /mcp reconnect open-brain. That is a step that works only while someone remembers it, and it was missed. MEASURED 2026-09-22: the main tree was at 0bf0597, 24 commits behind origin/master 9788064, while every check read green, because build-freshness compares the main tree's build to the main tree's own HEAD and never to master (G-034). The SessionStart hook prints a tree-currency line for the seat's own checkout but none for the checkout actually serving the hooks and the MCP server. FIX SHAPE, deterministic first: (1) cli-bootstrap prints, first, 'serving build: <sha>, N behind origin/master (last fetch <time>)' for the MAIN tree, however the session was launched; it reads refs locally and never fetches; (2) one command, e.g. `open-brain main-tree update`, which refuses on a dirty tree or on commits not on origin/master (the detach command's three refusals), fast-forwards, rebuilds, and reads build-freshness back against origin/master rather than trusting exit codes. It then says which sessions must reconnect, because only the human can. The reconnect cannot be automated from inside a session. Relates to G-033, G-034, T-154. — FINDING, planner session 150 (from T-201's stop): StateSchema is z.strictObject at every level, so ANY new field written to master's record blinds every checkout whose build predates it, including the main tree that serves every session's MCP server. T-158 (merged d5dfa74) already added optional GapSchema fields (status, closed_session, closed_rev). The first close_gap tombstone that reaches master will therefore make every not-yet-rebuilt build fail to parse the record. It is dormant until then, and it is a real reason for this task: the serving build must be rebuilt when a schema-changing merge lands, and a refusing command must say so. Until it ships: rebuild the main tree (npm install, not npm ci) before the first close_gap after d5dfa74, and tell the QA PC's main checkout the same. — s168 planner triage: half 1 DONE (4d19938/#345 serving-build line with its distance from origin/master; refined by #373 SERVED_PATHS). Stays open after 4d19938 for half 2: one refusing command that updates the main checkout, rebuilds and verifies it. Today's stand-in is clark's untracked clark-ops/scripts/sia-rebuild.sh (refuses a SHA not on master, backs up, checks out, npm ci when the lockfile changed, rebuilds, prints build-info) but it does not refuse a dirty tree, does not read build freshness back against origin/master, and does not list which sessions must reconnect. — s168: half 2 briefed: docs/loops/t172-main-rebuild-brief.md (#650), queued at clark: open-brain main-rebuild [<sha>] [--dry-run] [--no-fetch] (refusals in order: linked worktree, dirty tree, HEAD commits origin lacks, fetch failure, sha not on origin/master, not ahead of the BUILD STAMP, a better-sqlite3 change in the lock, npm not found); backup under the git common dir; npm install only on a lock change, never ci; V1 stamp, V2 import, V3 freshness 'current'; restore on failure (exit 3/4); RECONNECT list from live by-pid proofs. The coordinator was told of four defects in its stand-in sia-rebuild.sh (npm ci on a lock change; 'already at' by HEAD; build exit ignored with no restore; --help exits 1 hidden by | head) and will patch it until T-172 replaces it. — — s169: clark LAUNCHED half 2 at 13:10 CDT (desktop, Opus 5.5, base 50c112d7) on the OLD runner: non-ASCII in its prompt arrived as '?'. At READY, check the three '·' strings against the brief on master (L53's regex and STALE line, L60's 'REBUILT: serving build <sha7> · current (fetch <time>).'). Expect update-branch conflicts at refresh: sync/checks.ts (changed by T-267) and cli.ts / cli-spec.ts (changed by T-249). — s170: r1 BLOCKED at 634f7a8d PR #676 (a 36-row main-rebuild file, 7 of 7 mutants after a third commit, the 8 allowed files): CI failed S4-9.2, 'stale allowance for open-brain/tests/cli-flags.test.ts: expected 19 -> 18, found 19 -> 19'. The brief's main-rebuild --dry-rn row restores the base count, so the guard is right. #676 also conflicts with master in checks.ts's import block. G-001 check: its three '·' strings match the brief byte for byte. Ruling: docs/loops/t172-main-rebuild-brief-amendment-1.md (retire the cli-flags allowance; S4-9.2b tests a two-entry fixture; merge master c1975286 keeping all three imports; keep the typo row). Opus second review at the r2 READY. — s170: r2 LAUNCHED on the desktop from master 2534856e (clark, pid 11484, reply t172-r2-reply.md). — s170: r2 READY 778048db PR #676 (desktop; reply C:/Users/melve/AppData/Local/Temp/t172-r2-reply.md). Planner ACCEPT on the r2: the red at the head was the stale allowance; commit 1 is the ruling verbatim; the merge of c1975286 resolved checks.ts's imports exactly as ruled (cli.ts and cli-spec.ts auto-merged); tsc 0; 22 files, 433/433; M1 and M2 red; exactly the 9 files; CI pass at 778048db. Cosmetic: git kept its '# Conflicts:' paragraph after the merge commit's trailer. Opus second review (hard gate) body: C:/Users/melve/AppData/Local/Temp/T-172-opus-review-body.md, whole PR c1975286..778048db, first check the never-exercised default npm/git/node runners (a .cmd spawned without a shell throws EINVAL on Node 22 for Windows). — s170: Opus second review VERDICT CHANGES at 778048db (C:/Users/melve/AppData/Local/Temp/t172-review-reply.md; read it first-hand before ruling). Per clark's summary: F1 (HIGH) npm install rewrites package-lock.json on this host, so the restore then fails with exit 4; F2 (MEDIUM) V2 does not load the native binding; F3 (MEDIUM) pruning deletes real backups when the backups directory holds other entries; F4 (LOW) refusal 2 misses skip-worktree and assume-unchanged edits; F5 (MEDIUM, tests) six mutants of the changed src survive the four named test files. NOT RULED by s170 (rolled): the next planner rules from the review at 778048db and writes docs/loops/t172-main-rebuild-brief-amendment-2.md. #676 stays out of the merge batch until then. — s170: the Opus second review at 778048db came back CHANGES; the planner accepted every finding: F1 HIGH (npm 10.9.8 strips the lock's libc fields, so every install dirties package-lock.json and a failed restore exits 4), F2 (V2 never loads the binding: better-sqlite3 loads it in the constructor), F3 (pruning deletes real backups beside other entries), F4 (skip-worktree/assume-unchanged edits slip past refusal 2), F5 (mutants MA-MF), plus four nits. Amendment-2: docs/loops/t172-main-rebuild-brief-amendment-2.md (#691, b7bf4c06); V2's new check proven first-hand on Node 22 in the scratchpad. Queued on the QA PC chain as r3. — s170: r3 (amendment-2) RUNNING on the QA PC since 21:30 CDT (clark; clone head b0d1161e).",
       "note_by": null,
       "closed_rev": null
     },
@@ -1923,14 +1923,15 @@
       "id": "T-266",
       "title": "Same key in a different scope silently re-points the row: indexKnowledge's ON CONFLICT(key) moves the row to the new note and overwrites its content for EVERY kind, orphaning the old note",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "s168, found by the T-022 research (read-only, 399121cd): a write under an existing key but a different scope (global vs project, or another project) writes a second note, and indexKnowledge's ON CONFLICT(key) DO UPDATE (db-v2.ts:452-463) re-points vault_path and overwrites content: a silent replace for every kind, with no Log, and the old note is orphaned (still in the vault, no longer indexed). key and vault_path are both NOT NULL UNIQUE (db-v2.ts:121-122). Out of T-022's scope by ruling. Needs a design: refuse with a clear message, or scope the uniqueness (key + scope), plus a check for orphaned notes. — s170: ruled (A), refuse a store whose key a row already holds under a different vault path, before any note is written; (B) scoped uniqueness rejected (table rebuild, FTS rebuild, every key lookup). storeFailure guarded too; ob_store's description states the rule. /sync vault-index-parity already reports the orphan shape. Brief docs/loops/t266-key-scope-collision-brief.md (base 7bdf2483); queued on the QA PC chain.",
+      "note": "s168, found by the T-022 research (read-only, 399121cd): a write under an existing key but a different scope (global vs project, or another project) writes a second note, and indexKnowledge's ON CONFLICT(key) DO UPDATE (db-v2.ts:452-463) re-points vault_path and overwrites content: a silent replace for every kind, with no Log, and the old note is orphaned (still in the vault, no longer indexed). key and vault_path are both NOT NULL UNIQUE (db-v2.ts:121-122). Out of T-022's scope by ruling. Needs a design: refuse with a clear message, or scope the uniqueness (key + scope), plus a check for orphaned notes. — s170: ruled (A), refuse a store whose key a row already holds under a different vault path, before any note is written; (B) scoped uniqueness rejected (table rebuild, FTS rebuild, every key lookup). storeFailure guarded too; ob_store's description states the rule. /sync vault-index-parity already reports the orphan shape. Brief docs/loops/t266-key-scope-collision-brief.md (base 7bdf2483); queued on the QA PC chain. — s170: LAUNCHED on the QA PC (clark, Opus, pinned 9d93d837); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170: READY ee701cf3 PR #701 (QA PC, Opus); clark copied the reply to ~/Worktrees/t266-reply.md. Not yet reviewed by the planner (s170 rolled first). — s171 planner ACCEPT at ee701cf3 (PR #701): src verbatim; one test-only deviation (typed heldOf accessor so commit 1 typechecks at the base), accepted; red set exact; M1-M6 killed; CI test pass; merges clean. Touches server.ts (as do T-271, T-276): the later merge may need a refresh fix. Needs Aaron's word naming #701.",
       "note_by": [
         "f21ca920-a048-4990-935f-42f102efc85f",
-        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+        "13042431-247e-4dad-9477-507e43fc7916"
       ],
       "closed_rev": null
     },
@@ -1969,14 +1970,15 @@
       "id": "T-269",
       "title": "SIA's SEATS line prints the hub's alarmReason, and the T-168 suite census counts an alarm run_too_long or orphan_run seat as busy",
       "priority": "P3",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 169,
       "closed_session": null,
       "supersedes": null,
-      "note": "s169: A2A-Hub v1.22.13 (Relay's D-049/D-003 notice to the planner, 10-13) shows a run older than WAKE_RUN_ALARM_MS (default 60 min) as alarm / run_too_long in presence; nothing is killed. SIA's formatHubSeatState (open-brain/src/pipelines/session-start/hub-seat-state.ts:20-23) prints any state it does not know as state:unknown(<raw>), so a long SIA run will read state:unknown(alarm) on the SEATS line. Scope when briefed: read the exact presence field and values from A2A-Hub's v1.22.13 source first (told by Relay, not read by the planner), map them to a named word in hub-seat-state.ts, one test row. Context, as CLARK REPORTED it (told, not read by the planner): the QA PC wakers were restarted onto waker-v1.22.13-59e0f2f3 at 2026-10-13T17:29Z on Aaron's word in clark's window (forge 24984→15088, cursor-infra 18908→10296, cursor-builder 6972→27456; chisel too), all seen on the hub with clean stderr. The planner checked SIA's side before the restart: atlas-ops hub.sh already exits on rc 1, SIA's Cursor wakers never run --wait, and no SIA code reads the removed --inbox text. — s170 brief (research fork, planner-ruled): the note's premise is false: 'alarm' is a known state since T-095, so SIA prints 'alarm', not state:unknown(alarm). A2A-Hub v1.22.13 (59e0f2f3) keeps seatState 'alarm' and puts the detail in alarmReason (run_too_long, orphan_run, ...), which SIA drops. Bigger defect: the T-168 census counts only 'working' as busy, so a SIA seat past 60 minutes reads idle and a controlled rerun is not refused beside it. Brief docs/loops/t269-hub-alarm-state-brief.md: W1 prints alarm(<reason>), W2 counts alarm run_too_long/orphan_run as busy. Queued on the QA PC chain.",
+      "note": "s169: A2A-Hub v1.22.13 (Relay's D-049/D-003 notice to the planner, 10-13) shows a run older than WAKE_RUN_ALARM_MS (default 60 min) as alarm / run_too_long in presence; nothing is killed. SIA's formatHubSeatState (open-brain/src/pipelines/session-start/hub-seat-state.ts:20-23) prints any state it does not know as state:unknown(<raw>), so a long SIA run will read state:unknown(alarm) on the SEATS line. Scope when briefed: read the exact presence field and values from A2A-Hub's v1.22.13 source first (told by Relay, not read by the planner), map them to a named word in hub-seat-state.ts, one test row. Context, as CLARK REPORTED it (told, not read by the planner): the QA PC wakers were restarted onto waker-v1.22.13-59e0f2f3 at 2026-10-13T17:29Z on Aaron's word in clark's window (forge 24984→15088, cursor-infra 18908→10296, cursor-builder 6972→27456; chisel too), all seen on the hub with clean stderr. The planner checked SIA's side before the restart: atlas-ops hub.sh already exits on rc 1, SIA's Cursor wakers never run --wait, and no SIA code reads the removed --inbox text. — s170 brief (research fork, planner-ruled): the note's premise is false: 'alarm' is a known state since T-095, so SIA prints 'alarm', not state:unknown(alarm). A2A-Hub v1.22.13 (59e0f2f3) keeps seatState 'alarm' and puts the detail in alarmReason (run_too_long, orphan_run, ...), which SIA drops. Bigger defect: the T-168 census counts only 'working' as busy, so a SIA seat past 60 minutes reads idle and a controlled rerun is not refused beside it. Brief docs/loops/t269-hub-alarm-state-brief.md: W1 prints alarm(<reason>), W2 counts alarm run_too_long/orphan_run as busy. Queued on the QA PC chain. — s170: LAUNCHED on the QA PC (clark, Opus, pinned b7bf4c06); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170: READY a5eec8d9 PR #702 (QA PC, Opus); clark copied the reply to ~/Worktrees/t269-reply.md. Not yet reviewed by the planner (s170 rolled first). — s171 planner ACCEPT at a5eec8d9 (PR #702): src = W1+W2 verbatim; tests change only the presence() helper (back-compatible) plus new rows; M1-M9 each red on the predicted rows; CI test pass; merges clean into a61634b1. Needs Aaron's word naming #702 (code).",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
-        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+        "13042431-247e-4dad-9477-507e43fc7916"
       ],
       "closed_rev": null
     },
@@ -1999,13 +2001,15 @@
       "id": "T-271",
       "title": "ob_state refusals list EVERY invalid field of the op at once, with the op's expected shape, instead of one field per attempt",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 169,
       "closed_session": null,
       "supersedes": null,
-      "note": "s169, from the planner's evaluation of Prism's session 1 (~/Worktrees/prism-s1-evaluation-2026-10-13.md, outside the repo): 4 dry-run refusals in 70 s, each naming one field (add_verified claim, then evidence's type, then its entries, then set_handoff loop_state). The ob_state tool description lists op names but not their fields. Fix: report the full validation issue list for the failing op and print that op's expected shape (or put each op's shape in the description). Prism stored the shapes as lesson 670; the fix makes that lesson unnecessary for every seat.",
+      "note": "s169, from the planner's evaluation of Prism's session 1 (~/Worktrees/prism-s1-evaluation-2026-10-13.md, outside the repo): 4 dry-run refusals in 70 s, each naming one field (add_verified claim, then evidence's type, then its entries, then set_handoff loop_state). The ob_state tool description lists op names but not their fields. Fix: report the full validation issue list for the failing op and print that op's expected shape (or put each op's shape in the description). Prism stored the shapes as lesson 670; the fix makes that lesson unnecessary for every seat. — s170: LAUNCHED on the QA PC (clark, Opus, pinned a122a07c); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170: READY 39adb0b4 PR #708 (QA PC, Opus); clark copied the reply to ~/Worktrees/t271-reply.md. Not yet reviewed by the planner (s170 rolled first). — s171 planner ACCEPT at 39adb0b4 (PR #708): every line of the ruling's 5 code blocks present; state-writer/server.ts edits as ruled. Builder rightly flagged a brief error: M3 cannot turn S3 red (S3 checks only the required op key and length); still killed by 4 rows. Local runs showed one vitest worker-RPC 'Unhandled Error' exit 1 both before and after (0 failed rows); CI test pass. Merges clean. Needs Aaron's word naming #708.",
       "note_by": [
-        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+        "13042431-247e-4dad-9477-507e43fc7916"
       ],
       "closed_rev": null
     },
@@ -2013,13 +2017,15 @@
       "id": "T-272",
       "title": "SIA bootstrap on a seat checkout moves the seat file aside and names the tracked AGENT.md after the folder (Prism lesson 671): reproduce, then fix",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 169,
       "closed_session": null,
       "supersedes": null,
-      "note": "s169, from the evaluation of Prism's session 1 (agent-dashboard bootstrapped onto SIA from its seat checkout ~/Worktrees/dashboard-planner on 10-13): Prism had to rename the tracked .agents/AGENT.md back to the project's name and restore its seat file (lesson 671 in the knowledge store). Reproduce on a scratch worktree with an AGENT.local.md, then make bootstrap keep the seat file and name AGENT.md after the repository (T-249's projectIdentityName), not the checkout folder.",
+      "note": "s169, from the evaluation of Prism's session 1 (agent-dashboard bootstrapped onto SIA from its seat checkout ~/Worktrees/dashboard-planner on 10-13): Prism had to rename the tracked .agents/AGENT.md back to the project's name and restore its seat file (lesson 671 in the knowledge store). Reproduce on a scratch worktree with an AGENT.local.md, then make bootstrap keep the seat file and name AGENT.md after the repository (T-249's projectIdentityName), not the checkout folder. — s170: LAUNCHED on the QA PC (clark, Opus, pinned 3c0bff7a); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170: READY PR #705 at bc0d5991 (QA PC, Opus): commit 1 red exactly as ruled (S1-S4, S6), then 156/156 green (2 vitest onTaskUpdate RPC timeouts, environmental), tsc 0, 6 of 6 mutants red, CI test pass. Planner ACCEPT: the src diff is exactly rulings 1-2. Opus second review RUNNING on the QA PC (reply to ~/Worktrees/t272-review-reply.md); then merge SIA #705 needs Aaron's word, via clark. — s171: Opus second review VERDICT ACCEPT at bc0d5991 (#705; reply ~/Worktrees/t272-review-reply.md, outside the repo). No src defect. Three surviving mutants are test gaps only, for a follow-up row in a later brief: MA (bootstrap/index.ts:141 drop the '?? ' guard: a tracked, modified AGENT.local.md stops counting as dirty), MB (:186 drop isFile(): a DIRECTORY .agents/AGENT.local.md/ reads empty and the project is stuck), MC (:141 === -> endsWith: an untracked notes/AGENT.local.md is dropped). Rows S7-S9. Also: the bare-repo + worktree layout still gets the checkout name (shared/paths.ts:78, T-249's helper, out of scope). Merge ask sent to clark for Aaron.",
       "note_by": [
-        "fada3e0e-78ee-4afc-a280-d0cc17b55f57"
+        "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+        "13042431-247e-4dad-9477-507e43fc7916"
       ],
       "closed_rev": null
     },
@@ -2027,14 +2033,15 @@
       "id": "T-273",
       "title": "After #669 (T-022) merges: rehash R-011's pinned lines and delete db-v2.ts's wrong archiveKnowledgeEntry parenthesis ('the helper ob_forget uses; …')",
       "priority": "P3",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 169,
       "closed_session": null,
       "supersedes": null,
-      "note": "s169: T-022's run could not delete the wrong line because R-011 (.agents/retirements.json) pins its hash; it kept the line verbatim under a correction comment (#669 commit 885b4f82). Rehash with the CLI's sync --retirements-rehash --write, delete the old parenthesis, keep retirements-live green. Code PR (src comment) plus the retirements file. — s170: briefed: docs/loops/t273-r011-rehash-brief.md (the comment loses the wrong parenthesis and its false first line; R-011's db-v2.ts hash f3daf705 becomes b8b4f34e, proven on a scratch clone); queued on the QA PC chain.",
+      "note": "s169: T-022's run could not delete the wrong line because R-011 (.agents/retirements.json) pins its hash; it kept the line verbatim under a correction comment (#669 commit 885b4f82). Rehash with the CLI's sync --retirements-rehash --write, delete the old parenthesis, keep retirements-live green. Code PR (src comment) plus the retirements file. — s170: briefed: docs/loops/t273-r011-rehash-brief.md (the comment loses the wrong parenthesis and its false first line; R-011's db-v2.ts hash f3daf705 becomes b8b4f34e, proven on a scratch clone); queued on the QA PC chain. — s170: LAUNCHED on the QA PC (clark, Opus, pinned 9d93d837); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170: READY 9b6e76c5 PR #697 (QA PC, Opus); clark copied the reply to ~/Worktrees/t273-reply.md. Not yet reviewed by the planner (s170 rolled first). — s171 planner ACCEPT at 9b6e76c5 (PR #697): comment 5->3 lines and the one ruled rehash (10th hash f3daf705 -> b8b4f34e), nothing else; CI test pass; merges clean. src comment, so treated as code: needs Aaron's word naming #697.",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
-        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+        "13042431-247e-4dad-9477-507e43fc7916"
       ],
       "closed_rev": null
     },
@@ -2042,16 +2049,16 @@
       "id": "T-274",
       "title": "Re-measure the recall trigger's relevance floor (8.0, measured at 599 entries) on the T-264 replay data now that T-265 narrowed the status element",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 169,
-      "closed_session": null,
+      "closed_session": 170,
       "supersedes": null,
-      "note": "s169, from T-265's s168 note: open-brain/src/trigger/policies/recall-trigger.json says the floor 'must be re-measured'; the store holds more entries now, and T-265 (merged 7b8c6e59) changed which queries reach queryStore. Read-only replay on a DB snapshot (as T-264/T-265 did): precision and recall per floor value for the VIOLATING class; aggregates only (D-090). — s170: briefed: docs/loops/t274-relevance-floor-remeasure-brief.md (docs-only measurement: snapshot by better-sqlite3 backup(), replay every anchored fire through the built deriveQuery and queryStore, precision and recall per floor, a fixed recommendation rule; a floor change, if ruled, is a separate code PR). HELD: desktop-only (the live DB and transcripts); clark launches it alone when the desktop has headroom.",
+      "note": "s169, from T-265's s168 note: open-brain/src/trigger/policies/recall-trigger.json says the floor 'must be re-measured'; the store holds more entries now, and T-265 (merged 7b8c6e59) changed which queries reach queryStore. Read-only replay on a DB snapshot (as T-264/T-265 did): precision and recall per floor value for the VIOLATING class; aggregates only (D-090). — s170: briefed: docs/loops/t274-relevance-floor-remeasure-brief.md (docs-only measurement: snapshot by better-sqlite3 backup(), replay every anchored fire through the built deriveQuery and queryStore, precision and recall per floor, a fixed recommendation rule; a floor change, if ruled, is a separate code PR). HELD: desktop-only (the live DB and transcripts); clark launches it alone when the desktop has headroom. — s170: READY PR #699 (d8ed529b), docs only; the planner read the reply first-hand and privacy-scanned result.md and floor.mjs (no paths, uuids or text); MERGED 1f436507 (docs-only standing merge). Result on 695 entries, 34,253 anchored fires, 112 VIOLATING: at the shipped floor 8.0, 99 injected, precision 96.0%, VIOLATING recall 84.8%; TRIM+STATUS top 299 at 13.81, STATUS top 299 at 6.16 (10 STATUS-only violations missed), TRIM top 642 at 7.92 over 14,023 TRIM-only fires with 0 VIOLATING, 0.08 under the floor. Rule output: NO SEPARATING FLOOR. Ruling: T-286.",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
         "0a40685b-edbc-4c79-be9f-dcd4963428e7"
       ],
-      "closed_rev": null
+      "closed_rev": 443
     },
     {
       "id": "T-275",
@@ -2072,11 +2079,11 @@
       "id": "T-276",
       "title": "A seat without Remote Control has no Claude-Session id to write, and ob_end still counts its commits as missing the trailer: fall back to the transcript's own session id",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 169,
       "closed_session": null,
       "supersedes": null,
-      "note": "s169, reported by Prism (session 2) and planner-verified: Prism's session-1 transcript (656a5f8c) holds 0 bridge-session records (this Remote Control session's holds 100), so sessionIdsFromTranscript finds nothing and ob_end flagged 7 commits as missing Claude-Session. The count was structural, not a seat miss (the planner's Prism evaluation is corrected). Fix: when no bridge id exists, let the trailer check accept, and the attribution use, the transcript's own sessionId; test both kinds of transcript. — s170 planner research (not briefed): SIA's src never tells a seat what trailer to write; Claude Code's attribution reminder adds the 'Claude-Session: https://claude.ai/code/session_<X>' line only for a Remote Control session, so a non-RC seat's commits carry no trailer and count as UNATTRIBUTED. The guards match trailer text against the bridge ids sessionIdsFromTranscript reads (handoff-guard.ts:106, the cse_<X> of the bridge-session records); server.ts endSessionWindow already falls back to [sessionId] when there are none, cli-session-end.ts's E4 (around :147) does not (sessionIdsOk then says 'could not be read'). Fix shape: (1) one helper beside sessionIdsFromTranscript, bridge ids or else the transcript's own session uuid, used by server.ts and both cli-session-end checks; (2) a writing side, a conditional ob_start line for a session with no bridge id ('end every commit with Claude-Session: <uuid>'), which touches start-report.ts and briefing.ts, so brief it AFTER #688 (T-161) merges; (3) the UNATTRIBUTED line says when the cause is structural (no Remote Control). Test both kinds of transcript. — s170: briefed: docs/loops/t276-non-rc-session-trailer-brief.md (base 7d9215b2): sessionTrailerIds falls back to the session's own uuid when a transcript record names it and no bridge id exists (whole-file read when the head has none: Remote Control can start mid-session); both cli-session-end checks use it; ob_start prints one COMMIT TRAILER line outside the Briefing. Queued on the QA PC chain. Deterministic follow-up: T-284.",
+      "note": "s169, reported by Prism (session 2) and planner-verified: Prism's session-1 transcript (656a5f8c) holds 0 bridge-session records (this Remote Control session's holds 100), so sessionIdsFromTranscript finds nothing and ob_end flagged 7 commits as missing Claude-Session. The count was structural, not a seat miss (the planner's Prism evaluation is corrected). Fix: when no bridge id exists, let the trailer check accept, and the attribution use, the transcript's own sessionId; test both kinds of transcript. — s170 planner research (not briefed): SIA's src never tells a seat what trailer to write; Claude Code's attribution reminder adds the 'Claude-Session: https://claude.ai/code/session_<X>' line only for a Remote Control session, so a non-RC seat's commits carry no trailer and count as UNATTRIBUTED. The guards match trailer text against the bridge ids sessionIdsFromTranscript reads (handoff-guard.ts:106, the cse_<X> of the bridge-session records); server.ts endSessionWindow already falls back to [sessionId] when there are none, cli-session-end.ts's E4 (around :147) does not (sessionIdsOk then says 'could not be read'). Fix shape: (1) one helper beside sessionIdsFromTranscript, bridge ids or else the transcript's own session uuid, used by server.ts and both cli-session-end checks; (2) a writing side, a conditional ob_start line for a session with no bridge id ('end every commit with Claude-Session: <uuid>'), which touches start-report.ts and briefing.ts, so brief it AFTER #688 (T-161) merges; (3) the UNATTRIBUTED line says when the cause is structural (no Remote Control). Test both kinds of transcript. — s170: briefed: docs/loops/t276-non-rc-session-trailer-brief.md (base 7d9215b2): sessionTrailerIds falls back to the session's own uuid when a transcript record names it and no bridge id exists (whole-file read when the head has none: Remote Control can start mid-session); both cli-session-end checks use it; ob_start prints one COMMIT TRAILER line outside the Briefing. Queued on the QA PC chain. Deterministic follow-up: T-284. — s170: LAUNCHED on the QA PC (clark, Opus, pinned 9d93d837); clark confirmed RUNNING 2026-10-13 ~21:5x CDT.",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
         "0a40685b-edbc-4c79-be9f-dcd4963428e7"
@@ -2087,14 +2094,15 @@
       "id": "T-277",
       "title": "ob_start's 'Latest brief:' line scans only docs/loops/, so a project that keeps briefs as docs/loop-*-brief.md (agent-dashboard) gets no line",
       "priority": "P3",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 169,
       "closed_session": null,
       "supersedes": null,
-      "note": "s169, reported by Prism (session 2): agent-dashboard's /start showed no 'Latest brief' line and the brief was found by hand. Scan docs/loop-*-brief.md as well, or make the brief glob a project setting; keep SIA's rule (newest by git commit date). — s170: briefed: docs/loops/t277-latest-brief-glob-brief.md (also scan docs/loop-*-brief.md at the docs root, newest by commit date across both; the T-233 C endings unchanged; the three /start copies get one byte-identical sentence). Queued on the QA PC chain.",
+      "note": "s169, reported by Prism (session 2): agent-dashboard's /start showed no 'Latest brief' line and the brief was found by hand. Scan docs/loop-*-brief.md as well, or make the brief glob a project setting; keep SIA's rule (newest by git commit date). — s170: briefed: docs/loops/t277-latest-brief-glob-brief.md (also scan docs/loop-*-brief.md at the docs root, newest by commit date across both; the T-233 C endings unchanged; the three /start copies get one byte-identical sentence). Queued on the QA PC chain. — s170: LAUNCHED on the QA PC (clark, Opus, pinned b7bf4c06); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170: READY 5baed1b5 PR #704 (QA PC, Opus); clark copied the reply to ~/Worktrees/t277-reply.md. Not yet reviewed by the planner (s170 rolled first). — s171 planner ACCEPT at 5baed1b5 (PR #704): latest-brief.ts and the three start.md lines verbatim; red set exact; M1-M6 killed (M2/M3 on more rows, explained correctly); CI test pass; merges clean. Launcher rated latestBriefSelection/isBrief HIGH: Opus second review recommended. Needs Aaron's word naming #704.",
       "note_by": [
         "fada3e0e-78ee-4afc-a280-d0cc17b55f57",
-        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+        "13042431-247e-4dad-9477-507e43fc7916"
       ],
       "closed_rev": null
     },
@@ -2116,11 +2124,11 @@
       "id": "T-279",
       "title": "Read the Win32 process table through an ASCII-safe pipe, and correct T-270's comment and test docstring: the C0 bytes come from the console's cp437 best-fit encoding, not ConvertTo-Json",
       "priority": "P3",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 170,
       "closed_session": null,
       "supersedes": null,
-      "note": "s170 root cause (see T-270's note): Windows PowerShell 5.1 writes its stdout in the console OEM code page 437 with .NET best-fit, so → • § ¶ ← ↑ ↓ ↔ ☺ ► arrive as C0 bytes, and non-ASCII without a cp437 glyph arrives as U+FFFD (· and ✓ seen live). T-270 makes the parse survive by turning C0 into spaces, but command lines are still read lossily. Fix shape to weigh: escape every non-ASCII character to \\uXXXX inside PowerShell before it writes (a regex replace on ConvertTo-Json's output; 5.1 has no -EscapeHandling), so the pipe carries ASCII only; or set [Console]::OutputEncoding to UTF-8 (it can throw with no console). Keep T-270's replacement as defence in depth. Correct process-session.ts's T-270 comment and the t270 test file's docstring. Prove the trigger first with the scratchpad pattern (build the input inside PowerShell, capture what Node receives): atlas-ops briefs.md, s170.",
+      "note": "s170 root cause (see T-270's note): Windows PowerShell 5.1 writes its stdout in the console OEM code page 437 with .NET best-fit, so → • § ¶ ← ↑ ↓ ↔ ☺ ► arrive as C0 bytes, and non-ASCII without a cp437 glyph arrives as U+FFFD (· and ✓ seen live). T-270 makes the parse survive by turning C0 into spaces, but command lines are still read lossily. Fix shape to weigh: escape every non-ASCII character to \\uXXXX inside PowerShell before it writes (a regex replace on ConvertTo-Json's output; 5.1 has no -EscapeHandling), so the pipe carries ASCII only; or set [Console]::OutputEncoding to UTF-8 (it can throw with no console). Keep T-270's replacement as defence in depth. Correct process-session.ts's T-270 comment and the t270 test file's docstring. Prove the trigger first with the scratchpad pattern (build the input inside PowerShell, capture what Node receives): atlas-ops briefs.md, s170. — s170: LAUNCHED on the QA PC (clark, Opus, pinned b0d1161e); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170 r1: BLOCKED at CI on S4-9.2 (the brief told W1 and W2 to use it.runIf); PR #700 at 77313347 is otherwise green on Windows. Amendment-1 (docs PR #711): W1 and W2 branch inside the row (win32: the live check; elsewhere: the loader fails closed). r2 to launch on the QA PC.",
       "note_by": [
         "0a40685b-edbc-4c79-be9f-dcd4963428e7"
       ],
@@ -2144,13 +2152,14 @@
       "id": "T-281",
       "title": "T-161 follow-ups: the Cursor path's transcript check before a Cursor seat relies on it, the budgeted briefing's line cap, and the two untested pushes",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 170,
       "closed_session": null,
       "supersedes": null,
-      "note": "From the T-161 Opus review (s170, at 5a9443ab). (1) Cursor: proveSessionAtKey (process-session.ts:354) passes the Cursor payload's transcript_path through, and whether Cursor's agent-transcripts/<uuid>/<uuid>.jsonl exists at the first tool call has never been observed; if it is written at turn end, every Cursor seat's first /start prints NO TRANSCRIPT falsely. Either drop the Cursor path's transcriptPath until one live Cursor /start proves the file exists, or prove it live when the QA PC's Cursor seats are back. (2) Budget: with the line, the budgeted worst case is 32 lines / 4670 chars against BRIEFING_BUDGET 31 / 4400 (briefing.ts:200); add a worst-case row with transcript set and lift the cap, or append the line to an existing one as missingHandoff does; update missingHandoff's doc comment ('no spare line'). (3) Tests: a Cursor-path row (t235 harness, cursorWalk) if that path keeps the field; a P4 row on the log-skipped branch (start-report.ts:172).",
+      "note": "From the T-161 Opus review (s170, at 5a9443ab). (1) Cursor: proveSessionAtKey (process-session.ts:354) passes the Cursor payload's transcript_path through, and whether Cursor's agent-transcripts/<uuid>/<uuid>.jsonl exists at the first tool call has never been observed; if it is written at turn end, every Cursor seat's first /start prints NO TRANSCRIPT falsely. Either drop the Cursor path's transcriptPath until one live Cursor /start proves the file exists, or prove it live when the QA PC's Cursor seats are back. (2) Budget: with the line, the budgeted worst case is 32 lines / 4670 chars against BRIEFING_BUDGET 31 / 4400 (briefing.ts:200); add a worst-case row with transcript set and lift the cap, or append the line to an existing one as missingHandoff does; update missingHandoff's doc comment ('no spare line'). (3) Tests: a Cursor-path row (t235 harness, cursorWalk) if that path keeps the field; a P4 row on the log-skipped branch (start-report.ts:172). — s170: LAUNCHED on the QA PC (clark, Opus, pinned a122a07c); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170: READY ac4e7b3f PR #707 (QA PC, Opus); clark copied the reply to ~/Worktrees/t281-reply.md. Not yet reviewed by the planner (s170 rolled first). — s171 planner ACCEPT at ac4e7b3f (PR #707): process-session.ts and briefing.ts as ruled (renderBudgeted only; legacy layout untouched); M1-M6 each bite; CI test pass; merges clean. Launcher rated HIGH; rows cover proveSession and renderBriefing callers. Needs Aaron's word naming #707.",
       "note_by": [
-        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+        "13042431-247e-4dad-9477-507e43fc7916"
       ],
       "closed_rev": null
     },
@@ -2158,25 +2167,26 @@
       "id": "T-282",
       "title": "state-render.test.ts T183-3 builds expected lines by string concatenation, so an object-form open question or watch-out in the live record fails CI",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 170,
-      "closed_session": null,
+      "closed_session": 171,
       "supersedes": null,
-      "note": "s170: records PR #690 (rev 439) failed CI on tests/pipelines/session-start/state-render.test.ts > 'renderState: T183-3 the real record's handoffs are verbatim > renders the planner seat's watch-outs and open questions as whole lines, byte-identical' with 'expected [...] to include \"    - [object Object]\"'. The schema allows {text, owner?, resolved_by?} open questions and {text, expires?} watch-outs (state-schema.ts OpenQuestionSchema, WatchOutSchema); the renderer prints the text, but the test concatenates the object. Rev 440 rewrote the planner handoff's open questions as strings to land the handoff. Fix: the test maps through questionText() and watchText(). Tests only, so SG-1 merges it on green CI. — s170: briefed: docs/loops/t282-state-render-object-forms-brief.md (tests only, SG-1): T183-3 reads handoff items through watchText, questionText and questionResolvedBy, plus a synthetic object-form row. Queued on the QA PC chain.",
+      "note": "s170: records PR #690 (rev 439) failed CI on tests/pipelines/session-start/state-render.test.ts > 'renderState: T183-3 the real record's handoffs are verbatim > renders the planner seat's watch-outs and open questions as whole lines, byte-identical' with 'expected [...] to include \"    - [object Object]\"'. The schema allows {text, owner?, resolved_by?} open questions and {text, expires?} watch-outs (state-schema.ts OpenQuestionSchema, WatchOutSchema); the renderer prints the text, but the test concatenates the object. Rev 440 rewrote the planner handoff's open questions as strings to land the handoff. Fix: the test maps through questionText() and watchText(). Tests only, so SG-1 merges it on green CI. — s170: briefed: docs/loops/t282-state-render-object-forms-brief.md (tests only, SG-1): T183-3 reads handoff items through watchText, questionText and questionResolvedBy, plus a synthetic object-form row. Queued on the QA PC chain. — s170: LAUNCHED on the QA PC (clark, Opus, pinned b7bf4c06); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170: READY ba38d32e PR #703 (QA PC, Opus); clark copied the reply to ~/Worktrees/t282-reply.md. Not yet reviewed by the planner (s170 rolled first). — s171 planner ACCEPT at ba38d32e (PR #703), tests only (SG-1): diff = ruling verbatim; CI test pass. pr-refresh started s171 (ba38d32e -> 2310c371); clark merges on green CI pinned to the refreshed head. — s171: MERGED by clark under SG-1, merge 59c1434e (CI at 2310c371, merge-tree trees equal). Tests only, no rebuild. — Closed s171: merged #703 as 59c1434e. Handoff watch-outs and open questions may now use the object form.",
       "note_by": [
-        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7",
+        "13042431-247e-4dad-9477-507e43fc7916"
       ],
-      "closed_rev": null
+      "closed_rev": 446
     },
     {
       "id": "T-283",
       "title": "The heavy suite's vitest JSON path splits on a space: cli-suite-run.ts passes an absolute --outputFile through shell:true, so on the QA PC (home with a space) the suite's counts are lost",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 170,
       "closed_session": null,
       "supersedes": null,
-      "note": "s170, found by the T-280 research fork, planner-read at origin/master: open-brain/src/cli-suite-run.ts:244-251 sets jsonOut = join(process.cwd(), 'suite-vitest.json') and runs spawnSync('npx', ['vitest','run','--reporter=json','--outputFile', jsonOut], {shell: true}); Node joins shell arguments unquoted, so a cwd with a space splits --outputFile and the rest arrive as vitest filters; existsSync(jsonOut) is false and the counts stay null. Reproduced by the fork with a fake npx.cmd. Brief: docs/loops/t283-suite-json-path-space-brief.md (new module suite-vitest.ts and a new test file, clear of T-269's hunks); queued on the QA PC chain. Bears on the owed T-168 QA PC check.",
+      "note": "s170, found by the T-280 research fork, planner-read at origin/master: open-brain/src/cli-suite-run.ts:244-251 sets jsonOut = join(process.cwd(), 'suite-vitest.json') and runs spawnSync('npx', ['vitest','run','--reporter=json','--outputFile', jsonOut], {shell: true}); Node joins shell arguments unquoted, so a cwd with a space splits --outputFile and the rest arrive as vitest filters; existsSync(jsonOut) is false and the counts stay null. Reproduced by the fork with a fake npx.cmd. Brief: docs/loops/t283-suite-json-path-space-brief.md (new module suite-vitest.ts and a new test file, clear of T-269's hunks); queued on the QA PC chain. Bears on the owed T-168 QA PC check. — s170: LAUNCHED on the QA PC (clark, Opus, pinned 9d93d837); clark confirmed RUNNING 2026-10-13 ~21:5x CDT. — s170 r1: BLOCKED at CI on tests/harness/s4-guards.test.ts S4-9.2 (the brief told P4 to use it.skipIf); PR #698 at 96f72acf is otherwise green on every gate. Amendment-1 (docs PR #711): P4 runs on every platform with a per-platform fake npx (the onPath pattern of mcp-command-paths.test.ts). r2 to launch on the QA PC.",
       "note_by": [
         "0a40685b-edbc-4c79-be9f-dcd4963428e7"
       ],
@@ -2205,6 +2215,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s170, from the T-266 research fork: open-brain/src/server.ts:1452-1457 at 7bdf2483 inserts into knowledge_index with no ON CONFLICT, so a chunk stored under an existing key fails with SQLite's raw UNIQUE constraint message instead of a clear refusal like T-266's. Out of T-266's scope by ruling.",
+      "note_by": [
+        "0a40685b-edbc-4c79-be9f-dcd4963428e7"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-286",
+      "title": "The recall trigger asks the store only when the query carries the status element (a TRIM-only query never queries), then the floor drops from 8.0 to 6.0",
+      "priority": "P2",
+      "status": "in_progress",
+      "opened_session": 170,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s170, the planner ruling on T-274 (docs/loops/t274/result.md, #699): 14,023 TRIM-only fires, 0 VIOLATING, and TRIM top hit entry 642 at 7.92 sits 0.08 under the 8.0 floor, so a small bm25 drift would start ~14k injections at 0.7% precision; meanwhile the 10 STATUS-only violations (entry 299 at 6.16) never inject. Structural fix: deriveQuery returns the empty query when the status element is absent (a trimmer pipeline alone becomes a not-asked fire, T-159 cheap path), then relevance_floor 6.0 with the provenance rewritten from T-274 (expected: about 110 injected, ~95% precision, 105 of 112 VIOLATING). Brief drafting (research-only fork): docs/loops/t286-status-element-required-brief.md. — s170: ruled option (B): the status element carries \"tail\", so every asking query is \"tail\" \"exit\" \"code\" (top 13.81), and the floor stays 8.0 with a 5.81 margin. Brief docs/loops/t286-status-element-required-brief.md (#709). RUNNING on the QA PC (clark).",
       "note_by": [
         "0a40685b-edbc-4c79-be9f-dcd4963428e7"
       ],
@@ -5268,59 +5292,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "On QA 272's verdict: one ask to Aaron for #415, #420 and #421 (use mergeone: update-branch, first parent = QA'd SHA, patch-id equal). Rule builder's P2-3 plan; collect forge's P2-4 and infra's P2-6 PRs for QA 273. Re-arm one hub --wait per room after every reply.",
-      "watch_out": [
-        "CURSOR SEATS (Aaron 2026-10-03/04): all SIA dev runs as Cursor seats on the QA PC, each woken by its own waker. Rooms: cursor-builder k575sfwr9wcx3r8fw83g3bc00x8fmar3, forge k571z4ghp7nbp34djhecwnsk3n8fmhsf, cursor-infra k57d92gqtjm9wpfs74ekbx9rns8fmy2f. Send: HUB_URL=http://100.124.212.87:4000 node C:/Users/melve/Projects/A2A-Hub/scripts/hub-talk.mjs --as atlas --session <room> --say \"...\"; listen: same with --wait --wait-timeout 3500 in the background; it exits on each reply, so re-arm. The Claude Code seats take no new work. sia-infra-1d (desktop) retires on Aaron's word; its desktop checkout shares the basename sia-infra with the QA PC's (one record instance), so it writes nothing to ob_state.",
-        "USAGE: Claude levels (AMBER/RED/STOP in slots.json) gate Claude sessions only; Cursor dev is NOT gated (Aaron). QA routing: SIA QA on Plumb first, then the desktop (launch-qa.ps1); the QA PC takes no headless QA while dev runs there except through qa-queue.ps1 + the lease.",
-        "MACHINE LEASE (T-204, D-118, D-119 alias D-118a): on the QA PC and laptop, every HEAVY dev run takes machine-lease.ps1 with -OwnerPid = the nearest cursor-agent ancestor (fail closed if none); release with the same pid. Put it in every dispatch.",
-        "BATCH QA + ONE APPROVAL PER BATCH (Aaron, standing): one AskUserQuestion per accepted batch naming every PR and SHA; D-117 requires up-to-date branches, so merge each with update-branch, then check first parent = QA'd SHA and an equal PR-diff patch-id ($TEMP/mergeone.sh did this in s160), pinned --match-head-commit. A conflict resolution gets read with `git show --remerge-diff`.",
-        "STANDING MERGE RULE: docs/** and .agents record files merge without asking once CLEAN; check scope with a FRESH `git fetch origin` (s160: a stale origin/master made a docs PR look like it carried record files). Config, code, tests and role files are Aaron's. D-063 one-line notice to clark per merge.",
-        "QA DISPATCHES: DISPATCH_SHA must contain every file (cat-file); write the prompt with Write and edit the push helper with Edit (sed missed lines twice in s160); test every refusal including the old prefix; never test the success path against origin; set npm_config_cache under tmp; a batch merge row names the real conflict.",
-        "REPORTING TO CLARK (D-113): events only (verdicts, merges, blocks, READY TO ROLL). A serving-tree deploy needs Aaron's word per occasion; setup.mjs is MANUAL (the classifier blocks it for clark); then /mcp reconnect open-brain.",
-        "VERIFY BEFORE RULING: read the load-bearing rows yourself; READ A TASK'S NOTE BEFORE DISPATCHING IT (s160 dispatched T-204 as new when a built candidate existed); derive machine facts from the doc, not memory (s160 swapped the laptop and QA PC IPs). Never route a classifier-denied act through another seat.",
-        "JEV: calibration 1 COMPLETE (D-100): G_done stays shadow; calibration 2 needs T-225."
-      ],
-      "open_questions": [
-        "Recover the killed old CC builder session (5b3338ac) by running cli-session-end.js by hand, and/or open a task for a start-time catch-up of sessions that ended without SessionEnd? Asked of Aaron in session 159, unanswered.",
-        "Retire the desktop sia-infra worktree and clark's desktop cursor-infra keys now that #418 merged? Needs Aaron's word (worktree removal), after its dirty/unpushed check."
-      ],
-      "session": 160,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#415",
-            "qa_status": "in_progress",
-            "note": "T-239 follow-up dc092840, QA 272"
-          },
-          {
-            "ref": "#420",
-            "qa_status": "in_progress",
-            "note": "T-200 port 0d2bc66e (forge), QA 272"
-          },
-          {
-            "ref": "#421",
-            "qa_status": "in_progress",
-            "note": "G-053 82aeb3da (cursor-infra), QA 272; security-boundary row"
-          }
-        ],
-        "frozen_sha": null,
-        "questions_for_aaron": [
-          "QA 272 batch merge after the verdict",
-          "Retire the desktop sia-infra worktree"
-        ],
-        "rulings": [
-          "s160 merged: #387-#413 batches, #415 pending, #416-#419, #422",
-          "D-117 up-to-date rule; D-118 lease use; D-119 (D-118a) waker lease owner",
-          "Closed: T-199 T-201(superseded) T-204 T-207 T-213 T-236 T-237 T-238 T-239",
-          "T-191 deferred P2; G-053 opened"
-        ]
-      },
-      "session_uuid": "766a2128-4c5f-4b3f-93b7-3f9a88c1e594",
-      "checkout": "sia-planner",
-      "first_rev": 318
-    },
-    {
-      "seat": "planner",
       "pick_up": "(1) #451: infra is resolving its checks.ts conflict by merging master into the branch. Read the resolution with git show --remerge-diff (only the conflict hunks, mechanical), wait for CI, merge pinned; it is QA-accepted (QA 277) and Aaron said merge. (2) #437 r2 (QA 279 REJECT: stale reclaim double-claims at 8 claimers) and #445 r2 (REJECT: CC-19 unpaired, 5 doc readers unlisted): Aaron chose 'All 13, now', but the classifier refused merging rejected PRs, so ask Aaron (via clark) whether to fix and re-QA (forge #437 r3, builder #445 r3) or merge as-is himself. #425 merges only after #437. (3) Then T-168's follow-up (wire the owner resolver to #427's findCursorAgentHostPid, plus QA's different-owner row), G-056 (two vacuous regression tests), T-025's /sync frontmatter check (now buildable: #424 and #442 merged), and close T-235.",
       "watch_out": [
         "QUESTIONS GO TO CLARK (Aaron's 'ask clark', s161): routing, sequencing and record calls go to clark by SendMessage. Acts needing Aaron's own word go to clark, who asks once and relays his words; proceed only on his quoted words. D-121 is NOT committed (classifier: instruction poisoning); it needs Aaron's own word in the planner's window.",
@@ -5784,23 +5755,24 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 170 (Atlas) resumed after the roll on clark's MAX USAGE relay (Aaron 01:20Z and 01:24Z, verified: 'use as much as we can before the reset ... GO GO GO'). DONE tonight: the SIA train merged and was live-checked: #678 T-159 6fa4b592, #673 T-243 26dc0cee, #685 T-275 7bdf2483, #688 T-161 7d9215b2; main rebuilt 7d9215b2; all four PASS and closed. QUEUED on the QA PC chain (clark, Opus, one clone at a time; clark fetches replies with qapc-reply.sh): T-172 r3 (amendment-2, PR #676), T-269, T-277, T-282, then T-283, T-276, T-266, T-273 (briefs on master at b7bf4c06 and 9d93d837). On each READY: read the reply first-hand, review the PR (pr-src-diff.sh), route QA to a judge other than the builder (Grok bots for the first pass, or an Opus headless review), then Aaron's word naming the PR (T-282 is tests only and merges under SG-1 on green CI). HELD: T-274 is desktop-only (it reads the live DB and transcripts); clark launches it alone when the desktop has headroom. DRAFTING (research-only forks): T-271 (base 7bdf2483) and T-281 (after #688; must not edit start-report.ts or transcript-check.ts, which T-276 owns). NOT YET DRAFTED: T-279 (prove the cp437 mechanism through a SIM line, never a desktop run) and T-272. Records tonight: T-280 closed (done by T-267); T-283 opened (the heavy suite's vitest path splits on the QA PC's space); T-284 (a deterministic commit-msg trailer hook) and T-285 (ob_store_chunk's raw UNIQUE error) opened; T-268 closed on a Git Bash live check; T-168's QA PC lease check still owed.",
+      "pick_up": "Session 170 (Atlas) ROLLED 2026-10-13 ~22:1x CDT on Aaron's 'ready to roll? run end after you write your handoff', after a MAX USAGE night (Aaron 01:20Z/01:24Z, verified). DONE tonight: the SIA train (#678 T-159, #673 T-243, #685 T-275, #688 T-161) merged, main rebuilt 7d9215b2, live checks PASS, closed; T-274 measured and merged (#699) and ruled into T-286; 14 briefs and 2 amendments landed. FIRST: review the 7 READYs first-hand, one at a time (clark's copy of each reply is ~/Worktrees/<tag>-reply.md; then pr-src-diff.sh <pr>): T-269 #702 a5eec8d9, T-277 #704 5baed1b5, T-282 #703 ba38d32e (tests only: SG-1 merges it on green CI after the planner's ACCEPT), T-266 #701 ee701cf3, T-273 #697 9b6e76c5, T-271 #708 39adb0b4, T-281 #707 ac4e7b3f. For each code PR: the planner's ACCEPT, plus an Opus second review if wanted (clark launches a review-body file on the QA PC; %TEMP%/t272-opus-review-body.md is the template), then Aaron's word naming the PR via clark; merge one at a time with pr-refresh.sh before each, then one sia-rebuild and the live checks. T-272 #705 bc0d5991 has the planner's ACCEPT; its Opus review is RUNNING (reply to ~/Worktrees/t272-review-reply.md); then ask 'merge SIA #705'. RUNNING on the QA PC: T-172 r3 (PR #676), T-276, T-286. BLOCKED, then amended: T-283 (#698) and T-279 (#700), both on S4-9.2; amendment-1 for each is in docs PR #711; clark merges it and launches both r2s. The desktop rule stands: no npm, vitest, tsc or build on the desktop; at most 2 research-only subagents.",
       "watch_out": [
         "Aaron (via clark, 2026-10-13 ~20:5x CDT): the desktop CPU hit 100%. Run NO npm, vitest, tsc or build on the desktop; at most 2 subagents, research only; a brief that needs a pre-ship simulation sends clark a SIM line (repo, sha40, folder, exact command, what to report) for the QA PC, or ships without it.",
         "Overlaps managed tonight: T-283 got its own module and test file to stay clear of T-269's cli-suite-run.ts import (line 22) and its suite-run-meta.test.ts rows; T-281 must not touch start-report.ts or transcript-check.ts (T-276's hunks); T-266 does not edit db-v2.ts (T-273 does); T-276 and T-271 touch server.ts in different functions. The second of two neighbouring PRs to merge may still need a conflict fix at its refresh.",
+        "S4-9.2 (tests/harness/s4-guards.test.ts, ruled session 157) forbids any added skip, todo, skipIf or runIf under open-brain/tests. A platform-specific row branches inside itself (const win = process.platform === \"win32\", as tests/pipelines/sync/mcp-command-paths.test.ts does) and asserts something true on each platform. T-283 and T-279 each lost a round to briefs that said skipIf/runIf.",
         "Master has no branch protection: records and docs PRs merge by hand (clark's docs-merge.sh, or pr-keep-current.sh for a CLEAN .agents/docs-only PR, pinned; it exits 2 when it gives up after 30 min; read its exit unpiped, because a '| tail' wrapper reports tail's 0). Code PRs need Aaron's word naming them.",
         "Merges go one at a time: pr-refresh.sh just before each PR's own merge. A records or docs PR that merges between a refresh and its merge breaks clark's merge-tree gate, so land docs and records only in the gaps.",
         "SG-1 (D-135): config, rule-text and tests-only PRs merge on green CI pinned to the head, with no QA gate and no Aaron word. Code needs a QA ACCEPT from a judge other than the builder, and Aaron's word too.",
         "Write handoff open questions and watch-outs as plain strings until T-282 lands: state-render.test.ts T183-3 reads the live record and fails CI on the object form.",
         "Every running seat's open-brain server predates the 7d9215b2 rebuild: /mcp reconnect open-brain is Aaron's act (clark is asking him).",
         "Dry-run every post-merge live-check script against the pre-merge build: each new-behaviour check must FAIL there (knowledge 694; tonight's t161-livecheck failed check 2 on c1975286 and passed on 7d9215b2).",
-        "A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED (tonight's eight are QUEUED, not launched).",
+        "A launch line sent is not a launch: record a task in_progress only after clark says LAUNCHED or RUNNING (tonight's twelve were recorded only after clark confirmed all twelve RUNNING; t283's first launch aborted before cloning).",
         "Verify every relayed merge word in clark's transcript with relay-check.mjs (literal by default); approval is a snapshot of the PRs he named.",
         "T-270's mechanism: Windows PowerShell 5.1's console cp437 best-fit turns arrows and bullets into raw C0 bytes on the pipe to Node (knowledge 693; entry 685 is falsified: forget it only on Aaron's word).",
         "The repo is PUBLIC (D-090): transcripts, command text, paths and session ids stay outside it. The s170 live-check scripts live in ~/Worktrees/s170-livechecks/."
       ],
       "open_questions": [
-        "Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 (drafting) drops the Cursor path's transcriptPath until one live Cursor /start proves the file exists at the first tool call.",
+        "Planner: does T-161's NO TRANSCRIPT line false-alarm on Cursor seats? T-281 (READY, #707) withholds an ide:cursor proof's transcriptPath until one live Cursor /start proves the file exists at the first tool call.",
         "Planner, D-148 data point: the recall trigger injected entry 299 (pipe-to-tail masks the exit code) right after the planner made that mistake, and the planner re-ran the command unpiped. One observed case of an injection changing the next act, not a measurement."
       ],
       "session": 170,
@@ -5809,11 +5781,62 @@
           {
             "ref": "#676",
             "qa_status": "in_progress",
-            "note": "T-172 r2 at 778048db; the Opus review's CHANGES ruled, every finding accepted; amendment-2 (docs/loops/t172-main-rebuild-brief-amendment-2.md) is queued on the QA PC chain as r3"
+            "note": "T-172 r3 (amendment-2) RUNNING on the QA PC"
+          },
+          {
+            "ref": "#705",
+            "qa_status": "accepted",
+            "note": "T-272 at bc0d5991: planner ACCEPT; Opus second review RUNNING; then ask merge SIA #705"
+          },
+          {
+            "ref": "#702",
+            "qa_status": "in_progress",
+            "note": "T-269 READY a5eec8d9, not yet reviewed by the planner"
+          },
+          {
+            "ref": "#704",
+            "qa_status": "in_progress",
+            "note": "T-277 READY 5baed1b5, not yet reviewed"
+          },
+          {
+            "ref": "#703",
+            "qa_status": "in_progress",
+            "note": "T-282 READY ba38d32e, tests only (SG-1), not yet reviewed"
+          },
+          {
+            "ref": "#701",
+            "qa_status": "in_progress",
+            "note": "T-266 READY ee701cf3, not yet reviewed"
+          },
+          {
+            "ref": "#697",
+            "qa_status": "in_progress",
+            "note": "T-273 READY 9b6e76c5, not yet reviewed"
+          },
+          {
+            "ref": "#708",
+            "qa_status": "in_progress",
+            "note": "T-271 READY 39adb0b4, not yet reviewed"
+          },
+          {
+            "ref": "#707",
+            "qa_status": "in_progress",
+            "note": "T-281 READY ac4e7b3f, not yet reviewed"
+          },
+          {
+            "ref": "#698",
+            "qa_status": "in_progress",
+            "note": "T-283 r1 BLOCKED on S4-9.2 at 96f72acf; amendment-1 in docs PR #711, r2 to launch"
+          },
+          {
+            "ref": "#700",
+            "qa_status": "in_progress",
+            "note": "T-279 r1 BLOCKED on S4-9.2 at 77313347; amendment-1 in docs PR #711, r2 to launch"
           }
         ],
         "frozen_sha": null,
         "questions_for_aaron": [
+          "merge SIA #705 (T-272), after its Opus review comes back",
           "after T-172's amendment-2 and its READY: merge SIA #676",
           "T-194: (a), (b) or (c); planner recommends (c) now, (b) later",
           "T-024 (P0): may the planner rewrite knowledge entries 184 and 303 (they cite deleted knowledge-mcp paths) to say 'retired'?",
@@ -5828,7 +5851,8 @@
           "2026-10-13 21:33:00Z Aaron (clark's window, relay-check verified): 'SIA merges #678/#673/#685/#688 · A2A v1.22.14 release, go' (all four merged tonight)",
           "s170 planner: T-172's Opus review ruled, every finding accepted (amendment-2, #691); T-266 ruled (A), refuse; T-269 keeps W2 (the census counts alarm run_too_long and orphan_run as busy); T-274 changes no src (a floor change is a separate PR); T-280 closed as done by T-267",
           "s170 planner: T-196 HB-1, e21e71af not merged (stale); rewrite when the Cursor seats are back",
-          "s170 planner: T-251's install-commands allowlist question ruled no change; T-161's review findings went to T-281"
+          "s170 planner: T-251's install-commands allowlist question ruled no change; T-161's review findings went to T-281",
+          "s170 planner: T-286 ruled option (B): the status element carries \"tail\", so every asking query is \"tail\" \"exit\" \"code\" and the floor stays 8.0 (margin 5.81); S4-9.2 stands, and T-283 and T-279 were amended to branch inside the row"
         ]
       },
       "session_uuid": "0a40685b-edbc-4c79-be9f-dcd4963428e7",
@@ -5860,14 +5884,6 @@
       "seat": "developer",
       "checkout": "sia-builder",
       "first_rev": 263
-    },
-    {
-      "n": 160,
-      "date": "2026-10-04",
-      "uuid": "766a2128-4c5f-4b3f-93b7-3f9a88c1e594",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 318
     },
     {
       "n": 161,
@@ -5948,6 +5964,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 435
+    },
+    {
+      "n": 171,
+      "date": "2026-10-13",
+      "uuid": "13042431-247e-4dad-9477-507e43fc7916",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 445
     }
   ]
 }

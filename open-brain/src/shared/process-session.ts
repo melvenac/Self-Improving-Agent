@@ -318,6 +318,17 @@ export type ProveSessionOptions = {
   loadTable?: () => Win32TableResult;
 };
 
+/**
+ * T-281: the proof's transcript path for describeTranscript (T-161), or nothing. A Cursor proof's path is withheld: whether
+ * Cursor's agent-transcripts/<uuid>/<uuid>.jsonl exists at a session's first tool call has never been observed, and if
+ * Cursor writes it only when a turn ends, every Cursor seat's /start would print a false NO TRANSCRIPT. Pass it through for
+ * Cursor only after one live Cursor /start shows the file exists when ob_start runs.
+ */
+function provenTranscriptPath(proof: Partial<ProcessSessionProof>): { transcriptPath?: string } {
+  if (proof.ide === "cursor") return {};
+  return typeof proof.transcript_path === "string" && proof.transcript_path ? { transcriptPath: proof.transcript_path } : {};
+}
+
 function proveSessionAtKey(
   dir: string,
   keyPid: number,
@@ -362,7 +373,7 @@ function proveSessionAtKey(
       reason: `the session proof ${path} was written for a process that started at ${String(proof.proc_start)}, and the cursor-agent host ${keyPid} started at ${keyStart}: a reused pid`,
     };
   }
-  return { id: proof.session_id, pid: keyPid, ...(typeof proof.transcript_path === "string" && proof.transcript_path ? { transcriptPath: proof.transcript_path } : {}) };
+  return { id: proof.session_id, pid: keyPid, ...provenTranscriptPath(proof) };
 }
 
 function proveSessionClaude(dir: string, parentPid: number, parentStart: string | null): ProvenSession {
@@ -392,7 +403,7 @@ function proveSessionClaude(dir: string, parentPid: number, parentStart: string 
   if (proof.proc_start !== parentStart) {
     return { id: null, reason: `the session proof ${path} was written for a process that started at ${String(proof.proc_start)}, and this server's parent ${parentPid} started at ${parentStart}: a reused pid` };
   }
-  return { id: proof.session_id, pid: parentPid, ...(typeof proof.transcript_path === "string" && proof.transcript_path ? { transcriptPath: proof.transcript_path } : {}) };
+  return { id: proof.session_id, pid: parentPid, ...provenTranscriptPath(proof) };
 }
 
 /**
