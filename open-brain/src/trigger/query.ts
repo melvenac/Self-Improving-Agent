@@ -127,8 +127,11 @@ const stageProgram = (stage: string): string => {
   return t.slice(t.lastIndexOf("/") + 1).toLowerCase().replace(/\.exe$/, "");
 };
 
-/** T-288: the text before a single quote ends in an inner shell's `-c` (bash -c, bash -lc, wsl bash -c, docker exec app sh -c). */
-const INNER_SHELL_C = /(^|[\s/\\])(bash|sh|zsh|dash)(\.exe)?\s+-[A-Za-z]*c[A-Za-z]*\s*$/i;
+/**
+ * T-288: the text before a single quote ends in an inner shell's `-c` (bash -c, bash -lc, wsl bash -c, docker exec app sh -c);
+ * separate flags before `-c` (`bash -e -c`, `bash --norc -c`), a shell after `(` (`$(bash -c …)`), and ksh (T-290).
+ */
+const INNER_SHELL_C = /(^|[\s/\\(])(bash|sh|zsh|dash|ksh)(\.exe)?(\s+--?[A-Za-z][\w-]*)*?\s+-[A-Za-z]*c[A-Za-z]*\s*$/i;
 
 /**
  * Split a script into top-level statements (on unquoted `;`, newline, `&&`,
@@ -158,7 +161,13 @@ const splitStatements = (script: string): { stmts: Statement[]; remote: string[]
   for (let i = 0; i < script.length; i++) {
     const c = script[i];
     const n = script[i + 1];
-    if (esc) { add(c); esc = false; continue; }
+    if (esc) {
+      esc = false;
+      // T-290: a backslash-newline is removed before tokenising (sh), so `cmd | \⏎ tail` is one pipeline.
+      if (c === "\n") { stages[stages.length - 1] = stages[stages.length - 1].slice(0, -1); masked = masked.slice(0, -1); continue; }
+      add(c);
+      continue;
+    }
     if (sq) {
       if (c === "'") {
         sq = false;
@@ -198,10 +207,13 @@ const splitStatements = (script: string): { stmts: Statement[]; remote: string[]
 const isTrimmerPipeline = (s: Statement): boolean =>
   s.stages.length > 1 && (TRIMMERS as readonly string[]).includes(stageProgram(s.stages[s.stages.length - 1]));
 
-// T-288: a statement that is only `}` closes a `{ ...; }` group, whose status is its last command's: skip it, as a
-// `( ... )` subshell is already transparent.
+/** T-290: a group's close, alone or followed only by redirections (`} 2>&1`, `} > log`, `} &>/dev/null`). */
+const GROUP_CLOSE = /^\s*\}(\s*[0-9]*(?:[<>]{1,2}|&>)&?\s*[^\s;|&<>]+)*\s*$/;
+
+// T-288: a statement that is only `}`, or `}` with redirections (T-290), closes a `{ ...; }` group, whose status is its
+// last command's: skip it, as a `( ... )` subshell is already transparent.
 const scriptHasUnsafeRead = (all: readonly Statement[]): boolean => {
-  const stmts = all.filter((s) => s.masked.trim() !== "}");
+  const stmts = all.filter((s) => !GROUP_CLOSE.test(s.masked));
   return stmts.some(
     (s, i) =>
       i > 0 &&
