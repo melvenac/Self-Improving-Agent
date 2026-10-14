@@ -18,8 +18,13 @@ function ancestry(rows: { pid: number; ppid: number; commandLine: string }[]): s
   return JSON.stringify(rows);
 }
 
-function presence(agents: { name: string; seatState: string }[]) {
-  return { agents: agents.map((a) => ({ name: a.name, seat: { seatState: a.seatState } })) };
+function presence(agents: { name: string; seatState: string; alarmReason?: string }[]) {
+  return {
+    agents: agents.map((a) => ({
+      name: a.name,
+      seat: a.alarmReason === undefined ? { seatState: a.seatState } : { seatState: a.seatState, alarmReason: a.alarmReason },
+    })),
+  };
 }
 
 function fetchBodies(bodies: unknown[], status = 200): typeof fetch {
@@ -227,6 +232,114 @@ describe("T-168 suite meta", () => {
       ]),
     });
     expect(census.busySia).toContain("cursor-builder-waker");
+  });
+
+  it("T-269 C1 an alarm run_too_long seat is busy and a controlled rerun refuses", async () => {
+    const census = await readCensus({
+      hubUrl: "http://hub",
+      keyPath,
+      siaSeatNames: SIA,
+      gapMs: 0,
+      fetchFn: fetchBodies([
+        presence([{ name: "forge", seatState: "alarm", alarmReason: "run_too_long" }]),
+        presence([{ name: "forge", seatState: "alarm", alarmReason: "run_too_long" }]),
+      ]),
+    });
+    expect(census.agents).toEqual([{ name: "forge", seatState: "alarm", alarmReason: "run_too_long" }]);
+    expect(census.busySia).toContain("forge");
+    expect(decideSuiteStart({ leaseExit: 0, census, controlledRerun: true }).refuse).toBe(true);
+  });
+
+  it("T-269 C2 an orphan_run waker alarm is busy", async () => {
+    const census = await readCensus({
+      hubUrl: "http://hub",
+      keyPath,
+      siaSeatNames: SIA,
+      gapMs: 0,
+      fetchFn: fetchBodies([
+        presence([{ name: "cursor-builder-waker", seatState: "alarm", alarmReason: "orphan_run" }]),
+        presence([{ name: "cursor-builder-waker", seatState: "alarm", alarmReason: "orphan_run" }]),
+      ]),
+    });
+    expect(census.busySia).toContain("cursor-builder-waker");
+  });
+
+  it("T-269 C3 an informational alarm, or an alarm with no reason, is not busy", async () => {
+    const informational = await readCensus({
+      hubUrl: "http://hub",
+      keyPath,
+      siaSeatNames: SIA,
+      gapMs: 0,
+      fetchFn: fetchBodies([
+        presence([{ name: "forge", seatState: "alarm", alarmReason: "activity_without_lock" }]),
+        presence([{ name: "forge", seatState: "alarm", alarmReason: "activity_without_lock" }]),
+      ]),
+    });
+    expect(informational.busySia).toEqual([]);
+    const noReason = await readCensus({
+      hubUrl: "http://hub",
+      keyPath,
+      siaSeatNames: SIA,
+      gapMs: 0,
+      fetchFn: fetchBodies([
+        presence([{ name: "forge", seatState: "alarm" }]),
+        presence([{ name: "forge", seatState: "alarm" }]),
+      ]),
+    });
+    expect(noReason.busySia).toEqual([]);
+  });
+
+  it("T-269 C4 a busy alarm in either sample wins the merge", async () => {
+    const census = await readCensus({
+      hubUrl: "http://hub",
+      keyPath,
+      siaSeatNames: SIA,
+      gapMs: 0,
+      fetchFn: fetchBodies([
+        presence([{ name: "forge", seatState: "idle" }]),
+        presence([{ name: "forge", seatState: "alarm", alarmReason: "run_too_long" }]),
+      ]),
+    });
+    expect(census.busySia).toContain("forge");
+    expect(census.agents.find((a) => a.name === "forge")?.seatState).toBe("alarm");
+  });
+
+  it("T-269 C5 cli fixture path counts an alarm run_too_long seat as busy", () => {
+    const dir = mkdtempSync(join(tmpdir(), "t168-meta-"));
+    const fixture = join(dir, "presence.json");
+    const vitestJson = join(dir, "vitest.json");
+    const meta = join(dir, "suite-run-meta.json");
+    writeFileSync(
+      fixture,
+      JSON.stringify({
+        samples: [
+          presence([{ name: "forge", seatState: "alarm", alarmReason: "run_too_long" }]),
+          presence([{ name: "forge", seatState: "alarm", alarmReason: "run_too_long" }]),
+        ],
+      }),
+    );
+    writeFileSync(vitestJson, JSON.stringify({ numPassedTests: 3, numFailedTests: 1, unhandledErrors: 0 }));
+    const r = spawnSync(process.execPath, [TSX, CLI, "--seat", "cursor-builder", "--meta", meta], {
+      encoding: "utf8",
+      cwd: dir,
+      env: {
+        ...process.env,
+        SUITE_CENSUS_FIXTURE: fixture,
+        SUITE_LEASE_EXIT: "0",
+        SUITE_VITEST_JSON: vitestJson,
+        SUITE_VITEST_EXIT: "0",
+        SUITE_ANCESTRY: ancestry([
+          { pid: process.pid, ppid: HOST, commandLine: "node.exe tsx cli-suite-run.ts" },
+          { pid: HOST, ppid: 1, commandLine: HOST_CMD },
+        ]),
+        SUITE_OWNER_FROM: String(process.pid),
+      },
+    });
+    expect(r.status, r.stderr ?? "").toBe(0);
+    const written = JSON.parse(readFileSync(meta, "utf8"));
+    expect(written.census.busy_sia).toEqual(["forge"]);
+    expect(written.census.agents[0]).toEqual({ name: "forge", seatState: "alarm", alarmReason: "run_too_long" });
+    rmSync(dir, { recursive: true, force: true });
   });
 
   it("seat key path is A2A_KEY_DIR or ~/.a2a-hub/keys/<host>-<port>/<hub_name>.key", () => {
