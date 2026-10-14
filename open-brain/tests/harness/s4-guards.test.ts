@@ -79,6 +79,26 @@ export function testCountFindings(rows: { file: string; before: number; after: n
   return findings;
 }
 
+/**
+ * The ONLY skips S4-9.2 accepts (T-194 ship, atlas-sia ruling, session 171): a test of Windows-only path forms, which
+ * cannot run on Linux CI and does run on Windows. An entry matches one ADDED line EXACTLY (trimmed), and an entry that
+ * matches no added line is itself a finding, so an allowance cannot outlive the test it names. Spelled in pieces so this
+ * file does not contain what it scans for.
+ */
+export interface PlatformSkipAllowance { line: string; reason: string }
+export const ALLOWED_PLATFORM_SKIPS: readonly PlatformSkipAllowance[] = [
+  { line: `it.${"sk"}${"ipIf"}(process.platform !== "win32")("through the hook (Windows): an upper-case absolute path is denied", () => {`, reason: "T-194 r7, planner-hook/r4.test.ts: upper-case Windows paths" },
+  { line: `it.${"sk"}${"ipIf"}(process.platform !== "win32")("Windows: case, long-path prefix, NTFS dots/streams and the /mnt, /cygdrive forms", () => {`, reason: "T-194 r7, planner-hook/r5.test.ts: Windows-only path forms" },
+];
+
+/** Skip hits no allowance covers, plus every allowance no hit uses; [] means the guard holds. */
+export function skipFindings(skipHits: string[], allowances: readonly PlatformSkipAllowance[]): string[] {
+  const findings: string[] = [];
+  for (const h of skipHits) if (!allowances.some((a) => a.line === h.trim())) findings.push(`skip added with no matching allowance: ${h.trim()}`);
+  for (const a of allowances) if (!skipHits.some((h) => h.trim() === a.line)) findings.push(`stale platform-skip allowance: ${a.line}`);
+  return findings;
+}
+
 describe("slice four guards", { timeout: 120_000 }, () => {
   it("G0 the scans fire on a planted line and stay quiet on a clean one", () => {
     expect(hits(FORBIDDEN_WORD, [`the values are ${"calibrat"}${"ed"}`])).toHaveLength(1);
@@ -232,7 +252,7 @@ describe("slice four guards", { timeout: 120_000 }, () => {
   });
 
   it("S4-9.2 no skip, todo, skipIf or runIf is added, and no test file loses a test", () => {
-    expect(hits(SKIPS, scopedAdded("skips"))).toEqual([]);
+    expect(skipFindings(hits(SKIPS, scopedAdded("skips")), ALLOWED_PLATFORM_SKIPS)).toEqual([]);
     expect(git(["diff", "--diff-filter=D", "--name-only", BASE, "--", ...SCOPES.skips]).trim()).toBe("");
     const changed = git(["diff", "--diff-filter=M", "--name-only", BASE, "--", ...SCOPES.skips])
       .split("\n")
@@ -243,6 +263,15 @@ describe("slice four guards", { timeout: 120_000 }, () => {
       after: countTests(git(["show", `HEAD:${file}`])),
     }));
     expect(testCountFindings(rows, ALLOWED_TEST_LOSSES)).toEqual([]);
+  });
+
+  it("S4-9.2b a platform-skip allowance matches one added line exactly, and an unused one is stale", () => {
+    const gate = `  it.${"sk"}${"ipIf"}(process.platform !== "win32")("w", () => {`;
+    const allow = [{ line: gate.trim(), reason: "row" }];
+    expect(skipFindings([gate], allow)).toEqual([]);
+    expect(skipFindings([gate], [])).toHaveLength(1);
+    expect(skipFindings([`  it.${"sk"}${"ip"}("w", () => {`], allow)).toHaveLength(2);
+    expect(skipFindings([], allow)).toHaveLength(1);
   });
 
   it("S4-5c.1 the three policy files are unchanged, and later policies are the named additions", () => {
