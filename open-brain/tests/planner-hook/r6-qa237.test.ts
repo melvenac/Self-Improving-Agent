@@ -9,7 +9,7 @@
  * rows P1-P3 still decide: if the gate swallowed everything this would go red.
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { makeFixture, type Fixture } from "./r5-fixture.js";
@@ -26,9 +26,7 @@ interface Row {
   extra?: { how?: string[] };
 }
 
-// The rows file stays on loop/t194-planner-hook with the rest of docs/loops/t194-r6/ (T-194 ship brief); without it this suite skips.
-const ROWS_PATH = join(dirname(fileURLToPath(import.meta.url)), "../../../docs/loops/t194-r6/qa237-rows.json");
-const ROWS: Row[] = existsSync(ROWS_PATH) ? JSON.parse(readFileSync(ROWS_PATH, "utf8")) : [];
+const ROWS: Row[] = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../../../docs/loops/t194-r6/qa237-rows.json"), "utf8"));
 const NOT_PARSEABLE = "not statically parseable";
 
 let fx: Fixture;
@@ -110,7 +108,7 @@ function judge(row: Row, o: Outcome): string | null {
   }
 }
 
-describe.skipIf(ROWS.length === 0)("QA 237: every probe and generated case, against r6", () => {
+describe("QA 237: every probe and generated case, against r6", () => {
   it("loaded every row QA's scripts produce", () => {
     const by: Record<string, number> = {};
     for (const r of ROWS) by[r.source] = (by[r.source] ?? 0) + 1;
