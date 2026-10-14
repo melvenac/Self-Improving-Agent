@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 463 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 464 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -41,6 +41,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-206** The assignments sidecar gets the record's protections: a /sync erasure check (no entry dropped by a hand edit or a merge resolution), a stale-assignment flag (the assigned task is no longer active), and a planner-only writer once T-203 resolves seats by checkout
 - [ ] **T-261** Physically split core and memory into separate packages (after T-154; D-151)
 - [ ] **T-284** A commit-msg hook appends the Claude-Session trailer from the session's own id, so attribution never depends on the agent writing it
+- [ ] **T-291** latest-brief.test.ts afterAll cleanup flakes with ENOTEMPTY on .git
 
 ## Done (last 3 sessions)
 
