@@ -237,6 +237,17 @@ describe("T-276: session trailer ids", { timeout: 180_000 }, () => {
     expect(body).not.toContain("no Remote Control id");
   });
 
+  it("F4 (r4): a transcript that names another session gives source none, and ob_end prints no note", async () => {
+    initOldLayoutRepo(dir);
+    proveSessionWithTranscript(dir, nonRc(dir, OTHER_UUID));
+    commitAt(dir, DURING, "src/a.ts", "uuid trailer", U_TRAILER);
+    commitAt(dir, DURING, "src/b.ts", "no trailer", null);
+    touchNextSession(dir, DURING);
+    const body = text(await handleEnd({ project_root: dir, session_id: U, dry_run: true }));
+    expect(body).toContain("1 commit(s) in the window carry no Claude-Session trailer (UNATTRIBUTED, not counted)");
+    expect(body).not.toContain("no Remote Control id");
+  });
+
   it("E3 (r2): work after ob_end with no trailer in a Remote Control session is UNATTRIBUTED with no note", async () => {
     initOldLayoutRepo(dir);
     const tr = rc(dir);
