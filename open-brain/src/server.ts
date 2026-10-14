@@ -37,7 +37,7 @@ import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
 import { resolvePaths, canonicalizeProjectDir, projectIdentity, projectIdentityName, obsidianVaultDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
-import { sessionIdsFromTranscript, sessionStartFromTranscript } from "./shared/handoff-guard.js";
+import { sessionIdsFromTranscript, sessionStartFromTranscript, structuralTrailerNote } from "./shared/handoff-guard.js";
 import {
   OLD_LAYOUT_LINE,
   isOldLayoutProject,
@@ -419,8 +419,10 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
           preamble.push(`RECORD OK: closing without a matching record — ${recordOkReason}`);
         }
         if (evaluation.work.unattributed > 0) {
+          // T-276: endSessionWindow fell back to the session's own uuid, so its transcript carried no Remote Control id.
+          const noRemoteControl = sessionIds.length === 1 && sessionIds[0] === endedId;
           preamble.push(
-            `${evaluation.work.unattributed} commit(s) in the window carry no Claude-Session trailer (UNATTRIBUTED, not counted)`,
+            `${evaluation.work.unattributed} commit(s) in the window carry no Claude-Session trailer (UNATTRIBUTED, not counted)${noRemoteControl ? structuralTrailerNote(endedId) : ""}`,
           );
         }
       }

@@ -121,6 +121,66 @@ export function sessionIdsFromTranscript(path: unknown): string[] {
   return [...ids];
 }
 
+/** T-276: where a session's trailer ids came from. */
+export type TrailerIdSource = "bridge" | "session" | "none";
+
+export interface TrailerIds {
+  ids: string[];
+  source: TrailerIdSource;
+}
+
+const TRANSCRIPT_HEAD_BYTES = 256 * 1024;
+const BRIDGE_ID_RE = /"bridgeSessionId"\s*:\s*"cse_([A-Za-z0-9]+)"/g;
+const escapeRegExp = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+function readTranscriptHead(path: string): string | null {
+  try {
+    const fd = openSync(path, "r");
+    try {
+      const buf = Buffer.alloc(TRANSCRIPT_HEAD_BYTES);
+      const n = readSync(fd, buf, 0, buf.length, 0);
+      return buf.subarray(0, n).toString("utf8");
+    } finally {
+      closeSync(fd);
+    }
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * T-276: the ids this session's `Claude-Session:` trailer can carry. A Remote Control session's trailer is
+ * `https://claude.ai/code/session_<X>`, read as its bridge ids. A session without Remote Control gets no trailer from
+ * Claude Code, so ob_start tells it to end each commit with `Claude-Session: <uuid>`, and its own uuid counts when a
+ * record in its transcript names it. The head is read first; the whole file only when the head holds no bridge id,
+ * because Remote Control can be switched on mid-session (one measured transcript's first bridge record sat past byte
+ * 830,000).
+ */
+export function sessionTrailerIds(path: unknown, sessionUuid: string): TrailerIds {
+  if (typeof path !== "string" || !path || !existsSync(path)) return { ids: [], source: "none" };
+  const head = readTranscriptHead(path);
+  if (head === null) return { ids: [], source: "none" };
+  const bridgeIds = (text: string): string[] => [...new Set([...text.matchAll(BRIDGE_ID_RE)].map((m) => m[1]!))];
+  let text = head;
+  let bridge = bridgeIds(head);
+  if (bridge.length === 0) {
+    try {
+      text = readFileSync(path, "utf8");
+    } catch {
+      return { ids: [], source: "none" };
+    }
+    bridge = bridgeIds(text);
+  }
+  const namesSelf = sessionUuid !== "" && new RegExp(`"sessionId"\\s*:\\s*"${escapeRegExp(sessionUuid)}"`).test(text);
+  if (bridge.length > 0) return { ids: namesSelf ? [...bridge, sessionUuid] : bridge, source: "bridge" };
+  return namesSelf ? { ids: [sessionUuid], source: "session" } : { ids: [], source: "none" };
+}
+
+/** T-276: appended to an UNATTRIBUTED count when the session's trailer ids are its own uuid only (no Remote Control). */
+export function structuralTrailerNote(sessionUuid: string): string {
+  return `; this session has no Remote Control id, so Claude Code adds no trailer to its commits: end each one with the line Claude-Session: ${sessionUuid}`;
+}
+
 /** Did this session commit work (E1, any branch), and is the record or a loop handoff in place? */
 export function checkSessionHandoff(
   projectDir: string,
