@@ -56,6 +56,11 @@ export interface BriefingInput {
   /** IMPORT-CMDS C4: valid record but project `.claude/commands/start.md` is not SIA's copy. */
   oldStartCommand?: string | null;
   /**
+   * T-161: describeTranscript()'s line, when the proven session has no transcript on disk. Printed on its own line after the
+   * serving line and oldStartCommand, in both layouts. Null or absent prints nothing, so every other render is byte-identical.
+   */
+  transcript?: string | null;
+  /**
    * T-239, OPT-IN per repo (greeting.json `handoff_by_checkout`, via `handoffCheckout`), default OFF. Set: the reader's
    * checkout, and only that checkout's handoff is the pick-up. Absent: the role's newest handoff, as before.
    */
@@ -117,6 +122,7 @@ export function renderBriefing(i: BriefingInput): string[] {
 
   out.push(i.serving);
   if (i.oldStartCommand) out.push(i.oldStartCommand);
+  if (i.transcript) out.push(i.transcript);
   out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
   out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}`);
@@ -222,6 +228,7 @@ function renderBudgeted(i: BriefingInput): string[] {
   const s = i.state;
   const out: string[] = [BRIEFING_START, i.serving];
   if (i.oldStartCommand) out.push(i.oldStartCommand);
+  if (i.transcript) out.push(i.transcript);
   out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
   const drift =
