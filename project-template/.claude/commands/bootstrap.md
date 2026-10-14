@@ -83,8 +83,10 @@ project's, and then **checks with git** that every file is tracked or local exac
 It prints each file as `tracked` or `local` with the reason. **Read that list to the owner**:
 
 - **Tracked** (committed with the project): `.agents/TASKS/INBOX.md`, `.agents/TASKS/task.md`,
-  `.agents/SYSTEM/SUMMARY.md`, `.agents/AGENT.md`, the four session commands in
-  `.claude/commands/` (`/start`, `/end`, `/task`, `/sync`), `.gitignore` and `.gitattributes`.
+  `.agents/SYSTEM/SUMMARY.md`, `.agents/AGENT.md`, the four role-file stubs in `.agents/roles/`
+  (`shared.md`, `planner.md`, `developer.md`, `qa.md`: starting points to replace with this project's
+  own rules), the four session commands in `.claude/commands/` (`/start`, `/end`, `/task`, `/sync`),
+  `.gitignore` and `.gitattributes`.
 - **Local** (this disk only, by design): `.agents/SESSIONS/SESSION_TEMPLATE.md`, because session logs
   are local. The template's PRD, DECISIONS, ENTITIES, RULES and similar files are **not** scaffolded:
   the gitignore keeps them local, so they would exist on one disk only. Write them when the project
@@ -149,8 +151,8 @@ Show the owner the three files.
 OB state import --draft
 ```
 
-It writes nothing but a draft and a report (`.agents/state.draft.json`,
-`.agents/state.import-report.md`), in this folder's `.agents/` and never a parent's. The project
+It writes nothing but a draft, a report and a record of the inputs it read (`.agents/state.draft.json`,
+`.agents/state.import-report.md`, `.agents/state.draft.inputs.json`), all local, in this folder's `.agents/` and never a parent's. The project
 needs no `package.json`: without one, the project's name is the folder's name, and the draft says
 so. Check the summary:
 
@@ -199,8 +201,20 @@ The status must list exactly:
 - `.agents/state.json`
 - the four rendered views: `.agents/TASKS/INBOX.md`, `.agents/TASKS/task.md`,
   `.agents/SESSIONS/next-session.md`, `.agents/SYSTEM/SUMMARY.md`
+- the four role-file stubs the commit installs where the project had none: `.agents/roles/shared.md`,
+  `planner.md`, `developer.md`, `qa.md` (a role file the project already had is kept as it was)
 - the four session commands: `.claude/commands/start.md`, `end.md`, `task.md`, `sync.md`
 - `CLAUDE.md` if step 4 changed it
+
+If the role files do not appear, the project's `.gitignore` predates them and ignores `.agents/roles/`
+(`--commit` does not change `.gitignore`). Add these three lines after its other `.agents` rules, then
+run the status again:
+
+```
+!/.agents/roles/
+/.agents/roles/*
+!/.agents/roles/*.md
+```
 
 On a **fresh install** (step 3 ran), the status must list exactly the tracked files from step 3, plus
 `.agents/state.json` and `.agents/SESSIONS/next-session.md`, plus `CLAUDE.md` if step 4 changed it.

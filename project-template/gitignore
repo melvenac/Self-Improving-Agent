@@ -10,9 +10,10 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# .agents/ is ignored EXCEPT the five state files and AGENT.md: state.json is
-# the record; INBOX.md, task.md, next-session.md and SUMMARY.md are its rendered
-# views; AGENT.md says whether this checkout is a seat, and a clone needs it.
+# .agents/ is ignored EXCEPT the five state files, AGENT.md and the role files:
+# state.json is the record; INBOX.md, task.md, next-session.md and SUMMARY.md
+# are its rendered views; AGENT.md says whether this checkout is a seat, and the
+# role files under roles/ say how each seat works, so a clone needs both.
 # Session logs, archive/, PRD, docs etc. stay local (git is not their history).
 /.agents/*
 !/.agents/state.json
@@ -27,6 +28,9 @@ Thumbs.db
 !/.agents/SYSTEM/
 /.agents/SYSTEM/*
 !/.agents/SYSTEM/SUMMARY.md
+!/.agents/roles/
+/.agents/roles/*
+!/.agents/roles/*.md
 
 # Runtime artifacts (session-local / regenerated)
 /.recalled-entries.json

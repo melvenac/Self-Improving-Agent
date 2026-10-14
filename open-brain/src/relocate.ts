@@ -1,7 +1,7 @@
 import type Database from 'better-sqlite3';
 import { existsSync, mkdirSync, renameSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
-import { canonicalizeProjectDir, projectDisplayName, projectDirExists } from './shared/paths.js';
+import { canonicalizeProjectDir, projectDisplayName, projectDirExists, mainWorktreeRoot, projectIdentity } from './shared/paths.js';
 
 /**
  * Fold a project's stored history onto a renamed directory.
@@ -95,6 +95,46 @@ export function planRelocate(
     collisions,
     targetExistsOnDisk: existsSync(toRaw),
   };
+}
+
+/** Every distinct `project_dir` the knowledge index and the sessions table carry. */
+function distinctProjectDirs(db: Database.Database): string[] {
+  const rows = db
+    .prepare(`
+      SELECT project_dir AS p FROM knowledge_index WHERE project_dir IS NOT NULL AND project_dir != ''
+      UNION
+      SELECT project_dir AS p FROM sessions WHERE project_dir IS NOT NULL AND project_dir != ''
+    `)
+    .all() as { p: string }[];
+  return rows.map((r) => r.p).sort();
+}
+
+/**
+ * T-249: one fold per linked-worktree key, onto its repository.
+ *
+ * Before T-249 every worktree of a repo was keyed as a project of its own, so a
+ * repo worked on from three checkouts had its history split three ways. A key
+ * whose identity (`projectIdentity`) differs from itself is a worktree that is
+ * still on disk; it is folded with the same planRelocate a manual --from/--to
+ * uses, onto the main worktree's own spelling so the notes land in its folder.
+ */
+export function planWorktreeFolds(db: Database.Database, vaultDir: string): RelocatePlan[] {
+  const plans: RelocatePlan[] = [];
+  for (const v of distinctProjectDirs(db)) {
+    const own = canonicalizeProjectDir(v);
+    if (!own || projectIdentity(v) === own) continue;
+    plans.push(planRelocate(db, vaultDir, v, mainWorktreeRoot(v)));
+  }
+  return plans;
+}
+
+/**
+ * Keys `--worktrees` cannot resolve: a pruned worktree is gone from disk, and
+ * with it the `.git` file that names its repository. Listed so they can be
+ * folded by hand with --from/--to.
+ */
+export function unresolvableProjectDirs(db: Database.Database): string[] {
+  return distinctProjectDirs(db).filter((p) => p.includes('/') && !projectDirExists(p));
 }
 
 export interface RelocateResult {
