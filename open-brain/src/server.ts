@@ -885,7 +885,7 @@ server.tool(
 // --- ob_store ---
 server.tool(
   "ob_store",
-  "Store a piece of knowledge. By default stored globally. Set scope to 'project' and pass project_dir to scope it.",
+  "Store a piece of knowledge. By default stored globally. Set scope to 'project' and pass project_dir to scope it. A key is unique across every scope: a key another scope (or a chunk) already holds is refused, not moved.",
   {
     content: z.string().describe("The knowledge to store"),
     key: z.string().optional().describe("Short label for easy retrieval"),
@@ -1000,6 +1000,20 @@ export async function handleStore(args: StoreArgs): Promise<ToolResponse> {
         content: [{
           type: "text" as const,
           text: `Unchanged — state "${effectiveKey}" (id: ${same?.id ?? "?"}) already holds this value. Nothing was written.`,
+        }],
+      };
+    }
+
+    if (result.keyHeldBy) {
+      const held = result.keyHeldBy;
+      const heldScope = held.projectDir ? `project: ${held.projectDir}` : "global";
+      return {
+        content: [{
+          type: "text" as const,
+          text:
+            `Not stored — key "${effectiveKey}" already belongs to entry ${held.id} (${heldScope}) at ${held.vaultPath}. ` +
+            `A key is unique across every scope, so storing it${scopeLabel} would move that entry and orphan its note. ` +
+            `Nothing was written. Store under a different key, or use ob_forget (id: ${held.id}) first if you meant to move it.`,
         }],
       };
     }
