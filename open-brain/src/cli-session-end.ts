@@ -13,7 +13,10 @@
 import { existsSync } from "fs";
 import { join } from "path";
 import { homedir } from "os";
-import { openV2Database } from "./db-v2.js";
+import Database from "better-sqlite3";
+import { initTriggerFires, openV2Database } from "./db-v2.js";
+import { formatReconcileLine, reconcilePendingFires } from "./trigger/fires.js";
+import { pendingFiresPath } from "./trigger/pending-fires.js";
 import { formatSessionEndLines, sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
@@ -224,6 +227,24 @@ try {
   }
 } catch (err) {
   console.log(`[session-end] skills-audit check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+}
+
+// T-159: the recall trigger's not-asked fires wait in a file beside the store;
+// move every session's into trigger_fires. Before the vault exit, so a machine
+// with no vault still reconciles. Never openV2Database, which creates a store.
+if (existsSync(V2_DB)) {
+  try {
+    const db = new Database(V2_DB, { fileMustExist: true });
+    try {
+      initTriggerFires(db);
+      const r = reconcilePendingFires(db, pendingFiresPath(V2_DB));
+      console.log(`[session-end] ${formatReconcileLine(r)}`);
+    } finally {
+      db.close();
+    }
+  } catch (err) {
+    console.log(`[session-end] trigger fires NOT RECONCILED: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+  }
 }
 
 try {
