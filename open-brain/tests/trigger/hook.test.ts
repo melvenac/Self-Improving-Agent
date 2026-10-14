@@ -226,9 +226,13 @@ describe('A5 — what the hook emits', () => {
     db.close();
 
     const byState = Object.fromEntries(rows.map((r) => [r.state, r.n]));
-    // The rows above ran: two injections and three not-asked, at least.
+    // The rows above ran: two injections, at least, in the store. T-159: the
+    // three not-asked fires are NOT rows yet — each is one line in the pending
+    // file beside the store, reconciled at SessionEnd and ob_end.
     expect(byState.injected).toBeGreaterThanOrEqual(2);
-    expect(byState['not-asked']).toBeGreaterThanOrEqual(3);
+    expect(byState['not-asked'] ?? 0).toBe(0);
+    const pending = join(dir, 'recall-trigger-pending.jsonl');
+    expect(readFileSync(pending, 'utf-8').split('\n').filter((l) => l.trim() !== '')).toHaveLength(3);
   }, SPAWN_TIMEOUT);
 });
 

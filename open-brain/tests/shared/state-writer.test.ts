@@ -259,6 +259,50 @@ describe("applyStateOps (Loop 3 writer)", () => {
     expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "close_gap", id: "G-001" }] }), /already closed/);
   });
 
+  /** T-275: a recurrence reopens the same gap instead of filing a new id. */
+  function closeThenReopenG001(root: string): WriteResult {
+    execFileSync("git", ["init", "-q", "-b", "master"], { cwd: root, stdio: "ignore" });
+    execFileSync("git", ["-c", "user.email=qa@example.com", "-c", "user.name=qa", "commit", "-q", "--allow-empty", "-m", "init"], { cwd: root, stdio: "ignore" });
+    expect(applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "close_gap", id: "G-001" }] }).ok).toBe(true);
+    return applyStateOps(root, { session: SESSION, expected_revision: 8, ops: [{ op: "reopen_gap", id: "G-001", evidence: "recurred" }] });
+  }
+
+  it("reopen_gap moves a closed gap back to open, clears the close stamp and appends the evidence (RG1)", () => {
+    const before = readState(root).gaps.find((g) => g.id === "G-001")!.evidence;
+    const r = closeThenReopenG001(root);
+    expect(r.ok).toBe(true);
+    expect(r.applied).toEqual([{ op: "reopen_gap", id: "G-001" }]);
+    const g = readState(root).gaps.find((x) => x.id === "G-001")!;
+    expect(g).toMatchObject({ status: "open", closed_session: null, closed_rev: null });
+    expect(g.evidence).toBe(`${before} — s${SESSION} reopened: recurred`);
+    expect(g.evidence.endsWith(` — s${SESSION} reopened: recurred`)).toBe(true);
+    expect(r.notes.some((n) => n.includes("reopen_gap G-001") && n.includes(`closed session ${SESSION}`) && n.includes("rev 8"))).toBe(true);
+    const summary = readFileSync(join(root, ".agents/SYSTEM/SUMMARY.md"), "utf-8");
+    expect(summary).toContain("Gap G-001:");
+  });
+
+  it("reopen_gap refuses an open gap, an unknown gap and an empty evidence (RG2)", () => {
+    execFileSync("git", ["init", "-q", "-b", "master"], { cwd: root, stdio: "ignore" });
+    execFileSync("git", ["-c", "user.email=qa@example.com", "-c", "user.name=qa", "commit", "-q", "--allow-empty", "-m", "init"], { cwd: root, stdio: "ignore" });
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "reopen_gap", id: "G-002", evidence: "e" }] }), /gap G-002 is not closed/);
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "reopen_gap", id: "G-404", evidence: "e" }] }), /unknown gap G-404/);
+    expectRefused(applyStateOps(root, { session: SESSION, expected_revision: 7, ops: [{ op: "reopen_gap", id: "G-001", evidence: "" }] }), /^ops\[0\] invalid at evidence: /);
+  });
+
+  it("a reopened gap can be closed again and takes the new session and revision (RG3)", () => {
+    expect(closeThenReopenG001(root).ok).toBe(true);
+    const r = applyStateOps(root, { session: SESSION + 1, expected_revision: 9, ops: [{ op: "close_gap", id: "G-001" }] });
+    expect(r.ok).toBe(true);
+    expect(readState(root).gaps.find((g) => g.id === "G-001")).toMatchObject({ status: "closed", closed_session: SESSION + 1, closed_rev: 10 });
+  });
+
+  it("the ob_state description lists reopen_gap (RG4)", () => {
+    const server = readFileSync(join(import.meta.dirname, "../../src/server.ts"), "utf-8");
+    const line = server.split("\n").find((l) => l.includes("Write .agents/state.json through typed operations"));
+    expect(line).toBeDefined();
+    expect(line).toContain("reopen_gap");
+  });
+
   it("a cited fixture id is skipped and an uncited one is not (TG-3)", () => {
     const repo = mkdtempSync(join(tmpdir(), "ob-gap-cite-"));
     try {

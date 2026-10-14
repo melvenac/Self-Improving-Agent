@@ -2,6 +2,7 @@ import type Database from 'better-sqlite3';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
 import { join, basename, relative } from 'node:path';
 import { parseFrontmatterScalar, parseInlineArray } from '../../shared/parse-frontmatter.js';
+import { slugify } from '../../vault-writer.js';
 
 /**
  * Generate Topic notes — one per subject tag, linking every note that carries it.
@@ -79,7 +80,9 @@ function parseTags(raw: string | null | undefined): string[] {
 
 function normalizeProject(raw: string | null | undefined): string | null {
   if (!raw) return null;
-  const slug = raw.trim().toLowerCase().replace(/\s+/g, '-');
+  // The same slug `writeSummary` builds its tag with, so a summary's project and
+  // its tag are one topic. The fallback keeps an all-non-ASCII name out of `unsorted`.
+  const slug = slugify(raw) || raw.trim().toLowerCase().replace(/\s+/g, '-');
   return NON_PROJECTS.has(slug) ? null : slug;
 }
 

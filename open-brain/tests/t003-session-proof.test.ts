@@ -339,7 +339,7 @@ describe("T-003 hooks: SessionStart writes the proof, SessionEnd removes its own
     expect(p).toMatchObject({ session_id: SELF, claude_pid: CLAUDE, ide: "claude", transcript_path: "C:/t/x.jsonl" });
     expect(p.proc_start).toBe(processStartTime(CLAUDE));
     // End to end: a server whose parent is this process would prove SELF.
-    expect(proveSession(byPidDir(slot), CLAUDE, processStartTime(CLAUDE))).toEqual({ id: SELF, pid: CLAUDE });
+    expect(proveSession(byPidDir(slot), CLAUDE, processStartTime(CLAUDE))).toEqual({ id: SELF, pid: CLAUDE, transcriptPath: "C:/t/x.jsonl" });
   });
 
   it("no CLAUDE_PID, a Cursor payload, a subagent, or no payload id: NO proof is written, and the first two say why", () => {
