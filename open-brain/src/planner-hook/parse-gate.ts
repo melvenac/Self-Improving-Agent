@@ -45,6 +45,8 @@ const RESERVED = new Set([
   "if", "then", "else", "elif", "fi", "for", "while", "until", "do", "done", "case", "esac", "in", "select", "function",
   "time", "coproc", "!", "{", "}", "[[", "]]",
 ]);
+/** T-293: the script a `bash <file> [args]` call may run. */
+const BASH_SCRIPT_RE = /\.sh$/i;
 const SHELLS = new Set(["sh", "bash", "zsh", "dash", "ksh", "ash", "csh", "tcsh", "fish"]);
 const REFUSED_COMMANDS = new Set([
   "sudo", "doas", "su", "runuser", "nice", "ionice", "timeout", "xargs", "exec", "builtin", "stdbuf", "setsid", "watch",
@@ -278,8 +280,11 @@ function checkBashSimples(simples: GSimple[], depth: number): string | null {
     if (REFUSED_COMMANDS.has(name)) return refuse(`wrapper, shell or code-running command (${name})`);
     const args = s.words.slice(k + 1);
     if (SHELLS.has(name)) {
+      // T-293: bash may also run a script FILE, as node may (`node <file.js> [args]`): no option before the script, and
+      // the file must end in .sh. Its contents are not read, exactly as node's are not; GitHub's ruleset is the guarantee.
+      if (name === "bash" && args.length >= 1 && !args[0].text.startsWith("-") && BASH_SCRIPT_RE.test(args[0].text)) continue;
       const ok = args.length === 2 && args[0].text === "-c";
-      if (!ok) return refuse(`${name} is only parseable as: ${name} -c '<string>'`);
+      if (!ok) return refuse(`${name} is only parseable as: ${name} -c '<string>', or bash <file.sh> [args]`);
       if (depth >= 3) return refuse("shell strings nested deeper than 3");
       const inner = gateBash(args[1].text, depth + 1);
       if (inner) return refuse(`inside ${name} -c: ${inner}`);

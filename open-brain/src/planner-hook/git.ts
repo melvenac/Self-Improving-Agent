@@ -21,13 +21,13 @@ const DOCS_MERGE_ALLOWLIST_EXACT = new Set([
  * between (`-C <dir>`, `-c k=v`, `--git-dir=...`, `--no-pager`), by that subcommand. The git word is read as
  * the gh word is: file name, any case, any extension, quotes removed. Merge and tag always need a grant. A push
  * needs a grant unless it is a STANDING push: remote `origin`, every refspec a plain branch under loop/, qa/,
- * docs/ or chore/, and no force, tag, mirror, delete or master/main target. A grant matches exactly (r4-5).
+ * docs/, chore/ or records/ (T-293), and no force, tag, mirror, delete or master/main target. A grant matches exactly (r4-5).
  */
 const GIT_RISKY_CONFIG_RE = /^(?:alias|remote|url|include|includeif|core)\./i;
 const GIT_GLOBAL_WITH_VALUE = new Set(["-C", "-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix", "--config-env", "--exec-path"]);
 const PUSH_OPTION_WITH_VALUE = new Set(["--repo", "-o", "--push-option", "--receive-pack", "--exec", "--signed"]);
 const PUSH_ALWAYS_GRANT = new Set(["--tags", "--follow-tags", "--mirror", "--all", "--prune", "--delete", "-d"]);
-const STANDING_BRANCH_RE = /^(?:loop|qa|docs|chore)\/[^\s/][^\s]*$/;
+const STANDING_BRANCH_RE = /^(?:loop|qa|docs|chore|records)\/[^\s/][^\s]*$/;
 
 /** True when this push must be matched by a grant. `args` are the words after `push`. */
 function pushNeedsGrant(args: readonly { text: string; expands: boolean }[]): boolean {
