@@ -260,7 +260,7 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
   });
 
-  it("WORST CASE with EVERY flag on (FOCUS + SEATS + a MISSING_HANDOFF_MAX_CHARS T-199 notice + handoff_by_checkout + a clipped T-167 PROBLEM line): still fits BRIEFING_BUDGET", () => {
+  it("WORST CASE with EVERY flag on (FOCUS + SEATS + a MISSING_HANDOFF_MAX_CHARS T-199 notice + handoff_by_checkout + a clipped T-167 PROBLEM line + T-161's NO TRANSCRIPT, T-281): still fits BRIEFING_BUDGET", () => {
     // T-239 merged with T-236 (c) and T-199: one PICK UP block carries all three. FOCUS on the header, this checkout's own
     // handoff (picked over a NEWER sibling's) on the body line, the notice appended to it. Built with the real producers.
     const raw = structuredClone(SIA);
@@ -311,6 +311,8 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
       ownCheckout: "sia-infra",
       // T-167: the longest PROBLEM line describeProblemStatement can print (a 300-character clip of a longer statement).
       problem: `PROBLEM (.agents/SYSTEM/PRD.md): ${"p".repeat(300)}… (100000 chars)`,
+      // T-281: T-161's line at a long real-shaped path. The budgeted layout carries only a fixed note for it, on the session line.
+      transcript: `NO TRANSCRIPT: session 00000000-0000-4000-8000-000000000000 has no transcript at C:/Users/someone/.claude/projects/C--Users-someone-Worktrees-sia-builder/00000000-0000-4000-8000-000000000000.jsonl, so /end's transcript checks, the handoff guard and the recall census cannot see it (T-161). Relaunching is the first thing to try; the cause is unknown.`,
     });
     const { lines: count, chars } = size(lines);
     const at = lines.findIndex((l) => l.startsWith("PICK UP HERE"));
@@ -322,6 +324,9 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     expect(lines.some((l) => l.startsWith("PROBLEM ("))).toBe(true);
     expect(count, `${count} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
     expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    // T-281: the note rides the session line, and the full line is not in the Briefing.
+    expect(lines.find((l) => l.startsWith("Session 160 — "))!.endsWith(" · NO TRANSCRIPT (T-161): /end cannot see this session")).toBe(true);
+    expect(lines.join("\n")).not.toContain("NO TRANSCRIPT: session");
   });
 
   it("WORST CASE keeps the facts that decide a session: every section header is present, each cut ends with its pointer", () => {
