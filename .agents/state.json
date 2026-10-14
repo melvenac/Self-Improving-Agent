@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 463,
+  "revision": 464,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2297,6 +2297,20 @@
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
       "closed_rev": 463
+    },
+    {
+      "id": "T-291",
+      "title": "latest-brief.test.ts afterAll cleanup flakes with ENOTEMPTY on .git",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 171,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s171: CI run 38609276291 on records PR #741 (records-only, head 06a836e0) failed one file, tests/pipelines/session-start/latest-brief.test.ts, at its afterAll: `rmSync(d, { recursive: true, force: true })` threw ENOTEMPTY rmdir '<tmp>/latest-brief-*/.git'. Every test passed (3501 passed, 7 skipped); a rerun of the failed job was green and the PR merged. Likely a git process still writing into the fixture's .git when cleanup runs (the file calls handleStart, which may spawn git). Other test files already use `maxRetries: 3, retryDelay: 50` for this (active-session, audit-fix-a1-r5/r7/r8/r9). Candidate fix: add the same options here, and check whether handleStart leaves a detached git child; tests-only, so SG-1 applies.",
+      "note_by": [
+        "13042431-247e-4dad-9477-507e43fc7916"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
