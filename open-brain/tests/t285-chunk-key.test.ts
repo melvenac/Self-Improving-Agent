@@ -4,6 +4,7 @@ import { join } from "path";
 import { tmpdir } from "os";
 import { handleStore, handleStoreChunk } from "../src/server.js";
 import { slugify } from "../src/vault-writer.js";
+import * as dbV2 from "../src/db-v2.js";
 
 // T-285: ob_store_chunk refuses a key or a vault file another entry already holds, before writing anything.
 
@@ -86,5 +87,41 @@ describe("T-285 — ob_store_chunk refuses a held key or file", () => {
     const r = await handleStoreChunk({ content: "fresh body", key: `F285-${tag}`, category: "note" });
     expect(r.isError, text(r)).toBeFalsy();
     expect(text(r).startsWith("Chunk stored (id: ")).toBe(true);
+  });
+
+  it("K5: two keys that slugify to one file: the second is refused naming the first entry", async () => {
+    makeVault();
+    const tag = Math.random().toString(36).slice(2, 8);
+    expect(slugify(`Foo Bar ${tag}`)).toBe(slugify(`foo-bar-${tag}`));
+    const first = await handleStoreChunk({ content: "one", key: `Foo Bar ${tag}`, category: "note" });
+    expect(first.isError, text(first)).toBeFalsy();
+    const m = text(first).match(/\(id: (\d+)\)/);
+    expect(m, text(first)).toBeTruthy();
+    const id = m![1];
+
+    const second = await handleStoreChunk({ content: "two", key: `foo-bar-${tag}`, category: "note" });
+    expect(second.isError, text(second)).toBe(true);
+    expect(text(second)).toContain(`is already indexed as entry ${id} (key "Foo Bar ${tag}")`);
+  });
+
+  it("K6: a row holding the same file in another case and slash form, with no file on disk, is refused", async () => {
+    const vault = makeVault();
+    const tag = Math.random().toString(36).slice(2, 8);
+    const key = `K6-${tag}`;
+    const today = new Date().toISOString().slice(0, 10);
+    const computed = join(vault, "Chunks", `${today}-general-${slugify(key)}.md`);
+    const variant = computed.split("\\").join("/").toUpperCase();
+    const db = dbV2.openV2Database(process.env.KNOWLEDGE_V2_DB!);
+    try {
+      dbV2.indexKnowledge(db, { vaultPath: variant, key: `K6-${tag}-holder`, content: "holder", tags: "" });
+      const holderId = (db.prepare("SELECT id FROM knowledge_index WHERE key = ?").get(`K6-${tag}-holder`) as { id: number }).id;
+
+      const r = await handleStoreChunk({ content: "x", key, category: "note" });
+      expect(r.isError, text(r)).toBe(true);
+      expect(text(r)).toContain(`is already indexed as entry ${holderId} (key "K6-${tag}-holder")`);
+      expect(existsSync(computed)).toBe(false);
+    } finally {
+      db.close();
+    }
   });
 });
