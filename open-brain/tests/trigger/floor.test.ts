@@ -105,9 +105,20 @@ describe('A4 — the floor is read from data', () => {
     // corpus was, and when. A free-text field nobody asserts on is the same
     // rot one step later.
     const { provenance } = loadPolicy();
-    expect(provenance).toMatch(/\b599\b/);
+    expect(provenance).toMatch(/\b695\b/);
     expect(provenance).toMatch(/\b\d{4}-\d{2}-\d{2}\b/);
     expect(provenance).toContain(String(loadPolicy().relevance_floor));
+  });
+
+  it('T-286: the shipped floor sits under the asking query\'s measured top hit and above TRIM\'s old top hit (T-274)', () => {
+    // T-274 (docs/loops/t274/result.md, 695 entries): since T-286 the only asking query is "tail" "exit" "code", whose
+    // top hit (entry 299) scored 13.81. TRIM alone asks nothing now, but its old top hit scored 7.92; a floor at or under
+    // that is the fragile cut T-286 removed, so the lower bound guards against a drift back.
+    const T274_ASKING_TOP1 = 13.81;
+    const T274_TRIM_OLD_TOP1 = 7.92;
+    const { relevance_floor } = loadPolicy();
+    expect(relevance_floor).toBeLessThanOrEqual(T274_ASKING_TOP1);
+    expect(relevance_floor).toBeGreaterThan(T274_TRIM_OLD_TOP1);
   });
 
   it('the corpus is at production scale, so the shipped number means here what it means live', () => {

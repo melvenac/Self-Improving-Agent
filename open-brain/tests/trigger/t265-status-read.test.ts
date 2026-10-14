@@ -8,7 +8,7 @@ import * as query from '../../src/trigger/query.js';
  * pipeline, and 85% on commands that already read PIPESTATUS or captured the
  * status from a different statement. Every row here asserts the classifier AND
  * what `deriveQuery` then asks, because a classifier nothing calls is a test of
- * nothing (the trimmer element still decides whether "tail" is in the query).
+ * nothing (since T-286 a query is asked only when the status element is present, and its terms carry "tail" themselves).
  *
  * Imported as a namespace so the red commit runs: a missing export is a failing
  * row, not a file that cannot load.
@@ -23,14 +23,14 @@ const UNSAFE: Array<[string, string]> = [
 ];
 
 const SAFE: Array<[string, string]> = [
-  ['npm test | tail -5; echo "${PIPESTATUS[0]}"', '"tail"'],
-  ["ssh h 'npm test | tail -5; echo ${PIPESTATUS[0]}'", '"tail"'],
-  ['node b.js; rc=$?; git log | head -3', '"tail"'],
-  ['set -o pipefail; npm test | tail -5; echo $?', '"tail"'],
+  ['npm test | tail -5; echo "${PIPESTATUS[0]}"', ''],
+  ["ssh h 'npm test | tail -5; echo ${PIPESTATUS[0]}'", ''],
+  ['node b.js; rc=$?; git log | head -3', ''],
+  ['set -o pipefail; npm test | tail -5; echo $?', ''],
   ['tail -f build.log; echo $?', ''],
-  ["echo '$?' | tail -1", '"tail"'],
+  ["echo '$?' | tail -1", ''],
   ["grep 'a|b' f; echo $?", ''],
-  ["cat > f <<'EOF'\nx | tail -1; echo $?\nEOF", '"tail"'],
+  ["cat > f <<'EOF'\nx | tail -1; echo $?\nEOF", ''],
 ];
 
 describe('T-265 — a $? read of a pipeline whose last stage is a trimmer', () => {

@@ -18,7 +18,7 @@
  */
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync, rmSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { basename, dirname, join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { defaultTemplateDir } from "../bootstrap/index.js";
 import {
   StateSchema,
@@ -37,6 +37,7 @@ import { applyStateOps, DONE_RETENTION_SESSIONS } from "../../shared/state-write
 import { readJson } from "../../shared/fs-utils.js";
 import { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS, DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL, ROLE_STUB_RELS } from "../../shared/import-outputs.js";
 import { readAgentIdentity } from "../session-start/agent-identity.js";
+import { projectIdentityName } from "../../shared/paths.js";
 
 export { STATE_REL, STATE_IMPORT_COMMIT_OUTPUTS, DRAFT_REL, REPORT_REL, DRAFT_INPUTS_REL, ROLE_STUB_RELS };
 export const SNAPSHOT_PREFIX = "pre-state-migration-";
@@ -54,7 +55,7 @@ export interface SupersededLink { from: string; from_line: number; to: string; t
 export interface HandoffLineNotImported { line: number; section: "watch_out" | "open_questions"; text: string }
 
 export interface ImportReport {
-  /** `name_from: "folder"` when there is no package.json name (R-BF-9); `"flag"` when --name gave it (T-248). */
+  /** `name_from: "folder"` when there is no package.json name (R-BF-9): the REPOSITORY's folder, so a linked worktree is named after its main checkout (T-272); `"flag"` when --name gave it (T-248). */
   project: { name: string; version: string; name_from: "package.json" | "folder" | "flag" };
   current_session: number;
   migration_date: string;
@@ -797,7 +798,7 @@ export function buildImportDraft(projectRoot: string, today: string, templateDir
       ? { name: opts.name, version: pkg?.version ?? "0.0.0", name_from: "flag" }
       : pkg?.name
         ? { name: pkg.name, version: pkg.version ?? "0.0.0", name_from: "package.json" }
-        : { name: basename(root), version: pkg?.version ?? "0.0.0", name_from: "folder" },
+        : { name: projectIdentityName(root), version: pkg?.version ?? "0.0.0", name_from: "folder" },
     current_session: current,
     migration_date: today,
     staleness: detectStaleness(texts, last, undecodable, readAs, encodings),
