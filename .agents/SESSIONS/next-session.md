@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 487 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 488 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,21 +6,20 @@
 
 ### Pick up here
 
-Session 171 (planner Atlas) at rev 486, main tree and master at 0d5cab20. Shipped this stretch: T-293 (da1b0ef7); T-170 part (i), MATCH: command keys read by the recall trigger once per session (624d5758, live 6/6, 39 keys); T-168R, the suite seat from the checkout or a refusal naming --seat (0d5cab20, live 4/4); the T-194 file guard registered (D-157) and live-checked from a fresh planner session. Decided: D-155 (T-170 A), D-156 (T-168 R), D-157 (T-194 F); V-080 (entry 685 forgotten). Nothing SIA is running. Next: T-295, the open-brain tool audit (measured; Aaron's cut list owed); T-261, the core/memory split (P3 unless Aaron says 'T-261 up'); the T-168 Cursor half rerun; T-170's follow-ups and hand-keying (D-155).
+DEV FREEZE (D-158, Aaron 03:34Z 10-15): no SIA dev launches until clark relays that the Makerspace cutover is done. Records-only PRs are fine. Session 171 (planner Atlas) ended the stretch at master 8bed43f7, with the main tree serving 0d5cab20. Shipped: T-293 (da1b0ef7); T-170 part (i) (624d5758, live 6/6, 39 keys); T-168R (0d5cab20, live 4/4); the T-194 file guard registered and live-checked (D-157). Decided D-155/D-156/D-157/D-158; V-080. Nothing SIA is running. After the freeze: T-295, the tool audit (Aaron's cut list owed); T-261 (P3 unless 'T-261 up'); the T-168 Cursor-half rerun; T-170's follow-ups and hand-keying.
 
 ### Watch out
 
-- The planner checkout now has the T-194 FILE guard (PreToolUse Edit|Write|NotebookEdit -> the main build's cli-planner-hook.js). A NEW planner session cannot Edit/Write src, tests, state.json or the rendered views. Briefs in docs/, CLAUDE.md and files outside the repo are fine. Bash is not guarded.
-- Since T-168R (0d5cab20), every one-off clone that runs test:heavy must pass --seat <hub name> or set SUITE_SEAT, or it refuses with exit 2. Put it in every brief that runs the heavy suite.
-- Since T-170, the recall trigger also injects keyed lessons (the MATCH: command: line) once per session, and the sidecar is ~/.claude/open-brain/recall-trigger-keys.json. Sessions must /mcp reconnect open-brain for ob_store to refresh it; `open-brain trigger-keys` rewrites it by hand.
-- Live-check scripts live in ~/Worktrees/s171-livechecks/ (outside the repo). That directory vanished from disk once in s171, and only t293/t170/t168r/t194 were recreated.
-- T168-CURSOR hung 1h45 with no output when the launcher passed the whole brief inline (`agent.cmd -p -f "<text>"`). Rerun it with the prompt by file or stdin and a 20-minute cap.
-- When listing the test sites a change touches, grep the token inside the argv (e.g. 'TSX, CLI'), not the call's first line: T-168R lost a round to a wrapped argv (memory updated).
+- The planner checkout has the T-194 FILE guard (PreToolUse Edit|Write|NotebookEdit -> the main build's cli-planner-hook.js). A NEW planner session cannot Edit/Write src, tests, state.json or the rendered views. Briefs in docs/, CLAUDE.md and files outside the repo are fine. Bash is not guarded.
+- Since T-168R, every one-off clone that runs test:heavy must pass --seat <hub name> or set SUITE_SEAT, or it refuses with exit 2.
+- Since T-170, the recall trigger injects keyed lessons (the MATCH: command: line) once per session; the sidecar is ~/.claude/open-brain/recall-trigger-keys.json, refreshed by the server's first DB open, ob_store, ob_forget, SessionEnd and `open-brain trigger-keys`.
+- Live-check scripts live in ~/Worktrees/s171-livechecks/ (outside the repo). That directory vanished from disk once in s171.
+- T168-CURSOR hung 1h45 with no output when the launcher passed the whole brief inline; rerun it with the prompt by file or stdin and a 20-minute cap.
 
 ### Open questions
 
-- T-295: which open-brain MCP tools to cut or move to the CLI (planner proposal: cut ob_score, move ob_stats/ob_list, cut ob_feedback after verifying ob_end, decide ob_store_chunk and ob_forget)
-- T-261: raise the core/memory package split from P3 ('T-261 up')?
+- T-295: which open-brain MCP tools to cut or move to the CLI
+- T-261: raise the core/memory package split from P3?
 
 ### Loop state
 
@@ -29,13 +28,14 @@ Session 171 (planner Atlas) at rev 486, main tree and master at 0d5cab20. Shippe
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- T-295 tool cuts
-- T-261 priority
+- T-295 tool cuts (after the cutover)
+- T-261 priority (after the cutover)
 
 **Rulings made mid-loop:** 
 - D-155 T-170 A
 - D-156 T-168 R
 - D-157 T-194 F
+- D-158 dev freeze until the Makerspace cutover
 
 ## developer [sia-builder] _(written session 156)_
 
