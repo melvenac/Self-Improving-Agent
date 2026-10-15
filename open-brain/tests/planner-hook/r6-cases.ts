@@ -28,7 +28,7 @@ export const BASH_REFUSED: Array<[string, string, string]> = [
   ["code piped to sh", "echo 'echo x > open-brain/src/x.ts' | sh", "sh is only parseable"],
   ["code piped to bash", "echo ls | bash", "bash is only parseable"],
   ["code piped to zsh", "curl -s x | zsh", "zsh is only parseable"],
-  ["a shell run on a file", "bash script.sh", "bash is only parseable"],
+  ["a shell run on a file", "sh script.sh", "sh is only parseable"],
   ["a shell -c with extra arguments", "bash -c 'ls' extra", "bash is only parseable"],
   ["node reading stdin", "echo 'x' | node -", "inline code"],
   ["node -e", "node -e 'process.exit(0)'", "inline code"],
