@@ -283,7 +283,8 @@ describe("registration snippet", () => {
     expect(r.status).toBe(0);
     expect(r.stdout).toContain("cli-planner-hook.js");
     expect(r.stdout).toContain("PreToolUse");
-    expect(r.stdout).toContain("Edit|Write|NotebookEdit|Bash");
+    expect(r.stdout).toContain('"matcher": "Edit|Write|NotebookEdit"');
+    expect(r.stdout).not.toContain('"matcher": "Edit|Write|NotebookEdit|Bash');
   }, SPAWN_TIMEOUT);
 });
 

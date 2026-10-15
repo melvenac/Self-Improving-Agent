@@ -6,7 +6,7 @@
  * onto the real one, so a reader never sees half a file.
  */
 
-import { renameSync, writeFileSync } from "node:fs";
+import { renameSync, unlinkSync, writeFileSync } from "node:fs";
 import type Database from "better-sqlite3";
 import { parseCommandKey, type CommandKey } from "./match-keys.js";
 
@@ -31,6 +31,15 @@ export function writeTriggerKeys(db: Database.Database, path: string): { written
 
   const tmp = `${path}.tmp-${process.pid}`;
   writeFileSync(tmp, JSON.stringify({ generated_at: new Date().toISOString(), keys }), "utf-8");
-  renameSync(tmp, path);
+  try {
+    renameSync(tmp, path);
+  } catch (err) {
+    try {
+      unlinkSync(tmp);
+    } catch {
+      /* already gone */
+    }
+    throw err;
+  }
   return { written: keys.length, unusable };
 }

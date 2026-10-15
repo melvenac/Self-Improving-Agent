@@ -10,8 +10,8 @@
  * Registration is Aaron's hand; run with --print-registration for the snippet.
  */
 
-import { join } from "node:path";
-import { resolveHookProjectDir } from "./shared/repo-root.js";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { formatDeny } from "./planner-hook/emit.js";
 import { formatRegistrationSnippet } from "./planner-hook/registration.js";
 import { runPlannerHookAsync } from "./planner-hook/run.js";
@@ -24,9 +24,8 @@ async function readStdin(): Promise<string> {
 
 async function main(): Promise<void> {
   if (process.argv.includes("--print-registration")) {
-    const repoRoot = resolveHookProjectDir(process.cwd());
-    const openBrainDir = join(repoRoot, "open-brain");
-    process.stdout.write(`${formatRegistrationSnippet(openBrainDir)}\n`);
+    const openBrainDir = dirname(dirname(fileURLToPath(import.meta.url)));
+    process.stdout.write(`${formatRegistrationSnippet(openBrainDir, { fileOnly: !process.argv.includes("--all") })}\n`);
     return;
   }
 

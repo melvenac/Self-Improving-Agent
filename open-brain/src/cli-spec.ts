@@ -38,6 +38,7 @@ export const COMMAND_SPECS = {
     values: { "--session": "both", "--last": "both", "--seat": "both", "--runtime": "both" },
     positionals: "directory",
   },
+  triggerKeys: { name: "trigger-keys", booleans: [], values: {}, positionals: "none" },
   scrubTriggerFires: {
     name: "scrub-trigger-fires",
     booleans: ["--dry-run"],
