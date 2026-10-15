@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 494 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 495 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-13 (Aaron, clark's window, 08:53 CDT): max parallel until the weekly reset at 00:00: every code-only brief goes to clark as soon as it is pinned; runs end at READY + PR; merges still need Aaron's word. QA PC OFF since ~14:3x CDT 10-13 for a RAM upgrade (Aaron's call, told via Relay for clark; no ETA): code-only runs and Opus reviews go to the desktop and the laptop meanwhile; its wakers restart at v1.22.13 on clark's word (SIA GO given, s170). Pending Aaron: T-194 approval mechanics (a)/(b)/(c); planner recommends (c) now, (b) later.
 
 ## What's working
@@ -158,6 +158,8 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - Gap G-055: A cursor-agent --model flag on one launch PERSISTS as the machine's global Cursor default (~/.cursor/cli-config.json), and the seat wakers pass no --model. So one trial launch silently moved every SIA Cursor seat on the QA PC from composer-2.5 to grok-4.7-high at ~05:40 CDT 2026-10-04, and nothing in a seat's reply or a PR names the model. Built in that window, per clark: #427 r3 (a6d75b52), #441 (48bf4795), #442 (08fa9002), #444 r2 (a5f11819), #445 (d292747f), #446 (685b9fe9), #448 (merged, docs), plus the T-187 and T-166 work in progress. Builder != judge still holds (QA is Opus).
 - Gap G-057: The 'model from store.db' instruction in every Cursor dispatch reports the chat's stored model, not the model the run used. Forge reported grok-4.7-high for #437 r3 while its waker had launched that exact resume with --model composer-2.5.
 - Gap G-058: A hub restart or burst knocks every QA PC waker out: since T-110 all wakers on one host share one per-source /health window, a 429 is read as authMode=warn, and the waker exits fail closed. Seen twice in s162 (03:52Z, and 06:11Z after the v1.19.0 swap).
+- Gap G-059: The recall trigger never runs on a Bash command that exits non-zero. Claude Code fires PostToolUseFailure, not PostToolUse, for a failing tool, and the trigger is registered on PostToolUse/Bash only. Command keys and the element path are therefore blind to every failing command, which is where most mistakes show.
+- Gap G-060: The recall trigger never sees a PowerShell tool call. It handles tool_name Bash (Claude Code) and Shell (Cursor) only, and is registered with matcher Bash, so command keys, error keys and the element path skip every PowerShell call.
 
 ## What's next
 
