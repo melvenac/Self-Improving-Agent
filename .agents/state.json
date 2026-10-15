@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 479,
+  "revision": 480,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2351,6 +2351,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s171, found by the planner before the T-194 registration ask: in ~/Worktrees/sia-planner, `node <main>/open-brain/build/cli-planner-hook.js --print-registration` prints `node \"C:\\Users\\melve\\Worktrees\\sia-planner\\open-brain\\build\\cli-planner-hook.js\"`. cli-planner-hook.ts:27 resolves repoRoot from process.cwd(). The seat worktrees do not build (desktop rule; the planner's build is 688628d and has no cli-planner-hook.js), so the printed registration would run node on a missing file on every Edit/Write/Bash call: a non-blocking error each time, and no refusal. The main tree's build works for the planner checkout because the hook resolves the role from the payload cwd (T-293 live check: 9/9 with cwd = the planner checkout). FIX SHAPE: print the path of the running build itself (fileURLToPath(import.meta.url)), and say so in the snippet's comment; one row: run from a cwd that has no build, assert the printed path is the script's own. Small; tests plus one src line; it needs Aaron's word to merge (src).",
+      "note_by": [
+        "13042431-247e-4dad-9477-507e43fc7916"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-295",
+      "title": "Audit open-brain's 14 MCP tools: keep what the protocol calls, cut or move to the CLI what nothing calls",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 171,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Raised by Aaron in the planner session (s171, 2026-10-14): 'auditing all the tools in open brain. I think we only use 2 or 3 of them.' PLANNER MEASUREMENT (read-only parse of every Claude Code transcript on the desktop, subagents included: 787 files, 2026-09-14..2026-10-15, 0 unparseable lines; Cursor seats and QA PC sessions are NOT in it): ob_state 2043 (last 10-15), ob_set_session 192, ob_start 163, ob_store 158, ob_feedback 109 (none since 09-26), ob_recall 73, ob_sync 56, ob_recalled 43, ob_end 21 (October only), ob_store_chunk 10 (none since 09-26), ob_stats 2 (last 09-23), ob_list 1 (last 09-15), ob_forget 0, ob_score 0. Reading: eight are in regular use, but only ob_state, ob_store and ob_recall are chosen by an agent mid-task. ob_set_session, ob_start, ob_recalled and ob_end are called by /start and /end, and ob_sync by /sync. Docs that still name the rare ones: start.md's monthly maintenance names ob_list; sync.md names ob_score ('or ob_sync --score'); end.md and checkpoint.md name ob_store_chunk; CLAUDE.md lists all 14. Planner proposal, NOT ruled: keep the eight; ob_score is a duplicate of ob_sync score:true, so cut it; ob_stats and ob_list go to the CLI and dashboard; ob_feedback is superseded by ob_end's entry_ratings, so verify that and cut it; ob_store_chunk folds into ob_store or stays as /end's long-write-up path; ob_forget is the only delete path (entry 685 waits on it), so keep it or move it to a CLI command with a confirm. Every cut is a server.ts change plus doc and command edits in three copies, so it needs Aaron's ruling.",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916"
       ],
