@@ -39,7 +39,8 @@
  *
  * Half of all fires derive no query. Those load nothing heavy: the static
  * imports below are node builtins, `deriveQuery` (whose module takes
- * better-sqlite3 as a type only) and `pending-fires.ts`, and a not-asked fire
+ * better-sqlite3 as a type only), `pending-fires.ts` and `match-keys.ts` (the
+ * T-170 key sidecar, read as JSON), and a not-asked fire
  * is one appended line beside the store, reconciled into `trigger_fires` at
  * SessionEnd and at `ob_end`. better-sqlite3, db-v2, the policy loader (zod)
  * and run.js are imported only on the asked path. A static import of any of
@@ -52,6 +53,7 @@ import { homedir } from "node:os";
 import type Database from "better-sqlite3";
 import { deriveQuery } from "./trigger/query.js";
 import { appendPendingNotAsked, pendingFiresPath } from "./trigger/pending-fires.js";
+import { matchingKeyIds, readTriggerKeys, triggerKeysPath } from "./trigger/match-keys.js";
 
 const DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const LOG_PATH = process.env.RECALL_TRIGGER_LOG || join(dirname(DB_PATH), "recall-trigger.log");
@@ -138,8 +140,10 @@ async function main(): Promise<void> {
   }
 
   // T-159: AFTER the session check, so an unattributable fire is still
-  // dropped rather than written to the pending file.
-  if (deriveQuery(command) === "") {
+  // dropped rather than written to the pending file. T-170: a command that
+  // matches a lesson's `MATCH: command:` key in the sidecar is asked too.
+  const keyIds = matchingKeyIds(readTriggerKeys(triggerKeysPath(DB_PATH)), command);
+  if (deriveQuery(command) === "" && keyIds.length === 0) {
     try {
       appendPendingNotAsked(pendingFiresPath(DB_PATH), { sessionUuid, command }, new Date());
     } catch (err) {
@@ -198,7 +202,7 @@ async function main(): Promise<void> {
     writeDb.pragma("busy_timeout = 0");
     initTriggerFires(writeDb);
 
-    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy });
+    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds });
 
     // The deadline is checked HERE, after the synchronous work, and it
     // governs only whether the result may still be emitted. A reminder that

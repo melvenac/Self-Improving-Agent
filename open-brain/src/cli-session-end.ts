@@ -17,6 +17,8 @@ import Database from "better-sqlite3";
 import { initTriggerFires, openV2Database } from "./db-v2.js";
 import { formatReconcileLine, reconcilePendingFires } from "./trigger/fires.js";
 import { pendingFiresPath } from "./trigger/pending-fires.js";
+import { triggerKeysPath } from "./trigger/match-keys.js";
+import { writeTriggerKeys } from "./trigger/keys-writer.js";
 import { formatSessionEndLines, sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { obsidianVaultDir } from "./shared/paths.js";
@@ -243,6 +245,9 @@ if (existsSync(V2_DB)) {
       initTriggerFires(db);
       const r = reconcilePendingFires(db, pendingFiresPath(V2_DB));
       console.log(`[session-end] ${formatReconcileLine(r)}`);
+      // T-170: refresh the recall trigger's key sidecar from the store.
+      const k = writeTriggerKeys(db, triggerKeysPath(V2_DB));
+      console.log(`[session-end] trigger keys: ${k.written} command key(s), ${k.unusable} unusable`);
     } finally {
       db.close();
     }

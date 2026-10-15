@@ -31,6 +31,8 @@ import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverag
 import { sessionEndV2 } from "./pipelines/session-end/index-v2.js";
 import { formatReconcileLine, reconcilePendingFires } from "./trigger/fires.js";
 import { pendingFiresPath } from "./trigger/pending-fires.js";
+import { MATCH_KEY_MIN_CHARS, parseCommandKey, triggerKeysPath } from "./trigger/match-keys.js";
+import { writeTriggerKeys } from "./trigger/keys-writer.js";
 import { resolveRecalledIdsObserved, formatRecalledResolution, formatForeignWriter, readRecalledFile } from "./pipelines/session-end/recalled-ids.js";
 import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.js";
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
@@ -78,7 +80,39 @@ function getV2Db(): Database.Database {
   if (_v2db) return _v2db;
   _v2db = openV2Database(V2_DB_PATH);
   _schemaSkew = checkSchemaSkew(_v2db);
+  refreshTriggerKeys(_v2db);
   return _v2db;
+}
+
+/**
+ * T-170: rewrite the recall trigger's key sidecar from the store. Returns ""
+ * on success, or a note for the reply on failure — a sidecar that could not be
+ * written costs the trigger a miss, never a store.
+ */
+function refreshTriggerKeys(db: Database.Database): string {
+  try {
+    writeTriggerKeys(db, triggerKeysPath(V2_DB_PATH));
+    return "";
+  } catch (err) {
+    return ` (trigger keys not refreshed: ${(err instanceof Error ? err.message : String(err)).split("\n")[0]})`;
+  }
+}
+
+/**
+ * T-170 (D-155): what ob_store says about an event's MATCH: key. Reported,
+ * never refused.
+ */
+function matchKeyNote(content: string): string {
+  if (parseCommandKey(content)) return " — match: command (the recall trigger reads it)";
+  const lines = content.split(/\r?\n/);
+  if (lines.some((l) => /^MATCH:\s*command:/.test(l))) {
+    return ` — match: command line present but under ${MATCH_KEY_MIN_CHARS} characters, so lookup-only`;
+  }
+  for (const l of lines) {
+    const m = /^MATCH:\s*(path|error):/.exec(l);
+    if (m) return ` — match: ${m[1]} (stored; the trigger does not read ${m[1]} keys yet)`;
+  }
+  return " — lookup-only: no MATCH: line (D-155)";
 }
 
 /**
@@ -981,7 +1015,8 @@ export async function handleStore(args: StoreArgs): Promise<ToolResponse> {
           type: "text" as const,
           text:
             `Indexed existing vault note "${effectiveKey}"${scopeLabel} — the file was already on disk but absent from the index. ` +
-            `Its own content was indexed, not the text passed here (the vault is the source of truth).\n  Vault: ${result.vaultPath}`,
+            `Its own content was indexed, not the text passed here (the vault is the source of truth).\n  Vault: ${result.vaultPath}` +
+            refreshTriggerKeys(v2db),
         }],
       };
     }
@@ -992,7 +1027,8 @@ export async function handleStore(args: StoreArgs): Promise<ToolResponse> {
           type: "text" as const,
           text:
             `Replaced state "${effectiveKey}" (id: ${result.replaced.id})${scopeLabel} — the previous value moved to "## Log" ` +
-            `(${result.replaced.demotedAt.slice(0, 10)}) in the vault note and is no longer recalled.\n  Vault: ${result.vaultPath}`,
+            `(${result.replaced.demotedAt.slice(0, 10)}) in the vault note and is no longer recalled.\n  Vault: ${result.vaultPath}` +
+            refreshTriggerKeys(v2db),
         }],
       };
     }
@@ -1042,8 +1078,10 @@ export async function handleStore(args: StoreArgs): Promise<ToolResponse> {
       .get(result.vaultPath) as { id: number } | undefined;
 
     const kindLabel = kind ? ` — kind: ${kind}` : "";
+    const matchLabel = kind === "event" ? matchKeyNote(content) : "";
+    const keysNote = refreshTriggerKeys(v2db);
     return {
-      content: [{ type: "text" as const, text: `Stored knowledge (id: ${row?.id ?? "?"}) with key "${effectiveKey}"${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}${kindLabel}` }],
+      content: [{ type: "text" as const, text: `Stored knowledge (id: ${row?.id ?? "?"}) with key "${effectiveKey}"${scopeLabel}${tags && tags.length > 0 ? ` — tags: ${tags.join(", ")}` : ""}${kindLabel}${matchLabel}${keysNote}` }],
     };
 }
 
@@ -1161,7 +1199,7 @@ server.tool(
       content: [{
         type: "text" as const,
         text: deleted > 0
-          ? `Removed ${deleted} knowledge entry(ies).${archived > 0 ? ` Moved ${archived} vault note(s) to Archive/.` : ""}`
+          ? `Removed ${deleted} knowledge entry(ies).${archived > 0 ? ` Moved ${archived} vault note(s) to Archive/.` : ""}${refreshTriggerKeys(v2db)}`
           : `No knowledge found with ${id ? `id ${id}` : `key "${key}"`}.`,
       }],
     };

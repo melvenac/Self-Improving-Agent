@@ -15,7 +15,8 @@
 
 import type Database from "better-sqlite3";
 import { deriveQuery, queryStore } from "./query.js";
-import { recordFire, type FireState } from "./fires.js";
+import { injectedIds, recordFire, type FireState } from "./fires.js";
+import { commandMatchesKey, parseCommandKey } from "./match-keys.js";
 import type { TriggerPolicy } from "./policy.js";
 
 export interface TriggerRunInput {
@@ -30,6 +31,8 @@ export interface TriggerRunInput {
   sessionUuid: string;
   command: string;
   policy: TriggerPolicy;
+  /** Ids the sidecar prefilter matched; re-tested here against the store (T-170). */
+  keyIds?: number[];
 }
 
 export interface TriggerOutcome {
@@ -82,9 +85,10 @@ export function actionOf(content: string): string {
  * the model (A6, R3, R15).
  */
 export function runTrigger(input: TriggerRunInput): TriggerOutcome {
-  const query = deriveQuery(input.command);
+  const derived = deriveQuery(input.command);
+  const keyIds = input.keyIds ?? [];
 
-  if (!query) {
+  if (!derived && keyIds.length === 0) {
     recordFire(input.db, {
       sessionUuid: input.sessionUuid,
       command: input.command,
@@ -95,12 +99,38 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
     return { state: "not-asked", ids: [] };
   }
 
-  const hits = queryStore({
-    db: input.readDb ?? input.db,
-    command: input.command,
-    floor: input.policy.relevance_floor,
-    limit: input.policy.max_injected,
-  });
+  const readDb = input.readDb ?? input.db;
+  const hits: Array<{ id: number; key: string | null; content: string }> = derived
+    ? queryStore({
+        db: readDb,
+        command: input.command,
+        floor: input.policy.relevance_floor,
+        limit: input.policy.max_injected,
+      })
+    : [];
+
+  // T-170: keyed entries fill the slots the element path left. The sidecar
+  // only prefiltered them, so each is re-read and re-tested here: a stale
+  // sidecar can cost a miss, never a wrong injection. A keyed entry is
+  // injected at most once per session, and no relevance floor applies — it is
+  // not a bm25 match.
+  if (hits.length < input.policy.max_injected && keyIds.length > 0) {
+    const already = injectedIds(input.db, input.sessionUuid);
+    const byId = readDb.prepare(
+      `SELECT id, key, content FROM knowledge_index WHERE id = ? AND archived_into IS NULL`,
+    );
+    for (const id of keyIds) {
+      if (hits.length >= input.policy.max_injected) break;
+      const row = byId.get(id) as { id: number; key: string | null; content: string } | undefined;
+      if (!row) continue;
+      const fragments = parseCommandKey(row.content);
+      if (!fragments || !commandMatchesKey(fragments, input.command)) continue;
+      if (already.includes(row.id) || hits.some((h) => h.id === row.id)) continue;
+      hits.push(row);
+    }
+  }
+
+  const query = [derived, keyIds.length ? `match:${keyIds.join(",")}` : ""].filter(Boolean).join(" ");
 
   if (hits.length === 0) {
     recordFire(input.db, {

@@ -1,0 +1,116 @@
+/**
+ * T-170 (D-155): a lesson's `MATCH: command:` line is the key the recall
+ * trigger matches a Bash command against.
+ *
+ * There is no second representation of the key. Since 10-02 `/end` step 2
+ * writes `MATCH: command|path|error|none` into each lesson, and this module
+ * parses that line. Only command keys are read: the trigger is a
+ * PostToolUse/Bash hook and sees commands. Path and error keys stay stored and
+ * unread (T-170 part ii).
+ *
+ * The hook reads keys through a small JSON sidecar beside the store, written by
+ * the server and the CLIs (keys-writer.ts), so that a command which asks
+ * nothing still loads no better-sqlite3 (T-159). The sidecar is only a
+ * PREFILTER: the asked path re-reads each entry from the store and re-tests it
+ * (run.ts), so a stale sidecar can cost a miss, never a wrong injection.
+ *
+ * Node builtins only: this is a fast-path module and imports nothing from the
+ * repo.
+ */
+
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+
+/** A key with fewer non-whitespace characters than this is lookup-only. */
+export const MATCH_KEY_MIN_CHARS = 6;
+
+export interface CommandKey {
+  id: number;
+  fragments: string[];
+}
+
+const KEY_LINE = /^MATCH:\s*command:/;
+
+/**
+ * The fragments of a lesson's `MATCH: command:` key, in order, or `null` when
+ * it has no command key or the key is too short to match on.
+ *
+ * The first backticked span is the key; without one, a parenthetical is
+ * commentary and is cut. `<placeholder>`, `…` and `...` are wildcards.
+ */
+export function parseCommandKey(content: string): string[] | null {
+  const line = content.split(/\r?\n/).find((l) => KEY_LINE.test(l));
+  if (line === undefined) return null;
+
+  let text = line.replace(/^MATCH:\s*command:\s*/, "");
+  const span = /`([^`]+)`/.exec(text);
+  if (span) {
+    text = span[1];
+  } else {
+    const paren = text.indexOf(" (");
+    if (paren !== -1) text = text.slice(0, paren);
+  }
+
+  const fragments = text
+    .split(/<[^>]*>|…|\.\.\./)
+    .map((f) => f.replace(/\s+/g, " ").trim())
+    .filter((f) => f !== "");
+
+  if (fragments.join("").replace(/\s/g, "").length < MATCH_KEY_MIN_CHARS) return null;
+  return fragments;
+}
+
+/**
+ * True exactly when every fragment occurs in the command IN ORDER, each
+ * searched from the end of the previous one. Case-sensitive; whitespace runs in
+ * the command count as one space.
+ */
+export function commandMatchesKey(fragments: string[], command: string): boolean {
+  const c = command.replace(/\s+/g, " ");
+  let from = 0;
+  for (const f of fragments) {
+    const at = c.indexOf(f, from);
+    if (at === -1) return false;
+    from = at + f.length;
+  }
+  return true;
+}
+
+/** The sidecar lives beside the store. */
+export function triggerKeysPath(dbPath: string): string {
+  return join(dirname(dbPath), "recall-trigger-keys.json");
+}
+
+/**
+ * The sidecar's keys. Any failure — absent, unreadable, not JSON, wrong shape —
+ * is `[]` and never throws: a missing prefilter costs a miss, nothing more.
+ */
+export function readTriggerKeys(path: string): CommandKey[] {
+  try {
+    const parsed = JSON.parse(readFileSync(path, "utf-8")) as { keys?: unknown };
+    const keys = parsed?.keys;
+    if (!Array.isArray(keys)) return [];
+    const ok = keys.every(
+      (k) =>
+        k !== null &&
+        typeof k === "object" &&
+        typeof (k as CommandKey).id === "number" &&
+        Array.isArray((k as CommandKey).fragments) &&
+        (k as CommandKey).fragments.every((f) => typeof f === "string"),
+    );
+    return ok ? (keys as CommandKey[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The ids whose fragments match the command, longest key first (a more
+ * specific key is more likely the mistake's shape), then id ascending.
+ */
+export function matchingKeyIds(keys: CommandKey[], command: string): number[] {
+  return keys
+    .filter((k) => commandMatchesKey(k.fragments, command))
+    .sort((a, b) => b.fragments.join("").length - a.fragments.join("").length || a.id - b.id)
+    .map((k) => k.id);
+}
