@@ -246,8 +246,12 @@ if (existsSync(V2_DB)) {
       const r = reconcilePendingFires(db, pendingFiresPath(V2_DB));
       console.log(`[session-end] ${formatReconcileLine(r)}`);
       // T-170: refresh the recall trigger's key sidecar from the store.
-      const k = writeTriggerKeys(db, triggerKeysPath(V2_DB));
-      console.log(`[session-end] trigger keys: ${k.written} command key(s), ${k.unusable} unusable`);
+      try {
+        const k = writeTriggerKeys(db, triggerKeysPath(V2_DB));
+        console.log(`[session-end] trigger keys: ${k.written} command key(s), ${k.unusable} unusable`);
+      } catch (err) {
+        console.log(`[session-end] trigger keys NOT REFRESHED: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+      }
     } finally {
       db.close();
     }

@@ -314,6 +314,7 @@ if (command === "sync") {
     process.exit(1);
   }
 } else if (command === "trigger-keys") {
+  parseOrRefuse(COMMAND_SPECS.triggerKeys, args.slice(1));
   // T-170: write the recall trigger's key sidecar from the default store.
   const { existsSync } = await import("node:fs");
   const { join } = await import("node:path");
@@ -807,6 +808,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log(
     "    Limits: an older MCP build may still hold the store during the run; a 0-byte or non-knowledge SQLite file may be accepted with its path printed; --dry-run may create empty -wal/-shm siblings.",
   );
+  console.log("  trigger-keys                               Rewrite the recall trigger's key sidecar from the store (T-170)");
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  skills-audit [--session <uuid>] [--last <n>] [--seat <name>] [--runtime claude|cursor] [--json] [dir]   Read-only: shell commands this session repeated (T-262)");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
