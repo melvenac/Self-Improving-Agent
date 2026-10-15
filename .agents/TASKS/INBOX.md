@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 489 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 491 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -32,7 +32,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-174** Win32 job-object launcher so the role's whole process tree is killed on a NORMAL exit too (R22's named limit on Windows)
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
-- [ ] **T-294** The planner hook's --print-registration prints a path into the checkout it runs in, which has no build in a seat worktree; print the running build's own path
+- [~] **T-294** The planner hook's --print-registration prints a path into the checkout it runs in, which has no build in a seat worktree; print the running build's own path
 - [ ] **T-295** Audit open-brain's 14 MCP tools: keep what the protocol calls, cut or move to the CLI what nothing calls
 
 ## P3
