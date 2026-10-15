@@ -481,7 +481,7 @@ describe("T-168 suite meta", () => {
     const eleven = runCli(dir, { ...NO_OWNER, SUITE_LEASE_EXIT: "11" });
     const withOwner = (code: string, metaName: string) => spawnSync(
       process.execPath,
-      [TSX, CLI, "--owner-pid", "100", "--meta", join(dir, metaName)],
+      [TSX, CLI, "--seat", "cursor-builder", "--owner-pid", "100", "--meta", join(dir, metaName)],
       {
         encoding: "utf8",
         cwd: dir,
@@ -521,7 +521,7 @@ describe("T-168 suite meta", () => {
     // status fixture does not bypass; point it at a stub so the row does not depend on the machine.
     const helper = join(dir, "machine-lease.ps1");
     writeFileSync(helper, "");
-    const owned = spawnSync(process.execPath, [TSX, CLI, "--owner-pid", "100", "--meta", join(dir, "held.json")], {
+    const owned = spawnSync(process.execPath, [TSX, CLI, "--seat", "cursor-builder", "--owner-pid", "100", "--meta", join(dir, "held.json")], {
       encoding: "utf8",
       cwd: dir,
       env: {
@@ -548,7 +548,7 @@ describe("T-168 suite meta", () => {
   it("cli: a missing win32 helper refuses unless the opt-out is set", () => {
     const dir = mkdtempSync(join(tmpdir(), "t168-helper-"));
     runCli(dir, { ...NO_OWNER });
-    const missing = spawnSync(process.execPath, [TSX, CLI, "--owner-pid", "100", "--meta", join(dir, "miss.json")], {
+    const missing = spawnSync(process.execPath, [TSX, CLI, "--seat", "cursor-builder", "--owner-pid", "100", "--meta", join(dir, "miss.json")], {
       encoding: "utf8",
       cwd: dir,
       env: {
@@ -558,7 +558,7 @@ describe("T-168 suite meta", () => {
         SUITE_LEASE_HELPER: "missing",
       },
     });
-    const opted = spawnSync(process.execPath, [TSX, CLI, "--owner-pid", "100", "--meta", join(dir, "opt.json")], {
+    const opted = spawnSync(process.execPath, [TSX, CLI, "--seat", "cursor-builder", "--owner-pid", "100", "--meta", join(dir, "opt.json")], {
       encoding: "utf8",
       cwd: dir,
       env: {
