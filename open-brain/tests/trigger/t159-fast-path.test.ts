@@ -121,13 +121,13 @@ describe('N1 — the not-asked fast path loads nothing heavy', () => {
     expect(fs.existsSync(dbPath)).toBe(false);
   }, SPAWN_TIMEOUT);
 
-  it('N1b: from the hook entry on, every specifier resolves to a node: builtin or one of the four fast-path modules', async () => {
+  it('N1b: from the hook entry on, every specifier resolves to a node: builtin or one of the five fast-path modules', async () => {
     const { r, resolved } = await spied('git status --porcelain');
     expect(r.status).toBe(0);
     // What precedes the entry is the tsx loader itself (and the spy), not the hook.
     const entry = resolved.findIndex((x) => /\/src\/cli-recall-trigger\.(ts|js)$/.test(x.url));
     expect(entry).toBeGreaterThanOrEqual(0);
-    const allowed = /\/src\/(cli-recall-trigger|trigger\/query|trigger\/pending-fires|trigger\/command-log)\.(ts|js)$/;
+    const allowed = /\/src\/(cli-recall-trigger|trigger\/query|trigger\/pending-fires|trigger\/command-log|trigger\/match-keys)\.(ts|js)$/;
     const outside = resolved.slice(entry).filter((x) => !x.url.startsWith('node:') && !allowed.test(x.url));
     expect(outside).toEqual([]);
   }, SPAWN_TIMEOUT);

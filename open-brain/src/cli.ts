@@ -313,6 +313,28 @@ if (command === "sync") {
     console.error(err instanceof Error ? err.message : String(err));
     process.exit(1);
   }
+} else if (command === "trigger-keys") {
+  // T-170: write the recall trigger's key sidecar from the default store.
+  const { existsSync } = await import("node:fs");
+  const { join } = await import("node:path");
+  const { homedir } = await import("node:os");
+  const dbPath = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
+  if (!existsSync(dbPath)) {
+    console.log(`trigger keys: no store at ${dbPath}`);
+    process.exit(1);
+  }
+  const { default: Database } = await import("better-sqlite3");
+  const { writeTriggerKeys } = await import("./trigger/keys-writer.js");
+  const { triggerKeysPath } = await import("./trigger/match-keys.js");
+  const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+  try {
+    const path = triggerKeysPath(dbPath);
+    const r = writeTriggerKeys(db, path);
+    console.log(`trigger keys: ${r.written} command key(s), ${r.unusable} unusable -> ${path}`);
+  } finally {
+    db.close();
+  }
+  process.exit(0);
 } else if (command === "topics") {
   const opts = parseOrRefuse(COMMAND_SPECS.topics, args.slice(1));
   const { openV2Database } = await import("./db-v2.js");
