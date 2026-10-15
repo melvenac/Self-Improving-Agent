@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 492 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 493 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,20 +6,21 @@
 
 ### Pick up here
 
-Overnight 10-14/15: SIA runs as normal (D-159). The pause for the Makerspace cutover (D-158) starts when clark relays that Aaron is back at the desktop. From then, no SIA dev launches until the cutover is done; records-only PRs stay fine. Session 171 (planner Atlas): master 5072f68d, main tree serving 0d5cab20. Shipped: T-293 (da1b0ef7); T-170 part (i) (624d5758, live 6/6, 39 keys); T-168R (0d5cab20, live 4/4); the T-194 file guard registered and live-checked (D-157). Decided D-155..D-159; V-080. Overnight candidates (no Aaron word needed to BUILD; src merges need it): T-294 (print-registration path) plus T-170 follow-ups 1-3; the T-168 Cursor-half rerun (its brief must now set SUITE_SEAT). Waiting on Aaron: T-295 (tool cuts) and T-261 (priority).
+MORNING PAUSE: D-158 + D-159. When clark relays that Aaron is back at the desktop, SIA stops dev launches until the Makerspace cutover is done (records-only PRs stay fine). Until then the normal rules apply. Session 171 (planner Atlas) closed at master 66801f6e, with the main tree serving a346e5b1. Shipped: T-293 (da1b0ef7, live 9/9); T-170 part (i), keyed lessons injected once per session (624d5758, live 6/6, now 41 keys); T-168R, suite seat from the checkout or refuse naming --seat (0d5cab20, live 4/4); T-294, the snippet prints its own build and the D-157 matcher, plus T-170 follow-ups 1-3 (a346e5b1, live 5/5); the T-194 file guard registered (D-157) and live-checked. Decided D-155..D-159; V-080 (entry 685 forgotten). /end done: lessons 721-723 stored, the skills audit clean, ob_end ran. Nothing SIA is running. PARKED (until after the cutover): T-295 tool audit (Aaron's cut list owed); T-261 core/memory split (P3 unless 'T-261 up'); the T-168 Cursor-half rerun, which WAITS ON clark's seat-launcher fix (seat-oneoff.ps1 passes the prompt inline with no cap; amendment docs/loops/t168-cursor-half-amendment-1.md is ready, base must contain 0d5cab20); T-170 (ii) path and error keys, the hand-keying, and the latency check; the open-brain auto-reconnect idea (planner advice: a STALE warning on build-info change first, a respawning stdio proxy only if needed), which waits on Aaron's go.
 
 ### Watch out
 
 - The planner checkout has the T-194 FILE guard (PreToolUse Edit|Write|NotebookEdit -> the main build's cli-planner-hook.js). A NEW planner session cannot Edit/Write src, tests, state.json or the rendered views. Briefs in docs/, CLAUDE.md and files outside the repo are fine. Bash is not guarded.
 - Since T-168R, every one-off clone that runs test:heavy must pass --seat <hub name> or set SUITE_SEAT, or it refuses with exit 2.
-- Since T-170, the recall trigger injects keyed lessons (the MATCH: command: line) once per session; the sidecar is ~/.claude/open-brain/recall-trigger-keys.json.
-- Live-check scripts live in ~/Worktrees/s171-livechecks/ (outside the repo). That directory vanished from disk once in s171.
-- T168-CURSOR hung 1h45 with no output when the launcher passed the whole brief inline; rerun it with the prompt by file or stdin and a 20-minute cap.
+- The user-level ~/.claude/commands/end.md and ~/.cursor/commands/end.md still say 'Nothing reads MATCH: yet'. Clark should recopy them from the repo after #769 (the repo copies were updated).
+- Two briefs lost a round each on s171 to unlisted existing tests: grep the token inside an argv (entry 721), and grep a registry's own name when adding to it (entry 722).
+- Live-check scripts live in ~/Worktrees/s171-livechecks/ (outside the repo). The directory vanished once in s171; t293/t170/t168r/t194/t294 are there now.
 
 ### Open questions
 
 - T-295: which open-brain MCP tools to cut or move to the CLI
 - T-261: raise the core/memory package split from P3?
+- Auto-reconnect for the open-brain MCP server: build it (STALE warning first)?
 
 ### Loop state
 
@@ -30,6 +31,7 @@ Overnight 10-14/15: SIA runs as normal (D-159). The pause for the Makerspace cut
 **Questions pending for Aaron:** 
 - T-295 tool cuts
 - T-261 priority
+- open-brain auto-reconnect
 
 **Rulings made mid-loop:** 
 - D-155 T-170 A
@@ -112,4 +114,4 @@ _10 older handoff(s), superseded within their seat and checkout, are in state.js
 
 ## Last session
 
-Session 171 — 2026-10-14 — planner [sia-planner] — `13042431-247e-4dad-9477-507e43fc7916` (14 writing session(s) in the record)
+Session 171 — 2026-10-15 — planner [sia-planner] — `13042431-247e-4dad-9477-507e43fc7916` (14 writing session(s) in the record)
