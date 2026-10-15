@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 485 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 487 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,22 +6,21 @@
 
 ### Pick up here
 
-Session 171 (Atlas), 10-13 22:2x -> 10-14 ~16:xx CDT. Main is at 1aebb121 (rebuilt; running seats need /mcp reconnect open-brain). Today on Aaron's words or SG-1: #727 #728 #738 #744 #749 #752 merged; T-285 T-288 T-290 T-166 T-024 T-291 closed; D-154 (T-194 option c now, b later); 15 stale PRs #463-#519 closed; every merged code change live-checked (scripts in ~/Worktrees/s171-livechecks/, each proven to FAIL before its merge). T-194: the r7 planner hook is on master INERT (not registered). Nothing running, nothing READY. NEXT: (1) T-293 (P1): rule how the hook and the atlas-ops scripts fit before any registration ask (replay: every `bash <atlas-ops script>` and a records/ push are denied; docs/ pushes pass); read git.ts's push rule and grant.ts first; the replay script is ~/Worktrees/t194-replay.mjs rev 2. (2) Aaron's two answers via clark (T-168 seat; forget entry 685); act on each when relayed, verified in clark's transcript. (3) P2/P3 backlog.
+Session 171 (planner Atlas) at rev 486, main tree and master at 0d5cab20. Shipped this stretch: T-293 (da1b0ef7); T-170 part (i), MATCH: command keys read by the recall trigger once per session (624d5758, live 6/6, 39 keys); T-168R, the suite seat from the checkout or a refusal naming --seat (0d5cab20, live 4/4); the T-194 file guard registered (D-157) and live-checked from a fresh planner session. Decided: D-155 (T-170 A), D-156 (T-168 R), D-157 (T-194 F); V-080 (entry 685 forgotten). Nothing SIA is running. Next: T-295, the open-brain tool audit (measured; Aaron's cut list owed); T-261, the core/memory split (P3 unless Aaron says 'T-261 up'); the T-168 Cursor half rerun; T-170's follow-ups and hand-keying (D-155).
 
 ### Watch out
 
-- Desktop rule (Aaron 10-13): no npm, vitest, tsc or build on the desktop. Planner pre-checks run node + git (+ the repo's tsx) on scratch copies only.
-- The Bash tool collapses doubled backslashes in heredoc and command text: write any script holding regex escapes with the Write tool, never a heredoc (s171: a skip-scan sim silently found 0 hits).
-- Simulate a brief's rows AND mutants before dispatch (memory feedback_simulate_brief_predictions); also check what the shipped tests READ (T-194's brief missed two rows files the QA tests load).
-- S4-9.2 (tests/harness/s4-guards.test.ts) refuses any skip/skipIf added since 2448a6ea; the only exceptions are ALLOWED_PLATFORM_SKIPS (exact line, stale if unused). Nit owed: its new row's title starts 'S4-9.2b' like an existing row.
-- A records-only PR can fail CI on T-292's vitest-worker onTaskUpdate timeout with every test passed: read the failure, rerun the failed job, and note the sighting on T-292.
-- Running seats need /mcp reconnect open-brain after each rebuild (main is at 1aebb121).
-- The repo is PUBLIC (D-090): live-check scripts, replay scripts, reply files and review bodies live outside it (~/Worktrees/, %TEMP%).
+- The planner checkout now has the T-194 FILE guard (PreToolUse Edit|Write|NotebookEdit -> the main build's cli-planner-hook.js). A NEW planner session cannot Edit/Write src, tests, state.json or the rendered views. Briefs in docs/, CLAUDE.md and files outside the repo are fine. Bash is not guarded.
+- Since T-168R (0d5cab20), every one-off clone that runs test:heavy must pass --seat <hub name> or set SUITE_SEAT, or it refuses with exit 2. Put it in every brief that runs the heavy suite.
+- Since T-170, the recall trigger also injects keyed lessons (the MATCH: command: line) once per session, and the sidecar is ~/.claude/open-brain/recall-trigger-keys.json. Sessions must /mcp reconnect open-brain for ob_store to refresh it; `open-brain trigger-keys` rewrites it by hand.
+- Live-check scripts live in ~/Worktrees/s171-livechecks/ (outside the repo). That directory vanished from disk once in s171, and only t293/t170/t168r/t194 were recreated.
+- T168-CURSOR hung 1h45 with no output when the launcher passed the whole brief inline (`agent.cmd -p -f "<text>"`). Rerun it with the prompt by file or stdin and a 20-minute cap.
+- When listing the test sites a change touches, grep the token inside the argv (e.g. 'TSX, CLI'), not the call's first line: T-168R lost a round to a wrapped argv (memory updated).
 
 ### Open questions
 
-- Aaron (via clark): T-168's default seat: planner recommends resolve from the checkout and refuse when unresolved, no default.
-- Aaron (via clark): forget knowledge entry 685 (falsified; 693 corrects it)? A delete, so held for its own word.
+- T-295: which open-brain MCP tools to cut or move to the CLI (planner proposal: cut ob_score, move ob_stats/ob_list, cut ob_feedback after verifying ob_end, decide ob_store_chunk and ob_forget)
+- T-261: raise the core/memory package split from P3 ('T-261 up')?
 
 ### Loop state
 
@@ -30,10 +29,13 @@ Session 171 (Atlas), 10-13 22:2x -> 10-14 ~16:xx CDT. Main is at 1aebb121 (rebui
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- T-168 default seat
-- forget knowledge entry 685
+- T-295 tool cuts
+- T-261 priority
 
-**Rulings made mid-loop:** _None._
+**Rulings made mid-loop:** 
+- D-155 T-170 A
+- D-156 T-168 R
+- D-157 T-194 F
 
 ## developer [sia-builder] _(written session 156)_
 
