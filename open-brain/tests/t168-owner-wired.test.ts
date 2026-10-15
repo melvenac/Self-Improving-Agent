@@ -50,7 +50,7 @@ function heldByOther(statusOut: string) {
   const dir = mkdtempSync(join(tmpdir(), "t168-other-"));
   const { census, vitestJson } = fixtures(dir);
   const meta = join(dir, "meta.json");
-  const r = spawnSync(process.execPath, [TSX, CLI, "--owner-pid", "100", "--meta", meta], {
+  const r = spawnSync(process.execPath, [TSX, CLI, "--seat", "cursor-builder", "--owner-pid", "100", "--meta", meta], {
     encoding: "utf8",
     cwd: dir,
     env: {
@@ -94,7 +94,7 @@ describe("T-168 owner wired to #427's walker", () => {
     const dir = mkdtempSync(join(tmpdir(), "t168-wired-"));
     const { census } = fixtures(dir);
     const meta = join(dir, "meta.json");
-    const r = spawnSync(process.execPath, [FIXTURE_HOST, "--", TSX, CLI, "--meta", meta], {
+    const r = spawnSync(process.execPath, [FIXTURE_HOST, "--", TSX, CLI, "--seat", "cursor-builder", "--meta", meta], {
       encoding: "utf8",
       cwd: dir,
       input: "",

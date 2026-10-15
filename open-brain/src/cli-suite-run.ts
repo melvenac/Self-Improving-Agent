@@ -4,9 +4,9 @@
  * #427's cursor-agent host walk, else the nearest claude.exe), takes the machine
  * lease (Windows, when the helper exists), reads hub presence twice, writes
  * suite-run-meta.json, then runs vitest. Refuses when there is no owner and
- * no --owner-pid, on any lease take exit other than 0, or when
+ * no --owner-pid, on any lease take exit other than 0, when
  * OPEN_BRAIN_CONTROLLED_RERUN=1 and a SIA seat (or its waker) is working or
- * the census is unavailable. process.ppid is only where the walk starts.
+ * the census is unavailable, or when no seat can be worked out (D-156). process.ppid is only where the walk starts.
  *
  * Tests inject SUITE_CENSUS_FIXTURE (JSON file of two presence bodies),
  * SUITE_ANCESTRY (JSON ancestor rows), SUITE_OWNER_FROM (walk start for that table), SUITE_LEASE_EXIT, SUITE_LEASE_STATUS_EXIT,
@@ -29,6 +29,7 @@ import {
   type ResolvedOwner,
 } from "./suite-owner.js";
 import { SUITE_VITEST_REPORT, suiteVitestArgs } from "./suite-vitest.js";
+import { resolveSuiteSeat } from "./suite-seat.js";
 
 const SIA_SEATS = ["atlas", "cursor-builder", "forge", "cursor-infra", "cursor-qa"];
 
@@ -207,7 +208,15 @@ async function censusFromEnv(hubUrl: string, keyPath: string | undefined): Promi
 }
 
 async function main(): Promise<void> {
-  const seat = arg("--seat") ?? process.env.SUITE_SEAT ?? "cursor-builder";
+  // T-168 / D-156: no default seat. The seat comes from --seat, SUITE_SEAT or this checkout's row in the seat map.
+  const resolved = resolveSuiteSeat({ flag: arg("--seat"), env: process.env.SUITE_SEAT, cwd: process.cwd() });
+  if (!resolved.ok) {
+    process.stderr.write(`suite refused: no seat for this run: ${resolved.why}. Pass --seat <hub name> (or set SUITE_SEAT).\n`);
+    process.exitCode = 2;
+    return;
+  }
+  const seat = resolved.seat;
+  process.stdout.write(`suite seat: ${seat} (${resolved.source})\n`);
   const hubUrl = arg("--hub") ?? process.env.HUB_URL ?? "http://100.124.212.87:4000";
   const keyPath = arg("--key") ?? process.env.SUITE_KEY_PATH ?? resolveSeatKeyPath({
     hubUrl,
