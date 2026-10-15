@@ -43,9 +43,11 @@ greeting (`SKILLS AUDIT NOT RUN`).
 
 ## 2. Store each one with its KEY
 
-Give every lesson the key a machine could match against the act that repeats it. **Nothing reads
-`MATCH:` yet:** the recall trigger matches on the command text, not on this line. The line is
-written now so the entries exist, keyed, when something does read it.
+Give every lesson the key a machine could match against the act that repeats it. **The recall
+trigger reads `MATCH: command:`** (T-170): the first backticked span is the key, `<placeholder>` and `…`
+are wildcards, and the parts must appear in that order in a Bash command. Key the MISTAKE's shape, not
+the tool: a bare `git show` fires on every `git show`. A keyed lesson is injected at most once per
+session. `path:` and `error:` keys are stored but not read yet; a key under 6 characters is lookup-only.
 
 For each lesson, `ob_recall` its title first with `purpose: "dedup"` (explicit trigger); skip it if it is already stored,
 or add the new detail. Then call `ob_store` with `kind: "event"`:
