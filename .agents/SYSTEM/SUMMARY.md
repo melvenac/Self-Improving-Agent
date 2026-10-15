@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 480 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 481 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-13 (Aaron, clark's window, 08:53 CDT): max parallel until the weekly reset at 00:00: every code-only brief goes to clark as soon as it is pinned; runs end at READY + PR; merges still need Aaron's word. QA PC OFF since ~14:3x CDT 10-13 for a RAM upgrade (Aaron's call, told via Relay for clark; no ETA): code-only runs and Opus reviews go to the desktop and the laptop meanwhile; its wakers restart at v1.22.13 on clark's word (SIA GO given, s170). Pending Aaron: T-194 approval mechanics (a)/(b)/(c); planner recommends (c) now, (b) later.
 
 ## What's working
@@ -85,6 +85,7 @@
 - A correct detector was dismissed by BOTH seats that saw it, and severity alone would not have fixed it: 'pre-existing' was used as a reason to classify a finding as unrelated, when it is only a statement about WHEN it started _(V-077, 3 evidence)_
 - tcm's A2A hub has run AUTH_MODE=strict since 2026-09-30T12:32:42Z (D-063 / A2A D-033), and SIA's seats are reachable under it: atlas's own-key read of the {atlas, forge} room k571c0nz returned 200 at 12:34:05Z _(V-078, 3 evidence)_
 - Aaron's one-time scrub-trigger-fires ran on the production store (2026-10-08, ~16:49 CDT). VERIFIED BY A POST-RUN DRY RUN, not by the run's own output, which was not kept: the pre-scrub dry run showed 19964 of 22536 rows pending; the post-run dry run shows 22957 rows scanned, 0 to rewrite, exit 0. _(V-079, 1 evidence)_
+- Knowledge entry 685 (ps51-convertto-json-leaves-control-chars-raw, a falsified cause) is forgotten on Aaron's word; entry 693, which corrects it, stays (T-024's held forget, s171) _(V-080, 2 evidence)_
 
 ## What's broken
 
