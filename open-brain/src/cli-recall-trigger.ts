@@ -67,12 +67,19 @@ const LOG_PATH = process.env.RECALL_TRIGGER_LOG || join(dirname(DB_PATH), "recal
 export const CURSOR_MEASURED_SHELL_TOOL_NAMES = new Set<string>(["Shell"]);
 
 /**
+ * Shell tool names Claude Code sends on PostToolUse and PostToolUseFailure. `Bash` is the original; `PowerShell` was
+ * measured live (T-170-II-PS, G-060, 2026-10-15, QA PC, claude 2.1.296, docs/loops/t170-ii/powershell-reply.md): its
+ * payload has Bash's shape and `tool_input.command` is the command exactly. No other names without a new measurement row.
+ */
+export const CLAUDE_CODE_MEASURED_SHELL_TOOL_NAMES = new Set<string>(["Bash", "PowerShell"]);
+
+/**
  * Extract the shell command from a PostToolUse / postToolUse hook payload, or
  * null when this event is not one the trigger handles.
  */
 export function shellCommandFromHookPayload(payload: Record<string, unknown>): string | null {
   const toolName = payload.tool_name;
-  if (toolName === "Bash") {
+  if (typeof toolName === "string" && CLAUDE_CODE_MEASURED_SHELL_TOOL_NAMES.has(toolName)) {
     const command = (payload.tool_input as Record<string, unknown> | undefined)?.command;
     return typeof command === "string" && command.trim() !== "" ? command : null;
   }
