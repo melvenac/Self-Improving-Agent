@@ -28,13 +28,13 @@ const ALARM_PATTERNS: Record<AlarmId, RegExp> = {
   tree_diverged: /^THIS TREE HAS DIVERGED/m,
   tree_stale: /^THIS TREE IS STALE/m,
   record_behind: /^THE RECORD HERE IS BEHIND/m,
-  stale_process: /· STALE PROCESS:/,
+  stale_process: /^Build \S+ · STALE PROCESS:/m,
   build_behind: /^Build \S+ · STALE:/m,
   old_start_command: /^OLD \/start/m,
   usage_not_checked: /^Usage: not checked/m,
-  drift_not_fixed: /\(not fixed\)/,
-  handoff_missing: /Handoff MISSING:/,
-  latest_brief_undetermined: /Latest brief: not determined/,
+  drift_not_fixed: /(?:^|· )Drift detected \(\d+\):[^\n]*\(not fixed\)/m,
+  handoff_missing: /(?:^|· )Handoff MISSING: /m,
+  latest_brief_undetermined: /^Latest brief: not determined/m,
 };
 
 export function greetingMetricsPath(env: NodeJS.ProcessEnv = process.env): string {

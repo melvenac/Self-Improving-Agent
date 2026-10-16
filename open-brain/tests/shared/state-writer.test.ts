@@ -501,13 +501,13 @@ describe("applyStateOps (Loop 3 writer)", () => {
 
   const LEGACY_HANDOFF = () => readState(root).handoffs.find((h) => h.session_uuid === null)!;
 
-  it("set_handoff writes THIS session's entry, stamped with its uuid, checkout and first-write revision, and leaves ANOTHER seat's legacy entry alone", () => {
+  it("set_handoff writes THIS session's entry, stamped with its uuid, checkout and first-write revision and written_rev, and leaves ANOTHER seat's legacy entry alone", () => {
     const legacy = LEGACY_HANDOFF(); // the fixture's is a developer's
     const r = applyStateOps(root, { session: SESSION, expected_revision: 7, session_uuid: "u-1", checkout: "sia-qa", ops: [{ op: "set_handoff", seat: "qa", pick_up: "Here", watch_out: ["a"], open_questions: [] }] });
     expect(r.ok).toBe(true);
     expect(readState(root).handoffs).toEqual([
       legacy,
-      { seat: "qa", pick_up: "Here", watch_out: ["a"], open_questions: [], session: SESSION, loop_state: null, session_uuid: "u-1", checkout: "sia-qa", first_rev: 8 },
+      { seat: "qa", pick_up: "Here", watch_out: ["a"], open_questions: [], session: SESSION, loop_state: null, session_uuid: "u-1", checkout: "sia-qa", first_rev: 8, written_rev: 8 },
     ]);
   });
 

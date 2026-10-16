@@ -803,6 +803,8 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
         session_uuid: ctx.uuid,
         checkout: ctx.checkout,
         first_rev: ctx.firstRev,
+        // T-298 step 2: the revision THIS write produces, so the greeting can say how far the record moved after the handoff.
+        written_rev: ctx.rev,
       };
       const idx = s.handoffs.findIndex((h) => h.session_uuid === ctx.uuid);
       if (idx === -1) s.handoffs.push(entry);
