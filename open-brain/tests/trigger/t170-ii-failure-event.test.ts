@@ -140,7 +140,7 @@ describe('F5 — the README registers the trigger on PostToolUseFailure', () => 
     const c = text.indexOf('\n```', o + 1);
     expect([h >= 0, o >= 0, c >= 0]).toEqual([true, true, true]);
     const block = text.slice(o, c);
-    const needle = '"PostToolUseFailure": [{ "matcher": "Bash"';
+    const needle = '"PostToolUseFailure": [{ "matcher": "Bash|PowerShell"';
     expect(block).toContain(needle);
     const line = block.split('\n').find((l) => l.includes(needle));
     expect(line).toContain('cli-recall-trigger.js');
