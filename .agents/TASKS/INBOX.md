@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 509 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 510 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -21,6 +21,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-225** Jev calibration 2 prerequisites: G_qa request with requirement statuses stripped, a run with real deterministic checks, a held-out set, and score.mjs matching the current gate reason text
 - [ ] **T-235** Cursor parity with Claude Code: measure every CC surface under cursor-agent CLI, then close the ruled gaps
 - [~] **T-262** /end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)
+- [ ] **T-298** Briefing gaps seen in Maker's S67 greeting: stale handoff not detectable, Latest brief silent outside docs/loops, divergence banner against the wrong branch, Usage 'not checked' noise
+- [ ] **T-299** Greeting metrics: each /start appends one measured row (size, handoff lag, missing pointers, repeated lines) for a dashboard scorecard
 
 ## P2
 
@@ -34,7 +36,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
 - [ ] **T-295** Audit open-brain's 14 MCP tools: keep what the protocol calls, cut or move to the CLI what nothing calls
 - [ ] **T-297** PRE-STATE import loses content a live project carries: dated-heading decisions, free-form handoff sections, scaffold's gitignore; plus CRLF command copy and view-header version
-- [ ] **T-298** Briefing gaps seen in Maker's S67 greeting: stale handoff not detectable, Latest brief silent outside docs/loops, divergence banner against the wrong branch, Usage 'not checked' noise
+- [ ] **T-300** The coordinator seat gets no SIA greeting: clark's /start runs on a hand-kept handoff file with no render, cap or currency check
 
 ## P3
 
