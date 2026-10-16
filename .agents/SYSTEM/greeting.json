@@ -5,5 +5,6 @@
   "handoff_by_checkout": true,
   "handoff_caps": false,
   "missing_handoff": true,
-  "role_docs_by_sha": true
+  "role_docs_by_sha": true,
+  "state_compact": true
 }
