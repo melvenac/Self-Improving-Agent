@@ -159,7 +159,7 @@ describe("describeLatestBrief — T-210", () => {
     expect(describeLatestBrief(root)).toBeNull();
   });
 
-  it("T210-7: ob_start prints the line after the drift line, and omits it when there is no brief", async () => {
+  it("T210-7: ob_start prints the line after the drift line, and prints where it looked when there is no brief", async () => {
     const NL = "\n";
     const project = (withBrief: boolean): string => {
       const root = repo();
@@ -178,7 +178,7 @@ describe("describeLatestBrief — T-210", () => {
     expect(i).toBeGreaterThan(withBrief.findIndex((l) => l.startsWith("Drift")));
     expect(withBrief.filter((l) => l.startsWith("Latest brief:"))).toHaveLength(1);
     const without = (await handleStart({ project_root: project(false) })).content[0]!.text;
-    expect(without).not.toContain("Latest brief");
+    expect(without).toContain("Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)");
   });
 });
 

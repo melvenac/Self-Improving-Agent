@@ -268,6 +268,12 @@ export const HandoffSchema = z.strictObject({
   checkout: z.string().min(1).nullable(),
   /** The writing session's first-write revision (see `SessionRecordSchema.first_rev`). */
   first_rev: nonNegInt.nullable(),
+  /**
+   * T-298: the record revision the write that set THIS handoff produced. OPTIONAL and, until T-298 step 2, written by
+   * nothing: an older build rejects an unknown key, so readers ship first. Absent means "not stamped"; the greeting then
+   * prints no lag note, never a guessed one.
+   */
+  written_rev: nonNegInt.optional(),
 }).refine((h) => h.seat !== "planner" || h.loop_state !== null, {
   message: "a planner handoff must carry loop_state (its fields may be empty, but not absent)",
   path: ["loop_state"],
@@ -511,7 +517,7 @@ export const KEY_ORDER: Readonly<Record<string, readonly string[]>> = {
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session", "status", "closed_session", "closed_rev"],
   decisions: ["id", "title", "date", "note", "standing"],
-  handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state", "session_uuid", "checkout", "first_rev"],
+  handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state", "session_uuid", "checkout", "first_rev", "written_rev"],
   loop_state: ["open_prs", "frozen_sha", "questions_for_aaron", "rulings"],
   open_prs: ["ref", "qa_status", "note"],
   sessions: ["n", "date", "uuid", "seat", "checkout", "first_rev"],
