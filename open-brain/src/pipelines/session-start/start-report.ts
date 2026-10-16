@@ -17,7 +17,8 @@ import { describeServingBuild } from "./serving-build.js";
 import { describeCommitTrailer, describeTranscript } from "./transcript-check.js";
 import { renderBriefing, describeUsage, describeWorkingTree, describeSkills, describeProblemStatement } from "./briefing.js";
 import { oldStartCommandWarning } from "../bootstrap/index.js";
-import { describeLatestBrief } from "./latest-brief.js";
+import { describeLatestBrief, describeNoBrief } from "./latest-brief.js";
+import { recordGreetingMetrics } from "./greeting-metrics.js";
 import { describeReadsOwed } from "./reads-owed.js";
 import { describeFleet, fleetFallback } from "./fleet.js";
 import { formatScanCounts } from "./scan-counts.js";
@@ -92,6 +93,7 @@ export function isSeat(role: string): role is Seat {
 }
 
 export async function renderStartReport(input: StartReportInput): Promise<StartReport> {
+  const startedAt = Date.now();
   const projectRoot = input.projectRoot;
   const proven = input.proven;
   const result = sessionStart({
@@ -153,8 +155,9 @@ export async function renderStartReport(input: StartReportInput): Promise<StartR
 
   // T-210: the newest brief by git commit date, so the briefing does not guess it from file names.
   // Omitted when there is no brief; says so when git could not answer.
-  const latestBrief = describeLatestBrief(projectRoot);
-  if (latestBrief) lines.push(latestBrief);
+  // T-298: when none is found the line says where it looked, so "no brief" and "did not look" differ.
+  const latestBrief = describeLatestBrief(projectRoot) ?? describeNoBrief(projectRoot);
+  lines.push(latestBrief);
 
   if (result.session.logPath) {
     const localNote =
@@ -357,6 +360,24 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
 
   // Total is of everything above it — the measurement Part 1 of the
   // evaluation asks for. Computed last so it counts the real return.
+  // T-299: opt-in (greeting.json `greeting_metrics`). Never changes isError or any line but its own failure line.
+  if (greetingFlag(projectRoot, "greeting_metrics")) {
+    const m = recordGreetingMetrics({
+      projectRoot,
+      callerLabel: input.callerLabel,
+      report: lines.join("\n"),
+      serving,
+      state: sj.present && sj.valid && sj.data ? sj.data : null,
+      seatName: roles.seat?.name ?? null,
+      role: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+      ownCheckout: handoffCheckout(projectRoot),
+      sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
+      startedAt,
+      budget: greetingFlag(projectRoot, "briefing_budget"),
+    });
+    if (!m.ok) lines.push(`\nGreeting metrics: not written (${m.why})`);
+  }
+
   const text = lines.join("\n");
   const totalWords = countWords(text);
   return { text: `${text}\n\nTotal returned words: ${totalWords} (~${estimateTokens(text)} tokens)`, isError: false };

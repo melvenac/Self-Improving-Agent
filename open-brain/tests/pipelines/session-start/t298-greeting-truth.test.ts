@@ -92,22 +92,22 @@ describe("T-298 G1: HandoffSchema accepts an optional written_rev", () => {
 });
 
 describe("T-298 G2-G4: the handoff lag note", () => {
-  it("G2 (legacy): state rev 508 · handoff rev 506 (+2)", () => {
+  it("G2 (legacy): state rev 508 (handoff +2)", () => {
     const out = renderBriefing(input(stateOf(raw(508, { written_rev: 506 }))));
-    expect(out.some((l) => l.includes("state rev 508 · handoff rev 506 (+2)"))).toBe(true);
+    expect(out.some((l) => l.includes("state rev 508 (handoff +2)"))).toBe(true);
   });
 
   it("G3 (budgeted): the note sits between the revision and the drift", () => {
     const out = renderBriefing(input(stateOf(raw(508, { written_rev: 506 })), { budget: true }));
-    expect(out.some((l) => l.includes("state rev 508 · handoff rev 506 (+2) · Drift"))).toBe(true);
+    expect(out.some((l) => l.includes("state rev 508 (handoff +2) · Drift"))).toBe(true);
   });
 
   it("G4: no note at lag 0 or when unstamped, and the legacy render equals the unstamped one line for line", () => {
     for (const budget of [false, true]) {
       const stamped = renderBriefing(input(stateOf(raw(508, { written_rev: 508 })), { budget }));
       const unstamped = renderBriefing(input(stateOf(raw(508)), { budget }));
-      expect(stamped.join("\n")).not.toContain("handoff rev");
-      expect(unstamped.join("\n")).not.toContain("handoff rev");
+      expect(stamped.join("\n")).not.toContain("(handoff");
+      expect(unstamped.join("\n")).not.toContain("(handoff");
       expect(stamped).toEqual(unstamped);
     }
   });

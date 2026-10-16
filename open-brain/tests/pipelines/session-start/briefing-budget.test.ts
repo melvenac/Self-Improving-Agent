@@ -272,8 +272,11 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     raw.tasks = raw.tasks.map((t: { status: string }) =>
       t.status !== "done" ? { ...t, title: long("Title", 400), assignee: slots[n++ % slots.length]!.seat, status: n <= 6 ? "blocked" : t.status, priority: n <= 4 ? "P0" : "P2" } : t,
     );
+    // T-298: the reader's own handoff is stamped 999 revisions behind the record, so the lag note is present in the worst case.
+    const stampedRev = raw.revision;
+    raw.revision = stampedRev + 999;
     const handoff = (checkout: string, first_rev: number, tag: string) => ({
-      ...raw.handoffs[0], seat: "developer", checkout, session_uuid: `u-${checkout}`, first_rev,
+      ...raw.handoffs[0], seat: "developer", checkout, session_uuid: `u-${checkout}`, first_rev, ...(tag === "OWN" ? { written_rev: stampedRev } : {}),
       pick_up: `${tag} ${"Pick up ".repeat(300)}`,
       watch_out: Array.from({ length: 17 }, (_, i) => long(`${tag} watch ${i}:`, 700)),
       open_questions: [...Array.from({ length: 8 }, (_, i) => ({ text: long(`${tag} wait ${i}`, 500), owner: "aaron" })), ...Array.from({ length: 8 }, (_, i) => long(`${tag} open ${i}`, 500))],

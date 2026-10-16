@@ -117,6 +117,17 @@ export function standingRulesBudgetLine(state: State): string | null {
   return line;
 }
 
+/**
+ * T-298: how far the record has moved since the reader's own handoff was written. Null when there is no own handoff, the
+ * handoff is not stamped (`written_rev` absent) or nothing was written after it: the note prints only when it says
+ * something.
+ */
+export function handoffLagNote(own: { written_rev?: number } | null, revision: number): string | null {
+  if (own === null || own.written_rev === undefined) return null;
+  const lag = revision - own.written_rev;
+  return lag > 0 ? `handoff +${lag}` : null;
+}
+
 export function renderBriefing(i: BriefingInput): string[] {
   if (i.budget === true) return renderBudgeted(i);
   const s = i.state;
@@ -127,7 +138,9 @@ export function renderBriefing(i: BriefingInput): string[] {
   if (i.transcript) out.push(i.transcript);
   out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
-  out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}`);
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+  const lagNote = handoffLagNote(own, s.revision);
+  out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""}`);
   out.push(
     i.drift.length === 0
       ? "Drift: none"
@@ -148,7 +161,6 @@ export function renderBriefing(i: BriefingInput): string[] {
   if (ranked.length === 0) out.push("- (no active P0 or P1 task)");
   out.push(`${active.length} active (${byPriority.map(([p, g]) => `${g.length} ${p}`).join(", ")}); ${done} done. Backlog order, not a decision: the pick-up below rules what starts.`);
 
-  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
   if (i.fleet) out.push("", ...i.fleet.legacy);
   out.push("", "PICK UP HERE");
   if (own) out.push(own.pick_up.trim() === "" ? "(nothing recorded)" : own.pick_up.trim());
@@ -242,7 +254,9 @@ function renderBudgeted(i: BriefingInput): string[] {
     i.drift.length === 0
       ? "Drift: none"
       : cut(`Drift detected (${i.drift.length}): ${i.drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`).join("; ")}`, CAPS.drift);
-  const sessionLine = `${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision} · ${drift}`;
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+  const lagNote = handoffLagNote(own, s.revision);
+  const sessionLine = `${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""} · ${drift}`;
   // T-281: T-161's line rides the session line as a fixed note, so an alarm state costs no line and stays inside the char cap.
   out.push(i.transcript ? `${sessionLine} · ${TRANSCRIPT_BUDGET_NOTE}` : sessionLine);
 
@@ -265,7 +279,6 @@ function renderBudgeted(i: BriefingInput): string[] {
   const seats = i.focus?.seats ?? null;
   if (seats !== null) out.push(seats);
   if (i.fleet) out.push(i.fleet.budget);
-  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
   out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
   const pickUp = own
     ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars)

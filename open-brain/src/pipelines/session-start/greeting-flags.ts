@@ -10,7 +10,7 @@ import { checkoutOf } from "../../shared/state-schema.js";
  * file, an unreadable or malformed file, a non-boolean value and an absent key all mean false,
  * which is today's output.
  *
- * Keys: briefing_budget, briefing_focus, briefing_problem, handoff_by_checkout, handoff_caps, missing_handoff, role_docs_by_sha, state_compact. Keep them sorted in the tracked file.
+ * Keys: brief_dir (string), briefing_budget, briefing_focus, briefing_problem, greeting_metrics, handoff_by_checkout, handoff_caps, missing_handoff, role_docs_by_sha, state_compact. Keep them sorted in the tracked file.
  */
 export const GREETING_FLAGS_REL = ".agents/SYSTEM/greeting.json";
 
@@ -27,6 +27,23 @@ export function readGreetingFlags(projectRoot: string): Readonly<Record<string, 
   const flags: Record<string, boolean> = {};
   for (const [k, v] of Object.entries(data)) if (typeof v === "boolean") flags[k] = v;
   return flags;
+}
+
+/**
+ * T-298: one STRING key from the same file (`brief_dir`). An absent file or key, a malformed file and a non-string value are
+ * all null. Validation of the value belongs to the caller, which says what was wrong.
+ */
+export function greetingString(projectRoot: string, key: string): string | null {
+  const abs = join(projectRoot, GREETING_FLAGS_REL);
+  if (!existsSync(abs)) return null;
+  try {
+    const data: unknown = JSON.parse(readFileSync(abs, "utf8"));
+    if (typeof data !== "object" || data === null || Array.isArray(data)) return null;
+    const v = (data as Record<string, unknown>)[key];
+    return typeof v === "string" ? v : null;
+  } catch {
+    return null;
+  }
 }
 
 export function greetingFlag(projectRoot: string, key: string): boolean {

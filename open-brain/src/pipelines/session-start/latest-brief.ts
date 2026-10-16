@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
+import { greetingString } from "./greeting-flags.js";
 
 /**
  * T-210: the newest brief under docs/loops, by GIT commit date.
@@ -33,9 +34,34 @@ function rootBriefOnDisk(projectRoot: string): boolean {
   }
 }
 
+/**
+ * T-298: the repo's own brief directory (greeting.json `brief_dir`). Valid is a non-empty repo-relative directory: not
+ * absolute, no `\`, no `..` segment, not `.`. Null when the key is absent.
+ */
+export function briefDirSetting(projectRoot: string): { dir: string } | { invalid: string } | null {
+  const raw = greetingString(projectRoot, "brief_dir");
+  if (raw === null) return null;
+  const dir = raw.trim().replace(/\/+$/, "");
+  const bad = dir === "" || dir === "." || isAbsolute(dir) || dir.startsWith("/") || dir.includes("\\") || dir.split("/").includes("..");
+  return bad ? { invalid: raw } : { dir };
+}
+
 function latestBriefSelection(projectRoot: string): { path: string; date: string } | null {
   const run = (args: string[]): string =>
     execFileSync("git", args, { cwd: projectRoot, encoding: "utf-8", maxBuffer: 1 << 26, stdio: ["ignore", "pipe", "pipe"] }).replace(/\r\n/g, "\n");
+  const setting = briefDirSetting(projectRoot);
+  if (setting !== null && "invalid" in setting) return null;
+  if (setting !== null) {
+    // T-298: every tracked *.md under the named directory is a brief; the selection loop and tie-break are shared.
+    if (!existsSync(join(projectRoot, setting.dir))) return null;
+    const inDir = new Set(
+      run(["ls-tree", "-r", "--name-only", "HEAD", "--", `${setting.dir}/`])
+        .split("\n")
+        .filter((p) => p.endsWith(".md")),
+    );
+    if (inDir.size === 0) return null;
+    return newestOf(inDir, run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${setting.dir}/`]));
+  }
   if (!existsSync(join(projectRoot, BRIEF_DIR)) && !rootBriefOnDisk(projectRoot)) return null;
   const present = new Set(
     run(["ls-tree", "-r", "--name-only", "HEAD", "--", `${ROOT_BRIEF_DIR}/`])
@@ -48,7 +74,11 @@ function latestBriefSelection(projectRoot: string): { path: string; date: string
   // there are (Windows refuses a spawn near 32 KB of arguments). `present` already filters the names, and a glob `*`
   // never crosses a `/`, so only docs-root files match.
   const rootSpec = rootBriefs.length > 0 ? [`:(glob)${ROOT_BRIEF_DIR}/loop-*.md`] : [];
-  const log = run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${BRIEF_DIR}/`, ...rootSpec]);
+  return newestOf(present, run(["log", "--format=@%cI", "--name-only", "--no-renames", "HEAD", "--", `${BRIEF_DIR}/`, ...rootSpec]));
+}
+
+/** The newest of `present` by commit date in `log` (`@date` lines followed by names); ties go to the later path. */
+function newestOf(present: Set<string>, log: string): { path: string; date: string } | null {
   const latest = new Map<string, string>();
   let date = "";
   for (const line of log.split("\n")) {
@@ -73,6 +103,10 @@ export function latestBriefPath(projectRoot: string): { path: string; date: stri
 }
 
 export function describeLatestBrief(projectRoot: string): string | null {
+  const setting = briefDirSetting(projectRoot);
+  if (setting !== null && "invalid" in setting) {
+    return `Latest brief: not determined (greeting.json brief_dir is not a repo-relative directory: ${JSON.stringify(setting.invalid)})`;
+  }
   try {
     const best = latestBriefSelection(projectRoot);
     return best ? `Latest brief: ${best.path} (${best.date.slice(0, 10)})` : null;
@@ -80,6 +114,14 @@ export function describeLatestBrief(projectRoot: string): string | null {
     const cause = (err as { stderr?: string; message?: string }).stderr?.trim().split("\n")[0] || (err as Error).message.split("\n")[0];
     return `Latest brief: not determined (git: ${cause})`;
   }
+}
+
+/** T-298: the line ob_start prints when describeLatestBrief found no brief: where it looked, so "none" and "didn't look" differ. */
+export function describeNoBrief(projectRoot: string): string {
+  const s = briefDirSetting(projectRoot);
+  return s !== null && "dir" in s
+    ? `Latest brief: none (looked in ${s.dir}/, from greeting.json brief_dir)`
+    : `Latest brief: none (looked in ${BRIEF_DIR}/ and ${ROOT_BRIEF_DIR}/loop-*-brief.md)`;
 }
 
 /**
