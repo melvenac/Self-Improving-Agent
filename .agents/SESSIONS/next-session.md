@@ -1,48 +1,46 @@
-<!-- generated from .agents/state.json rev 510 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 511 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 172)_
+## planner [sia-planner] _(written session 173)_
 
 ### Pick up here
 
-OVERNIGHT 10-15 (Aaron asleep; clark asked the planners for downstream work, no questions to Aaron). Session 172 (planner Atlas) ran two QA PC one-offs through clark: (1) T-170-II research (docs/loops/t170-ii/research-reply.md), ACCEPTED: a failing Bash fires PostToolUseFailure, not PostToolUse, so the recall trigger is blind to failing commands (G-059, confirmed in production on the desktop) and to PowerShell (G-060); hook latency measured (~60 ms not-asked, ~170 ms asked); the path/error-key design is ruled in T-170's note. (2) T-170-II-S1 READY: PR #794 at b7eb1dc3, CI pass, NOT merged. Its live step showed the code half is REQUIRED (base build: injection recorded, never delivered). MORNING, after the cutover pause rules (D-158/D-159: the pause starts on Aaron's word; #794 is a code merge, so it is Aaron's call whether it lands before or after the cutover): merge #794 on Aaron's word (refresh the head first) -> clark rebuilds main -> add PostToolUseFailure/Bash to ~/.claude/settings.json -> one live check, then close G-059. Then the real-key over-fire run: t170ii-keys.json (desktop %TEMP%, 49 path/error MATCH lines from a read-only live-DB export; clark's classifier refused moving it to the QA PC) and t170ii-overfire.mjs (desktop %TEMP%, sha256 478248a3...5e2e verified, the QA PC original) wait on Aaron's ruling on where it runs. Still PARKED from s171: T-295, T-261, the T-168 Cursor half (behind clark's seat-oneoff fix), T-170 hand-keying, auto-reconnect. Also T-235: the QA PC ~/.cursor/hooks.json, like the desktop's, has sessionStart only (setup.mjs:230 would add postToolUse; it was never re-run after P2-5).
+S173 (10-16): T-296 closed; G-060 closed (#803, recall trigger on PowerShell); #794 merged. Aaron's scorecard for /start greetings (memory feedback_transcript_reviews_find_sia_issues): 7 questions + start cost. T-298-S1 (#822) MERGED + rebuilt 795b3e60: brief_dir, 'Latest brief: none (looked in ...)', handoff lag note (read side), opt-in greeting-metrics.jsonl (SIA, Maker, Courier, Relay, Prism opted in; first live row written 20:42Z). T-298-S2 PR #825 (set_handoff stamps written_rev; anchored alarms) ACCEPTED at 5f3b0d3b; QA PC SIA rebuilt to 75ec2ebe (read-back PASS on a stamped record); clark merges #825 once maker + courier /mcp reconnect, then sia-rebuild. After that: one live set_handoff, then the greeting shows 'state rev N (handoff +L)'. Next: T-300 options (coordinator greeting); T-297 importer gaps; T-298 items (3) record branch and (4) usage noise.
 
 ### Watch out
 
-- Register PostToolUseFailure ONLY with #794's code in the build. The base build answers hookEventName PostToolUse, which Claude Code drops on a failure event, while trigger_fires still records 'injected': a silent census lie.
-- The planner checkout has the T-194 FILE guard (PreToolUse Edit|Write|NotebookEdit -> the main build's cli-planner-hook.js). A new planner session cannot Edit/Write src, tests, state.json or the rendered views; docs/ and files outside the repo are fine.
-- Since T-168R, every one-off clone that runs test:heavy must pass --seat <hub name> or set SUITE_SEAT, or it refuses with exit 2.
-- SIA is a PUBLIC repo. The live store's MATCH keys name client domains and private paths: never commit or post key text (the t170ii-keys.json export stays off-repo).
-- Files copied from the QA PC to the desktop as text can lose characters (the research reply's `…` became `.`). Copy byte-for-byte and compare sha256 when a file will be run.
-- The user-level ~/.claude/commands/end.md and ~/.cursor/commands/end.md still say 'Nothing reads MATCH: yet'. Clark should recopy them from the repo.
+- T-298-S2 must NOT merge before every process reading a stamped record is >= 795b3e60 (strictObject refuses unknown keys): QA PC done; maker and courier reconnects pending.
+- The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.
+- SIA is a PUBLIC repo: never commit or post live MATCH key text.
+- Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC (two SIMs this session each corrected a brief).
 
 ### Open questions
 
-- #794 (T-170-II-S1, G-059): merge it and register PostToolUseFailure in ~/.claude/settings.json? Before or after the Makerspace cutover?
-- t170ii-keys.json (49 live MATCH keys): may it go to the QA PC, or does the real-key over-fire measurement run on the desktop?
-- T-295: which open-brain MCP tools to cut or move to the CLI
+- t170ii-keys.json (49 live MATCH keys): may it go to the QA PC, or does the real-key over-fire run stay on the desktop?
+- T-295: which open-brain MCP tools to cut or move to the CLI?
 - T-261: raise the core/memory package split from P3?
-- Auto-reconnect for the open-brain MCP server: build it (STALE warning first)?
+- Auto-reconnect for the open-brain MCP server: build it? (today every rebuild needs a /mcp reconnect in each seat window)
+- #794 merge + PostToolUseFailure registration _(resolved by merged s173 (G-059 closed); PowerShell via #803)_
 
 ### Loop state
 
 **Open PRs:** 
-- #794 — QA: accepted — T-170-II-S1 (G-059) hook code at b7eb1dc3, CI pass, planner ACCEPT; merge needs Aaron's word; register settings.json only after the rebuild
+- #825 — QA: accepted — T-298-S2 at 5f3b0d3b; QA PC rebuilt; merge waits on maker + courier reconnects
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- #794 merge + PostToolUseFailure registration
-- t170ii-keys.json transfer or desktop run
+- t170ii-keys run host
 - T-295 tool cuts
 - T-261 priority
 - open-brain auto-reconnect
 
 **Rulings made mid-loop:** 
-- T-170-II research ACCEPTED (path/error-key design in T-170's note)
-- T-170-II-S1 ACCEPTED at b7eb1dc3
-- G-059 and G-060 opened
+- T-298-S1 ACCEPT at 597b64c9 (merged 795b3e60)
+- T-298-S1 amendment 1: budget stays 4400; note shortened
+- T-298-S2 ACCEPT at 5f3b0d3b
+- Courier greeting.json: the four Maker flags + greeting_metrics
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -114,7 +112,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
