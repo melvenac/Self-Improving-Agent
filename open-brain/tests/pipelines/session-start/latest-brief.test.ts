@@ -1,8 +1,8 @@
 import { describe, it, expect, afterAll } from "vitest";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { handleStart } from "../../../src/server.js";
 import { describeLatestBrief } from "../../../src/pipelines/session-start/latest-brief.js";
 
@@ -289,5 +289,41 @@ describe("describeLatestBrief — T-277 briefs at the docs root (docs/loop-*-bri
     made.push(root);
     writeFileSync(join(root, "docs"), "x");
     expect(describeLatestBrief(root)).toBeNull();
+  });
+});
+
+describe("T-296 — task-named briefs", () => {
+  it.each(["l69-build-task.md", "t262-fix-1-task.md", "l70-build-task-amendment-1.md", "v1.25.0-release-task.md", "task.md"])(
+    "K1 kept: %s is a brief",
+    (name) => {
+      const root = repo();
+      commit(root, "loop-1-brief.md", "2026-09-01T12:00:00+00:00");
+      commit(root, name, "2026-09-20T12:00:00+00:00");
+      expect(describeLatestBrief(root)).toBe(`Latest brief: docs/loops/${name} (2026-09-20)`);
+    },
+  );
+
+  it.each(["l69-qa-job.md", "l69-qa-results.md", "t262-task-notes.md", "loop-9-task-2.md", "multitask.md", "l69-build-task.md.orig"])(
+    "K2 excluded: %s is not a brief",
+    (name) => {
+      const root = repo();
+      commit(root, "loop-1-brief.md", "2026-09-01T12:00:00+00:00");
+      commit(root, name, "2026-09-20T12:00:00+00:00");
+      expect(describeLatestBrief(root)).toBe("Latest brief: docs/loops/loop-1-brief.md (2026-09-01)");
+    },
+  );
+
+  it("K3: A2A's case — l69-build-task.md is newer than loop-50-brief.md, and it wins", () => {
+    const root = repo();
+    commit(root, "loop-50-brief.md", "2026-10-14T12:00:00+00:00");
+    commit(root, "l69-build-task.md", "2026-10-15T16:57:02+00:00");
+    expect(describeLatestBrief(root)).toBe("Latest brief: docs/loops/l69-build-task.md (2026-10-15)");
+  });
+
+  it("K4: every start.md copy names `*-task.md` as a brief", () => {
+    const repoRoot = resolve(__dirname, "../../../..");
+    for (const f of [".claude/commands/start.md", "project-template/.claude/commands/start.md", "project-template/.cursor/commands/start.md"]) {
+      expect(readFileSync(join(repoRoot, f), "utf8"), f).toContain("`*-task.md`");
+    }
   });
 });
