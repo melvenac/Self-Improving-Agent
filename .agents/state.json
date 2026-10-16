@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 511,
+  "revision": 512,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2408,7 +2408,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "s173 (Atlas), from reviewing Maker's S67 /start greeting (Aaron's request, verified in maker transcript a65a9321). Makerspace planner tree, record rev 508. Each observed:\n(1) HANDOFF LAG: the planner handoff was written at rev 506 ('S66 roll handoff'); revs 507-508 landed after (site-analytics skill written; staging PASS + prod-release brief). PICK UP and WAITING ON AARON were stale (an answered question still listed), and only Maker's manual git-log cross-check caught it. handoffs[] carry no revision stamp, so the briefing cannot say 'handoff from rev 506, record at rev 508'. Stamp the rev on set_handoff; print the lag when > 0.\n(2) LATEST BRIEF SILENT: latest-brief.ts looks only in docs/loops/ and docs/loop-*.md and returns null otherwise, so the line is omitted. Makerspace keeps briefs in .agents/plans/ (prod-release-1016b.md, b1af65d). 'None found' and 'did not look there' read the same. Print 'Latest brief: none under <dirs>' and let a project name its brief dir (greeting.json).\n(3) DIVERGENCE BANNER: tree-currency compares with the default branch (D-062). Makerspace's record lives on docs/t001-plans (693 ahead / 298 behind origin/main, never merged), so 'THIS TREE HAS DIVERGED' fires every start and is read past; origin/main's state.json is far behind, so a main-checkout session would brief from an old record. Let a project name its record branch and compare with that. Question to clark/Maker whether the docs branch should merge.\n(4) USAGE NOISE: 'Usage: not checked (... no usageLevel ...)' prints every start; slots.json now has usageLevelRemoved (D-145 restrictions off) but AGENT.local.md still names usage_file. Omit the line when nothing is configured or the key is retired.\nRelates T-296 (greeting focus), T-277 (brief locations), T-200/D-062 (record source). — s173 later: raised to P1 on Aaron's review scorecard (10-16): item (1), the handoff lag, is the root cause of his 'does the greeting match the current project state?' failing in every project, and T-299's lag metric needs its revision stamp.",
+      "note": "s173 (Atlas), from reviewing Maker's S67 /start greeting (Aaron's request, verified in maker transcript a65a9321). Makerspace planner tree, record rev 508. Each observed:\n(1) HANDOFF LAG: the planner handoff was written at rev 506 ('S66 roll handoff'); revs 507-508 landed after (site-analytics skill written; staging PASS + prod-release brief). PICK UP and WAITING ON AARON were stale (an answered question still listed), and only Maker's manual git-log cross-check caught it. handoffs[] carry no revision stamp, so the briefing cannot say 'handoff from rev 506, record at rev 508'. Stamp the rev on set_handoff; print the lag when > 0.\n(2) LATEST BRIEF SILENT: latest-brief.ts looks only in docs/loops/ and docs/loop-*.md and returns null otherwise, so the line is omitted. Makerspace keeps briefs in .agents/plans/ (prod-release-1016b.md, b1af65d). 'None found' and 'did not look there' read the same. Print 'Latest brief: none under <dirs>' and let a project name its brief dir (greeting.json).\n(3) DIVERGENCE BANNER: tree-currency compares with the default branch (D-062). Makerspace's record lives on docs/t001-plans (693 ahead / 298 behind origin/main, never merged), so 'THIS TREE HAS DIVERGED' fires every start and is read past; origin/main's state.json is far behind, so a main-checkout session would brief from an old record. Let a project name its record branch and compare with that. Question to clark/Maker whether the docs branch should merge.\n(4) USAGE NOISE: 'Usage: not checked (... no usageLevel ...)' prints every start; slots.json now has usageLevelRemoved (D-145 restrictions off) but AGENT.local.md still names usage_file. Omit the line when nothing is configured or the key is retired.\nRelates T-296 (greeting focus), T-277 (brief locations), T-200/D-062 (record source). — s173 later: raised to P1 on Aaron's review scorecard (10-16): item (1), the handoff lag, is the root cause of his 'does the greeting match the current project state?' failing in every project, and T-299's lag metric needs its revision stamp. — s173: items (1) and (2) DONE: S1 #822 (merged 795b3e60) + amendment 1 (note shortened to 'state rev N (handoff +L)'; budget stays 4400), S2 #825 (merged 52e7894b; set_handoff stamps written_rev; metrics alarms anchored). V-084. QA PC SIA was 12 days behind (10-04 build refusing the record's `standing` key, so every QA PC one-off greeted degraded); clark rebuilt it. OPEN: (3) record branch for the divergence banner, (4) 'Usage: not checked' noise.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -2418,15 +2418,15 @@
       "id": "T-299",
       "title": "Greeting metrics: each /start appends one measured row (size, handoff lag, missing pointers, repeated lines) for a dashboard scorecard",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 173,
       "supersedes": null,
-      "note": "s173: Aaron's word 2026-10-16: 'go ahead with step 1 and send the dashboard idea to clark and or prism'. Step 1 = SIA side. The review scorecard (memory feedback_transcript_reviews_find_sia_issues): 1 state match, 2 fits whole, 3 focused+pointing, 4 first action matched, 5 every line earns its place, 6 absence visible, 7 waiting-on-Aaron true, + measured start cost. Rows 1, 2, 5, 6 are mechanical and computed at every start; 3, 4, 7 stay judged (Atlas reviews add dated rows on the dashboard side). SIA writes the row LOCALLY (a JSONL beside the store, like recall-trigger-pending.jsonl): no network code in SIA (public repo, standalone). Transport to the dashboard is clark-ops (ondeck-sync.mjs already reads local files and POSTs /api/ondeck/<project>); the panel is Prism's (agent-dashboard). Depends on T-298 (1) for the handoff-lag number. Brief: docs/loops/t298-t299-greeting-truth-brief.md.",
+      "note": "s173: Aaron's word 2026-10-16: 'go ahead with step 1 and send the dashboard idea to clark and or prism'. Step 1 = SIA side. The review scorecard (memory feedback_transcript_reviews_find_sia_issues): 1 state match, 2 fits whole, 3 focused+pointing, 4 first action matched, 5 every line earns its place, 6 absence visible, 7 waiting-on-Aaron true, + measured start cost. Rows 1, 2, 5, 6 are mechanical and computed at every start; 3, 4, 7 stay judged (Atlas reviews add dated rows on the dashboard side). SIA writes the row LOCALLY (a JSONL beside the store, like recall-trigger-pending.jsonl): no network code in SIA (public repo, standalone). Transport to the dashboard is clark-ops (ondeck-sync.mjs already reads local files and POSTs /api/ondeck/<project>); the panel is Prism's (agent-dashboard). Depends on T-298 (1) for the handoff-lag number. Brief: docs/loops/t298-t299-greeting-truth-brief.md. — s173: step 1 (SIA side) DONE in #822: opt-in greeting_metrics, schema 1 pinned in the S1 brief R5 and greeting-metrics.ts; alarms anchored in #825. Opted in: SIA, Makerspace, Courier, Relay, Prism. Transport (clark-ops, POST /api/scorecard) and panel (Prism) are outside SIA; Prism builds after a day of rows. V-084.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
-      "closed_rev": null
+      "closed_rev": 512
     },
     {
       "id": "T-300",
@@ -4018,6 +4018,29 @@
           "type": "command",
           "path": "PowerShell tool, planner session 4a1f437b, 2026-10-16",
           "observation": "failing `git archive g060-no-such-ref` (exit 128) -> trigger_fires 44777 match:638 state silent (638 already injected this session, row 43598: per-session repeat suppression); a non-matching parse-error failure and a non-matching success each wrote a not-asked line to recall-trigger-pending.jsonl (16:30:57Z, 16:30:52Z)"
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-084",
+      "claim": "T-298 steps 1-2 and T-299 step 1 are live on the main build (52e7894b): the greeting prints 'Latest brief: none (looked in ...)' instead of omitting the line, a repo's greeting.json brief_dir is honoured, set_handoff stamps written_rev with the revision it produces, the briefing shows 'state rev N (handoff +L)' when the record moved after the handoff, and opted-in repos append one greeting-metrics.jsonl row per start.",
+      "evidence": [
+        {
+          "type": "command",
+          "path": "open-brain/build/pipelines/session-start/latest-brief.js",
+          "observation": "s173 live: makerspace-planner printed 'Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)' at 795b3e60, then '.agents/plans/t169-rotate.md (2026-10-16)' after Maker set brief_dir (newest plans commit 15f600a confirmed by git log)."
+        },
+        {
+          "type": "command",
+          "path": "open-brain/build/shared/state-writer.js",
+          "observation": "s173 live on 52e7894b: applyStateOps set_handoff on a scratch copy of the SIA record at rev 511 gave written_rev 512 at revision 512; handoffLagNote(h, 514) = 'handoff +2'."
+        },
+        {
+          "type": "file",
+          "path": "~/.claude/open-brain/greeting-metrics.jsonl",
+          "observation": "s173 first live row (ob_start via MCP at 795b3e6, 20:42Z): caller mcp, checkout sia-planner, agent Atlas, record_rev 510, lag_reason no_stamp, greeting_chars 3467 of budget 4400, start_ms 4359, alarm_streaks {usage_not_checked:1}."
         }
       ],
       "since_session": 173,
@@ -6184,12 +6207,12 @@
     },
     {
       "seat": "planner",
-      "pick_up": "S173 (10-16): T-296 closed; G-060 closed (#803, recall trigger on PowerShell); #794 merged. Aaron's scorecard for /start greetings (memory feedback_transcript_reviews_find_sia_issues): 7 questions + start cost. T-298-S1 (#822) MERGED + rebuilt 795b3e60: brief_dir, 'Latest brief: none (looked in ...)', handoff lag note (read side), opt-in greeting-metrics.jsonl (SIA, Maker, Courier, Relay, Prism opted in; first live row written 20:42Z). T-298-S2 PR #825 (set_handoff stamps written_rev; anchored alarms) ACCEPTED at 5f3b0d3b; QA PC SIA rebuilt to 75ec2ebe (read-back PASS on a stamped record); clark merges #825 once maker + courier /mcp reconnect, then sia-rebuild. After that: one live set_handoff, then the greeting shows 'state rev N (handoff +L)'. Next: T-300 options (coordinator greeting); T-297 importer gaps; T-298 items (3) record branch and (4) usage noise.",
+      "pick_up": "S173 (10-16): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues: 7 questions + start cost). DONE this session: T-296; G-060 (#803); #794; T-298 items (1)(2) via #822 + #825 (brief_dir, 'Latest brief: none (looked in ...)', set_handoff stamps written_rev, 'state rev N (handoff +L)', anchored alarms); T-299 step 1 (greeting-metrics.jsonl, opted in by SIA/Maker/Courier/Relay/Prism; first live row 20:42Z). V-084. Stamping on live records starts at each seat's next /mcp reconnect or new session (seat MCP processes run 795b3e60, which reads but does not stamp). Next: T-300 options (coordinator greeting: clark's 91 KB hand-kept handoff); T-297 importer gaps (from the tarrantmailer migration); T-298 (3) record branch, (4) usage-line noise. Prism builds the scorecard panel after a day of rows; clark-ops owns the transport.",
       "watch_out": [
-        "T-298-S2 must NOT merge before every process reading a stamped record is >= 795b3e60 (strictObject refuses unknown keys): QA PC done; maker and courier reconnects pending.",
         "The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.",
         "SIA is a PUBLIC repo: never commit or post live MATCH key text.",
-        "Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC (two SIMs this session each corrected a brief)."
+        "Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC (two SIMs this session each corrected a brief).",
+        "A schema field addition is two-step (readers, then writers): strictObject refuses unknown keys, and stale MCP processes and the QA PC build lag the main build."
       ],
       "open_questions": [
         {
@@ -6215,13 +6238,7 @@
       ],
       "session": 173,
       "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#825",
-            "qa_status": "accepted",
-            "note": "T-298-S2 at 5f3b0d3b; QA PC rebuilt; merge waits on maker + courier reconnects"
-          }
-        ],
+        "open_prs": [],
         "frozen_sha": null,
         "questions_for_aaron": [
           "t170ii-keys run host",
@@ -6232,7 +6249,7 @@
         "rulings": [
           "T-298-S1 ACCEPT at 597b64c9 (merged 795b3e60)",
           "T-298-S1 amendment 1: budget stays 4400; note shortened",
-          "T-298-S2 ACCEPT at 5f3b0d3b",
+          "T-298-S2 ACCEPT at 5f3b0d3b (merged 52e7894b)",
           "Courier greeting.json: the four Maker flags + greeting_metrics"
         ]
       },
