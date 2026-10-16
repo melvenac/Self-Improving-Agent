@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 509,
+  "revision": 510,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2403,12 +2403,40 @@
     {
       "id": "T-298",
       "title": "Briefing gaps seen in Maker's S67 greeting: stale handoff not detectable, Latest brief silent outside docs/loops, divergence banner against the wrong branch, Usage 'not checked' noise",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s173 (Atlas), from reviewing Maker's S67 /start greeting (Aaron's request, verified in maker transcript a65a9321). Makerspace planner tree, record rev 508. Each observed:\n(1) HANDOFF LAG: the planner handoff was written at rev 506 ('S66 roll handoff'); revs 507-508 landed after (site-analytics skill written; staging PASS + prod-release brief). PICK UP and WAITING ON AARON were stale (an answered question still listed), and only Maker's manual git-log cross-check caught it. handoffs[] carry no revision stamp, so the briefing cannot say 'handoff from rev 506, record at rev 508'. Stamp the rev on set_handoff; print the lag when > 0.\n(2) LATEST BRIEF SILENT: latest-brief.ts looks only in docs/loops/ and docs/loop-*.md and returns null otherwise, so the line is omitted. Makerspace keeps briefs in .agents/plans/ (prod-release-1016b.md, b1af65d). 'None found' and 'did not look there' read the same. Print 'Latest brief: none under <dirs>' and let a project name its brief dir (greeting.json).\n(3) DIVERGENCE BANNER: tree-currency compares with the default branch (D-062). Makerspace's record lives on docs/t001-plans (693 ahead / 298 behind origin/main, never merged), so 'THIS TREE HAS DIVERGED' fires every start and is read past; origin/main's state.json is far behind, so a main-checkout session would brief from an old record. Let a project name its record branch and compare with that. Question to clark/Maker whether the docs branch should merge.\n(4) USAGE NOISE: 'Usage: not checked (... no usageLevel ...)' prints every start; slots.json now has usageLevelRemoved (D-145 restrictions off) but AGENT.local.md still names usage_file. Omit the line when nothing is configured or the key is retired.\nRelates T-296 (greeting focus), T-277 (brief locations), T-200/D-062 (record source). — s173 later: raised to P1 on Aaron's review scorecard (10-16): item (1), the handoff lag, is the root cause of his 'does the greeting match the current project state?' failing in every project, and T-299's lag metric needs its revision stamp.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-299",
+      "title": "Greeting metrics: each /start appends one measured row (size, handoff lag, missing pointers, repeated lines) for a dashboard scorecard",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s173: Aaron's word 2026-10-16: 'go ahead with step 1 and send the dashboard idea to clark and or prism'. Step 1 = SIA side. The review scorecard (memory feedback_transcript_reviews_find_sia_issues): 1 state match, 2 fits whole, 3 focused+pointing, 4 first action matched, 5 every line earns its place, 6 absence visible, 7 waiting-on-Aaron true, + measured start cost. Rows 1, 2, 5, 6 are mechanical and computed at every start; 3, 4, 7 stay judged (Atlas reviews add dated rows on the dashboard side). SIA writes the row LOCALLY (a JSONL beside the store, like recall-trigger-pending.jsonl): no network code in SIA (public repo, standalone). Transport to the dashboard is clark-ops (ondeck-sync.mjs already reads local files and POSTs /api/ondeck/<project>); the panel is Prism's (agent-dashboard). Depends on T-298 (1) for the handoff-lag number. Brief: docs/loops/t298-t299-greeting-truth-brief.md.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-300",
+      "title": "The coordinator seat gets no SIA greeting: clark's /start runs on a hand-kept handoff file with no render, cap or currency check",
       "priority": "P2",
       "status": "open",
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "s173 (Atlas), from reviewing Maker's S67 /start greeting (Aaron's request, verified in maker transcript a65a9321). Makerspace planner tree, record rev 508. Each observed:\n(1) HANDOFF LAG: the planner handoff was written at rev 506 ('S66 roll handoff'); revs 507-508 landed after (site-analytics skill written; staging PASS + prod-release brief). PICK UP and WAITING ON AARON were stale (an answered question still listed), and only Maker's manual git-log cross-check caught it. handoffs[] carry no revision stamp, so the briefing cannot say 'handoff from rev 506, record at rev 508'. Stamp the rev on set_handoff; print the lag when > 0.\n(2) LATEST BRIEF SILENT: latest-brief.ts looks only in docs/loops/ and docs/loop-*.md and returns null otherwise, so the line is omitted. Makerspace keeps briefs in .agents/plans/ (prod-release-1016b.md, b1af65d). 'None found' and 'did not look there' read the same. Print 'Latest brief: none under <dirs>' and let a project name its brief dir (greeting.json).\n(3) DIVERGENCE BANNER: tree-currency compares with the default branch (D-062). Makerspace's record lives on docs/t001-plans (693 ahead / 298 behind origin/main, never merged), so 'THIS TREE HAS DIVERGED' fires every start and is read past; origin/main's state.json is far behind, so a main-checkout session would brief from an old record. Let a project name its record branch and compare with that. Question to clark/Maker whether the docs branch should merge.\n(4) USAGE NOISE: 'Usage: not checked (... no usageLevel ...)' prints every start; slots.json now has usageLevelRemoved (D-145 restrictions off) but AGENT.local.md still names usage_file. Omit the line when nothing is configured or the key is retired.\nRelates T-296 (greeting focus), T-277 (brief locations), T-200/D-062 (record source).",
+      "note": "s173, from reviewing clark's /start (2977a6e5, Aaron's request 17:36Z 10-16). ~/Worktrees has no .agents, so /start runs Part B and clark-ops/reference/start.md: clark-start.sh saves a 'newest block' of the hand-kept handoff that had grown to 534 lines / 90.8 KB (23 sections each labelled newest); start.md says read all of it; clark read 110 lines (chunked), printed no greeting, and went straight to work. Scorecard: state match unclear, fits NO, pointing NO. SIA owns the briefing for every other seat (ob_start, T-233 render, caps, tree currency), but none of it reaches the coordinator. Options to weigh: give ~/Worktrees (or a clark checkout) a record and an ob_start briefing; or an SIA 'coordinator' render over the planners' records plus clark's own small handoff. Not a clark-ops prompt fix (deterministic first).",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
