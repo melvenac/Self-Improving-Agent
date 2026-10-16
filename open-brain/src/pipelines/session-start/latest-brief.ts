@@ -7,7 +7,7 @@ import { join } from "node:path";
  *
  * /start used to say "the largest loop number", which fits `loop-N-brief.md` and nothing named for a
  * task (`t201-brief.md`, `qa-233-*`); one session picked a 2026-09-20 report that way. A brief is a
- * file under docs/loops whose basename ends in `brief.md`, `rebrief.md` or an `-amendment-N` of either (T-233 C). The date is the file's latest
+ * file under docs/loops whose basename ends in `brief.md`, `rebrief.md`, `-task.md` (T-296) or an `-amendment-N` of any of them (T-233 C). The date is the file's latest
  * commit, never its mtime: a checkout, a touch or an uncommitted edit changes mtime and says nothing
  * about when the brief was written.
  *
@@ -86,8 +86,9 @@ export function describeLatestBrief(projectRoot: string): string | null {
  * A brief is `loop-N-brief`, `*-grok-brief`, `tN-*-brief`, `*-rebrief-amendment-N` or `*-brief-amendment-N`. T-233 C: the
  * old test was a substring (`includes("brief")`), so a `-draft`, a research note or a handoff whose name happened to
  * contain the word could be named the latest brief.
+ * T-296: `*-task` counts too (A2A's `l69-build-task.md`, SIA's `t262-fix-1-task.md`), so a task-named brief is not passed over for an older `-brief`.
  */
-export const BRIEF_NAME = /(^|-)(re)?brief(-amendment-\d+)?\.md$/;
+export const BRIEF_NAME = /(^|-)((re)?brief|task)(-amendment-\d+)?\.md$/;
 
 export function isBrief(path: string): boolean {
   const base = path.split("/").pop() ?? "";
