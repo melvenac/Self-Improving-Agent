@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "revision": 510,
+  "revision": 511,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-16 06:05Z (Aaron at clark's roll, typed, verified in clark's transcript): the planner pause is LIFTED, dev resumes on all 4 projects; his focus stays on Makerspace and the A2A hub. The QA PC is back on (s172 ran two one-offs there); the 10-13 max-parallel window ended at that week's reset. Code merges still need Aaron's word. Pending Aaron: #794 merge + PostToolUseFailure registration; T-194 approval mechanics (a)/(b)/(c) (planner recommends (c) now, (b) later).",
+    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).",
     "since_session": 173
   },
   "tasks": [
@@ -6181,6 +6181,64 @@
       "session_uuid": "990a713e-014b-49ab-804b-0b7c1288fbb2",
       "checkout": "sia-planner",
       "first_rev": 494
+    },
+    {
+      "seat": "planner",
+      "pick_up": "S173 (10-16): T-296 closed; G-060 closed (#803, recall trigger on PowerShell); #794 merged. Aaron's scorecard for /start greetings (memory feedback_transcript_reviews_find_sia_issues): 7 questions + start cost. T-298-S1 (#822) MERGED + rebuilt 795b3e60: brief_dir, 'Latest brief: none (looked in ...)', handoff lag note (read side), opt-in greeting-metrics.jsonl (SIA, Maker, Courier, Relay, Prism opted in; first live row written 20:42Z). T-298-S2 PR #825 (set_handoff stamps written_rev; anchored alarms) ACCEPTED at 5f3b0d3b; QA PC SIA rebuilt to 75ec2ebe (read-back PASS on a stamped record); clark merges #825 once maker + courier /mcp reconnect, then sia-rebuild. After that: one live set_handoff, then the greeting shows 'state rev N (handoff +L)'. Next: T-300 options (coordinator greeting); T-297 importer gaps; T-298 items (3) record branch and (4) usage noise.",
+      "watch_out": [
+        "T-298-S2 must NOT merge before every process reading a stamped record is >= 795b3e60 (strictObject refuses unknown keys): QA PC done; maker and courier reconnects pending.",
+        "The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.",
+        "SIA is a PUBLIC repo: never commit or post live MATCH key text.",
+        "Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC (two SIMs this session each corrected a brief)."
+      ],
+      "open_questions": [
+        {
+          "owner": "aaron",
+          "text": "t170ii-keys.json (49 live MATCH keys): may it go to the QA PC, or does the real-key over-fire run stay on the desktop?"
+        },
+        {
+          "owner": "aaron",
+          "text": "T-295: which open-brain MCP tools to cut or move to the CLI?"
+        },
+        {
+          "owner": "aaron",
+          "text": "T-261: raise the core/memory package split from P3?"
+        },
+        {
+          "owner": "aaron",
+          "text": "Auto-reconnect for the open-brain MCP server: build it? (today every rebuild needs a /mcp reconnect in each seat window)"
+        },
+        {
+          "resolved_by": "merged s173 (G-059 closed); PowerShell via #803",
+          "text": "#794 merge + PostToolUseFailure registration"
+        }
+      ],
+      "session": 173,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#825",
+            "qa_status": "accepted",
+            "note": "T-298-S2 at 5f3b0d3b; QA PC rebuilt; merge waits on maker + courier reconnects"
+          }
+        ],
+        "frozen_sha": null,
+        "questions_for_aaron": [
+          "t170ii-keys run host",
+          "T-295 tool cuts",
+          "T-261 priority",
+          "open-brain auto-reconnect"
+        ],
+        "rulings": [
+          "T-298-S1 ACCEPT at 597b64c9 (merged 795b3e60)",
+          "T-298-S1 amendment 1: budget stays 4400; note shortened",
+          "T-298-S2 ACCEPT at 5f3b0d3b",
+          "Courier greeting.json: the four Maker flags + greeting_metrics"
+        ]
+      },
+      "session_uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
+      "checkout": "sia-planner",
+      "first_rev": 499
     }
   ],
   "sessions": [
