@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 502 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 503 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-16 06:05Z (Aaron at clark's roll, typed, verified in clark's transcript): the planner pause is LIFTED, dev resumes on all 4 projects; his focus stays on Makerspace and the A2A hub. The QA PC is back on (s172 ran two one-offs there); the 10-13 max-parallel window ended at that week's reset. Code merges still need Aaron's word. Pending Aaron: #794 merge + PostToolUseFailure registration; T-194 approval mechanics (a)/(b)/(c) (planner recommends (c) now, (b) later).
 
 ## What's working
@@ -160,6 +160,7 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - Gap G-057: The 'model from store.db' instruction in every Cursor dispatch reports the chat's stored model, not the model the run used. Forge reported grok-4.7-high for #437 r3 while its waker had launched that exact resume with --model composer-2.5.
 - Gap G-058: A hub restart or burst knocks every QA PC waker out: since T-110 all wakers on one host share one per-source /health window, a 429 is read as authMode=warn, and the waker exits fail closed. Seen twice in s162 (03:52Z, and 06:11Z after the v1.19.0 swap).
 - Gap G-060: The recall trigger never sees a PowerShell tool call. It handles tool_name Bash (Claude Code) and Shell (Cursor) only, and is registered with matcher Bash, so command keys, error keys and the element path skip every PowerShell call.
+- Gap G-061: Cursor: the recall trigger is blind to a FAILING Shell call, the G-059 pattern again. cursor-agent fires postToolUseFailure (and afterShellExecution), and no postToolUse, when a Shell command exits non-zero; and the trigger's current answer on that event (hookEventName 'PostToolUse') does not reach the model.
 
 ## What's next
 
