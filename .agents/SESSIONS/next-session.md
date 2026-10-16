@@ -1,44 +1,48 @@
-<!-- generated from .agents/state.json rev 495 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 498 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 171)_
+## planner [sia-planner] _(written session 172)_
 
 ### Pick up here
 
-MORNING PAUSE: D-158 + D-159. When clark relays that Aaron is back at the desktop, SIA stops dev launches until the Makerspace cutover is done (records-only PRs stay fine). Until then the normal rules apply. Session 171 (planner Atlas) closed at master 66801f6e, with the main tree serving a346e5b1. Shipped: T-293 (da1b0ef7, live 9/9); T-170 part (i), keyed lessons injected once per session (624d5758, live 6/6, now 41 keys); T-168R, suite seat from the checkout or refuse naming --seat (0d5cab20, live 4/4); T-294, the snippet prints its own build and the D-157 matcher, plus T-170 follow-ups 1-3 (a346e5b1, live 5/5); the T-194 file guard registered (D-157) and live-checked. Decided D-155..D-159; V-080 (entry 685 forgotten). /end done: lessons 721-723 stored, the skills audit clean, ob_end ran. Nothing SIA is running. PARKED (until after the cutover): T-295 tool audit (Aaron's cut list owed); T-261 core/memory split (P3 unless 'T-261 up'); the T-168 Cursor-half rerun, which WAITS ON clark's seat-launcher fix (seat-oneoff.ps1 passes the prompt inline with no cap; amendment docs/loops/t168-cursor-half-amendment-1.md is ready, base must contain 0d5cab20); T-170 (ii) path and error keys, the hand-keying, and the latency check; the open-brain auto-reconnect idea (planner advice: a STALE warning on build-info change first, a respawning stdio proxy only if needed), which waits on Aaron's go.
+OVERNIGHT 10-15 (Aaron asleep; clark asked the planners for downstream work, no questions to Aaron). Session 172 (planner Atlas) ran two QA PC one-offs through clark: (1) T-170-II research (docs/loops/t170-ii/research-reply.md), ACCEPTED: a failing Bash fires PostToolUseFailure, not PostToolUse, so the recall trigger is blind to failing commands (G-059, confirmed in production on the desktop) and to PowerShell (G-060); hook latency measured (~60 ms not-asked, ~170 ms asked); the path/error-key design is ruled in T-170's note. (2) T-170-II-S1 READY: PR #794 at b7eb1dc3, CI pass, NOT merged. Its live step showed the code half is REQUIRED (base build: injection recorded, never delivered). MORNING, after the cutover pause rules (D-158/D-159: the pause starts on Aaron's word; #794 is a code merge, so it is Aaron's call whether it lands before or after the cutover): merge #794 on Aaron's word (refresh the head first) -> clark rebuilds main -> add PostToolUseFailure/Bash to ~/.claude/settings.json -> one live check, then close G-059. Then the real-key over-fire run: t170ii-keys.json (desktop %TEMP%, 49 path/error MATCH lines from a read-only live-DB export; clark's classifier refused moving it to the QA PC) and t170ii-overfire.mjs (desktop %TEMP%, sha256 478248a3...5e2e verified, the QA PC original) wait on Aaron's ruling on where it runs. Still PARKED from s171: T-295, T-261, the T-168 Cursor half (behind clark's seat-oneoff fix), T-170 hand-keying, auto-reconnect. Also T-235: the QA PC ~/.cursor/hooks.json, like the desktop's, has sessionStart only (setup.mjs:230 would add postToolUse; it was never re-run after P2-5).
 
 ### Watch out
 
-- The planner checkout has the T-194 FILE guard (PreToolUse Edit|Write|NotebookEdit -> the main build's cli-planner-hook.js). A NEW planner session cannot Edit/Write src, tests, state.json or the rendered views. Briefs in docs/, CLAUDE.md and files outside the repo are fine. Bash is not guarded.
+- Register PostToolUseFailure ONLY with #794's code in the build. The base build answers hookEventName PostToolUse, which Claude Code drops on a failure event, while trigger_fires still records 'injected': a silent census lie.
+- The planner checkout has the T-194 FILE guard (PreToolUse Edit|Write|NotebookEdit -> the main build's cli-planner-hook.js). A new planner session cannot Edit/Write src, tests, state.json or the rendered views; docs/ and files outside the repo are fine.
 - Since T-168R, every one-off clone that runs test:heavy must pass --seat <hub name> or set SUITE_SEAT, or it refuses with exit 2.
-- The user-level ~/.claude/commands/end.md and ~/.cursor/commands/end.md still say 'Nothing reads MATCH: yet'. Clark should recopy them from the repo after #769 (the repo copies were updated).
-- Two briefs lost a round each on s171 to unlisted existing tests: grep the token inside an argv (entry 721), and grep a registry's own name when adding to it (entry 722).
-- Live-check scripts live in ~/Worktrees/s171-livechecks/ (outside the repo). The directory vanished once in s171; t293/t170/t168r/t194/t294 are there now.
+- SIA is a PUBLIC repo. The live store's MATCH keys name client domains and private paths: never commit or post key text (the t170ii-keys.json export stays off-repo).
+- Files copied from the QA PC to the desktop as text can lose characters (the research reply's `…` became `.`). Copy byte-for-byte and compare sha256 when a file will be run.
+- The user-level ~/.claude/commands/end.md and ~/.cursor/commands/end.md still say 'Nothing reads MATCH: yet'. Clark should recopy them from the repo.
 
 ### Open questions
 
+- #794 (T-170-II-S1, G-059): merge it and register PostToolUseFailure in ~/.claude/settings.json? Before or after the Makerspace cutover?
+- t170ii-keys.json (49 live MATCH keys): may it go to the QA PC, or does the real-key over-fire measurement run on the desktop?
 - T-295: which open-brain MCP tools to cut or move to the CLI
 - T-261: raise the core/memory package split from P3?
 - Auto-reconnect for the open-brain MCP server: build it (STALE warning first)?
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #794 — QA: accepted — T-170-II-S1 (G-059) hook code at b7eb1dc3, CI pass, planner ACCEPT; merge needs Aaron's word; register settings.json only after the rebuild
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- #794 merge + PostToolUseFailure registration
+- t170ii-keys.json transfer or desktop run
 - T-295 tool cuts
 - T-261 priority
 - open-brain auto-reconnect
 
 **Rulings made mid-loop:** 
-- D-155 T-170 A
-- D-156 T-168 R
-- D-157 T-194 F
-- D-158 pause until the Makerspace cutover
-- D-159 the pause starts when Aaron is back at the desktop
+- T-170-II research ACCEPTED (path/error-key design in T-170's note)
+- T-170-II-S1 ACCEPTED at b7eb1dc3
+- G-059 and G-060 opened
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -110,7 +114,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
