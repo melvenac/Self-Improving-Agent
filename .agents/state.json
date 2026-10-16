@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 498,
+  "revision": 499,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-13 (Aaron, clark's window, 08:53 CDT): max parallel until the weekly reset at 00:00: every code-only brief goes to clark as soon as it is pinned; runs end at READY + PR; merges still need Aaron's word. QA PC OFF since ~14:3x CDT 10-13 for a RAM upgrade (Aaron's call, told via Relay for clark; no ETA): code-only runs and Opus reviews go to the desktop and the laptop meanwhile; its wakers restart at v1.22.13 on clark's word (SIA GO given, s170). Pending Aaron: T-194 approval mechanics (a)/(b)/(c); planner recommends (c) now, (b) later.",
-    "since_session": 170
+    "text": "D-145 (Aaron 10-11): SIA loop at normal pace, usage restrictions off; work the backlog by priority (P0 first). 10-16 06:05Z (Aaron at clark's roll, typed, verified in clark's transcript): the planner pause is LIFTED, dev resumes on all 4 projects; his focus stays on Makerspace and the A2A hub. The QA PC is back on (s172 ran two one-offs there); the 10-13 max-parallel window ended at that week's reset. Code merges still need Aaron's word. Pending Aaron: #794 merge + PostToolUseFailure registration; T-194 approval mechanics (a)/(b)/(c) (planner recommends (c) now, (b) later).",
+    "since_session": 173
   },
   "tasks": [
     {
@@ -2368,6 +2368,20 @@
       "note": "Raised by Aaron in the planner session (s171, 2026-10-14): 'auditing all the tools in open brain. I think we only use 2 or 3 of them.' PLANNER MEASUREMENT (read-only parse of every Claude Code transcript on the desktop, subagents included: 787 files, 2026-09-14..2026-10-15, 0 unparseable lines; Cursor seats and QA PC sessions are NOT in it): ob_state 2043 (last 10-15), ob_set_session 192, ob_start 163, ob_store 158, ob_feedback 109 (none since 09-26), ob_recall 73, ob_sync 56, ob_recalled 43, ob_end 21 (October only), ob_store_chunk 10 (none since 09-26), ob_stats 2 (last 09-23), ob_list 1 (last 09-15), ob_forget 0, ob_score 0. Reading: eight are in regular use, but only ob_state, ob_store and ob_recall are chosen by an agent mid-task. ob_set_session, ob_start, ob_recalled and ob_end are called by /start and /end, and ob_sync by /sync. Docs that still name the rare ones: start.md's monthly maintenance names ob_list; sync.md names ob_score ('or ob_sync --score'); end.md and checkpoint.md name ob_store_chunk; CLAUDE.md lists all 14. Planner proposal, NOT ruled: keep the eight; ob_score is a duplicate of ob_sync score:true, so cut it; ob_stats and ob_list go to the CLI and dashboard; ob_feedback is superseded by ob_end's entry_ratings, so verify that and cut it; ob_store_chunk folds into ob_store or stays as /end's long-write-up path; ob_forget is the only delete path (entry 685 waits on it), so keep it or move it to a CLI command with a confirm. Every cut is a server.ts change plus doc and command edits in three copies, so it needs Aaron's ruling.",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-296",
+      "title": "Greeting follow-ups from the 10-16 planner-greeting audit: a stale usage file prints no verdict; Latest brief finds task-named and .agents/plans briefs; the State block stops duplicating the budgeted Briefing",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S173 (Atlas, at Aaron's word 10-16: 'read all the start greetings from all the planners ... Fix what's not right'). Measured on the four planners' newest /start transcripts (10-16 ~06:1xZ), build a346e5b. ob_start returns: SIA 16.5 KB (Briefing 3.2 KB), A2A 46.3 KB (Briefing 7.8 KB; 26 KB of it the two role docs, printed in full because A2A has no greeting.json, so role_docs_by_sha is off), makerspace 14.8 KB (Briefing 5.5 KB), agent-dashboard 13.1 KB (Briefing 4.7 KB). Only SIA opts into T-236 (.agents/SYSTEM/greeting.json); the other three get the uncapped legacy layout (A2A printed all 19 watch-outs). Preview with SIA's flags on scratch clones (no tree touched): A2A Briefing 7.8 KB/57 lines -> 2.3 KB/24; makerspace 5.5 KB/53 -> 3.4 KB/29; dashboard 4.7 KB/49 -> 2.4 KB/25. The opt-in is each repo's own file and its planner's act (sent to Relay, Maker, Prism). THREE CODE DEFECTS REMAIN WITH THE OPT-IN ON, each in every repo's greeting: (1) USAGE: describeUsage prints 'GREEN ... -> dispatches open' from ~/slots.json usageLevel set 10-09 23:16 CDT, 6 days and several resets ago, with only a STALE suffix. A verdict from data older than its own 5h reset is not a verdict: past fiveHourResetsAt, print 'Usage: not checked (usageLevel set <stamp>, before the <reset> reset)' and no consequence. (2) LATEST BRIEF: A2A names its briefs docs/loops/l<N>-build-task.md, so the line reads 'docs/loops/loop-50-brief.md (2026-10-14)' while L69 is in flight, and READS OWED sends Relay to loop 50. Makerspace keeps briefs in .agents/plans/<tag>.md and gets no line. Fix: the brief scan also matches *-task.md under docs/loops and *.md under .agents/plans (by commit date, as T-233), or prints nothing rather than a wrong file; extend T-277's test over all three layouts. (3) DUPLICATION: with briefing_budget on, ob_start still returns the full '## State' block (handoff pick-up, every watch-out, 10 verified claims, 10 gaps, other handoffs) BEFORE the Briefing that re-renders the same record; in SIA that is ~11.4 KB of the 16.5 KB return, entering every session's context. With briefing_budget on, return the Briefing and a one-line pointer (state show --json / state.json paths, which the Briefing's '+N more:' lines already name) instead of the State block; T-197's Cursor/CC parity check must still pass. Size test: ob_start's whole return for each of SIA, A2A, makerspace, agent-dashboard fixtures under 6 KB with the opt-ins on. Code: a brief to a seat via clark; the planner hook keeps it out of this checkout.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
       "closed_rev": null
     }
@@ -5497,66 +5511,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "(1) QA 285 (Jev cal 2 DEV phase, 33 live calls, laptop, DISPATCH d6415f5f) reports to clark: read its report yourself, then freeze the policy from DEV evidence only (a policy file committed on a docs branch, its sha256 in the manifest), write QA 286 for the held-out 34 run once, and score against the four useful criteria in docs/loops/jev-calibration-2-brief.md. (2) Forge #437 r4: confirm its reply in room k571z4gh, give clark dlv 58 for the forge waker restart, then QA 284 = #437 r4 + #472 (infra guard r2 7248d9a3) on Plumb; #425 merges only after a working #437. (3) cursor-infra: give clark dlv 66 once run 66 ends (its #472 reply is in).",
-      "watch_out": [
-        "WAKER RESTARTS (until A2A T-104 and T-113): any hub swap knocks every QA PC waker out (429 on the shared /health window). A restart must use a dlv the planner confirmed from the room (the last atlas turn the seat's latest reply covers), or stale turns replay and seats redo frozen work. Builder dlv 83 is right; infra 66; forge 58 after its reply lands.",
-        "JEV CAL 2: never run a held-out row before the policy is frozen from dev evidence. Inputs are PR 470 head 1e1ca342; requests go out with harness shadow-done --request/--policy/--phase; a label lives only in input metadata, never in the request field. The stacked PRs #463 <- #465 <- #470 are unmerged and touch src, so they need QA and Aaron's word.",
-        "MERGES: P2 lets the planner merge a tests/docs-only PR after QA ACCEPT by path check (post the list and authority on the PR); anything touching src needs Aaron's word. Always: update-branch, CI, first parent = the QA'd head, --remerge-diff with zero conflicts, merge --match-head-commit, read back on origin/master.",
-        "PEERS: Aaron is in the planner window; ask him directly, one question at a time. clark (a fresh session since 05:5xZ) relays D-033/P3 notices and launches QA. Relay is relay-a2a; find peers with ListAgents, because pipe addresses go stale after a restart.",
-        "MODEL REPORTS: a seat's store.db model is chat metadata, not the model the run used; use the waker log's resume line (gap opened this session).",
-        "FUNNEL is ON, standing (03:54Z 10-06, Aaron's word via clark). SIA's HOLD was lifted after T-107 and T-110 gave tailnet callers their own windows. Residual: tcm-local callers share the public bucket."
-      ],
-      "open_questions": [
-        "None blocking. Aaron's word is needed to merge #437 r4 and #425 after QA 284, and the Jev stacked PRs after their QA."
-      ],
-      "session": 162,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#437",
-            "qa_status": "rejected",
-            "note": "T-235 P2-7 r3 8e751360 rejected by QA 280; r4 in progress by forge (turns 57/58); reserved for QA 284"
-          },
-          {
-            "ref": "#425",
-            "qa_status": "accepted",
-            "note": "T-235 P2-4 1eea3cdb, QA 280 ACCEPT; merges only after a working #437"
-          },
-          {
-            "ref": "#472",
-            "qa_status": "not_started",
-            "note": "HUBROOM-GUARD r2 7248d9a3 (infra), CI green; to QA 284"
-          },
-          {
-            "ref": "#463",
-            "qa_status": "not_started",
-            "note": "Jev cal 2 gate changes (builder), base master"
-          },
-          {
-            "ref": "#465",
-            "qa_status": "not_started",
-            "note": "Jev cal 2 collector a9d7ee42 (Scout), base loop/jev-cal-2"
-          },
-          {
-            "ref": "#470",
-            "qa_status": "in_progress",
-            "note": "Jev cal 2 inputs and runner 1e1ca342 (builder), base loop/jev-cal-2-collector; QA 285 runs from it"
-          }
-        ],
-        "frozen_sha": "1e1ca3423bac37bffb7ab04c24bb51ecf3c8624d",
-        "questions_for_aaron": [],
-        "rulings": [
-          "s162 merged on Aaron's word: #451 27dd1e77, #457 2f8e6489 (no QA; QA 281 retro FINDINGS, fixed by #468), #458 1671d005 (no QA; QA 281 HOLDS), #466 b8ab0f04, #468 5309fc2c; under P2: #445 ecbfb169, #464 52359857; docs-only: #459 #460 #461 #462 #467 #469 #471 #473.",
-          "QA 280 d8cb4652: #425 ACCEPT, #437 r3 REJECT, #445 r3 REJECT. QA 281 ae2baca7: #445 r4 ACCEPT. QA 282 5d0cbbd9: #464 ACCEPT, #466 REJECT. QA 283 29a398b3: #466 r2 ACCEPT, #468 ACCEPT (K1/K2 sent back as #472).",
-          "Hub changes GO'd for SIA: v1.18.0, v1.18.1 (T-107), T-110 SNAT off, Funnel standing, v1.19.0 (T-111, sign-in OFF)."
-        ]
-      },
-      "session_uuid": "b8fa00fd-5821-40b3-b472-eec717bcf49a",
-      "checkout": "sia-planner",
-      "first_rev": 340
-    },
-    {
-      "seat": "planner",
       "pick_up": "(1) After the Claude weekly reset (~00:05 CDT 10-07, a new week ON PACE), write ONE narrow Opus QA dispatch covering #437 r10 (9d197466, CI 37546516861), #472 r5 (1a374101, CI 37501631053) and #484 r9 (edfc964d, CI 37553637298 — read grok-audit's final r9 verdict in room k575fscd first). Re-run only the deciding rows plus Windows rows, read grok-qa-sia's #472 r4 first-pass (FIRST-PASS PASS; one uncaught source mutant: negation widened from clause to sentence) and the grok reviews only AFTER QA reports (D-125). All three change src/: each merge needs Aaron's word. (2) Jev cal 2: QA 287 (0836350f) answered 33/33 with tools fixed but NO separation (BA 0.50, AUC 0.385, everything rejected). Rule round 3 or stop: read grok-research's SIA-R1 answer (room k5779c36, 4 parts) first. QA 286 (held-out) stays held. (3) Commit grok-qa-sia's baseline + flake-hunt + #472 first-pass reports verbatim to a qa/* branch (D-127); they're in room k573rrq0.",
       "watch_out": [
         "USAGE: Aaron's weekly pace rule (usage-winddown-rules.md §4): allowance = elapsed/7d x 95%; AHEAD means dev work to Cursor/Grok and Claude for planning and QA only. Plus §5: roll before an idle gap over 1 h when under 50% context left, and fewer wakes.",
@@ -6116,14 +6070,6 @@
       "first_rev": 263
     },
     {
-      "n": 162,
-      "date": "2026-10-06",
-      "uuid": "b8fa00fd-5821-40b3-b472-eec717bcf49a",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 340
-    },
-    {
       "n": 163,
       "date": "2026-10-07",
       "uuid": "d43a0485-7166-4db2-9ca2-eacde1f63101",
@@ -6202,6 +6148,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 494
+    },
+    {
+      "n": 173,
+      "date": "2026-10-16",
+      "uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 499
     }
   ]
 }
