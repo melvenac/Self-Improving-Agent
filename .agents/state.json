@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 499,
+  "revision": 500,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3896,6 +3896,29 @@
       ],
       "since_session": 171,
       "status": "verified"
+    },
+    {
+      "id": "V-081",
+      "claim": "G-059 is closed in production: a FAILING Bash call now reaches the recall trigger and its injection reaches the model. After #794 (T-170-II-S1) merged at c382f0c9 on Aaron's word, clark rebuilt the main tree and registered PostToolUseFailure/Bash in ~/.claude/settings.json; the running planner session picked it up without a restart. `git archive <no-such-ref>` exited 128 and '[stored knowledge 638 ...]' arrived as PostToolUseFailure:Bash context (row 43598 injected [638]). A repeat match in the same session is silent (row 43597). PowerShell is still blind (G-060).",
+      "evidence": [
+        {
+          "type": "db",
+          "path": "~/.claude/open-brain/knowledge-v2.db trigger_fires",
+          "observation": "session 4a1f437b-3711-4f60-8d0d-4e85764e8bde: row 43597 state=silent query=match:697 06:30:33Z (697 injected 7 s earlier, row 43596); row 43598 state=injected injected_ids [638] 06:30:56Z for the failing git archive"
+        },
+        {
+          "type": "git",
+          "path": "master c382f0c956174409a69e75ed3d689a61857a21ec",
+          "observation": "#794 merge commit; the main tree's open-brain/build/build-info.json commit = c382f0c9 (read 10-16 ~06:30Z)"
+        },
+        {
+          "type": "transcript",
+          "path": "~/.claude/projects/C--Users-melve-Worktrees/cd6c6878-50cf-4e31-80bf-15f33f3b6cba.jsonl",
+          "observation": "Aaron typed, queue-operation 2026-10-16T06:22:23Z: 'merge SIA #794 (T-170-II-S1, the PostToolUseFailure recall trigger), rebuild SIA, then add the PostToolUseFailure (Bash) entry to ~/.claude/settings.json, yes'"
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
     }
   ],
   "gaps": [
@@ -4268,7 +4291,10 @@
       "what": "The recall trigger never runs on a Bash command that exits non-zero. Claude Code fires PostToolUseFailure, not PostToolUse, for a failing tool, and the trigger is registered on PostToolUse/Bash only. Command keys and the element path are therefore blind to every failing command, which is where most mistakes show.",
       "evidence": "T-170-II research (QA PC, base 94a577ba, Opus 5.5): a logging hook on Pre/PostToolUse/PostToolUseFailure saw a failing Bash fire only PostToolUseFailure (top-level `error` = 'Exit code N' + output; no tool_response). Docs: code.claude.com/docs/en/hooks, 'PostToolUse: runs immediately after a tool completes successfully'. PLANNER FIRST-HAND (desktop production, session 990a713e, read-only query of trigger_fires): 30 Bash calls, 29 rows; the one missing is the single call that exited 1 (the first keys.cjs export attempt, ~05:50Z). Registration read in ~/.claude/settings.json:118-124 (PostToolUse, matcher Bash). cli-recall-trigger.ts:226 hard-codes hookEventName 'PostToolUse'.",
       "recommended_update": "FIX READY: PR #794 (b7eb1dc3, CI pass, unmerged; T-170-II-S1). It echoes PostToolUseFailure in hookSpecificOutput.hookEventName and documents the registration. Live step L showed the code half is REQUIRED: with the base build registered on PostToolUseFailure, the injection is recorded in trigger_fires but never reaches the model. Order: merge #794 on Aaron's word, rebuild main, THEN add the PostToolUseFailure/Bash entry to ~/.claude/settings.json, then one live check. Close this gap on that live check.",
-      "opened_session": 172
+      "opened_session": 172,
+      "status": "closed",
+      "closed_session": 173,
+      "closed_rev": 500
     },
     {
       "id": "G-060",
