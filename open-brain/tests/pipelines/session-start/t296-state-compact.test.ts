@@ -143,7 +143,7 @@ describe("T-296-S2: opt-in compact State block (state_compact, default off)", ()
   });
 
   it("C4: the default is unchanged — no compact equals compact: false", () => {
-    const inputs: [State, { seat?: string }][] = [
+    const inputs: [State, { seat?: "developer" }][] = [
       [c1State, {}],
       [many(40, 3), {}],
       [c3State, { seat: "developer" }],

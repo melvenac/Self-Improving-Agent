@@ -252,6 +252,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
       projectRoot,
       ownCheckout,
+      compact: greetingFlag(projectRoot, "state_compact"),
     }));
     // T-233 B: the whole briefing, rendered here, so /start prints it instead of assembling it.
     lines.push("", ...renderBriefing({

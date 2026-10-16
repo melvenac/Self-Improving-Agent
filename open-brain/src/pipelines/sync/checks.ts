@@ -2593,6 +2593,7 @@ export function composeGreeting(projectRoot: string, version: string): ComposedG
   const state = renderState(data, version, {
     seat: seat?.success ? seat.data : null,
     projectRoot,
+    compact: greetingFlag(projectRoot, "state_compact"),
   }).join("\n");
   const roleFiles = roles.files
     .filter((f) => f.content !== null)
