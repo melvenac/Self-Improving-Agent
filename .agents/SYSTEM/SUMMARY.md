@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 511 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 512 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).
 
 ## What's working
@@ -89,6 +89,7 @@
 - G-059 is closed in production: a FAILING Bash call now reaches the recall trigger and its injection reaches the model. After #794 (T-170-II-S1) merged at c382f0c9 on Aaron's word, clark rebuilt the main tree and registered PostToolUseFailure/Bash in ~/.claude/settings.json; the running planner session picked it up without a restart. `git archive <no-such-ref>` exited 128 and '[stored knowledge 638 ...]' arrived as PostToolUseFailure:Bash context (row 43598 injected [638]). A repeat match in the same session is silent (row 43597). PowerShell is still blind (G-060). _(V-081, 3 evidence)_
 - T-296-S2 state_compact is default off in production: the main build at ae16482a renders SIA's State block byte-identical to b55730c7 with no state_compact key, and opting in cuts SIA's State block by 4.6 KB while keeping the reader's own handoff, open PRs, decisions and objective. _(V-082, 3 evidence)_
 - The recall trigger covers Claude Code PowerShell calls on both events (G-060 closed): with #803 merged (master 0dcf8f4c, main rebuilt) and ~/.claude/settings.json matching Bash|PowerShell on PostToolUse and PostToolUseFailure, a matched PowerShell command injects on success AND on failure. _(V-083, 3 evidence)_
+- T-298 steps 1-2 and T-299 step 1 are live on the main build (52e7894b): the greeting prints 'Latest brief: none (looked in ...)' instead of omitting the line, a repo's greeting.json brief_dir is honoured, set_handoff stamps written_rev with the revision it produces, the briefing shows 'state rev N (handoff +L)' when the record moved after the handoff, and opted-in repos append one greeting-metrics.jsonl row per start. _(V-084, 3 evidence)_
 
 ## What's broken
 

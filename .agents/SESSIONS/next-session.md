@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 511 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 512 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,14 +6,14 @@
 
 ### Pick up here
 
-S173 (10-16): T-296 closed; G-060 closed (#803, recall trigger on PowerShell); #794 merged. Aaron's scorecard for /start greetings (memory feedback_transcript_reviews_find_sia_issues): 7 questions + start cost. T-298-S1 (#822) MERGED + rebuilt 795b3e60: brief_dir, 'Latest brief: none (looked in ...)', handoff lag note (read side), opt-in greeting-metrics.jsonl (SIA, Maker, Courier, Relay, Prism opted in; first live row written 20:42Z). T-298-S2 PR #825 (set_handoff stamps written_rev; anchored alarms) ACCEPTED at 5f3b0d3b; QA PC SIA rebuilt to 75ec2ebe (read-back PASS on a stamped record); clark merges #825 once maker + courier /mcp reconnect, then sia-rebuild. After that: one live set_handoff, then the greeting shows 'state rev N (handoff +L)'. Next: T-300 options (coordinator greeting); T-297 importer gaps; T-298 items (3) record branch and (4) usage noise.
+S173 (10-16): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues: 7 questions + start cost). DONE this session: T-296; G-060 (#803); #794; T-298 items (1)(2) via #822 + #825 (brief_dir, 'Latest brief: none (looked in ...)', set_handoff stamps written_rev, 'state rev N (handoff +L)', anchored alarms); T-299 step 1 (greeting-metrics.jsonl, opted in by SIA/Maker/Courier/Relay/Prism; first live row 20:42Z). V-084. Stamping on live records starts at each seat's next /mcp reconnect or new session (seat MCP processes run 795b3e60, which reads but does not stamp). Next: T-300 options (coordinator greeting: clark's 91 KB hand-kept handoff); T-297 importer gaps (from the tarrantmailer migration); T-298 (3) record branch, (4) usage-line noise. Prism builds the scorecard panel after a day of rows; clark-ops owns the transport.
 
 ### Watch out
 
-- T-298-S2 must NOT merge before every process reading a stamped record is >= 795b3e60 (strictObject refuses unknown keys): QA PC done; maker and courier reconnects pending.
 - The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.
 - SIA is a PUBLIC repo: never commit or post live MATCH key text.
 - Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC (two SIMs this session each corrected a brief).
+- A schema field addition is two-step (readers, then writers): strictObject refuses unknown keys, and stale MCP processes and the QA PC build lag the main build.
 
 ### Open questions
 
@@ -25,8 +25,7 @@ S173 (10-16): T-296 closed; G-060 closed (#803, recall trigger on PowerShell); #
 
 ### Loop state
 
-**Open PRs:** 
-- #825 — QA: accepted — T-298-S2 at 5f3b0d3b; QA PC rebuilt; merge waits on maker + courier reconnects
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
@@ -39,7 +38,7 @@ S173 (10-16): T-296 closed; G-060 closed (#803, recall trigger on PowerShell); #
 **Rulings made mid-loop:** 
 - T-298-S1 ACCEPT at 597b64c9 (merged 795b3e60)
 - T-298-S1 amendment 1: budget stays 4400; note shortened
-- T-298-S2 ACCEPT at 5f3b0d3b
+- T-298-S2 ACCEPT at 5f3b0d3b (merged 52e7894b)
 - Courier greeting.json: the four Maker flags + greeting_metrics
 
 ## developer [sia-builder] _(written session 156)_
