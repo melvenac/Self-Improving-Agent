@@ -75,14 +75,15 @@ Register it in your Claude Code MCP settings (`~/.claude/.mcp.json` or `~/.claud
 }
 ```
 
-**2. Register the hooks** in `~/.claude/settings.json`. `node scripts/setup.mjs` registers `SessionStart` and `SessionEnd` for you (from the checkout you run it in; it replaces a registration of the same script from another checkout). `PostToolUse`, the recall trigger, is not registered by `setup.mjs`; add it by hand:
+**2. Register the hooks** in `~/.claude/settings.json`. `node scripts/setup.mjs` registers `SessionStart` and `SessionEnd` for you (from the checkout you run it in; it replaces a registration of the same script from another checkout). `PostToolUse` and `PostToolUseFailure`, the recall trigger, are not registered by `setup.mjs`; add them by hand:
 
 ```jsonc
 {
   "hooks": {
     "SessionStart": [{ "matcher": "", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-bootstrap.js\"" }] }],
     "SessionEnd":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-session-end.js\"" }] }],
-    "PostToolUse":  [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-recall-trigger.js\"", "timeout": 10 }] }]
+    "PostToolUse":  [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-recall-trigger.js\"", "timeout": 10 }] }],
+    "PostToolUseFailure": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "node \"/abs/path/to/open-brain/build/cli-recall-trigger.js\"", "timeout": 10 }] }]
   }
 }
 ```
@@ -90,6 +91,7 @@ Register it in your Claude Code MCP settings (`~/.claude/.mcp.json` or `~/.claud
 Three things about the trigger's registration that are not obvious:
 
 - **`PostToolUse`, not `PreToolUse`, and the choice is load-bearing.** Both accept `hookSpecificOutput.additionalContext`. On `PreToolUse` exit 2 blocks the tool call; on `PostToolUse` nothing can. The trigger must never block, and on this event that is structural rather than a promise the code keeps.
+- **`PostToolUseFailure` as well (G-059).** A Bash call that exits non-zero fires `PostToolUseFailure` and no `PostToolUse`, so without this entry the trigger never sees a failing command. It cannot block either: the tool has already failed.
 - **`timeout` is the host's bound; `deadline_ms` in the policy is the trigger's own.** The host's `timeout` bounds how long the process may run. `deadline_ms` decides whether a result that came back late may still be emitted. Set `timeout` comfortably above `deadline_ms`.
 - **It runs the build it is registered against.** The path is absolute, so a stale checkout serves a stale trigger (`G-030`, `G-034`; `T-154`).
 

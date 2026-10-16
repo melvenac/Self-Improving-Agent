@@ -84,6 +84,15 @@ export function shellCommandFromHookPayload(payload: Record<string, unknown>): s
 }
 
 /**
+ * The event name to answer with (G-059). Claude Code fires PostToolUseFailure, not PostToolUse, for a Bash call
+ * that exits non-zero; the answer names the event it was called on. Anything else, including Cursor's
+ * `postToolUse`, keeps the PostToolUse answer it has always had.
+ */
+export function outputHookEventName(payload: Record<string, unknown>): "PostToolUse" | "PostToolUseFailure" {
+  return payload.hook_event_name === "PostToolUseFailure" ? "PostToolUseFailure" : "PostToolUse";
+}
+
+/**
  * The only thing this process ever says about a failure.
  *
  * Best-effort by design: if the log itself cannot be written there is nowhere
@@ -223,7 +232,7 @@ async function main(): Promise<void> {
     process.stdout.write(
       `${JSON.stringify({
         hookSpecificOutput: {
-          hookEventName: "PostToolUse",
+          hookEventName: outputHookEventName(payload),
           additionalContext: outcome.additionalContext,
         },
       })}\n`,
