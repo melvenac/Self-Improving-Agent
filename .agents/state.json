@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 507,
+  "revision": 508,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2385,6 +2385,20 @@
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
       "closed_rev": 504
+    },
+    {
+      "id": "T-297",
+      "title": "PRE-STATE import loses content a live project carries: dated-heading decisions, free-form handoff sections, scaffold's gitignore; plus CRLF command copy and view-header version",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s173 (Atlas), from reviewing clark's tarrantmailer migration (clark 2977a6e5, 18:36-18:45Z 2026-10-16; review in Atlas scratchpad tarrantmailer-migration-review.md). Repo melvenac/co-op-mailer at feafbda. Each item observed, not inferred:\n(1) DECISIONS: 0 of 98 imported. The file uses `## YYYY-MM-DD — title` headings; the importer reads only ADR `Date:` lines, and the report says 'imported as a dated log' while importing none. ob_start then shows Decisions: 0.\n(2) HANDOFF: next-session.md sections 'Start here', 'Waiting on Aaron', 'Not built, and why', 'The one thing to fix first', 'Housekeeping' are not imported, then the view is re-rendered EMPTY (0 pick-up/watch-out/questions). The content survives only in the snapshot, so the live view erases it. At least 'Waiting on Aaron' maps to open_questions.\n(3) GITIGNORE: the import path skips scaffold's gitignore merge, so the project keeps no .agents allowlist: the pre-state-migration snapshot is committed (incl. a copy of a gitignored reflection-queue.json), session logs stay tracked, and AGENT.local.md is not ignored (a seat's name can be committed and rename the main checkout). Makerspace has the same gap.\n(4) AGENT.md: an old `role: implementation` is kept; the import ASSUMES developer and the handoff renders `developer [legacy]`. Nothing flags a non-seat role or a stale partner/mailbox_channel.\n(5) LAST SESSION: dated the migration day (2026-10-16) though Session_3.md is 2026-09-04.\n(6) CRLF: install-commands copies working-tree bytes; in the SIA main checkout .claude/commands/sync.md and project-template/.claude/commands/sync.md are i/lf w/crlf, so the target gets a CRLF working copy (blob LF). Copy from the git blob, or renormalize those two files.\n(7) VIEW HEADER: 'generated ... by open-brain vX' prints the PROJECT's package.json version (tarrantmailer v0.11.0, Makerspace v0.7.2), not open-brain's.\nLesson 648 already covers objective/task.md heading and project.name; not repeated here. Relates T-241 (Frogger re-run).",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
