@@ -28,6 +28,12 @@ export interface RenderStateOptions {
    * and a legacy entry (null checkout) is listed as `[legacy, unattributed]`. Absent: the role's newest, as before.
    */
   ownCheckout?: string;
+  /**
+   * T-296 (3), OPT-IN per repo (greeting.json `state_compact`), default OFF. Set: Verified prints only reopened claims
+   * plus one count line, Gaps prints one count line, and other seats' handoffs are one line in all. The reader's own
+   * handoff, the tasks, the objective and the decisions line are unchanged. The full text stays in state.json.
+   */
+  compact?: boolean;
 }
 
 export function renderState(state: State, version?: string, options: RenderStateOptions = {}): string[] {
@@ -61,18 +67,30 @@ export function renderState(state: State, version?: string, options: RenderState
   if (active.length === 0) lines.push(`  (none)`);
 
   lines.push(`\nVerified (${state.verified.length}):`);
-  // Verified is append-ordered like decisions, so the newest are the last
-  // VERIFIED_SHOWN. A reopened claim is shown whatever its age: it is a warning,
-  // not history. What is left out is counted and named, never dropped silently.
-  const newest = new Set(state.verified.slice(-VERIFIED_SHOWN));
-  const shown = state.verified.filter((v) => newest.has(v) || v.status === "reopened");
-  for (const v of shown) {
-    const flag = v.status === "reopened" ? " [REOPENED]" : "";
-    lines.push(`  ${v.id} — ${clip(v.claim, VERIFIED_CLIP, `verified[${v.id}]`)} (${v.evidence.length} evidence)${flag}`);
-  }
-  const omitted = state.verified.length - shown.length;
-  if (omitted > 0) {
-    lines.push(`  … ${omitted} older verified claim(s) not shown (${state.verified.length} total); all of them: ${VERIFIED_FULL_TEXT}`);
+  if (options.compact === true) {
+    // T-296 (3): only reopened claims (a warning, whatever the age), then one line for the rest.
+    const reopened = state.verified.filter((v) => v.status === "reopened");
+    for (const v of reopened) {
+      lines.push(`  ${v.id} — ${clip(v.claim, VERIFIED_CLIP, `verified[${v.id}]`)} (${v.evidence.length} evidence) [REOPENED]`);
+    }
+    const rest = state.verified.length - reopened.length;
+    if (rest > 0) {
+      lines.push(`  … ${rest} claim(s) not shown (newest ${state.verified[state.verified.length - 1]!.id}); all of them: ${VERIFIED_FULL_TEXT}`);
+    }
+  } else {
+    // Verified is append-ordered like decisions, so the newest are the last
+    // VERIFIED_SHOWN. A reopened claim is shown whatever its age: it is a warning,
+    // not history. What is left out is counted and named, never dropped silently.
+    const newest = new Set(state.verified.slice(-VERIFIED_SHOWN));
+    const shown = state.verified.filter((v) => newest.has(v) || v.status === "reopened");
+    for (const v of shown) {
+      const flag = v.status === "reopened" ? " [REOPENED]" : "";
+      lines.push(`  ${v.id} — ${clip(v.claim, VERIFIED_CLIP, `verified[${v.id}]`)} (${v.evidence.length} evidence)${flag}`);
+    }
+    const omitted = state.verified.length - shown.length;
+    if (omitted > 0) {
+      lines.push(`  … ${omitted} older verified claim(s) not shown (${state.verified.length} total); all of them: ${VERIFIED_FULL_TEXT}`);
+    }
   }
   if (state.verified.length === 0) lines.push(`  (none)`);
 
@@ -80,13 +98,18 @@ export function renderState(state: State, version?: string, options: RenderState
   // reader and hid the newest at 40 open gaps. Sorted on a copy; the record's order is untouched.
   const openGaps = state.gaps.filter(isOpenGap).sort(newestGapFirst);
   lines.push(`\nGaps (${openGaps.length}):`);
-  // D-100: only the newest GAPS_SHOWN are printed. The count line is computed from the record's gaps, never
-  // from what was printed, so the cap cannot make it understate (a mutant that counts lines goes red).
-  for (const g of openGaps.slice(0, GAPS_SHOWN)) {
-    lines.push(`  ${g.id} — ${clip(g.what, GAP_CLIP, `gaps[${g.id}]`)} (opened session ${g.opened_session})`);
-  }
-  if (openGaps.length > GAPS_SHOWN) {
-    lines.push(`  … and ${openGaps.length - GAPS_SHOWN} older open gaps (${openGaps.length} open in all): state.json gaps[]`);
+  if (options.compact === true) {
+    // T-296 (3): one line; the budgeted Briefing already prints the count and the newest id.
+    if (openGaps.length > 0) lines.push(`  newest ${openGaps[0]!.id}; all ${openGaps.length} open: state.json gaps[]`);
+  } else {
+    // D-100: only the newest GAPS_SHOWN are printed. The count line is computed from the record's gaps, never
+    // from what was printed, so the cap cannot make it understate (a mutant that counts lines goes red).
+    for (const g of openGaps.slice(0, GAPS_SHOWN)) {
+      lines.push(`  ${g.id} — ${clip(g.what, GAP_CLIP, `gaps[${g.id}]`)} (opened session ${g.opened_session})`);
+    }
+    if (openGaps.length > GAPS_SHOWN) {
+      lines.push(`  … and ${openGaps.length - GAPS_SHOWN} older open gaps (${openGaps.length} open in all): state.json gaps[]`);
+    }
   }
   if (openGaps.length === 0) lines.push(`  (none)`);
 
@@ -226,10 +249,14 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
 
   const others = visible.filter((h) => h !== own);
   if (others.length > 0) {
-    lines.push(`\nOther handoffs (newest per seat and checkout; named, not rendered — read one by its commit):`);
-    for (const h of others) {
-      lines.push(`  ${h.seat}${instanceLabel(h, byCheckout)} (session ${h.session}): ${describeProvenance(h, options)}`);
-      lines.push(`    ${firstLine(h.pick_up)}`);
+    if (options.compact === true) {
+      lines.push(`\nOther handoffs (${others.length}): ${others.map((h) => `${h.seat}${instanceLabel(h, byCheckout)} (session ${h.session})`).join(" · ")}: state.json handoffs[]`);
+    } else {
+      lines.push(`\nOther handoffs (newest per seat and checkout; named, not rendered — read one by its commit):`);
+      for (const h of others) {
+        lines.push(`  ${h.seat}${instanceLabel(h, byCheckout)} (session ${h.session}): ${describeProvenance(h, options)}`);
+        lines.push(`    ${firstLine(h.pick_up)}`);
+      }
     }
   }
   if (hidden > 0) lines.push(`  (${hidden} older handoff(s) superseded within their seat and checkout are in the record, not shown)`);
