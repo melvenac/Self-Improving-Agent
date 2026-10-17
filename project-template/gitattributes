@@ -8,3 +8,5 @@
 # views churn, and SUMMARY.md's rendered region ends up LF inside a CRLF file.
 # `eol=lf` makes the checkout LF whatever the local git config says.
 /.agents/** text eol=lf
+# The session commands are copied from SIA's template; keep them LF too, so a Windows checkout does not rewrite them.
+/.claude/commands/*.md text eol=lf

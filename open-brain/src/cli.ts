@@ -793,6 +793,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     console.log(`Rendered: ${r.rendered.join(", ")}`);
     console.log(`Moved into snapshot: ${r.moved.join(", ")}`);
     console.log(`Role files: installed ${r.role_stubs.installed.length ? r.role_stubs.installed.join(", ") : "none"} · kept ${r.role_stubs.kept.length ? r.role_stubs.kept.join(", ") : "none"}${r.role_stubs.missing.length ? ` · missing in template: ${r.role_stubs.missing.join(", ")}` : ""}`);
+    console.log(`Git files: ${r.merged_files.written.length ? r.merged_files.written.join(", ") : "none changed"}${r.merged_files.skipped.length ? ` · unchanged: ${r.merged_files.skipped.join("; ")}` : ""}. Commit them with the record.`);
   } catch (err) {
     console.error(`state import refused: ${err instanceof Error ? err.message : String(err)}`);
     process.exit(1);
