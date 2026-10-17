@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 518 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 519 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -45,6 +45,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-284** A commit-msg hook appends the Claude-Session trailer from the session's own id, so attribution never depends on the agent writing it
 - [ ] **T-292** CI test job failed on a vitest-worker 'Timeout calling onTaskUpdate' after every test passed
 - [ ] **T-301** A test:heavy dry run prints only the seat line: owner, lease and census reach only suite-run-meta.json
+- [ ] **T-303** Record write model: weigh an append-only ops log (Scion lessons) against today's single state.json, on measured collision data
 
 ## Done (last 3 sessions)
 
