@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 516,
+  "revision": 518,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2464,7 +2464,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "s173, from Maker's S68 /start (ff642601, 03:01:33Z 10-17). Makerspace #129-#132 merged 02:57:55-02:58:14Z (heads 429d521e, 033afb5e, e3086cac, 6a0daf85), yet PICK UP said 'FOUR PRs READY ... waiting on Aaron's ONE merge word' and WAITING ON AARON asked to merge them: scorecard rows 1 and 7 FAIL. The fact was on disk: the seat's fetch (03:01:31Z) postdated the merges and all four heads are ancestors of origin/main (4389a55). Fix (deterministic, no schema change): at start, for each 7-40 hex SHA in the own handoff (pick_up, open_questions, loop_state.open_prs notes), run merge-base --is-ancestor against origin/<default>; print one line 'MERGED since this handoff: <sha> ...' (as of the last fetch). A squash merge is not caught (lower bound; say so in the line or the note).",
+      "note": "s173, from Maker's S68 /start (ff642601, 03:01:33Z 10-17). Makerspace #129-#132 merged 02:57:55-02:58:14Z (heads 429d521e, 033afb5e, e3086cac, 6a0daf85), yet PICK UP said 'FOUR PRs READY ... waiting on Aaron's ONE merge word' and WAITING ON AARON asked to merge them: scorecard rows 1 and 7 FAIL. The fact was on disk: the seat's fetch (03:01:31Z) postdated the merges and all four heads are ancestors of origin/main (4389a55). Fix (deterministic, no schema change): at start, for each 7-40 hex SHA in the own handoff (pick_up, open_questions, loop_state.open_prs notes), run merge-base --is-ancestor against origin/<default>; print one line 'MERGED since this handoff: <sha> ...' (as of the last fetch). A squash merge is not caught (lower bound; say so in the line or the note). — s173 SHIPPED via #835 (head cf82c308, merged b73b17a2; brief docs/loops/t302-merged-citations-brief.md; two QA PC SIMs: worst case 31 lines / 4395 chars, m1-m6 red as predicted). Opt-in greeting.json merged_citations; SIA opted in (#836). Live check pending. — s173 live check PASS (V-087). Next: offer the opt-in to Maker, Courier, Relay and Prism.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -4095,6 +4095,19 @@
           "type": "live-check",
           "path": "open-brain/build/cli.js (SIA main 3c83ef4e)",
           "observation": "state import --draft on a scratch copy of tarrantmailer's pre-migration snapshot (co-op-mailer 2865663): Decisions: 98 (0 skipped), D-001 2026-09-02 .. D-098 2026-09-05 (the real migration got 0); last session Session 3 dated 2026-09-04 (was the migration day 2026-10-16); 'Handoff: 6 section(s) NOT imported ((text before the first ## heading: 76 lines); Start here; ...)' and pick_up points to the snapshot; seat line ends 'set role: in .agents/AGENT.md (or AGENT.local.md) to planner, developer or qa'."
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-087",
+      "claim": "T-302 is live on the main build (b73b17a2): with greeting.json merged_citations on, the budgeted briefing's pick-up line ends with 'Already in origin/master (last fetch): <sha8>, ...' for SHAs the reader's own handoff cites that origin/master contains, and the line stays within the pick-up cap.",
+      "evidence": [
+        {
+          "type": "live-check",
+          "path": "open-brain/build/cli.js start (SIA main b73b17a2) on C:/Users/melve/Worktrees/sia-planner at rev 517",
+          "observation": "pick-up line (417 chars) ends 'Already in origin/master (last fetch): cf82c308, b73b17a2' (the handoff cites #835's head and merge); Briefing 30 lines / 3590 chars; exit 0. Side effect: CLI start with no proven session created a local Session_174.md (gitignored), removed."
         }
       ],
       "since_session": 173,
@@ -6261,7 +6274,7 @@
     },
     {
       "seat": "planner",
-      "pick_up": "S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues). DONE: T-296; G-060; #794; T-298 (1)(2) via #822/#825; T-299 step 1 (metrics); T-168 closed (V-085); T-297 step 1 via #831 (V-086: dated decisions, named handoff gaps, last-session date, seat hint). Maker S68 review -> T-302 (P1: greeting shows PRs as waiting after they merged; check handoff SHAs against origin) + T-298 items 5-6. T-300 option A (clark gets its own SIA record in ~/Projects/fleet) queued by clark for Aaron. Next: T-302 brief (P1); T-297 step 2 (gitignore + CRLF), step 3 (view header); T-298 (3)-(6).",
+      "pick_up": "S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues). DONE: T-296; G-060; #794; T-298 (1)(2); T-299 step 1 (metrics); T-168 closed (V-085); T-297 step 1 via #831 (V-086); T-302 via #835 (head cf82c308, merged b73b17a2): the greeting names SHAs this handoff cites that origin/master already contains (opt-in merged_citations; SIA opted in #836). Maker S68 review -> T-302 + T-298 items 5-6. T-300 option A (clark gets its own SIA record in ~/Projects/fleet) queued by clark for Aaron. Next: T-302 live check + opt-in offer to Maker/Courier/Relay/Prism; T-297 step 2 (gitignore + CRLF), step 3 (view header); T-298 (3)-(6).",
       "watch_out": [
         "The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.",
         "SIA is a PUBLIC repo: never commit or post live MATCH key text.",
@@ -6303,14 +6316,14 @@
           "T-300 option A"
         ],
         "rulings": [
-          "T168-CURSOR PASS: T-168 closed, V-085",
-          "T-297-S1 ACCEPT at 4016162c (merged 3c83ef4e), V-086"
+          "T-297-S1 ACCEPT at 4016162c (merged 3c83ef4e), V-086",
+          "T-302 ACCEPT at cf82c308 (merged b73b17a2)"
         ]
       },
       "session_uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
       "checkout": "sia-planner",
       "first_rev": 499,
-      "written_rev": 516
+      "written_rev": 517
     }
   ],
   "sessions": [

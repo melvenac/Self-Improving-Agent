@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 516 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 518 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues). DONE: T-296; G-060; #794; T-298 (1)(2) via #822/#825; T-299 step 1 (metrics); T-168 closed (V-085); T-297 step 1 via #831 (V-086: dated decisions, named handoff gaps, last-session date, seat hint). Maker S68 review -> T-302 (P1: greeting shows PRs as waiting after they merged; check handoff SHAs against origin) + T-298 items 5-6. T-300 option A (clark gets its own SIA record in ~/Projects/fleet) queued by clark for Aaron. Next: T-302 brief (P1); T-297 step 2 (gitignore + CRLF), step 3 (view header); T-298 (3)-(6).
+S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues). DONE: T-296; G-060; #794; T-298 (1)(2); T-299 step 1 (metrics); T-168 closed (V-085); T-297 step 1 via #831 (V-086); T-302 via #835 (head cf82c308, merged b73b17a2): the greeting names SHAs this handoff cites that origin/master already contains (opt-in merged_citations; SIA opted in #836). Maker S68 review -> T-302 + T-298 items 5-6. T-300 option A (clark gets its own SIA record in ~/Projects/fleet) queued by clark for Aaron. Next: T-302 live check + opt-in offer to Maker/Courier/Relay/Prism; T-297 step 2 (gitignore + CRLF), step 3 (view header); T-298 (3)-(6).
 
 ### Watch out
 
@@ -38,8 +38,8 @@ S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_r
 - T-300 option A
 
 **Rulings made mid-loop:** 
-- T168-CURSOR PASS: T-168 closed, V-085
 - T-297-S1 ACCEPT at 4016162c (merged 3c83ef4e), V-086
+- T-302 ACCEPT at cf82c308 (merged b73b17a2)
 
 ## developer [sia-builder] _(written session 156)_
 
