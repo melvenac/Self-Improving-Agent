@@ -10,7 +10,7 @@ import { checkoutOf } from "../../shared/state-schema.js";
  * file, an unreadable or malformed file, a non-boolean value and an absent key all mean false,
  * which is today's output.
  *
- * Keys: brief_dir (string), briefing_budget, briefing_focus, briefing_problem, greeting_metrics, handoff_by_checkout, handoff_caps, missing_handoff, role_docs_by_sha, state_compact. Keep them sorted in the tracked file.
+ * Keys: brief_dir (string), briefing_budget, briefing_focus, briefing_problem, greeting_metrics, handoff_by_checkout, handoff_caps, merged_citations, missing_handoff, role_docs_by_sha, state_compact. Keep them sorted in the tracked file.
  */
 export const GREETING_FLAGS_REL = ".agents/SYSTEM/greeting.json";
 

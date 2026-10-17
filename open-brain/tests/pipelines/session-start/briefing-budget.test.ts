@@ -261,6 +261,7 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
   });
 
   it("WORST CASE with EVERY flag on (FOCUS + SEATS + a MISSING_HANDOFF_MAX_CHARS T-199 notice + handoff_by_checkout + a clipped T-167 PROBLEM line + T-161's NO TRANSCRIPT, T-281): still fits BRIEFING_BUDGET", () => {
+    const MERGED_MAX = "Already in origin/master (last fetch): aaaaaaaa, bbbbbbbb, cccccccc, dddddddd (+20)";
     // T-239 merged with T-236 (c) and T-199: one PICK UP block carries all three. FOCUS on the header, this checkout's own
     // handoff (picked over a NEWER sibling's) on the body line, the notice appended to it. Built with the real producers.
     const raw = structuredClone(SIA);
@@ -311,6 +312,8 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
         seats: seatsLine(state, slots, presence),
       },
       missingHandoff: notice,
+      // T-302: the longest merged-citations line (four shown, (+20) of MERGED_SCAN_MAX 24, the longer default ref).
+      mergedCitations: MERGED_MAX,
       ownCheckout: "sia-infra",
       // T-167: the longest PROBLEM line describeProblemStatement can print (a 300-character clip of a longer statement).
       problem: `PROBLEM (.agents/SYSTEM/PRD.md): ${"p".repeat(300)}… (100000 chars)`,
@@ -321,11 +324,12 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
     const at = lines.findIndex((l) => l.startsWith("PICK UP HERE"));
     expect(lines[at]).toMatch(/^PICK UP HERE · FOCUS: T-\d+ Title x+… \(P\d, \w+\)/);
     expect(lines[at + 1]!.startsWith("OWN Pick up"), "this checkout's handoff, not the newer sibling's").toBe(true);
-    expect(lines[at + 1]!.endsWith(` · ${notice}`)).toBe(true);
+    expect(lines[at + 1]!.endsWith(` · ${notice} · ${MERGED_MAX}`)).toBe(true);
     expect(lines.join("\n")).not.toContain("SIBLING");
     expect(lines.some((l) => l.startsWith("SEATS: "))).toBe(true);
     expect(lines.some((l) => l.startsWith("PROBLEM ("))).toBe(true);
     expect(count, `${count} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
+    console.log(`T302-WORST lines=${count} chars=${chars}`);
     expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
     // T-281: the note rides the session line, and the full line is not in the Briefing.
     expect(lines.find((l) => l.startsWith("Session 160 — "))!.endsWith(" · NO TRANSCRIPT (T-161): /end cannot see this session")).toBe(true);

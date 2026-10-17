@@ -53,6 +53,12 @@ export interface BriefingInput {
    * exactly at its cap, and T-281 keeps it there), so it is APPENDED to the pick-up line, which is never cut after the append.
    */
   missingHandoff?: string | null;
+  /**
+   * T-302, OPT-IN per repo (greeting.json `merged_citations`), default OFF. The SHAs the reader's own handoff cites that the
+   * upstream branch already contains (handoff-merged.ts). Null or absent prints nothing. Legacy: its own line after the
+   * pick-up (and after missingHandoff). Budgeted: appended to the pick-up line after missingHandoff, so no line is added.
+   */
+  mergedCitations?: string | null;
   /** IMPORT-CMDS C4: valid record but project `.claude/commands/start.md` is not SIA's copy. */
   oldStartCommand?: string | null;
   /**
@@ -167,6 +173,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   else if (i.seat === null) out.push("none: this reader's seat is unresolved, so no handoff is named as yours");
   else out.push(noneRecorded(i.seat, i.ownCheckout));
   if (i.missingHandoff) out.push(i.missingHandoff);
+  if (i.mergedCitations) out.push(i.mergedCitations);
 
   if (own && own.watch_out.length > 0) {
     out.push("", "WATCH OUT");
@@ -280,10 +287,12 @@ function renderBudgeted(i: BriefingInput): string[] {
   if (seats !== null) out.push(seats);
   if (i.fleet) out.push(i.fleet.budget);
   out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
+  // T-302: the merged note rides the pick-up line and is paid for out of the pick-up's cap, so the budget does not grow.
+  const mergedRoom = i.mergedCitations ? i.mergedCitations.length + 3 : 0;
   const pickUp = own
-    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars)
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars - mergedRoom)
     : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : noneRecorded(i.seat, i.ownCheckout);
-  out.push(i.missingHandoff ? `${pickUp} · ${i.missingHandoff}` : pickUp);
+  out.push([pickUp, i.missingHandoff, i.mergedCitations].filter((x): x is string => typeof x === "string" && x !== "").join(" · "));
 
   if (own) {
     const live = own.watch_out.filter((w) => !isExpired(w, i.sessionNumber, i.date));
