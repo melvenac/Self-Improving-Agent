@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 521,
+  "revision": 522,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2408,7 +2408,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "s173 (Atlas), from reviewing Maker's S67 /start greeting (Aaron's request, verified in maker transcript a65a9321). Makerspace planner tree, record rev 508. Each observed:\n(1) HANDOFF LAG: the planner handoff was written at rev 506 ('S66 roll handoff'); revs 507-508 landed after (site-analytics skill written; staging PASS + prod-release brief). PICK UP and WAITING ON AARON were stale (an answered question still listed), and only Maker's manual git-log cross-check caught it. handoffs[] carry no revision stamp, so the briefing cannot say 'handoff from rev 506, record at rev 508'. Stamp the rev on set_handoff; print the lag when > 0.\n(2) LATEST BRIEF SILENT: latest-brief.ts looks only in docs/loops/ and docs/loop-*.md and returns null otherwise, so the line is omitted. Makerspace keeps briefs in .agents/plans/ (prod-release-1016b.md, b1af65d). 'None found' and 'did not look there' read the same. Print 'Latest brief: none under <dirs>' and let a project name its brief dir (greeting.json).\n(3) DIVERGENCE BANNER: tree-currency compares with the default branch (D-062). Makerspace's record lives on docs/t001-plans (693 ahead / 298 behind origin/main, never merged), so 'THIS TREE HAS DIVERGED' fires every start and is read past; origin/main's state.json is far behind, so a main-checkout session would brief from an old record. Let a project name its record branch and compare with that. Question to clark/Maker whether the docs branch should merge.\n(4) USAGE NOISE: 'Usage: not checked (... no usageLevel ...)' prints every start; slots.json now has usageLevelRemoved (D-145 restrictions off) but AGENT.local.md still names usage_file. Omit the line when nothing is configured or the key is retired.\nRelates T-296 (greeting focus), T-277 (brief locations), T-200/D-062 (record source). — s173 later: raised to P1 on Aaron's review scorecard (10-16): item (1), the handoff lag, is the root cause of his 'does the greeting match the current project state?' failing in every project, and T-299's lag metric needs its revision stamp. — s173: items (1) and (2) DONE: S1 #822 (merged 795b3e60) + amendment 1 (note shortened to 'state rev N (handoff +L)'; budget stays 4400), S2 #825 (merged 52e7894b; set_handoff stamps written_rev; metrics alarms anchored). V-084. QA PC SIA was 12 days behind (10-04 build refusing the record's `standing` key, so every QA PC one-off greeted degraded); clark rebuilt it. OPEN: (3) record branch for the divergence banner, (4) 'Usage: not checked' noise. — s173 Maker S68 review adds two: (5) when the objective names task ids, NEXT lists them even when done ('[done] T-169' took a NEXT slot; the objective was 3 sessions old): show only open ones, or flag that the objective names a done task. (6) READS OWED compares the brief's commit DATE to the previous session's DATE with >=, so a brief committed the same day as the previous session (including the seat's own brief) is owed again.",
+      "note": "s173 (Atlas), from reviewing Maker's S67 /start greeting (Aaron's request, verified in maker transcript a65a9321). Makerspace planner tree, record rev 508. Each observed:\n(1) HANDOFF LAG: the planner handoff was written at rev 506 ('S66 roll handoff'); revs 507-508 landed after (site-analytics skill written; staging PASS + prod-release brief). PICK UP and WAITING ON AARON were stale (an answered question still listed), and only Maker's manual git-log cross-check caught it. handoffs[] carry no revision stamp, so the briefing cannot say 'handoff from rev 506, record at rev 508'. Stamp the rev on set_handoff; print the lag when > 0.\n(2) LATEST BRIEF SILENT: latest-brief.ts looks only in docs/loops/ and docs/loop-*.md and returns null otherwise, so the line is omitted. Makerspace keeps briefs in .agents/plans/ (prod-release-1016b.md, b1af65d). 'None found' and 'did not look there' read the same. Print 'Latest brief: none under <dirs>' and let a project name its brief dir (greeting.json).\n(3) DIVERGENCE BANNER: tree-currency compares with the default branch (D-062). Makerspace's record lives on docs/t001-plans (693 ahead / 298 behind origin/main, never merged), so 'THIS TREE HAS DIVERGED' fires every start and is read past; origin/main's state.json is far behind, so a main-checkout session would brief from an old record. Let a project name its record branch and compare with that. Question to clark/Maker whether the docs branch should merge.\n(4) USAGE NOISE: 'Usage: not checked (... no usageLevel ...)' prints every start; slots.json now has usageLevelRemoved (D-145 restrictions off) but AGENT.local.md still names usage_file. Omit the line when nothing is configured or the key is retired.\nRelates T-296 (greeting focus), T-277 (brief locations), T-200/D-062 (record source). — s173 later: raised to P1 on Aaron's review scorecard (10-16): item (1), the handoff lag, is the root cause of his 'does the greeting match the current project state?' failing in every project, and T-299's lag metric needs its revision stamp. — s173: items (1) and (2) DONE: S1 #822 (merged 795b3e60) + amendment 1 (note shortened to 'state rev N (handoff +L)'; budget stays 4400), S2 #825 (merged 52e7894b; set_handoff stamps written_rev; metrics alarms anchored). V-084. QA PC SIA was 12 days behind (10-04 build refusing the record's `standing` key, so every QA PC one-off greeted degraded); clark rebuilt it. OPEN: (3) record branch for the divergence banner, (4) 'Usage: not checked' noise. — s173 Maker S68 review adds two: (5) when the objective names task ids, NEXT lists them even when done ('[done] T-169' took a NEXT slot; the objective was 3 sessions old): show only open ones, or flag that the objective names a done task. (6) READS OWED compares the brief's commit DATE to the previous session's DATE with >=, so a brief committed the same day as the previous session (including the seat's own brief) is owed again. — s173 STEP 3 SHIPPED: item (4) via #844 (head b36c3241, merged 81889ce3; brief docs/loops/t298-s3-usage-off-brief.md; two QA PC SIMs; V-089). Clark decides slots.json usageLevel OFF. Item (5) RULED: no change. briefing-budget.test.ts:187 pins T-236's design ('a done task is marked done, not dressed as work to start'); an objective can name a done task on purpose ('Verify T-x') and [done] says so. Maker's real miss was a 3-session-old objective, which is a different check if wanted. Remaining: (3) record branch for the divergence banner, (6) READS OWED same-day comparison.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -4135,6 +4135,19 @@
           "type": "live-check",
           "path": "open-brain/build/cli.js (SIA main 40d9980b)",
           "observation": "draft + --commit on a scratch copy of tarrantmailer's pre-migration snapshot (co-op-mailer 2865663): exit 0/0; 'Git files: .gitignore (created), .gitattributes (created)'; no CR in either; git check-ignore in a fresh repo: state.json and next-session.md tracked, Session_3.md, archive/, AGENT.local.md and reflection-queue.json ignored; check-attr eol=lf for .agents/state.json and .claude/commands/start.md. Scratch removed."
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-089",
+      "claim": "T-298 step 3 is live on the main build (81889ce3): a usage file whose usageLevel is OFF makes the greeting's usage line 'Usage: OFF → no usage gate (restrictions lifted)' instead of 'Usage: not checked (...)'.",
+      "evidence": [
+        {
+          "type": "live-check",
+          "path": "open-brain/build/pipelines/session-start/briefing.js (build-info commit 81889ce3)",
+          "observation": "describeUsage on a scratch project whose AGENT.local.md usage_file names a slots.json with {\"usageLevel\":\"OFF\"} returned 'Usage: OFF → no usage gate (restrictions lifted)'. Scratch removed."
         }
       ],
       "since_session": 173,
@@ -6301,14 +6314,14 @@
     },
     {
       "seat": "planner",
-      "pick_up": "S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues). SHIPPED this session: T-297 steps 1-2 (#831 V-086, #840 V-088), T-302 merged-citations (#835 V-087, SIA opted in), T-168 closed (V-085), T-298 (1)(2) (#822/#825), T-299 step 1. T-303 (Scion ops-log) ruled not-now; Scout measured 0 collisions since 10-01. IN FLIGHT: T-298 step 3 = items (4) usageLevel OFF line + (5) NEXT counts done named tasks: SIM files in Atlas scratchpad sim-t298s3/ (edits 1aaf6db5, test 646d9a6b, m1-m3), base f3c2b6b3; clark rolled before running it, so RE-SEND the SIM T298S3 line to the new clark. Then brief docs/loops/t298-s3/ the same way (edits verbatim + apply.cjs). After it ships clark decides slots.json usageLevel OFF. Next after: T-297 step 3 (view header version, low value), T-298 (3)(6), T-300 on Aaron's answer.",
+      "pick_up": "S173 (10-16/17) closed out for the night (Aaron to bed; clark: weekly usage +8.7, go light; focus Makerspace + Tarrant Mailer, SIA small fixes only). SHIPPED this session: T-297 steps 1-2 (#831 V-086, #840 V-088), T-302 merged-citations (#835 V-087, SIA opted in), T-298 (1)(2) (#822/#825) and step 3 usage OFF (#844 V-089), T-299 step 1 metrics, T-168 closed (V-085). T-303 (Scion ops-log) parked: 0 collisions measured. Ruled: T-298 (5) no change. No PR open, nothing in flight. Next (small only until focus shifts): T-297 step 3 (view header version, low value), T-298 (3) divergence banner and (6) READS OWED same-day, T-300 on Aaron's answer, offer merged_citations opt-in to the other seats (clark relays).",
       "watch_out": [
         "The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.",
         "SIA is a PUBLIC repo: never commit or post live MATCH key text.",
         "Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC; a brief ships its edits verbatim (docs/loops/<tag>/edits.txt + apply.cjs) once a SIM measured them.",
         "A schema field addition is two-step (readers, then writers): strictObject refuses unknown keys, and stale MCP processes and the QA PC build lag the main build.",
         "The dashboard redactor withholds whole lines it suspects; test a question's wording with agent-dashboard src/redact.js safeLine before recording it.",
-        "Running cli.js start by hand with no proven session creates a stray local Session_<n+1>.md: delete it after a live check."
+        "Run records-pr.sh from the repo root; from a subfolder it fails with 'pathspec .agents/state.json did not match'."
       ],
       "open_questions": [
         {
@@ -6344,15 +6357,16 @@
           "T-300 option A"
         ],
         "rulings": [
-          "T-302 ACCEPT at cf82c308 (merged b73b17a2), V-087",
-          "T-297-S2 ACCEPT at 1aedc464 (refreshed 098a12bf, merged 40d9980b), V-088",
-          "T-303 not now (0 collisions measured)"
+          "T-297-S2 ACCEPT at 1aedc464 (merged 40d9980b), V-088",
+          "T-298-S3 ACCEPT at b36c3241 (merged 81889ce3), V-089",
+          "T-298 (5) no change (T-236 design)",
+          "T-303 parked (0 collisions)"
         ]
       },
       "session_uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
       "checkout": "sia-planner",
       "first_rev": 499,
-      "written_rev": 521
+      "written_rev": 522
     }
   ],
   "sessions": [

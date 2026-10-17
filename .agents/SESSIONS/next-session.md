@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 521 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 522 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues). SHIPPED this session: T-297 steps 1-2 (#831 V-086, #840 V-088), T-302 merged-citations (#835 V-087, SIA opted in), T-168 closed (V-085), T-298 (1)(2) (#822/#825), T-299 step 1. T-303 (Scion ops-log) ruled not-now; Scout measured 0 collisions since 10-01. IN FLIGHT: T-298 step 3 = items (4) usageLevel OFF line + (5) NEXT counts done named tasks: SIM files in Atlas scratchpad sim-t298s3/ (edits 1aaf6db5, test 646d9a6b, m1-m3), base f3c2b6b3; clark rolled before running it, so RE-SEND the SIM T298S3 line to the new clark. Then brief docs/loops/t298-s3/ the same way (edits verbatim + apply.cjs). After it ships clark decides slots.json usageLevel OFF. Next after: T-297 step 3 (view header version, low value), T-298 (3)(6), T-300 on Aaron's answer.
+S173 (10-16/17) closed out for the night (Aaron to bed; clark: weekly usage +8.7, go light; focus Makerspace + Tarrant Mailer, SIA small fixes only). SHIPPED this session: T-297 steps 1-2 (#831 V-086, #840 V-088), T-302 merged-citations (#835 V-087, SIA opted in), T-298 (1)(2) (#822/#825) and step 3 usage OFF (#844 V-089), T-299 step 1 metrics, T-168 closed (V-085). T-303 (Scion ops-log) parked: 0 collisions measured. Ruled: T-298 (5) no change. No PR open, nothing in flight. Next (small only until focus shifts): T-297 step 3 (view header version, low value), T-298 (3) divergence banner and (6) READS OWED same-day, T-300 on Aaron's answer, offer merged_citations opt-in to the other seats (clark relays).
 
 ### Watch out
 
@@ -15,7 +15,7 @@ S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_r
 - Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC; a brief ships its edits verbatim (docs/loops/<tag>/edits.txt + apply.cjs) once a SIM measured them.
 - A schema field addition is two-step (readers, then writers): strictObject refuses unknown keys, and stale MCP processes and the QA PC build lag the main build.
 - The dashboard redactor withholds whole lines it suspects; test a question's wording with agent-dashboard src/redact.js safeLine before recording it.
-- Running cli.js start by hand with no proven session creates a stray local Session_<n+1>.md: delete it after a live check.
+- Run records-pr.sh from the repo root; from a subfolder it fails with 'pathspec .agents/state.json did not match'.
 
 ### Open questions
 
@@ -39,9 +39,10 @@ S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_r
 - T-300 option A
 
 **Rulings made mid-loop:** 
-- T-302 ACCEPT at cf82c308 (merged b73b17a2), V-087
-- T-297-S2 ACCEPT at 1aedc464 (refreshed 098a12bf, merged 40d9980b), V-088
-- T-303 not now (0 collisions measured)
+- T-297-S2 ACCEPT at 1aedc464 (merged 40d9980b), V-088
+- T-298-S3 ACCEPT at b36c3241 (merged 81889ce3), V-089
+- T-298 (5) no change (T-236 design)
+- T-303 parked (0 collisions)
 
 ## developer [sia-builder] _(written session 156)_
 
