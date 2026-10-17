@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+    const m = mergeTemplateFiles(root, templateDir);
+===
+    const m: ReturnType<typeof mergeTemplateFiles> = { written: [], skipped: [] };
+>>>

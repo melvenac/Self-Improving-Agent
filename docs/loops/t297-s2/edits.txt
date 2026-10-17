@@ -1,0 +1,193 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+export function scaffold(projectRoot: string, templateDir = defaultTemplateDir()): ScaffoldResult {
+===
+/**
+ * T-297: a template file as LF text. The build is served from a checkout whose working copies core.autocrlf may have
+ * rewritten to CRLF (the SIA main checkout's sync.md is), and a copy of those bytes gave the target CRLF files.
+ */
+export function templateText(path: string): string {
+  return readFileSync(path, "utf8").replace(/\r\n/g, "\n");
+}
+
+/**
+ * BF-4, shared by `scaffold` and (T-297) `state import --commit`: the template's gitignore and gitattributes merged into the
+ * project's. The owner's lines stay; the template's missing rules are appended under one SIA header.
+ */
+export function mergeTemplateFiles(root: string, templateDir: string): { written: ScaffoldResult["written"]; skipped: ScaffoldResult["skipped"] } {
+  const written: ScaffoldResult["written"] = [];
+  const skipped: ScaffoldResult["skipped"] = [];
+  for (const m of MERGED_FILES) {
+    const dest = join(root, m.path);
+    const src = join(templateDir, m.from);
+    // A template without the file is reported, not thrown, as `state import --commit` reports a missing role stub (T-251 K1).
+    if (!existsSync(src)) { skipped.push({ path: m.path, reason: `project-template/${m.from} not found — not merged` }); continue; }
+    const tmpl = templateText(src);
+    if (!existsSync(dest)) {
+      writeFileSync(dest, tmpl, "utf8");
+      written.push({ path: m.path, tracked: true, action: "created", from: `project-template/${m.from}`, why: m.why });
+      continue;
+    }
+    const existing = readFileSync(dest, "utf8");
+    const have = new Set(existing.split(/\r?\n/).map((l) => l.trim()));
+    const missing = tmpl.split(/\r?\n/).filter((l) => l.trim() !== "" && !l.startsWith("#") && !have.has(l.trim()));
+    if (missing.length === 0) { skipped.push({ path: m.path, reason: "already carries every rule in the template's copy" }); continue; }
+    const nl = existing.includes("\r\n") ? "\r\n" : "\n";
+    const sep = existing.length === 0 || existing.endsWith("\n") ? "" : nl;
+    writeFileSync(dest, `${existing}${sep}${nl}# --- SIA (Self-Improving Agent): from project-template/${m.from} ---${nl}${missing.join(nl)}${nl}`, "utf8");
+    written.push({ path: m.path, tracked: true, action: "merged", from: `project-template/${m.from}`, why: m.why });
+  }
+  return { written, skipped };
+}
+
+export function scaffold(projectRoot: string, templateDir = defaultTemplateDir()): ScaffoldResult {
+>>>
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+      copyFileSync(join(templateDir, f.from), dest);
+      written.push({ path: f.path, tracked: f.tracked, action: "copied", from: `project-template/${f.from}`, why: f.why });
+===
+      writeFileSync(dest, templateText(join(templateDir, f.from)), "utf8");
+      written.push({ path: f.path, tracked: f.tracked, action: "copied", from: `project-template/${f.from}`, why: f.why });
+>>>
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+  for (const m of MERGED_FILES) {
+    const dest = join(root, m.path);
+    const tmpl = readFileSync(join(templateDir, m.from), "utf8");
+    if (!existsSync(dest)) {
+      writeFileSync(dest, tmpl, "utf8");
+      written.push({ path: m.path, tracked: true, action: "created", from: `project-template/${m.from}`, why: m.why });
+      continue;
+    }
+    const existing = readFileSync(dest, "utf8");
+    const have = new Set(existing.split(/\r?\n/).map((l) => l.trim()));
+    const missing = tmpl.split(/\r?\n/).filter((l) => l.trim() !== "" && !l.startsWith("#") && !have.has(l.trim()));
+    if (missing.length === 0) { skipped.push({ path: m.path, reason: "already carries every rule in the template's copy" }); continue; }
+    const nl = existing.includes("\r\n") ? "\r\n" : "\n";
+    const sep = existing.length === 0 || existing.endsWith("\n") ? "" : nl;
+    writeFileSync(dest, `${existing}${sep}${nl}# --- SIA (Self-Improving Agent): from project-template/${m.from} ---${nl}${missing.join(nl)}${nl}`, "utf8");
+    written.push({ path: m.path, tracked: true, action: "merged", from: `project-template/${m.from}`, why: m.why });
+  }
+
+  return { root, template: templateDir, written, skipped, verify: verifyTracking(root, written) };
+===
+  const merged = mergeTemplateFiles(root, templateDir);
+  written.push(...merged.written);
+  skipped.push(...merged.skipped);
+
+  return { root, template: templateDir, written, skipped, verify: verifyTracking(root, written) };
+>>>
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+      copyFileSync(join(templateDir, sessionCommandRel(name)), dest);
+===
+      writeFileSync(dest, templateText(join(templateDir, sessionCommandRel(name))), "utf8");
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+import { defaultTemplateDir } from "../bootstrap/index.js";
+===
+import { defaultTemplateDir, mergeTemplateFiles, templateText } from "../bootstrap/index.js";
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  role_stubs: { installed: string[]; kept: string[]; missing: string[] };
+}
+===
+  role_stubs: { installed: string[]; kept: string[]; missing: string[] };
+  /** T-297: the template's gitignore and gitattributes merged into the project's, as scaffold merges them (BF-4). */
+  merged_files: { written: string[]; skipped: string[] };
+}
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  const migrate = () => {
+    // 2. state.json at revision 0, canonical bytes.
+===
+  // T-297: the owner files step 4c merges into, as they are now, so an import that does not complete puts them back.
+  const ownerFiles = [".gitignore", ".gitattributes"].map((rel) => {
+    const p = join(root, rel);
+    const kind = !existsSync(p) ? "absent" : statSync(p).isFile() ? "file" : "other";
+    return { p, kind, before: kind === "file" ? readFileSync(p) : null };
+  });
+
+  const migrate = () => {
+    // 2. state.json at revision 0, canonical bytes.
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+      writeFileSync(dest, readFileSync(stub), { flag: "wx" });
+      role_stubs.installed.push(rel);
+    }
+===
+      writeFileSync(dest, templateText(stub), { encoding: "utf8", flag: "wx" });
+      role_stubs.installed.push(rel);
+    }
+
+    // 4c. T-297: the .agents allowlist (gitignore) and the LF rule (gitattributes), merged as scaffold merges them. Without
+    // it an imported project kept no allowlist: its session logs and snapshot were tracked and AGENT.local.md was not ignored.
+    const m = mergeTemplateFiles(root, templateDir);
+    const merged_files = { written: m.written.map((w) => `${w.path} (${w.action})`), skipped: m.skipped.map((s) => `${s.path}: ${s.reason}`) };
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+    return { summary, rendered: r.rendered, moved, role_stubs };
+  };
+===
+    return { summary, rendered: r.rendered, moved, role_stubs, merged_files };
+  };
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+    const why = err instanceof Error ? err.message : String(err);
+    throw new Error(`${why}. ${rollBack(agents, snapshot.dir, made.created, aside, marker)}`);
+===
+    const why = err instanceof Error ? err.message : String(err);
+    // A path that is not a file (a directory, say) was never the importer's to write, so it is left exactly as it is.
+    for (const f of ownerFiles) {
+      if (f.kind === "file") writeFileSync(f.p, f.before!);
+      else if (f.kind === "absent") rmSync(f.p, { force: true });
+    }
+    throw new Error(`${why}. ${rollBack(agents, snapshot.dir, made.created, aside, marker)}`);
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+inputs_unrecorded, role_stubs: done.role_stubs };
+===
+inputs_unrecorded, role_stubs: done.role_stubs, merged_files: done.merged_files };
+>>>
+@@@ open-brain/src/shared/import-outputs.ts
+<<<
+  ".agents/SYSTEM/SUMMARY.md",
+  ...ROLE_STUB_RELS,
+];
+===
+  ".agents/SYSTEM/SUMMARY.md",
+  ...ROLE_STUB_RELS,
+  // T-297: --commit merges the template's into these, as scaffold does.
+  ".gitignore",
+  ".gitattributes",
+];
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+    console.log(`Role files: installed ${r.role_stubs.installed.length ? r.role_stubs.installed.join(", ") : "none"} · kept ${r.role_stubs.kept.length ? r.role_stubs.kept.join(", ") : "none"}${r.role_stubs.missing.length ? ` · missing in template: ${r.role_stubs.missing.join(", ")}` : ""}`);
+===
+    console.log(`Role files: installed ${r.role_stubs.installed.length ? r.role_stubs.installed.join(", ") : "none"} · kept ${r.role_stubs.kept.length ? r.role_stubs.kept.join(", ") : "none"}${r.role_stubs.missing.length ? ` · missing in template: ${r.role_stubs.missing.join(", ")}` : ""}`);
+    console.log(`Git files: ${r.merged_files.written.length ? r.merged_files.written.join(", ") : "none changed"}${r.merged_files.skipped.length ? ` · unchanged: ${r.merged_files.skipped.join("; ")}` : ""}. Commit them with the record.`);
+>>>
+@@@ project-template/gitattributes
+<<<
+/.agents/** text eol=lf
+===
+/.agents/** text eol=lf
+# The session commands are copied from SIA's template; keep them LF too, so a Windows checkout does not rewrite them.
+/.claude/commands/*.md text eol=lf
+>>>
+@@@ project-template/.claude/commands/bootstrap.md
+<<<
+(`--commit` does not change `.gitignore`).
+===
+(`--commit` merges the template's rules into `.gitignore` but never removes an owner's older rule).
+>>>
