@@ -455,6 +455,8 @@ export const USAGE_CONSEQUENCES: Readonly<Record<string, string>> = {
   AMBER: "small LIGHT tasks only, QA cap 2",
   RED: "devs finish the current step then park; planners rule and merge only",
   STOP: "everyone parks until the 5-hour reset",
+  // T-298 (4): usage restrictions lifted (Aaron 10-11). One short true line, where "not checked (...)" printed in every greeting.
+  OFF: "no usage gate (restrictions lifted)",
 };
 
 /** The weekly percentage at which every seat winds down; below it, from 95, the weekly window only holds new work. */
@@ -550,6 +552,7 @@ export function describeUsage(projectRoot: string, env: NodeJS.ProcessEnv = proc
   const five = /^[A-Za-z]+/.exec(levelText.trim())?.[0].toUpperCase() ?? "";
   const consequence = USAGE_CONSEQUENCES[five];
   if (consequence === undefined) return notChecked(`${path} usageLevel ${JSON.stringify(levelText)} does not start with one of ${Object.keys(USAGE_CONSEQUENCES).join(", ")}`);
+  if (five === "OFF") return `Usage: OFF → ${consequence}`;
 
   const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
   const fivePct = obj ? num(obj.fiveHourPct) : null;
