@@ -1,0 +1,17 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  STOP: "everyone parks until the 5-hour reset",
+};
+===
+  STOP: "everyone parks until the 5-hour reset",
+  // T-298 (4): usage restrictions lifted (Aaron 10-11). One short true line, where "not checked (...)" printed in every greeting.
+  OFF: "no usage gate (restrictions lifted)",
+};
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  if (consequence === undefined) return notChecked(`${path} usageLevel ${JSON.stringify(levelText)} does not start with one of ${Object.keys(USAGE_CONSEQUENCES).join(", ")}`);
+===
+  if (consequence === undefined) return notChecked(`${path} usageLevel ${JSON.stringify(levelText)} does not start with one of ${Object.keys(USAGE_CONSEQUENCES).join(", ")}`);
+  if (five === "OFF") return `Usage: OFF → ${consequence}`;
+>>>

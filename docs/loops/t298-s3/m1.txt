@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  if (five === "OFF") return `Usage: OFF → ${consequence}`;
+===
+  // M1: no OFF short line
+>>>
