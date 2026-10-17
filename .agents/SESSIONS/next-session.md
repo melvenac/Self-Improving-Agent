@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 515 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 516 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,13 +6,13 @@
 
 ### Pick up here
 
-S173 (10-16): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues: 7 questions + start cost). DONE: T-296; G-060 (#803); #794; T-298 items (1)(2) via #822 + #825; T-299 step 1 (greeting-metrics.jsonl, 5 repos opted in); V-084; T-168 closed (Cursor half PASS, V-085; finding 2 -> T-301). T-300: options sent to clark (scratchpad t300-options.md): RECOMMEND A, clark gets its own SIA record in ~/Projects/fleet (private) and clark-start.sh runs open-brain start there first; clark queued it for Aaron, leaning yes. On yes: write the SIA side (import clark.md's newest block, fleet greeting.json flags). Clark fixed ondeck-sync (in_progress no longer shown as run; questions filtered and true count; held asks marked) and passed 3 redactor false positives to Prism. Next: T-300 on Aaron's answer; T-297 importer gaps; T-298 (3) record branch, (4) usage-line noise.
+S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues). DONE: T-296; G-060; #794; T-298 (1)(2) via #822/#825; T-299 step 1 (metrics); T-168 closed (V-085); T-297 step 1 via #831 (V-086: dated decisions, named handoff gaps, last-session date, seat hint). Maker S68 review -> T-302 (P1: greeting shows PRs as waiting after they merged; check handoff SHAs against origin) + T-298 items 5-6. T-300 option A (clark gets its own SIA record in ~/Projects/fleet) queued by clark for Aaron. Next: T-302 brief (P1); T-297 step 2 (gitignore + CRLF), step 3 (view header); T-298 (3)-(6).
 
 ### Watch out
 
 - The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.
 - SIA is a PUBLIC repo: never commit or post live MATCH key text.
-- Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC.
+- Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC; a brief can ship its edits verbatim (docs/loops/<tag>/edits.txt + apply.cjs) once a SIM measured them.
 - A schema field addition is two-step (readers, then writers): strictObject refuses unknown keys, and stale MCP processes and the QA PC build lag the main build.
 - The dashboard redactor withholds whole lines it suspects; test a question's wording with agent-dashboard src/redact.js safeLine before recording it.
 
@@ -38,9 +38,8 @@ S173 (10-16): Aaron's /start-greeting scorecard (memory feedback_transcript_revi
 - T-300 option A
 
 **Rulings made mid-loop:** 
-- T-298-S1 ACCEPT (merged 795b3e60)
-- T-298-S2 ACCEPT (merged 52e7894b)
-- T168-CURSOR REPORT PASS at cafb5f13: T-168 closed, V-085, T-301 opened
+- T168-CURSOR PASS: T-168 closed, V-085
+- T-297-S1 ACCEPT at 4016162c (merged 3c83ef4e), V-086
 
 ## developer [sia-builder] _(written session 156)_
 
