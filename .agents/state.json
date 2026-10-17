@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 519,
+  "revision": 520,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2394,7 +2394,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "s173 (Atlas), from reviewing clark's tarrantmailer migration (clark 2977a6e5, 18:36-18:45Z 2026-10-16; review in Atlas scratchpad tarrantmailer-migration-review.md). Repo melvenac/co-op-mailer at feafbda. Each item observed, not inferred:\n(1) DECISIONS: 0 of 98 imported. The file uses `## YYYY-MM-DD — title` headings; the importer reads only ADR `Date:` lines, and the report says 'imported as a dated log' while importing none. ob_start then shows Decisions: 0.\n(2) HANDOFF: next-session.md sections 'Start here', 'Waiting on Aaron', 'Not built, and why', 'The one thing to fix first', 'Housekeeping' are not imported, then the view is re-rendered EMPTY (0 pick-up/watch-out/questions). The content survives only in the snapshot, so the live view erases it. At least 'Waiting on Aaron' maps to open_questions.\n(3) GITIGNORE: the import path skips scaffold's gitignore merge, so the project keeps no .agents allowlist: the pre-state-migration snapshot is committed (incl. a copy of a gitignored reflection-queue.json), session logs stay tracked, and AGENT.local.md is not ignored (a seat's name can be committed and rename the main checkout). Makerspace has the same gap.\n(4) AGENT.md: an old `role: implementation` is kept; the import ASSUMES developer and the handoff renders `developer [legacy]`. Nothing flags a non-seat role or a stale partner/mailbox_channel.\n(5) LAST SESSION: dated the migration day (2026-10-16) though Session_3.md is 2026-09-04.\n(6) CRLF: install-commands copies working-tree bytes; in the SIA main checkout .claude/commands/sync.md and project-template/.claude/commands/sync.md are i/lf w/crlf, so the target gets a CRLF working copy (blob LF). Copy from the git blob, or renormalize those two files.\n(7) VIEW HEADER: 'generated ... by open-brain vX' prints the PROJECT's package.json version (tarrantmailer v0.11.0, Makerspace v0.7.2), not open-brain's.\nLesson 648 already covers objective/task.md heading and project.name; not repeated here. Relates T-241 (Frogger re-run). — s173 STEP 1 SHIPPED: items (1)(2)(4)(5) via #831 (merged 3c83ef4e, brief docs/loops/t297-s1-importer-brief.md, two QA PC SIMs before dispatch; V-086 live check). (2) deliberately does NOT import free-form sections as current (some were months stale); it names them and points pick_up at the snapshot. Remaining: step 2 = (3) gitignore/gitattributes merge on --commit + (6) CRLF (the SIA main checkout's working copies of .claude/commands/sync.md and project-template/.claude/commands/sync.md are w/crlf; normalise on copy); step 3 = (7) view header version.",
+      "note": "s173 (Atlas), from reviewing clark's tarrantmailer migration (clark 2977a6e5, 18:36-18:45Z 2026-10-16; review in Atlas scratchpad tarrantmailer-migration-review.md). Repo melvenac/co-op-mailer at feafbda. Each item observed, not inferred:\n(1) DECISIONS: 0 of 98 imported. The file uses `## YYYY-MM-DD — title` headings; the importer reads only ADR `Date:` lines, and the report says 'imported as a dated log' while importing none. ob_start then shows Decisions: 0.\n(2) HANDOFF: next-session.md sections 'Start here', 'Waiting on Aaron', 'Not built, and why', 'The one thing to fix first', 'Housekeeping' are not imported, then the view is re-rendered EMPTY (0 pick-up/watch-out/questions). The content survives only in the snapshot, so the live view erases it. At least 'Waiting on Aaron' maps to open_questions.\n(3) GITIGNORE: the import path skips scaffold's gitignore merge, so the project keeps no .agents allowlist: the pre-state-migration snapshot is committed (incl. a copy of a gitignored reflection-queue.json), session logs stay tracked, and AGENT.local.md is not ignored (a seat's name can be committed and rename the main checkout). Makerspace has the same gap.\n(4) AGENT.md: an old `role: implementation` is kept; the import ASSUMES developer and the handoff renders `developer [legacy]`. Nothing flags a non-seat role or a stale partner/mailbox_channel.\n(5) LAST SESSION: dated the migration day (2026-10-16) though Session_3.md is 2026-09-04.\n(6) CRLF: install-commands copies working-tree bytes; in the SIA main checkout .claude/commands/sync.md and project-template/.claude/commands/sync.md are i/lf w/crlf, so the target gets a CRLF working copy (blob LF). Copy from the git blob, or renormalize those two files.\n(7) VIEW HEADER: 'generated ... by open-brain vX' prints the PROJECT's package.json version (tarrantmailer v0.11.0, Makerspace v0.7.2), not open-brain's.\nLesson 648 already covers objective/task.md heading and project.name; not repeated here. Relates T-241 (Frogger re-run). — s173 STEP 1 SHIPPED: items (1)(2)(4)(5) via #831 (merged 3c83ef4e, brief docs/loops/t297-s1-importer-brief.md, two QA PC SIMs before dispatch; V-086 live check). (2) deliberately does NOT import free-form sections as current (some were months stale); it names them and points pick_up at the snapshot. Remaining: step 2 = (3) gitignore/gitattributes merge on --commit + (6) CRLF (the SIA main checkout's working copies of .claude/commands/sync.md and project-template/.claude/commands/sync.md are w/crlf; normalise on copy); step 3 = (7) view header version. — s173 STEP 2 SHIPPED: items (3)(6) via #840 (reviewed 1aedc464, refreshed 098a12bf patch-id SAME, merged 40d9980b; brief docs/loops/t297-s2-gitfiles-brief.md; two QA PC SIMs; V-088 live check). Already-imported projects (tarrantmailer, Makerspace) are NOT retro-fixed by this: their owners merge the template's gitignore by hand or with scaffold's rules. Remaining: step 3 = (7) view header version.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -2478,7 +2478,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "s173, from Scout's write-up (sia-research checkout, Aaron's ask; claude.ai doc 'Scion Lessons for SIA State', source anthropic.com/engineering/redesigning-source-control 2026-10-13). Proposal: ob_state ops stored one file per write (.agents/ops/<id>.json), state.json and the views derived by replay; revision named by a content hash; task notes split out (431 KB of the 905 KB record at rev 518); reads resolve from origin/master. It is G-027's third candidate fix. RULING (Atlas): not now. Since G-027 (2026-09-17) the collision has been prevented procedurally: one writer per record in practice, one records PR at a time, tree-sync before every write, pr-keep-current. Gate: measure first, from git history, how many records PRs since 2026-10-01 hit a state.json conflict or a duplicate revision/id; adopt only if that is non-trivial. ID question: under any log design, mint ids at write time from the base record and let a CI check refuse a merge that would duplicate an id (replay-time ids would break every brief and PR that cites one). Independent smaller items stay candidates: notes out of state.json (size, not correctness); origin/master reads already exist (record-source.ts kind 'master').",
+      "note": "s173, from Scout's write-up (sia-research checkout, Aaron's ask; claude.ai doc 'Scion Lessons for SIA State', source anthropic.com/engineering/redesigning-source-control 2026-10-13). Proposal: ob_state ops stored one file per write (.agents/ops/<id>.json), state.json and the views derived by replay; revision named by a content hash; task notes split out (431 KB of the 905 KB record at rev 518); reads resolve from origin/master. It is G-027's third candidate fix. RULING (Atlas): not now. Since G-027 (2026-09-17) the collision has been prevented procedurally: one writer per record in practice, one records PR at a time, tree-sync before every write, pr-keep-current. Gate: measure first, from git history, how many records PRs since 2026-10-01 hit a state.json conflict or a duplicate revision/id; adopt only if that is non-trivial. ID question: under any log design, mint ids at write time from the base record and let a CI check refuse a merge that would duplicate an id (replay-time ids would break every brief and PR that cites one). Independent smaller items stay candidates: notes out of state.json (size, not correctness); origin/master reads already exist (record-source.ts kind 'master'). — s173 GATE MEASURED (Scout, read-only git on origin/master, 2026-10-17): since 2026-10-01, 701 commits touched state.json (425 merges, 276 non-merge); merge-tree replay of all 425 merges: 0 conflicts; same revision on two non-ancestor lines: 0; duplicate T/V/G/D ids in any committed state: 0; control (three consecutive master states as base/A/B) does report conflicts, so the check can fire. Limit: master only; a collision unwound before merge leaves no trace (next instrument: open PRs and remote branches). Stays parked. File size at rev 518: 959,414 bytes as written (905 KB was a compact re-serialization); task notes 432,246 bytes.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -4122,6 +4122,19 @@
           "type": "live-check",
           "path": "open-brain/build/cli.js start (SIA main b73b17a2) on C:/Users/melve/Worktrees/sia-planner at rev 517",
           "observation": "pick-up line (417 chars) ends 'Already in origin/master (last fetch): cf82c308, b73b17a2' (the handoff cites #835's head and merge); Briefing 30 lines / 3590 chars; exit 0. Side effect: CLI start with no proven session created a local Session_174.md (gitignored), removed."
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-088",
+      "claim": "T-297 step 2 is live on the main build (40d9980b): state import --commit merges the template's gitignore and gitattributes into the project (created here), LF, so the .agents allowlist and the eol rules hold after an import; role stubs are written LF.",
+      "evidence": [
+        {
+          "type": "live-check",
+          "path": "open-brain/build/cli.js (SIA main 40d9980b)",
+          "observation": "draft + --commit on a scratch copy of tarrantmailer's pre-migration snapshot (co-op-mailer 2865663): exit 0/0; 'Git files: .gitignore (created), .gitattributes (created)'; no CR in either; git check-ignore in a fresh repo: state.json and next-session.md tracked, Session_3.md, archive/, AGENT.local.md and reflection-queue.json ignored; check-attr eol=lf for .agents/state.json and .claude/commands/start.md. Scratch removed."
         }
       ],
       "since_session": 173,
@@ -6447,7 +6460,7 @@
     },
     {
       "n": 173,
-      "date": "2026-10-16",
+      "date": "2026-10-17",
       "uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
       "seat": "planner",
       "checkout": "sia-planner",
