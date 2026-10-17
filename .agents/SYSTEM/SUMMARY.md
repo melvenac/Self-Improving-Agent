@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 512 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 513 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).
 
 ## What's working
@@ -90,6 +90,7 @@
 - T-296-S2 state_compact is default off in production: the main build at ae16482a renders SIA's State block byte-identical to b55730c7 with no state_compact key, and opting in cuts SIA's State block by 4.6 KB while keeping the reader's own handoff, open PRs, decisions and objective. _(V-082, 3 evidence)_
 - The recall trigger covers Claude Code PowerShell calls on both events (G-060 closed): with #803 merged (master 0dcf8f4c, main rebuilt) and ~/.claude/settings.json matching Bash|PowerShell on PostToolUse and PostToolUseFailure, a matched PowerShell command injects on success AND on failure. _(V-083, 3 evidence)_
 - T-298 steps 1-2 and T-299 step 1 are live on the main build (52e7894b): the greeting prints 'Latest brief: none (looked in ...)' instead of omitting the line, a repo's greeting.json brief_dir is honoured, set_handoff stamps written_rev with the revision it produces, the briefing shows 'state rev N (handoff +L)' when the record moved after the handoff, and opted-in repos append one greeting-metrics.jsonl row per start. _(V-084, 3 evidence)_
+- T-168's peer-idleness check works from a Cursor process on the QA PC: the suite runner names seat cursor-builder from SUITE_SEAT, detects its owner as cursor-agent, takes and releases the lease (0/0), reads an available hub-presence census, and leaves the clone's porcelain empty. _(V-085, 1 evidence)_
 
 ## What's broken
 

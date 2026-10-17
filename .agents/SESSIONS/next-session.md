@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 512 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 513 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,22 +6,23 @@
 
 ### Pick up here
 
-S173 (10-16): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues: 7 questions + start cost). DONE this session: T-296; G-060 (#803); #794; T-298 items (1)(2) via #822 + #825 (brief_dir, 'Latest brief: none (looked in ...)', set_handoff stamps written_rev, 'state rev N (handoff +L)', anchored alarms); T-299 step 1 (greeting-metrics.jsonl, opted in by SIA/Maker/Courier/Relay/Prism; first live row 20:42Z). V-084. Stamping on live records starts at each seat's next /mcp reconnect or new session (seat MCP processes run 795b3e60, which reads but does not stamp). Next: T-300 options (coordinator greeting: clark's 91 KB hand-kept handoff); T-297 importer gaps (from the tarrantmailer migration); T-298 (3) record branch, (4) usage-line noise. Prism builds the scorecard panel after a day of rows; clark-ops owns the transport.
+S173 (10-16): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues: 7 questions + start cost). DONE: T-296; G-060 (#803); #794; T-298 items (1)(2) via #822 + #825; T-299 step 1 (greeting-metrics.jsonl, 5 repos opted in); V-084; T-168 closed (Cursor half PASS, V-085; finding 2 -> T-301). T-300: options sent to clark (scratchpad t300-options.md): RECOMMEND A, clark gets its own SIA record in ~/Projects/fleet (private) and clark-start.sh runs open-brain start there first; clark queued it for Aaron, leaning yes. On yes: write the SIA side (import clark.md's newest block, fleet greeting.json flags). Clark fixed ondeck-sync (in_progress no longer shown as run; questions filtered and true count; held asks marked) and passed 3 redactor false positives to Prism. Next: T-300 on Aaron's answer; T-297 importer gaps; T-298 (3) record branch, (4) usage-line noise.
 
 ### Watch out
 
 - The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.
 - SIA is a PUBLIC repo: never commit or post live MATCH key text.
-- Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC (two SIMs this session each corrected a brief).
+- Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC.
 - A schema field addition is two-step (readers, then writers): strictObject refuses unknown keys, and stale MCP processes and the QA PC build lag the main build.
+- The dashboard redactor withholds whole lines it suspects; test a question's wording with agent-dashboard src/redact.js safeLine before recording it.
 
 ### Open questions
 
-- t170ii-keys.json (49 live MATCH keys): may it go to the QA PC, or does the real-key over-fire run stay on the desktop?
-- T-295: which open-brain MCP tools to cut or move to the CLI?
-- T-261: raise the core/memory package split from P3?
-- Auto-reconnect for the open-brain MCP server: build it? (today every rebuild needs a /mcp reconnect in each seat window)
-- #794 merge + PostToolUseFailure registration _(resolved by merged s173 (G-059 closed); PowerShell via #803)_
+- Real-key over-fire run for T-170-II (49 live MATCH patterns, kept off-repo): QA PC or desktop only? Rec: desktop only.
+- T-295: which open-brain MCP tools to cut or move to the CLI? Rec: count calls per tool first.
+- T-261: raise the core/memory package split from P3? Rec: leave at P3.
+- Auto-reconnect for the open-brain MCP server: build it? Rec: yes (each rebuild needs a /mcp reconnect per seat).
+- T-300: give clark its own SIA record in ~/Projects/fleet (option A)? Rec: yes.
 
 ### Loop state
 
@@ -30,16 +31,16 @@ S173 (10-16): Aaron's /start-greeting scorecard (memory feedback_transcript_revi
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- t170ii-keys run host
+- T-170-II real-key run host
 - T-295 tool cuts
 - T-261 priority
 - open-brain auto-reconnect
+- T-300 option A
 
 **Rulings made mid-loop:** 
-- T-298-S1 ACCEPT at 597b64c9 (merged 795b3e60)
-- T-298-S1 amendment 1: budget stays 4400; note shortened
-- T-298-S2 ACCEPT at 5f3b0d3b (merged 52e7894b)
-- Courier greeting.json: the four Maker flags + greeting_metrics
+- T-298-S1 ACCEPT (merged 795b3e60)
+- T-298-S2 ACCEPT (merged 52e7894b)
+- T168-CURSOR REPORT PASS at cafb5f13: T-168 closed, V-085, T-301 opened
 
 ## developer [sia-builder] _(written session 156)_
 
