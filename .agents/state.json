@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 515,
+  "revision": 516,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2394,7 +2394,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "s173 (Atlas), from reviewing clark's tarrantmailer migration (clark 2977a6e5, 18:36-18:45Z 2026-10-16; review in Atlas scratchpad tarrantmailer-migration-review.md). Repo melvenac/co-op-mailer at feafbda. Each item observed, not inferred:\n(1) DECISIONS: 0 of 98 imported. The file uses `## YYYY-MM-DD — title` headings; the importer reads only ADR `Date:` lines, and the report says 'imported as a dated log' while importing none. ob_start then shows Decisions: 0.\n(2) HANDOFF: next-session.md sections 'Start here', 'Waiting on Aaron', 'Not built, and why', 'The one thing to fix first', 'Housekeeping' are not imported, then the view is re-rendered EMPTY (0 pick-up/watch-out/questions). The content survives only in the snapshot, so the live view erases it. At least 'Waiting on Aaron' maps to open_questions.\n(3) GITIGNORE: the import path skips scaffold's gitignore merge, so the project keeps no .agents allowlist: the pre-state-migration snapshot is committed (incl. a copy of a gitignored reflection-queue.json), session logs stay tracked, and AGENT.local.md is not ignored (a seat's name can be committed and rename the main checkout). Makerspace has the same gap.\n(4) AGENT.md: an old `role: implementation` is kept; the import ASSUMES developer and the handoff renders `developer [legacy]`. Nothing flags a non-seat role or a stale partner/mailbox_channel.\n(5) LAST SESSION: dated the migration day (2026-10-16) though Session_3.md is 2026-09-04.\n(6) CRLF: install-commands copies working-tree bytes; in the SIA main checkout .claude/commands/sync.md and project-template/.claude/commands/sync.md are i/lf w/crlf, so the target gets a CRLF working copy (blob LF). Copy from the git blob, or renormalize those two files.\n(7) VIEW HEADER: 'generated ... by open-brain vX' prints the PROJECT's package.json version (tarrantmailer v0.11.0, Makerspace v0.7.2), not open-brain's.\nLesson 648 already covers objective/task.md heading and project.name; not repeated here. Relates T-241 (Frogger re-run).",
+      "note": "s173 (Atlas), from reviewing clark's tarrantmailer migration (clark 2977a6e5, 18:36-18:45Z 2026-10-16; review in Atlas scratchpad tarrantmailer-migration-review.md). Repo melvenac/co-op-mailer at feafbda. Each item observed, not inferred:\n(1) DECISIONS: 0 of 98 imported. The file uses `## YYYY-MM-DD — title` headings; the importer reads only ADR `Date:` lines, and the report says 'imported as a dated log' while importing none. ob_start then shows Decisions: 0.\n(2) HANDOFF: next-session.md sections 'Start here', 'Waiting on Aaron', 'Not built, and why', 'The one thing to fix first', 'Housekeeping' are not imported, then the view is re-rendered EMPTY (0 pick-up/watch-out/questions). The content survives only in the snapshot, so the live view erases it. At least 'Waiting on Aaron' maps to open_questions.\n(3) GITIGNORE: the import path skips scaffold's gitignore merge, so the project keeps no .agents allowlist: the pre-state-migration snapshot is committed (incl. a copy of a gitignored reflection-queue.json), session logs stay tracked, and AGENT.local.md is not ignored (a seat's name can be committed and rename the main checkout). Makerspace has the same gap.\n(4) AGENT.md: an old `role: implementation` is kept; the import ASSUMES developer and the handoff renders `developer [legacy]`. Nothing flags a non-seat role or a stale partner/mailbox_channel.\n(5) LAST SESSION: dated the migration day (2026-10-16) though Session_3.md is 2026-09-04.\n(6) CRLF: install-commands copies working-tree bytes; in the SIA main checkout .claude/commands/sync.md and project-template/.claude/commands/sync.md are i/lf w/crlf, so the target gets a CRLF working copy (blob LF). Copy from the git blob, or renormalize those two files.\n(7) VIEW HEADER: 'generated ... by open-brain vX' prints the PROJECT's package.json version (tarrantmailer v0.11.0, Makerspace v0.7.2), not open-brain's.\nLesson 648 already covers objective/task.md heading and project.name; not repeated here. Relates T-241 (Frogger re-run). — s173 STEP 1 SHIPPED: items (1)(2)(4)(5) via #831 (merged 3c83ef4e, brief docs/loops/t297-s1-importer-brief.md, two QA PC SIMs before dispatch; V-086 live check). (2) deliberately does NOT import free-form sections as current (some were months stale); it names them and points pick_up at the snapshot. Remaining: step 2 = (3) gitignore/gitattributes merge on --commit + (6) CRLF (the SIA main checkout's working copies of .claude/commands/sync.md and project-template/.claude/commands/sync.md are w/crlf; normalise on copy); step 3 = (7) view header version.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -4082,6 +4082,19 @@
           "type": "qa-report",
           "path": "C:/Users/melve/Worktrees/t168-cursor-a1-reply.md",
           "observation": "REPORT T168-CURSOR cafb5f134326e093eb285d74cab9505b5f6cb15d; suite seat: cursor-builder (SUITE_SEAT); meta owner_source cursor-agent, lease_take_exit 0, lease_release_exit 0, census available true busy_sia []; EXIT=0; porcelain empty; runner log exit 0 at 2026-10-16T19:24:23 (QA PC)"
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-086",
+      "claim": "T-297 step 1 is live on the main build (3c83ef4e): the importer reads a dated decision log (## YYYY-MM-DD — title) as D-001.. oldest first, dates the last session from any full date in its heading or a Date line, names every next-session section it did not import (including text above the first ## heading) with pick_up pointing to the snapshot, and tells how to fix a role that is not a seat.",
+      "evidence": [
+        {
+          "type": "live-check",
+          "path": "open-brain/build/cli.js (SIA main 3c83ef4e)",
+          "observation": "state import --draft on a scratch copy of tarrantmailer's pre-migration snapshot (co-op-mailer 2865663): Decisions: 98 (0 skipped), D-001 2026-09-02 .. D-098 2026-09-05 (the real migration got 0); last session Session 3 dated 2026-09-04 (was the migration day 2026-10-16); 'Handoff: 6 section(s) NOT imported ((text before the first ## heading: 76 lines); Start here; ...)' and pick_up points to the snapshot; seat line ends 'set role: in .agents/AGENT.md (or AGENT.local.md) to planner, developer or qa'."
         }
       ],
       "since_session": 173,
@@ -6248,11 +6261,11 @@
     },
     {
       "seat": "planner",
-      "pick_up": "S173 (10-16): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues: 7 questions + start cost). DONE: T-296; G-060 (#803); #794; T-298 items (1)(2) via #822 + #825; T-299 step 1 (greeting-metrics.jsonl, 5 repos opted in); V-084; T-168 closed (Cursor half PASS, V-085; finding 2 -> T-301). T-300: options sent to clark (scratchpad t300-options.md): RECOMMEND A, clark gets its own SIA record in ~/Projects/fleet (private) and clark-start.sh runs open-brain start there first; clark queued it for Aaron, leaning yes. On yes: write the SIA side (import clark.md's newest block, fleet greeting.json flags). Clark fixed ondeck-sync (in_progress no longer shown as run; questions filtered and true count; held asks marked) and passed 3 redactor false positives to Prism. Next: T-300 on Aaron's answer; T-297 importer gaps; T-298 (3) record branch, (4) usage-line noise.",
+      "pick_up": "S173 (10-16/17): Aaron's /start-greeting scorecard (memory feedback_transcript_reviews_find_sia_issues). DONE: T-296; G-060; #794; T-298 (1)(2) via #822/#825; T-299 step 1 (metrics); T-168 closed (V-085); T-297 step 1 via #831 (V-086: dated decisions, named handoff gaps, last-session date, seat hint). Maker S68 review -> T-302 (P1: greeting shows PRs as waiting after they merged; check handoff SHAs against origin) + T-298 items 5-6. T-300 option A (clark gets its own SIA record in ~/Projects/fleet) queued by clark for Aaron. Next: T-302 brief (P1); T-297 step 2 (gitignore + CRLF), step 3 (view header); T-298 (3)-(6).",
       "watch_out": [
         "The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.",
         "SIA is a PUBLIC repo: never commit or post live MATCH key text.",
-        "Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC.",
+        "Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC; a brief can ship its edits verbatim (docs/loops/<tag>/edits.txt + apply.cjs) once a SIM measured them.",
         "A schema field addition is two-step (readers, then writers): strictObject refuses unknown keys, and stale MCP processes and the QA PC build lag the main build.",
         "The dashboard redactor withholds whole lines it suspects; test a question's wording with agent-dashboard src/redact.js safeLine before recording it."
       ],
@@ -6290,14 +6303,14 @@
           "T-300 option A"
         ],
         "rulings": [
-          "T-298-S1 ACCEPT (merged 795b3e60)",
-          "T-298-S2 ACCEPT (merged 52e7894b)",
-          "T168-CURSOR REPORT PASS at cafb5f13: T-168 closed, V-085, T-301 opened"
+          "T168-CURSOR PASS: T-168 closed, V-085",
+          "T-297-S1 ACCEPT at 4016162c (merged 3c83ef4e), V-086"
         ]
       },
       "session_uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
       "checkout": "sia-planner",
-      "first_rev": 499
+      "first_rev": 499,
+      "written_rev": 516
     }
   ],
   "sessions": [
