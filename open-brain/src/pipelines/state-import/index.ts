@@ -82,6 +82,8 @@ export interface ImportReport {
     date_partial: Array<{ id: string; original: string }>;
     date_unknown: number;
     skipped: Array<{ line: number; heading: string; reason: string }>;
+    /** T-297: entries of a dated log (`## YYYY-MM-DD — title`), numbered D-001.. oldest first. Absent means 0. */
+    dated?: number;
   };
   /** DECISIONS.md holds bytes that cannot be read; it is not judged, so this names it rather than blocks (R4-5). */
   decisions_unreadable: DecisionsUnreadable | null;
@@ -401,13 +403,18 @@ const ADR_RE = /^### (ADR-\d+):\s*(.+?)\s*$/;
 const ADR_UNNUMBERED_RE = /^### ADR\b/;
 const DATE_LINE_RE = /^\s*(?:- )?\*{0,2}Date:?\*{0,2}\s*:?\s*(\S+)/;
 const FULL_DATE = /^\d{4}-\d{2}-\d{2}$/;
+/** T-297: a dated decision log, as tarrantmailer's DECISIONS.md writes it. */
+const DATED_RE = /^#{2,3} (\d{4}-\d{2}-\d{2})\s+[—–-]+\s+(.+?)\s*$/;
 
 export function importDecisions(text: string, migrationDate: string, report: ImportReport["decisions"]): Decision[] {
   const lines = text.split(/\r?\n/);
   const out: Decision[] = [];
   const seen = new Set<string>();
+  const dated: Array<{ date: string; title: string; k: number }> = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    const dm = line.match(DATED_RE);
+    if (dm) { dated.push({ date: dm[1], title: dm[2], k: dated.length }); continue; }
     if (!line.startsWith("### ")) continue;
     const m = line.match(ADR_RE);
     if (!m) {
@@ -437,8 +444,19 @@ export function importDecisions(text: string, migrationDate: string, report: Imp
     }
     out.push({ id, title, date, note });
   }
+  // T-297: oldest first, so D-001 is the first decision; same-date entries keep file order.
+  dated.sort((a, b) => a.date.localeCompare(b.date) || a.k - b.k);
+  dated.forEach((d, n) => out.push({ id: `D-${String(n + 1).padStart(3, "0")}`, title: d.title, date: d.date, note: "" }));
+  report.dated = dated.length;
   report.imported = out.length;
   return out;
+}
+
+/** T-297: a DECISIONS.md with text and no decision the importer reads would import 0 without a word. */
+export function decisionsWarning(r: ImportReport): string | null {
+  const src = r.sources.decisions;
+  if (!src?.present || src.lines === 0 || r.decisions.imported > 0) return null;
+  return `WARNING: ${src.path} has ${src.lines} lines and no ADR (\`### ADR-N: title\`) or dated entry (\`## YYYY-MM-DD — title\`): 0 decisions will be imported`;
 }
 
 export interface DecisionsUnreadable { evidence: string; imported: string[]; not_imported: string[] }
@@ -527,6 +545,9 @@ export function importHandoff(text: string | null, current: number, report: Impo
   if (!text) return handoff;
   const lines = text.split(/\r?\n/);
   const headings = lines.map((l, i) => ({ l, i })).filter(({ l }) => /^#{2,6} /.test(l));
+  // T-297: prose above the first `##` heading is not imported either; it is counted, not dropped silently.
+  const preamble = lines.slice(0, headings.length ? headings[0].i : lines.length).filter((l) => l.trim() !== "" && !/^# /.test(l)).length;
+  if (preamble > 0) report.sections_not_imported.push(`(text before the first ## heading: ${preamble} lines)`);
   for (const { l, i } of headings) {
     const title = l.replace(/^#+ /, "");
     if (/^Pick up here\b/i.test(title)) {
@@ -542,6 +563,10 @@ export function importHandoff(text: string | null, current: number, report: Impo
     } else {
       report.sections_not_imported.push(title);
     }
+  }
+  // T-297: an empty pick_up over sections that were not imported would render as "nothing recorded"; point at them instead.
+  if (handoff.pick_up === "" && report.sections_not_imported.length > 0) {
+    handoff.pick_up = `Imported from a prose next-session.md with no "Pick up here" section. Not imported: ${report.sections_not_imported.join("; ")}. They are in the pre-migration snapshot under .agents/archive/ in the checkout that ran the import; re-enter what is current with ob_state set_handoff.`;
   }
   return handoff;
 }
@@ -565,7 +590,7 @@ export function importSeat(root: string): ImportSeat {
 export function describeHandoffSeat(s: ImportSeat): string {
   if (!s.assumed) return `Handoff seat: ${s.seat} (the role .agents/AGENT.md or AGENT.local.md declares)`;
   const why = s.declared_role === null ? "no role is declared in .agents/AGENT.local.md or AGENT.md" : `the declared role "${s.declared_role}" is not a seat (planner, developer or qa)`;
-  return `Handoff seat: ${s.seat}, ASSUMED: ${why}`;
+  return `Handoff seat: ${s.seat}, ASSUMED: ${why}${s.declared_role === null ? "" : "; set role: in .agents/AGENT.md (or AGENT.local.md) to planner, developer or qa"}`;
 }
 
 function adrNotImported(u: DecisionsUnreadable): string {
@@ -579,8 +604,10 @@ function adrNotImported(u: DecisionsUnreadable): string {
 
 /** The line the report and both CLI modes print, so a latest log cannot be named in only one of them. */
 export function describeLastSession(last: ImportReport["last_session"]): string | null {
-  if (!last.unreadable) return null;
-  return `${last.file} ${last.unreadable}. Date used: ${last.date}, ${last.date_why}.`;
+  if (last.unreadable) return `${last.file} ${last.unreadable}. Date used: ${last.date}, ${last.date_why}.`;
+  // T-297: a log whose date could not be found is named, so the migration date is not mistaken for the log's own.
+  if (last.n > 0 && last.date_why.startsWith("the migration date")) return `${last.file}: no date in its heading or in a Date line. Date used: ${last.date}, ${last.date_why}.`;
+  return null;
 }
 
 export function findLastSession(sessionsDir: string, today: string): ImportReport["last_session"] {
@@ -597,14 +624,19 @@ export function findLastSession(sessionsDir: string, today: string): ImportRepor
   }
   if (!best) return row(0, "(no Session_N.md)", today, null, "the migration date, because there is no session log", null);
   const decoded = decodeText(readBytes(join(sessionsDir, best.file)));
-  const fromLog = decoded.text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? null;
+  // T-297: the heading's `— YYYY-MM-DD`, else any full date in the `# Session N` line, else a Date line in the first 10 lines.
+  const h1 = decoded.text.match(/^# Session \d+\b.*$/m)?.[0] ?? "";
+  const headDate = decoded.text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? h1.match(/\b(\d{4}-\d{2}-\d{2})\b/)?.[1] ?? null;
+  const lineDate = headDate ? null : decoded.text.split(/\r?\n/).slice(0, 10).map((l) => l.match(DATE_LINE_RE)?.[1]?.replace(/\*+$/, "")).find((d): d is string => d !== undefined && FULL_DATE.test(d)) ?? null;
+  const fromLog = headDate ?? lineDate;
+  const fromWhy = headDate ? "read from the log heading" : "read from the log's Date line";
   const uuid = decoded.text.match(/Session ID:\*{0,2}\s*`?([0-9a-fA-F-]{36})`?/)?.[1] ?? null;
   const file = `.agents/SESSIONS/${best.file}`;
   if (decoded.undecodable) {
-    if (fromLog) return row(best.n, file, fromLog, uuid, "read from the log heading", decoded.undecodable);
+    if (fromLog) return row(best.n, file, fromLog, uuid, fromWhy, decoded.undecodable);
     return row(best.n, file, today, uuid, "the migration date, because the log's date line could not be read", decoded.undecodable);
   }
-  if (fromLog) return row(best.n, file, fromLog, uuid, "read from the log heading", null);
+  if (fromLog) return row(best.n, file, fromLog, uuid, fromWhy, null);
   return row(best.n, file, today, uuid, "the migration date, because the log heading has no date", null);
 }
 
@@ -695,7 +727,7 @@ const INPUT_REL: Record<InputKey, string> = {
 const JUDGED: InputKey[] = ["next", "inbox", "task"];
 const NOT_JUDGED_REASON: Partial<Record<InputKey, string>> = {
   summary: "not imported as state: --commit only cuts its status blockquote and `## Current State`",
-  decisions: "imported as a dated log of past decisions, not as current state",
+  decisions: "read as a log of past decisions (ADRs or dated entries), not judged as current state",
 };
 
 /** `#` to `######`, then a space or the end of the line (R5-1). */
@@ -963,7 +995,10 @@ export function renderImportReport(r: ImportReport, mode: "draft" | "commit"): s
   for (const u of r.inbox.unparsed) L.push(`- line ${u.line}: ${u.reason} — \`${u.text}\``);
   L.push("", "## Objective (task.md)", "", r.objective.found ? `Found: ${r.objective.preview}${r.objective.preview.length >= 160 ? "…" : ""}` : `NOT imported: ${r.objective.preview}`);
   L.push("", "## Decisions (DECISIONS.md)", "");
-  L.push(`Imported ${r.decisions.imported} ADRs: ${r.decisions.date_from_line} with a full \`Date:\` line, ${r.decisions.date_partial.length} with a partial date (kept in the note), ${r.decisions.date_unknown} with none (date = migration date, note "imported; original date unknown").`);
+  const datedN = r.decisions.dated ?? 0;
+  L.push(`Imported ${r.decisions.imported} decisions: ${r.decisions.imported - datedN} ADRs (${r.decisions.date_from_line} with a full \`Date:\` line, ${r.decisions.date_partial.length} with a partial date (kept in the note), ${r.decisions.date_unknown} with none (date = migration date, note "imported; original date unknown")) and ${datedN} dated entries (\`## YYYY-MM-DD — title\`, numbered D-001 oldest first).`);
+  const decWarn = decisionsWarning(r);
+  if (decWarn) L.push("", decWarn);
   for (const d of r.decisions.date_partial) L.push(`- ${d.id}: original date \`${d.original}\``);
   if (r.decisions.skipped.length) { L.push("", "Skipped:"); for (const s of r.decisions.skipped) L.push(`- line ${s.line}: ${s.reason} — \`${s.heading}\``); }
   if (r.decisions_unreadable) { L.push("", "**Not read in full:**"); for (const l of describeDecisionsUnreadable(r.decisions_unreadable)) L.push(`- ${l}`); }
