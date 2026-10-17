@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 518,
+  "revision": 519,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2465,6 +2465,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s173, from Maker's S68 /start (ff642601, 03:01:33Z 10-17). Makerspace #129-#132 merged 02:57:55-02:58:14Z (heads 429d521e, 033afb5e, e3086cac, 6a0daf85), yet PICK UP said 'FOUR PRs READY ... waiting on Aaron's ONE merge word' and WAITING ON AARON asked to merge them: scorecard rows 1 and 7 FAIL. The fact was on disk: the seat's fetch (03:01:31Z) postdated the merges and all four heads are ancestors of origin/main (4389a55). Fix (deterministic, no schema change): at start, for each 7-40 hex SHA in the own handoff (pick_up, open_questions, loop_state.open_prs notes), run merge-base --is-ancestor against origin/<default>; print one line 'MERGED since this handoff: <sha> ...' (as of the last fetch). A squash merge is not caught (lower bound; say so in the line or the note). — s173 SHIPPED via #835 (head cf82c308, merged b73b17a2; brief docs/loops/t302-merged-citations-brief.md; two QA PC SIMs: worst case 31 lines / 4395 chars, m1-m6 red as predicted). Opt-in greeting.json merged_citations; SIA opted in (#836). Live check pending. — s173 live check PASS (V-087). Next: offer the opt-in to Maker, Courier, Relay and Prism.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-303",
+      "title": "Record write model: weigh an append-only ops log (Scion lessons) against today's single state.json, on measured collision data",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s173, from Scout's write-up (sia-research checkout, Aaron's ask; claude.ai doc 'Scion Lessons for SIA State', source anthropic.com/engineering/redesigning-source-control 2026-10-13). Proposal: ob_state ops stored one file per write (.agents/ops/<id>.json), state.json and the views derived by replay; revision named by a content hash; task notes split out (431 KB of the 905 KB record at rev 518); reads resolve from origin/master. It is G-027's third candidate fix. RULING (Atlas): not now. Since G-027 (2026-09-17) the collision has been prevented procedurally: one writer per record in practice, one records PR at a time, tree-sync before every write, pr-keep-current. Gate: measure first, from git history, how many records PRs since 2026-10-01 hit a state.json conflict or a duplicate revision/id; adopt only if that is non-trivial. ID question: under any log design, mint ids at write time from the base record and let a CI check refuse a merge that would duplicate an id (replay-time ids would break every brief and PR that cites one). Independent smaller items stay candidates: notes out of state.json (size, not correctness); origin/master reads already exist (record-source.ts kind 'master').",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
