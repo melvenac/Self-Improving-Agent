@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+      writeFileSync(dest, templateText(stub), { encoding: "utf8", flag: "wx" });
+===
+      writeFileSync(dest, readFileSync(stub), { flag: "wx" });
+>>>

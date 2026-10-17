@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+    if (!existsSync(src)) { skipped.push({ path: m.path, reason: `project-template/${m.from} not found — not merged` }); continue; }
+===
+    // M5: no missing-template guard
+>>>

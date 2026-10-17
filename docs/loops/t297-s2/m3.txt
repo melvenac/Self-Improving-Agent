@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+  return readFileSync(path, "utf8").replace(/\r\n/g, "\n");
+===
+  return readFileSync(path, "utf8");
+>>>

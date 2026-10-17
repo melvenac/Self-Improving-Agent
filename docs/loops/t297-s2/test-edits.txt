@@ -1,0 +1,17 @@
+@@@ open-brain/tests/pipelines/import-cmds-r2-l1.test.ts
+<<<
+        ".claude/commands/task.md",
+      ].sort(),
+===
+        ".claude/commands/task.md",
+        // T-297: --commit merges the template's gitattributes (this fixture's .gitignore already carries every rule).
+        ".gitattributes",
+      ].sort(),
+>>>
+@@@ open-brain/tests/pipelines/template-seed.test.ts
+<<<
+    expect(lines).toEqual(["/.agents/** text eol=lf"]);
+===
+    // T-297: the session commands copied from the template stay LF too.
+    expect(lines).toEqual(["/.agents/** text eol=lf", "/.claude/commands/*.md text eol=lf"]);
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+      if (f.kind === "file") writeFileSync(f.p, f.before!);
+===
+      if (f.kind === "never") writeFileSync(f.p, f.before!);
+>>>
