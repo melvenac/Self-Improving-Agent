@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 514 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 515 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -21,6 +21,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-235** Cursor CC parity: measure every CC surface under cursor-agent CLI, then close the ruled gaps
 - [~] **T-262** /end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)
 - [ ] **T-298** Briefing gaps seen in Maker's S67 greeting: stale handoff not detectable, Latest brief silent outside docs/loops, divergence banner against the wrong branch, Usage 'not checked' noise
+- [ ] **T-302** The greeting does not see that PRs its handoff names have merged: a SHA the handoff cites that origin already contains is shown as still waiting
 
 ## P2
 
