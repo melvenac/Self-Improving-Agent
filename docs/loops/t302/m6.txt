@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  const mergedRoom = i.mergedCitations ? i.mergedCitations.length + 3 : 0;
+===
+  const mergedRoom = 0;
+>>>

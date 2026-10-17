@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  out.push([pickUp, i.missingHandoff, i.mergedCitations].filter((x): x is string => typeof x === "string" && x !== "").join(" · "));
+===
+  out.push([pickUp, i.missingHandoff].filter((x): x is string => typeof x === "string" && x !== "").join(" · "));
+>>>

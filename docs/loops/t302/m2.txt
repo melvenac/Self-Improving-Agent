@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/handoff-merged.ts
+<<<
+    ...h.open_questions.filter((q) => questionResolvedBy(q) === null).map(questionText),
+===
+    ...h.open_questions.map(questionText),
+>>>
