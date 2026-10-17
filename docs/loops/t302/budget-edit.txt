@@ -1,0 +1,32 @@
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+      missingHandoff: notice,
+      ownCheckout: "sia-infra",
+===
+      missingHandoff: notice,
+      // T-302: the longest merged-citations line (four shown, (+20) of MERGED_SCAN_MAX 24, the longer default ref).
+      mergedCitations: MERGED_MAX,
+      ownCheckout: "sia-infra",
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    expect(lines[at + 1]!.endsWith(` · ${notice}`)).toBe(true);
+===
+    expect(lines[at + 1]!.endsWith(` · ${notice} · ${MERGED_MAX}`)).toBe(true);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+  it("WORST CASE with EVERY flag on (FOCUS + SEATS + a MISSING_HANDOFF_MAX_CHARS T-199 notice + handoff_by_checkout + a clipped T-167 PROBLEM line + T-161's NO TRANSCRIPT, T-281): still fits BRIEFING_BUDGET", () => {
+===
+  it("WORST CASE with EVERY flag on (FOCUS + SEATS + a MISSING_HANDOFF_MAX_CHARS T-199 notice + handoff_by_checkout + a clipped T-167 PROBLEM line + T-161's NO TRANSCRIPT, T-281): still fits BRIEFING_BUDGET", () => {
+    const MERGED_MAX = "Already in origin/master (last fetch): aaaaaaaa, bbbbbbbb, cccccccc, dddddddd (+20)";
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    // T-281: the note rides the session line, and the full line is not in the Briefing.
+===
+    console.log(`T302-WORST lines=${count} chars=${chars}`);
+    expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    // T-281: the note rides the session line, and the full line is not in the Briefing.
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/handoff-merged.ts
+<<<
+  const merged = citedShas(own).filter((s) => gitLine(projectRoot, ["merge-base", "--is-ancestor", s, upstreamRef]) !== null);
+===
+  const merged = citedShas(own).filter((s) => gitLine(projectRoot, ["rev-parse", "--verify", "--quiet", `${s}^{commit}`]) !== null);
+>>>

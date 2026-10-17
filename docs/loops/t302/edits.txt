@@ -1,0 +1,66 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  missingHandoff?: string | null;
+  /** IMPORT-CMDS C4: valid record but project `.claude/commands/start.md` is not SIA's copy. */
+===
+  missingHandoff?: string | null;
+  /**
+   * T-302, OPT-IN per repo (greeting.json `merged_citations`), default OFF. The SHAs the reader's own handoff cites that the
+   * upstream branch already contains (handoff-merged.ts). Null or absent prints nothing. Legacy: its own line after the
+   * pick-up (and after missingHandoff). Budgeted: appended to the pick-up line after missingHandoff, so no line is added.
+   */
+  mergedCitations?: string | null;
+  /** IMPORT-CMDS C4: valid record but project `.claude/commands/start.md` is not SIA's copy. */
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  if (i.missingHandoff) out.push(i.missingHandoff);
+
+  if (own && own.watch_out.length > 0) {
+===
+  if (i.missingHandoff) out.push(i.missingHandoff);
+  if (i.mergedCitations) out.push(i.mergedCitations);
+
+  if (own && own.watch_out.length > 0) {
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  const pickUp = own
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars)
+===
+  // T-302: the merged note rides the pick-up line and is paid for out of the pick-up's cap, so the budget does not grow.
+  const mergedRoom = i.mergedCitations ? i.mergedCitations.length + 3 : 0;
+  const pickUp = own
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars - mergedRoom)
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  out.push(i.missingHandoff ? `${pickUp} · ${i.missingHandoff}` : pickUp);
+===
+  out.push([pickUp, i.missingHandoff, i.mergedCitations].filter((x): x is string => typeof x === "string" && x !== "").join(" · "));
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+import { SeatName, schemaVersionAdvice, type Seat } from "../../shared/state-schema.js";
+===
+import { SeatName, ownHandoff, schemaVersionAdvice, type Seat } from "../../shared/state-schema.js";
+import { describeMergedCitations } from "./handoff-merged.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+        ? missingHandoffLine(sj.data, { projectRoot, sessionUuid: proven.id, seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null })
+        : null,
+===
+        ? missingHandoffLine(sj.data, { projectRoot, sessionUuid: proven.id, seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null })
+        : null,
+      // T-302, opt-in: SHAs this reader's handoff cites that the upstream branch already contains, as of the last fetch.
+      mergedCitations: greetingFlag(projectRoot, "merged_citations")
+        ? describeMergedCitations(projectRoot, ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout), recordSource.upstreamRef)
+        : null,
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-flags.ts
+<<<
+ * Keys: brief_dir (string), briefing_budget, briefing_focus, briefing_problem, greeting_metrics, handoff_by_checkout, handoff_caps, missing_handoff, role_docs_by_sha, state_compact. Keep them sorted in the tracked file.
+===
+ * Keys: brief_dir (string), briefing_budget, briefing_focus, briefing_problem, greeting_metrics, handoff_by_checkout, handoff_caps, merged_citations, missing_handoff, role_docs_by_sha, state_compact. Keep them sorted in the tracked file.
+>>>
