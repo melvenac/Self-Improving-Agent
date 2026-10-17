@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 519 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 520 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).
 
 ## What's working
@@ -93,6 +93,7 @@
 - T-168's peer-idleness check works from a Cursor process on the QA PC: the suite runner names seat cursor-builder from SUITE_SEAT, detects its owner as cursor-agent, takes and releases the lease (0/0), reads an available hub-presence census, and leaves the clone's porcelain empty. _(V-085, 1 evidence)_
 - T-297 step 1 is live on the main build (3c83ef4e): the importer reads a dated decision log (## YYYY-MM-DD — title) as D-001.. oldest first, dates the last session from any full date in its heading or a Date line, names every next-session section it did not import (including text above the first ## heading) with pick_up pointing to the snapshot, and tells how to fix a role that is not a seat. _(V-086, 1 evidence)_
 - T-302 is live on the main build (b73b17a2): with greeting.json merged_citations on, the budgeted briefing's pick-up line ends with 'Already in origin/master (last fetch): <sha8>, ...' for SHAs the reader's own handoff cites that origin/master contains, and the line stays within the pick-up cap. _(V-087, 1 evidence)_
+- T-297 step 2 is live on the main build (40d9980b): state import --commit merges the template's gitignore and gitattributes into the project (created here), LF, so the .agents allowlist and the eol rules hold after an import; role stubs are written LF. _(V-088, 1 evidence)_
 
 ## What's broken
 
