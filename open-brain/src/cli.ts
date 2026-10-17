@@ -670,7 +670,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
     process.exit(0);
   }
 
-  const { runDraft, runCommit, describeHandoffSeat, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, ACCEPT_CHANGED_FLAG, DRAFT_INPUTS_REL, NAME_FLAG, blocksCommit, inboxWarning, describeDecisionsUnreadable, describeLastSession } = await import("./pipelines/state-import/index.js");
+  const { runDraft, runCommit, describeHandoffSeat, DRAFT_REL, REPORT_REL, STATE_REL, ACCEPT_STALE_FLAG, ACCEPT_CHANGED_FLAG, DRAFT_INPUTS_REL, NAME_FLAG, blocksCommit, inboxWarning, decisionsWarning, describeDecisionsUnreadable, describeLastSession } = await import("./pipelines/state-import/index.js");
   const { relative } = await import("node:path");
   const { existsSync, statSync } = await import("node:fs");
   // T-150's rule: an unrecognised flag refuses. Before this, a misspelled flag
@@ -762,12 +762,15 @@ Read-only. Change state through ob_state — never by editing the file.`);
       const warning = inboxWarning(rep);
       if (warning) console.log(warning);
       console.log(`Decisions: ${rep.decisions.imported} (${rep.decisions.skipped.length} skipped) · verified ${rep.verified_imported} · gaps ${rep.gaps_imported} · objective ${rep.objective.found ? "found" : "NOT found"}`);
+      const decWarn = decisionsWarning(rep);
+      if (decWarn) console.log(decWarn);
       if (rep.decisions_unreadable) for (const l of describeDecisionsUnreadable(rep.decisions_unreadable)) console.log(`  ${l}`);
       const lastDraft = describeLastSession(rep.last_session);
       if (lastDraft) console.log(lastDraft);
       console.log(describeHandoffSeat(rep.handoff_seat));
       console.log(`Handoff: pick_up ${rep.handoff.pick_up_lines} lines, watch_out ${rep.handoff.watch_out}, open_questions ${rep.handoff.open_questions}`);
       if (rep.handoff.not_imported.length) console.log(`Handoff: ${rep.handoff.not_imported.length} line(s) under Watch out / Open questions NOT imported — listed in the report`);
+      if (rep.handoff.sections_not_imported.length) console.log(`Handoff: ${rep.handoff.sections_not_imported.length} section(s) NOT imported (${rep.handoff.sections_not_imported.join("; ")}); they stay only in the snapshot${rep.handoff.pick_up_lines === 0 ? ", and pick_up will point to it" : ""}`);
       if (rep.summary_removal) console.log(`SUMMARY.md: --commit will remove ${rep.summary_removal.total_lines_removed} lines (${rep.summary_removal.blockquote_lines} blockquote + ${rep.summary_removal.current_state_lines} Current State)`);
       console.log(`\nReview the report, then run: open-brain state import --commit`);
       process.exit(r.validation.ok ? 0 : 1);
