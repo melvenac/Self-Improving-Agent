@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  if (preamble > 0) report.sections_not_imported.push(`(text before the first ## heading: ${preamble} lines)`);
+===
+  // M3: preamble not reported
+>>>

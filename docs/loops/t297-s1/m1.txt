@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  dated.sort((a, b) => a.date.localeCompare(b.date) || a.k - b.k);
+===
+  // M1: no sort
+>>>

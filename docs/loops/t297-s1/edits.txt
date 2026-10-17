@@ -1,0 +1,164 @@
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+    skipped: Array<{ line: number; heading: string; reason: string }>;
+  };
+===
+    skipped: Array<{ line: number; heading: string; reason: string }>;
+    /** T-297: entries of a dated log (`## YYYY-MM-DD — title`), numbered D-001.. oldest first. Absent means 0. */
+    dated?: number;
+  };
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+const FULL_DATE = /^\d{4}-\d{2}-\d{2}$/;
+===
+const FULL_DATE = /^\d{4}-\d{2}-\d{2}$/;
+/** T-297: a dated decision log, as tarrantmailer's DECISIONS.md writes it. */
+const DATED_RE = /^#{2,3} (\d{4}-\d{2}-\d{2})\s+[—–-]+\s+(.+?)\s*$/;
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  const seen = new Set<string>();
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.startsWith("### ")) continue;
+===
+  const seen = new Set<string>();
+  const dated: Array<{ date: string; title: string; k: number }> = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const dm = line.match(DATED_RE);
+    if (dm) { dated.push({ date: dm[1], title: dm[2], k: dated.length }); continue; }
+    if (!line.startsWith("### ")) continue;
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+    out.push({ id, title, date, note });
+  }
+  report.imported = out.length;
+  return out;
+}
+===
+    out.push({ id, title, date, note });
+  }
+  // T-297: oldest first, so D-001 is the first decision; same-date entries keep file order.
+  dated.sort((a, b) => a.date.localeCompare(b.date) || a.k - b.k);
+  dated.forEach((d, n) => out.push({ id: `D-${String(n + 1).padStart(3, "0")}`, title: d.title, date: d.date, note: "" }));
+  report.dated = dated.length;
+  report.imported = out.length;
+  return out;
+}
+
+/** T-297: a DECISIONS.md with text and no decision the importer reads would import 0 without a word. */
+export function decisionsWarning(r: ImportReport): string | null {
+  const src = r.sources.decisions;
+  if (!src?.present || src.lines === 0 || r.decisions.imported > 0) return null;
+  return `WARNING: ${src.path} has ${src.lines} lines and no ADR (\`### ADR-N: title\`) or dated entry (\`## YYYY-MM-DD — title\`): 0 decisions will be imported`;
+}
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  const lines = text.split(/\r?\n/);
+  const headings = lines.map((l, i) => ({ l, i })).filter(({ l }) => /^#{2,6} /.test(l));
+  for (const { l, i } of headings) {
+===
+  const lines = text.split(/\r?\n/);
+  const headings = lines.map((l, i) => ({ l, i })).filter(({ l }) => /^#{2,6} /.test(l));
+  // T-297: prose above the first `##` heading is not imported either; it is counted, not dropped silently.
+  const preamble = lines.slice(0, headings.length ? headings[0].i : lines.length).filter((l) => l.trim() !== "" && !/^# /.test(l)).length;
+  if (preamble > 0) report.sections_not_imported.push(`(text before the first ## heading: ${preamble} lines)`);
+  for (const { l, i } of headings) {
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+      report.sections_not_imported.push(title);
+    }
+  }
+  return handoff;
+}
+===
+      report.sections_not_imported.push(title);
+    }
+  }
+  // T-297: an empty pick_up over sections that were not imported would render as "nothing recorded"; point at them instead.
+  if (handoff.pick_up === "" && report.sections_not_imported.length > 0) {
+    handoff.pick_up = `Imported from a prose next-session.md with no "Pick up here" section. Not imported: ${report.sections_not_imported.join("; ")}. They are in the pre-migration snapshot under .agents/archive/ in the checkout that ran the import; re-enter what is current with ob_state set_handoff.`;
+  }
+  return handoff;
+}
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  return `Handoff seat: ${s.seat}, ASSUMED: ${why}`;
+===
+  return `Handoff seat: ${s.seat}, ASSUMED: ${why}${s.declared_role === null ? "" : "; set role: in .agents/AGENT.md (or AGENT.local.md) to planner, developer or qa"}`;
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  if (!last.unreadable) return null;
+  return `${last.file} ${last.unreadable}. Date used: ${last.date}, ${last.date_why}.`;
+===
+  if (last.unreadable) return `${last.file} ${last.unreadable}. Date used: ${last.date}, ${last.date_why}.`;
+  // T-297: a log whose date could not be found is named, so the migration date is not mistaken for the log's own.
+  if (last.n > 0 && last.date_why.startsWith("the migration date")) return `${last.file}: no date in its heading or in a Date line. Date used: ${last.date}, ${last.date_why}.`;
+  return null;
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  const fromLog = decoded.text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? null;
+===
+  // T-297: the heading's `— YYYY-MM-DD`, else any full date in the `# Session N` line, else a Date line in the first 10 lines.
+  const h1 = decoded.text.match(/^# Session \d+\b.*$/m)?.[0] ?? "";
+  const headDate = decoded.text.match(/^# Session \d+\s+[—–-]+\s+(\d{4}-\d{2}-\d{2})/m)?.[1] ?? h1.match(/\b(\d{4}-\d{2}-\d{2})\b/)?.[1] ?? null;
+  const lineDate = headDate ? null : decoded.text.split(/\r?\n/).slice(0, 10).map((l) => l.match(DATE_LINE_RE)?.[1]?.replace(/\*+$/, "")).find((d): d is string => d !== undefined && FULL_DATE.test(d)) ?? null;
+  const fromLog = headDate ?? lineDate;
+  const fromWhy = headDate ? "read from the log heading" : "read from the log's Date line";
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+    if (fromLog) return row(best.n, file, fromLog, uuid, "read from the log heading", decoded.undecodable);
+===
+    if (fromLog) return row(best.n, file, fromLog, uuid, fromWhy, decoded.undecodable);
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  if (fromLog) return row(best.n, file, fromLog, uuid, "read from the log heading", null);
+===
+  if (fromLog) return row(best.n, file, fromLog, uuid, fromWhy, null);
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  decisions: "imported as a dated log of past decisions, not as current state",
+===
+  decisions: "read as a log of past decisions (ADRs or dated entries), not judged as current state",
+>>>
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  L.push(`Imported ${r.decisions.imported} ADRs: ${r.decisions.date_from_line} with a full \`Date:\` line, ${r.decisions.date_partial.length} with a partial date (kept in the note), ${r.decisions.date_unknown} with none (date = migration date, note "imported; original date unknown").`);
+===
+  const datedN = r.decisions.dated ?? 0;
+  L.push(`Imported ${r.decisions.imported} decisions: ${r.decisions.imported - datedN} ADRs (${r.decisions.date_from_line} with a full \`Date:\` line, ${r.decisions.date_partial.length} with a partial date (kept in the note), ${r.decisions.date_unknown} with none (date = migration date, note "imported; original date unknown")) and ${datedN} dated entries (\`## YYYY-MM-DD — title\`, numbered D-001 oldest first).`);
+  const decWarn = decisionsWarning(r);
+  if (decWarn) L.push("", decWarn);
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+blocksCommit, inboxWarning, describeDecisionsUnreadable, describeLastSession } = await import("./pipelines/state-import/index.js");
+===
+blocksCommit, inboxWarning, decisionsWarning, describeDecisionsUnreadable, describeLastSession } = await import("./pipelines/state-import/index.js");
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+      if (rep.decisions_unreadable) for (const l of describeDecisionsUnreadable(rep.decisions_unreadable)) console.log(`  ${l}`);
+===
+      const decWarn = decisionsWarning(rep);
+      if (decWarn) console.log(decWarn);
+      if (rep.decisions_unreadable) for (const l of describeDecisionsUnreadable(rep.decisions_unreadable)) console.log(`  ${l}`);
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+      if (rep.handoff.not_imported.length) console.log(`Handoff: ${rep.handoff.not_imported.length} line(s) under Watch out / Open questions NOT imported — listed in the report`);
+===
+      if (rep.handoff.not_imported.length) console.log(`Handoff: ${rep.handoff.not_imported.length} line(s) under Watch out / Open questions NOT imported — listed in the report`);
+      if (rep.handoff.sections_not_imported.length) console.log(`Handoff: ${rep.handoff.sections_not_imported.length} section(s) NOT imported (${rep.handoff.sections_not_imported.join("; ")}); they stay only in the snapshot${rep.handoff.pick_up_lines === 0 ? ", and pick_up will point to it" : ""}`);
+>>>
