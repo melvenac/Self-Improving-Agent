@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/state-import/index.ts
+<<<
+  if (handoff.pick_up === "" && report.sections_not_imported.length > 0) {
+===
+  if (false) {
+>>>
