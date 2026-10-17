@@ -41,6 +41,8 @@ describe("QA290 L1: import path one Bootstrap SIA commit", () => {
         ".claude/commands/start.md",
         ".claude/commands/sync.md",
         ".claude/commands/task.md",
+        // T-297: --commit merges the template's gitattributes (this fixture's .gitignore already carries every rule).
+        ".gitattributes",
       ].sort(),
     );
   });

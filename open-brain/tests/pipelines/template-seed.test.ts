@@ -62,6 +62,7 @@ describe("project-template/.agents", () => {
 
   it("the template's gitattributes (shipped without the dot) keeps .agents/ LF", () => {
     const lines = readFileSync(join(templateDir, "gitattributes"), "utf-8").split(/\r?\n/).filter((l) => l && !l.startsWith("#"));
-    expect(lines).toEqual(["/.agents/** text eol=lf"]);
+    // T-297: the session commands copied from the template stay LF too.
+    expect(lines).toEqual(["/.agents/** text eol=lf", "/.claude/commands/*.md text eol=lf"]);
   });
 });

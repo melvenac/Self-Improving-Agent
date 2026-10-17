@@ -207,7 +207,7 @@ The status must list exactly:
 - `CLAUDE.md` if step 4 changed it
 
 If the role files do not appear, the project's `.gitignore` predates them and ignores `.agents/roles/`
-(`--commit` does not change `.gitignore`). Add these three lines after its other `.agents` rules, then
+(`--commit` merges the template's rules into `.gitignore` but never removes an owner's older rule). Add these three lines after its other `.agents` rules, then
 run the status again:
 
 ```

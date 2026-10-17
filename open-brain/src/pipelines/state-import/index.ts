@@ -19,7 +19,7 @@
 import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, cpSync, renameSync, statSync, rmSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join, relative, resolve } from "node:path";
-import { defaultTemplateDir } from "../bootstrap/index.js";
+import { defaultTemplateDir, mergeTemplateFiles, templateText } from "../bootstrap/index.js";
 import {
   StateSchema,
   SeatName,
@@ -1167,6 +1167,8 @@ export interface CommitResult {
   inputs_unrecorded: boolean;
   /** T-251: role-file stubs copied from project-template, the project's own kept, and any the template lacks. */
   role_stubs: { installed: string[]; kept: string[]; missing: string[] };
+  /** T-297: the template's gitignore and gitattributes merged into the project's, as scaffold merges them (BF-4). */
+  merged_files: { written: string[]; skipped: string[] };
 }
 
 export function runCommit(projectRoot: string, today: string, opts: { forceSnapshot?: boolean; version?: string; acceptStale?: boolean; acceptChanged?: boolean; templateDir?: string } = {}): CommitResult {
@@ -1244,6 +1246,13 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
     throw err;
   }
 
+  // T-297: the owner files step 4c merges into, as they are now, so an import that does not complete puts them back.
+  const ownerFiles = [".gitignore", ".gitattributes"].map((rel) => {
+    const p = join(root, rel);
+    const kind = !existsSync(p) ? "absent" : statSync(p).isFile() ? "file" : "other";
+    return { p, kind, before: kind === "file" ? readFileSync(p) : null };
+  });
+
   const migrate = () => {
     // 2. state.json at revision 0, canonical bytes.
     writeFileSync(statePath, serializeState(parsed.data), "utf-8");
@@ -1273,9 +1282,14 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
       const stub = join(templateDir, rel);
       if (!existsSync(stub)) { role_stubs.missing.push(rel); continue; }
       mkdirSync(dirname(dest), { recursive: true });
-      writeFileSync(dest, readFileSync(stub), { flag: "wx" });
+      writeFileSync(dest, templateText(stub), { encoding: "utf8", flag: "wx" });
       role_stubs.installed.push(rel);
     }
+
+    // 4c. T-297: the .agents allowlist (gitignore) and the LF rule (gitattributes), merged as scaffold merges them. Without
+    // it an imported project kept no allowlist: its session logs and snapshot were tracked and AGENT.local.md was not ignored.
+    const m = mergeTemplateFiles(root, templateDir);
+    const merged_files = { written: m.written.map((w) => `${w.path} (${w.action})`), skipped: m.skipped.map((s) => `${s.path}: ${s.reason}`) };
 
     // 5. Move the draft and the report into the snapshot.
     const moved: string[] = [];
@@ -1286,7 +1300,7 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
       renameSync(from, to);
       moved.push(relative(root, to).replace(/\\/g, "/"));
     }
-    return { summary, rendered: r.rendered, moved, role_stubs };
+    return { summary, rendered: r.rendered, moved, role_stubs, merged_files };
   };
 
   let done: ReturnType<typeof migrate>;
@@ -1294,13 +1308,18 @@ export function runCommit(projectRoot: string, today: string, opts: { forceSnaps
     done = migrate();
   } catch (err) {
     const why = err instanceof Error ? err.message : String(err);
+    // A path that is not a file (a directory, say) was never the importer's to write, so it is left exactly as it is.
+    for (const f of ownerFiles) {
+      if (f.kind === "file") writeFileSync(f.p, f.before!);
+      else if (f.kind === "absent") rmSync(f.p, { force: true });
+    }
     throw new Error(`${why}. ${rollBack(agents, snapshot.dir, made.created, aside, marker)}`);
   }
   rmSync(marker, { force: true });
   if (aside) rmSync(aside, { recursive: true, force: true });
   const decisionsText = onDisk.texts.decisions;
   const decisions_unreadable = decisionsText !== null && onDisk.undecodable.decisions ? decisionsUnreadable(decisionsText, onDisk.undecodable.decisions, parsed.data.decisions.map((d) => d.id)) : null;
-  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable, last_session, accepted_changed: changed, inputs_unrecorded, role_stubs: done.role_stubs };
+  return { statePath, snapshot, summary: done.summary, rendered: done.rendered, moved: done.moved, staleness, accepted_stale: stale.map((i) => i.input), accepted_unreadable: unreadable.map((i) => i.input), decisions_unreadable, last_session, accepted_changed: changed, inputs_unrecorded, role_stubs: done.role_stubs, merged_files: done.merged_files };
 }
 
 /**

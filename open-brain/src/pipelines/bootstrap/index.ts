@@ -492,7 +492,7 @@ export function installCommands(
         rolledBack.push({ archivePath: archived, dest });
       }
       mkdirSync(commandsDir, { recursive: true });
-      copyFileSync(join(templateDir, sessionCommandRel(name)), dest);
+      writeFileSync(dest, templateText(join(templateDir, sessionCommandRel(name))), "utf8");
       if (before === "absent") createdCopies.push(dest);
       lines.push({ name, before, after: "SIA" });
     }
@@ -576,6 +576,44 @@ export interface ScaffoldResult {
   verify: { ok: boolean; problems: string[] };
 }
 
+/**
+ * T-297: a template file as LF text. The build is served from a checkout whose working copies core.autocrlf may have
+ * rewritten to CRLF (the SIA main checkout's sync.md is), and a copy of those bytes gave the target CRLF files.
+ */
+export function templateText(path: string): string {
+  return readFileSync(path, "utf8").replace(/\r\n/g, "\n");
+}
+
+/**
+ * BF-4, shared by `scaffold` and (T-297) `state import --commit`: the template's gitignore and gitattributes merged into the
+ * project's. The owner's lines stay; the template's missing rules are appended under one SIA header.
+ */
+export function mergeTemplateFiles(root: string, templateDir: string): { written: ScaffoldResult["written"]; skipped: ScaffoldResult["skipped"] } {
+  const written: ScaffoldResult["written"] = [];
+  const skipped: ScaffoldResult["skipped"] = [];
+  for (const m of MERGED_FILES) {
+    const dest = join(root, m.path);
+    const src = join(templateDir, m.from);
+    // A template without the file is reported, not thrown, as `state import --commit` reports a missing role stub (T-251 K1).
+    if (!existsSync(src)) { skipped.push({ path: m.path, reason: `project-template/${m.from} not found — not merged` }); continue; }
+    const tmpl = templateText(src);
+    if (!existsSync(dest)) {
+      writeFileSync(dest, tmpl, "utf8");
+      written.push({ path: m.path, tracked: true, action: "created", from: `project-template/${m.from}`, why: m.why });
+      continue;
+    }
+    const existing = readFileSync(dest, "utf8");
+    const have = new Set(existing.split(/\r?\n/).map((l) => l.trim()));
+    const missing = tmpl.split(/\r?\n/).filter((l) => l.trim() !== "" && !l.startsWith("#") && !have.has(l.trim()));
+    if (missing.length === 0) { skipped.push({ path: m.path, reason: "already carries every rule in the template's copy" }); continue; }
+    const nl = existing.includes("\r\n") ? "\r\n" : "\n";
+    const sep = existing.length === 0 || existing.endsWith("\n") ? "" : nl;
+    writeFileSync(dest, `${existing}${sep}${nl}# --- SIA (Self-Improving Agent): from project-template/${m.from} ---${nl}${missing.join(nl)}${nl}`, "utf8");
+    written.push({ path: m.path, tracked: true, action: "merged", from: `project-template/${m.from}`, why: m.why });
+  }
+  return { written, skipped };
+}
+
 export function scaffold(projectRoot: string, templateDir = defaultTemplateDir()): ScaffoldResult {
   const ins = inspectProject(projectRoot, templateDir);
   const root = ins.root;
@@ -605,28 +643,14 @@ export function scaffold(projectRoot: string, templateDir = defaultTemplateDir()
       writeFileSync(dest, agentMd(projectIdentityName(root)), "utf8");
       written.push({ path: f.path, tracked: f.tracked, action: "generated", from: null, why: f.why });
     } else {
-      copyFileSync(join(templateDir, f.from), dest);
+      writeFileSync(dest, templateText(join(templateDir, f.from)), "utf8");
       written.push({ path: f.path, tracked: f.tracked, action: "copied", from: `project-template/${f.from}`, why: f.why });
     }
   }
 
-  for (const m of MERGED_FILES) {
-    const dest = join(root, m.path);
-    const tmpl = readFileSync(join(templateDir, m.from), "utf8");
-    if (!existsSync(dest)) {
-      writeFileSync(dest, tmpl, "utf8");
-      written.push({ path: m.path, tracked: true, action: "created", from: `project-template/${m.from}`, why: m.why });
-      continue;
-    }
-    const existing = readFileSync(dest, "utf8");
-    const have = new Set(existing.split(/\r?\n/).map((l) => l.trim()));
-    const missing = tmpl.split(/\r?\n/).filter((l) => l.trim() !== "" && !l.startsWith("#") && !have.has(l.trim()));
-    if (missing.length === 0) { skipped.push({ path: m.path, reason: "already carries every rule in the template's copy" }); continue; }
-    const nl = existing.includes("\r\n") ? "\r\n" : "\n";
-    const sep = existing.length === 0 || existing.endsWith("\n") ? "" : nl;
-    writeFileSync(dest, `${existing}${sep}${nl}# --- SIA (Self-Improving Agent): from project-template/${m.from} ---${nl}${missing.join(nl)}${nl}`, "utf8");
-    written.push({ path: m.path, tracked: true, action: "merged", from: `project-template/${m.from}`, why: m.why });
-  }
+  const merged = mergeTemplateFiles(root, templateDir);
+  written.push(...merged.written);
+  skipped.push(...merged.skipped);
 
   return { root, template: templateDir, written, skipped, verify: verifyTracking(root, written) };
 }

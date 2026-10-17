@@ -24,4 +24,7 @@ export const STATE_IMPORT_COMMIT_OUTPUTS: readonly string[] = [
   ".agents/SESSIONS/next-session.md",
   ".agents/SYSTEM/SUMMARY.md",
   ...ROLE_STUB_RELS,
+  // T-297: --commit merges the template's into these, as scaffold does.
+  ".gitignore",
+  ".gitattributes",
 ];
