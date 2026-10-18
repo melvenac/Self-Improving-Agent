@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+ownCheckout), resolveUpstreamRef(projectRoot))
+===
+ownCheckout), (resolveUpstreamRef, recordSource.upstreamRef))
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/record-source.ts
+<<<
+export function resolveRecordSource(projectRoot: string, upstreamRef = resolveRecordRef(projectRoot)): RecordSource {
+===
+export function resolveRecordSource(projectRoot: string, upstreamRef = (resolveRecordRef, "origin/main")): RecordSource {
+>>>

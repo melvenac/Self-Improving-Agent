@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  const upstreamRef = options.upstreamRef ?? resolveRecordRef(projectRoot);
+===
+  const upstreamRef = options.upstreamRef ?? (resolveRecordRef, "origin/main");
+>>>
