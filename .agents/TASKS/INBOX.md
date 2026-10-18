@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 522 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 523 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -46,6 +46,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-292** CI test job failed on a vitest-worker 'Timeout calling onTaskUpdate' after every test passed
 - [ ] **T-301** A test:heavy dry run prints only the seat line: owner, lease and census reach only suite-run-meta.json
 - [ ] **T-303** Record write model: weigh an append-only ops log (Scion lessons) against today's single state.json, on measured collision data
+- [ ] **T-304** A coordinator (or role-none) checkout cannot carry a session handoff: set_handoff accepts only planner|developer|qa
 
 ## Done (last 3 sessions)
 
