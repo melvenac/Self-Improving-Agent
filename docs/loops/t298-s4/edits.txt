@@ -1,0 +1,87 @@
+@@@ open-brain/src/pipelines/session-start/upstream-ref.ts
+<<<
+import { execFileSync } from "node:child_process";
+===
+import { execFileSync } from "node:child_process";
+import { greetingString } from "./greeting-flags.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/upstream-ref.ts
+<<<
+  return FALLBACK_UPSTREAM;
+}
+===
+  return FALLBACK_UPSTREAM;
+}
+
+/** T-298 (3): a branch name, not ref syntax: no leading "-", no spaces, no "..". */
+const RECORD_BRANCH_RE = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
+
+/**
+ * T-298 (3): the ref the RECORD is read from and compared with. A project whose record lives on a branch other than the
+ * default (Makerspace: docs/t001-plans) names it in greeting.json `record_branch`, so the divergence banner stops firing
+ * every start. Absent, malformed or not fetched: resolveUpstreamRef, unchanged. Code questions (merged citations) keep the
+ * default branch.
+ */
+export function resolveRecordRef(projectRoot: string): string {
+  const branch = greetingString(projectRoot, "record_branch");
+  if (branch !== null && RECORD_BRANCH_RE.test(branch) && !branch.includes("..")) {
+    const ref = `origin/${branch}`;
+    if (verifiesAsCommit(projectRoot, ref)) return ref;
+  }
+  return resolveUpstreamRef(projectRoot);
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/record-source.ts
+<<<
+import { resolveUpstreamRef } from "./upstream-ref.js";
+===
+import { resolveRecordRef } from "./upstream-ref.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/record-source.ts
+<<<
+export function resolveRecordSource(projectRoot: string, upstreamRef = resolveUpstreamRef(projectRoot)): RecordSource {
+===
+export function resolveRecordSource(projectRoot: string, upstreamRef = resolveRecordRef(projectRoot)): RecordSource {
+>>>
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+import { resolveUpstreamRef } from "./upstream-ref.js";
+===
+import { resolveRecordRef } from "./upstream-ref.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  /** Defaults to resolveUpstreamRef(projectRoot) (T-250). */
+===
+  /** Defaults to resolveRecordRef(projectRoot): the default branch (T-250), or greeting.json `record_branch` (T-298). */
+>>>
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  const upstreamRef = options.upstreamRef ?? resolveUpstreamRef(projectRoot);
+===
+  const upstreamRef = options.upstreamRef ?? resolveRecordRef(projectRoot);
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+import { describeMergedCitations } from "./handoff-merged.js";
+===
+import { describeMergedCitations } from "./handoff-merged.js";
+import { resolveUpstreamRef } from "./upstream-ref.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      // T-302, opt-in: SHAs this reader's handoff cites that the upstream branch already contains, as of the last fetch.
+      mergedCitations: greetingFlag(projectRoot, "merged_citations")
+        ? describeMergedCitations(projectRoot, ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout), recordSource.upstreamRef)
+===
+      // T-302, opt-in: SHAs this reader's handoff cites that the upstream branch already contains, as of the last fetch.
+      // T-298 (3): the DEFAULT branch, where code merges, even when the record lives on `record_branch`.
+      mergedCitations: greetingFlag(projectRoot, "merged_citations")
+        ? describeMergedCitations(projectRoot, ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout), resolveUpstreamRef(projectRoot))
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-flags.ts
+<<<
+ * Keys: brief_dir (string), briefing_budget,
+===
+ * Keys: brief_dir (string), record_branch (string, T-298), briefing_budget,
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/upstream-ref.ts
+<<<
+    if (verifiesAsCommit(projectRoot, ref)) return ref;
+===
+    if (verifiesAsCommit(projectRoot, ref)) void ref;
+>>>
