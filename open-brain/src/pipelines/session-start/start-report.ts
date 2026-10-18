@@ -10,6 +10,7 @@ import { focusLine, seatsLine, seatOrder } from "./focus.js";
 import { resolveCheckoutSeat } from "./seat-map.js";
 import { SeatName, ownHandoff, schemaVersionAdvice, type Seat } from "../../shared/state-schema.js";
 import { describeMergedCitations } from "./handoff-merged.js";
+import { resolveUpstreamRef } from "./upstream-ref.js";
 import { readAgentIdentity } from "./agent-identity.js";
 import { describeHubPresence } from "./hub-presence.js";
 import { countWords, estimateTokens, STATE_JSON_REL } from "./state-reader.js";
@@ -303,8 +304,9 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         ? missingHandoffLine(sj.data, { projectRoot, sessionUuid: proven.id, seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null })
         : null,
       // T-302, opt-in: SHAs this reader's handoff cites that the upstream branch already contains, as of the last fetch.
+      // T-298 (3): the DEFAULT branch, where code merges, even when the record lives on `record_branch`.
       mergedCitations: greetingFlag(projectRoot, "merged_citations")
-        ? describeMergedCitations(projectRoot, ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout), recordSource.upstreamRef)
+        ? describeMergedCitations(projectRoot, ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout), resolveUpstreamRef(projectRoot))
         : null,
       oldStartCommand: oldStartCommandWarning(projectRoot),
       transcript,
