@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 522,
+  "revision": 523,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2436,7 +2436,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "s173, from reviewing clark's /start (2977a6e5, Aaron's request 17:36Z 10-16). ~/Worktrees has no .agents, so /start runs Part B and clark-ops/reference/start.md: clark-start.sh saves a 'newest block' of the hand-kept handoff that had grown to 534 lines / 90.8 KB (23 sections each labelled newest); start.md says read all of it; clark read 110 lines (chunked), printed no greeting, and went straight to work. Scorecard: state match unclear, fits NO, pointing NO. SIA owns the briefing for every other seat (ob_start, T-233 render, caps, tree currency), but none of it reaches the coordinator. Options to weigh: give ~/Worktrees (or a clark checkout) a record and an ob_start briefing; or an SIA 'coordinator' render over the planners' records plus clark's own small handoff. Not a clark-ops prompt fix (deterministic first).",
+      "note": "s173, from reviewing clark's /start (2977a6e5, Aaron's request 17:36Z 10-16). ~/Worktrees has no .agents, so /start runs Part B and clark-ops/reference/start.md: clark-start.sh saves a 'newest block' of the hand-kept handoff that had grown to 534 lines / 90.8 KB (23 sections each labelled newest); start.md says read all of it; clark read 110 lines (chunked), printed no greeting, and went straight to work. Scorecard: state match unclear, fits NO, pointing NO. SIA owns the briefing for every other seat (ob_start, T-233 render, caps, tree currency), but none of it reaches the coordinator. Options to weigh: give ~/Worktrees (or a clark checkout) a record and an ob_start briefing; or an SIA 'coordinator' render over the planners' records plus clark's own small handoff. Not a clark-ops prompt fix (deterministic first). — s173 10-18: Aaron yes to option A (e255061a 15:58:09Z, verified by relay-check). Brief docs/loops/t300-clark-record-brief.md (#846). clark DONE 7e637a02 in fleet: record at ~/Projects/fleet/.agents/state.json rev 2, clark.md FROZEN (agent-dashboard #305), clark-ops start/roll switched. Ruled the deviation: role none cannot carry a handoff (set_handoff refuses non-seat roles; a role-none reader gets READER'S SEAT UNRESOLVED and no PICK UP), so clark uses an ignored AGENT.local.md with role planner. Accepted as interim; the real fix is T-304. Open until step 10: Atlas scores clark's next-roll greeting and records the V-entry.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -2479,6 +2479,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s173, from Scout's write-up (sia-research checkout, Aaron's ask; claude.ai doc 'Scion Lessons for SIA State', source anthropic.com/engineering/redesigning-source-control 2026-10-13). Proposal: ob_state ops stored one file per write (.agents/ops/<id>.json), state.json and the views derived by replay; revision named by a content hash; task notes split out (431 KB of the 905 KB record at rev 518); reads resolve from origin/master. It is G-027's third candidate fix. RULING (Atlas): not now. Since G-027 (2026-09-17) the collision has been prevented procedurally: one writer per record in practice, one records PR at a time, tree-sync before every write, pr-keep-current. Gate: measure first, from git history, how many records PRs since 2026-10-01 hit a state.json conflict or a duplicate revision/id; adopt only if that is non-trivial. ID question: under any log design, mint ids at write time from the base record and let a CI check refuse a merge that would duplicate an id (replay-time ids would break every brief and PR that cites one). Independent smaller items stay candidates: notes out of state.json (size, not correctness); origin/master reads already exist (record-source.ts kind 'master'). — s173 GATE MEASURED (Scout, read-only git on origin/master, 2026-10-17): since 2026-10-01, 701 commits touched state.json (425 merges, 276 non-merge); merge-tree replay of all 425 merges: 0 conflicts; same revision on two non-ancestor lines: 0; duplicate T/V/G/D ids in any committed state: 0; control (three consecutive master states as base/A/B) does report conflicts, so the check can fire. Limit: master only; a collision unwound before merge leaves no trace (next instrument: open PRs and remote branches). Stays parked. File size at rev 518: 959,414 bytes as written (905 KB was a compact re-serialization); task notes 432,246 bytes.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-304",
+      "title": "A coordinator (or role-none) checkout cannot carry a session handoff: set_handoff accepts only planner|developer|qa",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s173, found by T-300 (clark's fleet record, 10-18). set_handoff refuses role none ('seat: expected planner|developer|qa'), and a role-none reader's briefing prints READER'S SEAT UNRESOLVED with no PICK UP. A one-agent bootstrap project (role none by design, bootstrap.md step 3) therefore never gets a pick-up line either. clark works around it with an ignored AGENT.local.md role planner, which also forces a planner loop_state. Options: a 'coordinator' role value, or let role none write and read a handoff without loop_state. Size SMALL to MEDIUM; check the T-163 per-session handoff rules first.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -6476,7 +6490,7 @@
     },
     {
       "n": 173,
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
       "seat": "planner",
       "checkout": "sia-planner",
