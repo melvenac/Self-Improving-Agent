@@ -1,0 +1,6 @@
+@@@ project-template/.claude/commands/end.md
+<<<
+`node <build>/cli.js skills-audit --session <SESSION_UUID> [--seat <name>] "<project dir>"`
+===
+`node <build>/cli.js skills-audit [--seat <name>] "<project dir>"`
+>>>

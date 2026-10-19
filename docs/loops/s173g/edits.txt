@@ -1,0 +1,70 @@
+@@@ open-brain/src/pipelines/shadow/index.ts
+<<<
+export function formatShadowReport(entries: ShadowLogEntry[]): string {
+  const rows = aggregateShadowLog(entries);
+  if (rows.length === 0) return "Shadow recall: no evaluated sessions yet.";
+===
+export function formatShadowReport(entries: ShadowLogEntry[]): string {
+  const all = aggregateShadowLog(entries);
+  if (all.length === 0) return "Shadow recall: no evaluated sessions yet.";
+
+  // T-306: a strategy no longer in SHADOW_STRATEGIES keeps its rows in the log but is never compared or proposed. Its
+  // mean covers only the sessions before it was removed, and what it swept may no longer exist (no_maturity, s173).
+  const current = new Set(SHADOW_STRATEGIES.map((s) => s.name));
+  const rows = all.filter((r) => current.has(r.strategy));
+  const retired = all.filter((r) => !current.has(r.strategy)).map((r) => r.strategy);
+  if (rows.length === 0) {
+    return `Shadow recall: no evaluated sessions for the current strategies (retired, not compared: ${retired.join(", ")}).`;
+  }
+>>>
+@@@ open-brain/src/pipelines/shadow/index.ts
+<<<
+      `  ${row.strategy.padEnd(16)} nDCG ${row.meanNdcg.toFixed(3)}  MRR ${row.meanMrr.toFixed(3)}  harmful ${row.harmful}`
+    );
+  }
+===
+      `  ${row.strategy.padEnd(16)} nDCG ${row.meanNdcg.toFixed(3)}  MRR ${row.meanMrr.toFixed(3)}  harmful ${row.harmful}`
+    );
+  }
+  if (retired.length > 0) lines.push(`  retired, not compared: ${retired.join(", ")}`);
+>>>
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+            .replace("Not stale; local work is not yet on master.", "Not confirmed against a fresh fetch; local work is not yet on master.")
+===
+            .replace("Not stale; local work is not yet on ", "Not confirmed against a fresh fetch; local work is not yet on ")
+>>>
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+          `Not stale; local work is not yet on master.`
+===
+          `Not stale; local work is not yet on ${d.upstreamRef}.`
+>>>
+@@@ .claude/commands/end.md
+<<<
+`node <build>/cli.js skills-audit [--seat <name>] "<project dir>"`
+===
+`node <build>/cli.js skills-audit --session <SESSION_UUID> [--seat <name>] "<project dir>"`
+>>>
+@@@ .claude/commands/end.md
+<<<
+ops skill at `~/.claude/skills/<name>-ops/`.
+===
+ops skill at `~/.claude/skills/<name>-ops/`. `<SESSION_UUID>` is the one on the SessionStart hook's `SESSION_UUID:`
+line. Without `--session` the audit reads the project's newest transcript, which is another session's when one
+started after this one (T-307).
+>>>
+@@@ project-template/.claude/commands/end.md
+<<<
+`node <build>/cli.js skills-audit [--seat <name>] "<project dir>"`
+===
+`node <build>/cli.js skills-audit --session <SESSION_UUID> [--seat <name>] "<project dir>"`
+>>>
+@@@ project-template/.claude/commands/end.md
+<<<
+ops skill at `~/.claude/skills/<name>-ops/`.
+===
+ops skill at `~/.claude/skills/<name>-ops/`. `<SESSION_UUID>` is the one on the SessionStart hook's `SESSION_UUID:`
+line. Without `--session` the audit reads the project's newest transcript, which is another session's when one
+started after this one (T-307).
+>>>
