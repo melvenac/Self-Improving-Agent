@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/shadow/index.ts
+<<<
+  const rows = all.filter((r) => current.has(r.strategy));
+===
+  const rows = all;
+>>>
