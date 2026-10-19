@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 530,
+  "revision": 531,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2506,7 +2506,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found s173 in transcript reviews (scorecard row 1). Maker S70 (10-18 ~22:45 CDT) and clark a2983b23 (19:37 CDT) both printed 'Session N — 2026-10-19'. Source: start-report.ts:271 `date: new Date().toISOString().slice(0, 10)`; 4 such call sites in open-brain/src. The same date feeds watch-out expiry (isExpired) and likely the session-log/record stamps, so a display-only change would split the greeting from the record. Decide first: one project-local date (America/Chicago, as chicagoStamp already uses for FLEET) for every stamp, or keep UTC and label it ('2026-10-19Z'). Recommendation: the label: one char, no record migration. — RULED 10-19 (Aaron via clark, verified): the Z label, not local time. Planning: the Z goes where a date is displayed; stored stamps and isExpired comparisons stay as they are.",
+      "note": "Found s173 in transcript reviews (scorecard row 1). Maker S70 (10-18 ~22:45 CDT) and clark a2983b23 (19:37 CDT) both printed 'Session N — 2026-10-19'. Source: start-report.ts:271 `date: new Date().toISOString().slice(0, 10)`; 4 such call sites in open-brain/src. The same date feeds watch-out expiry (isExpired) and likely the session-log/record stamps, so a display-only change would split the greeting from the record. Decide first: one project-local date (America/Chicago, as chicagoStamp already uses for FLEET) for every stamp, or keep UTC and label it ('2026-10-19Z'). Recommendation: the label: one char, no record migration. — RULED 10-19 (Aaron via clark, verified): the Z label, not local time. Planning: the Z goes where a date is displayed; stored stamps and isExpired comparisons stay as they are. — Brief: docs/loops/s173h-utc-z-brief.md (PR #859, merged 9aa287c4). SIM S173H at f675784c: baseline 2 failed | 1 passed, APPLIED 8, 700/700, m1->R1, m2->R2, m3->R3. Launch requested on base 9aa287c4.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -4309,6 +4309,19 @@
           "type": "command",
           "path": "build/pipelines/session-start/tree-currency.js describeTreeCurrency(makerspace-planner) at build 4460e485",
           "observation": "level with origin/docs/t001-plans, rev 653 both sides; resolveRecordRef = origin/docs/t001-plans (checked at c727deae too)."
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-093",
+      "claim": "T-307 reaches every project: the global ~/.claude/commands/end.md now passes skills-audit --session <SESSION_UUID>",
+      "evidence": [
+        {
+          "type": "file",
+          "path": "~/.claude/commands/end.md",
+          "observation": "10-19: on Aaron's typed Yes (clark window 198bce0f, 19:36:10Z), clark copied .claude/commands/end.md @ a9ca8813 over it (backup end.md.bak-pre-s173g-202610191436). Atlas cmp, ignoring CR: identical; the --session line count is 1."
         }
       ],
       "since_session": 173,
