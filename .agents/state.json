@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 526,
+  "revision": 527,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2507,6 +2507,90 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Found s173 in transcript reviews (scorecard row 1). Maker S70 (10-18 ~22:45 CDT) and clark a2983b23 (19:37 CDT) both printed 'Session N — 2026-10-19'. Source: start-report.ts:271 `date: new Date().toISOString().slice(0, 10)`; 4 such call sites in open-brain/src. The same date feeds watch-out expiry (isExpired) and likely the session-log/record stamps, so a display-only change would split the greeting from the record. Decide first: one project-local date (America/Chicago, as chicagoStamp already uses for FLEET) for every stamp, or keep UTC and label it ('2026-10-19Z'). Recommendation: the label: one char, no record migration.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-306",
+      "title": "Shadow recall report proposes a removed strategy to Aaron (no_maturity)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found s173 auditing Maker S69 after /end. ob_end printed 'Candidate: no_maturity beats live on nDCG. Aaron's call whether to adopt.' and Maker relayed it to Aaron as a real choice. no_maturity was removed in Loop 10 C2 (strategies.ts:40: byte-identical to control since Loop 8); its JSONL rows stay in the historical log and aggregateShadowLog means them with current strategies, over different session sets. This run's own best was live. Scorecard rows 5 and 7 fail. Fix: formatShadowReport compares only SHADOW_STRATEGIES names and lists the rest as 'retired, not compared'. Briefed as S173G.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-307",
+      "title": "/end step 1b runs skills-audit without --session; lesson 751 patches it after the act",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found s173 (Maker S69 /end). .claude/commands/end.md and the template copy give `skills-audit [--seat <name>] \"<project dir>\"`; with no --session the audit reads the NEWEST transcript (skills-audit/index.ts:219), which is the wrong session when another session in the project started later. Stored lesson 751 says to pass --session, but the trigger is PostToolUse so it arrives after the run (fired on Maker S69 and on Atlas s173). Fix the instruction itself (deterministic-first): add --session <SESSION_UUID> to both Claude copies; the Cursor copy is unchanged (no proof). Changing end.md makes installed copies OLD until install-commands. ~/.claude/commands/end.md is Aaron's global copy: same line, proposal only. Briefed as S173G.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-308",
+      "title": "Lessons whose mistake is not a Bash command cannot be keyed to fire",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found s173 (Maker S69 /end). Two of four lessons: 'bang-prefix-runs-bash-mangles-powershell-env' (text handed to the user) and 'event-links-carry-date-query-slug-grep' (a grep written into a brief that another seat runs) are keyed MATCH: command, but the trigger reads only this seat's own Bash, so neither fires when the mistake repeats. path: keys would fit but are stored and not read (end.md step 2). Decide: read path: keys on Write/Edit, or say in end.md that such lessons are lookup-only.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-309",
+      "title": "Budgeted NEXT does not say when the objective names a done task",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found s173 (Maker S70 greeting). Budgeted NEXT lists only ids the objective names (briefing.ts renderBudgeted). Maker's s65 objective named done T-169 first, so NEXT led with '[done] T-169' while 6 active P1s were hidden; the greeting marks it but never says the objective is stale. Fix: one line 'objective names done T-169: update it (set_objective)'. Maker reset its objective in rev 643, so no live case now.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-310",
+      "title": "Tree line hardcodes 'master': 'local work is not yet on master'",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found s173 in the T-298-S4 live check on makerspace: 'This tree is 4 commits ahead of origin/docs/t001-plans … Not stale; local work is not yet on master.' tree-currency.ts:336 (and the replace at :222) hardcode master; wrong for any origin/main project and for record_branch. Fix: name d.upstreamRef. No test pins the text. Briefed as S173G.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-311",
+      "title": "handoff_caps is opt-in: an uncapped handoff is accepted and clipped silently",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found s173: Maker's pick-up was 2830 chars and 11 watch-outs (greeting shows 400 chars, 3 items); clark's 415 cut on its own instruction. Caps (handoff-caps.ts) apply only with greeting.json handoff_caps. Maker turned it on 10-19. Candidate: scaffold and import write handoff_caps:true by default. Needs a ruling on existing projects.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -6522,7 +6606,7 @@
     },
     {
       "n": 173,
-      "date": "2026-10-18",
+      "date": "2026-10-19",
       "uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
       "seat": "planner",
       "checkout": "sia-planner",
