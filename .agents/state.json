@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 524,
+  "revision": 525,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2432,15 +2432,15 @@
       "id": "T-300",
       "title": "The coordinator seat gets no SIA greeting: clark's /start runs on a hand-kept handoff file with no render, cap or currency check",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 173,
       "supersedes": null,
-      "note": "s173, from reviewing clark's /start (2977a6e5, Aaron's request 17:36Z 10-16). ~/Worktrees has no .agents, so /start runs Part B and clark-ops/reference/start.md: clark-start.sh saves a 'newest block' of the hand-kept handoff that had grown to 534 lines / 90.8 KB (23 sections each labelled newest); start.md says read all of it; clark read 110 lines (chunked), printed no greeting, and went straight to work. Scorecard: state match unclear, fits NO, pointing NO. SIA owns the briefing for every other seat (ob_start, T-233 render, caps, tree currency), but none of it reaches the coordinator. Options to weigh: give ~/Worktrees (or a clark checkout) a record and an ob_start briefing; or an SIA 'coordinator' render over the planners' records plus clark's own small handoff. Not a clark-ops prompt fix (deterministic first). — s173 10-18: Aaron yes to option A (e255061a 15:58:09Z, verified by relay-check). Brief docs/loops/t300-clark-record-brief.md (#846). clark DONE 7e637a02 in fleet: record at ~/Projects/fleet/.agents/state.json rev 2, clark.md FROZEN (agent-dashboard #305), clark-ops start/roll switched. Ruled the deviation: role none cannot carry a handoff (set_handoff refuses non-seat roles; a role-none reader gets READER'S SEAT UNRESOLVED and no PICK UP), so clark uses an ignored AGENT.local.md with role planner. Accepted as interim; the real fix is T-304. Open until step 10: Atlas scores clark's next-roll greeting and records the V-entry.",
+      "note": "s173, from reviewing clark's /start (2977a6e5, Aaron's request 17:36Z 10-16). ~/Worktrees has no .agents, so /start runs Part B and clark-ops/reference/start.md: clark-start.sh saves a 'newest block' of the hand-kept handoff that had grown to 534 lines / 90.8 KB (23 sections each labelled newest); start.md says read all of it; clark read 110 lines (chunked), printed no greeting, and went straight to work. Scorecard: state match unclear, fits NO, pointing NO. SIA owns the briefing for every other seat (ob_start, T-233 render, caps, tree currency), but none of it reaches the coordinator. Options to weigh: give ~/Worktrees (or a clark checkout) a record and an ob_start briefing; or an SIA 'coordinator' render over the planners' records plus clark's own small handoff. Not a clark-ops prompt fix (deterministic first). — s173 10-18: Aaron yes to option A (e255061a 15:58:09Z, verified by relay-check). Brief docs/loops/t300-clark-record-brief.md (#846). clark DONE 7e637a02 in fleet: record at ~/Projects/fleet/.agents/state.json rev 2, clark.md FROZEN (agent-dashboard #305), clark-ops start/roll switched. Ruled the deviation: role none cannot carry a handoff (set_handoff refuses non-seat roles; a role-none reader gets READER'S SEAT UNRESOLVED and no PICK UP), so clark uses an ignored AGENT.local.md with role planner. Accepted as interim; the real fix is T-304. Open until step 10: Atlas scores clark's next-roll greeting and records the V-entry. — Closed s173: step 10 proof verified in clark's a2983b23 transcript (V-entry this rev). Follow-ups, not SIA code: clark refreshes fleet.json (verifiedAt 10-16; versions behind the pick-up) or the FLEET line stays STALE every start. Role workaround (AGENT.local.md role planner) stays until T-304.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
-      "closed_rev": null
+      "closed_rev": 525
     },
     {
       "id": "T-301",
@@ -4162,6 +4162,24 @@
           "type": "live-check",
           "path": "open-brain/build/pipelines/session-start/briefing.js (build-info commit 81889ce3)",
           "observation": "describeUsage on a scratch project whose AGENT.local.md usage_file names a slots.json with {\"usageLevel\":\"OFF\"} returned 'Usage: OFF → no usage gate (restrictions lifted)'. Scratch removed."
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-090",
+      "claim": "T-300 step 10: clark's fresh session a2983b23 (/start 10-18 19:37 CDT) printed the SIA briefing for ~/Projects/fleet (Build c727dea · current; Fleet (clark) state rev 9; Drift: none; 23 lines incl. headers) with no read of clark.md. Scorecard: 2 fits, 3 pointing, 4 first action (planner status sweep), 6 absence visible (+N more, pick-up truncation count), 7 waiting-on-Aaron are clark's own current asks: PASS. 1 and 5 PARTIAL: the FLEET line (fleet.json verifiedAt 10-16) says dashboard v1.26.2 / hub v1.24.3 while the pick-up says dashboard v1.28.2; it is flagged STALE, so it is correct-and-visible but read past every start (fleet.json is clark's data, not SIA code); 'Latest brief: none' and 'Skills: none' are absence lines a coordinator record will always print.",
+      "evidence": [
+        {
+          "type": "transcript",
+          "path": "~/.claude/projects/C--Users-melve-Worktrees/a2983b23-5ebf-41f6-96f7-f8eb2a6b7850.jsonl",
+          "observation": "ob_start tool_result: ## Briefing … ## End Briefing, 23 lines, first 3 = 'Build c727dea · current' / 'Usage: OFF …' / 'Session 3 — 2026-10-19 · Fleet (clark) v0.0.0 · state rev 9 · Drift: none'; matches clark's relayed lines; no assistant Read of clark.md (its 2 mentions are in SendMessage/text)."
+        },
+        {
+          "type": "code",
+          "path": "open-brain/src/pipelines/session-start/fleet.ts",
+          "observation": "verifiedStale() adds ' · STALE (verified …)' past FLEET_STALE_HOURS=24: the line behaves as designed; the stale source is fleet.json verifiedAt."
         }
       ],
       "since_session": 173,

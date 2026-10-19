@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 524 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 525 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).
 
 ## What's working
@@ -95,6 +95,7 @@
 - T-302 is live on the main build (b73b17a2): with greeting.json merged_citations on, the budgeted briefing's pick-up line ends with 'Already in origin/master (last fetch): <sha8>, ...' for SHAs the reader's own handoff cites that origin/master contains, and the line stays within the pick-up cap. _(V-087, 1 evidence)_
 - T-297 step 2 is live on the main build (40d9980b): state import --commit merges the template's gitignore and gitattributes into the project (created here), LF, so the .agents allowlist and the eol rules hold after an import; role stubs are written LF. _(V-088, 1 evidence)_
 - T-298 step 3 is live on the main build (81889ce3): a usage file whose usageLevel is OFF makes the greeting's usage line 'Usage: OFF → no usage gate (restrictions lifted)' instead of 'Usage: not checked (...)'. _(V-089, 1 evidence)_
+- T-300 step 10: clark's fresh session a2983b23 (/start 10-18 19:37 CDT) printed the SIA briefing for ~/Projects/fleet (Build c727dea · current; Fleet (clark) state rev 9; Drift: none; 23 lines incl. headers) with no read of clark.md. Scorecard: 2 fits, 3 pointing, 4 first action (planner status sweep), 6 absence visible (+N more, pick-up truncation count), 7 waiting-on-Aaron are clark's own current asks: PASS. 1 and 5 PARTIAL: the FLEET line (fleet.json verifiedAt 10-16) says dashboard v1.26.2 / hub v1.24.3 while the pick-up says dashboard v1.28.2; it is flagged STALE, so it is correct-and-visible but read past every start (fleet.json is clark's data, not SIA code); 'Latest brief: none' and 'Skills: none' are absence lines a coordinator record will always print. _(V-090, 2 evidence)_
 
 ## What's broken
 
