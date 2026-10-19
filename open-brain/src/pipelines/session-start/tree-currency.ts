@@ -219,7 +219,7 @@ export function describeTreeCurrency(projectRoot: string, options: TreeCurrencyO
       : result.lines.map((l) =>
           l
             .replace("although the commits are level with", "although the commits show no difference from")
-            .replace("Not stale; local work is not yet on master.", "Not confirmed against a fresh fetch; local work is not yet on master.")
+            .replace("Not stale; local work is not yet on ", "Not confirmed against a fresh fetch; local work is not yet on ")
         );
   return { ...result, lines: [failed, ...body] };
 }
@@ -333,7 +333,7 @@ function describe(severity: TreeCurrencySeverity, d: DescribeInput): string[] {
     case "ahead":
       lines.push(
         `This tree is ${plural(d.headAhead, "commit")} ahead of ${d.upstreamRef} and behind by none — ${records}. ` +
-          `Not stale; local work is not yet on master.`
+          `Not stale; local work is not yet on ${d.upstreamRef}.`
       );
       break;
     case "record-behind":

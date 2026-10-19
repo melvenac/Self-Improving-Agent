@@ -109,8 +109,17 @@ export function aggregateShadowLog(entries: ShadowLogEntry[]): AggregateRow[] {
 export const MIN_SESSIONS_FOR_VERDICT = 10;
 
 export function formatShadowReport(entries: ShadowLogEntry[]): string {
-  const rows = aggregateShadowLog(entries);
-  if (rows.length === 0) return "Shadow recall: no evaluated sessions yet.";
+  const all = aggregateShadowLog(entries);
+  if (all.length === 0) return "Shadow recall: no evaluated sessions yet.";
+
+  // T-306: a strategy no longer in SHADOW_STRATEGIES keeps its rows in the log but is never compared or proposed. Its
+  // mean covers only the sessions before it was removed, and what it swept may no longer exist (no_maturity, s173).
+  const current = new Set(SHADOW_STRATEGIES.map((s) => s.name));
+  const rows = all.filter((r) => current.has(r.strategy));
+  const retired = all.filter((r) => !current.has(r.strategy)).map((r) => r.strategy);
+  if (rows.length === 0) {
+    return `Shadow recall: no evaluated sessions for the current strategies (retired, not compared: ${retired.join(", ")}).`;
+  }
 
   const sessions = Math.max(...rows.map((r) => r.sessions));
   const lines = [`Shadow recall — ${sessions} session(s) evaluated`];
@@ -120,6 +129,7 @@ export function formatShadowReport(entries: ShadowLogEntry[]): string {
       `  ${row.strategy.padEnd(16)} nDCG ${row.meanNdcg.toFixed(3)}  MRR ${row.meanMrr.toFixed(3)}  harmful ${row.harmful}`
     );
   }
+  if (retired.length > 0) lines.push(`  retired, not compared: ${retired.join(", ")}`);
 
   if (sessions < MIN_SESSIONS_FOR_VERDICT) {
     lines.push(
