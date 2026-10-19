@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  out.push(`${session} — ${i.date}Z · ${s.project.name}
+===
+  out.push(`${session} — ${i.date} · ${s.project.name}
+>>>
