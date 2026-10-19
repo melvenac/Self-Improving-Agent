@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 525,
+  "revision": 526,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2493,6 +2493,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s173, found by T-300 (clark's fleet record, 10-18). set_handoff refuses role none ('seat: expected planner|developer|qa'), and a role-none reader's briefing prints READER'S SEAT UNRESOLVED with no PICK UP. A one-agent bootstrap project (role none by design, bootstrap.md step 3) therefore never gets a pick-up line either. clark works around it with an ignored AGENT.local.md role planner, which also forces a planner loop_state. Options: a 'coordinator' role value, or let role none write and read a handoff without loop_state. Size SMALL to MEDIUM; check the T-163 per-session handoff rules first.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-305",
+      "title": "Greeting date is UTC: after 19:00 CDT every /start reads tomorrow",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Found s173 in transcript reviews (scorecard row 1). Maker S70 (10-18 ~22:45 CDT) and clark a2983b23 (19:37 CDT) both printed 'Session N — 2026-10-19'. Source: start-report.ts:271 `date: new Date().toISOString().slice(0, 10)`; 4 such call sites in open-brain/src. The same date feeds watch-out expiry (isExpired) and likely the session-log/record stamps, so a display-only change would split the greeting from the record. Decide first: one project-local date (America/Chicago, as chicagoStamp already uses for FLEET) for every stamp, or keep UTC and label it ('2026-10-19Z'). Recommendation: the label: one char, no record migration.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
