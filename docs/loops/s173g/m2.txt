@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+          `Not stale; local work is not yet on ${d.upstreamRef}.`
+===
+          `Not stale; local work is not yet on master.`
+>>>
