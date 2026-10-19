@@ -71,7 +71,7 @@ describe("renderBriefing: the sections, from the record alone", () => {
     expect(out[out.length - 1]).toBe(BRIEFING_END);
     expect(out[1]).toBe("Serving build: synthetic");
     expect(out[2]).toBe("Usage: GREEN → dispatches open");
-    expect(out[3]).toBe(`Session 12 — 2026-10-03 · ${state.project.name} v9.9.9 · state rev ${state.revision}`);
+    expect(out[3]).toBe(`Session 12 — 2026-10-03Z · ${state.project.name} v9.9.9 · state rev ${state.revision}`);
     expect(out[4]).toBe("Drift: none");
   });
 

@@ -2,7 +2,7 @@
 ## Briefing
 Build abc1234 · current
 Usage: GREEN → dispatches open
-Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
+Session 160 — 2026-10-03Z · a2a-intelligent-hub v9.9.9 · state rev 179
 Drift: none
 
 OBJECTIVE
@@ -129,7 +129,7 @@ Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writin
 ## Briefing
 Build abc1234 · current
 Usage: GREEN → dispatches open
-Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
+Session 160 — 2026-10-03Z · a2a-intelligent-hub v9.9.9 · state rev 179
 Drift: none
 
 OBJECTIVE
@@ -204,7 +204,7 @@ Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writin
 ## Briefing
 Build abc1234 · current
 Usage: GREEN → dispatches open
-Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
+Session 160 — 2026-10-03Z · a2a-intelligent-hub v9.9.9 · state rev 179
 Drift: none
 
 OBJECTIVE
@@ -300,7 +300,7 @@ Last session: #26 2026-10-03 (1a3524d0-0140-4bd8-99bf-d0498faea4f4) — 9 writin
 ## Briefing
 Build abc1234 · current
 Usage: GREEN → dispatches open
-Session 160 — 2026-10-03 · a2a-intelligent-hub v9.9.9 · state rev 179
+Session 160 — 2026-10-03Z · a2a-intelligent-hub v9.9.9 · state rev 179
 Drift: none
 
 OBJECTIVE
