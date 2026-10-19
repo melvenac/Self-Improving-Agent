@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 527,
+  "revision": 528,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2520,7 +2520,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found s173 auditing Maker S69 after /end. ob_end printed 'Candidate: no_maturity beats live on nDCG. Aaron's call whether to adopt.' and Maker relayed it to Aaron as a real choice. no_maturity was removed in Loop 10 C2 (strategies.ts:40: byte-identical to control since Loop 8); its JSONL rows stay in the historical log and aggregateShadowLog means them with current strategies, over different session sets. This run's own best was live. Scorecard rows 5 and 7 fail. Fix: formatShadowReport compares only SHADOW_STRATEGIES names and lists the rest as 'retired, not compared'. Briefed as S173G.",
+      "note": "Found s173 auditing Maker S69 after /end. ob_end printed 'Candidate: no_maturity beats live on nDCG. Aaron's call whether to adopt.' and Maker relayed it to Aaron as a real choice. no_maturity was removed in Loop 10 C2 (strategies.ts:40: byte-identical to control since Loop 8); its JSONL rows stay in the historical log and aggregateShadowLog means them with current strategies, over different session sets. This run's own best was live. Scorecard rows 5 and 7 fail. Fix: formatShadowReport compares only SHADOW_STRATEGIES names and lists the rest as 'retired, not compared'. Briefed as S173G. — s173 part 1 merged (S173G, 4460e485): retired strategies are no longer compared. Live check shows part 2 still open: 'Candidate: recency_strong beats live' (0.119 vs 0.116) while recency_0_02, the SAME constant, scores 0.091. The means are over different session sets (the recency sweep started later), so the candidate line still asks Aaron about noise. Fix: compare each strategy with live only over sessions where both were scored (paired), and require MIN_SESSIONS_FOR_VERDICT paired sessions.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -2530,15 +2530,15 @@
       "id": "T-307",
       "title": "/end step 1b runs skills-audit without --session; lesson 751 patches it after the act",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 173,
       "supersedes": null,
-      "note": "Found s173 (Maker S69 /end). .claude/commands/end.md and the template copy give `skills-audit [--seat <name>] \"<project dir>\"`; with no --session the audit reads the NEWEST transcript (skills-audit/index.ts:219), which is the wrong session when another session in the project started later. Stored lesson 751 says to pass --session, but the trigger is PostToolUse so it arrives after the run (fired on Maker S69 and on Atlas s173). Fix the instruction itself (deterministic-first): add --session <SESSION_UUID> to both Claude copies; the Cursor copy is unchanged (no proof). Changing end.md makes installed copies OLD until install-commands. ~/.claude/commands/end.md is Aaron's global copy: same line, proposal only. Briefed as S173G.",
+      "note": "Found s173 (Maker S69 /end). .claude/commands/end.md and the template copy give `skills-audit [--seat <name>] \"<project dir>\"`; with no --session the audit reads the NEWEST transcript (skills-audit/index.ts:219), which is the wrong session when another session in the project started later. Stored lesson 751 says to pass --session, but the trigger is PostToolUse so it arrives after the run (fired on Maker S69 and on Atlas s173). Fix the instruction itself (deterministic-first): add --session <SESSION_UUID> to both Claude copies; the Cursor copy is unchanged (no proof). Changing end.md makes installed copies OLD until install-commands. ~/.claude/commands/end.md is Aaron's global copy: same line, proposal only. Briefed as S173G. — Closed s173: S173G merged 4460e485 (PR #855), both Claude end.md copies pass --session. Installed copies read OLD until install-commands; Aaron's global ~/.claude/commands/end.md queued to him by clark as a proposal.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
-      "closed_rev": null
+      "closed_rev": 528
     },
     {
       "id": "T-308",
@@ -2572,15 +2572,15 @@
       "id": "T-310",
       "title": "Tree line hardcodes 'master': 'local work is not yet on master'",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 173,
       "supersedes": null,
-      "note": "Found s173 in the T-298-S4 live check on makerspace: 'This tree is 4 commits ahead of origin/docs/t001-plans … Not stale; local work is not yet on master.' tree-currency.ts:336 (and the replace at :222) hardcode master; wrong for any origin/main project and for record_branch. Fix: name d.upstreamRef. No test pins the text. Briefed as S173G.",
+      "note": "Found s173 in the T-298-S4 live check on makerspace: 'This tree is 4 commits ahead of origin/docs/t001-plans … Not stale; local work is not yet on master.' tree-currency.ts:336 (and the replace at :222) hardcode master; wrong for any origin/main project and for record_branch. Fix: name d.upstreamRef. No test pins the text. Briefed as S173G. — Closed s173: S173G merged 4460e485; the ahead line names d.upstreamRef (s173g R3, mutant m2).",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
-      "closed_rev": null
+      "closed_rev": 528
     },
     {
       "id": "T-311",
@@ -4278,6 +4278,37 @@
           "type": "code",
           "path": "open-brain/src/pipelines/session-start/fleet.ts",
           "observation": "verifiedStale() adds ' · STALE (verified …)' past FLEET_STALE_HOURS=24: the line behaves as designed; the stale source is fleet.json verifiedAt."
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-091",
+      "claim": "S173G live on the main build 4460e485 (PR #855): the shadow report over the real log (28 sessions) has no no_maturity row or candidate and lists 'retired, not compared: no_maturity, maturity_strong' (T-306 part 1); the main checkout's .claude/commands/end.md carries 'skills-audit --session <SESSION_UUID>' (T-307). T-310's ahead line is pinned by s173g R3 (makerspace is level now, so not seen live).",
+      "evidence": [
+        {
+          "type": "command",
+          "path": "build/pipelines/shadow/index.js formatShadowReport(readShadowLog(~/.claude/open-brain/shadow-recall.jsonl))",
+          "observation": "7 current rows, then 'retired, not compared: no_maturity, maturity_strong', then 'Candidate: recency_strong beats live on nDCG' (0.119 vs 0.116)."
+        },
+        {
+          "type": "review",
+          "path": "PR #855 head 09ca34df",
+          "observation": "byte-compare SAME on all 5 files vs edits.txt applied to adbfd368; CI test SUCCESS; mutants from SIM S173G on identical files m1 R1 R2, m2 R3, m3 R4."
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-092",
+      "claim": "T-298-S4 live on makerspace (record_branch docs/t001-plans set by Maker 10-19): the tree line is 'Tree currency: level with origin/docs/t001-plans (record here rev 653, at origin/docs/t001-plans rev 653)' with no DIVERGED banner; before the flag it was 371 behind / 921 ahead of origin/main every start.",
+      "evidence": [
+        {
+          "type": "command",
+          "path": "build/pipelines/session-start/tree-currency.js describeTreeCurrency(makerspace-planner) at build 4460e485",
+          "observation": "level with origin/docs/t001-plans, rev 653 both sides; resolveRecordRef = origin/docs/t001-plans (checked at c727deae too)."
         }
       ],
       "since_session": 173,
