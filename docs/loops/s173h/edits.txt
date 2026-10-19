@@ -1,0 +1,81 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""}`);
+===
+  // T-305 (D-160): the date is UTC, and the Z says so; i.date itself stays plain because isExpired compares it.
+  out.push(`${session} — ${i.date}Z · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""}`);
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  const sessionLine = `${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""} · ${drift}`;
+===
+  const sessionLine = `${session} — ${i.date}Z · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""} · ${drift}`;
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing.test.ts
+<<<
+    expect(out[3]).toBe(`Session 12 — 2026-10-03 · ${state.project.name} v9.9.9 · state rev ${state.revision}`);
+===
+    expect(out[3]).toBe(`Session 12 — 2026-10-03Z · ${state.project.name} v9.9.9 · state rev ${state.revision}`);
+>>>
+@@@ open-brain/tests/fixtures-state/a2a-1c200b41-render.golden.txt
+<<<
+=== renderBriefing seat=planner ===
+## Briefing
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03 ·
+===
+=== renderBriefing seat=planner ===
+## Briefing
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03Z ·
+>>>
+@@@ open-brain/tests/fixtures-state/a2a-1c200b41-render.golden.txt
+<<<
+=== renderBriefing seat=developer ===
+## Briefing
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03 ·
+===
+=== renderBriefing seat=developer ===
+## Briefing
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03Z ·
+>>>
+@@@ open-brain/tests/fixtures-state/a2a-1c200b41-render.golden.txt
+<<<
+=== renderBriefing seat=qa ===
+## Briefing
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03 ·
+===
+=== renderBriefing seat=qa ===
+## Briefing
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03Z ·
+>>>
+@@@ open-brain/tests/fixtures-state/a2a-1c200b41-render.golden.txt
+<<<
+=== renderBriefing seat=null ===
+## Briefing
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03 ·
+===
+=== renderBriefing seat=null ===
+## Briefing
+Build abc1234 · current
+Usage: GREEN → dispatches open
+Session 160 — 2026-10-03Z ·
+>>>
+@@@ open-brain/tests/pipelines/__snapshots__/fleet-ae-f5.test.ts.snap
+<<<
+Session 12 — 2026-10-03 · Self-Improving-Agent v9.9.9 · state rev 7
+===
+Session 12 — 2026-10-03Z · Self-Improving-Agent v9.9.9 · state rev 7
+>>>
