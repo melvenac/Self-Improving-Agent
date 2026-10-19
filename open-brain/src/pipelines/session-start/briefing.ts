@@ -146,7 +146,8 @@ export function renderBriefing(i: BriefingInput): string[] {
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
   const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
   const lagNote = handoffLagNote(own, s.revision);
-  out.push(`${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""}`);
+  // T-305 (D-160): the date is UTC, and the Z says so; i.date itself stays plain because isExpired compares it.
+  out.push(`${session} — ${i.date}Z · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""}`);
   out.push(
     i.drift.length === 0
       ? "Drift: none"
@@ -263,7 +264,7 @@ function renderBudgeted(i: BriefingInput): string[] {
       : cut(`Drift detected (${i.drift.length}): ${i.drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`).join("; ")}`, CAPS.drift);
   const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
   const lagNote = handoffLagNote(own, s.revision);
-  const sessionLine = `${session} — ${i.date} · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""} · ${drift}`;
+  const sessionLine = `${session} — ${i.date}Z · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""} · ${drift}`;
   // T-281: T-161's line rides the session line as a fixed note, so an alarm state costs no line and stays inside the char cap.
   out.push(i.transcript ? `${sessionLine} · ${TRANSCRIPT_BUDGET_NOTE}` : sessionLine);
 
