@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 528,
+  "revision": 529,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2516,15 +2516,15 @@
       "id": "T-306",
       "title": "Shadow recall report proposes a removed strategy to Aaron (no_maturity)",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 173,
       "supersedes": null,
-      "note": "Found s173 auditing Maker S69 after /end. ob_end printed 'Candidate: no_maturity beats live on nDCG. Aaron's call whether to adopt.' and Maker relayed it to Aaron as a real choice. no_maturity was removed in Loop 10 C2 (strategies.ts:40: byte-identical to control since Loop 8); its JSONL rows stay in the historical log and aggregateShadowLog means them with current strategies, over different session sets. This run's own best was live. Scorecard rows 5 and 7 fail. Fix: formatShadowReport compares only SHADOW_STRATEGIES names and lists the rest as 'retired, not compared'. Briefed as S173G. — s173 part 1 merged (S173G, 4460e485): retired strategies are no longer compared. Live check shows part 2 still open: 'Candidate: recency_strong beats live' (0.119 vs 0.116) while recency_0_02, the SAME constant, scores 0.091. The means are over different session sets (the recency sweep started later), so the candidate line still asks Aaron about noise. Fix: compare each strategy with live only over sessions where both were scored (paired), and require MIN_SESSIONS_FOR_VERDICT paired sessions.",
+      "note": "Found s173 auditing Maker S69 after /end. ob_end printed 'Candidate: no_maturity beats live on nDCG. Aaron's call whether to adopt.' and Maker relayed it to Aaron as a real choice. no_maturity was removed in Loop 10 C2 (strategies.ts:40: byte-identical to control since Loop 8); its JSONL rows stay in the historical log and aggregateShadowLog means them with current strategies, over different session sets. This run's own best was live. Scorecard rows 5 and 7 fail. Fix: formatShadowReport compares only SHADOW_STRATEGIES names and lists the rest as 'retired, not compared'. Briefed as S173G. — s173 part 1 merged (S173G, 4460e485): retired strategies are no longer compared. Live check shows part 2 still open: 'Candidate: recency_strong beats live' (0.119 vs 0.116) while recency_0_02, the SAME constant, scores 0.091. The means are over different session sets (the recency sweep started later), so the candidate line still asks Aaron about noise. Fix: compare each strategy with live only over sessions where both were scored (paired), and require MIN_SESSIONS_FOR_VERDICT paired sessions. — Closed s173. CORRECTION to the 'part 2' note above: it was wrong. Paired over the same sessions, recency_strong beats live 0.119 vs 0.116 on all 28; recency_0_02 equals recency_strong on all 20 shared sessions (0 differences), so the harness is deterministic and the 0.091 was a different session subset, not unpaired-mean noise. The remaining Candidate line is honest. Atlas's recommendation to Aaron (via clark, morning queue): do not adopt; +0.003 nDCG, and over the newest 20 sessions the same constant loses to live (0.091 vs 0.095).",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
-      "closed_rev": null
+      "closed_rev": 529
     },
     {
       "id": "T-307",
