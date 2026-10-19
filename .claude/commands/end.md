@@ -21,11 +21,13 @@ fine answer: say so and go to step 3.
 
 Run the extractor on this session. It reads your transcript and writes nothing:
 
-`node <build>/cli.js skills-audit [--seat <name>] "<project dir>"`
+`node <build>/cli.js skills-audit --session <SESSION_UUID> [--seat <name>] "<project dir>"`
 
 `<build>` is the open-brain build directory named on the SessionStart hook's `CLI start` line (in this
 repository: `open-brain/build`). Pass `--seat <name>` when the header says `seat none` but you have an
-ops skill at `~/.claude/skills/<name>-ops/`.
+ops skill at `~/.claude/skills/<name>-ops/`. `<SESSION_UUID>` is the one on the SessionStart hook's `SESSION_UUID:`
+line. Without `--session` the audit reads the project's newest transcript, which is another session's when one
+started after this one (T-307).
 
 For **each `by-hand` row**, do exactly one of these, in this session:
 
