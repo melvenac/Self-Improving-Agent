@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  const sessionLine = `${session} — ${i.date}Z · 
+===
+  const sessionLine = `${session} — ${i.date} · 
+>>>

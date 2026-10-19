@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+!isExpired(w, i.sessionNumber, i.date)
+===
+!isExpired(w, i.sessionNumber, `${i.date}Z`)
+>>>
