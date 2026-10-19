@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 531,
+  "revision": 532,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2502,15 +2502,15 @@
       "id": "T-305",
       "title": "Greeting date is UTC: after 19:00 CDT every /start reads tomorrow",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 173,
       "supersedes": null,
-      "note": "Found s173 in transcript reviews (scorecard row 1). Maker S70 (10-18 ~22:45 CDT) and clark a2983b23 (19:37 CDT) both printed 'Session N — 2026-10-19'. Source: start-report.ts:271 `date: new Date().toISOString().slice(0, 10)`; 4 such call sites in open-brain/src. The same date feeds watch-out expiry (isExpired) and likely the session-log/record stamps, so a display-only change would split the greeting from the record. Decide first: one project-local date (America/Chicago, as chicagoStamp already uses for FLEET) for every stamp, or keep UTC and label it ('2026-10-19Z'). Recommendation: the label: one char, no record migration. — RULED 10-19 (Aaron via clark, verified): the Z label, not local time. Planning: the Z goes where a date is displayed; stored stamps and isExpired comparisons stay as they are. — Brief: docs/loops/s173h-utc-z-brief.md (PR #859, merged 9aa287c4). SIM S173H at f675784c: baseline 2 failed | 1 passed, APPLIED 8, 700/700, m1->R1, m2->R2, m3->R3. Launch requested on base 9aa287c4.",
+      "note": "Found s173 in transcript reviews (scorecard row 1). Maker S70 (10-18 ~22:45 CDT) and clark a2983b23 (19:37 CDT) both printed 'Session N — 2026-10-19'. Source: start-report.ts:271 `date: new Date().toISOString().slice(0, 10)`; 4 such call sites in open-brain/src. The same date feeds watch-out expiry (isExpired) and likely the session-log/record stamps, so a display-only change would split the greeting from the record. Decide first: one project-local date (America/Chicago, as chicagoStamp already uses for FLEET) for every stamp, or keep UTC and label it ('2026-10-19Z'). Recommendation: the label: one char, no record migration. — RULED 10-19 (Aaron via clark, verified): the Z label, not local time. Planning: the Z goes where a date is displayed; stored stamps and isExpired comparisons stay as they are. — Brief: docs/loops/s173h-utc-z-brief.md (PR #859, merged 9aa287c4). SIM S173H at f675784c: baseline 2 failed | 1 passed, APPLIED 8, 700/700, m1->R1, m2->R2, m3->R3. Launch requested on base 9aa287c4. — CLOSED: S173H merged 99a9ae0a, REBUILT, live check V-entry this rev. Session-log headers and record dates are unchanged, by the ruling's scope.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
-      "closed_rev": null
+      "closed_rev": 532
     },
     {
       "id": "T-306",
@@ -4322,6 +4322,19 @@
           "type": "file",
           "path": "~/.claude/commands/end.md",
           "observation": "10-19: on Aaron's typed Yes (clark window 198bce0f, 19:36:10Z), clark copied .claude/commands/end.md @ a9ca8813 over it (backup end.md.bak-pre-s173g-202610191436). Atlas cmp, ignoring CR: identical; the --session line count is 1."
+        }
+      ],
+      "since_session": 173,
+      "status": "verified"
+    },
+    {
+      "id": "V-094",
+      "claim": "S173H live (T-305, D-160): the greeting's session line prints the UTC date with a Z, in both layouts; watch-out expiry still compares the plain date",
+      "evidence": [
+        {
+          "type": "build",
+          "path": "~/Projects/Self-Improving-Agent/open-brain/build",
+          "observation": "PR #861 merged 99a9ae0a (QA ACCEPT by Atlas, byte-compare SAME on all 5 files, CI test SUCCESS); build-info commit 99a9ae0a. briefing.js has 2 'i.date}Z · ' and isExpired still gets i.date. renderBriefing from that build on this repo's state.json printed 'Session 174 — 2026-10-19Z · …' for budget false and true."
         }
       ],
       "since_session": 173,
