@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 529,
+  "revision": 530,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2506,7 +2506,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "Found s173 in transcript reviews (scorecard row 1). Maker S70 (10-18 ~22:45 CDT) and clark a2983b23 (19:37 CDT) both printed 'Session N — 2026-10-19'. Source: start-report.ts:271 `date: new Date().toISOString().slice(0, 10)`; 4 such call sites in open-brain/src. The same date feeds watch-out expiry (isExpired) and likely the session-log/record stamps, so a display-only change would split the greeting from the record. Decide first: one project-local date (America/Chicago, as chicagoStamp already uses for FLEET) for every stamp, or keep UTC and label it ('2026-10-19Z'). Recommendation: the label: one char, no record migration.",
+      "note": "Found s173 in transcript reviews (scorecard row 1). Maker S70 (10-18 ~22:45 CDT) and clark a2983b23 (19:37 CDT) both printed 'Session N — 2026-10-19'. Source: start-report.ts:271 `date: new Date().toISOString().slice(0, 10)`; 4 such call sites in open-brain/src. The same date feeds watch-out expiry (isExpired) and likely the session-log/record stamps, so a display-only change would split the greeting from the record. Decide first: one project-local date (America/Chicago, as chicagoStamp already uses for FLEET) for every stamp, or keep UTC and label it ('2026-10-19Z'). Recommendation: the label: one char, no record migration. — RULED 10-19 (Aaron via clark, verified): the Z label, not local time. Planning: the Z goes where a date is displayed; stored stamps and isExpired comparisons stay as they are.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -5863,6 +5863,12 @@
       "title": "Aaron 10-14 CORRECTS D-158's start: the planner pause begins when Aaron is back at the desktop tomorrow morning, not tonight; all planners run overnight as normal",
       "date": "2026-10-14",
       "note": "VERIFIED TYPED (SG-1, relay-check.mjs): clark's window, transcript 81125b2f, a queue-operation enqueued at 2026-10-15T03:43:17Z: 'Pausing the planners is scheduled when I'm back at the the desktop. All planners can run over night.' Clark's relay of D-158 had read it as starting now. D-158 stands for the pause itself (dev stops until the Makerspace cutover is done), but it starts only when clark relays that Aaron is back at the desktop. Until then, SIA dev work continues overnight under the normal rules."
+    },
+    {
+      "id": "D-160",
+      "title": "T-305: date labels stay UTC and carry a \"Z\" (2026-10-19Z); no switch to local time",
+      "date": "2026-10-19",
+      "note": "Aaron 10-19 19:30:43Z typed \"Yes\" in clark's session 198bce0f, answering clark's 19:29 question (Atlas's recommendation); verified with relay-check. The dates already come from UTC (start-report.ts:271 toISOString); the label makes that explicit and migrates no data."
     }
   ],
   "handoffs": [
