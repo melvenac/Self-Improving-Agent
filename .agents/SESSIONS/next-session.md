@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 550 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 551 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,46 +6,44 @@
 
 ### Pick up here
 
-FIRST (Aaron's morning): ask 'merge 900' (T317-S2, READY head 197cb5e71e6b6864d4226483713aec7d3efeb551, byte-compare SAME x3, CI SUCCESS). Before running it: pr-refresh.sh 900 197cb5e7... (it may be BEHIND by then), then pr-merge.sh pinned to the printed head. Then sia-rebuild to the merge sha: since the T-315 revert (8c81a6c2, live 08:18Z 10-20) a rebuild leaves servers RUNNING, so each seat shows STALE PROCESS until it reconnects. T-317 S3 (the writer stamps sessions[].last_work_rev) must NOT dispatch until every running open-brain server started after that rebuild (check with Get-CimInstance start times vs build-info builtAt) and the QA PC's SIA build is moved too, or a stale server refuses the record ('Unrecognized key'). Write S3 brief + SIM in the meantime. Also pending: Maker's T-316 measure (asked 10-20 ~09:20Z: rerun open-brain sync on Makerspace, count how many of T-189/T-202/T-126/T-148/T-036 it names; predicted at most 3); record it in T-316, then T-316 S2 (opt-in MAYBE SHIPPED briefing line). Then T-318 (Aaron: after T-317). T-315 stays open for a respawn that does not depend on the host; a headless claude -p cannot reconnect (Maker's prod release lost open-brain at the 08:18 rebuild). S174 shipped: #885 then revert #896 (T-315), #888 T-317 S1, #895 T-316 S1, #892/#893 tcm runner egress + tooling (verified on tcm by clark), all live on 8c81a6c2; #900 READY.
+FIRST: T-317 S3 (the writer stamps sessions[].last_work_rev on every write carrying a non-handoff op; keep the existing value on a handoff-only write). Write its SIM + build brief now; DISPATCH the build only after every running open-brain server started after the 18:37:41Z 10-20 rebuild (5f48b9d9) - check Get-CimInstance start times - and the QA PC SIA build is at 5f48b9d9 or later (clark's Clark-sia-rebuild task), or a stale server refuses the record ('Unrecognized key'). Note E4's hashNewLayoutSessionRecord does not include last_work_rev. Then T-318 (Aaron: after T-317). T-316 S2 (opt-in MAYBE SHIPPED briefing line; S1 measured working on Makerspace). T-315 stays open (respawn must cover headless claude -p). S174 shipped and live: T-315 revert (verified 18:38Z: rebuild leaves servers running), T-317 S1 + S2 (#888, #900), T-316 S1 (#895), tcm runner #892/#893.
 
 ### Watch out
 
 - Weekly Claude allowance was 89% at 04:10 CDT 10-20 (clark): resets 00:00 CDT 10-21. Builds on Sonnet via the job runner; short turns; no idle polling.
-- The auto-mode classifier refuses Atlas's own pr-merge.sh ('Merge Without Review'). Aaron types 'merge <n>' naming the PR; Atlas then runs pr-merge.sh pinned to the refreshed head. A remote Aaron cannot run '!' lines.
-- Dashboard job runner: agent-dashboard scripts/job.mjs (a copy is not tracked; fetch it with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs). Submit --token-file C:/Users/melve/.agent-dashboard/jobs-atlas.token --json <f> --git <tree>; kinds build/sim; the brief must be on master or origin/loop/* (sim-push.sh's sim/* branches are refused); ASCII only; amendments in amendments[]; tags never repeat. A SIM brief that restores src between mutants must re-apply the edits first.
+- The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR ('merge <n>'); then Atlas runs pr-merge.sh pinned to the refreshed head. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand (git diff <head>^2 <head> | git patch-id --stable) before calling for a re-review.
+- Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs). Submit --token-file C:/Users/melve/.agent-dashboard/jobs-atlas.token --json <f> --git <tree>; the brief must be on master or origin/loop/*; ASCII only; amendments in amendments[]; tags never repeat.
 - QA PC load (T-292) reaches several files: handoff-caps.test.ts and checks-state.test.ts went red under load and green alone. Briefs name the files a load re-run may cover.
 - sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with git show origin/master:<path>. The desktop runs no builds or tests.
 - SIA is a PUBLIC repo: never commit or post live MATCH key text.
 
 ### Open questions
 
-- Merge #900 (T317-S2: /end refuses a handoff written before the session's later work)? Rec: yes - SIM and build agree on every number, byte-compare SAME.
 - Real-key over-fire run for T-170-II (49 live MATCH patterns, kept off-repo): QA PC or desktop only? Rec: desktop only.
 - T-295: which open-brain MCP tools to cut or move to the CLI? Rec: count calls per tool first.
 - T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold.
 - Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? Rec: yes.
 - The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small.
+- Reconnect open-brain in every seat when convenient, so T-317 S3 can dispatch (S2 is on disk; running servers are still the previous build). Rec: at your next desk visit.
 
 ### Loop state
 
-**Open PRs:** 
-- #900 — QA: accepted — T317-S2 READY 197cb5e7; Atlas byte-compare SAME x3, CI SUCCESS; waits for Aaron's 'merge 900', then refresh, merge, rebuild
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- merge #900
 - T-170-II real-key run host
 - T-295 tool cuts
 - T-261 S3/S4 now or hold
 - forget entry 751
 - name the yaml dependency PR
+- reconnect all seats for S3
 
 **Rulings made mid-loop:** 
-- T315-S1 merged 97eb3481, live test FAILED (Claude Code does not respawn), reverted #896 8c81a6c2 (live)
-- T317-S1 merged 9e0d5b01 (live)
-- T316-S1 merged 75186b3f (live)
-- SIM T317-S2 ALL PASS 44ecc717; build ACCEPT 197cb5e7 PR #900
+- T-315 revert live and verified 18:38Z
+- T317-S1 and T317-S2 merged and on disk (5f48b9d9)
+- T316-S1 measured working on Makerspace (Maker)
 - tcm runner #892/#893 installed and verified by clark
 
 ## developer [sia-builder] _(written session 156)_
