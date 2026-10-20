@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 541,
+  "revision": 542,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2650,6 +2650,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "D-161 (Aaron 10-20). Problem: server.ts is loaded once per Claude Code session, so after sia-rebuild every seat serves the old build until a human runs /mcp reconnect open-brain. The serving-build line (T-254) already reads build-info.json from disk, so the gap is visible but not closed. Candidate shape, to measure first (step 0): a thin stable launcher keeps the stdio transport, and when build/build-info.json's commit changes between calls it re-imports the handler module from the build with a cache-busting URL query (ESM gives a fresh module instance; the better-sqlite3 addon is already loaded and is reused), re-registers tools and sends notifications/tools/list_changed. Alternative: the server exits on a build change and the host restarts it. Step 0 must check whether Claude Code restarts a stdio MCP server that exits (if not, the launcher is the only route), whether Claude Code honours tools/list_changed, how many module-level singletons server.ts holds (DB handle, session registration, recall-entries state) that a reload must carry across, and the Cursor (cursor-agent) behaviour under T-235. Acceptance: after sia-rebuild, the next tool call in an already-running session reports the new build on the briefing's Build line, with no reconnect, and a registered session id survives the reload.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-316",
+      "title": "The briefing shows the open tasks a code commit already names (T-256's finding), so a stale backlog is visible at /start, not only in /sync",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S173 (10-20), from Maker's audit for Aaron (melvenac-makerspace docs/t001-plans@c5828b04 .agents/audit/2026-10-19-stale-backlog.md). Maker found 5 of 44 open tasks already done (T-189 sending live since 10-18, plus T-202, T-126, T-148 and T-036), 3 code-done and waiting only on owner steps, and 17 with 'merged/LIVE/shipped' in their notes. Maker built Aaron a pending list from titles, which the briefing shows by design. SIA already has the deterministic detector: T-256's /sync check open-task-commits warns on an open/in_progress task named by a code commit on HEAD (SIA's own /sync showed 8 on 10-19). The gap: it runs only in /sync, never in the briefing. Fix shape: ob_start computes the same set (same function, bounded git log) and the briefing prints one line, 'MAYBE SHIPPED (n): T-x T-y …', capped like the other lines; the task note's 'stays open after <sha7>' exemption still applies. Not adopted: note-text markers ('merged', 'LIVE') as a signal, because prose is not a record. Per-project, not SIA: a release step that runs close_task (Maker adopts it locally), and closing code-done tasks with the owner's leftover as an open_question owned by aaron, using the existing schema with no new status. First measure: run `open-brain sync` in makerspace and count how many of the 5 the check catches (that depends on commit subjects naming task ids).",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
