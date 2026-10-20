@@ -1,0 +1,7 @@
+@@@ open-brain/src/shared/build-watch.ts
+<<<
+      watch.stop();
+      opts.onNewBuild(onDisk);
+===
+      opts.onNewBuild(onDisk);
+>>>

@@ -1,0 +1,7 @@
+@@@ open-brain/src/server.ts
+<<<
+        if (!/claude/i.test(client)) return;
+        console.error(
+===
+        console.error(
+>>>
