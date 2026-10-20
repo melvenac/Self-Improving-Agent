@@ -10,8 +10,9 @@
 #   watch   check; on failure log why and STOP every gh-runner@ instance (fail closed)
 #   remove  delete the jumps and the chains
 #
+# Both families: loopback tcp ports 42000-42099 (CI test servers, D-043 10-20) and nothing else on this host.
 # IPv4: the runner may reach systemd-resolved's DNS stubs and the public internet, nothing else.
-# IPv6: rejected entirely. tcm's global IPv6 /64 is shared with the LAN and the ISP can change it,
+# IPv6: otherwise rejected entirely. tcm's global IPv6 /64 is shared with the LAN and the ISP can change it,
 #       so a prefix rule would go stale silently; clients fall back to IPv4.
 set -euo pipefail
 
@@ -22,6 +23,11 @@ STATE_DIR=/run/gh-runner-egress
 RUID=$(id -u "$RUNNER_USER")
 
 v4_rules() {
+  # D-043 (Aaron 10-20): loopback ports 42000-42099 only, for CI that starts its own test servers (co-op-mailer:
+  # Next and a local Convex backend). Replies from those ports are allowed only on an ESTABLISHED connection, so a
+  # client cannot bind a source port in the range to reach another loopback service.
+  echo "-o lo -p tcp -d 127.0.0.1/32 --dport 42000:42099 -j RETURN"
+  echo "-o lo -p tcp -s 127.0.0.1/32 --sport 42000:42099 -m conntrack --ctstate ESTABLISHED -j RETURN"
   echo "-p udp -d 127.0.0.53/32 --dport 53 -j RETURN"
   echo "-p tcp -d 127.0.0.53/32 --dport 53 -j RETURN"
   echo "-p udp -d 127.0.0.54/32 --dport 53 -j RETURN"
@@ -38,6 +44,9 @@ v4_rules() {
 }
 
 v6_rules() {
+  # D-043 (Aaron 10-20): the same loopback test-server ports as IPv4.
+  echo "-o lo -p tcp -d ::1/128 --dport 42000:42099 -j RETURN"
+  echo "-o lo -p tcp -s ::1/128 --sport 42000:42099 -m conntrack --ctstate ESTABLISHED -j RETURN"
   # tcp-reset fails a connect at once; the ICMP reject took ~1s per address, so a client that tries
   # a host's addresses in sequence (registry.npmjs.org has 12 AAAA) timed out before reaching IPv4.
   echo "-p tcp -j REJECT --reject-with tcp-reset"
