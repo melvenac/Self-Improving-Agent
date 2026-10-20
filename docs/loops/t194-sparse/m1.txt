@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+  const modes: string[][] = [[], ["--cached"]];
+===
+  const modes: string[][] = [[]];
+>>>
