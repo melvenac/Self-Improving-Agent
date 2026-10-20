@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 552 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 553 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -38,6 +38,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
 - [ ] **T-295** Audit open-brain's 14 MCP tools: keep what the protocol calls, cut or move to the CLI what nothing calls
 - [ ] **T-297** PRE-STATE import loses content a live project carries: dated-heading decisions, free-form handoff sections, scaffold's gitignore; plus CRLF command copy and view-header version
+- [ ] **T-319** Retire domains.json (D-162): /start, READS OWED, score, template, SIA's own file and its allowlist
 
 ## P3
 
