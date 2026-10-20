@@ -39,6 +39,15 @@ export function resolveUpstreamRef(projectRoot: string): string {
   return FALLBACK_UPSTREAM;
 }
 
+/**
+ * T-316: the default branch's remote-tracking ref when it exists in this clone, else null. Unlike resolveUpstreamRef
+ * there is no fallback: a caller that adds it to a git command must not name a ref git cannot resolve.
+ */
+export function resolveCodeRef(projectRoot: string): string | null {
+  const ref = resolveUpstreamRef(projectRoot);
+  return verifiesAsCommit(projectRoot, ref) ? ref : null;
+}
+
 /** T-298 (3): a branch name, not ref syntax: no leading "-", no spaces, no "..". */
 const RECORD_BRANCH_RE = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
 
