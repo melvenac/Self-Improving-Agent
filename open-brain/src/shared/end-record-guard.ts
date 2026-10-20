@@ -354,14 +354,26 @@ function newLayoutRecordUpdated(
     };
   }
   const s = stateRead.data;
-  const handoff = s.handoffs.some((h) => h.session_uuid === sessionUuid);
+  const own = s.handoffs.find((h) => h.session_uuid === sessionUuid);
+  const lastWork = s.sessions.find((x) => x.uuid === sessionUuid)?.last_work_rev;
   const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, changesAfter ?? since, sessionIds);
 
   // T-317 (Aaron 10-20, P0): a sessions[] row no longer counts. Every write records its session there, so any
   // add_decision or update_task passed this gate without a handoff, and the next session started from whatever
   // handoff an earlier session left.
-  if (handoff) {
-    return { updated: true, layout: "new", detail: `set_handoff for session ${sessionUuid}` };
+  // T-317 S2: a handoff written before this session's later work describes an older state. Both stamps must be present
+  // to judge; with either absent (S3 not shipped, or a handoff from before T-298) S1's rule stands. A committed loop
+  // handoff still counts.
+  if (own !== undefined) {
+    const stale = own.written_rev !== undefined && lastWork !== undefined && lastWork > own.written_rev;
+    if (!stale) return { updated: true, layout: "new", detail: `set_handoff for session ${sessionUuid}` };
+    if (loopHandoffs.length === 0) {
+      return {
+        updated: false,
+        layout: "new",
+        detail: `HANDOFF STALE: written at rev ${own.written_rev}; this session wrote rev ${lastWork} after it. Re-run ob_state set_handoff`,
+      };
+    }
   }
   if (loopHandoffs.length > 0) {
     return { updated: true, layout: "new", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
