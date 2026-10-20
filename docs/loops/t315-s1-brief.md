@@ -97,8 +97,14 @@ QA PC SIM T315-S1 at `0aa3cbb8` (master `6d6a6528` plus these files) used these 
 | `tests/pipelines/sync/module-boundary.test.ts`, `t261-s1`, `t261-s2` | stay green | `build-watch.ts` is core (it imports only `serving-build.ts`); `server.ts` is memory and may import core. The count stays at 4 dynamic loads. Green in the SIM. |
 | the rest of `tests/shared` and `tests/pipelines/sync` | stay green | Green in the SIM. |
 
-Any other red existing row means STOP and report `BLOCKED T315-S1 <test name>`. The one exception is T-292's
-`Timeout calling onTaskUpdate` error when every test passed: paste it and go on.
+Any other red existing row means STOP and report `BLOCKED T315-S1 <test name>`. There are two exceptions, both
+from T-292 load on the shared QA PC:
+- T-292's `Timeout calling onTaskUpdate` error when every test passed: paste it and go on.
+- **Ruled 10-20 after round 1.** That error together with ONE red existing test outside `t315-s1.test.ts`: re-run
+  that test's file alone. If it is green alone, paste both runs and go on. If it is red alone, STOP.
+  - Round 1 saw this twice, with a different test each time: `state-writer.test.ts` "reopen_gap refuses…" and
+    `record-erasure.test.ts` "the v2 → v3 migration commit…". Each passed alone.
+  - A red `t315-s1.test.ts` row is never an exception.
 
 ## Steps
 
