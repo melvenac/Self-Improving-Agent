@@ -1,0 +1,7 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+  "cli-memory.ts", // T-261 S2: relocate, scrub-trigger-fires, trigger-keys and topics
+  // T-261 S1:
+===
+  // T-261 S1:
+>>>

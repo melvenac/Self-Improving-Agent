@@ -1,0 +1,12 @@
+@@@ open-brain/tests/pipelines/sync/t261-s1.test.ts
+<<<
+  it("R5: this repository's own source passes with exactly the 8 listed loads", () => {
+===
+  it("R5: this repository's own source passes with exactly the 4 listed loads", () => {
+>>>
+@@@ open-brain/tests/pipelines/sync/t261-s1.test.ts
+<<<
+    expect(r.message).toContain("8 dynamic memory load(s) allowed by DYNAMIC_MEMORY_LOADS");
+===
+    expect(r.message).toContain("4 dynamic memory load(s) allowed by DYNAMIC_MEMORY_LOADS");
+>>>
