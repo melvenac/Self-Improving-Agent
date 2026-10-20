@@ -1,14 +1,23 @@
 #!/bin/bash
-# gh-runners-resume - start both tcm runners after gh-runners-pause (for A2A-Hub tcm deploys).
+# gh-runners-resume - start the runner instances gh-runners-pause stopped (for A2A-Hub tcm deploys).
 #
 # Installed by Forge (SIA developer seat, record session 97, 2026-09-24) under D-044, at Relay's request.
 # Usage: sudo gh-runners-resume
-# Says "resumed" only after reading is-active back as active for both. A runner refuses to start if
+# Says "resumed" only after reading is-active back as active for every one. A runner refuses to start if
 # its egress firewall is missing (ExecStartPre), and this script then reports NOT resumed.
+#
+# 10-20 (clark): starts the instances listed in $PAUSED by gh-runners-pause. With no list (no pause since boot),
+# every ENABLED gh-runner@*.service instance, read from multi-user.target.wants, so a stopped one is found too.
 set -uo pipefail
 
-UNITS=(gh-runner@1.service gh-runner@2.service)
+PAUSED=/run/gh-runners-paused
 [ "$(id -u)" -eq 0 ] || { echo "run with sudo" >&2; exit 2; }
+if [ -s "$PAUSED" ]; then
+  mapfile -t UNITS < "$PAUSED"
+else
+  mapfile -t UNITS < <(find /etc/systemd/system/multi-user.target.wants -maxdepth 1 -name 'gh-runner@*.service' -printf '%f\n' | sort)
+fi
+[ ${#UNITS[@]} -gt 0 ] || { echo "no paused or enabled gh-runner@ instance found; nothing to resume" >&2; exit 1; }
 
 ts() { date -u +%H:%M:%SZ; }
 
@@ -20,5 +29,5 @@ for u in "${UNITS[@]}"; do
   echo "  $u: $s"
   [ "$s" = active ] || rc=1
 done
-if [ "$rc" -eq 0 ]; then echo "[$(ts)] resumed"; else echo "[$(ts)] NOT resumed (see states above; journalctl -u 'gh-runner@*')"; fi
+if [ "$rc" -eq 0 ]; then rm -f "$PAUSED"; echo "[$(ts)] resumed"; else echo "[$(ts)] NOT resumed (see states above; journalctl -u 'gh-runner@*')"; fi
 exit "$rc"

@@ -1,5 +1,5 @@
 #!/bin/bash
-# gh-runners-pause - stop both tcm runners WITHOUT killing a running CI job (for A2A-Hub tcm deploys).
+# gh-runners-pause - stop every runner instance WITHOUT killing a running CI job (for A2A-Hub tcm deploys).
 #
 # Installed by Forge (SIA developer seat, record session 97, 2026-09-24) under D-044, at Relay's request.
 # Usage: sudo gh-runners-pause [timeout-seconds, default 3600]
@@ -11,12 +11,22 @@
 #
 # Limit: between the idle check and the stop there are milliseconds in which GitHub could assign a
 # job; stopping would then cancel that job. Resume with gh-runners-resume. A reboot also resumes.
+#
+# 10-20 (clark): every loaded gh-runner@*.service instance, not a fixed list (gh-runner@co-op-mailer-1 was missed).
+# The instances this run found active are written to $PAUSED, so gh-runners-resume starts exactly those.
 set -uo pipefail
 
-UNITS=(gh-runner@1.service gh-runner@2.service)
+PAUSED=/run/gh-runners-paused
 TIMEOUT=${1:-3600}
 [[ "$TIMEOUT" =~ ^[0-9]+$ ]] || { echo "usage: $0 [timeout-seconds]" >&2; exit 2; }
 [ "$(id -u)" -eq 0 ] || { echo "run with sudo" >&2; exit 2; }
+mapfile -t UNITS < <(systemctl list-units --all --plain --no-legend 'gh-runner@*.service' | awk '{print $1}')
+[ ${#UNITS[@]} -gt 0 ] || { echo "no gh-runner@ instance is loaded; nothing to pause" >&2; exit 1; }
+active=()
+for u in "${UNITS[@]}"; do systemctl is-active --quiet "$u" && active+=("$u"); done
+# Merge with an earlier pause's list, so pausing twice never forgets a runner the first run stopped.
+{ [ -r "$PAUSED" ] && cat "$PAUSED"; printf '%s\n' "${active[@]}"; } | grep . | sort -u > "$PAUSED.tmp"; mv "$PAUSED.tmp" "$PAUSED"
+echo "instances: ${UNITS[*]} (active now: ${active[*]:-none}; recorded in $PAUSED)"
 
 ts() { date -u +%H:%M:%SZ; }
 
