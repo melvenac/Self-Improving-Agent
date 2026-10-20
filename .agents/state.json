@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 535,
+  "revision": 536,
   "project": {
     "name": "self-improving-agent"
   },
@@ -6560,13 +6560,13 @@
     },
     {
       "seat": "planner",
-      "pick_up": "S173 (10-16/17) closed out for the night (Aaron to bed; clark: weekly usage +8.7, go light; focus Makerspace + Tarrant Mailer, SIA small fixes only). SHIPPED this session: T-297 steps 1-2 (#831 V-086, #840 V-088), T-302 merged-citations (#835 V-087, SIA opted in), T-298 (1)(2) (#822/#825) and step 3 usage OFF (#844 V-089), T-299 step 1 metrics, T-168 closed (V-085). T-303 (Scion ops-log) parked: 0 collisions measured. Ruled: T-298 (5) no change. No PR open, nothing in flight. Next (small only until focus shifts): T-297 step 3 (view header version, low value), T-298 (3) divergence banner and (6) READS OWED same-day, T-300 on Aaron's answer, offer merged_citations opt-in to the other seats (clark relays).",
+      "pick_up": "S173 (10-19/20). SHIPPED: T-305 Z on greeting dates (#861, V-094); T-194 sparse half (S173S #866 b208b485: the citation scans read the index too; sia-planner is now SPARSE, cone docs .agents .claude, live-checked V-095). Global end.md copied (V-093). Reviews for Aaron: clark s4 /end and s5 greeting scored (5/7); clark fixed prompt-from.sh, pr-wait.sh, audit-ignore. Filed: T-262 note (skills-audit blind to sed/cd/assignment-only command lines), T-312 (budgeted WAITING ON AARON / WATCH OUT headers carry the total), T-313 (seat-specific recall entries fire for other seats). No PR open, nothing in flight. Next: T-194 (b) agent GitHub account waits on D-154; T-312 is a small SIM-first brief; T-313 measure first (trigger_fires by seat).",
       "watch_out": [
+        "sia-planner is a SPARSE checkout (cone docs .agents .claude): no open-brain/, scripts/ or project-template/ in the tree. Read code with `git show origin/master:<path>` or `git grep <pat> origin/master -- <path>`; the CLI and hooks run from the main checkout's build.",
         "The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.",
         "SIA is a PUBLIC repo: never commit or post live MATCH key text.",
         "Desktop is coordination only: predictions a brief depends on go to clark as SIM lines for the QA PC; a brief ships its edits verbatim (docs/loops/<tag>/edits.txt + apply.cjs) once a SIM measured them.",
-        "A schema field addition is two-step (readers, then writers): strictObject refuses unknown keys, and stale MCP processes and the QA PC build lag the main build.",
-        "The dashboard redactor withholds whole lines it suspects; test a question's wording with agent-dashboard src/redact.js safeLine before recording it.",
+        "After any rebuild, an open-brain MCP server started before it runs the old build until /mcp reconnect. Check the briefing's Build line, and dry-run a record write from the sparse tree when the server is older than b208b485.",
         "Run records-pr.sh from the repo root; from a subfolder it fails with 'pathspec .agents/state.json did not match'."
       ],
       "open_questions": [
@@ -6584,11 +6584,7 @@
         },
         {
           "owner": "aaron",
-          "text": "Auto-reconnect for the open-brain MCP server: build it? Rec: yes (each rebuild needs a /mcp reconnect per seat)."
-        },
-        {
-          "owner": "aaron",
-          "text": "T-300: give clark its own SIA record in ~/Projects/fleet (option A)? Rec: yes."
+          "text": "Auto-reconnect for the open-brain MCP server: build it? Rec: yes (each rebuild needs a /mcp reconnect per seat; S173S needed one)."
         }
       ],
       "session": 173,
@@ -6599,20 +6595,18 @@
           "T-170-II real-key run host",
           "T-295 tool cuts",
           "T-261 priority",
-          "open-brain auto-reconnect",
-          "T-300 option A"
+          "open-brain auto-reconnect"
         ],
         "rulings": [
-          "T-297-S2 ACCEPT at 1aedc464 (merged 40d9980b), V-088",
-          "T-298-S3 ACCEPT at b36c3241 (merged 81889ce3), V-089",
-          "T-298 (5) no change (T-236 design)",
-          "T-303 parked (0 collisions)"
+          "S173H ACCEPT e4501454 (merged 99a9ae0a), V-094",
+          "SIM T194-SPARSE: S2 real (219/280, 74/75), fix = index union",
+          "S173S ACCEPT 18a94570 (refreshed d2a0ba41, merged b208b485), V-095"
         ]
       },
       "session_uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
       "checkout": "sia-planner",
       "first_rev": 499,
-      "written_rev": 522
+      "written_rev": 536
     }
   ],
   "sessions": [
