@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 551,
+  "revision": 552,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4882,6 +4882,20 @@
       "evidence": "MEASURED s173 (T-235-FAIL, QA PC, cursor-agent 2026.10.14-941492e, docs/loops/t235/cursor-failure-reply.md, brief docs/loops/t235-cursor-failure-measure-brief.md at cb1090ab; planner ACCEPTED). `echo` (exit 0) -> afterShellExecution + postToolUse, marker SEEN. `exit 3` and a native `git` failure -> afterShellExecution + postToolUseFailure, marker NONE. A PowerShell non-terminating cmdlet error exits 0 -> postToolUse, marker SEEN. afterShellExecution's marker was never seen. Every probe answered hookEventName 'PostToolUse'. postToolUseFailure payload: tool_name Shell, tool_input {command, cwd, timeout}, error_message (exit code only in text, or absent: git's stderr), failure_type 'error', is_interrupt; no tool_output. postToolUse tool_output is a JSON-encoded STRING {output, exitCode}. Cursor prefixes hook stdin with U+FEFF on Windows; open-brain's hook entry points trim it (planner-checked).",
       "recommended_update": "Do NOT register Cursor postToolUseFailure yet: the trigger would record 'injected' fires the model never sees (the census lie #794's watch-out names). Register postToolUse only (T-235's ask to Aaron). Then a one-row measurement: on postToolUseFailure, does Cursor deliver hookSpecificOutput.additionalContext when hookEventName is 'postToolUseFailure' or 'PostToolUseFailure', or does it need another output shape? outputHookEventName (cli-recall-trigger.ts) answers 'PostToolUse' to the lower-case 'postToolUseFailure' today (F3 pins that). Build only on a delivery row.",
       "opened_session": 173
+    },
+    {
+      "id": "G-062",
+      "what": "READS OWED keeps listing a brief whose work has shipped, or that the seat wrote itself. Nothing clears 'owed' when the brief's work closes or when the reading seat authored it, so every new session pays a read for nothing and learns to skim the line.",
+      "evidence": "open-brain/src/pipelines/session-start/reads-owed.ts. Maker S71 (10-20, build 5f48b9d, rev 698): READS OWED (1) named .agents/plans/release-1020c-convex.md, launched, run and shipped in S70 (#157-#170; S70's handoff: nothing in flight). Atlas S174: READS OWED named docs/loops/t317-s1-brief.md (written by Atlas S173) and later docs/loops/t315-revert-brief-amendment-1.md (written by Atlas in S174 itself).",
+      "recommended_update": "Decide what 'owed' means, then make reads-owed.ts compute it: (a) a brief this seat's checkout committed (author = this seat) is not owed to it; (b) a brief whose tag's PR or task is closed/merged is not owed. Ship (a) first: it is deterministic from git. Pin both with rows (a self-authored brief; a shipped one).",
+      "opened_session": 174
+    },
+    {
+      "id": "G-063",
+      "what": "domains.json is half-retired: /start step 4 and READS OWED name it and `open-brain sync --score` reads it, but /bootstrap never creates it (project-template has none), so projects adopted by /bootstrap (Makerspace) carry no domains.json, lose a score category and see a read step that silently skips.",
+      "evidence": "git grep on master 10-20: .claude/commands/start.md:86 and project-template start.md:86 (Cursor :89) list it; open-brain/src/pipelines/session-start/reads-owed.ts:88 counts it; open-brain/src/pipelines/sync/score.ts:44 reads it; project-template has no domains.json. Reported by Maker S71: makerspace-planner has none.",
+      "recommended_update": "One decision for Aaron: keep domain tags (then /bootstrap writes a default domains.json) or retire them (then drop it from /start step 4 in both runtimes, reads-owed.ts and the score). Rec: retire, since nothing in the briefing uses the tags.",
+      "opened_session": 174
     }
   ],
   "decisions": [
