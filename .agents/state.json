@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 546,
+  "revision": 547,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2649,9 +2649,10 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "D-161 (Aaron 10-20). Problem: server.ts is loaded once per Claude Code session, so after sia-rebuild every seat serves the old build until a human runs /mcp reconnect open-brain. The serving-build line (T-254) already reads build-info.json from disk, so the gap is visible but not closed. Candidate shape, to measure first (step 0): a thin stable launcher keeps the stdio transport, and when build/build-info.json's commit changes between calls it re-imports the handler module from the build with a cache-busting URL query (ESM gives a fresh module instance; the better-sqlite3 addon is already loaded and is reused), re-registers tools and sends notifications/tools/list_changed. Alternative: the server exits on a build change and the host restarts it. Step 0 must check whether Claude Code restarts a stdio MCP server that exits (if not, the launcher is the only route), whether Claude Code honours tools/list_changed, how many module-level singletons server.ts holds (DB handle, session registration, recall-entries state) that a reload must carry across, and the Cursor (cursor-agent) behaviour under T-235. Acceptance: after sia-rebuild, the next tool call in an already-running session reports the new build on the briefing's Build line, with no reconnect, and a registered session id survives the reload.",
+      "note": "D-161 (Aaron 10-20). Problem: server.ts is loaded once per Claude Code session, so after sia-rebuild every seat serves the old build until a human runs /mcp reconnect open-brain. The serving-build line (T-254) already reads build-info.json from disk, so the gap is visible but not closed. Candidate shape, to measure first (step 0): a thin stable launcher keeps the stdio transport, and when build/build-info.json's commit changes between calls it re-imports the handler module from the build with a cache-busting URL query (ESM gives a fresh module instance; the better-sqlite3 addon is already loaded and is reused), re-registers tools and sends notifications/tools/list_changed. Alternative: the server exits on a build change and the host restarts it. Step 0 must check whether Claude Code restarts a stdio MCP server that exits (if not, the launcher is the only route), whether Claude Code honours tools/list_changed, how many module-level singletons server.ts holds (DB handle, session registration, recall-entries state) that a reload must carry across, and the Cursor (cursor-agent) behaviour under T-235. Acceptance: after sia-rebuild, the next tool call in an already-running session reports the new build on the briefing's Build line, with no reconnect, and a registered session id survives the reload. — S174 (10-20) LIVE TEST FAILED, REVERT IN FLIGHT. #885 merged 97eb3481 (Atlas byte-compare SAME x3, patch-id = reviewed f17c7a25, merge-tree CLEAN, CI test SUCCESS; Aaron ran pr-merge.sh because the auto-mode classifier refused it to Atlas as Merge Without Review). (1) The 97eb348 rebuild could not test anything: every running server was on 11b1b72, which has no watch, so the Build line said STALE PROCESS; the s173 handoff's 'within 15 s' prediction assumed the watch was already running. Aaron reconnected every seat (servers started 06:18Z on 97eb348). (2) sia-rebuild to 9e0d5b01 finished 06:19:27Z; by 06:19:57Z all six open-brain server processes had exited, and Claude Code respawned NONE: the session showed open-brain as a failed MCP server and its tools were removed until Aaron ran /mcp reconnect in every seat (~06:32Z). So exit works and the D-161 premise (Claude Code respawns an exited stdio server) is false here. A stale server is better than none: Aaron (10-20: 'that's fine, go') approved unwiring it. docs/loops/t315-revert-brief.md (docs #889, ASCII fix #890), build job #4 on the dashboard job runner at 7e24dc76. build-watch.ts and its R1-R5 stay for the next attempt. After the revert merges, its rebuild makes every server exit ONE last time: every seat reconnects right after. Next attempt must not depend on the host respawning: e.g. an in-process reload (re-import handlers from the new build behind a stable stdio transport).",
       "note_by": [
-        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
       "closed_rev": null
     },
@@ -2663,9 +2664,10 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "S173 (10-20), from Maker's audit for Aaron (melvenac-makerspace docs/t001-plans@c5828b04 .agents/audit/2026-10-19-stale-backlog.md). Maker found 5 of 44 open tasks already done (T-189 sending live since 10-18, plus T-202, T-126, T-148 and T-036), 3 code-done and waiting only on owner steps, and 17 with 'merged/LIVE/shipped' in their notes. Maker built Aaron a pending list from titles, which the briefing shows by design. SIA already has the deterministic detector: T-256's /sync check open-task-commits warns on an open/in_progress task named by a code commit on HEAD (SIA's own /sync showed 8 on 10-19). The gap: it runs only in /sync, never in the briefing. Fix shape: ob_start computes the same set (same function, bounded git log) and the briefing prints one line, 'MAYBE SHIPPED (n): T-x T-y …', capped like the other lines; the task note's 'stays open after <sha7>' exemption still applies. Not adopted: note-text markers ('merged', 'LIVE') as a signal, because prose is not a record. Per-project, not SIA: a release step that runs close_task (Maker adopts it locally), and closing code-done tasks with the owner's leftover as an open_question owned by aaron, using the existing schema with no new status. First measure: run `open-brain sync` in makerspace and count how many of the 5 the check catches (that depends on commit subjects naming task ids). — MEASURED (Maker, 10-20): open-task-commits named 0 of the 5, run on Makerspace's record at rev 677 with all 5 still open ('0 open tasks named by a code commit; scanned 1434 non-merge commits'). Two causes. (1) SIA BLIND SPOT, now the main fix: the check scans HEAD's history only. Makerspace's record lives on docs/t001-plans, and origin/main is not an ancestor of it, so the check sees no code commit at all, whatever the subjects say. The same holds for any project with record_branch set (T-298-S4) or a planner worktree detached at a records commit. Fix: also scan the resolved code branch (origin/<default>, via upstream-ref.ts / T-250), and name the scanned ref(s) in the result. Raised to P1, because the detector is blind exactly where seats keep records apart from code. (2) Id form: Makerspace subjects use lowercase `t202` / `feat(t202)` (141 of 693 main subjects carry an uppercase T-id). The matcher stays `T-NNN`: a case-insensitive `t-?NNN` would match loop tags (Courier's `t010-browser` is a run, not task T-010), and a false 'maybe shipped' risks closing a live task. Maker adopts `T-NNN` in subjects. Undetectable by design: T-189 (shipped as DB rows) and T-036 (superseded), so those are close-with-evidence.",
+      "note": "S173 (10-20), from Maker's audit for Aaron (melvenac-makerspace docs/t001-plans@c5828b04 .agents/audit/2026-10-19-stale-backlog.md). Maker found 5 of 44 open tasks already done (T-189 sending live since 10-18, plus T-202, T-126, T-148 and T-036), 3 code-done and waiting only on owner steps, and 17 with 'merged/LIVE/shipped' in their notes. Maker built Aaron a pending list from titles, which the briefing shows by design. SIA already has the deterministic detector: T-256's /sync check open-task-commits warns on an open/in_progress task named by a code commit on HEAD (SIA's own /sync showed 8 on 10-19). The gap: it runs only in /sync, never in the briefing. Fix shape: ob_start computes the same set (same function, bounded git log) and the briefing prints one line, 'MAYBE SHIPPED (n): T-x T-y …', capped like the other lines; the task note's 'stays open after <sha7>' exemption still applies. Not adopted: note-text markers ('merged', 'LIVE') as a signal, because prose is not a record. Per-project, not SIA: a release step that runs close_task (Maker adopts it locally), and closing code-done tasks with the owner's leftover as an open_question owned by aaron, using the existing schema with no new status. First measure: run `open-brain sync` in makerspace and count how many of the 5 the check catches (that depends on commit subjects naming task ids). — MEASURED (Maker, 10-20): open-task-commits named 0 of the 5, run on Makerspace's record at rev 677 with all 5 still open ('0 open tasks named by a code commit; scanned 1434 non-merge commits'). Two causes. (1) SIA BLIND SPOT, now the main fix: the check scans HEAD's history only. Makerspace's record lives on docs/t001-plans, and origin/main is not an ancestor of it, so the check sees no code commit at all, whatever the subjects say. The same holds for any project with record_branch set (T-298-S4) or a planner worktree detached at a records commit. Fix: also scan the resolved code branch (origin/<default>, via upstream-ref.ts / T-250), and name the scanned ref(s) in the result. Raised to P1, because the detector is blind exactly where seats keep records apart from code. (2) Id form: Makerspace subjects use lowercase `t202` / `feat(t202)` (141 of 693 main subjects carry an uppercase T-id). The matcher stays `T-NNN`: a case-insensitive `t-?NNN` would match loop tags (Courier's `t010-browser` is a run, not task T-010), and a false 'maybe shipped' risks closing a live task. Maker adopts `T-NNN` in subjects. Undetectable by design: T-189 (shipped as DB rows) and T-036 (superseded), so those are close-with-evidence. — S174 (10-20): SIM T316-S1 ALL PASS (4c277391: baseline 2 failed | 2 passed, APPLIED 5 edits to 2 files, 98 files / 1479 tests, T256 green, sync line 'across HEAD and origin/master', m1 R1+R3 red, m2 R4 red). Brief docs/loops/t316-s1-brief.md landed (#889, #890). Build job #5 on the dashboard job runner at 7e24dc76.",
       "note_by": [
-        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
       "closed_rev": null
     },
@@ -2677,9 +2679,10 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "Aaron 10-20, typed in the Atlas window: 'yes and high priority. Several agents are about to roll'. He asked 'does end have the agent write its handoff?'. No: /end writes no project state, and the handoff is written during work with ob_state set_handoff. The backstop is ob_end's RECORD NOT UPDATED gate (end-record-guard.ts newLayoutRecordUpdated, also used by the SessionEnd hook's checkSessionHandoff). It has two holes. (1) A sessions[] row passes it: ANY record write by this session counts, with no handoff needed. (2) A handoff by this session passes no matter when it was written. Each handoff carries written_rev, but nothing compares it with the session's later work. Seen live in S173: Atlas's handoff described 10-16 work through dozens of record writes, PRs and merges on 10-19, and the gate would have passed it; Atlas caught and rewrote it by hand at rev 536 and again at rev 541. Interim (sent to clark 10-20 for every seat before tonight's rolls): set_handoff right before /end and land it before /clear. Fix shape, to settle in the brief: (a) on the new layout, a sessions[] row alone no longer satisfies the gate; this session's set_handoff is required (loop docs/loops/*-handoff.md commits still count, as today). (b) Stale check: refuse when this session's handoff written_rev is lower than the highest record revision this session wrote that changed anything other than the handoff (the session's rows in tasks/decisions/verified/gaps carry their revisions, and sessions[] keeps first_rev). Equivalently, any record write after the handoff makes it stale unless the session re-sets it. Message: 'HANDOFF STALE: written at rev N; this session wrote rev M after it. Re-run set_handoff.' record_ok still bypasses, with its reason printed next start. (c) The SessionEnd hook's missing-handoff notice uses the same rule, so a session without /end is flagged at the next /start too. Tests: a session with only a sessions[] row is refused; a handoff followed by a task update is refused as stale; re-setting the handoff passes; record_ok bypasses.",
+      "note": "Aaron 10-20, typed in the Atlas window: 'yes and high priority. Several agents are about to roll'. He asked 'does end have the agent write its handoff?'. No: /end writes no project state, and the handoff is written during work with ob_state set_handoff. The backstop is ob_end's RECORD NOT UPDATED gate (end-record-guard.ts newLayoutRecordUpdated, also used by the SessionEnd hook's checkSessionHandoff). It has two holes. (1) A sessions[] row passes it: ANY record write by this session counts, with no handoff needed. (2) A handoff by this session passes no matter when it was written. Each handoff carries written_rev, but nothing compares it with the session's later work. Seen live in S173: Atlas's handoff described 10-16 work through dozens of record writes, PRs and merges on 10-19, and the gate would have passed it; Atlas caught and rewrote it by hand at rev 536 and again at rev 541. Interim (sent to clark 10-20 for every seat before tonight's rolls): set_handoff right before /end and land it before /clear. Fix shape, to settle in the brief: (a) on the new layout, a sessions[] row alone no longer satisfies the gate; this session's set_handoff is required (loop docs/loops/*-handoff.md commits still count, as today). (b) Stale check: refuse when this session's handoff written_rev is lower than the highest record revision this session wrote that changed anything other than the handoff (the session's rows in tasks/decisions/verified/gaps carry their revisions, and sessions[] keeps first_rev). Equivalently, any record write after the handoff makes it stale unless the session re-sets it. Message: 'HANDOFF STALE: written at rev N; this session wrote rev M after it. Re-run set_handoff.' record_ok still bypasses, with its reason printed next start. (c) The SessionEnd hook's missing-handoff notice uses the same rule, so a session without /end is flagged at the next /start too. Tests: a session with only a sessions[] row is refused; a handoff followed by a task update is refused as stale; re-setting the handoff passes; record_ok bypasses. — S174 (10-20): part 1 merged. T317-S1 #888: Atlas byte-compare SAME x2 at d66d1656 (reply: R1 red pre-fix, 79 files / 1076 tests, m1 R1 red, CI test pass); pr-refresh to 3d86d086 (patch-id = reviewed, CI SUCCESS, merge-tree CLEAN); Aaron ran pr-merge.sh -> 9e0d5b01; main tree rebuilt to 9e0d5b01 and every seat reconnected ~06:32Z, so the gate (set_handoff required; other record writes do not count) is LIVE. Part 2 (stale handoff written before later work) remains.",
       "note_by": [
-        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
       "closed_rev": null
     },
@@ -6126,62 +6129,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "(1) After the Claude weekly reset (~00:05 CDT 10-07, a new week ON PACE), write ONE narrow Opus QA dispatch covering #437 r10 (9d197466, CI 37546516861), #472 r5 (1a374101, CI 37501631053) and #484 r9 (edfc964d, CI 37553637298 — read grok-audit's final r9 verdict in room k575fscd first). Re-run only the deciding rows plus Windows rows, read grok-qa-sia's #472 r4 first-pass (FIRST-PASS PASS; one uncaught source mutant: negation widened from clause to sentence) and the grok reviews only AFTER QA reports (D-125). All three change src/: each merge needs Aaron's word. (2) Jev cal 2: QA 287 (0836350f) answered 33/33 with tools fixed but NO separation (BA 0.50, AUC 0.385, everything rejected). Rule round 3 or stop: read grok-research's SIA-R1 answer (room k5779c36, 4 parts) first. QA 286 (held-out) stays held. (3) Commit grok-qa-sia's baseline + flake-hunt + #472 first-pass reports verbatim to a qa/* branch (D-127); they're in room k573rrq0.",
-      "watch_out": [
-        "USAGE: Aaron's weekly pace rule (usage-winddown-rules.md §4): allowance = elapsed/7d x 95%; AHEAD means dev work to Cursor/Grok and Claude for planning and QA only. Plus §5: roll before an idle gap over 1 h when under 50% context left, and fewer wakes.",
-        "PLANNER-WATCH: run `node scripts/planner-watch.mjs --as atlas --hub-talk C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs --peers cursor-builder,cursor-infra,forge,grok-qa-sia,grok-sia-review,grok-audit,grok-research --interval 30` under Monitor (an exact allow-rule is in .claude/settings.local.json; CronCreate goes through the classifier). It MISSES turns (task opened), so do a direct room sweep whenever it's quiet for 30+ min with jobs out. Use the a2a-planner copy of hub-talk, never ~/Projects/A2A-Hub (Aaron's stack checkout).",
-        "HEAVY RULE: forge ran r7 HEAVY unbooked and without the lease; it ACKed turn 64's rule. Every stress run: ask in its room, the planner relays to clark, wait for the GO, take the lease, HEAVY END, release from the same shell.",
-        "AFTER #484 MERGES: Aaron must stop the MCP server, close Claude Code sessions, and run `open-brain scrub-trigger-fires` once (4066 trigger_fires rows on his store).",
-        "GROK BOTS: one long QA job per bot, 2 on the VM at once; reviews and audits are light. JOB FAILED / JOB STALLED turns mean ask clark for a hand retry. The bots ask only the planner (QUESTION <turn>)."
-      ],
-      "open_questions": [
-        "Aaron: is #437 r10 acceptable with its documented limits (F3 stall past TTL, F4 triple-crash wedge, F5 60 s crash window), or would he rather go simpler if a rare double sessionStart/End is harmless downstream? (planner recommends accepting r10 if QA confirms)"
-      ],
-      "session": 163,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#437",
-            "qa_status": "in_progress",
-            "note": "T-235 P2-7 r10 9d197466 frozen, CI green; HEAVY 0/0 x4 at r9; grok r9 review: exclusion clean apart from limits; awaits Opus QA + Aaron"
-          },
-          {
-            "ref": "#472",
-            "qa_status": "in_progress",
-            "note": "HUBROOM-GUARD r5 1a374101 frozen, CI green; planner probe 7/7 caught, 5/5 ok; grok-qa-sia first-pass PASS on r4; awaits Opus QA + Aaron"
-          },
-          {
-            "ref": "#484",
-            "qa_status": "not_started",
-            "note": "AUDIT-FIX r9 edfc964d (A3/A6/A1 + scrub-trigger-fires) frozen, CI green; grok-audit final r9 verdict pending; awaits Opus QA + Aaron"
-          },
-          {
-            "ref": "#425",
-            "qa_status": "accepted",
-            "note": "T-235 P2-4, QA 280 ACCEPT; merges only after #437"
-          },
-          {
-            "ref": "#470",
-            "qa_status": "in_progress",
-            "note": "Jev cal 2 dev r2 fa8a8213; QA 287 COMPLETE, no separation; round 3 or stop pending"
-          }
-        ],
-        "frozen_sha": "9d197466d8865b610953b3cb2cd542d0ea8c5c2d",
-        "questions_for_aaron": [
-          "Accept #437 r10 with documented limits, or go simpler (rare doubles ok if capture is idempotent)?"
-        ],
-        "rulings": [
-          "s163 merged (docs/records-only, standing rule): #475 #476 #477 #478 #479 #480 #482 #483; on Aaron's word: #481 (scripts/planner-watch.mjs).",
-          "QA 284 e765175e: #437 r5 REJECT (lost-run F1, breaker F2), #472 r3 REJECT (K1). QA 285 edad72ab / QA 287 0836350f: Jev cal 2 dev, no separation. D-125..D-128 Grok seats + Jev hold.",
-          "Grok calibration: grok-sia-review found 5/5 of QA 283's K1/K2 blind plus 3 new (docs/loops/grok-sia-review-cal-468.md)."
-        ]
-      },
-      "session_uuid": "d43a0485-7166-4db2-9ca2-eacde1f63101",
-      "checkout": "sia-planner",
-      "first_rev": 341
-    },
-    {
-      "seat": "planner",
       "pick_up": "(1) The main-checkout rebuild is DONE and verified: clark's successor rebuilt to ba53859c (it contains e86461b6, so #498, #489 and #516 are all in); build-info ba53859c, built 2026-10-08T18:45:53Z. (2) E4: in a session served by the rebuilt build (check the Build line, and that ob_state lists set_standing), tag the standing rules with ob_state set_standing: D-060, D-117, D-125, D-130, D-131, D-135, D-137 and any other decision that is a rule rather than an event. Then check that STANDING RULES renders in your own next /start. (3) The Makerspace import is clear from SIA's side: docs/loops/makerspace-import-brief.md. Maker's first job is listing the 17 uncommitted files, with the answer going through clark (SG-1/D-135). (4) After the import, the first loop is BRIEFING-FIX: plain '## Briefing' header, a stale-usage line, READS OWED, clark's Fleet block, the 4 QA 295 findings, and #498's P1/P2. Brief it from docs/loops/fleet-deterministic-dispatch.md and D-134..D-136. Apply D-137 (mutants scoped to the changed code) in every QA dispatch. (5) Aaron's one-time scrub-trigger-fires: the dry run on his store showed 22536 rows scanned, 19964 would be rewritten. clark times the real run (after Caliper QA-041 exits) and records the output. (6) PARKED (D-130): #437, #425, Jev cal 2.",
       "watch_out": [
         "SG-1 (D-135): don't ask Aaron. Send QA ACCEPTs to clark (PR, QA number, report sha, head sha) and questions to clark. Verify a relayed Aaron decision in clark's transcript (type user, string; skip '<' and 'Another Claude session…' lines).",
@@ -6747,14 +6694,6 @@
       "first_rev": 263
     },
     {
-      "n": 163,
-      "date": "2026-10-07",
-      "uuid": "d43a0485-7166-4db2-9ca2-eacde1f63101",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 341
-    },
-    {
       "n": 164,
       "date": "2026-10-08",
       "uuid": "63c84e2f-cb93-4270-a361-060c608be6a4",
@@ -6833,6 +6772,14 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 499
+    },
+    {
+      "n": 174,
+      "date": "2026-10-20",
+      "uuid": "0bbb03c4-d91d-496e-a6d5-43924f16405b",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 547
     }
   ]
 }
