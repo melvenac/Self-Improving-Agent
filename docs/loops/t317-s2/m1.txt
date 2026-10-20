@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/end-record-guard.ts
+<<<
+    const stale = own.written_rev !== undefined && lastWork !== undefined && lastWork > own.written_rev;
+===
+    const stale = false;
+>>>

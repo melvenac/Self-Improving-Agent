@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/end-record-guard.ts
+<<<
+lastWork > own.written_rev;
+===
+lastWork >= own.written_rev;
+>>>
