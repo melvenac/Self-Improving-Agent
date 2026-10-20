@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 537 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 538 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -50,6 +50,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-311** handoff_caps is opt-in: an uncapped handoff is accepted and clipped silently
 - [ ] **T-312** Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap
 - [ ] **T-313** Recall trigger fires a seat-specific stored entry for other seats, naming a script path they don't have
+- [ ] **T-314** CLI `start` creates a session log, so a read-only check takes the next session number
 
 ## Done (last 3 sessions)
 
