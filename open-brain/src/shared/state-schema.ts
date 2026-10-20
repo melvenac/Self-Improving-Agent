@@ -309,6 +309,12 @@ export const SessionRecordSchema = z.strictObject({
    * removes.
    */
   first_rev: nonNegInt.nullable(),
+  /**
+   * T-317 S2: the revision of this session's latest write that carried an op other than set_handoff. OPTIONAL and,
+   * until T-317 S3, written by nothing: an older build rejects an unknown key, so readers ship first. The /end gate
+   * calls this session's handoff stale when this is above its written_rev; absent means "not stamped", no stale check.
+   */
+  last_work_rev: nonNegInt.optional(),
 });
 
 function unique(values: Array<string | null>): boolean {
@@ -520,7 +526,7 @@ export const KEY_ORDER: Readonly<Record<string, readonly string[]>> = {
   handoffs: ["seat", "pick_up", "watch_out", "open_questions", "session", "loop_state", "session_uuid", "checkout", "first_rev", "written_rev"],
   loop_state: ["open_prs", "frozen_sha", "questions_for_aaron", "rulings"],
   open_prs: ["ref", "qa_status", "note"],
-  sessions: ["n", "date", "uuid", "seat", "checkout", "first_rev"],
+  sessions: ["n", "date", "uuid", "seat", "checkout", "first_rev", "last_work_rev"],
 };
 
 /**
