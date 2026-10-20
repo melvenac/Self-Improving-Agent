@@ -23,7 +23,7 @@ Code would respawn it from the new build. The live test failed on 10-20:
 - By 06:19:57Z all six servers had exited, and Claude Code respawned none. Each seat showed open-brain as a failed
   MCP server, and its tools were gone until Aaron ran `/mcp reconnect open-brain` in every seat.
 
-Before T-315, a stale server kept serving and the briefing's Build line said `STALE PROCESS → /mcp reconnect`. That is
+Before T-315, a stale server kept serving and the briefing's Build line said `STALE PROCESS -> /mcp reconnect`. That is
 better than no server. **Fix:** remove the wiring. `build-watch.ts` stays for T-315's next attempt (a respawn that
 does not depend on the host), and its R1-R5 rows stay green.
 
