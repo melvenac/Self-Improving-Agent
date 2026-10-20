@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 534 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 535 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).
 
 ## What's working
@@ -100,6 +100,7 @@
 - T-298-S4 live on makerspace (record_branch docs/t001-plans set by Maker 10-19): the tree line is 'Tree currency: level with origin/docs/t001-plans (record here rev 653, at origin/docs/t001-plans rev 653)' with no DIVERGED banner; before the flag it was 371 behind / 921 ahead of origin/main every start. _(V-092, 1 evidence)_
 - T-307 reaches every project: the global ~/.claude/commands/end.md now passes skills-audit --session <SESSION_UUID> _(V-093, 1 evidence)_
 - S173H live (T-305, D-160): the greeting's session line prints the UTC date with a Z, in both layouts; watch-out expiry still compares the plain date _(V-094, 1 evidence)_
+- T-194 sparse planner checkout is live: ~/Worktrees/sia-planner is sparse (cone docs .agents .claude), and the citation scans (S173S, PR #866, merge b208b485, REBUILT) cite the same ids there as in a full tree _(V-095, 3 evidence)_
 
 ## What's broken
 
