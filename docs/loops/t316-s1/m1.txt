@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/open-task-commits.ts
+<<<
+"--format=%x1e%H%x1f%s", ...refs], projectRoot);
+===
+"--format=%x1e%H%x1f%s", "HEAD"], projectRoot);
+>>>
