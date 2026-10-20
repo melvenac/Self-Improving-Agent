@@ -86,10 +86,11 @@ describe("T-315: watchBuild", () => {
     expect(sent).toHaveLength(2);
   });
 
-  it("R6: server.ts wires the watch after connect and exits only for a Claude client", () => {
+  it("R6 (T-315 revert): server.ts does not wire the watch, so a rebuild never makes a running server exit", () => {
     const src = readFileSync(join(import.meta.dirname, "..", "..", "src", "server.ts"), "utf8");
-    expect(src).toContain("attachBuildWatch(transport, watch)");
-    expect(src).toMatch(/if \(!\/claude\/i\.test\(client\)\) return;/);
-    expect(src).toContain("loaded: LOADED_COMMIT");
+    expect(src).not.toContain("./shared/build-watch.js");
+    expect(src).not.toContain("attachBuildWatch(");
+    expect(src).not.toContain("process.exit(0)");
+    expect(src).toContain("server.connect(transport).catch(");
   });
 });
