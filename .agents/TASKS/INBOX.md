@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 544 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 545 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -24,6 +24,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-298** Briefing gaps seen in Maker's S67 greeting: stale handoff not detectable, Latest brief silent outside docs/loops, divergence banner against the wrong branch, Usage 'not checked' noise
 - [ ] **T-315** open-brain MCP auto-reconnect: a running server serves the rebuilt build without /mcp reconnect (D-161)
 - [ ] **T-316** The briefing shows the open tasks a code commit already names (T-256's finding), so a stale backlog is visible at /start, not only in /sync
+- [ ] **T-318** Automate the session scorecard and review by exception: greeting metrics alarm on the measured failure classes; manual transcript review only for flagged sessions plus a weekly sample
 
 ## P2
 
