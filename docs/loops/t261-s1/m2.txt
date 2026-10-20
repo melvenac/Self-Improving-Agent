@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+    if (DYNAMIC_MEMORY_LOADS.includes(load)) allowedLoads++;
+===
+    if (false) allowedLoads++;
+>>>
