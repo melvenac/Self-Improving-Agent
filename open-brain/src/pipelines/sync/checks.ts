@@ -2069,6 +2069,7 @@ export const MEMORY_SIDE: string[] = [
   "pipelines/shadow/",
   "pipelines/sync/checks-memory.ts",
   "pipelines/sync/score.ts",
+  "cli-memory.ts", // T-261 S2: relocate, scrub-trigger-fires, trigger-keys and topics
   // T-261 S1: memory in all but name. Memory imports each of these and no core file does (measured at c3b5ceec).
   "lifecycle.ts",
   "shared/fts.ts",
@@ -2100,11 +2101,7 @@ export const DYNAMIC_MEMORY_LOADS: string[] = [
   "cli.ts -> pipelines/sync/checks-memory.ts",
   "cli.ts -> pipelines/sync/score.ts",
   "cli.ts -> db-v2.ts",
-  "cli.ts -> scrub-trigger-fires.ts",
-  "cli.ts -> trigger/keys-writer.ts",
-  "cli.ts -> trigger/match-keys.ts",
-  "cli.ts -> pipelines/topics/index.ts",
-  "cli.ts -> better-sqlite3",
+  "cli.ts -> cli-memory.ts",
 ];
 
 /**
