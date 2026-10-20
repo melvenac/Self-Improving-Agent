@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/build-watch.ts
+<<<
+      if (onDisk === null || onDisk === opts.loaded) return false;
+===
+      if (onDisk === opts.loaded) return false;
+>>>

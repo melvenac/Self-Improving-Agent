@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/build-watch.ts
+<<<
+      if (stopped || inFlight > 0) return false;
+===
+      if (stopped) return false;
+>>>
