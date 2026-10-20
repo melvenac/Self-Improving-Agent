@@ -1,0 +1,6 @@
+@@@ open-brain/src/server.ts
+<<<
+  server.connect(transport).catch((err) => {
+===
+  server.connect(transport).then(() => { attachBuildWatch(transport, watchBuild({} as never)); }).catch((err) => {
+>>>
