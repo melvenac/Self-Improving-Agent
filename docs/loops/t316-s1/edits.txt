@@ -1,0 +1,53 @@
+@@@ open-brain/src/pipelines/session-start/upstream-ref.ts
+<<<
+/** T-298 (3): a branch name, not ref syntax: no leading "-", no spaces, no "..". */
+===
+/**
+ * T-316: the default branch's remote-tracking ref when it exists in this clone, else null. Unlike resolveUpstreamRef
+ * there is no fallback: a caller that adds it to a git command must not name a ref git cannot resolve.
+ */
+export function resolveCodeRef(projectRoot: string): string | null {
+  const ref = resolveUpstreamRef(projectRoot);
+  return verifiesAsCommit(projectRoot, ref) ? ref : null;
+}
+
+/** T-298 (3): a branch name, not ref syntax: no leading "-", no spaces, no "..". */
+>>>
+@@@ open-brain/src/pipelines/sync/open-task-commits.ts
+<<<
+import { execRunner, type CommandRunner } from "./checks-state.js";
+===
+import { execRunner, type CommandRunner } from "./checks-state.js";
+import { resolveCodeRef } from "../session-start/upstream-ref.js";
+>>>
+@@@ open-brain/src/pipelines/sync/open-task-commits.ts
+<<<
+export function checkOpenTaskCommits(projectRoot: string, run: CommandRunner = execRunner): CheckResult {
+===
+/**
+ * T-316: HEAD alone misses a project whose record lives on a docs branch, or in a planner worktree detached at a
+ * records commit: code reaches the default branch by PR and never comes back to HEAD (Makerspace, 10-20: 0 of 5 found).
+ * So the log also reads the default branch's ref, resolved here when `codeRef` is not given, and only when it exists.
+ * With HEAD alone, every message is unchanged.
+ */
+export function checkOpenTaskCommits(projectRoot: string, run: CommandRunner = execRunner, codeRef?: string | null): CheckResult {
+>>>
+@@@ open-brain/src/pipelines/sync/open-task-commits.ts
+<<<
+  const log = run("git", ["-c", "core.quotepath=off", "log", "--no-merges", `--max-count=${OPEN_TASK_COMMIT_BOUND}`, "--name-only", "--format=%x1e%H%x1f%s", "HEAD"], projectRoot);
+===
+  const extra = codeRef === undefined ? resolveCodeRef(projectRoot) : codeRef;
+  const refs = extra !== null && extra !== "HEAD" ? ["HEAD", extra] : ["HEAD"];
+  const where = refs.join(" or ");
+  const log = run("git", ["-c", "core.quotepath=off", "log", "--no-merges", `--max-count=${OPEN_TASK_COMMIT_BOUND}`, "--name-only", "--format=%x1e%H%x1f%s", ...refs], projectRoot);
+>>>
+@@@ open-brain/src/pipelines/sync/open-task-commits.ts
+<<<
+    hits.push(`${String(t.id)} is ${String(t.status)} but ${sha7} '${subj}' on HEAD touches code; close it with evidence or note why it stays open`);
+  }
+  const scanned = `scanned ${records.length} non-merge commits (bound ${OPEN_TASK_COMMIT_BOUND}) against ${open.length} open/in_progress task(s)`;
+===
+    hits.push(`${String(t.id)} is ${String(t.status)} but ${sha7} '${subj}' on ${where} touches code; close it with evidence or note why it stays open`);
+  }
+  const scanned = `scanned ${records.length} non-merge commits (bound ${OPEN_TASK_COMMIT_BOUND}) against ${open.length} open/in_progress task(s)${refs.length > 1 ? ` across ${refs.join(" and ")}` : ""}`;
+>>>
