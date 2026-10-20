@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 552,
+  "revision": 553,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2697,6 +2697,20 @@
       "note": "Aaron 10-20, typed in the Atlas window: 'file it and put it after T-317' (ORDER: start after T-317 lands). Context: he asked whether the start/end transcript-review loop is making progress. Atlas's evidence-based answer: the mechanical greeting is now right (state match, drift none, fits 1.4k-3.6k of 4.4k, start in 6-20 calls). The misses that remain fall in 4 recurring classes that reviews keep re-finding: (1) stale handoffs; (2) WAITING ON AARON under-reported (clark s5: 'one question' with 5 open; Relay s42: none recorded); (3) agents reading past shown signals ('+3 more', lessons that fired before the same mistake, entries rated helpful when they fired after the right act: 751 sits at 13 helpful / 4 neutral, with at least clark's and Courier's helpful rows wrong); (4) detectors that are blind or quiet (T-316's 0/5; stale_process in Maker s69 and clark s4; Maker tree_diverged 3 sessions running; greeting-metrics recorded Atlas handoff_lag_revs 12-13 on 10-20 00:50 with NO alarm). Scope: (a) greeting-metrics.jsonl alarms (alarm_streaks already exist) on handoff_lag_revs > N, stale_process, a tree_diverged streak, and the count of aaron-owned open questions across the seat's handoff vs what the greeting printed; (b) an end-side scorecard row from ob_end: this session's handoff written after its last work (shares T-317's rule), lessons stored with a MATCH: command key, and ratings where the entry fired AFTER the command it recommends auto-flagged as neutral candidates; (c) a 'review queue': sessions that trip an alarm are listed for the planner, everything else is not reviewed by hand; plus one sampled session per week to look for new classes; (d) a coverage fix: only 15 greeting-metrics rows exist since 10-16, none from Courier or Prism, so find which start path skips the append (CLI fallback, older builds, Cursor) before trusting the alarms. Step 0: measure (d) and list which alarm thresholds the 15 rows would have tripped.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-319",
+      "title": "Retire domains.json (D-162): /start, READS OWED, score, template, SIA's own file and its allowlist",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 174,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "D-162 (Aaron 10-20). Closes G-063. References on master 10-20: .claude/commands/start.md:86, project-template/.claude/commands/start.md:86, project-template/.cursor/commands/start.md:89, .claude/commands/harness-audit.md:81, project-template/.cursor/commands/harness-audit.md:86, open-brain/src/pipelines/session-start/reads-owed.ts:88, open-brain/src/pipelines/sync/score.ts:43-51 (pass [] to getCoverageStatsV2), tests/pipelines/session-start/briefing-fix.test.ts:171-178 (pins the file in READS OWED), .agents/SYSTEM/domains.json, .gitignore:40, CLAUDE.md:30, .agents/SYSTEM/RULES.md:76, .agents/retirements.json:84 (skill-scan's allowed referrer is the file itself). SIM first: measure what the retirements check says when an allowed referrer file is deleted, and whether a new retirement entry for 'domains.json' is wanted (CHANGELOG mentions stay as history). Leave CHANGELOG and docs/ alone.",
+      "note_by": [
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
       "closed_rev": null
     }
@@ -6065,6 +6079,12 @@
       "title": "Build open-brain MCP auto-reconnect: a running server picks up a rebuilt build without /mcp reconnect",
       "date": "2026-10-20",
       "note": "Aaron, typed in the Atlas window (session 173, 10-20): 'Open-brain auto-reconnect: yes'. He answered the standing question 'Auto-reconnect for the open-brain MCP server: build it? Rec: yes (each rebuild needs a /mcp reconnect per seat)'. On 10-19 alone, S173S and T261-S1/S2 each needed per-seat reconnects, and until one happened, the Atlas window's server ran the pre-fix citation scan from a sparse tree."
+    },
+    {
+      "id": "D-162",
+      "title": "Retire domains.json (domain tags): drop it from /start, READS OWED, the health score and the template",
+      "date": "2026-10-20",
+      "note": "Aaron 10-20, typed in the Atlas window: 'retire domains.json' (G-063, raised by Maker S71 and Prism S8). /bootstrap never created it, so adopted projects had none; nothing in the briefing uses the tags; recall is FTS5 keyword search since Loop 10. Scope: /start step 4 (.claude and both project-template runtimes), harness-audit rows, reads-owed.ts, score.ts (coverage always unscoped, as for every project without the file), the briefing-fix row that pins it, SIA's own .agents/SYSTEM/domains.json, its .gitignore allowlist line, CLAUDE.md and RULES.md lists, and retirements.json. Work: T-319."
     }
   ],
   "handoffs": [
