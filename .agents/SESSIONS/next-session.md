@@ -1,34 +1,34 @@
-<!-- generated from .agents/state.json rev 547 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 549 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 173)_
+## planner [sia-planner] _(written session 174)_
 
 ### Pick up here
 
-FIRST: byte-compare and merge T-315's PR #885 (READY head f17c7a251e5dffe6989ea999d9f863da0fa9dfe2, reply C:/Users/melve/Worktrees/t315-r2-reply.md: 1516/1516, mutants m1-m4 as predicted, CI test pass). Base is master 16075e2a + docs/loops/t315-s1/edits.txt (2 edits to open-brain/src/server.ts) + build-watch.ts + t315-s1.test.ts. Then pr-refresh, SG-1 merge-pinned, the merge-tree check and sia-rebuild. THE REBUILD IS T-315'S LIVE TEST: within about 15 s every Claude Code seat's open-brain server should exit and respawn, and your next ob_start should print the new Build with no /mcp reconnect. If it doesn't, /mcp reconnect and record what happened. THEN, in flight on the QA PC (re-arm qapc-wait, which died with session 173): (1) t317-s1 build (P0 T-317 part 1, base 064799b7, reply AppData/Local/Temp/t317-s1-reply.md); byte-compare, merge and rebuild. (2) sim-t316-s1 (sim/t316-s1 4c277391, reply AppData/Local/Temp/sim-t316-s1-reply.md); on ALL PASS, write docs/loops/t316-s1-brief.md modelled on t317-s1-brief.md. Files are on the sim branch; the brief must also list the T256 rows staying green. NEXT: T-317 part 2 (a stale handoff: needs a per-session last-write revision field; a two-step schema change after T-315 is live). Then T-318 (Aaron: after T-317). T-316 S2 (opt-in MAYBE SHIPPED briefing line, appended to an existing budgeted line). T-313, T-314. S173 shipped: T-305, T-194 sparse (V-095), T-261 S1+S2 (V-096), D-161/T-315, and reviews of clark, Relay and Courier.
+FIRST: the held sia-rebuild. Master 8c81a6c2 carries T-317 part 1 (#888, already live on the 9e0d5b01 build), T-316 S1 (#895 75186b3f) and the T-315 REVERT (#896 8c81a6c2); the main tree is still on 9e0d5b01. Every running open-brain server has T-315's watch, so this rebuild disconnects EVERY seat one last time: only run it when Aaron can /mcp reconnect open-brain in every seat (he was remote at 10-20 ~08:10Z). Run `bash C:/Users/melve/.claude/skills/clark-ops/scripts/sia-rebuild.sh <master sha40>`, tell Aaron and clark to reconnect, then confirm with Get-CimInstance that new server PIDs start after the reconnect and ob_start prints the new Build. From then on a rebuild leaves servers running (Build line says STALE PROCESS). After it: ask Maker to rerun `open-brain sync` on Makerspace and count how many of the 5 shipped tasks open-task-commits names (T-316's measure). NEXT: T-317 part 2 (a stale handoff: per-session last-write revision field, two-step schema change). T-318 (Aaron: after T-317). T-316 S2 (opt-in MAYBE SHIPPED briefing line). T-315 stays open for a respawn that does not depend on the host (in-process reload). S174 shipped: #885 T-315 (then reverted, #896), #888 T-317 part 1, #895 T-316 S1, docs #889/#890/#894 briefs, #892/#893 tcm runner egress + tooling (clark installed and verified #893 on tcm: pause waited for a live co-op CI job, resume restored all 3), byte-compare.sh cygpath fix.
 
 ### Watch out
 
-- Fleet D-001 phase 1: Atlas merges SIA itself (docs-merge, SG-1 merge-pinned after its own byte-compare ACCEPT + pr-refresh SAME + the merge-tree check, one at a time; sia-rebuild; its own QA PC runs via clark-ops qapc-launch.sh, prompt-from.sh, qapc-wait.sh). Stamp every act with stamp.sh. Prod and secrets still need Aaron's word. No allow rules are in settings (that needs Aaron in this window).
-- sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with `git show origin/master:<path>`. The desktop runs no builds or tests: every prediction is a QA PC SIM first.
-- QA PC load (T-292): full vitest runs often show `Timeout calling onTaskUpdate`, sometimes with one unrelated red row that is green alone. Briefs now carry the ruling: re-run that file alone, go on if green, never excuse a red row in the new test file.
-- Before /end: run ob_state set_handoff covering the WHOLE session and land it before /clear. The ob_end gate passes on any record write until T-317 merges (Aaron asked for this at P0 on 10-20; clark relayed it fleet-wide).
+- UNTIL THE HELD REBUILD RUNS: any sia-rebuild makes every seat lose open-brain (T-315's watch is in every running server; Claude Code does not respawn). Do not rebuild while Aaron is away from the desktop.
+- The auto-mode classifier refuses Atlas's own pr-merge.sh ('Merge Without Review'). Aaron either runs it or types 'merge <n>' naming the PR; then Atlas runs it pinned to the refreshed head. A remote Aaron cannot run '!' lines.
+- Dashboard job runner (clark 10-20): submit SIA builds with agent-dashboard scripts/job.mjs submit --token-file C:/Users/melve/.agent-dashboard/jobs-atlas.token --json <f> --git <tree>; read with job.mjs reply --id N. Briefs and amendments must be ASCII (the runner refuses otherwise); amendments go in the job's amendments[]; tags cannot repeat. `job.mjs list` sometimes prints 'timeout' instead of JSON: parse defensively.
+- QA PC load (T-292) now reaches several files: handoff-caps.test.ts (4 rows, 12-124 s) and checks-state.test.ts (3 hook timeouts) both went red under load and green alone. Briefs should name the files a load re-run may cover.
+- sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with git show origin/master:<path>. The desktop runs no builds or tests.
 - SIA is a PUBLIC repo: never commit or post live MATCH key text.
-- Run records-pr.sh from the repo root.
 
 ### Open questions
 
 - Real-key over-fire run for T-170-II (49 live MATCH patterns, kept off-repo): QA PC or desktop only? Rec: desktop only.
 - T-295: which open-brain MCP tools to cut or move to the CLI? Rec: count calls per tool first.
 - T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold.
-- Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? It fires on the correct command, so it can never help, and 2+ of its 13 helpful ratings are wrong. Rec: yes.
+- Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? Rec: yes.
 - The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small.
+- When can the held sia-rebuild run (every seat needs /mcp reconnect right after it)? Rec: next time Aaron is at the desktop.
 
 ### Loop state
 
-**Open PRs:** 
-- #885 T315-S1 f17c7a25 — QA: not_started — READY; byte-compare and merge next session
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
@@ -38,12 +38,14 @@ FIRST: byte-compare and merge T-315's PR #885 (READY head f17c7a251e5dffe6989ea9
 - T-261 S3/S4 now or hold
 - forget entry 751
 - name the yaml dependency PR
+- when to run the held rebuild
 
 **Rulings made mid-loop:** 
-- T261-S1 ACCEPT 2464d416 (merged 55cf1567)
-- T261-S2 ACCEPT 20e6353b (merged 11b1b72a), V-096
-- T315-S1 round 1 BLOCKED on a T-292 load flake; brief ruled (#882), round 2 READY #885
-- SIM T317-S1 ALL PASS (3d11c2dc); build launched 23:26 CDT
+- T315-S1 ACCEPT f17c7a25 -> merged 97eb3481 (live test FAILED: servers exit, Claude Code does not respawn)
+- T317-S1 ACCEPT d66d1656 -> merged 9e0d5b01, live
+- T316-S1 ACCEPT 9479156d -> merged 75186b3f
+- T315-REVERT r1 BLOCKED (handoff-caps load) -> amendment 1; r2 ACCEPT 1adccd7b -> merged 8c81a6c2
+- tcm runner egress #892 and tooling #893: clark installed both, byte-identical; #893 pause/resume verified on tcm
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -115,7 +117,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
