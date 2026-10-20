@@ -68,7 +68,10 @@ describe("T-317 S2: the /end gate refuses a handoff older than this session's la
   it("R3 (guard): with no last_work_rev stamped, S1's rule stands and the handoff passes", async () => {
     write({ op: "add_decision", title: "a decision", date: "2026-10-20", note: "n" });
     write(handoff);
-    expect(state().sessions.find((x: Record<string, unknown>) => x.uuid === SESSION_UUID)).not.toHaveProperty("last_work_rev");
+    // T-317 S3: the writer now stamps last_work_rev, so remove it by hand: a record a pre-S3 build wrote carries none.
+    const s = state();
+    for (const r of s.sessions) delete r.last_work_rev;
+    writeFileSync(statePath(), JSON.stringify(s, null, 2) + "\n");
     const r = await handleEnd({ project_root: dir, session_id: SESSION_UUID, dry_run: true, session_summary: "s" });
     expect(r.isError).not.toBe(true);
   });
@@ -77,7 +80,8 @@ describe("T-317 S2: the /end gate refuses a handoff older than this session's la
     write(handoff);
     stampLastWork(7);
     expect(readState(dir).ok).toBe(true);
-    write({ op: "add_decision", title: "another", date: "2026-10-20", note: "n" });
+    // T-317 S3: a handoff-only write keeps the stamp; a work write now restamps it (t317-s3 R4).
+    write(handoff);
     expect(state().sessions.find((x: Record<string, unknown>) => x.uuid === SESSION_UUID).last_work_rev).toBe(7);
   });
 
