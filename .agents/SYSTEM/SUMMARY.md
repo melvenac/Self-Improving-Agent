@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 551 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 552 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).
 
 ## What's working
@@ -175,6 +175,8 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - Gap G-057: The 'model from store.db' instruction in every Cursor dispatch reports the chat's stored model, not the model the run used. Forge reported grok-4.7-high for #437 r3 while its waker had launched that exact resume with --model composer-2.5.
 - Gap G-058: A hub restart or burst knocks every QA PC waker out: since T-110 all wakers on one host share one per-source /health window, a 429 is read as authMode=warn, and the waker exits fail closed. Seen twice in s162 (03:52Z, and 06:11Z after the v1.19.0 swap).
 - Gap G-061: Cursor: the recall trigger is blind to a FAILING Shell call, the G-059 pattern again. cursor-agent fires postToolUseFailure (and afterShellExecution), and no postToolUse, when a Shell command exits non-zero; and the trigger's current answer on that event (hookEventName 'PostToolUse') does not reach the model.
+- Gap G-062: READS OWED keeps listing a brief whose work has shipped, or that the seat wrote itself. Nothing clears 'owed' when the brief's work closes or when the reading seat authored it, so every new session pays a read for nothing and learns to skim the line.
+- Gap G-063: domains.json is half-retired: /start step 4 and READS OWED name it and `open-brain sync --score` reads it, but /bootstrap never creates it (project-template has none), so projects adopted by /bootstrap (Makerspace) carry no domains.json, lose a score category and see a read step that silently skips.
 
 ## What's next
 
