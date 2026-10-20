@@ -2069,6 +2069,12 @@ export const MEMORY_SIDE: string[] = [
   "pipelines/shadow/",
   "pipelines/sync/checks-memory.ts",
   "pipelines/sync/score.ts",
+  // T-261 S1: memory in all but name. Memory imports each of these and no core file does (measured at c3b5ceec).
+  "lifecycle.ts",
+  "shared/fts.ts",
+  "shared/vault-path-segment.ts",
+  "shared/yaml-frontmatter.ts",
+  "shared/content-guard.ts",
   // Loop 16. The recall trigger queries the knowledge store, so it is memory
   // by definition — but it arrived as new files, which this list's default
   // correctly classified as CORE, and the check went red on the first full
@@ -2082,6 +2088,24 @@ export const MEMORY_SIDE: string[] = [
 
 const isMemorySide = (rel: string): boolean =>
   MEMORY_SIDE.some((m) => (m.endsWith("/") ? rel.startsWith(m) : rel === m));
+
+/**
+ * T-261 S1: the dynamic `import()` crossings core is allowed to make, each as `importer -> target`.
+ *
+ * Core may load memory lazily only where the command needs it and nothing else does. Every entry is a
+ * reviewed line, the same as `MEMORY_SIDE`: a new lazy crossing fails the check until it is listed here or
+ * moved behind a memory entry point (T-261 S2 moves the four memory subcommands out of `cli.ts`).
+ */
+export const DYNAMIC_MEMORY_LOADS: string[] = [
+  "cli.ts -> pipelines/sync/checks-memory.ts",
+  "cli.ts -> pipelines/sync/score.ts",
+  "cli.ts -> db-v2.ts",
+  "cli.ts -> scrub-trigger-fires.ts",
+  "cli.ts -> trigger/keys-writer.ts",
+  "cli.ts -> trigger/match-keys.ts",
+  "cli.ts -> pipelines/topics/index.ts",
+  "cli.ts -> better-sqlite3",
+];
 
 /**
  * The dependency direction, asserted mechanically: **core must never import
@@ -2111,6 +2135,8 @@ const isMemorySide = (rel: string): boolean =>
  *    what covers that, and this check is not a substitute for it.**
  * 3. **It reads `open-brain/src`, not the build.** A stale `build/` can
  *    disagree with a passing result here.
+ * 4. **A computed `import()` specifier is not an edge.** T-261 S1 made a literal
+ *    `import()` specifier an edge; a template or a variable is still invisible.
  */
 export function checkModuleBoundary(projectRoot: string): CheckResult {
   const name = "module-boundary";
@@ -2165,6 +2191,23 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
   // T-048: the two kinds of import that are NOT edges of this graph, counted instead of dropped silently.
   let typeOnlyImports = 0;
   let packageImports = 0;
+  // T-261 S1: a literal dynamic import is an edge too, kept apart so DYNAMIC_MEMORY_LOADS can allow it.
+  const dynamicPattern = /\bimport\(\s*(["'])([^"']+)\1\s*\)/g;
+  const dynamicEdges = new Map<string, string[]>();
+
+  // Resolve "./x.js" -> "x.ts", or "./x" -> "x/index.ts", relative to rel.
+  const resolveSpec = (rel: string, spec: string): string | null => {
+    const fromDir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "";
+    const parts = (fromDir ? fromDir.split("/") : []).concat(spec.replace(/\.js$/, "").split("/"));
+    const stack: string[] = [];
+    for (const p of parts) {
+      if (p === "." || p === "") continue;
+      if (p === "..") stack.pop();
+      else stack.push(p);
+    }
+    const base = stack.join("/");
+    return files.includes(`${base}.ts`) ? `${base}.ts` : files.includes(`${base}/index.ts`) ? `${base}/index.ts` : null;
+  };
 
   for (const rel of files) {
     const src = sources.get(rel);
@@ -2183,21 +2226,25 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
         if (spec === "better-sqlite3") nativeImporters.add(rel);
         continue;
       }
-      // Resolve "./x.js" -> "x.ts", or "./x" -> "x/index.ts", relative to rel.
-      const fromDir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "";
-      const parts = (fromDir ? fromDir.split("/") : []).concat(spec.replace(/\.js$/, "").split("/"));
-      const stack: string[] = [];
-      for (const p of parts) {
-        if (p === "." || p === "") continue;
-        if (p === "..") stack.pop();
-        else stack.push(p);
-      }
-      const base = stack.join("/");
-      const target = files.includes(`${base}.ts`) ? `${base}.ts` : files.includes(`${base}/index.ts`) ? `${base}/index.ts` : null;
+      const target = resolveSpec(rel, spec);
       if (target) out.push(target);
       else unresolved++;
     }
     valueEdges.set(rel, out);
+
+    const dyn: string[] = [];
+    dynamicPattern.lastIndex = 0;
+    while ((m = dynamicPattern.exec(src)) !== null) {
+      const spec = m[2];
+      if (!spec.startsWith(".")) {
+        if (spec === "better-sqlite3") dyn.push(spec);
+        continue;
+      }
+      const target = resolveSpec(rel, spec);
+      if (target) dyn.push(target);
+      else unresolved++;
+    }
+    dynamicEdges.set(rel, dyn);
   }
 
   // An unresolved specifier drops an edge, and a dropped edge is a crossing this
@@ -2224,6 +2271,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
   };
 
   const violations: string[] = [];
+  const dynamicLoads = new Set<string>();
   for (const rel of files) {
     if (isMemorySide(rel)) continue;
     for (const target of valueEdges.get(rel) ?? []) {
@@ -2232,9 +2280,17 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
       }
     }
     if (nativeImporters.has(rel)) violations.push(`${rel} -> better-sqlite3 (native build, direct)`);
+    for (const target of dynamicEdges.get(rel) ?? []) {
+      if (target === "better-sqlite3" || isMemorySide(target) || reachesMemory(target)) dynamicLoads.add(`${rel} -> ${target}`);
+    }
+  }
+  let allowedLoads = 0;
+  for (const load of dynamicLoads) {
+    if (DYNAMIC_MEMORY_LOADS.includes(load)) allowedLoads++;
+    else violations.push(`${load} (dynamic import, not in DYNAMIC_MEMORY_LOADS)`);
   }
 
-  const scale = `${files.length} file(s), ${files.filter((f) => !isMemorySide(f)).length} core; excluded ${excluded} non-.ts file(s), not modules in the graph; ${typeOnlyImports} type-only and ${packageImports} package import(s) are not edges`;
+  const scale = `${files.length} file(s), ${files.filter((f) => !isMemorySide(f)).length} core; excluded ${excluded} non-.ts file(s), not modules in the graph; ${typeOnlyImports} type-only and ${packageImports} package import(s) are not edges; ${allowedLoads} dynamic memory load(s) allowed by DYNAMIC_MEMORY_LOADS`;
   const unreadNote = unreadable.length > 0
     ? `${unreadable.length} unreadable path(s) under open-brain/src — their imports are not in the graph, so a crossing there cannot be ruled out: ${unreadable.slice(0, 4).join(", ")}${unreadable.length > 4 ? ` (+${unreadable.length - 4} more)` : ""}. `
     : "";
@@ -2251,7 +2307,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
       severity: "issue",
       message:
         `${cross}${unreadNote}Checked ${scale}. ` +
-        `LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.`,
+        `LIMIT: sees value imports and literal import() only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.`,
       report: true,
     };
   }
@@ -2261,7 +2317,7 @@ export function checkModuleBoundary(projectRoot: string): CheckResult {
     severity: "pass",
     message:
       `core does not import memory (${scale}). ` +
-      `LIMIT: sees value imports only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.`,
+      `LIMIT: sees value imports and literal import() only — not instructions that reach a tool at run time, and not load-time native resolution in server.ts.`,
     report: true,
   };
 }
