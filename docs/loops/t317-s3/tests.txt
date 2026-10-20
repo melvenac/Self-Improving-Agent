@@ -1,0 +1,16 @@
+@@@ open-brain/tests/t317-s2.test.ts
+<<<
+    expect(state().sessions.find((x: Record<string, unknown>) => x.uuid === SESSION_UUID)).not.toHaveProperty("last_work_rev");
+===
+    // T-317 S3: the writer now stamps last_work_rev, so remove it by hand: a record a pre-S3 build wrote carries none.
+    const s = state();
+    for (const r of s.sessions) delete r.last_work_rev;
+    writeFileSync(statePath(), JSON.stringify(s, null, 2) + "\n");
+>>>
+@@@ open-brain/tests/t317-s2.test.ts
+<<<
+    write({ op: "add_decision", title: "another", date: "2026-10-20", note: "n" });
+===
+    // T-317 S3: a handoff-only write keeps the stamp; a work write now restamps it (t317-s3 R4).
+    write(handoff);
+>>>
