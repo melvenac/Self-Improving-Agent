@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli.ts
+<<<
+} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics") {
+===
+} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys") {
+>>>
