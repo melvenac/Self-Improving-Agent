@@ -10,6 +10,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { CheckResult } from "./types.js";
 import { execRunner, type CommandRunner } from "./checks-state.js";
+import { resolveCodeRef } from "../session-start/upstream-ref.js";
 
 export const OPEN_TASK_COMMIT_BOUND = 1500;
 const TASK_ID_RE = /\bT-\d+\b/g;
@@ -21,7 +22,13 @@ export function isCodePath(path: string): boolean {
   return !path.startsWith("docs/") && !path.startsWith(".agents/") && !/\.md$/i.test(path);
 }
 
-export function checkOpenTaskCommits(projectRoot: string, run: CommandRunner = execRunner): CheckResult {
+/**
+ * T-316: HEAD alone misses a project whose record lives on a docs branch, or in a planner worktree detached at a
+ * records commit: code reaches the default branch by PR and never comes back to HEAD (Makerspace, 10-20: 0 of 5 found).
+ * So the log also reads the default branch's ref, resolved here when `codeRef` is not given, and only when it exists.
+ * With HEAD alone, every message is unchanged.
+ */
+export function checkOpenTaskCommits(projectRoot: string, run: CommandRunner = execRunner, codeRef?: string | null): CheckResult {
   const name = "open-task-commits";
   const skip = (why: string): CheckResult => ({ name, report: true, severity: "skip", message: `skipped — ${why}; open-task commits: unknown` });
 
@@ -43,7 +50,10 @@ export function checkOpenTaskCommits(projectRoot: string, run: CommandRunner = e
   const rp = run("git", ["rev-parse", "--is-shallow-repository"], projectRoot);
   if (!rp.ok) return skip(/ENOENT/.test(rp.error) ? "git is not installed" : `not a git repository (${rp.error.split("\n")[0]})`);
   if (rp.stdout.trim() === "true") return skip("shallow clone, the history this check reads is not here (fetch full history to run it)");
-  const log = run("git", ["-c", "core.quotepath=off", "log", "--no-merges", `--max-count=${OPEN_TASK_COMMIT_BOUND}`, "--name-only", "--format=%x1e%H%x1f%s", "HEAD"], projectRoot);
+  const extra = codeRef === undefined ? resolveCodeRef(projectRoot) : codeRef;
+  const refs = extra !== null && extra !== "HEAD" ? ["HEAD", extra] : ["HEAD"];
+  const where = refs.join(" or ");
+  const log = run("git", ["-c", "core.quotepath=off", "log", "--no-merges", `--max-count=${OPEN_TASK_COMMIT_BOUND}`, "--name-only", "--format=%x1e%H%x1f%s", ...refs], projectRoot);
   if (!log.ok) return skip(`git log failed (${log.error.split("\n")[0]})`);
 
   // git log is newest first, so the first CODE commit that names a task is its newest.
@@ -68,9 +78,9 @@ export function checkOpenTaskCommits(projectRoot: string, run: CommandRunner = e
     const sha7 = h.sha.slice(0, 7);
     if (typeof t.note === "string" && t.note.includes(`stays open after ${sha7}`)) continue;
     const subj = h.subject.length > SUBJECT_CHARS ? `${h.subject.slice(0, SUBJECT_CHARS)}…` : h.subject;
-    hits.push(`${String(t.id)} is ${String(t.status)} but ${sha7} '${subj}' on HEAD touches code; close it with evidence or note why it stays open`);
+    hits.push(`${String(t.id)} is ${String(t.status)} but ${sha7} '${subj}' on ${where} touches code; close it with evidence or note why it stays open`);
   }
-  const scanned = `scanned ${records.length} non-merge commits (bound ${OPEN_TASK_COMMIT_BOUND}) against ${open.length} open/in_progress task(s)`;
+  const scanned = `scanned ${records.length} non-merge commits (bound ${OPEN_TASK_COMMIT_BOUND}) against ${open.length} open/in_progress task(s)${refs.length > 1 ? ` across ${refs.join(" and ")}` : ""}`;
   if (hits.length > 0) {
     const shown = hits.slice(0, SHOWN).join(" | ") + (hits.length > SHOWN ? ` | +${hits.length - SHOWN} more` : "");
     return { name, report: true, severity: "warn", message: `${hits.length} open task(s) named by a code commit: ${shown}. ${scanned}. Suppress one with "stays open after <sha7>" in its note` };
