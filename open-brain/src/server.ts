@@ -24,7 +24,8 @@ import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/histo
 import { renderStartReport, isSeat } from "./pipelines/session-start/start-report.js";
 import { greetingFlag } from "./pipelines/session-start/greeting-flags.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
-import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
+import { describeServingBuild, runningBuildDir, LOADED_COMMIT } from "./pipelines/session-start/serving-build.js";
+import { watchBuild, attachBuildWatch } from "./shared/build-watch.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
 import { applyStateOps, readState, DONE_RETENTION_SESSIONS, RECORD_RETENTION_SESSIONS } from "./shared/state-writer.js";
 import { openV2Database, getKnowledgeQualityStats, getStalenessStats, getCoverageStats as getCoverageStatsV2, recordSession, recordChunk, recordRecallEvent, recordFeedbackEvent, archiveKnowledgeEntry, checkSchemaSkew, type SchemaSkew, type RecallTrigger, type RecallPurpose } from "./db-v2.js";
@@ -1584,7 +1585,23 @@ export function computeScore(
 const isDirectRun = process.argv[1]?.endsWith("server.js") || process.argv[1]?.endsWith("server.ts");
 if (isDirectRun) {
   const transport = new StdioServerTransport();
-  server.connect(transport).catch((err) => {
+  server.connect(transport).then(() => {
+    // T-315 (D-161): when a rebuilt build is stamped on disk and nothing is in flight, exit so the host respawns this
+    // server from the new build. Only for Claude Code, whose respawn step 0 measured; any other client keeps today's
+    // behaviour (the briefing's Build line says STALE PROCESS).
+    const watch = watchBuild({
+      buildDir: runningBuildDir(),
+      loaded: LOADED_COMMIT,
+      intervalMs: 15_000,
+      onNewBuild: (commit) => {
+        const client = server.server.getClientVersion()?.name ?? "";
+        if (!/claude/i.test(client)) return;
+        console.error(`open-brain: build ${LOADED_COMMIT?.slice(0, 7)} -> ${commit.slice(0, 7)} on disk; exiting so ${client} restarts this server (T-315)`);
+        setTimeout(() => process.exit(0), 200);
+      },
+    });
+    attachBuildWatch(transport, watch);
+  }).catch((err) => {
     console.error("open-brain server failed:", err);
     process.exit(1);
   });
