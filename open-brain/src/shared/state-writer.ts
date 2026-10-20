@@ -1021,14 +1021,7 @@ export type GapCitationScan =
  * none. Any other failure refuses `add_gap`; it is not an empty citation list.
  */
 export function citedGapIds(projectRoot: string): GapCitationScan {
-  const grep = gitGrep(projectRoot, [
-    "grep", "--no-color", "-oI", "-E", "G-[0-9]+", "--", ".",
-    ":(exclude).agents/state.json",
-    ":(exclude).agents/TASKS/INBOX.md",
-    ":(exclude).agents/TASKS/task.md",
-    ":(exclude).agents/SESSIONS/next-session.md",
-    ":(exclude).agents/SYSTEM/SUMMARY.md",
-  ]);
+  const grep = trackedGrep(projectRoot, "G-[0-9]+");
   if (grep.status === 1) return { ok: true, cited: new Map() };
   if (grep.status !== 0) {
     const detail = grep.detail ? `: ${grep.detail}` : "";
@@ -1042,22 +1035,35 @@ export function citedTaskIds(projectRoot: string): Map<string, string[]> {
 }
 
 function citedIds(projectRoot: string, pattern: string): Map<string, string[]> {
-  const out = gitOut(projectRoot, [
-    "grep",
-    "--no-color",
-    "-oI",
-    "-E",
-    pattern,
-    "--",
-    ".",
-    ":(exclude).agents/state.json",
-    ":(exclude).agents/TASKS/INBOX.md",
-    ":(exclude).agents/TASKS/task.md",
-    ":(exclude).agents/SESSIONS/next-session.md",
-    ":(exclude).agents/SYSTEM/SUMMARY.md",
-  ]);
-  if (out === null) return new Map();
-  return parseCitedLines(out);
+  const grep = trackedGrep(projectRoot, pattern);
+  // Exit 1 (no match) and a real failure both mean no protection this write, which is the safe direction.
+  if (grep.status !== 0) return new Map();
+  return parseCitedLines(grep.text);
+}
+
+/** The record and its rendered views: counting them would make every live id cite itself. */
+const CITATION_EXCLUDES = [
+  ":(exclude).agents/state.json",
+  ":(exclude).agents/TASKS/INBOX.md",
+  ":(exclude).agents/TASKS/task.md",
+  ":(exclude).agents/SESSIONS/next-session.md",
+  ":(exclude).agents/SYSTEM/SUMMARY.md",
+];
+
+/**
+ * T-194: a worktree `git grep` skips the files a sparse checkout leaves out (git 2.55, a docs/.agents/.claude cone:
+ * 219 of 280 cited task ids, 74 of 75 gap ids), so the scan also reads the index, which still holds them. The union
+ * keeps a full checkout's answer, unstaged edits included, and gives a sparse checkout the same one. Exit 1 means no
+ * match in either; any other status is the first failure, unchanged.
+ */
+function trackedGrep(projectRoot: string, pattern: string): { status: number; text: string; detail: string } {
+  const modes: string[][] = [[], ["--cached"]];
+  const scans = modes.map((mode) =>
+    gitGrep(projectRoot, ["grep", ...mode, "--no-color", "-oI", "-E", pattern, "--", ".", ...CITATION_EXCLUDES]));
+  const failed = scans.find((s) => s.status !== 0 && s.status !== 1);
+  if (failed) return failed;
+  const text = scans.filter((s) => s.status === 0).map((s) => s.text).join("\n");
+  return text === "" ? { status: 1, text: "", detail: "" } : { status: 0, text, detail: "" };
 }
 
 function parseCitedLines(out: string): Map<string, string[]> {
@@ -1083,18 +1089,8 @@ function parseCitedLines(out: string): Map<string, string[]> {
 /**
  * execFileSync with an args array: no shell, so the `:(exclude)` pathspecs reach
  * git verbatim rather than being read as globs or comments by cmd.exe.
- *
- * `git grep` exits 1 on NO MATCHES, which is indistinguishable here from a real
- * failure, and both land in the catch. Both mean the same thing for the caller —
- * no protection this write — which is the safe direction.
+ * `git grep` exits 1 on NO MATCHES; both that and a real failure land in the catch.
  */
-function gitOut(cwd: string, args: string[]): string | null {
-  const grep = gitGrep(cwd, args);
-  if (grep.status === 0) return grep.text;
-  if (grep.status === 1) return "";
-  return null;
-}
-
 function gitGrep(cwd: string, args: string[]): { status: number; text: string; detail: string } {
   try {
     const text = execFileSync("git", args, {
