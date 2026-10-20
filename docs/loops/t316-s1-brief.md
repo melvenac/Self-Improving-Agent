@@ -26,7 +26,7 @@ holds for any project with `record_branch` set, and for a planner worktree detac
 second ref is read, each message names where it looked (`on HEAD or origin/master`) and the summary adds
 `across HEAD and origin/master`. With HEAD alone, every message is unchanged.
 
-Part 2 (the briefing line `MAYBE SHIPPED (n): …` at `/start`) follows this one.
+Part 2 (the briefing line `MAYBE SHIPPED (n): ...` at `/start`) follows this one.
 
 ## The change, exactly
 
@@ -62,7 +62,7 @@ QA PC SIM T316-S1 at `4c277391` (master `064799b7` plus these files). sha256 pre
 - Apply: `APPLIED 5 edits to 2 files`. Both tsc runs and the build exit 0.
 - The step 4 run: `98 passed (98)` files and `1479 passed (1479)` tests. No `Errors` line, no T-292 timeout. All T256
   rows are green.
-- `open-brain sync` on the SIM clone: `open-task-commits [warn]: 8 open task(s) … scanned 1500 non-merge commits
+- `open-brain sync` on the SIM clone: `open-task-commits [warn]: 8 open task(s) ... scanned 1500 non-merge commits
   (bound 1500) against 38 open/in_progress task(s) across HEAD and origin/master`.
 - m1 (the log reads `HEAD` alone again): R1 and R3 red, `2 failed | 2 passed`.
 - m2 (`resolveCodeRef` returns the ref without verifying it): R4 red, `1 failed | 3 passed`.
@@ -116,7 +116,7 @@ from T-292 load on the shared QA PC:
    - The status is empty.
 6. **Mutants.** On the committed fix, for each of `m1.txt` and `m2.txt` in turn:
    - Run `node docs/loops/t316-s1/apply.cjs . docs/loops/t316-s1/<m>.txt`. It prints `APPLIED 1 edits to 1 files`.
-   - Run the new test file. Paste the `x` rows. Expected red: m1 → R1 and R3; m2 → R4.
+   - Run the new test file. Paste the `x` rows. Expected red: m1 -> R1 and R3; m2 -> R4.
    - Restore with `git checkout -- open-brain/src`. The status must be empty. Never commit a mutant.
 7. **Check the diff.** `git diff --name-only <base>..HEAD` shows exactly:
    - `open-brain/src/pipelines/session-start/upstream-ref.ts`
