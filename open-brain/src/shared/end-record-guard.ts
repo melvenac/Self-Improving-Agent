@@ -355,14 +355,13 @@ function newLayoutRecordUpdated(
   }
   const s = stateRead.data;
   const handoff = s.handoffs.some((h) => h.session_uuid === sessionUuid);
-  const sessionRow = s.sessions.some((row) => row.uuid === sessionUuid);
   const loopHandoffs = loopHandoffsFromSessionCommits(projectDir, changesAfter ?? since, sessionIds);
 
+  // T-317 (Aaron 10-20, P0): a sessions[] row no longer counts. Every write records its session there, so any
+  // add_decision or update_task passed this gate without a handoff, and the next session started from whatever
+  // handoff an earlier session left.
   if (handoff) {
     return { updated: true, layout: "new", detail: `set_handoff for session ${sessionUuid}` };
-  }
-  if (sessionRow) {
-    return { updated: true, layout: "new", detail: `record revision with session ${sessionUuid} in sessions[]` };
   }
   if (loopHandoffs.length > 0) {
     return { updated: true, layout: "new", detail: `loop handoff committed (${loopHandoffs.join(", ")})` };
@@ -370,7 +369,7 @@ function newLayoutRecordUpdated(
   return {
     updated: false,
     layout: "new",
-    detail: `no set_handoff for session ${sessionUuid} and no sessions[] row for this session`,
+    detail: `no set_handoff for session ${sessionUuid} (other record writes by this session do not count: run ob_state set_handoff)`,
   };
 }
 
