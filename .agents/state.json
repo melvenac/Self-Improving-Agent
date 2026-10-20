@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 533,
+  "revision": 534,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2592,6 +2592,34 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Found s173: Maker's pick-up was 2830 chars and 11 watch-outs (greeting shows 400 chars, 3 items); clark's 415 cut on its own instruction. Caps (handoff-caps.ts) apply only with greeting.json handoff_caps. Maker turned it on 10-19. Candidate: scaffold and import write handoff_caps:true by default. Needs a ruling on existing projects.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-312",
+      "title": "Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S173 greeting review of clark session 5 (7b387bc1, fleet rev 15, greeting.json briefing_budget on). The budgeted layout (briefing.ts CAPS waiting/open 2, watch HANDOFF_CAPS.watchOuts) printed 2 Aaron items and '+3 more: state.json handoffs[].open_questions'. The seat greeted 'One question / WAITING ON AARON: L84 merge' with 5 Aaron-owned items open, one of them (incognito toggle) blocking a run and printed 2 lines above. Scorecard Q7 failed. ob_start's State block had all 5, so the data was in context; the header just gave no total, so '1' read as plausible. Fix: the headers print the total, e.g. 'WAITING ON AARON (5):' and 'WATCH OUT (6):', inside the budget (a few chars). Test: a 5-question handoff renders '(5)' in the budgeted layout; the legacy layout is byte-identical.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-313",
+      "title": "Recall trigger fires a seat-specific stored entry for other seats, naming a script path they don't have",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S173: entry 689 use-pr-status-not-gh-pr-view-loops (ACTION `bash $S/pr-status.sh`, $S = atlas-ops/scripts) fired for clark (198bce0f, 18:19Z) on a gh pr view loop. In clark's shell $S is clark-ops/scripts, which has no pr-status.sh, and the atlas script takes no -R anyway. Clark ignored it ~30 times, correctly, and it rated neutral. The fire cost attention and could mislead a seat into calling another seat's script. Options: a seat tag on ob_store (from the ops skill named in the key/tags, e.g. 'atlas-ops') that the trigger filters on against the session's seat; or require absolute script paths in ACTION. Measure first: how many stored entries reference `$S/` or a *-ops script, and how many fires went to a different seat (trigger_fires joined with session seat).",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
