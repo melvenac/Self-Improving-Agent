@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 543 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 546 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -11,6 +11,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-160** Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [ ] **T-194** Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
 - [ ] **T-196** The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
+- [ ] **T-317** The /end record gate passes a stale handoff: require this session's set_handoff, written after its last work, before ob_end closes
 
 ## P1
 
@@ -23,6 +24,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-298** Briefing gaps seen in Maker's S67 greeting: stale handoff not detectable, Latest brief silent outside docs/loops, divergence banner against the wrong branch, Usage 'not checked' noise
 - [ ] **T-315** open-brain MCP auto-reconnect: a running server serves the rebuilt build without /mcp reconnect (D-161)
 - [ ] **T-316** The briefing shows the open tasks a code commit already names (T-256's finding), so a stale backlog is visible at /start, not only in /sync
+- [ ] **T-318** Automate the session scorecard and review by exception: greeting metrics alarm on the measured failure classes; manual transcript review only for flagged sessions plus a weekly sample
 
 ## P2
 

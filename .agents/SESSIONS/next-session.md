@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 543 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 546 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,28 +6,29 @@
 
 ### Pick up here
 
-S173 (10-19/20). Shipped: T-305; T-194 sparse half (sia-planner is SPARSE, V-095); T-261 S1+S2 (boundary check sees dynamic imports; memory subcommands moved to cli-memory.ts; V-096), merged by Atlas under fleet D-001 phase 1. Reviews: clark s4 /end and s5 greeting, Relay s42/s43. Filed: T-312 (parked), T-313, T-314, plus notes on T-262, T-297 and T-298. NEXT: T-315 open-brain auto-reconnect (D-161, Aaron yes 10-20). Start with step 0 measurement of server.ts and the host restart/list_changed behaviour, then a SIM. The ondeck-brief 'now:' fix is with clark to apply (clark-ops file). Nothing in flight.
+FIRST: byte-compare and merge T-315's PR #885 (READY head f17c7a251e5dffe6989ea999d9f863da0fa9dfe2, reply C:/Users/melve/Worktrees/t315-r2-reply.md: 1516/1516, mutants m1-m4 as predicted, CI test pass). Base is master 16075e2a + docs/loops/t315-s1/edits.txt (2 edits to open-brain/src/server.ts) + build-watch.ts + t315-s1.test.ts. Then pr-refresh, SG-1 merge-pinned, the merge-tree check and sia-rebuild. THE REBUILD IS T-315'S LIVE TEST: within about 15 s every Claude Code seat's open-brain server should exit and respawn, and your next ob_start should print the new Build with no /mcp reconnect. If it doesn't, /mcp reconnect and record what happened. THEN, in flight on the QA PC (re-arm qapc-wait, which died with session 173): (1) t317-s1 build (P0 T-317 part 1, base 064799b7, reply AppData/Local/Temp/t317-s1-reply.md); byte-compare, merge and rebuild. (2) sim-t316-s1 (sim/t316-s1 4c277391, reply AppData/Local/Temp/sim-t316-s1-reply.md); on ALL PASS, write docs/loops/t316-s1-brief.md modelled on t317-s1-brief.md. Files are on the sim branch; the brief must also list the T256 rows staying green. NEXT: T-317 part 2 (a stale handoff: needs a per-session last-write revision field; a two-step schema change after T-315 is live). Then T-318 (Aaron: after T-317). T-316 S2 (opt-in MAYBE SHIPPED briefing line, appended to an existing budgeted line). T-313, T-314. S173 shipped: T-305, T-194 sparse (V-095), T-261 S1+S2 (V-096), D-161/T-315, and reviews of clark, Relay and Courier.
 
 ### Watch out
 
-- sia-planner is a SPARSE checkout (cone docs .agents .claude): no open-brain/, scripts/ or project-template/ in the tree. Read code with `git show origin/master:<path>` or `git grep <pat> origin/master -- <path>`; the CLI and hooks run from the main checkout's build.
-- Fleet D-001 phase 1 (Aaron 10-19, verified 01:43Z): Atlas merges SIA itself: docs-merge, pinned SG-1 code merges (independent build + Atlas byte-compare ACCEPT + merge-tree check, one at a time), tag-release, sia-rebuild, and its own QA PC runs (clark-ops qapc-launch.sh, prompt-from.sh, qapc-wait.sh). Stamp every act with stamp.sh. Prod deploys and secrets still need Aaron's word. No allow rules were added to settings (that needs Aaron in this window).
-- The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.
+- Fleet D-001 phase 1: Atlas merges SIA itself (docs-merge, SG-1 merge-pinned after its own byte-compare ACCEPT + pr-refresh SAME + the merge-tree check, one at a time; sia-rebuild; its own QA PC runs via clark-ops qapc-launch.sh, prompt-from.sh, qapc-wait.sh). Stamp every act with stamp.sh. Prod and secrets still need Aaron's word. No allow rules are in settings (that needs Aaron in this window).
+- sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with `git show origin/master:<path>`. The desktop runs no builds or tests: every prediction is a QA PC SIM first.
+- QA PC load (T-292): full vitest runs often show `Timeout calling onTaskUpdate`, sometimes with one unrelated red row that is green alone. Briefs now carry the ruling: re-run that file alone, go on if green, never excuse a red row in the new test file.
+- Before /end: run ob_state set_handoff covering the WHOLE session and land it before /clear. The ob_end gate passes on any record write until T-317 merges (Aaron asked for this at P0 on 10-20; clark relayed it fleet-wide).
 - SIA is a PUBLIC repo: never commit or post live MATCH key text.
-- Desktop is coordination only: predictions a brief depends on go to the QA PC as SIM runs; a brief ships its edits verbatim (docs/loops/<tag>/edits.txt + apply.cjs) once a SIM measured them.
-- After any rebuild, an open-brain MCP server started before it runs the old build until /mcp reconnect (until T-315 lands). Check the briefing's Build line.
+- Run records-pr.sh from the repo root.
 
 ### Open questions
 
 - Real-key over-fire run for T-170-II (49 live MATCH patterns, kept off-repo): QA PC or desktop only? Rec: desktop only.
 - T-295: which open-brain MCP tools to cut or move to the CLI? Rec: count calls per tool first.
-- T-261 S3/S4 (physical core/memory package split, core-only install): now, or hold until a real memory-free install exists? Rec: hold; S1+S2 already enforce the boundary.
-- T-261: raise the core/memory package split from P3? Rec: leave at P3. _(resolved by Aaron 10-19 'go ahead' on the core; S1+S2 shipped (V-096))_
-- Auto-reconnect for the open-brain MCP server: build it? Rec: yes. _(resolved by D-161 (Aaron 10-20: yes))_
+- T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold.
+- Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? It fires on the correct command, so it can never help, and 2+ of its 13 helpful ratings are wrong. Rec: yes.
+- The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small.
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #885 T315-S1 f17c7a25 — QA: not_started — READY; byte-compare and merge next session
 
 **SHA frozen for QA:** _None._
 
@@ -35,11 +36,14 @@ S173 (10-19/20). Shipped: T-305; T-194 sparse half (sia-planner is SPARSE, V-095
 - T-170-II real-key run host
 - T-295 tool cuts
 - T-261 S3/S4 now or hold
+- forget entry 751
+- name the yaml dependency PR
 
 **Rulings made mid-loop:** 
-- S173S ACCEPT 18a94570 (merged b208b485), V-095
 - T261-S1 ACCEPT 2464d416 (merged 55cf1567)
 - T261-S2 ACCEPT 20e6353b (merged 11b1b72a), V-096
+- T315-S1 round 1 BLOCKED on a T-292 load flake; brief ruled (#882), round 2 READY #885
+- SIM T317-S1 ALL PASS (3d11c2dc); build launched 23:26 CDT
 
 ## developer [sia-builder] _(written session 156)_
 

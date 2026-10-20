@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 543,
+  "revision": 546,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2664,6 +2664,34 @@
       "closed_session": null,
       "supersedes": null,
       "note": "S173 (10-20), from Maker's audit for Aaron (melvenac-makerspace docs/t001-plans@c5828b04 .agents/audit/2026-10-19-stale-backlog.md). Maker found 5 of 44 open tasks already done (T-189 sending live since 10-18, plus T-202, T-126, T-148 and T-036), 3 code-done and waiting only on owner steps, and 17 with 'merged/LIVE/shipped' in their notes. Maker built Aaron a pending list from titles, which the briefing shows by design. SIA already has the deterministic detector: T-256's /sync check open-task-commits warns on an open/in_progress task named by a code commit on HEAD (SIA's own /sync showed 8 on 10-19). The gap: it runs only in /sync, never in the briefing. Fix shape: ob_start computes the same set (same function, bounded git log) and the briefing prints one line, 'MAYBE SHIPPED (n): T-x T-y …', capped like the other lines; the task note's 'stays open after <sha7>' exemption still applies. Not adopted: note-text markers ('merged', 'LIVE') as a signal, because prose is not a record. Per-project, not SIA: a release step that runs close_task (Maker adopts it locally), and closing code-done tasks with the owner's leftover as an open_question owned by aaron, using the existing schema with no new status. First measure: run `open-brain sync` in makerspace and count how many of the 5 the check catches (that depends on commit subjects naming task ids). — MEASURED (Maker, 10-20): open-task-commits named 0 of the 5, run on Makerspace's record at rev 677 with all 5 still open ('0 open tasks named by a code commit; scanned 1434 non-merge commits'). Two causes. (1) SIA BLIND SPOT, now the main fix: the check scans HEAD's history only. Makerspace's record lives on docs/t001-plans, and origin/main is not an ancestor of it, so the check sees no code commit at all, whatever the subjects say. The same holds for any project with record_branch set (T-298-S4) or a planner worktree detached at a records commit. Fix: also scan the resolved code branch (origin/<default>, via upstream-ref.ts / T-250), and name the scanned ref(s) in the result. Raised to P1, because the detector is blind exactly where seats keep records apart from code. (2) Id form: Makerspace subjects use lowercase `t202` / `feat(t202)` (141 of 693 main subjects carry an uppercase T-id). The matcher stays `T-NNN`: a case-insensitive `t-?NNN` would match loop tags (Courier's `t010-browser` is a run, not task T-010), and a false 'maybe shipped' risks closing a live task. Maker adopts `T-NNN` in subjects. Undetectable by design: T-189 (shipped as DB rows) and T-036 (superseded), so those are close-with-evidence.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-317",
+      "title": "The /end record gate passes a stale handoff: require this session's set_handoff, written after its last work, before ob_end closes",
+      "priority": "P0",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Aaron 10-20, typed in the Atlas window: 'yes and high priority. Several agents are about to roll'. He asked 'does end have the agent write its handoff?'. No: /end writes no project state, and the handoff is written during work with ob_state set_handoff. The backstop is ob_end's RECORD NOT UPDATED gate (end-record-guard.ts newLayoutRecordUpdated, also used by the SessionEnd hook's checkSessionHandoff). It has two holes. (1) A sessions[] row passes it: ANY record write by this session counts, with no handoff needed. (2) A handoff by this session passes no matter when it was written. Each handoff carries written_rev, but nothing compares it with the session's later work. Seen live in S173: Atlas's handoff described 10-16 work through dozens of record writes, PRs and merges on 10-19, and the gate would have passed it; Atlas caught and rewrote it by hand at rev 536 and again at rev 541. Interim (sent to clark 10-20 for every seat before tonight's rolls): set_handoff right before /end and land it before /clear. Fix shape, to settle in the brief: (a) on the new layout, a sessions[] row alone no longer satisfies the gate; this session's set_handoff is required (loop docs/loops/*-handoff.md commits still count, as today). (b) Stale check: refuse when this session's handoff written_rev is lower than the highest record revision this session wrote that changed anything other than the handoff (the session's rows in tasks/decisions/verified/gaps carry their revisions, and sessions[] keeps first_rev). Equivalently, any record write after the handoff makes it stale unless the session re-sets it. Message: 'HANDOFF STALE: written at rev N; this session wrote rev M after it. Re-run set_handoff.' record_ok still bypasses, with its reason printed next start. (c) The SessionEnd hook's missing-handoff notice uses the same rule, so a session without /end is flagged at the next /start too. Tests: a session with only a sessions[] row is refused; a handoff followed by a task update is refused as stale; re-setting the handoff passes; record_ok bypasses.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-318",
+      "title": "Automate the session scorecard and review by exception: greeting metrics alarm on the measured failure classes; manual transcript review only for flagged sessions plus a weekly sample",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Aaron 10-20, typed in the Atlas window: 'file it and put it after T-317' (ORDER: start after T-317 lands). Context: he asked whether the start/end transcript-review loop is making progress. Atlas's evidence-based answer: the mechanical greeting is now right (state match, drift none, fits 1.4k-3.6k of 4.4k, start in 6-20 calls). The misses that remain fall in 4 recurring classes that reviews keep re-finding: (1) stale handoffs; (2) WAITING ON AARON under-reported (clark s5: 'one question' with 5 open; Relay s42: none recorded); (3) agents reading past shown signals ('+3 more', lessons that fired before the same mistake, entries rated helpful when they fired after the right act: 751 sits at 13 helpful / 4 neutral, with at least clark's and Courier's helpful rows wrong); (4) detectors that are blind or quiet (T-316's 0/5; stale_process in Maker s69 and clark s4; Maker tree_diverged 3 sessions running; greeting-metrics recorded Atlas handoff_lag_revs 12-13 on 10-20 00:50 with NO alarm). Scope: (a) greeting-metrics.jsonl alarms (alarm_streaks already exist) on handoff_lag_revs > N, stale_process, a tree_diverged streak, and the count of aaron-owned open questions across the seat's handoff vs what the greeting printed; (b) an end-side scorecard row from ob_end: this session's handoff written after its last work (shares T-317's rule), lessons stored with a MATCH: command key, and ratings where the entry fired AFTER the command it recommends auto-flagged as neutral candidates; (c) a 'review queue': sessions that trip an alarm are listed for the planner, everything else is not reviewed by hand; plus one sampled session per week to look for new classes; (d) a coverage fix: only 15 greeting-metrics rows exist since 10-16, none from Courier or Prism, so find which start path skips the append (CLI fallback, older builds, Cursor) before trusting the alarms. Step 0: measure (d) and list which alarm thresholds the 15 rows would have tripped.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
@@ -6632,14 +6660,14 @@
     },
     {
       "seat": "planner",
-      "pick_up": "S173 (10-19/20). Shipped: T-305; T-194 sparse half (sia-planner is SPARSE, V-095); T-261 S1+S2 (boundary check sees dynamic imports; memory subcommands moved to cli-memory.ts; V-096), merged by Atlas under fleet D-001 phase 1. Reviews: clark s4 /end and s5 greeting, Relay s42/s43. Filed: T-312 (parked), T-313, T-314, plus notes on T-262, T-297 and T-298. NEXT: T-315 open-brain auto-reconnect (D-161, Aaron yes 10-20). Start with step 0 measurement of server.ts and the host restart/list_changed behaviour, then a SIM. The ondeck-brief 'now:' fix is with clark to apply (clark-ops file). Nothing in flight.",
+      "pick_up": "FIRST: byte-compare and merge T-315's PR #885 (READY head f17c7a251e5dffe6989ea999d9f863da0fa9dfe2, reply C:/Users/melve/Worktrees/t315-r2-reply.md: 1516/1516, mutants m1-m4 as predicted, CI test pass). Base is master 16075e2a + docs/loops/t315-s1/edits.txt (2 edits to open-brain/src/server.ts) + build-watch.ts + t315-s1.test.ts. Then pr-refresh, SG-1 merge-pinned, the merge-tree check and sia-rebuild. THE REBUILD IS T-315'S LIVE TEST: within about 15 s every Claude Code seat's open-brain server should exit and respawn, and your next ob_start should print the new Build with no /mcp reconnect. If it doesn't, /mcp reconnect and record what happened. THEN, in flight on the QA PC (re-arm qapc-wait, which died with session 173): (1) t317-s1 build (P0 T-317 part 1, base 064799b7, reply AppData/Local/Temp/t317-s1-reply.md); byte-compare, merge and rebuild. (2) sim-t316-s1 (sim/t316-s1 4c277391, reply AppData/Local/Temp/sim-t316-s1-reply.md); on ALL PASS, write docs/loops/t316-s1-brief.md modelled on t317-s1-brief.md. Files are on the sim branch; the brief must also list the T256 rows staying green. NEXT: T-317 part 2 (a stale handoff: needs a per-session last-write revision field; a two-step schema change after T-315 is live). Then T-318 (Aaron: after T-317). T-316 S2 (opt-in MAYBE SHIPPED briefing line, appended to an existing budgeted line). T-313, T-314. S173 shipped: T-305, T-194 sparse (V-095), T-261 S1+S2 (V-096), D-161/T-315, and reviews of clark, Relay and Courier.",
       "watch_out": [
-        "sia-planner is a SPARSE checkout (cone docs .agents .claude): no open-brain/, scripts/ or project-template/ in the tree. Read code with `git show origin/master:<path>` or `git grep <pat> origin/master -- <path>`; the CLI and hooks run from the main checkout's build.",
-        "Fleet D-001 phase 1 (Aaron 10-19, verified 01:43Z): Atlas merges SIA itself: docs-merge, pinned SG-1 code merges (independent build + Atlas byte-compare ACCEPT + merge-tree check, one at a time), tag-release, sia-rebuild, and its own QA PC runs (clark-ops qapc-launch.sh, prompt-from.sh, qapc-wait.sh). Stamp every act with stamp.sh. Prod deploys and secrets still need Aaron's word. No allow rules were added to settings (that needs Aaron in this window).",
-        "The planner checkout has the T-194 FILE guard: no Edit/Write on src, tests, state.json or the rendered views; docs/ and greeting.json are fine.",
+        "Fleet D-001 phase 1: Atlas merges SIA itself (docs-merge, SG-1 merge-pinned after its own byte-compare ACCEPT + pr-refresh SAME + the merge-tree check, one at a time; sia-rebuild; its own QA PC runs via clark-ops qapc-launch.sh, prompt-from.sh, qapc-wait.sh). Stamp every act with stamp.sh. Prod and secrets still need Aaron's word. No allow rules are in settings (that needs Aaron in this window).",
+        "sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with `git show origin/master:<path>`. The desktop runs no builds or tests: every prediction is a QA PC SIM first.",
+        "QA PC load (T-292): full vitest runs often show `Timeout calling onTaskUpdate`, sometimes with one unrelated red row that is green alone. Briefs now carry the ruling: re-run that file alone, go on if green, never excuse a red row in the new test file.",
+        "Before /end: run ob_state set_handoff covering the WHOLE session and land it before /clear. The ob_end gate passes on any record write until T-317 merges (Aaron asked for this at P0 on 10-20; clark relayed it fleet-wide).",
         "SIA is a PUBLIC repo: never commit or post live MATCH key text.",
-        "Desktop is coordination only: predictions a brief depends on go to the QA PC as SIM runs; a brief ships its edits verbatim (docs/loops/<tag>/edits.txt + apply.cjs) once a SIM measured them.",
-        "After any rebuild, an open-brain MCP server started before it runs the old build until /mcp reconnect (until T-315 lands). Check the briefing's Build line."
+        "Run records-pr.sh from the repo root."
       ],
       "open_questions": [
         {
@@ -6652,38 +6680,45 @@
         },
         {
           "owner": "aaron",
-          "text": "T-261 S3/S4 (physical core/memory package split, core-only install): now, or hold until a real memory-free install exists? Rec: hold; S1+S2 already enforce the boundary."
+          "text": "T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold."
         },
         {
           "owner": "aaron",
-          "resolved_by": "Aaron 10-19 'go ahead' on the core; S1+S2 shipped (V-096)",
-          "text": "T-261: raise the core/memory package split from P3? Rec: leave at P3."
+          "text": "Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? It fires on the correct command, so it can never help, and 2+ of its 13 helpful ratings are wrong. Rec: yes."
         },
         {
           "owner": "aaron",
-          "resolved_by": "D-161 (Aaron 10-20: yes)",
-          "text": "Auto-reconnect for the open-brain MCP server: build it? Rec: yes."
+          "text": "The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small."
         }
       ],
       "session": 173,
       "loop_state": {
-        "open_prs": [],
+        "open_prs": [
+          {
+            "ref": "#885 T315-S1 f17c7a25",
+            "qa_status": "not_started",
+            "note": "READY; byte-compare and merge next session"
+          }
+        ],
         "frozen_sha": null,
         "questions_for_aaron": [
           "T-170-II real-key run host",
           "T-295 tool cuts",
-          "T-261 S3/S4 now or hold"
+          "T-261 S3/S4 now or hold",
+          "forget entry 751",
+          "name the yaml dependency PR"
         ],
         "rulings": [
-          "S173S ACCEPT 18a94570 (merged b208b485), V-095",
           "T261-S1 ACCEPT 2464d416 (merged 55cf1567)",
-          "T261-S2 ACCEPT 20e6353b (merged 11b1b72a), V-096"
+          "T261-S2 ACCEPT 20e6353b (merged 11b1b72a), V-096",
+          "T315-S1 round 1 BLOCKED on a T-292 load flake; brief ruled (#882), round 2 READY #885",
+          "SIM T317-S1 ALL PASS (3d11c2dc); build launched 23:26 CDT"
         ]
       },
       "session_uuid": "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
       "checkout": "sia-planner",
       "first_rev": 499,
-      "written_rev": 541
+      "written_rev": 546
     }
   ],
   "sessions": [
