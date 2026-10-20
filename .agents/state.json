@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 542,
+  "revision": 543,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2658,12 +2658,12 @@
     {
       "id": "T-316",
       "title": "The briefing shows the open tasks a code commit already names (T-256's finding), so a stale backlog is visible at /start, not only in /sync",
-      "priority": "P2",
+      "priority": "P1",
       "status": "open",
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "S173 (10-20), from Maker's audit for Aaron (melvenac-makerspace docs/t001-plans@c5828b04 .agents/audit/2026-10-19-stale-backlog.md). Maker found 5 of 44 open tasks already done (T-189 sending live since 10-18, plus T-202, T-126, T-148 and T-036), 3 code-done and waiting only on owner steps, and 17 with 'merged/LIVE/shipped' in their notes. Maker built Aaron a pending list from titles, which the briefing shows by design. SIA already has the deterministic detector: T-256's /sync check open-task-commits warns on an open/in_progress task named by a code commit on HEAD (SIA's own /sync showed 8 on 10-19). The gap: it runs only in /sync, never in the briefing. Fix shape: ob_start computes the same set (same function, bounded git log) and the briefing prints one line, 'MAYBE SHIPPED (n): T-x T-y …', capped like the other lines; the task note's 'stays open after <sha7>' exemption still applies. Not adopted: note-text markers ('merged', 'LIVE') as a signal, because prose is not a record. Per-project, not SIA: a release step that runs close_task (Maker adopts it locally), and closing code-done tasks with the owner's leftover as an open_question owned by aaron, using the existing schema with no new status. First measure: run `open-brain sync` in makerspace and count how many of the 5 the check catches (that depends on commit subjects naming task ids).",
+      "note": "S173 (10-20), from Maker's audit for Aaron (melvenac-makerspace docs/t001-plans@c5828b04 .agents/audit/2026-10-19-stale-backlog.md). Maker found 5 of 44 open tasks already done (T-189 sending live since 10-18, plus T-202, T-126, T-148 and T-036), 3 code-done and waiting only on owner steps, and 17 with 'merged/LIVE/shipped' in their notes. Maker built Aaron a pending list from titles, which the briefing shows by design. SIA already has the deterministic detector: T-256's /sync check open-task-commits warns on an open/in_progress task named by a code commit on HEAD (SIA's own /sync showed 8 on 10-19). The gap: it runs only in /sync, never in the briefing. Fix shape: ob_start computes the same set (same function, bounded git log) and the briefing prints one line, 'MAYBE SHIPPED (n): T-x T-y …', capped like the other lines; the task note's 'stays open after <sha7>' exemption still applies. Not adopted: note-text markers ('merged', 'LIVE') as a signal, because prose is not a record. Per-project, not SIA: a release step that runs close_task (Maker adopts it locally), and closing code-done tasks with the owner's leftover as an open_question owned by aaron, using the existing schema with no new status. First measure: run `open-brain sync` in makerspace and count how many of the 5 the check catches (that depends on commit subjects naming task ids). — MEASURED (Maker, 10-20): open-task-commits named 0 of the 5, run on Makerspace's record at rev 677 with all 5 still open ('0 open tasks named by a code commit; scanned 1434 non-merge commits'). Two causes. (1) SIA BLIND SPOT, now the main fix: the check scans HEAD's history only. Makerspace's record lives on docs/t001-plans, and origin/main is not an ancestor of it, so the check sees no code commit at all, whatever the subjects say. The same holds for any project with record_branch set (T-298-S4) or a planner worktree detached at a records commit. Fix: also scan the resolved code branch (origin/<default>, via upstream-ref.ts / T-250), and name the scanned ref(s) in the result. Raised to P1, because the detector is blind exactly where seats keep records apart from code. (2) Id form: Makerspace subjects use lowercase `t202` / `feat(t202)` (141 of 693 main subjects carry an uppercase T-id). The matcher stays `T-NNN`: a case-insensitive `t-?NNN` would match loop tags (Courier's `t010-browser` is a run, not task T-010), and a false 'maybe shipped' risks closing a live task. Maker adopts `T-NNN` in subjects. Undetectable by design: T-189 (shipped as DB rows) and T-036 (superseded), so those are close-with-evidence.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],

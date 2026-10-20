@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 542 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 543 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -22,6 +22,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [~] **T-262** /end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)
 - [ ] **T-298** Briefing gaps seen in Maker's S67 greeting: stale handoff not detectable, Latest brief silent outside docs/loops, divergence banner against the wrong branch, Usage 'not checked' noise
 - [ ] **T-315** open-brain MCP auto-reconnect: a running server serves the rebuilt build without /mcp reconnect (D-161)
+- [ ] **T-316** The briefing shows the open tasks a code commit already names (T-256's finding), so a stale backlog is visible at /start, not only in /sync
 
 ## P2
 
@@ -35,7 +36,6 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
 - [ ] **T-295** Audit open-brain's 14 MCP tools: keep what the protocol calls, cut or move to the CLI what nothing calls
 - [ ] **T-297** PRE-STATE import loses content a live project carries: dated-heading decisions, free-form handoff sections, scaffold's gitignore; plus CRLF command copy and view-header version
-- [ ] **T-316** The briefing shows the open tasks a code commit already names (T-256's finding), so a stale backlog is visible at /start, not only in /sync
 
 ## P3
 
