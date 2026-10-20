@@ -1,0 +1,7 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+  "lifecycle.ts",
+  "shared/fts.ts",
+===
+  "shared/fts.ts",
+>>>

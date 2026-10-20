@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+      if (target) dyn.push(target);
+===
+      if (target) void target;
+>>>
