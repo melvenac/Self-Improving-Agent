@@ -1,0 +1,9 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+      const entry = { n: effectiveSession, date: today, uuid, seat, checkout, first_rev: firstRev };
+===
+      // T-317 S3: the revision of this session's latest write that carried an op other than set_handoff; a handoff-only
+      // write keeps the stamp it had. The /end gate (S2) calls this session's handoff stale when this is above its written_rev.
+      const worked = options.ops.some((o) => (o as { op?: unknown }).op !== "set_handoff");
+      const entry = { n: effectiveSession, date: today, uuid, seat, checkout, first_rev: firstRev, ...(worked ? { last_work_rev: before + 1 } : {}) };
+>>>

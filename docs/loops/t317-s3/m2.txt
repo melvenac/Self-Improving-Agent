@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+      const worked = options.ops.some((o) => (o as { op?: unknown }).op !== "set_handoff");
+===
+      const worked = options.ops.length > 0;
+>>>
