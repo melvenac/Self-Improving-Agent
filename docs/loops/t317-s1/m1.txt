@@ -1,0 +1,15 @@
+@@@ open-brain/src/shared/end-record-guard.ts
+<<<
+  if (handoff) {
+    return { updated: true, layout: "new", detail: `set_handoff for session ${sessionUuid}` };
+  }
+  if (loopHandoffs.length > 0) {
+===
+  if (handoff) {
+    return { updated: true, layout: "new", detail: `set_handoff for session ${sessionUuid}` };
+  }
+  if (s.sessions.some((row) => row.uuid === sessionUuid)) {
+    return { updated: true, layout: "new", detail: `record revision with session ${sessionUuid} in sessions[]` };
+  }
+  if (loopHandoffs.length > 0) {
+>>>
