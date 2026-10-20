@@ -62,6 +62,20 @@ const TYPOGRAPHIC_DASH = /^[‐-―−﹘﹣－]/;
 
 const looksLikeFlag = (tok: string): boolean => tok.startsWith("-") || TYPOGRAPHIC_DASH.test(tok);
 
+/**
+ * T-185: parse a subcommand's tokens against its declared flags, or refuse with
+ * exit 2 before anything is read or written. Exit 2 is a usage refusal; the
+ * commands' own refusals stay at 1.
+ */
+export function parseOrRefuse(spec: CommandSpec, tokens: readonly string[]): ParsedArgs {
+  const r = parseArgs(spec, tokens);
+  if (!r.ok) {
+    console.error(`${spec.name} refused: ${r.error}\nNothing was run.`);
+    process.exit(2);
+  }
+  return r.args;
+}
+
 export function parseArgs(spec: CommandSpec, tokens: readonly string[], cwd: string = process.cwd()): ParseResult {
   const booleans = new Set<string>();
   const values = new Map<string, string>();

@@ -59,11 +59,11 @@ describe("T-261 S1: checkModuleBoundary sees dynamic imports", () => {
     expect(r.message).toContain("did not resolve");
   });
 
-  it("R5: this repository's own source passes with exactly the 8 listed loads", () => {
+  it("R5: this repository's own source passes with exactly the 4 listed loads", () => {
     const repoRoot = join(import.meta.dirname, "..", "..", "..", "..");
     const r = checkModuleBoundary(repoRoot);
     expect(r.severity, r.message).toBe("pass");
-    expect(r.message).toContain("8 dynamic memory load(s) allowed by DYNAMIC_MEMORY_LOADS");
+    expect(r.message).toContain("4 dynamic memory load(s) allowed by DYNAMIC_MEMORY_LOADS");
   });
 
   it("R6: the five memory-only files are on the memory side", () => {
