@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 544,
+  "revision": 545,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2678,6 +2678,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Aaron 10-20, typed in the Atlas window: 'yes and high priority. Several agents are about to roll'. He asked 'does end have the agent write its handoff?'. No: /end writes no project state, and the handoff is written during work with ob_state set_handoff. The backstop is ob_end's RECORD NOT UPDATED gate (end-record-guard.ts newLayoutRecordUpdated, also used by the SessionEnd hook's checkSessionHandoff). It has two holes. (1) A sessions[] row passes it: ANY record write by this session counts, with no handoff needed. (2) A handoff by this session passes no matter when it was written. Each handoff carries written_rev, but nothing compares it with the session's later work. Seen live in S173: Atlas's handoff described 10-16 work through dozens of record writes, PRs and merges on 10-19, and the gate would have passed it; Atlas caught and rewrote it by hand at rev 536 and again at rev 541. Interim (sent to clark 10-20 for every seat before tonight's rolls): set_handoff right before /end and land it before /clear. Fix shape, to settle in the brief: (a) on the new layout, a sessions[] row alone no longer satisfies the gate; this session's set_handoff is required (loop docs/loops/*-handoff.md commits still count, as today). (b) Stale check: refuse when this session's handoff written_rev is lower than the highest record revision this session wrote that changed anything other than the handoff (the session's rows in tasks/decisions/verified/gaps carry their revisions, and sessions[] keeps first_rev). Equivalently, any record write after the handoff makes it stale unless the session re-sets it. Message: 'HANDOFF STALE: written at rev N; this session wrote rev M after it. Re-run set_handoff.' record_ok still bypasses, with its reason printed next start. (c) The SessionEnd hook's missing-handoff notice uses the same rule, so a session without /end is flagged at the next /start too. Tests: a session with only a sessions[] row is refused; a handoff followed by a task update is refused as stale; re-setting the handoff passes; record_ok bypasses.",
+      "note_by": [
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-318",
+      "title": "Automate the session scorecard and review by exception: greeting metrics alarm on the measured failure classes; manual transcript review only for flagged sessions plus a weekly sample",
+      "priority": "P1",
+      "status": "open",
+      "opened_session": 173,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Aaron 10-20, typed in the Atlas window: 'file it and put it after T-317' (ORDER: start after T-317 lands). Context: he asked whether the start/end transcript-review loop is making progress. Atlas's evidence-based answer: the mechanical greeting is now right (state match, drift none, fits 1.4k-3.6k of 4.4k, start in 6-20 calls). The misses that remain fall in 4 recurring classes that reviews keep re-finding: (1) stale handoffs; (2) WAITING ON AARON under-reported (clark s5: 'one question' with 5 open; Relay s42: none recorded); (3) agents reading past shown signals ('+3 more', lessons that fired before the same mistake, entries rated helpful when they fired after the right act: 751 sits at 13 helpful / 4 neutral, with at least clark's and Courier's helpful rows wrong); (4) detectors that are blind or quiet (T-316's 0/5; stale_process in Maker s69 and clark s4; Maker tree_diverged 3 sessions running; greeting-metrics recorded Atlas handoff_lag_revs 12-13 on 10-20 00:50 with NO alarm). Scope: (a) greeting-metrics.jsonl alarms (alarm_streaks already exist) on handoff_lag_revs > N, stale_process, a tree_diverged streak, and the count of aaron-owned open questions across the seat's handoff vs what the greeting printed; (b) an end-side scorecard row from ob_end: this session's handoff written after its last work (shares T-317's rule), lessons stored with a MATCH: command key, and ratings where the entry fired AFTER the command it recommends auto-flagged as neutral candidates; (c) a 'review queue': sessions that trip an alarm are listed for the planner, everything else is not reviewed by hand; plus one sampled session per week to look for new classes; (d) a coverage fix: only 15 greeting-metrics rows exist since 10-16, none from Courier or Prism, so find which start path skips the append (CLI fallback, older builds, Cursor) before trusting the alarms. Step 0: measure (d) and list which alarm thresholds the 15 rows would have tripped.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
       ],
