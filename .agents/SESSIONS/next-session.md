@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 556 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 558 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,14 +6,14 @@
 
 ### Pick up here
 
-S174 closed T-317 (all parts live on 7eb8fd70: /end refuses HANDOFF STALE, verified live) and T-319 (domains.json retired, D-162). Every seat must /mcp reconnect open-brain to run 7eb8fd70; until then a seat runs an older build (STALE PROCESS). NEXT by priority: (1) T-316 S2: opt-in MAYBE SHIPPED briefing line, appended to an existing budgeted line (S1 measured working on Makerspace: 8 named). (2) G-064: bootstrap scaffold should take the seat's role (default developer for a single-agent project); add the numbering note (a session that writes the record before its first ob_start gets record n=1 but log Session_2.md). (3) T-317 wording follow-up: the RECORD NOT UPDATED generic advice still lists 'ob_state ops that write sessions[]'. (4) G-062 READS OWED never clears (self-authored brief first). (5) T-318 (Aaron: after T-317, so now unblocked). T-315 stays open (a respawn that works for headless claude -p too). Method that worked all session: write edits.txt/tests.txt + mutants, dry-apply on a scratch copy of origin/master, land a SIM brief as a docs PR, job-runner SIM on Sonnet, then the build brief with the SIM's numbers, job-runner build, byte-compare (EDITS='tests.txt edits.txt' when a test file changes), pr-refresh, Aaron's 'merge <n>', pr-merge.sh, sia-rebuild.
+FOUR CODE PRs verified, waiting on Aaron naming them: #917 T-316 S2 (MAYBE SHIPPED note; refreshed head 7de2a2c4), #921 T-317 wording (401b10e3), #922 G-064 role: developer scaffold (3e8ee5b3; reverses BF-5's role: none, Aaron decides), #924 T-318 S1 metrics review (bb2ff479). All byte-compare SAME and CI green. On his word: pr-refresh each just before ITS merge, pr-merge.sh pinned to the refreshed head, one at a time; then sia-rebuild and seats /mcp reconnect. Live checks: SIA greeting shows 'MAYBE SHIPPED (10)...' on the pick-up line; `open-brain metrics review --since 2026-10-16` lists the step-0 rows; then close T-316 (Maker can opt in), close G-064 (tell mail-server to set role: developer). NEXT after: T-318 S2 (ob_end end-side row), G-062 (measure the previous-session transcript lookup first; design note in the gap), T-315 (respawn for headless runs).
 
 ### Watch out
 
-- SIM briefs: never restore src between mutants with git checkout while the fix is uncommitted (it discards the fix); re-apply edits.txt first. Build briefs are fine (the fix is committed). Bit twice in S174 (S2 and T-319 SIMs).
-- A readers-first schema change needs every reader on the new build before the writer ships: all desktop servers restarted after the rebuild (Get-CimInstance start times vs build-info builtAt) AND the QA PC SIA build moved (clark's Clark-sia-rebuild; it waits for an idle box).
-- The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR; a bare 'merge' was read as the only PR waiting (#907) and said so. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand.
-- Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs); brief on master or origin/loop/*; briefs and amendments ASCII (loop files may not be); tags never repeat; amendments in amendments[].
+- SIM briefs: never restore src between mutants with git checkout while the fix is uncommitted (it discards the fix); back up the one file and Copy-Item it back. Build briefs are fine (the fix is committed).
+- Job runner: tags must be lowercase (T316-S2 was refused 'bad-tag'); jobs run one at a time on the QA PC; a SIM criterion that names rows must name every row tests.txt changes (T-318's SIM read MISMATCH on wording alone).
+- The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand.
+- Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs); brief on master or origin/loop/*; briefs and amendments ASCII (loop files may not be); tags never repeat.
 - sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with git show origin/master:<path>. The desktop runs no builds or tests.
 - SIA is a PUBLIC repo: never commit or post live MATCH key text.
 
@@ -24,14 +24,21 @@ S174 closed T-317 (all parts live on 7eb8fd70: /end refuses HANDOFF STALE, verif
 - T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold.
 - Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? Rec: yes.
 - The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small.
+- G-064 (#922): new scaffolds declare role: developer instead of role: none (reverses BF-5). Merge it? Rec: yes.
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #917 — QA: accepted — T-316 S2, head 7de2a2c4, byte-compare SAME x8, CI pass
+- #921 — QA: accepted — T-317 wording, head 401b10e3, SAME x2, CI pass
+- #922 — QA: accepted — G-064, head 3e8ee5b3, SAME x7, CI pass; Aaron decides the role default
+- #924 — QA: accepted — T-318 S1, head bb2ff479, SAME x5, CI pass
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- merge 917 921 922 924
+- G-064 role: developer default
 - T-170-II real-key run host
 - T-295 tool cuts
 - T-261 S3/S4 now or hold
@@ -39,10 +46,10 @@ S174 closed T-317 (all parts live on 7eb8fd70: /end refuses HANDOFF STALE, verif
 - name the yaml dependency PR
 
 **Rulings made mid-loop:** 
-- T-317 S1/S2/S3 merged (#888, #900, #907) and verified live (HANDOFF STALE refused at rev 555 vs 551)
-- T-319 merged #911 (domains.json retired, D-162)
-- T-315 reverted (#896), verified a rebuild leaves servers running
-- T-316 S1 merged #895, measured on Makerspace
+- T-316 S2 SIM ALL PASS, build READY #917, byte-compare SAME x8
+- T-317 wording READY #921 (no SIM: one string), SAME x2
+- G-064 SIM ALL PASS, build READY #922, SAME x7
+- T-318 step 0 measured (coverage complete since 10-16 20:42Z); S1 SIM MISMATCH on criterion wording only, ruled expected; build READY #924, SAME x5
 
 ## developer [sia-builder] _(written session 156)_
 
