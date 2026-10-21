@@ -1,0 +1,95 @@
+@@@ .claude/commands/start.md
+<<<
+1. `.agents/SYSTEM/domains.json`
+2. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
+===
+1. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
+>>>
+@@@ project-template/.claude/commands/start.md
+<<<
+1. `.agents/SYSTEM/domains.json`
+2. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
+===
+1. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
+>>>
+@@@ project-template/.cursor/commands/start.md
+<<<
+1. `.agents/SYSTEM/domains.json`
+2. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
+===
+1. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
+>>>
+@@@ .claude/commands/harness-audit.md
+<<<
+| Obsidian directories | README vault setup | actual vault structure, RULES.md references |
+| Domain tags | `.agents/SYSTEM/domains.json` | SUMMARY.md domain references |
+===
+| Obsidian directories | README vault setup | actual vault structure, RULES.md references |
+>>>
+@@@ project-template/.cursor/commands/harness-audit.md
+<<<
+| Obsidian directories | README vault setup | actual vault structure, RULES.md references |
+| Domain tags | `.agents/SYSTEM/domains.json` | SUMMARY.md domain references |
+===
+| Obsidian directories | README vault setup | actual vault structure, RULES.md references |
+>>>
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  for (const rel of [".agents/AGENT.md", ".agents/AGENT.local.md", ".agents/SYSTEM/domains.json"]) {
+===
+  // D-162: domains.json is retired, so it is never owed.
+  for (const rel of [".agents/AGENT.md", ".agents/AGENT.local.md"]) {
+>>>
+@@@ open-brain/src/pipelines/sync/score.ts
+<<<
+  // Domain tags scope the coverage score to this project's subject areas.
+  const domainsPath = join(projectRoot, ".agents", "SYSTEM", "domains.json");
+  let domainTags: string[] = [];
+  if (existsSync(domainsPath)) {
+    try {
+      const domains = JSON.parse(readFileSync(domainsPath, "utf-8"));
+      domainTags = domains.domains ?? domains.tags ?? [];
+    } catch { /* malformed domains.json should not break scoring */ }
+  }
+===
+  // D-162 (Aaron 10-20): domains.json is retired. Coverage is unscoped for every project, as it already was for every
+  // project without the file (/bootstrap never created one).
+  const domainTags: string[] = [];
+>>>
+@@@ .gitignore
+<<<
+!/.agents/SYSTEM/TESTING.md
+!/.agents/SYSTEM/domains.json
+===
+!/.agents/SYSTEM/TESTING.md
+>>>
+@@@ CLAUDE.md
+<<<
+`TESTING.md`, `domains.json`; `.agents/roles/`
+===
+`TESTING.md`; `.agents/roles/`
+>>>
+@@@ .agents/SYSTEM/RULES.md
+<<<
+`TESTING.md`, `domains.json` and `.agents/skills/`
+===
+`TESTING.md` and `.agents/skills/`
+>>>
+@@@ .agents/retirements.json
+<<<
+            "b71b2197a124410e8e1194da34de6a1526e8ce2767101a6fe8e14692b9da92d3"
+          ]
+        },
+        {
+          "path": ".agents/SYSTEM/domains.json",
+          "class": "prose",
+          "why": "obituary — records that this consumer was cut, after the stale description nearly became a false finding",
+          "line_hashes": [
+            "496fc2ff27651c90e6c029161ac384ce29fc95d7de77620589b2f3cf741beaf6"
+          ]
+        },
+===
+            "b71b2197a124410e8e1194da34de6a1526e8ce2767101a6fe8e14692b9da92d3"
+          ]
+        },
+>>>
