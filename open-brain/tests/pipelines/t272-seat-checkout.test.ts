@@ -76,8 +76,8 @@ describe("T-272: bootstrap in a seat checkout", { timeout: 60_000 }, () => {
     expect(fs.readFileSync(path.join(wt, ".agents", "AGENT.local.md"), "utf8")).toBe(SEAT);
     expect(cp.spawnSync("git", ["check-ignore", "-q", ".agents/AGENT.local.md"], { cwd: wt }).status).toBe(0);
     const agentMd = fs.readFileSync(path.join(wt, ".agents", "AGENT.md"), "utf8");
-    expect(agentMd.startsWith("---\nname: agent-dashboard\nrole: none\n")).toBe(true);
-    expect(agentMd).toContain("# agent-dashboard — not a seat");
+    expect(agentMd.startsWith("---\nname: agent-dashboard\nrole: developer\n")).toBe(true);
+    expect(agentMd).toContain("# agent-dashboard — the developer seat");
     expect(agentMd).not.toContain("dashboard-planner");
   });
 
@@ -104,7 +104,7 @@ describe("T-272: bootstrap in a seat checkout", { timeout: 60_000 }, () => {
   it("S5: a plain repository (not a worktree) still names AGENT.md after its own folder", () => {
     const dir = repo(tmpBase(), "plain-proj");
     bs.scaffold(dir, templateDir);
-    expect(fs.readFileSync(path.join(dir, ".agents", "AGENT.md"), "utf8").startsWith("---\nname: plain-proj\nrole: none\n")).toBe(true);
+    expect(fs.readFileSync(path.join(dir, ".agents", "AGENT.md"), "utf8").startsWith("---\nname: plain-proj\nrole: developer\n")).toBe(true);
   });
 
   it("S6: an owner rule that tracks AGENT.local.md fails scaffold's verify", () => {
