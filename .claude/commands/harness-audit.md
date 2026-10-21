@@ -78,7 +78,6 @@ For each pair, check for contradictions. Report findings in this format:
 | Command behavior | slash command `.md` files | what the scripts actually do (read script headers) |
 | Setup instructions | README manual setup steps | what `scripts/setup.mjs` actually does |
 | Obsidian directories | README vault setup | actual vault structure, RULES.md references |
-| Domain tags | `.agents/SYSTEM/domains.json` | SUMMARY.md domain references |
 
 ### Phase 3: Report
 

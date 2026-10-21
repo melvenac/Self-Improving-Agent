@@ -85,7 +85,8 @@ export function describeReadsOwed(
     add(p);
   }
 
-  for (const rel of [".agents/AGENT.md", ".agents/AGENT.local.md", ".agents/SYSTEM/domains.json"]) {
+  // D-162: domains.json is retired, so it is never owed.
+  for (const rel of [".agents/AGENT.md", ".agents/AGENT.local.md"]) {
     if (!owedByDate(commitDate(projectRoot, rel), prevDate)) continue;
     add(rel);
   }
