@@ -175,7 +175,8 @@ describe("BF-R: READS OWED", () => {
     const line = describeReadsOwed(root, state, 5, "developer", "sia-forge");
     expect(line).toContain("docs/loops/x-brief.md");
     expect(line).toContain(".agents/AGENT.md");
-    expect(line).toContain(".agents/SYSTEM/domains.json");
+    // D-162: domains.json is retired, so a repo that still carries one is not owed a read of it.
+    expect(line).not.toContain(".agents/SYSTEM/domains.json");
   });
 
   it("BF-R2: handoff paths appear in source order, de-duplicated", () => {
