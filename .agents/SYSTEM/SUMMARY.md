@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 554 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 556 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).
 
 ## What's working
@@ -176,7 +176,6 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - Gap G-058: A hub restart or burst knocks every QA PC waker out: since T-110 all wakers on one host share one per-source /health window, a 429 is read as authMode=warn, and the waker exits fail closed. Seen twice in s162 (03:52Z, and 06:11Z after the v1.19.0 swap).
 - Gap G-061: Cursor: the recall trigger is blind to a FAILING Shell call, the G-059 pattern again. cursor-agent fires postToolUseFailure (and afterShellExecution), and no postToolUse, when a Shell command exits non-zero; and the trigger's current answer on that event (hookEventName 'PostToolUse') does not reach the model.
 - Gap G-062: READS OWED keeps listing a brief whose work has shipped, or that the seat wrote itself. Nothing clears 'owed' when the brief's work closes or when the reading seat authored it, so every new session pays a read for nothing and learns to skim the line.
-- Gap G-063: domains.json is half-retired: /start step 4 and READS OWED name it and `open-brain sync --score` reads it, but /bootstrap never creates it (project-template has none), so projects adopted by /bootstrap (Makerspace) carry no domains.json, lose a score category and see a read step that silently skips.
 - Gap G-064: A checkout bootstrapped with role: none can never be shown its own handoff. bootstrap scaffold writes .agents/AGENT.md 'role: none', set_handoff accepts only planner|developer|qa, and ob_start renders no handoff as 'yours' while the reader's seat is unresolved (PICK UP HERE: none). On a single-agent bootstrapped project the full pick-up, watch-outs and open questions never reach the next session; /start forbids reading next-session.md to fill the gap.
 
 ## What's next
@@ -184,8 +183,8 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - [P0] T-160 Hub transport: make silence unambiguous (push or long-poll), a Stop-hook seat wake, per-agent keys
 - [P0] T-194 Planner seat hook: a tracked PreToolUse hook mechanically refuses the planner's out-of-boundary acts (source/tests/hooks/build writes, hand edits to rendered views, git merge/push/tag without per-occasion authority), fails closed, and names the rule it enforces
 - [P0] T-196 The hub procedure is tracked knowledge: each seat's hub room and hub-talk invocation in a tracked data file beside .agents/SYSTEM/worktree-seats.json; a short 'Talking to Cursor seats' section in planner.md (printed in full at /start) pointing at it; a tracked alwaysApply .cursor/rules hub rule; and Cursor's /start joins the seat's room and reads unread atlas turns before proposing anything
-- [P0] T-317 The /end record gate passes a stale handoff: require this session's set_handoff, written after its last work, before ob_end closes
 - [P1] T-170 Memory is LOOKUP by default and INJECTION only on a deterministic match against the act; fix the WRITE side first, so every stored lesson carries the key (command pattern, path or error string) that would have caught the mistake
+- [P1] T-181 Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing
 
 ## Decisions
 

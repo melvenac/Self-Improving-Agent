@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 554 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 556 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,14 +6,14 @@
 
 ### Pick up here
 
-FIRST: T-317 S3 (the writer stamps sessions[].last_work_rev on every write carrying a non-handoff op; keep the existing value on a handoff-only write). Write its SIM + build brief now; DISPATCH the build only after every running open-brain server started after the 18:37:41Z 10-20 rebuild (5f48b9d9) - check Get-CimInstance start times - and the QA PC SIA build is at 5f48b9d9 or later (clark's Clark-sia-rebuild task), or a stale server refuses the record ('Unrecognized key'). Note E4's hashNewLayoutSessionRecord does not include last_work_rev. Then T-318 (Aaron: after T-317). T-316 S2 (opt-in MAYBE SHIPPED briefing line; S1 measured working on Makerspace). T-315 stays open (respawn must cover headless claude -p). S174 shipped and live: T-315 revert (verified 18:38Z: rebuild leaves servers running), T-317 S1 + S2 (#888, #900), T-316 S1 (#895), tcm runner #892/#893.
+S174 closed T-317 (all parts live on 7eb8fd70: /end refuses HANDOFF STALE, verified live) and T-319 (domains.json retired, D-162). Every seat must /mcp reconnect open-brain to run 7eb8fd70; until then a seat runs an older build (STALE PROCESS). NEXT by priority: (1) T-316 S2: opt-in MAYBE SHIPPED briefing line, appended to an existing budgeted line (S1 measured working on Makerspace: 8 named). (2) G-064: bootstrap scaffold should take the seat's role (default developer for a single-agent project); add the numbering note (a session that writes the record before its first ob_start gets record n=1 but log Session_2.md). (3) T-317 wording follow-up: the RECORD NOT UPDATED generic advice still lists 'ob_state ops that write sessions[]'. (4) G-062 READS OWED never clears (self-authored brief first). (5) T-318 (Aaron: after T-317, so now unblocked). T-315 stays open (a respawn that works for headless claude -p too). Method that worked all session: write edits.txt/tests.txt + mutants, dry-apply on a scratch copy of origin/master, land a SIM brief as a docs PR, job-runner SIM on Sonnet, then the build brief with the SIM's numbers, job-runner build, byte-compare (EDITS='tests.txt edits.txt' when a test file changes), pr-refresh, Aaron's 'merge <n>', pr-merge.sh, sia-rebuild.
 
 ### Watch out
 
-- Weekly Claude allowance was 89% at 04:10 CDT 10-20 (clark): resets 00:00 CDT 10-21. Builds on Sonnet via the job runner; short turns; no idle polling.
-- The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR ('merge <n>'); then Atlas runs pr-merge.sh pinned to the refreshed head. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand (git diff <head>^2 <head> | git patch-id --stable) before calling for a re-review.
-- Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs). Submit --token-file C:/Users/melve/.agent-dashboard/jobs-atlas.token --json <f> --git <tree>; the brief must be on master or origin/loop/*; ASCII only; amendments in amendments[]; tags never repeat.
-- QA PC load (T-292) reaches several files: handoff-caps.test.ts and checks-state.test.ts went red under load and green alone. Briefs name the files a load re-run may cover.
+- SIM briefs: never restore src between mutants with git checkout while the fix is uncommitted (it discards the fix); re-apply edits.txt first. Build briefs are fine (the fix is committed). Bit twice in S174 (S2 and T-319 SIMs).
+- A readers-first schema change needs every reader on the new build before the writer ships: all desktop servers restarted after the rebuild (Get-CimInstance start times vs build-info builtAt) AND the QA PC SIA build moved (clark's Clark-sia-rebuild; it waits for an idle box).
+- The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR; a bare 'merge' was read as the only PR waiting (#907) and said so. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand.
+- Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs); brief on master or origin/loop/*; briefs and amendments ASCII (loop files may not be); tags never repeat; amendments in amendments[].
 - sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with git show origin/master:<path>. The desktop runs no builds or tests.
 - SIA is a PUBLIC repo: never commit or post live MATCH key text.
 
@@ -24,7 +24,6 @@ FIRST: T-317 S3 (the writer stamps sessions[].last_work_rev on every write carry
 - T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold.
 - Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? Rec: yes.
 - The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small.
-- Reconnect open-brain in every seat when convenient, so T-317 S3 can dispatch (S2 is on disk; running servers are still the previous build). Rec: at your next desk visit.
 
 ### Loop state
 
@@ -38,13 +37,12 @@ FIRST: T-317 S3 (the writer stamps sessions[].last_work_rev on every write carry
 - T-261 S3/S4 now or hold
 - forget entry 751
 - name the yaml dependency PR
-- reconnect all seats for S3
 
 **Rulings made mid-loop:** 
-- T-315 revert live and verified 18:38Z
-- T317-S1 and T317-S2 merged and on disk (5f48b9d9)
-- T316-S1 measured working on Makerspace (Maker)
-- tcm runner #892/#893 installed and verified by clark
+- T-317 S1/S2/S3 merged (#888, #900, #907) and verified live (HANDOFF STALE refused at rev 555 vs 551)
+- T-319 merged #911 (domains.json retired, D-162)
+- T-315 reverted (#896), verified a rebuild leaves servers running
+- T-316 S1 merged #895, measured on Makerspace
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -120,4 +118,4 @@ _10 older handoff(s), superseded within their seat and checkout, are in state.js
 
 ## Last session
 
-Session 174 — 2026-10-20 — planner [sia-planner] — `0bbb03c4-d91d-496e-a6d5-43924f16405b` (14 writing session(s) in the record)
+Session 174 — 2026-10-21 — planner [sia-planner] — `0bbb03c4-d91d-496e-a6d5-43924f16405b` (14 writing session(s) in the record)

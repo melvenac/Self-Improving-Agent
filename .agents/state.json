@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 554,
+  "revision": 556,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2675,16 +2675,16 @@
       "id": "T-317",
       "title": "The /end record gate passes a stale handoff: require this session's set_handoff, written after its last work, before ob_end closes",
       "priority": "P0",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 174,
       "supersedes": null,
-      "note": "Aaron 10-20, typed in the Atlas window: 'yes and high priority. Several agents are about to roll'. He asked 'does end have the agent write its handoff?'. No: /end writes no project state, and the handoff is written during work with ob_state set_handoff. The backstop is ob_end's RECORD NOT UPDATED gate (end-record-guard.ts newLayoutRecordUpdated, also used by the SessionEnd hook's checkSessionHandoff). It has two holes. (1) A sessions[] row passes it: ANY record write by this session counts, with no handoff needed. (2) A handoff by this session passes no matter when it was written. Each handoff carries written_rev, but nothing compares it with the session's later work. Seen live in S173: Atlas's handoff described 10-16 work through dozens of record writes, PRs and merges on 10-19, and the gate would have passed it; Atlas caught and rewrote it by hand at rev 536 and again at rev 541. Interim (sent to clark 10-20 for every seat before tonight's rolls): set_handoff right before /end and land it before /clear. Fix shape, to settle in the brief: (a) on the new layout, a sessions[] row alone no longer satisfies the gate; this session's set_handoff is required (loop docs/loops/*-handoff.md commits still count, as today). (b) Stale check: refuse when this session's handoff written_rev is lower than the highest record revision this session wrote that changed anything other than the handoff (the session's rows in tasks/decisions/verified/gaps carry their revisions, and sessions[] keeps first_rev). Equivalently, any record write after the handoff makes it stale unless the session re-sets it. Message: 'HANDOFF STALE: written at rev N; this session wrote rev M after it. Re-run set_handoff.' record_ok still bypasses, with its reason printed next start. (c) The SessionEnd hook's missing-handoff notice uses the same rule, so a session without /end is flagged at the next /start too. Tests: a session with only a sessions[] row is refused; a handoff followed by a task update is refused as stale; re-setting the handoff passes; record_ok bypasses. — S174 (10-20): part 1 merged. T317-S1 #888: Atlas byte-compare SAME x2 at d66d1656 (reply: R1 red pre-fix, 79 files / 1076 tests, m1 R1 red, CI test pass); pr-refresh to 3d86d086 (patch-id = reviewed, CI SUCCESS, merge-tree CLEAN); Aaron ran pr-merge.sh -> 9e0d5b01; main tree rebuilt to 9e0d5b01 and every seat reconnected ~06:32Z, so the gate (set_handoff required; other record writes do not count) is LIVE. Part 2 (stale handoff written before later work) remains. — S174 (10-20 overnight) part 2 step S2 READY: sessions[] gains OPTIONAL last_work_rev (written by nothing until S3); the /end gate (newLayoutRecordUpdated, shared with the SessionEnd hook) refuses 'HANDOFF STALE: written at rev N; this session wrote rev M after it. Re-run ob_state set_handoff' when last_work_rev > the handoff's written_rev, unless a loop handoff was committed; either stamp absent keeps part 1's rule. Two steps because every record object is strictObject (SIM baseline: 'Unrecognized key: last_work_rev'). SIM job #8 ALL PASS (44ecc717: 4 failed|1 passed pre-fix, 119 files / 1609 tests, m1 R1+R5, m2 R2). Brief docs/loops/t317-s2-brief.md (#899). Build job #10 READY 197cb5e7 PR #900 (identical numbers, CI test pass); Atlas byte-compare SAME x3, head current, CI SUCCESS. WAITS for Aaron's 'merge 900'. Then sia-rebuild; S3 (writer stamps last_work_rev on every write carrying a non-handoff op; note E4's hashNewLayoutSessionRecord does not include it) dispatches only once every running open-brain server started after that rebuild (and the QA PC SIA build moved), or a stale server would refuse the record. — S174 (10-20): S2 MERGED #900 5f48b9d9 on Aaron's 'merge 900' (refreshed to 03743749, patch-id 1724d94f = reviewed, CI SUCCESS, CLEAN); main tree rebuilt 18:37Z. Servers keep running on 8c81a6c until each seat reconnects. S3 (the writer stamps last_work_rev) dispatches ONLY after every running open-brain server started after 18:37:41Z (Get-CimInstance start times) and the QA PC SIA build is moved to 5f48b9d9 or later.",
+      "note": "Aaron 10-20, typed in the Atlas window: 'yes and high priority. Several agents are about to roll'. He asked 'does end have the agent write its handoff?'. No: /end writes no project state, and the handoff is written during work with ob_state set_handoff. The backstop is ob_end's RECORD NOT UPDATED gate (end-record-guard.ts newLayoutRecordUpdated, also used by the SessionEnd hook's checkSessionHandoff). It has two holes. (1) A sessions[] row passes it: ANY record write by this session counts, with no handoff needed. (2) A handoff by this session passes no matter when it was written. Each handoff carries written_rev, but nothing compares it with the session's later work. Seen live in S173: Atlas's handoff described 10-16 work through dozens of record writes, PRs and merges on 10-19, and the gate would have passed it; Atlas caught and rewrote it by hand at rev 536 and again at rev 541. Interim (sent to clark 10-20 for every seat before tonight's rolls): set_handoff right before /end and land it before /clear. Fix shape, to settle in the brief: (a) on the new layout, a sessions[] row alone no longer satisfies the gate; this session's set_handoff is required (loop docs/loops/*-handoff.md commits still count, as today). (b) Stale check: refuse when this session's handoff written_rev is lower than the highest record revision this session wrote that changed anything other than the handoff (the session's rows in tasks/decisions/verified/gaps carry their revisions, and sessions[] keeps first_rev). Equivalently, any record write after the handoff makes it stale unless the session re-sets it. Message: 'HANDOFF STALE: written at rev N; this session wrote rev M after it. Re-run set_handoff.' record_ok still bypasses, with its reason printed next start. (c) The SessionEnd hook's missing-handoff notice uses the same rule, so a session without /end is flagged at the next /start too. Tests: a session with only a sessions[] row is refused; a handoff followed by a task update is refused as stale; re-setting the handoff passes; record_ok bypasses. — S174 (10-20): part 1 merged. T317-S1 #888: Atlas byte-compare SAME x2 at d66d1656 (reply: R1 red pre-fix, 79 files / 1076 tests, m1 R1 red, CI test pass); pr-refresh to 3d86d086 (patch-id = reviewed, CI SUCCESS, merge-tree CLEAN); Aaron ran pr-merge.sh -> 9e0d5b01; main tree rebuilt to 9e0d5b01 and every seat reconnected ~06:32Z, so the gate (set_handoff required; other record writes do not count) is LIVE. Part 2 (stale handoff written before later work) remains. — S174 (10-20 overnight) part 2 step S2 READY: sessions[] gains OPTIONAL last_work_rev (written by nothing until S3); the /end gate (newLayoutRecordUpdated, shared with the SessionEnd hook) refuses 'HANDOFF STALE: written at rev N; this session wrote rev M after it. Re-run ob_state set_handoff' when last_work_rev > the handoff's written_rev, unless a loop handoff was committed; either stamp absent keeps part 1's rule. Two steps because every record object is strictObject (SIM baseline: 'Unrecognized key: last_work_rev'). SIM job #8 ALL PASS (44ecc717: 4 failed|1 passed pre-fix, 119 files / 1609 tests, m1 R1+R5, m2 R2). Brief docs/loops/t317-s2-brief.md (#899). Build job #10 READY 197cb5e7 PR #900 (identical numbers, CI test pass); Atlas byte-compare SAME x3, head current, CI SUCCESS. WAITS for Aaron's 'merge 900'. Then sia-rebuild; S3 (writer stamps last_work_rev on every write carrying a non-handoff op; note E4's hashNewLayoutSessionRecord does not include it) dispatches only once every running open-brain server started after that rebuild (and the QA PC SIA build moved), or a stale server would refuse the record. — S174 (10-20): S2 MERGED #900 5f48b9d9 on Aaron's 'merge 900' (refreshed to 03743749, patch-id 1724d94f = reviewed, CI SUCCESS, CLEAN); main tree rebuilt 18:37Z. Servers keep running on 8c81a6c until each seat reconnects. S3 (the writer stamps last_work_rev) dispatches ONLY after every running open-brain server started after 18:37:41Z (Get-CimInstance start times) and the QA PC SIA build is moved to 5f48b9d9 or later. — S174 (10-21): S3 MERGED #907 fd227c35 on Aaron's 'merge' (the only PR waiting; refreshed to 2dab1fac, patch-id cb35f6da = reviewed 943ae07c, CI SUCCESS, CLEAN). Build job #21 READY 943ae07c: commit 1 2 failed|8 passed (t317-s3 R2, R4; every t317-s2 row green), 180 files / 2058 tests green, m1 R2+R4, m2 R4, CI pass; Atlas byte-compare SAME x3. SIM job #16 had caught 2 S2 rows that assumed nothing stamps the field (tests.txt fixed them). Main tree rebuilt to 7eb8fd70 (contains S3 and T-319); this seat's server restarted 07:29:09Z after Aaron's reconnect. Live check follows in the next write. — CLOSED S174 (10-21) with a LIVE check on the 7eb8fd70 build (this seat's server restarted 07:29:09Z): after a work write (update_task, rev 555) state.json showed this session's row last_work_rev 555 against its handoff written_rev 551, and ob_end dry_run refused: 'RECORD NOT UPDATED: ... (HANDOFF STALE: written at rev 551; this session wrote rev 555 after it. Re-run ob_state set_handoff)'. This batch re-sets the handoff with the close; the dry run after it is the pass half. Follow-up (wording only): the refusal's generic advice still lists 'ob_state ops that write sessions[]' as satisfying the gate, untrue since S1.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
-      "closed_rev": null
+      "closed_rev": 556
     },
     {
       "id": "T-318",
@@ -2704,15 +2704,15 @@
       "id": "T-319",
       "title": "Retire domains.json (D-162): /start, READS OWED, score, template, SIA's own file and its allowlist",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 174,
-      "closed_session": null,
+      "closed_session": 174,
       "supersedes": null,
-      "note": "D-162 (Aaron 10-20). Closes G-063. References on master 10-20: .claude/commands/start.md:86, project-template/.claude/commands/start.md:86, project-template/.cursor/commands/start.md:89, .claude/commands/harness-audit.md:81, project-template/.cursor/commands/harness-audit.md:86, open-brain/src/pipelines/session-start/reads-owed.ts:88, open-brain/src/pipelines/sync/score.ts:43-51 (pass [] to getCoverageStatsV2), tests/pipelines/session-start/briefing-fix.test.ts:171-178 (pins the file in READS OWED), .agents/SYSTEM/domains.json, .gitignore:40, CLAUDE.md:30, .agents/SYSTEM/RULES.md:76, .agents/retirements.json:84 (skill-scan's allowed referrer is the file itself). SIM first: measure what the retirements check says when an allowed referrer file is deleted, and whether a new retirement entry for 'domains.json' is wanted (CHANGELOG mentions stay as history). Leave CHANGELOG and docs/ alone.",
+      "note": "D-162 (Aaron 10-20). Closes G-063. References on master 10-20: .claude/commands/start.md:86, project-template/.claude/commands/start.md:86, project-template/.cursor/commands/start.md:89, .claude/commands/harness-audit.md:81, project-template/.cursor/commands/harness-audit.md:86, open-brain/src/pipelines/session-start/reads-owed.ts:88, open-brain/src/pipelines/sync/score.ts:43-51 (pass [] to getCoverageStatsV2), tests/pipelines/session-start/briefing-fix.test.ts:171-178 (pins the file in READS OWED), .agents/SYSTEM/domains.json, .gitignore:40, CLAUDE.md:30, .agents/SYSTEM/RULES.md:76, .agents/retirements.json:84 (skill-scan's allowed referrer is the file itself). SIM first: measure what the retirements check says when an allowed referrer file is deleted, and whether a new retirement entry for 'domains.json' is wanted (CHANGELOG mentions stay as history). Leave CHANGELOG and docs/ alone. — CLOSED S174 (10-21): #911 merged 7eb8fd70 on Aaron's 'merge 911' (refreshed to a4d28aaf, patch-id e81b9d2d = reviewed 374ac0e1, CI SUCCESS, CLEAN); main tree rebuilt to 7eb8fd70. Build job #25 READY 374ac0e1: BF-R1 red pre-fix, APPLIED 11 edits to 11 files + git rm, 177 files / 2046 tests green, retirements [pass] (74 allowed referrers present), m1 BF-R1 red, 13 paths; Atlas byte-compare SAME x12 plus the intended D .agents/SYSTEM/domains.json. Projects pick up the new /start step 4 only via `open-brain bootstrap install-commands`.",
       "note_by": [
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
-      "closed_rev": null
+      "closed_rev": 556
     }
   ],
   "verified": [
@@ -4909,7 +4909,10 @@
       "what": "domains.json is half-retired: /start step 4 and READS OWED name it and `open-brain sync --score` reads it, but /bootstrap never creates it (project-template has none), so projects adopted by /bootstrap (Makerspace) carry no domains.json, lose a score category and see a read step that silently skips.",
       "evidence": "git grep on master 10-20: .claude/commands/start.md:86 and project-template start.md:86 (Cursor :89) list it; open-brain/src/pipelines/session-start/reads-owed.ts:88 counts it; open-brain/src/pipelines/sync/score.ts:44 reads it; project-template has no domains.json. Reported by Maker S71: makerspace-planner has none.",
       "recommended_update": "One decision for Aaron: keep domain tags (then /bootstrap writes a default domains.json) or retire them (then drop it from /start step 4 in both runtimes, reads-owed.ts and the score). Rec: retire, since nothing in the briefing uses the tags.",
-      "opened_session": 174
+      "opened_session": 174,
+      "status": "closed",
+      "closed_session": 174,
+      "closed_rev": 556
     },
     {
       "id": "G-064",
@@ -6710,12 +6713,12 @@
     },
     {
       "seat": "planner",
-      "pick_up": "FIRST: T-317 S3 (the writer stamps sessions[].last_work_rev on every write carrying a non-handoff op; keep the existing value on a handoff-only write). Write its SIM + build brief now; DISPATCH the build only after every running open-brain server started after the 18:37:41Z 10-20 rebuild (5f48b9d9) - check Get-CimInstance start times - and the QA PC SIA build is at 5f48b9d9 or later (clark's Clark-sia-rebuild task), or a stale server refuses the record ('Unrecognized key'). Note E4's hashNewLayoutSessionRecord does not include last_work_rev. Then T-318 (Aaron: after T-317). T-316 S2 (opt-in MAYBE SHIPPED briefing line; S1 measured working on Makerspace). T-315 stays open (respawn must cover headless claude -p). S174 shipped and live: T-315 revert (verified 18:38Z: rebuild leaves servers running), T-317 S1 + S2 (#888, #900), T-316 S1 (#895), tcm runner #892/#893.",
+      "pick_up": "S174 closed T-317 (all parts live on 7eb8fd70: /end refuses HANDOFF STALE, verified live) and T-319 (domains.json retired, D-162). Every seat must /mcp reconnect open-brain to run 7eb8fd70; until then a seat runs an older build (STALE PROCESS). NEXT by priority: (1) T-316 S2: opt-in MAYBE SHIPPED briefing line, appended to an existing budgeted line (S1 measured working on Makerspace: 8 named). (2) G-064: bootstrap scaffold should take the seat's role (default developer for a single-agent project); add the numbering note (a session that writes the record before its first ob_start gets record n=1 but log Session_2.md). (3) T-317 wording follow-up: the RECORD NOT UPDATED generic advice still lists 'ob_state ops that write sessions[]'. (4) G-062 READS OWED never clears (self-authored brief first). (5) T-318 (Aaron: after T-317, so now unblocked). T-315 stays open (a respawn that works for headless claude -p too). Method that worked all session: write edits.txt/tests.txt + mutants, dry-apply on a scratch copy of origin/master, land a SIM brief as a docs PR, job-runner SIM on Sonnet, then the build brief with the SIM's numbers, job-runner build, byte-compare (EDITS='tests.txt edits.txt' when a test file changes), pr-refresh, Aaron's 'merge <n>', pr-merge.sh, sia-rebuild.",
       "watch_out": [
-        "Weekly Claude allowance was 89% at 04:10 CDT 10-20 (clark): resets 00:00 CDT 10-21. Builds on Sonnet via the job runner; short turns; no idle polling.",
-        "The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR ('merge <n>'); then Atlas runs pr-merge.sh pinned to the refreshed head. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand (git diff <head>^2 <head> | git patch-id --stable) before calling for a re-review.",
-        "Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs). Submit --token-file C:/Users/melve/.agent-dashboard/jobs-atlas.token --json <f> --git <tree>; the brief must be on master or origin/loop/*; ASCII only; amendments in amendments[]; tags never repeat.",
-        "QA PC load (T-292) reaches several files: handoff-caps.test.ts and checks-state.test.ts went red under load and green alone. Briefs name the files a load re-run may cover.",
+        "SIM briefs: never restore src between mutants with git checkout while the fix is uncommitted (it discards the fix); re-apply edits.txt first. Build briefs are fine (the fix is committed). Bit twice in S174 (S2 and T-319 SIMs).",
+        "A readers-first schema change needs every reader on the new build before the writer ships: all desktop servers restarted after the rebuild (Get-CimInstance start times vs build-info builtAt) AND the QA PC SIA build moved (clark's Clark-sia-rebuild; it waits for an idle box).",
+        "The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR; a bare 'merge' was read as the only PR waiting (#907) and said so. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand.",
+        "Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs); brief on master or origin/loop/*; briefs and amendments ASCII (loop files may not be); tags never repeat; amendments in amendments[].",
         "sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with git show origin/master:<path>. The desktop runs no builds or tests.",
         "SIA is a PUBLIC repo: never commit or post live MATCH key text."
       ],
@@ -6724,8 +6727,7 @@
         "T-295: which open-brain MCP tools to cut or move to the CLI? Rec: count calls per tool first.",
         "T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold.",
         "Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? Rec: yes.",
-        "The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small.",
-        "Reconnect open-brain in every seat when convenient, so T-317 S3 can dispatch (S2 is on disk; running servers are still the previous build). Rec: at your next desk visit."
+        "The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small."
       ],
       "session": 174,
       "loop_state": {
@@ -6736,20 +6738,19 @@
           "T-295 tool cuts",
           "T-261 S3/S4 now or hold",
           "forget entry 751",
-          "name the yaml dependency PR",
-          "reconnect all seats for S3"
+          "name the yaml dependency PR"
         ],
         "rulings": [
-          "T-315 revert live and verified 18:38Z",
-          "T317-S1 and T317-S2 merged and on disk (5f48b9d9)",
-          "T316-S1 measured working on Makerspace (Maker)",
-          "tcm runner #892/#893 installed and verified by clark"
+          "T-317 S1/S2/S3 merged (#888, #900, #907) and verified live (HANDOFF STALE refused at rev 555 vs 551)",
+          "T-319 merged #911 (domains.json retired, D-162)",
+          "T-315 reverted (#896), verified a rebuild leaves servers running",
+          "T-316 S1 merged #895, measured on Makerspace"
         ]
       },
       "session_uuid": "0bbb03c4-d91d-496e-a6d5-43924f16405b",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "written_rev": 551
+      "written_rev": 556
     }
   ],
   "sessions": [
@@ -6859,11 +6860,12 @@
     },
     {
       "n": 174,
-      "date": "2026-10-20",
+      "date": "2026-10-21",
       "uuid": "0bbb03c4-d91d-496e-a6d5-43924f16405b",
       "seat": "planner",
       "checkout": "sia-planner",
-      "first_rev": 547
+      "first_rev": 547,
+      "last_work_rev": 556
     }
   ]
 }
