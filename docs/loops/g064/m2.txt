@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/role-files.ts
+<<<
+and /start shows no handoff as this checkout's own. If an agent works here, declare role: developer in .agents/AGENT.md.`);
+===
+and /start shows no handoff as this checkout's own.`);
+>>>

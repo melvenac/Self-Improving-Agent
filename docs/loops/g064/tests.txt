@@ -1,0 +1,25 @@
+@@@ open-brain/tests/pipelines/t272-seat-checkout.test.ts
+<<<
+    expect(agentMd.startsWith("---\nname: agent-dashboard\nrole: none\n")).toBe(true);
+    expect(agentMd).toContain("# agent-dashboard — not a seat");
+===
+    expect(agentMd.startsWith("---\nname: agent-dashboard\nrole: developer\n")).toBe(true);
+    expect(agentMd).toContain("# agent-dashboard — the developer seat");
+>>>
+@@@ open-brain/tests/pipelines/t272-seat-checkout.test.ts
+<<<
+    expect(fs.readFileSync(path.join(dir, ".agents", "AGENT.md"), "utf8").startsWith("---\nname: plain-proj\nrole: none\n")).toBe(true);
+===
+    expect(fs.readFileSync(path.join(dir, ".agents", "AGENT.md"), "utf8").startsWith("---\nname: plain-proj\nrole: developer\n")).toBe(true);
+>>>
+@@@ open-brain/tests/pipelines/bootstrap-fix.test.ts
+<<<
+    // BF-5: the fresh install says it is not a seat, and nothing about missing role files.
+    expect(text).toContain("NOT A SEAT");
+===
+    // G-064 (was BF-5's NOT A SEAT): the fresh install is the developer seat, so its handoff can be its own, and
+    // nothing about missing role files.
+    expect(text).toMatch(/^Seat: .+ \(developer\)/m);
+    expect(text).not.toContain("NOT A SEAT");
+    expect(text).not.toContain("this reader's seat is unresolved");
+>>>
