@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/end-record-guard.ts
+<<<
+    `Update the record (ob_state set_handoff for this session, or next-session.md on the old layout), or pass record_ok with a reason to close anyway.`
+===
+    `Update the record (ob_state set_handoff, ob_state ops that write sessions[], or next-session.md on the old layout), or pass record_ok with a reason to close anyway.`
+>>>
