@@ -1,0 +1,7 @@
+@@@ open-brain/tests/pipelines/session-start/briefing-fix.test.ts
+<<<
+    expect(line).toContain(".agents/SYSTEM/domains.json");
+===
+    // D-162: domains.json is retired, so a repo that still carries one is not owed a read of it.
+    expect(line).not.toContain(".agents/SYSTEM/domains.json");
+>>>

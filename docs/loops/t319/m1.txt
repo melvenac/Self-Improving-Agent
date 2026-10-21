@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  for (const rel of [".agents/AGENT.md", ".agents/AGENT.local.md"]) {
+===
+  for (const rel of [".agents/AGENT.md", ".agents/AGENT.local.md", ".agents/SYSTEM/domains.json"]) {
+>>>
