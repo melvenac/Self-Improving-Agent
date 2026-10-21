@@ -621,6 +621,27 @@ describe("server handlers", () => {
         expect(off.slice(4), body).toEqual(original.slice(4)); // past the serving, usage and session lines, which vary per run
       }
     }, 60_000);
+
+    it("T-316 S2: maybe_shipped ON names the open task a code commit names, in both layouts, from the rendered record; absent prints nothing", async () => {
+      project();
+      const id = (JSON.parse(readFileSync(stateFixture, "utf8")) as { tasks: Array<{ id: string; status: string }> }).tasks.find((t) => t.status === "open" || t.status === "in_progress")!.id;
+      const g = (...args: string[]): string =>
+        execFileSync("git", ["-c", "user.email=t@example.com", "-c", "user.name=T", ...args], { cwd: tmp, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+      g("init", "-q", "-b", "master");
+      mkdirSync(join(tmp, "src"), { recursive: true });
+      writeFileSync(join(tmp, "src", "a.ts"), "export {};\n");
+      g("add", "--", "src/a.ts");
+      g("commit", "-q", "-m", `${id}: the feature`);
+      const note = `MAYBE SHIPPED (1): ${id}, see /sync`;
+
+      expect(blockOf(getText(await handleStart({ project_root: tmp }))).join("\n")).not.toContain("MAYBE SHIPPED");
+
+      flags(JSON.stringify({ maybe_shipped: true }));
+      expect(blockOf(getText(await handleStart({ project_root: tmp })))).toContain(note);
+
+      flags(JSON.stringify({ maybe_shipped: true, briefing_budget: true }));
+      expect(blockOf(getText(await handleStart({ project_root: tmp }))).join("\n")).toContain(note);
+    }, 60_000);
   });
 
   describe("handleSync", () => {

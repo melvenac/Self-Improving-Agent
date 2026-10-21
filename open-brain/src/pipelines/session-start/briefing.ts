@@ -59,6 +59,12 @@ export interface BriefingInput {
    * pick-up (and after missingHandoff). Budgeted: appended to the pick-up line after missingHandoff, so no line is added.
    */
   mergedCitations?: string | null;
+  /**
+   * T-316 S2, OPT-IN per repo (greeting.json `maybe_shipped`), default OFF. describeMaybeShipped()'s note: the open tasks a
+   * code commit already names. Null or absent prints nothing. Legacy: its own line after the pick-up notes. Budgeted:
+   * appended to the pick-up line after mergedCitations and paid for out of the pick-up's cap, as T-302's note is.
+   */
+  maybeShipped?: string | null;
   /** IMPORT-CMDS C4: valid record but project `.claude/commands/start.md` is not SIA's copy. */
   oldStartCommand?: string | null;
   /**
@@ -175,6 +181,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   else out.push(noneRecorded(i.seat, i.ownCheckout));
   if (i.missingHandoff) out.push(i.missingHandoff);
   if (i.mergedCitations) out.push(i.mergedCitations);
+  if (i.maybeShipped) out.push(i.maybeShipped);
 
   if (own && own.watch_out.length > 0) {
     out.push("", "WATCH OUT");
@@ -289,11 +296,12 @@ function renderBudgeted(i: BriefingInput): string[] {
   if (i.fleet) out.push(i.fleet.budget);
   out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
   // T-302: the merged note rides the pick-up line and is paid for out of the pick-up's cap, so the budget does not grow.
-  const mergedRoom = i.mergedCitations ? i.mergedCitations.length + 3 : 0;
+  // T-316 S2: MAYBE SHIPPED rides it after the merged note, paid for the same way.
+  const noteRoom = [i.mergedCitations, i.maybeShipped].reduce((n, x) => n + (x ? x.length + 3 : 0), 0);
   const pickUp = own
-    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars - mergedRoom)
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars - noteRoom)
     : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : noneRecorded(i.seat, i.ownCheckout);
-  out.push([pickUp, i.missingHandoff, i.mergedCitations].filter((x): x is string => typeof x === "string" && x !== "").join(" · "));
+  out.push([pickUp, i.missingHandoff, i.mergedCitations, i.maybeShipped].filter((x): x is string => typeof x === "string" && x !== "").join(" · "));
 
   if (own) {
     const live = own.watch_out.filter((w) => !isExpired(w, i.sessionNumber, i.date));

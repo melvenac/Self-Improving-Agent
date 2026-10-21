@@ -22,6 +22,7 @@ import { oldStartCommandWarning } from "../bootstrap/index.js";
 import { describeLatestBrief, describeNoBrief } from "./latest-brief.js";
 import { recordGreetingMetrics } from "./greeting-metrics.js";
 import { describeReadsOwed } from "./reads-owed.js";
+import { describeMaybeShipped } from "../sync/open-task-commits.js";
 import { describeFleet, fleetFallback } from "./fleet.js";
 import { formatScanCounts } from "./scan-counts.js";
 import type { ProvenSession } from "../../shared/process-session.js";
@@ -308,6 +309,8 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       mergedCitations: greetingFlag(projectRoot, "merged_citations")
         ? describeMergedCitations(projectRoot, ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout), resolveUpstreamRef(projectRoot))
         : null,
+      // T-316 S2, opt-in: open tasks a code commit on HEAD or the default branch already names, from the record rendered here.
+      maybeShipped: greetingFlag(projectRoot, "maybe_shipped") ? describeMaybeShipped(projectRoot, sj.data.tasks) : null,
       oldStartCommand: oldStartCommandWarning(projectRoot),
       transcript,
       // T-167, opt-in: the PRD's own problem statement, one line above OBJECTIVE.
