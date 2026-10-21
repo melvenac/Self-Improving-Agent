@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 557,
+  "revision": 558,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2694,7 +2694,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "Aaron 10-20, typed in the Atlas window: 'file it and put it after T-317' (ORDER: start after T-317 lands). Context: he asked whether the start/end transcript-review loop is making progress. Atlas's evidence-based answer: the mechanical greeting is now right (state match, drift none, fits 1.4k-3.6k of 4.4k, start in 6-20 calls). The misses that remain fall in 4 recurring classes that reviews keep re-finding: (1) stale handoffs; (2) WAITING ON AARON under-reported (clark s5: 'one question' with 5 open; Relay s42: none recorded); (3) agents reading past shown signals ('+3 more', lessons that fired before the same mistake, entries rated helpful when they fired after the right act: 751 sits at 13 helpful / 4 neutral, with at least clark's and Courier's helpful rows wrong); (4) detectors that are blind or quiet (T-316's 0/5; stale_process in Maker s69 and clark s4; Maker tree_diverged 3 sessions running; greeting-metrics recorded Atlas handoff_lag_revs 12-13 on 10-20 00:50 with NO alarm). Scope: (a) greeting-metrics.jsonl alarms (alarm_streaks already exist) on handoff_lag_revs > N, stale_process, a tree_diverged streak, and the count of aaron-owned open questions across the seat's handoff vs what the greeting printed; (b) an end-side scorecard row from ob_end: this session's handoff written after its last work (shares T-317's rule), lessons stored with a MATCH: command key, and ratings where the entry fired AFTER the command it recommends auto-flagged as neutral candidates; (c) a 'review queue': sessions that trip an alarm are listed for the planner, everything else is not reviewed by hand; plus one sampled session per week to look for new classes; (d) a coverage fix: only 15 greeting-metrics rows exist since 10-16, none from Courier or Prism, so find which start path skips the append (CLI fallback, older builds, Cursor) before trusting the alarms. Step 0: measure (d) and list which alarm thresholds the 15 rows would have tripped. — S174 (10-21) STEP 0 MEASURED (Atlas, desktop read of ~/.claude/open-brain/greeting-metrics.jsonl, 26 rows 10-16T20:42Z..10-21T09:31Z, no .1 rotation). (d) coverage: NOT a skipped start path. Every desktop planner /start since the rows began has one (Atlas s173-s174, Maker s68-s71, Clark s2-s8, Relay s42-s44, Courier s6-s7, Prism s8; the sessions without a row all predate 10-16T20:42). Not covered by design: headless claude -p (QA PC job runner, another home), repos without greeting_metrics (mail-server has no greeting.json); CLI starts are caller 'cli' (3 rows). Thresholds the 26 rows would trip: handoff_lag_revs > 5: Atlas 12 and 13 (10-20 00:50/00:56), nothing else above 2. stale_process: Atlas s174 10-20 05:54, Maker s69, Clark s4 and s6. Repeat alarms (streak >= 2): Maker tree_diverged 2 and 3 (s69, s70) and old_start_command 2 and 3; Atlas tree_stale 2. Aaron-question counts are not in the rows (needs a new field). PROPOSED S1: `open-brain metrics review [--since DATE]`, a core CLI over the jsonl (+ .1) listing only rows that trip a threshold (lag > 5, stale_process, any alarm streak >= 2) as the review queue; everything else is not reviewed by hand. Then S2: the end-side row from ob_end (handoff after last work, shares T-317's rule).",
+      "note": "Aaron 10-20, typed in the Atlas window: 'file it and put it after T-317' (ORDER: start after T-317 lands). Context: he asked whether the start/end transcript-review loop is making progress. Atlas's evidence-based answer: the mechanical greeting is now right (state match, drift none, fits 1.4k-3.6k of 4.4k, start in 6-20 calls). The misses that remain fall in 4 recurring classes that reviews keep re-finding: (1) stale handoffs; (2) WAITING ON AARON under-reported (clark s5: 'one question' with 5 open; Relay s42: none recorded); (3) agents reading past shown signals ('+3 more', lessons that fired before the same mistake, entries rated helpful when they fired after the right act: 751 sits at 13 helpful / 4 neutral, with at least clark's and Courier's helpful rows wrong); (4) detectors that are blind or quiet (T-316's 0/5; stale_process in Maker s69 and clark s4; Maker tree_diverged 3 sessions running; greeting-metrics recorded Atlas handoff_lag_revs 12-13 on 10-20 00:50 with NO alarm). Scope: (a) greeting-metrics.jsonl alarms (alarm_streaks already exist) on handoff_lag_revs > N, stale_process, a tree_diverged streak, and the count of aaron-owned open questions across the seat's handoff vs what the greeting printed; (b) an end-side scorecard row from ob_end: this session's handoff written after its last work (shares T-317's rule), lessons stored with a MATCH: command key, and ratings where the entry fired AFTER the command it recommends auto-flagged as neutral candidates; (c) a 'review queue': sessions that trip an alarm are listed for the planner, everything else is not reviewed by hand; plus one sampled session per week to look for new classes; (d) a coverage fix: only 15 greeting-metrics rows exist since 10-16, none from Courier or Prism, so find which start path skips the append (CLI fallback, older builds, Cursor) before trusting the alarms. Step 0: measure (d) and list which alarm thresholds the 15 rows would have tripped. — S174 (10-21) STEP 0 MEASURED (Atlas, desktop read of ~/.claude/open-brain/greeting-metrics.jsonl, 26 rows 10-16T20:42Z..10-21T09:31Z, no .1 rotation). (d) coverage: NOT a skipped start path. Every desktop planner /start since the rows began has one (Atlas s173-s174, Maker s68-s71, Clark s2-s8, Relay s42-s44, Courier s6-s7, Prism s8; the sessions without a row all predate 10-16T20:42). Not covered by design: headless claude -p (QA PC job runner, another home), repos without greeting_metrics (mail-server has no greeting.json); CLI starts are caller 'cli' (3 rows). Thresholds the 26 rows would trip: handoff_lag_revs > 5: Atlas 12 and 13 (10-20 00:50/00:56), nothing else above 2. stale_process: Atlas s174 10-20 05:54, Maker s69, Clark s4 and s6. Repeat alarms (streak >= 2): Maker tree_diverged 2 and 3 (s69, s70) and old_start_command 2 and 3; Atlas tree_stale 2. Aaron-question counts are not in the rows (needs a new field). PROPOSED S1: `open-brain metrics review [--since DATE]`, a core CLI over the jsonl (+ .1) listing only rows that trip a threshold (lag > 5, stale_process, any alarm streak >= 2) as the review queue; everything else is not reviewed by hand. Then S2: the end-side row from ob_end (handoff after last work, shares T-317's rule). — S174 (10-21) S1 READY: SIM job #37 at 35f4e991 (MISMATCH only on the criterion's wording: the two command-count rows in cli-args.test.ts are red at baseline because tests.txt extends their lists; ruled expected), 178 files / 2054 tests, `metrics review` exit 0, module-boundary pass, m1 R1, m2 R2, m3 R4. Brief docs/loops/t318-s1-brief.md (#920, #923). Build job #38 READY bb2ff479 PR #924 (same numbers, CI pass); Atlas byte-compare SAME x5. After merge + rebuild: run `open-brain metrics review --since 2026-10-16` on the desktop and check it lists the step-0 rows. S2 next: the end-side row from ob_end.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
@@ -4918,7 +4918,7 @@
     {
       "id": "G-064",
       "what": "A checkout bootstrapped with role: none can never be shown its own handoff. bootstrap scaffold writes .agents/AGENT.md 'role: none', set_handoff accepts only planner|developer|qa, and ob_start renders no handoff as 'yours' while the reader's seat is unresolved (PICK UP HERE: none). On a single-agent bootstrapped project the full pick-up, watch-outs and open questions never reach the next session; /start forbids reading next-session.md to fill the gap.",
-      "evidence": "mail-server-34 (10-20, ~/projects/mail-server bootstrapped at 5e99b97): scaffold wrote role: none; set_handoff with seat 'none' refused ('seat: Invalid option'); written as developer (rev 4, 5d75563); ob_start printed 'Handoffs (1) - READER'S SEAT UNRESOLVED' and 'PICK UP HERE: none: this reader's seat is unresolved', with the handoff only as a ~150-char preview. Local workaround: untracked AGENT.local.md role: developer, partner: clark. Side note to verify: an ob_start mid-session created Session_2.md for the same uuid (ca00fcea...), where Atlas's repeat ob_start reused its log.",
+      "evidence": "mail-server-34 (10-20, ~/projects/mail-server bootstrapped at 5e99b97): scaffold wrote role: none; set_handoff with seat 'none' refused ('seat: Invalid option'); written as developer (rev 4, 5d75563); ob_start printed 'Handoffs (1) - READER'S SEAT UNRESOLVED' and 'PICK UP HERE: none: this reader's seat is unresolved', with the handoff only as a ~150-char preview. Local workaround: untracked AGENT.local.md role: developer, partner: clark. Side note to verify: an ob_start mid-session created Session_2.md for the same uuid (ca00fcea...), where Atlas's repeat ob_start reused its log. — S174 (10-21): SIM job #34 ALL PASS at 1bc3d56c (baseline 7 failed | 29 passed (36); 178 files / 2050 tests; m1 6 rows, m2 G4). Build job #36 READY 3e8ee5b3 PR #922 (same numbers, CI pass); Atlas byte-compare SAME x7. Waiting on Aaron's merge word (it reverses BF-5's role: none default for new scaffolds).",
       "recommended_update": "bootstrap scaffold takes the seat's role: default developer for a single-agent project, 'none' only by explicit choice (a checkout nobody works in). Keep set_handoff's seat enum (a handoff belongs to a working seat). Optionally, ob_start with an unresolved reader and exactly ONE handoff renders it under PICK UP HERE with 'seat unresolved' named. Separately reproduce the Session_2.md duplicate (did ob_set_session run first?). — S174 (10-21): fix written, docs/loops/g064/ + g064-sim.md (#916): the scaffold's AGENT.md declares role: developer (the seat T-251's import already assumes for the handoff), bootstrap.md and README follow, and a checkout still declaring role: none gets 'If an agent works here, declare role: developer in .agents/AGENT.md.' This reverses BF-5's NOT A SEAT default for new scaffolds; flagged to Aaron. SIM job #34 queued at 1bc3d56c.",
       "opened_session": 174
     }
@@ -6714,12 +6714,12 @@
     },
     {
       "seat": "planner",
-      "pick_up": "S174 closed T-317 (all parts live on 7eb8fd70: /end refuses HANDOFF STALE, verified live) and T-319 (domains.json retired, D-162). Every seat must /mcp reconnect open-brain to run 7eb8fd70; until then a seat runs an older build (STALE PROCESS). NEXT by priority: (1) T-316 S2: opt-in MAYBE SHIPPED briefing line, appended to an existing budgeted line (S1 measured working on Makerspace: 8 named). (2) G-064: bootstrap scaffold should take the seat's role (default developer for a single-agent project); add the numbering note (a session that writes the record before its first ob_start gets record n=1 but log Session_2.md). (3) T-317 wording follow-up: the RECORD NOT UPDATED generic advice still lists 'ob_state ops that write sessions[]'. (4) G-062 READS OWED never clears (self-authored brief first). (5) T-318 (Aaron: after T-317, so now unblocked). T-315 stays open (a respawn that works for headless claude -p too). Method that worked all session: write edits.txt/tests.txt + mutants, dry-apply on a scratch copy of origin/master, land a SIM brief as a docs PR, job-runner SIM on Sonnet, then the build brief with the SIM's numbers, job-runner build, byte-compare (EDITS='tests.txt edits.txt' when a test file changes), pr-refresh, Aaron's 'merge <n>', pr-merge.sh, sia-rebuild.",
+      "pick_up": "FOUR CODE PRs verified, waiting on Aaron naming them: #917 T-316 S2 (MAYBE SHIPPED note; refreshed head 7de2a2c4), #921 T-317 wording (401b10e3), #922 G-064 role: developer scaffold (3e8ee5b3; reverses BF-5's role: none, Aaron decides), #924 T-318 S1 metrics review (bb2ff479). All byte-compare SAME and CI green. On his word: pr-refresh each just before ITS merge, pr-merge.sh pinned to the refreshed head, one at a time; then sia-rebuild and seats /mcp reconnect. Live checks: SIA greeting shows 'MAYBE SHIPPED (10)...' on the pick-up line; `open-brain metrics review --since 2026-10-16` lists the step-0 rows; then close T-316 (Maker can opt in), close G-064 (tell mail-server to set role: developer). NEXT after: T-318 S2 (ob_end end-side row), G-062 (measure the previous-session transcript lookup first; design note in the gap), T-315 (respawn for headless runs).",
       "watch_out": [
-        "SIM briefs: never restore src between mutants with git checkout while the fix is uncommitted (it discards the fix); re-apply edits.txt first. Build briefs are fine (the fix is committed). Bit twice in S174 (S2 and T-319 SIMs).",
-        "A readers-first schema change needs every reader on the new build before the writer ships: all desktop servers restarted after the rebuild (Get-CimInstance start times vs build-info builtAt) AND the QA PC SIA build moved (clark's Clark-sia-rebuild; it waits for an idle box).",
-        "The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR; a bare 'merge' was read as the only PR waiting (#907) and said so. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand.",
-        "Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs); brief on master or origin/loop/*; briefs and amendments ASCII (loop files may not be); tags never repeat; amendments in amendments[].",
+        "SIM briefs: never restore src between mutants with git checkout while the fix is uncommitted (it discards the fix); back up the one file and Copy-Item it back. Build briefs are fine (the fix is committed).",
+        "Job runner: tags must be lowercase (T316-S2 was refused 'bad-tag'); jobs run one at a time on the QA PC; a SIM criterion that names rows must name every row tests.txt changes (T-318's SIM read MISMATCH on wording alone).",
+        "The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand.",
+        "Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs); brief on master or origin/loop/*; briefs and amendments ASCII (loop files may not be); tags never repeat.",
         "sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with git show origin/master:<path>. The desktop runs no builds or tests.",
         "SIA is a PUBLIC repo: never commit or post live MATCH key text."
       ],
@@ -6728,13 +6728,37 @@
         "T-295: which open-brain MCP tools to cut or move to the CLI? Rec: count calls per tool first.",
         "T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold.",
         "Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? Rec: yes.",
-        "The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small."
+        "The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small.",
+        "G-064 (#922): new scaffolds declare role: developer instead of role: none (reverses BF-5). Merge it? Rec: yes."
       ],
       "session": 174,
       "loop_state": {
-        "open_prs": [],
+        "open_prs": [
+          {
+            "ref": "#917",
+            "qa_status": "accepted",
+            "note": "T-316 S2, head 7de2a2c4, byte-compare SAME x8, CI pass"
+          },
+          {
+            "ref": "#921",
+            "qa_status": "accepted",
+            "note": "T-317 wording, head 401b10e3, SAME x2, CI pass"
+          },
+          {
+            "ref": "#922",
+            "qa_status": "accepted",
+            "note": "G-064, head 3e8ee5b3, SAME x7, CI pass; Aaron decides the role default"
+          },
+          {
+            "ref": "#924",
+            "qa_status": "accepted",
+            "note": "T-318 S1, head bb2ff479, SAME x5, CI pass"
+          }
+        ],
         "frozen_sha": null,
         "questions_for_aaron": [
+          "merge 917 921 922 924",
+          "G-064 role: developer default",
           "T-170-II real-key run host",
           "T-295 tool cuts",
           "T-261 S3/S4 now or hold",
@@ -6742,16 +6766,16 @@
           "name the yaml dependency PR"
         ],
         "rulings": [
-          "T-317 S1/S2/S3 merged (#888, #900, #907) and verified live (HANDOFF STALE refused at rev 555 vs 551)",
-          "T-319 merged #911 (domains.json retired, D-162)",
-          "T-315 reverted (#896), verified a rebuild leaves servers running",
-          "T-316 S1 merged #895, measured on Makerspace"
+          "T-316 S2 SIM ALL PASS, build READY #917, byte-compare SAME x8",
+          "T-317 wording READY #921 (no SIM: one string), SAME x2",
+          "G-064 SIM ALL PASS, build READY #922, SAME x7",
+          "T-318 step 0 measured (coverage complete since 10-16 20:42Z); S1 SIM MISMATCH on criterion wording only, ruled expected; build READY #924, SAME x5"
         ]
       },
       "session_uuid": "0bbb03c4-d91d-496e-a6d5-43924f16405b",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "written_rev": 556
+      "written_rev": 558
     }
   ],
   "sessions": [
@@ -6866,7 +6890,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "last_work_rev": 557
+      "last_work_rev": 558
     }
   ]
 }
