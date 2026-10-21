@@ -547,7 +547,7 @@ export const SCAFFOLD_FILES: readonly ScaffoldFile[] = [
   { path: ".agents/TASKS/task.md", from: ".agents/TASKS/task.md", tracked: true, why: "the current objective `state import` reads; afterwards a rendered view" },
   { path: ".agents/SYSTEM/SUMMARY.md", from: ".agents/SYSTEM/SUMMARY.md", tracked: true, why: "the project summary; its marked region is rendered from the record" },
   { path: ".agents/SESSIONS/SESSION_TEMPLATE.md", from: ".agents/SESSIONS/SESSION_TEMPLATE.md", tracked: false, why: "the shape of each per-session log, and session logs are local" },
-  { path: ".agents/AGENT.md", from: null, tracked: true, why: "declares this checkout is not a seat (role: none), so /start says so instead of NO SEAT IDENTITY RESOLVED" },
+  { path: ".agents/AGENT.md", from: null, tracked: true, why: "declares this checkout the developer seat (G-064), so the next /start shows its handoff as this checkout's own" },
   { path: ".agents/roles/shared.md", from: ".agents/roles/shared.md", tracked: true, why: "a starting stub of the rules every seat follows; tracked so every clone has it (T-251)" },
   { path: ".agents/roles/planner.md", from: ".agents/roles/planner.md", tracked: true, why: "a starting stub of the planner seat's role file" },
   { path: ".agents/roles/developer.md", from: ".agents/roles/developer.md", tracked: true, why: "a starting stub of the developer seat's role file" },
@@ -679,18 +679,19 @@ function verifyTracking(root: string, written: ScaffoldResult["written"]): Scaff
 function agentMd(name: string): string {
   return `---
 name: ${name}
-role: none
+role: developer
 partner:
 ---
 
-# ${name} — not a seat
+# ${name} — the developer seat
 
-${SCAFFOLD_SIGNATURE} This checkout is **not a seat**: a project
-bootstrapped with one agent has no planner / developer / QA loop, so there are no seat rules to
-load, and \`/start\` says NOT A SEAT rather than reporting a missing identity.
+${SCAFFOLD_SIGNATURE} A project bootstrapped with one agent has one
+seat, and it does the work: this checkout is the **developer** seat (G-064). Its handoff is filed
+under \`developer\`, so the next \`/start\` here shows it as this checkout's own pick-up.
 
-To make a checkout a seat later, write \`.agents/AGENT.local.md\` (local to that checkout) with
-\`role: planner\`, \`developer\` or \`qa\`, and track the role files under \`.agents/roles/\`.
+For a planner / developer / QA loop, give each seat checkout its own \`.agents/AGENT.local.md\`
+(local to that checkout) with \`role: planner\`, \`developer\` or \`qa\`. A checkout nobody works in
+may declare \`role: none\`: \`/start\` then says NOT A SEAT and shows no handoff as its own.
 `;
 }
 
