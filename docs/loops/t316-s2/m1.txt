@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  const noteRoom = [i.mergedCitations, i.maybeShipped].reduce((n, x) => n + (x ? x.length + 3 : 0), 0);
+===
+  const noteRoom = [i.mergedCitations].reduce((n, x) => n + (x ? x.length + 3 : 0), 0);
+>>>

@@ -1,0 +1,62 @@
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+import { MISSING_HANDOFF_MAX_CHARS } from "../../../src/pipelines/session-start/state-render.js";
+===
+import { MISSING_HANDOFF_MAX_CHARS } from "../../../src/pipelines/session-start/state-render.js";
+import { MAYBE_SHIPPED_MAX_CHARS } from "../../../src/pipelines/sync/open-task-commits.js";
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    const MERGED_MAX = "Already in origin/master (last fetch): aaaaaaaa, bbbbbbbb, cccccccc, dddddddd (+20)";
+===
+    const MERGED_MAX = "Already in origin/master (last fetch): aaaaaaaa, bbbbbbbb, cccccccc, dddddddd (+20)";
+    // T-316 S2: the longest MAYBE SHIPPED note the product allows. It rides the pick-up line after the merged note.
+    const SHIPPED_MAX = `MAYBE SHIPPED (99): ${"T".repeat(MAYBE_SHIPPED_MAX_CHARS - 20)}`;
+    expect(SHIPPED_MAX.length, "the note is at MAYBE_SHIPPED_MAX_CHARS").toBe(MAYBE_SHIPPED_MAX_CHARS);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+      mergedCitations: MERGED_MAX,
+===
+      mergedCitations: MERGED_MAX,
+      maybeShipped: SHIPPED_MAX,
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    expect(lines[at + 1]!.endsWith(` · ${notice} · ${MERGED_MAX}`)).toBe(true);
+===
+    expect(lines[at + 1]!.endsWith(` · ${notice} · ${MERGED_MAX} · ${SHIPPED_MAX}`)).toBe(true);
+>>>
+@@@ open-brain/tests/server.test.ts
+<<<
+    }, 60_000);
+  });
+
+  describe("handleSync", () => {
+===
+    }, 60_000);
+
+    it("T-316 S2: maybe_shipped ON names the open task a code commit names, in both layouts, from the rendered record; absent prints nothing", async () => {
+      project();
+      const id = (JSON.parse(readFileSync(stateFixture, "utf8")) as { tasks: Array<{ id: string; status: string }> }).tasks.find((t) => t.status === "open" || t.status === "in_progress")!.id;
+      const g = (...args: string[]): string =>
+        execFileSync("git", ["-c", "user.email=t@example.com", "-c", "user.name=T", ...args], { cwd: tmp, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+      g("init", "-q", "-b", "master");
+      mkdirSync(join(tmp, "src"), { recursive: true });
+      writeFileSync(join(tmp, "src", "a.ts"), "export {};\n");
+      g("add", "--", "src/a.ts");
+      g("commit", "-q", "-m", `${id}: the feature`);
+      const note = `MAYBE SHIPPED (1): ${id}, see /sync`;
+
+      expect(blockOf(getText(await handleStart({ project_root: tmp }))).join("\n")).not.toContain("MAYBE SHIPPED");
+
+      flags(JSON.stringify({ maybe_shipped: true }));
+      expect(blockOf(getText(await handleStart({ project_root: tmp })))).toContain(note);
+
+      flags(JSON.stringify({ maybe_shipped: true, briefing_budget: true }));
+      expect(blockOf(getText(await handleStart({ project_root: tmp }))).join("\n")).toContain(note);
+    }, 60_000);
+  });
+
+  describe("handleSync", () => {
+>>>
