@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 553,
+  "revision": 554,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4909,6 +4909,13 @@
       "what": "domains.json is half-retired: /start step 4 and READS OWED name it and `open-brain sync --score` reads it, but /bootstrap never creates it (project-template has none), so projects adopted by /bootstrap (Makerspace) carry no domains.json, lose a score category and see a read step that silently skips.",
       "evidence": "git grep on master 10-20: .claude/commands/start.md:86 and project-template start.md:86 (Cursor :89) list it; open-brain/src/pipelines/session-start/reads-owed.ts:88 counts it; open-brain/src/pipelines/sync/score.ts:44 reads it; project-template has no domains.json. Reported by Maker S71: makerspace-planner has none.",
       "recommended_update": "One decision for Aaron: keep domain tags (then /bootstrap writes a default domains.json) or retire them (then drop it from /start step 4 in both runtimes, reads-owed.ts and the score). Rec: retire, since nothing in the briefing uses the tags.",
+      "opened_session": 174
+    },
+    {
+      "id": "G-064",
+      "what": "A checkout bootstrapped with role: none can never be shown its own handoff. bootstrap scaffold writes .agents/AGENT.md 'role: none', set_handoff accepts only planner|developer|qa, and ob_start renders no handoff as 'yours' while the reader's seat is unresolved (PICK UP HERE: none). On a single-agent bootstrapped project the full pick-up, watch-outs and open questions never reach the next session; /start forbids reading next-session.md to fill the gap.",
+      "evidence": "mail-server-34 (10-20, ~/projects/mail-server bootstrapped at 5e99b97): scaffold wrote role: none; set_handoff with seat 'none' refused ('seat: Invalid option'); written as developer (rev 4, 5d75563); ob_start printed 'Handoffs (1) - READER'S SEAT UNRESOLVED' and 'PICK UP HERE: none: this reader's seat is unresolved', with the handoff only as a ~150-char preview. Local workaround: untracked AGENT.local.md role: developer, partner: clark. Side note to verify: an ob_start mid-session created Session_2.md for the same uuid (ca00fcea...), where Atlas's repeat ob_start reused its log.",
+      "recommended_update": "bootstrap scaffold takes the seat's role: default developer for a single-agent project, 'none' only by explicit choice (a checkout nobody works in). Keep set_handoff's seat enum (a handoff belongs to a working seat). Optionally, ob_start with an unresolved reader and exactly ONE handoff renders it under PICK UP HERE with 'seat unresolved' named. Separately reproduce the Session_2.md duplicate (did ob_set_session run first?).",
       "opened_session": 174
     }
   ],
