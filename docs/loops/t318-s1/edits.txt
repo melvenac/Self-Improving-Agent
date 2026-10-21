@@ -1,0 +1,49 @@
+@@@ open-brain/src/cli-spec.ts
+<<<
+  mainRebuild: {
+    name: "main-rebuild",
+    booleans: ["--dry-run", "--no-fetch"],
+    values: {},
+    positionals: "any",
+  },
+===
+  mainRebuild: {
+    name: "main-rebuild",
+    booleans: ["--dry-run", "--no-fetch"],
+    values: {},
+    positionals: "any",
+  },
+  metricsReview: {
+    name: "metrics review",
+    booleans: [],
+    values: { "--since": "both" },
+    positionals: "none",
+  },
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  process.exit(r.exitCode);
+} else if (command === "bootstrap") {
+===
+  process.exit(r.exitCode);
+} else if (command === "metrics" && args[1] === "review") {
+  // T-318 S1: read-only. The greetings whose metrics row tripped a review threshold; the rest are not reviewed by hand.
+  const opts = parseOrRefuse(COMMAND_SPECS.metricsReview, args.slice(2));
+  const since = opts.value("--since") ?? null;
+  if (since !== null && !/^\d{4}-\d{2}-\d{2}/.test(since)) {
+    console.error(`Invalid --since: expected a date (YYYY-MM-DD), got "${since}".`);
+    process.exit(1);
+  }
+  const { greetingMetricsPath } = await import("./pipelines/session-start/greeting-metrics.js");
+  const { reviewGreetingMetrics, renderReview } = await import("./pipelines/session-start/metrics-review.js");
+  const main = greetingMetricsPath();
+  console.log(renderReview(reviewGreetingMetrics([`${main}.1`, main], since), since, main).join("\n"));
+} else if (command === "bootstrap") {
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  console.log("  main-rebuild [<sha>] [--dry-run] [--no-fetch]  Update, rebuild and verify the main checkout's serving build, or refuse (T-172)");
+===
+  console.log("  main-rebuild [<sha>] [--dry-run] [--no-fetch]  Update, rebuild and verify the main checkout's serving build, or refuse (T-172)");
+  console.log("  metrics review [--since <YYYY-MM-DD>]        Read-only: the greetings that tripped a review threshold (T-318)");
+>>>

@@ -1,0 +1,13 @@
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "main-rebuild", "relocate", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "sync", "topics", "trigger-keys"]
+===
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "main-rebuild", "metrics review", "relocate", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "sync", "topics", "trigger-keys"]
+>>>
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+    ["main-rebuild", /^\s+main-rebuild (.*)$/m],
+===
+    ["main-rebuild", /^\s+main-rebuild (.*)$/m],
+    ["metrics review", /^\s+metrics review (.*)$/m],
+>>>

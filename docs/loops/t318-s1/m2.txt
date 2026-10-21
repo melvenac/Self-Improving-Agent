@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/metrics-review.ts
+<<<
+      if (typeof n === "number" && n >= REVIEW_STREAK) reasons.push
+===
+      if (typeof n === "number" && n >= 1) reasons.push
+>>>
