@@ -187,7 +187,7 @@ Nothing is ever written; the database is opened read-only.
 
 ## Project Template
 
-New projects get a standard folder structure that gives the agent immediate context: [project-template/README.md](project-template/README.md). The project is not a seat (`role: none`).
+New projects get a standard folder structure that gives the agent immediate context: [project-template/README.md](project-template/README.md). A project with one agent is the developer seat (`role: developer`, G-064).
 
 ## License
 

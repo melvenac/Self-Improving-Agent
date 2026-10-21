@@ -361,8 +361,11 @@ describe("BF-2/4/6/7/8: scaffold, import, commit, /start — on a real git proje
     const text = getText(await handleStart({ project_root: dir }));
     expect(text).toContain("## State (state.json rev 0)");
     expect(text.split("\n").find((l) => l.startsWith("Project:"))).toBe("Project: scratch-proj v0.1.0");
-    // BF-5: the fresh install says it is not a seat, and nothing about missing role files.
-    expect(text).toContain("NOT A SEAT");
+    // G-064 (was BF-5's NOT A SEAT): the fresh install is the developer seat, so its handoff can be its own, and
+    // nothing about missing role files.
+    expect(text).toMatch(/^Seat: .+ \(developer\)/m);
+    expect(text).not.toContain("NOT A SEAT");
+    expect(text).not.toContain("this reader's seat is unresolved");
     expect(text).not.toContain("NO SEAT IDENTITY RESOLVED");
     expect(text).not.toContain("ROLE FILE MISSING");
 
