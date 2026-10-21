@@ -81,14 +81,6 @@
           ]
         },
         {
-          "path": ".agents/SYSTEM/domains.json",
-          "class": "prose",
-          "why": "obituary — records that this consumer was cut, after the stale description nearly became a false finding",
-          "line_hashes": [
-            "496fc2ff27651c90e6c029161ac384ce29fc95d7de77620589b2f3cf741beaf6"
-          ]
-        },
-        {
           "path": ".agents/skills/self-improving-agent-guide/SKILL.md",
           "class": "prose",
           "why": "obituary — 'Skill-scan clustering was cut in Loop 10'",

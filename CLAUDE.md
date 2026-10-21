@@ -27,7 +27,7 @@ boundary reports are preserved in `docs/loops/sia-mailbox-*.md`.
   summary here said "except the five state files" and had been wrong for some time. Tracked:
   `state.json` (the record) and its rendered views `TASKS/INBOX.md`, `TASKS/task.md`,
   `SESSIONS/next-session.md`, `SYSTEM/SUMMARY.md`; the operating layer `SYSTEM/RULES.md`,
-  `RUNBOOK.md`, `SECURITY.md`, `TESTING.md`, `domains.json`; `.agents/roles/`; `AGENT.md`;
+  `RUNBOOK.md`, `SECURITY.md`, `TESTING.md`; `.agents/roles/`; `AGENT.md`;
   `LIFECYCLE.md`; `retirements.json`; the skills index and the two skill directories. **And as
   of session 77 the SCOPE layer: `SYSTEM/PRD.md`, `DECISIONS.md`, `ENTITIES.md`.** Local:
   the per-session session logs, the .agents archive directory, `AGENT.local.md`, and the

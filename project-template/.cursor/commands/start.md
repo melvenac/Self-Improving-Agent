@@ -86,8 +86,7 @@ The briefing's `Working tree:` line already ran `git status --porcelain`. Run it
 
 Skip any that do not exist. The briefing's `Skills:` line already read `.agents/skills/INDEX.md`.
 
-1. `.agents/SYSTEM/domains.json`
-2. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
+1. `.agents/AGENT.md` — parse YAML frontmatter for `name`, `role`, `partner`
 
 ### 5. Coordination
 

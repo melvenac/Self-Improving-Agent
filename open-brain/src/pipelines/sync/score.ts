@@ -40,15 +40,9 @@ export function computeScore(
   const paths = resolvePaths(projectRoot);
   const configScore = scoreConfigStructure(checks);
 
-  // Domain tags scope the coverage score to this project's subject areas.
-  const domainsPath = join(projectRoot, ".agents", "SYSTEM", "domains.json");
-  let domainTags: string[] = [];
-  if (existsSync(domainsPath)) {
-    try {
-      const domains = JSON.parse(readFileSync(domainsPath, "utf-8"));
-      domainTags = domains.domains ?? domains.tags ?? [];
-    } catch { /* malformed domains.json should not break scoring */ }
-  }
+  // D-162 (Aaron 10-20): domains.json is retired. Coverage is unscoped for every project, as it already was for every
+  // project without the file (/bootstrap never created one).
+  const domainTags: string[] = [];
 
   // Skill proposal counts come from the vault, not the DB.
   const vaultPath = obsidianVaultDir();
