@@ -1,0 +1,14 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+role: developer
+partner:
+---
+
+# ${name} — the developer seat
+===
+role: none
+partner:
+---
+
+# ${name} — the developer seat
+>>>
