@@ -1,0 +1,60 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+  { path: ".agents/AGENT.md", from: null, tracked: true, why: "declares this checkout is not a seat (role: none), so /start says so instead of NO SEAT IDENTITY RESOLVED" },
+===
+  { path: ".agents/AGENT.md", from: null, tracked: true, why: "declares this checkout the developer seat (G-064), so the next /start shows its handoff as this checkout's own" },
+>>>
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+role: none
+partner:
+---
+
+# ${name} — not a seat
+
+${SCAFFOLD_SIGNATURE} This checkout is **not a seat**: a project
+bootstrapped with one agent has no planner / developer / QA loop, so there are no seat rules to
+load, and \`/start\` says NOT A SEAT rather than reporting a missing identity.
+
+To make a checkout a seat later, write \`.agents/AGENT.local.md\` (local to that checkout) with
+\`role: planner\`, \`developer\` or \`qa\`, and track the role files under \`.agents/roles/\`.
+`;
+===
+role: developer
+partner:
+---
+
+# ${name} — the developer seat
+
+${SCAFFOLD_SIGNATURE} A project bootstrapped with one agent has one
+seat, and it does the work: this checkout is the **developer** seat (G-064). Its handoff is filed
+under \`developer\`, so the next \`/start\` here shows it as this checkout's own pick-up.
+
+For a planner / developer / QA loop, give each seat checkout its own \`.agents/AGENT.local.md\`
+(local to that checkout) with \`role: planner\`, \`developer\` or \`qa\`. A checkout nobody works in
+may declare \`role: none\`: \`/start\` then says NOT A SEAT and shows no handoff as its own.
+`;
+>>>
+@@@ open-brain/src/pipelines/session-start/role-files.ts
+<<<
+    lines0.push(`  Its sessions are recorded with no seat; a set_handoff names its seat in the op.`);
+===
+    // G-064: a reader that is not a seat is shown no handoff as its own, so a checkout an agent works in says how to fix it.
+    lines0.push(`  Its sessions are recorded with no seat; a set_handoff names its seat in the op, and /start shows no handoff as this checkout's own. If an agent works here, declare role: developer in .agents/AGENT.md.`);
+>>>
+@@@ project-template/.claude/commands/bootstrap.md
+<<<
+`.agents/AGENT.md` says `role: none`: a project with one agent is **not a seat**. Seats (planner,
+developer, QA) are for a multi-checkout loop, and this project does not run one. `/start` will say
+`NOT A SEAT`, which is correct.
+===
+`.agents/AGENT.md` says `role: developer`: a project with one agent has one seat, and it does the
+work, so its handoff is filed under `developer` and the next `/start` shows it as this checkout's
+own pick-up (G-064). A multi-checkout loop gives each seat checkout its own `.agents/AGENT.local.md`.
+>>>
+@@@ README.md
+<<<
+The project is not a seat (`role: none`).
+===
+A project with one agent is the developer seat (`role: developer`, G-064).
+>>>
