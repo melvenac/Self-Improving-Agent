@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      maybeShipped: greetingFlag(projectRoot, "maybe_shipped") ? describeMaybeShipped(projectRoot, sj.data.tasks) : null,
+===
+      maybeShipped: greetingFlag(projectRoot, "maybe_shipped") && describeMaybeShipped === undefined ? "" : null,
+>>>

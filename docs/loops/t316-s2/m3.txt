@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/open-task-commits.ts
+<<<
+    const reserve = (hiddenIfAdded > 0 ? ` +${hiddenIfAdded} more`.length : 0) + MAYBE_SHIPPED_TAIL.length;
+===
+    const reserve = hiddenIfAdded > 0 ? ` +${hiddenIfAdded} more`.length : 0;
+>>>
