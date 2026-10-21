@@ -57,6 +57,12 @@ export const COMMAND_SPECS = {
     values: {},
     positionals: "any",
   },
+  metricsReview: {
+    name: "metrics review",
+    booleans: [],
+    values: { "--since": "both" },
+    positionals: "none",
+  },
   stateShow: {
     name: "state show",
     booleans: ["--json"],

@@ -261,6 +261,18 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
   const r = await mainRebuild(tree, { positionals: opts.positionals, dryRun: opts.has("--dry-run"), noFetch: opts.has("--no-fetch") }, defaultDeps());
   for (const line of r.lines) (r.exitCode === 0 || r.exitCode === 5 ? console.log : console.error)(line);
   process.exit(r.exitCode);
+} else if (command === "metrics" && args[1] === "review") {
+  // T-318 S1: read-only. The greetings whose metrics row tripped a review threshold; the rest are not reviewed by hand.
+  const opts = parseOrRefuse(COMMAND_SPECS.metricsReview, args.slice(2));
+  const since = opts.value("--since") ?? null;
+  if (since !== null && !/^\d{4}-\d{2}-\d{2}/.test(since)) {
+    console.error(`Invalid --since: expected a date (YYYY-MM-DD), got "${since}".`);
+    process.exit(1);
+  }
+  const { greetingMetricsPath } = await import("./pipelines/session-start/greeting-metrics.js");
+  const { reviewGreetingMetrics, renderReview } = await import("./pipelines/session-start/metrics-review.js");
+  const main = greetingMetricsPath();
+  console.log(renderReview(reviewGreetingMetrics([`${main}.1`, main], since), since, main).join("\n"));
 } else if (command === "bootstrap") {
   // /bootstrap's deterministic half (bootstrap-fix BF-3/4/6). The directory is
   // taken literally, never walked up: a fresh project may not be a repository
@@ -640,6 +652,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
   console.log("  main-rebuild [<sha>] [--dry-run] [--no-fetch]  Update, rebuild and verify the main checkout's serving build, or refuse (T-172)");
+  console.log("  metrics review [--since <YYYY-MM-DD>]        Read-only: the greetings that tripped a review threshold (T-318)");
   console.log("  bootstrap check [--json] [dir]                Read-only: git, CLAUDE.md and .agents/ as /bootstrap needs them");
   console.log("  bootstrap move-residue [dir]                  Move a residue .agents/ under .agents/archive/ (never deletes)");
   console.log("  bootstrap scaffold [--json] [dir]             Copy the fresh-install files from project-template/ and verify tracking");
