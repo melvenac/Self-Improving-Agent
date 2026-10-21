@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/metrics-review.ts
+<<<
+  if (typeof row.handoff_lag_revs === "number" && row.handoff_lag_revs > REVIEW_LAG_REVS)
+===
+  if (typeof row.handoff_lag_revs === "number" && row.handoff_lag_revs >= REVIEW_LAG_REVS)
+>>>
