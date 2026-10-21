@@ -95,9 +95,9 @@ It prints each file as `tracked` or `local` with the reason. **Read that list to
 About the commands: they are installed **in the project** even if the owner has the same commands
 globally, so a clone on another machine has them too. Scaffold skips any that already exist here.
 
-`.agents/AGENT.md` says `role: none`: a project with one agent is **not a seat**. Seats (planner,
-developer, QA) are for a multi-checkout loop, and this project does not run one. `/start` will say
-`NOT A SEAT`, which is correct.
+`.agents/AGENT.md` says `role: developer`: a project with one agent has one seat, and it does the
+work, so its handoff is filed under `developer` and the next `/start` shows it as this checkout's
+own pick-up (G-064). A multi-checkout loop gives each seat checkout its own `.agents/AGENT.local.md`.
 
 If it ends with **`VERIFY FAILED`**, stop and show the owner the problems. It is almost always an
 older rule in their `.gitignore` or `.gitattributes`, for example `.agents/`. Fix it with the owner,

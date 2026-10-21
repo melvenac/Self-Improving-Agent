@@ -138,7 +138,8 @@ export function describeRoleFiles(
     // writer records the session with no seat, and set_handoff names its own seat
     // (verified, record 127). After bootstrap-fix BF-5 every fresh install reads
     // this line at every /start, so it has to be true.
-    lines0.push(`  Its sessions are recorded with no seat; a set_handoff names its seat in the op.`);
+    // G-064: a reader that is not a seat is shown no handoff as its own, so a checkout an agent works in says how to fix it.
+    lines0.push(`  Its sessions are recorded with no seat; a set_handoff names its seat in the op, and /start shows no handoff as this checkout's own. If an agent works here, declare role: developer in .agents/AGENT.md.`);
   } else if (seat) {
     wanted.push({ rel: `${ROLES_DIR}/${seat.role}.md`, owner: seat.role });
     if (!(ROLE_NAMES as readonly string[]).includes(seat.role)) {
