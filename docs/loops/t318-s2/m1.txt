@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/metrics-review.ts
+<<<
+  if (row.outcome === "refused" && !closedLater) return `ob_end refused, never closed: ${shortText(row.detail)}`;
+===
+  if (row.outcome === "refused") return `ob_end refused, never closed: ${shortText(row.detail)}`;
+>>>

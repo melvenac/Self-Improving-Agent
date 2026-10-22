@@ -1,0 +1,6 @@
+@@@ open-brain/src/server.ts
+<<<
+      if (args.dry_run || !greetingFlag(projectRoot, "greeting_metrics")) return;
+===
+      if (args.dry_run) return;
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/end-metrics.ts
+<<<
+    handoff_rev: handoff?.written_rev ?? null,
+===
+    handoff_rev: handoff?.first_rev ?? null,
+>>>
