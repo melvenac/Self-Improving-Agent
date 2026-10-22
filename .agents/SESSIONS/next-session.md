@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 558 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 559 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,50 +6,36 @@
 
 ### Pick up here
 
-FOUR CODE PRs verified, waiting on Aaron naming them: #917 T-316 S2 (MAYBE SHIPPED note; refreshed head 7de2a2c4), #921 T-317 wording (401b10e3), #922 G-064 role: developer scaffold (3e8ee5b3; reverses BF-5's role: none, Aaron decides), #924 T-318 S1 metrics review (bb2ff479). All byte-compare SAME and CI green. On his word: pr-refresh each just before ITS merge, pr-merge.sh pinned to the refreshed head, one at a time; then sia-rebuild and seats /mcp reconnect. Live checks: SIA greeting shows 'MAYBE SHIPPED (10)...' on the pick-up line; `open-brain metrics review --since 2026-10-16` lists the step-0 rows; then close T-316 (Maker can opt in), close G-064 (tell mail-server to set role: developer). NEXT after: T-318 S2 (ob_end end-side row), G-062 (measure the previous-session transcript lookup first; design note in the gap), T-315 (respawn for headless runs).
+All four S174 code PRs merged and REBUILT at 7f9423ad (#917 T-316 S2, #921 T-317 wording, #922 G-064 bootstrap role: developer, #924 T-318 S1). Live-checked: metrics review lists the 7 step-0 rows; MAYBE SHIPPED (11) renders. T-316 and G-064 closed. Next by priority: T-318 S2 (end-side metrics row from ob_end), then G-062 (measure the transcript lookup first), then T-315 (headless respawn).
 
 ### Watch out
 
-- SIM briefs: never restore src between mutants with git checkout while the fix is uncommitted (it discards the fix); back up the one file and Copy-Item it back. Build briefs are fine (the fix is committed).
-- Job runner: tags must be lowercase (T316-S2 was refused 'bad-tag'); jobs run one at a time on the QA PC; a SIM criterion that names rows must name every row tests.txt changes (T-318's SIM read MISMATCH on wording alone).
-- The auto-mode classifier refuses Atlas's own pr-merge.sh unless Aaron names the PR. pr-refresh can print a false PROOF FAILED ('bad object') when gh or the fetch times out: recompute the patch-id by hand.
-- Dashboard job runner: agent-dashboard scripts/job.mjs (fetch with git -C C:/Users/melve/Projects/agent-dashboard show origin/master:scripts/job.mjs); brief on master or origin/loop/*; briefs and amendments ASCII (loop files may not be); tags never repeat.
-- sia-planner is a SPARSE checkout (cone docs .agents .claude). Read code with git show origin/master:<path>. The desktop runs no builds or tests.
-- SIA is a PUBLIC repo: never commit or post live MATCH key text.
+- The greeting line itself was checked by calling the built describeMaybeShipped, not by a live /start: the next /start after /mcp reconnect should show 'MAYBE SHIPPED (n)' on the pick-up line; if absent, check the budget path in briefing.ts.
+- G-064 shipped (#922 merged 6f31ca38): new scaffolds declare role: developer. mail-server still carries its local AGENT.local.md workaround; tell its seat it can declare role: developer in .agents/AGENT.md.
 
 ### Open questions
 
-- Real-key over-fire run for T-170-II (49 live MATCH patterns, kept off-repo): QA PC or desktop only? Rec: desktop only.
-- T-295: which open-brain MCP tools to cut or move to the CLI? Rec: count calls per tool first.
-- T-261 S3/S4 (the physical core/memory package split and a core-only install): now, or hold until a real memory-free install exists? Rec: hold.
-- Stored entry 751 (skills-audit-without-session): forget it or make it lookup-only? Rec: yes.
-- The yaml dependency fix (planner-hook/prfiles.ts imports yaml at run time, but package.json lists it under devDependencies): name the PR so it can merge? Rec: yes, small.
-- G-064 (#922): new scaffolds declare role: developer instead of role: none (reverses BF-5). Merge it? Rec: yes.
+- T-170-II real-key run host
+- T-295 tool cuts
+- T-261 S3/S4
+- forget entry 751
+- the yaml dependency PR
 
 ### Loop state
 
-**Open PRs:** 
-- #917 — QA: accepted — T-316 S2, head 7de2a2c4, byte-compare SAME x8, CI pass
-- #921 — QA: accepted — T-317 wording, head 401b10e3, SAME x2, CI pass
-- #922 — QA: accepted — G-064, head 3e8ee5b3, SAME x7, CI pass; Aaron decides the role default
-- #924 — QA: accepted — T-318 S1, head bb2ff479, SAME x5, CI pass
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- merge 917 921 922 924
-- G-064 role: developer default
 - T-170-II real-key run host
 - T-295 tool cuts
-- T-261 S3/S4 now or hold
+- T-261 S3/S4
 - forget entry 751
-- name the yaml dependency PR
+- the yaml dependency PR
 
 **Rulings made mid-loop:** 
-- T-316 S2 SIM ALL PASS, build READY #917, byte-compare SAME x8
-- T-317 wording READY #921 (no SIM: one string), SAME x2
-- G-064 SIM ALL PASS, build READY #922, SAME x7
-- T-318 step 0 measured (coverage complete since 10-16 20:42Z); S1 SIM MISMATCH on criterion wording only, ruled expected; build READY #924, SAME x5
+- Aaron 10-21: 'merge 917 921 922 924 go' (includes G-064's role: developer default). Merged one at a time, each pr-refresh'd just before its merge and pinned: #917 d8c7d450, #921 ad601852 (T-317 wording follow-up), #922 6f31ca38, #924 7f9423ad.
 
 ## developer [sia-builder] _(written session 156)_
 
