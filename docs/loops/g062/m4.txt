@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+        greetingFlag(projectRoot, "reads_owed_own") ? ownTrailerIds(
+===
+        true ? ownTrailerIds(
+>>>
