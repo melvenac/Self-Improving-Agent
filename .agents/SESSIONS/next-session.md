@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 562 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 563 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,29 +6,28 @@
 
 ### Pick up here
 
-G-062 (a) SHIPPED (#933 merged e8e6f549, REBUILT, live-checked by calling the build). T-318 S2 shipped (#929). No open PRs. Next: G-062 (b) needs a design (how a brief links to its merged PR outside SIA) and T-315 needs an in-process reload design (step 0: does Claude Code honour tools/list_changed; server.ts module singletons; headless claude -p cannot reconnect). Ask Aaron which first if he has a preference; default T-315 step 0 (P1).
+T-315 proxy slice READY as PR #939 (head ce824d8a, byte-compare SAME x4, CI pass): needs Aaron 'merge 939', then pr-refresh.sh + pr-merge.sh, clark sia-rebuild. Then S2 on Aaron's word: point each seat's open-brain MCP command at build/build-proxy.js (config change), every seat reconnects once, live check: next sia-rebuild is served with no reconnect, ob_set_session still proves, a claude -p run keeps open-brain across a rebuild. G-062 (b) still needs a design. Pending live checks: next /start READS OWED own-filter line; next /end first END QUEUE row.
 
 ### Watch out
 
-- After /mcp reconnect: Atlas's next /start in sia-planner should show 'READS OWED: none (k written by this seat)' rather than a brief Atlas wrote in S173/S174.
-- T-318 S2 live check owed: after the next /end in SIA run `node open-brain/build/cli.js metrics review --since 2026-10-22` on the desktop and expect the END QUEUE to count one row.
-- Job-wait loops: a transient empty `job.mjs list` read ended one wait early (job 58); treat an unreadable list as still running.
+- build-watch.ts docstring still claims Claude Code respawns an exited server (false, step 0); it is dead code since the #896 revert — remove or correct it in S2.
+- The proxy itself is not hot-swapped: a change to build-proxy.ts still needs one reconnect per seat.
+- main-rebuild's report still says sessions need /mcp reconnect; reword it in S2 once seats run the proxy.
 
 ### Open questions
 
-- T-170-II real-key run host
-- T-295 tool cuts
-- T-261 S3/S4
-- forget entry 751
-- the yaml dependency PR
+_None._
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #939 — QA: accepted — T-315 build proxy READY, byte-compare SAME x4, CI pass; needs Aaron 'merge 939'
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- merge 939 (T-315 build proxy)
+- T-315 S2: switch each seat's open-brain MCP command to build/build-proxy.js
 - T-170-II real-key run host
 - T-295 tool cuts
 - T-261 S3/S4
@@ -36,8 +35,8 @@ G-062 (a) SHIPPED (#933 merged e8e6f549, REBUILT, live-checked by calling the bu
 - the yaml dependency PR
 
 **Rulings made mid-loop:** 
-- Aaron 10-21: 'merge 917 921 922 924 go'; all merged, REBUILT 7f9423ad, live checks passed.
 - Aaron 10-22: 'merge 929' (merged 79b7451f) and 'merge 933' (merged e8e6f549); REBUILT e8e6f549.
+- Aaron 10-23: 'yes' to the T-315 stdio-proxy shape (step 0, #936).
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -113,4 +112,4 @@ _10 older handoff(s), superseded within their seat and checkout, are in state.js
 
 ## Last session
 
-Session 174 — 2026-10-22 — planner [sia-planner] — `0bbb03c4-d91d-496e-a6d5-43924f16405b` (14 writing session(s) in the record)
+Session 174 — 2026-10-23 — planner [sia-planner] — `0bbb03c4-d91d-496e-a6d5-43924f16405b` (14 writing session(s) in the record)
