@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 561,
+  "revision": 562,
   "project": {
     "name": "self-improving-agent"
   },
@@ -4902,7 +4902,7 @@
       "id": "G-062",
       "what": "READS OWED keeps listing a brief whose work has shipped, or that the seat wrote itself. Nothing clears 'owed' when the brief's work closes or when the reading seat authored it, so every new session pays a read for nothing and learns to skim the line.",
       "evidence": "open-brain/src/pipelines/session-start/reads-owed.ts. Maker S71 (10-20, build 5f48b9d, rev 698): READS OWED (1) named .agents/plans/release-1020c-convex.md, launched, run and shipped in S70 (#157-#170; S70's handoff: nothing in flight). Atlas S174: READS OWED named docs/loops/t317-s1-brief.md (written by Atlas S173) and later docs/loops/t315-revert-brief-amendment-1.md (written by Atlas in S174 itself).",
-      "recommended_update": "Decide what 'owed' means, then make reads-owed.ts compute it: (a) a brief this seat's checkout committed (author = this seat) is not owed to it; (b) a brief whose tag's PR or task is closed/merged is not owed. Ship (a) first: it is deterministic from git. Pin both with rows (a self-authored brief; a shipped one). — S174 (10-21) design note for (a): no per-seat git author exists (every commit is Aaron's), so 'self-authored' must come from the Claude-Session trailer: a brief is not owed when the trailer of its newest commit is one of this session's ids (sessionTrailerIds of the proven transcript) or of the previous session of this checkout (its sessions[] row; that transcript's bridge ids). The previous session's transcript path has to be derived from the checkout slug: measure that lookup before briefing.",
+      "recommended_update": "Decide what 'owed' means, then make reads-owed.ts compute it: (a) a brief this seat's checkout committed (author = this seat) is not owed to it; (b) a brief whose tag's PR or task is closed/merged is not owed. Ship (a) first: it is deterministic from git. Pin both with rows (a self-authored brief; a shipped one). — S174 (10-21) design note for (a): no per-seat git author exists (every commit is Aaron's), so 'self-authored' must come from the Claude-Session trailer: a brief is not owed when the trailer of its newest commit is one of this session's ids (sessionTrailerIds of the proven transcript) or of the previous session of this checkout (its sessions[] row; that transcript's bridge ids). The previous session's transcript path has to be derived from the checkout slug: measure that lookup before briefing. — S174 (10-22): (a) SHIPPED. Measured first: the previous transcript is <dir of the proven transcript>/<uuid>.jsonl (s173 147 MB, bridge record at byte 459, inside the 256 KB head). SIM #57 ALL PASS, build #58 READY 679ab9a8 PR #933 (SAME x6), merged e8e6f549 on Aaron's \"merge 933\" (refreshed 018629c7, patch-id 91c59679 = reviewed), REBUILT e8e6f549. Opt-in greeting.json reads_owed_own (SIA on). Live: built ownTrailerIds for s174 returns both s174 and s173 ids; describeReadsOwed on sia-planner prints \"READS OWED (1): docs/loops/g062-brief.md\" without them and \"READS OWED: none (1 written by this seat)\" with them. OPEN: (b) a brief whose work shipped; needs a link from a brief to its merged PR that holds outside SIA (other repos do not use the brief tag as a commit-subject prefix).",
       "opened_session": 174
     },
     {
@@ -6717,9 +6717,9 @@
     },
     {
       "seat": "planner",
-      "pick_up": "G-062 (a) READY as PR #933 (679ab9a8, byte-compare SAME x6, CI green): READS OWED leaves out a file whose newest commit carries this seat's Claude-Session id (this session, or the newest other session of this checkout, read head-only); opt-in reads_owed_own, SIA on. Waiting on Aaron's 'merge 933'; then pr-refresh 933 679ab9a8, pr-merge pinned, clark rebuild, /mcp reconnect. T-318 S2 shipped (#929); its END QUEUE live check waits on the next /end. Next: G-062 (b) (shipped briefs) or T-315.",
+      "pick_up": "G-062 (a) SHIPPED (#933 merged e8e6f549, REBUILT, live-checked by calling the build). T-318 S2 shipped (#929). No open PRs. Next: G-062 (b) needs a design (how a brief links to its merged PR outside SIA) and T-315 needs an in-process reload design (step 0: does Claude Code honour tools/list_changed; server.ts module singletons; headless claude -p cannot reconnect). Ask Aaron which first if he has a preference; default T-315 step 0 (P1).",
       "watch_out": [
-        "After #933's rebuild: Atlas's next /start in sia-planner should not list a brief Atlas wrote in S174 (e.g. docs/loops/g062-brief.md); with none left the line reads 'READS OWED: none (k written by this seat)'.",
+        "After /mcp reconnect: Atlas's next /start in sia-planner should show 'READS OWED: none (k written by this seat)' rather than a brief Atlas wrote in S173/S174.",
         "T-318 S2 live check owed: after the next /end in SIA run `node open-brain/build/cli.js metrics review --since 2026-10-22` on the desktop and expect the END QUEUE to count one row.",
         "Job-wait loops: a transient empty `job.mjs list` read ended one wait early (job 58); treat an unreadable list as still running."
       ],
@@ -6732,16 +6732,9 @@
       ],
       "session": 174,
       "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#933",
-            "qa_status": "accepted",
-            "note": "G-062 (a); READY 679ab9a8 from build job #58; SIM #57 ALL PASS; byte-compare SAME x6; CI test SUCCESS; needs Aaron's merge word"
-          }
-        ],
+        "open_prs": [],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "merge 933 (G-062 a)",
           "T-170-II real-key run host",
           "T-295 tool cuts",
           "T-261 S3/S4",
@@ -6750,13 +6743,13 @@
         ],
         "rulings": [
           "Aaron 10-21: 'merge 917 921 922 924 go'; all merged, REBUILT 7f9423ad, live checks passed.",
-          "Aaron 10-22: 'merge 929'; merged 79b7451f, REBUILT 79b7451f."
+          "Aaron 10-22: 'merge 929' (merged 79b7451f) and 'merge 933' (merged e8e6f549); REBUILT e8e6f549."
         ]
       },
       "session_uuid": "0bbb03c4-d91d-496e-a6d5-43924f16405b",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "written_rev": 561
+      "written_rev": 562
     }
   ],
   "sessions": [
@@ -6871,7 +6864,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "last_work_rev": 561
+      "last_work_rev": 562
     }
   ]
 }
