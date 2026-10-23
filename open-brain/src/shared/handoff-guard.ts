@@ -154,16 +154,17 @@ function readTranscriptHead(path: string): string | null {
  * Claude Code, so ob_start tells it to end each commit with `Claude-Session: <uuid>`, and its own uuid counts when a
  * record in its transcript names it. The head is read first; the whole file only when the head holds no bridge id,
  * because Remote Control can be switched on mid-session (one measured transcript's first bridge record sat past byte
- * 830,000).
+ * 830,000). G-062: `headOnly` never reads past the head, for a caller that may be handed a very large transcript (an
+ * earlier session's, 147 MB measured) and accepts missing a late bridge id.
  */
-export function sessionTrailerIds(path: unknown, sessionUuid: string): TrailerIds {
+export function sessionTrailerIds(path: unknown, sessionUuid: string, options: { headOnly?: boolean } = {}): TrailerIds {
   if (typeof path !== "string" || !path || !existsSync(path)) return { ids: [], source: "none" };
   const head = readTranscriptHead(path);
   if (head === null) return { ids: [], source: "none" };
   const bridgeIds = (text: string): string[] => [...new Set([...text.matchAll(BRIDGE_ID_RE)].map((m) => m[1]!))];
   let text = head;
   let bridge = bridgeIds(head);
-  if (bridge.length === 0) {
+  if (bridge.length === 0 && options.headOnly !== true) {
     try {
       text = readFileSync(path, "utf8");
     } catch {

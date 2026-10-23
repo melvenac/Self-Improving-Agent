@@ -21,7 +21,7 @@ import { renderBriefing, describeUsage, describeWorkingTree, describeSkills, des
 import { oldStartCommandWarning } from "../bootstrap/index.js";
 import { describeLatestBrief, describeNoBrief } from "./latest-brief.js";
 import { recordGreetingMetrics } from "./greeting-metrics.js";
-import { describeReadsOwed } from "./reads-owed.js";
+import { describeReadsOwed, ownTrailerIds } from "./reads-owed.js";
 import { describeMaybeShipped } from "../sync/open-task-commits.js";
 import { describeFleet, fleetFallback } from "./fleet.js";
 import { formatScanCounts } from "./scan-counts.js";
@@ -279,6 +279,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         result.session.logPath ? result.session.sessionNumber : null,
         roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
         ownCheckout ?? null,
+        greetingFlag(projectRoot, "reads_owed_own") ? ownTrailerIds(sj.data, proven.id, proven.id !== null ? proven.transcriptPath : undefined, ownCheckout ?? null) : [],
       ),
       fleet: (() => {
         try {
