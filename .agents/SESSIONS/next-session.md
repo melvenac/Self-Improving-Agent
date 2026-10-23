@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 559 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 560 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,12 +6,12 @@
 
 ### Pick up here
 
-All four S174 code PRs merged and REBUILT at 7f9423ad (#917 T-316 S2, #921 T-317 wording, #922 G-064 bootstrap role: developer, #924 T-318 S1). Live-checked: metrics review lists the 7 step-0 rows; MAYBE SHIPPED (11) renders. T-316 and G-064 closed. Next by priority: T-318 S2 (end-side metrics row from ob_end), then G-062 (measure the transcript lookup first), then T-315 (headless respawn).
+T-318 S2 READY as PR #929 (b7b7fbb8, byte-compare SAME x5, CI green): ob_end writes an end-metrics row; metrics review prints an END QUEUE. Waiting on Aaron's 'merge 929'; then pr-refresh 929 b7b7fbb8, pr-merge pinned, clark rebuild, /mcp reconnect, live-check the END QUEUE after an ob_end. Then G-062 (measure the transcript lookup first), then T-315.
 
 ### Watch out
 
-- The greeting line itself was checked by calling the built describeMaybeShipped, not by a live /start: the next /start after /mcp reconnect should show 'MAYBE SHIPPED (n)' on the pick-up line; if absent, check the budget path in briefing.ts.
-- G-064 shipped (#922 merged 6f31ca38): new scaffolds declare role: developer. mail-server still carries its local AGENT.local.md workaround; tell its seat it can declare role: developer in .agents/AGENT.md.
+- The live END QUEUE check needs an ob_end after the rebuild in an opted-in repo (SIA is): run `node open-brain/build/cli.js metrics review --since <today>` on the desktop after the next /end and expect one END QUEUE row counted.
+- G-064 shipped (#922 merged 6f31ca38): mail-server can declare role: developer in .agents/AGENT.md (told clark 10-21).
 
 ### Open questions
 
@@ -23,11 +23,13 @@ All four S174 code PRs merged and REBUILT at 7f9423ad (#917 T-316 S2, #921 T-317
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #929 — QA: accepted — T-318 S2; READY b7b7fbb8 from build job #56; byte-compare SAME x5; CI test SUCCESS; needs Aaron's merge word
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
+- merge 929 (T-318 S2)
 - T-170-II real-key run host
 - T-295 tool cuts
 - T-261 S3/S4
@@ -35,7 +37,8 @@ All four S174 code PRs merged and REBUILT at 7f9423ad (#917 T-316 S2, #921 T-317
 - the yaml dependency PR
 
 **Rulings made mid-loop:** 
-- Aaron 10-21: 'merge 917 921 922 924 go' (includes G-064's role: developer default). Merged one at a time, each pr-refresh'd just before its merge and pinned: #917 d8c7d450, #921 ad601852 (T-317 wording follow-up), #922 6f31ca38, #924 7f9423ad.
+- Aaron 10-21: 'merge 917 921 922 924 go'; merged #917 d8c7d450, #921 ad601852, #922 6f31ca38, #924 7f9423ad; REBUILT 7f9423ad; live checks passed.
+- Aaron 10-22: 'go ahead' on T-318 S2.
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -111,4 +114,4 @@ _10 older handoff(s), superseded within their seat and checkout, are in state.js
 
 ## Last session
 
-Session 174 — 2026-10-21 — planner [sia-planner] — `0bbb03c4-d91d-496e-a6d5-43924f16405b` (14 writing session(s) in the record)
+Session 174 — 2026-10-22 — planner [sia-planner] — `0bbb03c4-d91d-496e-a6d5-43924f16405b` (14 writing session(s) in the record)
