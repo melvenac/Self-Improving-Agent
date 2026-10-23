@@ -270,9 +270,12 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
     process.exit(1);
   }
   const { greetingMetricsPath } = await import("./pipelines/session-start/greeting-metrics.js");
-  const { reviewGreetingMetrics, renderReview } = await import("./pipelines/session-start/metrics-review.js");
+  const { reviewGreetingMetrics, renderReview, reviewEndMetrics, renderEndReview } = await import("./pipelines/session-start/metrics-review.js");
+  const { endMetricsPath } = await import("./shared/end-metrics.js");
   const main = greetingMetricsPath();
   console.log(renderReview(reviewGreetingMetrics([`${main}.1`, main], since), since, main).join("\n"));
+  const end = endMetricsPath();
+  console.log(renderEndReview(reviewEndMetrics([`${end}.1`, end], since), since, end).join("\n"));
 } else if (command === "bootstrap") {
   // /bootstrap's deterministic half (bootstrap-fix BF-3/4/6). The directory is
   // taken literally, never walked up: a fresh project may not be a repository
@@ -652,7 +655,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("                                             Migrate state.json schema v1 -> v2");
   console.log("  detach [--dry-run] [--no-fetch] [--force] [dir]      Return a seat worktree to detached at origin/master");
   console.log("  main-rebuild [<sha>] [--dry-run] [--no-fetch]  Update, rebuild and verify the main checkout's serving build, or refuse (T-172)");
-  console.log("  metrics review [--since <YYYY-MM-DD>]        Read-only: the greetings that tripped a review threshold (T-318)");
+  console.log("  metrics review [--since <YYYY-MM-DD>]        Read-only: the greetings and ob_end calls that tripped a review threshold (T-318)");
   console.log("  bootstrap check [--json] [dir]                Read-only: git, CLAUDE.md and .agents/ as /bootstrap needs them");
   console.log("  bootstrap move-residue [dir]                  Move a residue .agents/ under .agents/archive/ (never deletes)");
   console.log("  bootstrap scaffold [--json] [dir]             Copy the fresh-install files from project-template/ and verify tracking");

@@ -40,6 +40,8 @@ import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
 import { resolvePaths, canonicalizeProjectDir, projectIdentity, projectIdentityName, obsidianVaultDir } from "./shared/paths.js";
 import { byPidDir, processStartTime, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
 import { sessionStartFromTranscript, sessionTrailerIds, structuralTrailerNote, type TrailerIdSource } from "./shared/handoff-guard.js";
+import { recordEndMetrics, type EndOutcome } from "./shared/end-metrics.js";
+import type { RecordCheck, SessionWorkScan } from "./shared/end-record-guard.js";
 import {
   OLD_LAYOUT_LINE,
   isOldLayoutProject,
@@ -415,6 +417,13 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       return { content: [{ type: "text" as const, text: `ob_end refused: ${endSession.refusal}` }], isError: true };
     }
     const endedId = endSession.id;
+    // T-318 S2: one end-metrics row per ob_end call that reaches the record gate. Same opt-in as the greeting row; a
+    // dry run writes nothing. A failed append is one line, never a failed ob_end.
+    const endRow = (outcome: EndOutcome, work: SessionWorkScan | null, record: RecordCheck | null, recordOk: string | null, notChecked: string | null): void => {
+      if (args.dry_run || !greetingFlag(projectRoot, "greeting_metrics")) return;
+      const r = recordEndMetrics({ projectRoot, sessionUuid: endedId, outcome, work, record, recordOk, notChecked });
+      if (!r.ok) preamble.push(`end metrics: not written (${r.why})`);
+    };
     if (endedId === null) {
       if (isOldLayoutProject(projectRoot)) preamble.push(OLD_LAYOUT_LINE);
       preamble.push(
@@ -422,6 +431,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
           `Session work and record update were not verified (Cursor writes no session proof). ` +
           `Pass record_ok with a reason to note that in the next greeting.`,
       );
+      endRow("not_checked", null, null, args.record_ok?.trim() || null, `no session proof (${endSession.reason ?? "no proof"})`);
     } else {
       const { since, sessionIds, trailerSource } = endSessionWindow(projectRoot, endedId);
       const evaluation = evaluateEndRecord(projectRoot, since, endedId, sessionIds);
@@ -432,6 +442,7 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
       if (evaluation.work.status === "unknown") {
         if (isOldLayoutProject(projectRoot)) preamble.push(OLD_LAYOUT_LINE);
         preamble.push(`RECORD NOT CHECKED: ${evaluation.work.reason ?? "session work could not be verified"}`);
+        endRow("not_checked", evaluation.work, record, args.record_ok?.trim() || null, evaluation.work.reason ?? "session work could not be verified");
       } else if (args.record_ok !== undefined && args.record_ok !== null && args.record_ok === "") {
         return {
           content: [{ type: "text" as const, text: "ob_end refused: record_ok must be a non-empty reason" }],
@@ -448,11 +459,15 @@ export async function handleEnd(args: EndArgs): Promise<ToolResponse> {
         if (evaluation.needsRecord && !recordOkReason) {
           const line = describeRecordNotUpdated(evaluation.work, record, sinceAnchor);
           const body = oldLayoutLine ? `${oldLayoutLine}\n${line}` : line;
+          endRow("refused", evaluation.work, record, null, null);
           return { content: [{ type: "text" as const, text: body }], isError: true };
         }
         if (evaluation.needsRecord && recordOkReason) {
           if (!args.dry_run) recordRecordOkNotice(projectRoot, endedId, recordOkReason);
           preamble.push(`RECORD OK: closing without a matching record — ${recordOkReason}`);
+          endRow("record_ok", evaluation.work, record, recordOkReason, null);
+        } else {
+          endRow("closed", evaluation.work, record, recordOkReason, null);
         }
         if (evaluation.work.unattributed > 0) {
           // T-276: the transcript names this session and carries no Remote Control id (sessionTrailerIds, as the hook reads it).
