@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 561 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 562 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,11 +6,11 @@
 
 ### Pick up here
 
-G-062 (a) READY as PR #933 (679ab9a8, byte-compare SAME x6, CI green): READS OWED leaves out a file whose newest commit carries this seat's Claude-Session id (this session, or the newest other session of this checkout, read head-only); opt-in reads_owed_own, SIA on. Waiting on Aaron's 'merge 933'; then pr-refresh 933 679ab9a8, pr-merge pinned, clark rebuild, /mcp reconnect. T-318 S2 shipped (#929); its END QUEUE live check waits on the next /end. Next: G-062 (b) (shipped briefs) or T-315.
+G-062 (a) SHIPPED (#933 merged e8e6f549, REBUILT, live-checked by calling the build). T-318 S2 shipped (#929). No open PRs. Next: G-062 (b) needs a design (how a brief links to its merged PR outside SIA) and T-315 needs an in-process reload design (step 0: does Claude Code honour tools/list_changed; server.ts module singletons; headless claude -p cannot reconnect). Ask Aaron which first if he has a preference; default T-315 step 0 (P1).
 
 ### Watch out
 
-- After #933's rebuild: Atlas's next /start in sia-planner should not list a brief Atlas wrote in S174 (e.g. docs/loops/g062-brief.md); with none left the line reads 'READS OWED: none (k written by this seat)'.
+- After /mcp reconnect: Atlas's next /start in sia-planner should show 'READS OWED: none (k written by this seat)' rather than a brief Atlas wrote in S173/S174.
 - T-318 S2 live check owed: after the next /end in SIA run `node open-brain/build/cli.js metrics review --since 2026-10-22` on the desktop and expect the END QUEUE to count one row.
 - Job-wait loops: a transient empty `job.mjs list` read ended one wait early (job 58); treat an unreadable list as still running.
 
@@ -24,13 +24,11 @@ G-062 (a) READY as PR #933 (679ab9a8, byte-compare SAME x6, CI green): READS OWE
 
 ### Loop state
 
-**Open PRs:** 
-- #933 — QA: accepted — G-062 (a); READY 679ab9a8 from build job #58; SIM #57 ALL PASS; byte-compare SAME x6; CI test SUCCESS; needs Aaron's merge word
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- merge 933 (G-062 a)
 - T-170-II real-key run host
 - T-295 tool cuts
 - T-261 S3/S4
@@ -39,7 +37,7 @@ G-062 (a) READY as PR #933 (679ab9a8, byte-compare SAME x6, CI green): READS OWE
 
 **Rulings made mid-loop:** 
 - Aaron 10-21: 'merge 917 921 922 924 go'; all merged, REBUILT 7f9423ad, live checks passed.
-- Aaron 10-22: 'merge 929'; merged 79b7451f, REBUILT 79b7451f.
+- Aaron 10-22: 'merge 929' (merged 79b7451f) and 'merge 933' (merged e8e6f549); REBUILT e8e6f549.
 
 ## developer [sia-builder] _(written session 156)_
 
