@@ -1,0 +1,8 @@
+@@@ open-brain/src/build-proxy.ts
+<<<
+    old.child.kill();
+    if (initialize === null) {
+===
+    old.child.kill();
+    if (initialize !== "") {
+>>>

@@ -1,0 +1,7 @@
+@@@ open-brain/src/build-proxy.ts
+<<<
+    if (!current.alive) return true;
+    if (inFlight.size > 0) return false;
+===
+    if (!current.alive) return true;
+>>>

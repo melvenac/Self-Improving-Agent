@@ -1,0 +1,6 @@
+@@@ open-brain/src/server.ts
+<<<
+  const parent = proofParentPid(process.env, process.ppid);
+===
+  const parent = process.ppid;
+>>>

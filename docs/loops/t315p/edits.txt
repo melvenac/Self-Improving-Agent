@@ -1,0 +1,70 @@
+@@@ open-brain/src/shared/process-session.ts
+<<<
+function proofPath(dir: string, pid: number): string {
+  return join(dir, `${pid}.json`);
+}
+===
+function proofPath(dir: string, pid: number): string {
+  return join(dir, `${pid}.json`);
+}
+
+/**
+ * T-315 (D-161): the pid whose proof an MCP server reads. Normally its `process.ppid`, the claude process. Under the
+ * build proxy (build-proxy.ts) the server's parent is the proxy, which names claude in OPEN_BRAIN_HOST_PID and itself in
+ * OPEN_BRAIN_PROXY_PID. The host pid counts ONLY when the proxy pid is this process's actual parent: a value inherited
+ * from further up (the CLAUDE_PID failure, T-003 Step 0b) cannot pass that check.
+ */
+export function proofParentPid(env: NodeJS.ProcessEnv, ppid: number): number {
+  const proxy = Number(env.OPEN_BRAIN_PROXY_PID);
+  const host = Number(env.OPEN_BRAIN_HOST_PID);
+  if (!Number.isInteger(proxy) || proxy <= 0 || proxy !== ppid) return ppid;
+  return Number.isInteger(host) && host > 0 ? host : ppid;
+}
+>>>
+@@@ open-brain/src/server.ts
+<<<
+import { byPidDir, processStartTime, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
+===
+import { byPidDir, processStartTime, proofParentPid, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
+>>>
+@@@ open-brain/src/server.ts
+<<<
+ * The parent is `process.ppid`, NEVER `CLAUDE_PID`: in an MCP server that
+ * variable is inherited from whoever launched claude, so it names the OUTER
+ * session when claude runs inside another one (T-003 Step 0b).
+ */
+let _parentStart: { pid: number; start: string | null } | null = null;
+function writeSessionId(): ProvenSession {
+  const parent = process.ppid;
+===
+ * The parent is `process.ppid`, NEVER `CLAUDE_PID`: in an MCP server that
+ * variable is inherited from whoever launched claude, so it names the OUTER
+ * session when claude runs inside another one (T-003 Step 0b). Under the build
+ * proxy (T-315) it is the proxy's parent, checked by proofParentPid.
+ */
+let _parentStart: { pid: number; start: string | null } | null = null;
+function writeSessionId(): ProvenSession {
+  const parent = proofParentPid(process.env, process.ppid);
+>>>
+@@@ open-brain/src/server.ts
+<<<
+  return { id: proven.id };
+}
+const _recalledKnowledgeIds = new Set<number>();
+===
+  return { id: proven.id };
+}
+>>>
+@@@ open-brain/src/server.ts
+<<<
+          updateRecall.run(row.id);
+          _recalledKnowledgeIds.add(row.id);
+===
+          updateRecall.run(row.id);
+>>>
+@@@ open-brain/src/server.ts
+<<<
+  const path = join(byPidDir(resolvePaths(process.cwd()).activeSession), `${process.ppid}.json`);
+===
+  const path = join(byPidDir(resolvePaths(process.cwd()).activeSession), `${proofParentPid(process.env, process.ppid)}.json`);
+>>>

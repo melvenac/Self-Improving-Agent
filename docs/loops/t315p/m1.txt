@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/process-session.ts
+<<<
+  if (!Number.isInteger(proxy) || proxy <= 0 || proxy !== ppid) return ppid;
+===
+  if (!Number.isInteger(proxy) || proxy <= 0) return ppid;
+>>>
