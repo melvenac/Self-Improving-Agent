@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/skills-audit/index.ts
+<<<
+    if (target === "" || target.startsWith("&") || NO_FILE.test(target)) continue;
+===
+    if (target === "" || NO_FILE.test(target)) continue;
+>>>
