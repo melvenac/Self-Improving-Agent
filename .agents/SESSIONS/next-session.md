@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 560 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 561 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,12 +6,13 @@
 
 ### Pick up here
 
-T-318 S2 READY as PR #929 (b7b7fbb8, byte-compare SAME x5, CI green): ob_end writes an end-metrics row; metrics review prints an END QUEUE. Waiting on Aaron's 'merge 929'; then pr-refresh 929 b7b7fbb8, pr-merge pinned, clark rebuild, /mcp reconnect, live-check the END QUEUE after an ob_end. Then G-062 (measure the transcript lookup first), then T-315.
+G-062 (a) READY as PR #933 (679ab9a8, byte-compare SAME x6, CI green): READS OWED leaves out a file whose newest commit carries this seat's Claude-Session id (this session, or the newest other session of this checkout, read head-only); opt-in reads_owed_own, SIA on. Waiting on Aaron's 'merge 933'; then pr-refresh 933 679ab9a8, pr-merge pinned, clark rebuild, /mcp reconnect. T-318 S2 shipped (#929); its END QUEUE live check waits on the next /end. Next: G-062 (b) (shipped briefs) or T-315.
 
 ### Watch out
 
-- The live END QUEUE check needs an ob_end after the rebuild in an opted-in repo (SIA is): run `node open-brain/build/cli.js metrics review --since <today>` on the desktop after the next /end and expect one END QUEUE row counted.
-- G-064 shipped (#922 merged 6f31ca38): mail-server can declare role: developer in .agents/AGENT.md (told clark 10-21).
+- After #933's rebuild: Atlas's next /start in sia-planner should not list a brief Atlas wrote in S174 (e.g. docs/loops/g062-brief.md); with none left the line reads 'READS OWED: none (k written by this seat)'.
+- T-318 S2 live check owed: after the next /end in SIA run `node open-brain/build/cli.js metrics review --since 2026-10-22` on the desktop and expect the END QUEUE to count one row.
+- Job-wait loops: a transient empty `job.mjs list` read ended one wait early (job 58); treat an unreadable list as still running.
 
 ### Open questions
 
@@ -24,12 +25,12 @@ T-318 S2 READY as PR #929 (b7b7fbb8, byte-compare SAME x5, CI green): ob_end wri
 ### Loop state
 
 **Open PRs:** 
-- #929 — QA: accepted — T-318 S2; READY b7b7fbb8 from build job #56; byte-compare SAME x5; CI test SUCCESS; needs Aaron's merge word
+- #933 — QA: accepted — G-062 (a); READY 679ab9a8 from build job #58; SIM #57 ALL PASS; byte-compare SAME x6; CI test SUCCESS; needs Aaron's merge word
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- merge 929 (T-318 S2)
+- merge 933 (G-062 a)
 - T-170-II real-key run host
 - T-295 tool cuts
 - T-261 S3/S4
@@ -37,8 +38,8 @@ T-318 S2 READY as PR #929 (b7b7fbb8, byte-compare SAME x5, CI green): ob_end wri
 - the yaml dependency PR
 
 **Rulings made mid-loop:** 
-- Aaron 10-21: 'merge 917 921 922 924 go'; merged #917 d8c7d450, #921 ad601852, #922 6f31ca38, #924 7f9423ad; REBUILT 7f9423ad; live checks passed.
-- Aaron 10-22: 'go ahead' on T-318 S2.
+- Aaron 10-21: 'merge 917 921 922 924 go'; all merged, REBUILT 7f9423ad, live checks passed.
+- Aaron 10-22: 'merge 929'; merged 79b7451f, REBUILT 79b7451f.
 
 ## developer [sia-builder] _(written session 156)_
 

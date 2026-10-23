@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 560,
+  "revision": 561,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2694,7 +2694,7 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "Aaron 10-20, typed in the Atlas window: 'file it and put it after T-317' (ORDER: start after T-317 lands). Context: he asked whether the start/end transcript-review loop is making progress. Atlas's evidence-based answer: the mechanical greeting is now right (state match, drift none, fits 1.4k-3.6k of 4.4k, start in 6-20 calls). The misses that remain fall in 4 recurring classes that reviews keep re-finding: (1) stale handoffs; (2) WAITING ON AARON under-reported (clark s5: 'one question' with 5 open; Relay s42: none recorded); (3) agents reading past shown signals ('+3 more', lessons that fired before the same mistake, entries rated helpful when they fired after the right act: 751 sits at 13 helpful / 4 neutral, with at least clark's and Courier's helpful rows wrong); (4) detectors that are blind or quiet (T-316's 0/5; stale_process in Maker s69 and clark s4; Maker tree_diverged 3 sessions running; greeting-metrics recorded Atlas handoff_lag_revs 12-13 on 10-20 00:50 with NO alarm). Scope: (a) greeting-metrics.jsonl alarms (alarm_streaks already exist) on handoff_lag_revs > N, stale_process, a tree_diverged streak, and the count of aaron-owned open questions across the seat's handoff vs what the greeting printed; (b) an end-side scorecard row from ob_end: this session's handoff written after its last work (shares T-317's rule), lessons stored with a MATCH: command key, and ratings where the entry fired AFTER the command it recommends auto-flagged as neutral candidates; (c) a 'review queue': sessions that trip an alarm are listed for the planner, everything else is not reviewed by hand; plus one sampled session per week to look for new classes; (d) a coverage fix: only 15 greeting-metrics rows exist since 10-16, none from Courier or Prism, so find which start path skips the append (CLI fallback, older builds, Cursor) before trusting the alarms. Step 0: measure (d) and list which alarm thresholds the 15 rows would have tripped. — S174 (10-21) STEP 0 MEASURED (Atlas, desktop read of ~/.claude/open-brain/greeting-metrics.jsonl, 26 rows 10-16T20:42Z..10-21T09:31Z, no .1 rotation). (d) coverage: NOT a skipped start path. Every desktop planner /start since the rows began has one (Atlas s173-s174, Maker s68-s71, Clark s2-s8, Relay s42-s44, Courier s6-s7, Prism s8; the sessions without a row all predate 10-16T20:42). Not covered by design: headless claude -p (QA PC job runner, another home), repos without greeting_metrics (mail-server has no greeting.json); CLI starts are caller 'cli' (3 rows). Thresholds the 26 rows would trip: handoff_lag_revs > 5: Atlas 12 and 13 (10-20 00:50/00:56), nothing else above 2. stale_process: Atlas s174 10-20 05:54, Maker s69, Clark s4 and s6. Repeat alarms (streak >= 2): Maker tree_diverged 2 and 3 (s69, s70) and old_start_command 2 and 3; Atlas tree_stale 2. Aaron-question counts are not in the rows (needs a new field). PROPOSED S1: `open-brain metrics review [--since DATE]`, a core CLI over the jsonl (+ .1) listing only rows that trip a threshold (lag > 5, stale_process, any alarm streak >= 2) as the review queue; everything else is not reviewed by hand. Then S2: the end-side row from ob_end (handoff after last work, shares T-317's rule). — S174 (10-21) S1 READY: SIM job #37 at 35f4e991 (MISMATCH only on the criterion's wording: the two command-count rows in cli-args.test.ts are red at baseline because tests.txt extends their lists; ruled expected), 178 files / 2054 tests, `metrics review` exit 0, module-boundary pass, m1 R1, m2 R2, m3 R4. Brief docs/loops/t318-s1-brief.md (#920, #923). Build job #38 READY bb2ff479 PR #924 (same numbers, CI pass); Atlas byte-compare SAME x5. After merge + rebuild: run `open-brain metrics review --since 2026-10-16` on the desktop and check it lists the step-0 rows. S2 next: the end-side row from ob_end. — S174 (10-21): S1 SHIPPED. PR #924 merged 7f9423ad (refreshed head 65bb96e5, patch-id 382ca642 = reviewed bb2ff479, CI SUCCESS); REBUILT 7f9423ad. Live on the desktop: `node open-brain/build/cli.js metrics review --since 2026-10-16` exit 0, 'REVIEW QUEUE: 7 of 27 greeting(s) since 2026-10-16 tripped a threshold': Maker s69/s70 (STALE PROCESS, tree_diverged and old_start_command streaks 2-3), Clark s4 and s6 (STALE PROCESS), Atlas s173/s174 (handoff 13/12 revs behind), Atlas s174 05:54Z (STALE PROCESS, tree_stale 2). Matches step 0. NEXT: S2, the end-side row from ob_end. — S174 (10-22): S2 READY. ob_end appends one row per call to end-metrics.jsonl beside the knowledge store (opt-in greeting_metrics, none on a dry run): outcome closed/refused/record_ok/not_checked, session n, seat, last_work_rev, handoff written_rev, record detail. `metrics review` prints an END QUEUE after the REVIEW QUEUE: record_ok closes, record not checked, refusals the same session never closed. Files docs/loops/t318-s2/ (#927), brief docs/loops/t318-s2-brief.md (#928). SIM job #55 at c0817dd8 ALL PASS (203 files / 2293 tests, module-boundary pass, m1 E2-E4, m2 E5, m3 E1+E4). Build job #56 READY b7b7fbb8 PR #929 (same numbers, CI pass); Atlas byte-compare SAME x5. After merge + rebuild: the next ob_end in an opted-in repo leaves a row; `metrics review` shows an END QUEUE line counting it. S3 candidates: lessons stored with a MATCH key, ratings where the entry fired after its command, sessions with a greeting row and no ob_end row.",
+      "note": "Aaron 10-20, typed in the Atlas window: 'file it and put it after T-317' (ORDER: start after T-317 lands). Context: he asked whether the start/end transcript-review loop is making progress. Atlas's evidence-based answer: the mechanical greeting is now right (state match, drift none, fits 1.4k-3.6k of 4.4k, start in 6-20 calls). The misses that remain fall in 4 recurring classes that reviews keep re-finding: (1) stale handoffs; (2) WAITING ON AARON under-reported (clark s5: 'one question' with 5 open; Relay s42: none recorded); (3) agents reading past shown signals ('+3 more', lessons that fired before the same mistake, entries rated helpful when they fired after the right act: 751 sits at 13 helpful / 4 neutral, with at least clark's and Courier's helpful rows wrong); (4) detectors that are blind or quiet (T-316's 0/5; stale_process in Maker s69 and clark s4; Maker tree_diverged 3 sessions running; greeting-metrics recorded Atlas handoff_lag_revs 12-13 on 10-20 00:50 with NO alarm). Scope: (a) greeting-metrics.jsonl alarms (alarm_streaks already exist) on handoff_lag_revs > N, stale_process, a tree_diverged streak, and the count of aaron-owned open questions across the seat's handoff vs what the greeting printed; (b) an end-side scorecard row from ob_end: this session's handoff written after its last work (shares T-317's rule), lessons stored with a MATCH: command key, and ratings where the entry fired AFTER the command it recommends auto-flagged as neutral candidates; (c) a 'review queue': sessions that trip an alarm are listed for the planner, everything else is not reviewed by hand; plus one sampled session per week to look for new classes; (d) a coverage fix: only 15 greeting-metrics rows exist since 10-16, none from Courier or Prism, so find which start path skips the append (CLI fallback, older builds, Cursor) before trusting the alarms. Step 0: measure (d) and list which alarm thresholds the 15 rows would have tripped. — S174 (10-21) STEP 0 MEASURED (Atlas, desktop read of ~/.claude/open-brain/greeting-metrics.jsonl, 26 rows 10-16T20:42Z..10-21T09:31Z, no .1 rotation). (d) coverage: NOT a skipped start path. Every desktop planner /start since the rows began has one (Atlas s173-s174, Maker s68-s71, Clark s2-s8, Relay s42-s44, Courier s6-s7, Prism s8; the sessions without a row all predate 10-16T20:42). Not covered by design: headless claude -p (QA PC job runner, another home), repos without greeting_metrics (mail-server has no greeting.json); CLI starts are caller 'cli' (3 rows). Thresholds the 26 rows would trip: handoff_lag_revs > 5: Atlas 12 and 13 (10-20 00:50/00:56), nothing else above 2. stale_process: Atlas s174 10-20 05:54, Maker s69, Clark s4 and s6. Repeat alarms (streak >= 2): Maker tree_diverged 2 and 3 (s69, s70) and old_start_command 2 and 3; Atlas tree_stale 2. Aaron-question counts are not in the rows (needs a new field). PROPOSED S1: `open-brain metrics review [--since DATE]`, a core CLI over the jsonl (+ .1) listing only rows that trip a threshold (lag > 5, stale_process, any alarm streak >= 2) as the review queue; everything else is not reviewed by hand. Then S2: the end-side row from ob_end (handoff after last work, shares T-317's rule). — S174 (10-21) S1 READY: SIM job #37 at 35f4e991 (MISMATCH only on the criterion's wording: the two command-count rows in cli-args.test.ts are red at baseline because tests.txt extends their lists; ruled expected), 178 files / 2054 tests, `metrics review` exit 0, module-boundary pass, m1 R1, m2 R2, m3 R4. Brief docs/loops/t318-s1-brief.md (#920, #923). Build job #38 READY bb2ff479 PR #924 (same numbers, CI pass); Atlas byte-compare SAME x5. After merge + rebuild: run `open-brain metrics review --since 2026-10-16` on the desktop and check it lists the step-0 rows. S2 next: the end-side row from ob_end. — S174 (10-21): S1 SHIPPED. PR #924 merged 7f9423ad (refreshed head 65bb96e5, patch-id 382ca642 = reviewed bb2ff479, CI SUCCESS); REBUILT 7f9423ad. Live on the desktop: `node open-brain/build/cli.js metrics review --since 2026-10-16` exit 0, 'REVIEW QUEUE: 7 of 27 greeting(s) since 2026-10-16 tripped a threshold': Maker s69/s70 (STALE PROCESS, tree_diverged and old_start_command streaks 2-3), Clark s4 and s6 (STALE PROCESS), Atlas s173/s174 (handoff 13/12 revs behind), Atlas s174 05:54Z (STALE PROCESS, tree_stale 2). Matches step 0. NEXT: S2, the end-side row from ob_end. — S174 (10-22): S2 READY. ob_end appends one row per call to end-metrics.jsonl beside the knowledge store (opt-in greeting_metrics, none on a dry run): outcome closed/refused/record_ok/not_checked, session n, seat, last_work_rev, handoff written_rev, record detail. `metrics review` prints an END QUEUE after the REVIEW QUEUE: record_ok closes, record not checked, refusals the same session never closed. Files docs/loops/t318-s2/ (#927), brief docs/loops/t318-s2-brief.md (#928). SIM job #55 at c0817dd8 ALL PASS (203 files / 2293 tests, module-boundary pass, m1 E2-E4, m2 E5, m3 E1+E4). Build job #56 READY b7b7fbb8 PR #929 (same numbers, CI pass); Atlas byte-compare SAME x5. After merge + rebuild: the next ob_end in an opted-in repo leaves a row; `metrics review` shows an END QUEUE line counting it. S3 candidates: lessons stored with a MATCH key, ratings where the entry fired after its command, sessions with a greeting row and no ob_end row. — S174 (10-22): S2 SHIPPED. PR #929 merged 79b7451f on Aaron's 'merge 929' (refreshed head b29ff7bb, patch-id 03289649 = reviewed b7b7fbb8, CI SUCCESS); clark REBUILT 79b7451f. Live: `metrics review --since 2026-10-22` exit 0, REVIEW QUEUE line plus 'END QUEUE: not checked (no ...end-metrics.jsonl ...)' (no ob_end on the new build yet). OWED: after the next /end in SIA, rerun it and expect the END QUEUE to count that row.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
@@ -6717,10 +6717,11 @@
     },
     {
       "seat": "planner",
-      "pick_up": "T-318 S2 READY as PR #929 (b7b7fbb8, byte-compare SAME x5, CI green): ob_end writes an end-metrics row; metrics review prints an END QUEUE. Waiting on Aaron's 'merge 929'; then pr-refresh 929 b7b7fbb8, pr-merge pinned, clark rebuild, /mcp reconnect, live-check the END QUEUE after an ob_end. Then G-062 (measure the transcript lookup first), then T-315.",
+      "pick_up": "G-062 (a) READY as PR #933 (679ab9a8, byte-compare SAME x6, CI green): READS OWED leaves out a file whose newest commit carries this seat's Claude-Session id (this session, or the newest other session of this checkout, read head-only); opt-in reads_owed_own, SIA on. Waiting on Aaron's 'merge 933'; then pr-refresh 933 679ab9a8, pr-merge pinned, clark rebuild, /mcp reconnect. T-318 S2 shipped (#929); its END QUEUE live check waits on the next /end. Next: G-062 (b) (shipped briefs) or T-315.",
       "watch_out": [
-        "The live END QUEUE check needs an ob_end after the rebuild in an opted-in repo (SIA is): run `node open-brain/build/cli.js metrics review --since <today>` on the desktop after the next /end and expect one END QUEUE row counted.",
-        "G-064 shipped (#922 merged 6f31ca38): mail-server can declare role: developer in .agents/AGENT.md (told clark 10-21)."
+        "After #933's rebuild: Atlas's next /start in sia-planner should not list a brief Atlas wrote in S174 (e.g. docs/loops/g062-brief.md); with none left the line reads 'READS OWED: none (k written by this seat)'.",
+        "T-318 S2 live check owed: after the next /end in SIA run `node open-brain/build/cli.js metrics review --since 2026-10-22` on the desktop and expect the END QUEUE to count one row.",
+        "Job-wait loops: a transient empty `job.mjs list` read ended one wait early (job 58); treat an unreadable list as still running."
       ],
       "open_questions": [
         "T-170-II real-key run host",
@@ -6733,14 +6734,14 @@
       "loop_state": {
         "open_prs": [
           {
-            "ref": "#929",
+            "ref": "#933",
             "qa_status": "accepted",
-            "note": "T-318 S2; READY b7b7fbb8 from build job #56; byte-compare SAME x5; CI test SUCCESS; needs Aaron's merge word"
+            "note": "G-062 (a); READY 679ab9a8 from build job #58; SIM #57 ALL PASS; byte-compare SAME x6; CI test SUCCESS; needs Aaron's merge word"
           }
         ],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "merge 929 (T-318 S2)",
+          "merge 933 (G-062 a)",
           "T-170-II real-key run host",
           "T-295 tool cuts",
           "T-261 S3/S4",
@@ -6748,14 +6749,14 @@
           "the yaml dependency PR"
         ],
         "rulings": [
-          "Aaron 10-21: 'merge 917 921 922 924 go'; merged #917 d8c7d450, #921 ad601852, #922 6f31ca38, #924 7f9423ad; REBUILT 7f9423ad; live checks passed.",
-          "Aaron 10-22: 'go ahead' on T-318 S2."
+          "Aaron 10-21: 'merge 917 921 922 924 go'; all merged, REBUILT 7f9423ad, live checks passed.",
+          "Aaron 10-22: 'merge 929'; merged 79b7451f, REBUILT 79b7451f."
         ]
       },
       "session_uuid": "0bbb03c4-d91d-496e-a6d5-43924f16405b",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "written_rev": 560
+      "written_rev": 561
     }
   ],
   "sessions": [
@@ -6870,7 +6871,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "last_work_rev": 560
+      "last_work_rev": 561
     }
   ]
 }
