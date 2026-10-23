@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+    if (own.length > 0) {
+===
+    if (own.length < 0) {
+>>>

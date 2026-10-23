@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+    if (prev === undefined || (row.first_rev ?? -1) > (prev.first_rev ?? -1)) prev = row;
+===
+    if (prev === undefined || (row.first_rev ?? -1) < (prev.first_rev ?? -1)) prev = row;
+>>>

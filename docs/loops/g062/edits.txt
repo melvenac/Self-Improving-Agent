@@ -1,0 +1,147 @@
+@@@ open-brain/src/shared/handoff-guard.ts
+<<<
+ * because Remote Control can be switched on mid-session (one measured transcript's first bridge record sat past byte
+ * 830,000).
+ */
+export function sessionTrailerIds(path: unknown, sessionUuid: string): TrailerIds {
+===
+ * because Remote Control can be switched on mid-session (one measured transcript's first bridge record sat past byte
+ * 830,000). G-062: `headOnly` never reads past the head, for a caller that may be handed a very large transcript (an
+ * earlier session's, 147 MB measured) and accepts missing a late bridge id.
+ */
+export function sessionTrailerIds(path: unknown, sessionUuid: string, options: { headOnly?: boolean } = {}): TrailerIds {
+>>>
+@@@ open-brain/src/shared/handoff-guard.ts
+<<<
+  let text = head;
+  let bridge = bridgeIds(head);
+  if (bridge.length === 0) {
+===
+  let text = head;
+  let bridge = bridgeIds(head);
+  if (bridge.length === 0 && options.headOnly !== true) {
+>>>
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+import { join } from "node:path";
+import type { Seat, State } from "../../shared/state-schema.js";
+===
+import { dirname, join } from "node:path";
+import { sessionTrailerIds } from "../../shared/handoff-guard.js";
+import type { Seat, State } from "../../shared/state-schema.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+function prevSessionDate(state: State, sessionNumber: number | null, checkout: string | null | undefined): string | null {
+===
+/** The newest commit's `Claude-Session:` trailer values for one path, space-joined; "" when none or unreadable. */
+function newestTrailer(projectRoot: string, relPath: string): string {
+  try {
+    return execFileSync("git", ["log", "-1", "--format=%(trailers:key=Claude-Session,valueonly,separator=%x20)", "--", relPath.replace(/\\/g, "/")], {
+      cwd: projectRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    }).trim();
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * G-062 (a): the `Claude-Session:` trailer ids this seat's own commits carry, so READS OWED does not list a file the seat
+ * wrote itself. Every commit's git author is Aaron, so authorship comes from the trailer (T-276's reading): this
+ * session's ids from its proven transcript, plus the newest other session of this checkout, whose transcript sits beside
+ * this one as `<uuid>.jsonl`. That one is read head-only (147 MB measured): a Remote Control id switched on late in it is
+ * missed, and its files are then listed, as before. No proof or no transcript path: no ids, so nothing is left out.
+ */
+export function ownTrailerIds(state: State, sessionUuid: string | null, transcriptPath: string | undefined, checkout: string | null | undefined): string[] {
+  if (sessionUuid === null || transcriptPath === undefined || transcriptPath === "") return [];
+  const ids = new Set(sessionTrailerIds(transcriptPath, sessionUuid).ids);
+  let prev: State["sessions"][number] | undefined;
+  for (const row of state.sessions) {
+    if (checkout == null || row.checkout !== checkout || row.uuid === null || row.uuid === sessionUuid) continue;
+    if (prev === undefined || (row.first_rev ?? -1) > (prev.first_rev ?? -1)) prev = row;
+  }
+  if (prev !== undefined && prev.uuid !== null) {
+    for (const id of sessionTrailerIds(join(dirname(transcriptPath), `${prev.uuid}.jsonl`), prev.uuid, { headOnly: true }).ids) ids.add(id);
+  }
+  return [...ids];
+}
+
+function prevSessionDate(state: State, sessionNumber: number | null, checkout: string | null | undefined): string | null {
+>>>
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  checkout: string | null | undefined,
+): string {
+  const prevDate = prevSessionDate(state, sessionNumber, checkout);
+  const paths: string[] = [];
+  const seen = new Set<string>();
+===
+  checkout: string | null | undefined,
+  /** G-062 (a): ownTrailerIds(); a path whose newest commit carries one of them is not owed. Empty: nothing is left out. */
+  ownIds: readonly string[] = [],
+): string {
+  const prevDate = prevSessionDate(state, sessionNumber, checkout);
+  const paths: string[] = [];
+  const seen = new Set<string>();
+  const own = ownIds.filter((id) => id !== "");
+  let ownCount = 0;
+>>>
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+    if (!existsSync(absFromRel(rel))) return;
+    seen.add(rel);
+    paths.push(rel);
+  };
+===
+    if (!existsSync(absFromRel(rel))) return;
+    seen.add(rel);
+    if (own.length > 0) {
+      const trailer = newestTrailer(projectRoot, rel);
+      if (trailer !== "" && own.some((id) => trailer.includes(id))) {
+        ownCount++;
+        return;
+      }
+    }
+    paths.push(rel);
+  };
+>>>
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  if (paths.length === 0) return "READS OWED: none";
+===
+  if (paths.length === 0) return ownCount > 0 ? `READS OWED: none (${ownCount} written by this seat)` : "READS OWED: none";
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+import { describeReadsOwed } from "./reads-owed.js";
+===
+import { describeReadsOwed, ownTrailerIds } from "./reads-owed.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+        roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+        ownCheckout ?? null,
+      ),
+===
+        roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
+        ownCheckout ?? null,
+        greetingFlag(projectRoot, "reads_owed_own") ? ownTrailerIds(sj.data, proven.id, proven.id !== null ? proven.transcriptPath : undefined, ownCheckout ?? null) : [],
+      ),
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-flags.ts
+<<<
+greeting_metrics, handoff_by_checkout, handoff_caps, maybe_shipped, merged_citations, missing_handoff, role_docs_by_sha, state_compact.
+===
+greeting_metrics, handoff_by_checkout, handoff_caps, maybe_shipped, merged_citations, missing_handoff, reads_owed_own, role_docs_by_sha, state_compact.
+>>>
+@@@ .agents/SYSTEM/greeting.json
+<<<
+  "missing_handoff": true,
+  "role_docs_by_sha": true,
+===
+  "missing_handoff": true,
+  "reads_owed_own": true,
+  "role_docs_by_sha": true,
+>>>
