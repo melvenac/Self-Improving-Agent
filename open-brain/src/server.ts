@@ -38,7 +38,7 @@ import { readLastInvocationTs } from "./pipelines/session-end/invocation-logger.
 import { computeScore as computeScoreShared } from "./pipelines/sync/score.js";
 import { invocationLogSuffix } from "./pipelines/sync/score-line.js";
 import { resolvePaths, canonicalizeProjectDir, projectIdentity, projectIdentityName, obsidianVaultDir } from "./shared/paths.js";
-import { byPidDir, processStartTime, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
+import { byPidDir, processStartTime, proofParentPid, proveSession, type ProvenSession, type ProcessSessionProof } from "./shared/process-session.js";
 import { sessionStartFromTranscript, sessionTrailerIds, structuralTrailerNote, type TrailerIdSource } from "./shared/handoff-guard.js";
 import { recordEndMetrics, type EndOutcome } from "./shared/end-metrics.js";
 import type { RecordCheck, SessionWorkScan } from "./shared/end-record-guard.js";
@@ -145,11 +145,12 @@ function skewWarning(): string {
  *
  * The parent is `process.ppid`, NEVER `CLAUDE_PID`: in an MCP server that
  * variable is inherited from whoever launched claude, so it names the OUTER
- * session when claude runs inside another one (T-003 Step 0b).
+ * session when claude runs inside another one (T-003 Step 0b). Under the build
+ * proxy (T-315) it is the proxy's parent, checked by proofParentPid.
  */
 let _parentStart: { pid: number; start: string | null } | null = null;
 function writeSessionId(): ProvenSession {
-  const parent = process.ppid;
+  const parent = proofParentPid(process.env, process.ppid);
   // The parent is fixed for this process's life, so its start time is read
   // once (it costs a process spawn on Windows). The pid is re-checked anyway.
   if (!_parentStart || _parentStart.pid !== parent) _parentStart = { pid: parent, start: processStartTime(parent) };
@@ -174,7 +175,6 @@ function attributedSession(named: string | null | undefined): { id: string | nul
   }
   return { id: proven.id };
 }
-const _recalledKnowledgeIds = new Set<number>();
 
 // Re-exported so existing importers (and tests) keep working; the shadow
 // harness imports them from shared/fts.js directly. `export ... from` alone
@@ -387,7 +387,7 @@ export interface EndArgs {
 }
 
 function readParentSessionProof(): ProcessSessionProof | null {
-  const path = join(byPidDir(resolvePaths(process.cwd()).activeSession), `${process.ppid}.json`);
+  const path = join(byPidDir(resolvePaths(process.cwd()).activeSession), `${proofParentPid(process.env, process.ppid)}.json`);
   if (!existsSync(path)) return null;
   try {
     return JSON.parse(readFileSync(path, "utf-8")) as ProcessSessionProof;
@@ -898,7 +898,6 @@ export async function handleRecall(args: {
         );
         for (const row of rows) {
           updateRecall.run(row.id);
-          _recalledKnowledgeIds.add(row.id);
 
           // Maturity and recency are applied in weighted_rank (see recallRankExpr),
           // so ordering is already correct here — nothing further to compute.
