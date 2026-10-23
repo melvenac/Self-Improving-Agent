@@ -62,6 +62,19 @@ function proofPath(dir: string, pid: number): string {
 }
 
 /**
+ * T-315 (D-161): the pid whose proof an MCP server reads. Normally its `process.ppid`, the claude process. Under the
+ * build proxy (build-proxy.ts) the server's parent is the proxy, which names claude in OPEN_BRAIN_HOST_PID and itself in
+ * OPEN_BRAIN_PROXY_PID. The host pid counts ONLY when the proxy pid is this process's actual parent: a value inherited
+ * from further up (the CLAUDE_PID failure, T-003 Step 0b) cannot pass that check.
+ */
+export function proofParentPid(env: NodeJS.ProcessEnv, ppid: number): number {
+  const proxy = Number(env.OPEN_BRAIN_PROXY_PID);
+  const host = Number(env.OPEN_BRAIN_HOST_PID);
+  if (!Number.isInteger(proxy) || proxy <= 0 || proxy !== ppid) return ppid;
+  return Number.isInteger(host) && host > 0 ? host : ppid;
+}
+
+/**
  * A process's start time as an opaque, comparable string, or null when it
  * cannot be read (no such process, or the query failed). The hook and the
  * server both call this, so the two values are produced by one implementation.
