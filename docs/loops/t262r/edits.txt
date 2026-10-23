@@ -1,0 +1,37 @@
+@@@ open-brain/src/pipelines/skills-audit/index.ts
+<<<
+const SCRIPT_RUNNERS = new Set(["node", "bash", "sh", "python", "tsx", "pwsh", "powershell"]);
+===
+/**
+ * Text tools whose output, redirected to a file, makes that file: a build step. Clark built four QA PC prompts in
+ * one session as `sed -e ... old-prompt.txt > new.txt` (T-262, S173), and a dropped generic program hid all four.
+ */
+const FILE_WRITERS = new Set(["sed", "awk", "cat", "head", "tail", "cut", "sort", "uniq", "tr", "grep", "jq", "iconv"]);
+const NO_FILE = /^(\/dev\/null|NUL|\$null)$/i;
+
+/** True when the tokens redirect stdout (`>` or `>>`, attached or not) to a real file; `2>`, `>&2`, null devices are not. */
+function writesFile(rest: string[]): boolean {
+  for (let i = 0; i < rest.length; i++) {
+    const m = /^>>?(.*)$/.exec(rest[i]);
+    if (!m) continue;
+    const target = m[1] !== "" ? m[1] : (rest[i + 1] ?? "");
+    if (target === "" || target.startsWith("&") || NO_FILE.test(target)) continue;
+    return true;
+  }
+  return false;
+}
+
+const SCRIPT_RUNNERS = new Set(["node", "bash", "sh", "python", "tsx", "pwsh", "powershell"]);
+>>>
+@@@ open-brain/src/pipelines/skills-audit/index.ts
+<<<
+    if (!/^[A-Za-z][\w.-]*$/.test(p) || GENERIC_PROGRAMS.has(p)) continue;
+===
+    if (!/^[A-Za-z][\w.-]*$/.test(p)) continue;
+    if (GENERIC_PROGRAMS.has(p)) {
+      // A heredoc body is the file's content, not a build from another file, so `cat > f <<EOF` stays unkeyed.
+      const key = `${p} > file`;
+      if (heredoc === -1 && FILE_WRITERS.has(p) && writesFile(tokens.slice(1)) && !keys.includes(key)) keys.push(key);
+      continue;
+    }
+>>>

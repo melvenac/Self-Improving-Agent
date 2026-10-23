@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/skills-audit/index.ts
+<<<
+      if (heredoc === -1 && FILE_WRITERS.has(p) && writesFile(tokens.slice(1)) && !keys.includes(key)) keys.push(key);
+===
+      if (heredoc === -1 && writesFile(tokens.slice(1)) && !keys.includes(key)) keys.push(key);
+>>>
