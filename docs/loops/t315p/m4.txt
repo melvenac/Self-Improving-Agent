@@ -1,0 +1,6 @@
+@@@ open-brain/src/build-proxy.ts
+<<<
+        if (now !== null && now !== lastTools) {
+===
+        if (now !== null) {
+>>>
