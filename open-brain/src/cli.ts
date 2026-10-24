@@ -272,12 +272,14 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
     process.exit(1);
   }
   const { greetingMetricsPath } = await import("./pipelines/session-start/greeting-metrics.js");
-  const { reviewGreetingMetrics, renderReview, reviewEndMetrics, renderEndReview } = await import("./pipelines/session-start/metrics-review.js");
+  const { reviewGreetingMetrics, renderReview, reviewEndMetrics, renderEndReview, reviewNoEnd, renderNoEnd } = await import("./pipelines/session-start/metrics-review.js");
   const { endMetricsPath } = await import("./shared/end-metrics.js");
   const main = greetingMetricsPath();
   console.log(renderReview(reviewGreetingMetrics([`${main}.1`, main], since), since, main).join("\n"));
   const end = endMetricsPath();
   console.log(renderEndReview(reviewEndMetrics([`${end}.1`, end], since), since, end).join("\n"));
+  // T-318 S3: sessions that greeted and never ended, so a skipped /end is listed rather than found by a transcript read.
+  console.log(renderNoEnd(reviewNoEnd([`${main}.1`, main], [`${end}.1`, end], since), end).join("\n"));
 } else if (command === "bootstrap") {
   // /bootstrap's deterministic half (bootstrap-fix BF-3/4/6). The directory is
   // taken literally, never walked up: a fresh project may not be a repository

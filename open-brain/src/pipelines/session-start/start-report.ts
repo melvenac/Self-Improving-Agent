@@ -295,7 +295,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
           return fleetFallback(err, process.env);
         }
       })(),
-      workingTree: describeWorkingTree(projectRoot),
+      workingTree: describeWorkingTree(projectRoot, result.session.logPath || undefined),
       skills: describeSkills(projectRoot),
       // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
       budget: greetingFlag(projectRoot, "briefing_budget"),
