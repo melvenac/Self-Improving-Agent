@@ -1598,8 +1598,8 @@ export function computeScore(
 const isDirectRun = process.argv[1]?.endsWith("server.js") || process.argv[1]?.endsWith("server.ts");
 if (isDirectRun) {
   const transport = new StdioServerTransport();
-  // T-315 revert (Aaron 10-20): the exit-on-new-build watch is unwired. Live at 9e0d5b01 every server exited and Claude
-  // Code respawned none, so each seat lost open-brain until /mcp reconnect. A stale server says STALE PROCESS instead.
+  // T-315: this server never exits on a new build. Live at 9e0d5b01 (10-20) every server exited and Claude Code
+  // respawned none. A rebuild reaches a running seat through build-proxy.ts, which starts a new server and stops this one.
   server.connect(transport).catch((err) => {
     console.error("open-brain server failed:", err);
     process.exit(1);
