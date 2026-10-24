@@ -57,15 +57,16 @@ describe("T-301: the suite run prints owner, lease and census", () => {
     expect(lines(r.stdout)).toContain("suite census: available, busy SIA: none");
   }, 60_000);
 
-  it("L2: a busy census names the busy seat, and the line prints before the refusal", () => {
-    const r = run({ samples: [presence("working"), presence("working")] });
+  it("L2: a busy census names the busy seat, and the line prints before a controlled rerun's refusal", () => {
+    // decideSuiteStart refuses on a busy census only for a controlled rerun; a normal run goes ahead.
+    const r = run({ samples: [presence("working"), presence("working")], env: { OPEN_BRAIN_CONTROLLED_RERUN: "1" } });
     expect(r.status, r.stdout).toBe(2);
     expect(lines(r.stdout)).toContain("suite census: available, busy SIA: forge");
   }, 60_000);
 
-  it("L3: an unavailable census prints its reason", () => {
+  it("L3: an unavailable census prints its reason; a normal run still goes ahead", () => {
     const r = run({ samples: [presence("idle")] });
-    expect(r.status, r.stdout).toBe(2);
+    expect(r.status, r.stdout).toBe(0);
     expect(lines(r.stdout)).toContain("suite census: census unavailable: fixture has fewer than two samples");
   }, 60_000);
 
