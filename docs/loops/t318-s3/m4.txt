@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli.ts
+<<<
+  console.log(renderNoEnd(reviewNoEnd([`${main}.1`, main], [`${end}.1`, end], since), end).join("\n"));
+===
+  void renderNoEnd;
+>>>

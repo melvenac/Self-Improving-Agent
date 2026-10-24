@@ -1,0 +1,84 @@
+@@@ open-brain/src/pipelines/session-start/metrics-review.ts
+<<<
+/** The END QUEUE lines `open-brain metrics review` prints after the greeting queue. */
+===
+type GreetRow = { ts?: unknown; caller?: unknown; checkout?: unknown; agent?: unknown; session?: unknown };
+
+/** The rows of `paths` in order that are JSON objects with a string ts; the rest are counted as skipped. */
+function readRows<T extends { ts?: unknown }>(paths: readonly string[]): { files: string[]; rows: T[]; skipped: number } {
+  const out = { files: [] as string[], rows: [] as T[], skipped: 0 };
+  for (const path of paths) {
+    if (!existsSync(path)) continue;
+    out.files.push(path);
+    for (const line of readFileSync(path, "utf8").split("\n")) {
+      if (line.trim() === "") continue;
+      try {
+        const row = JSON.parse(line) as T;
+        if (row !== null && typeof row === "object" && typeof row.ts === "string") out.rows.push(row);
+        else out.skipped++;
+      } catch {
+        out.skipped++;
+      }
+    }
+  }
+  return out;
+}
+
+export type NoEndResult = ReviewResult & { from: string | null };
+
+/**
+ * T-318 S3: sessions that greeted through ob_start (caller mcp, with a session number) and left no ob_end row for the
+ * same checkout and session. Counted only from the first end row on, since ob_end wrote none before T-318 S2; each
+ * checkout's newest greeting is left out, because that session may still be running.
+ */
+export function reviewNoEnd(greetingPaths: readonly string[], endPaths: readonly string[], since: string | null): NoEndResult {
+  const greet = readRows<GreetRow>(greetingPaths);
+  const ends = readRows<EndRow>(endPaths);
+  const result: NoEndResult = { files: [...greet.files, ...ends.files], scanned: 0, skipped: greet.skipped + ends.skipped, flagged: [], from: null };
+  const firstEnd = ends.rows.map((r) => r.ts as string).sort()[0];
+  if (firstEnd === undefined) return result;
+  const from = since !== null && since > firstEnd ? since : firstEnd;
+  result.from = from;
+  const key = (checkout: unknown, session: unknown): string => `${String(checkout)}#${String(session)}`;
+  const ended = new Set(ends.rows.map((r) => key(r.checkout, r.session)));
+  const opened = greet.rows.filter((r) => r.caller === "mcp" && typeof r.session === "number" && typeof r.checkout === "string");
+  const newest = new Map<string, string>();
+  for (const r of opened) newest.set(r.checkout as string, key(r.checkout, r.session));
+  const seen = new Set<string>();
+  for (const r of opened) {
+    if ((r.ts as string) < from) continue;
+    const k = key(r.checkout, r.session);
+    if (seen.has(k) || newest.get(r.checkout as string) === k) continue;
+    seen.add(k);
+    result.scanned++;
+    if (ended.has(k)) continue;
+    result.flagged.push({ ts: r.ts as string, checkout: r.checkout as string, agent: typeof r.agent === "string" ? r.agent : null, session: r.session as number, reasons: ["greeted, no ob_end row"] });
+  }
+  return result;
+}
+
+/** The NO END lines `open-brain metrics review` prints last. "Not checked" and "none" are different lines. */
+export function renderNoEnd(r: NoEndResult, endPath: string): string[] {
+  if (r.from === null) return [`NO END: not checked (no ob_end row yet in ${endPath})`];
+  const out = [`NO END: ${r.flagged.length} of ${r.scanned} earlier session(s) since ${r.from.slice(0, 16)}Z greeted and left no ob_end row (each checkout's newest session may still be running, so it is not counted)`];
+  for (const f of r.flagged) out.push(`- ${f.ts.slice(0, 16)}Z ${f.checkout} ${f.agent ?? "?"} s${f.session ?? "?"}: ${f.reasons.join("; ")}`);
+  if (r.skipped > 0) out.push(`(${r.skipped} unreadable line(s) skipped)`);
+  return out;
+}
+
+/** The END QUEUE lines `open-brain metrics review` prints after the greeting queue. */
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  const { reviewGreetingMetrics, renderReview, reviewEndMetrics, renderEndReview } = await import("./pipelines/session-start/metrics-review.js");
+===
+  const { reviewGreetingMetrics, renderReview, reviewEndMetrics, renderEndReview, reviewNoEnd, renderNoEnd } = await import("./pipelines/session-start/metrics-review.js");
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  console.log(renderEndReview(reviewEndMetrics([`${end}.1`, end], since), since, end).join("\n"));
+===
+  console.log(renderEndReview(reviewEndMetrics([`${end}.1`, end], since), since, end).join("\n"));
+  // T-318 S3: sessions that greeted and never ended, so a skipped /end is listed rather than found by a transcript read.
+  console.log(renderNoEnd(reviewNoEnd([`${main}.1`, main], [`${end}.1`, end], since), end).join("\n"));
+>>>
