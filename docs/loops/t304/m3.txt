@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+    const ownCheckout = handoffCheckout(projectRoot) ?? (notASeat ? checkoutOf(projectRoot) : undefined);
+===
+    const ownCheckout = handoffCheckout(projectRoot) ?? (notASeat ? undefined : undefined);
+>>>

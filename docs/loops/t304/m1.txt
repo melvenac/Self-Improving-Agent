@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-schema.ts
+<<<
+  if (seat === null) return notASeat && ownCheckout !== undefined ? newestFromCheckout(handoffs, ownCheckout) : null;
+===
+  if (seat === null) return null;
+>>>

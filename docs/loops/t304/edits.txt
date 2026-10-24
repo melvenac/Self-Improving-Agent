@@ -1,0 +1,113 @@
+@@@ open-brain/src/shared/state-schema.ts
+<<<
+/** The newest handoff (by `first_rev`) of one seat role across its instances, or null. */
+===
+/** T-304: the newest handoff (by `first_rev`) written from one checkout, whatever seat it is filed under, or null. */
+function newestFromCheckout(handoffs: readonly Handoff[], checkout: string): Handoff | null {
+  let best: Handoff | null = null;
+  for (const h of handoffs) if (h.checkout === checkout && (best === null || compareFirstRev(h.first_rev, best.first_rev) >= 0)) best = h;
+  return best;
+}
+
+/** The newest handoff (by `first_rev`) of one seat role across its instances, or null. */
+>>>
+@@@ open-brain/src/shared/state-schema.ts
+<<<
+export function ownHandoff(handoffs: readonly Handoff[], seat: Seat | null, ownCheckout?: string): Handoff | null {
+  if (seat === null) return null;
+===
+export function ownHandoff(handoffs: readonly Handoff[], seat: Seat | null, ownCheckout?: string, notASeat = false): Handoff | null {
+  // T-304: a checkout that declares role none has no seat, so its handoff is the newest written FROM it, by any seat.
+  // Never without a checkout: matching on nothing would brief it from another instance's entry.
+  if (seat === null) return notASeat && ownCheckout !== undefined ? newestFromCheckout(handoffs, ownCheckout) : null;
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  seat: Seat | null;
+===
+  seat: Seat | null;
+  /** T-304: the reader's checkout declares role none, so its handoff is matched by checkout alone (needs ownCheckout). */
+  notASeat?: boolean;
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+===
+  const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout, i.notASeat === true);
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+.join("; ")}`, CAPS.drift);
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+===
+.join("; ")}`, CAPS.drift);
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout, i.notASeat === true);
+>>>
+@@@ open-brain/src/pipelines/session-start/state-render.ts
+<<<
+  ownCheckout?: string;
+  /**
+   * T-296 (3)
+===
+  ownCheckout?: string;
+  /** T-304: the reader's checkout declares role none, so its handoff is matched by checkout alone (needs ownCheckout). */
+  notASeat?: boolean;
+  /**
+   * T-296 (3)
+>>>
+@@@ open-brain/src/pipelines/session-start/state-render.ts
+<<<
+  const own = ownHandoff(state.handoffs, seat, options.ownCheckout);
+
+  if (seat === null) {
+===
+  const own = ownHandoff(state.handoffs, seat, options.ownCheckout, options.notASeat === true);
+
+  if (seat === null && own === null) {
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+import { describeRoleFiles, renderRoleDocs, recordRoleReads } from "./role-files.js";
+===
+import { describeRoleFiles, renderRoleDocs, recordRoleReads, NOT_A_SEAT } from "./role-files.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+import { SeatName, ownHandoff, schemaVersionAdvice, type Seat } from "../../shared/state-schema.js";
+===
+import { SeatName, checkoutOf, ownHandoff, schemaVersionAdvice, type Seat } from "../../shared/state-schema.js";
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+    const ownCheckout = handoffCheckout(projectRoot);
+===
+    // T-304: a role-none checkout's handoff is matched by checkout alone, so it needs its checkout with the flag off too.
+    const notASeat = roles.seat?.role === NOT_A_SEAT;
+    const ownCheckout = handoffCheckout(projectRoot) ?? (notASeat ? checkoutOf(projectRoot) : undefined);
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      ownCheckout,
+      compact: greetingFlag(projectRoot, "state_compact"),
+===
+      ownCheckout,
+      notASeat,
+      compact: greetingFlag(projectRoot, "state_compact"),
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      ownCheckout,
+      sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
+===
+      ownCheckout,
+      notASeat,
+      sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout), resolveUpstreamRef(projectRoot))
+===
+ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout, notASeat), resolveUpstreamRef(projectRoot))
+>>>

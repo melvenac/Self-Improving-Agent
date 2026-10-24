@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-schema.ts
+<<<
+  for (const h of handoffs) if (h.checkout === checkout && (best === null
+===
+  for (const h of handoffs) if ((h.checkout === checkout || checkout !== "") && (best === null
+>>>
