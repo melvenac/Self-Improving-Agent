@@ -27,6 +27,8 @@ export interface BriefingInput {
   version: string;
   /** The reading seat's role, so its OWN handoff is the pick-up. Null: unresolved, and the briefing says so. */
   seat: Seat | null;
+  /** T-304: the reader's checkout declares role none, so its handoff is matched by checkout alone (needs ownCheckout). */
+  notASeat?: boolean;
   /** `Session #N`'s number, or null when no log was created (the briefing then says why instead of inventing one). */
   sessionNumber: number | null;
   sessionNote: string | null;
@@ -150,7 +152,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   if (i.transcript) out.push(i.transcript);
   out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
-  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout, i.notASeat === true);
   const lagNote = handoffLagNote(own, s.revision);
   // T-305 (D-160): the date is UTC, and the Z says so; i.date itself stays plain because isExpired compares it.
   out.push(`${session} — ${i.date}Z · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""}`);
@@ -270,7 +272,7 @@ function renderBudgeted(i: BriefingInput): string[] {
     i.drift.length === 0
       ? "Drift: none"
       : cut(`Drift detected (${i.drift.length}): ${i.drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`).join("; ")}`, CAPS.drift);
-  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout, i.notASeat === true);
   const lagNote = handoffLagNote(own, s.revision);
   const sessionLine = `${session} — ${i.date}Z · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""} · ${drift}`;
   // T-281: T-161's line rides the session line as a fixed note, so an alarm state costs no line and stays inside the char cap.
