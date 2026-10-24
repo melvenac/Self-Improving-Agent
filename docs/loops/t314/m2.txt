@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+  const unrecorded = input.readOnly === true ? null : recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
+===
+  const unrecorded = recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
+>>>

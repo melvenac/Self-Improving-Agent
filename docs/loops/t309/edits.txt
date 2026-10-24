@@ -1,0 +1,15 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+      out.push(t ? `- [${t.status === "done" ? "done" : t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+===
+      // T-309: a done task in the objective says so on its own row, so a stale objective costs no line.
+      if (t?.status === "done") out.push(`- [done] ${t.id} ${cut(t.title, 36)} ${STALE_OBJECTIVE}`);
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+const MORE_TASKS = "state.json tasks[]";
+===
+const MORE_TASKS = "state.json tasks[]";
+export const STALE_OBJECTIVE = "(objective names a done task: update it with set_objective)";
+>>>

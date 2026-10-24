@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+===
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cut(t.title, 100)} ${STALE_OBJECTIVE}` : `- ${id} (not in the record)`);
+>>>
