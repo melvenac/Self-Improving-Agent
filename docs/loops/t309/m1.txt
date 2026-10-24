@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+      if (t?.status === "done") out.push(`- [done] ${t.id} ${cut(t.title, 36)} ${STALE_OBJECTIVE}`);
+===
+      if (t?.status === "done") out.push(`- [done] ${t.id} ${cut(t.title, 36)}`);
+>>>

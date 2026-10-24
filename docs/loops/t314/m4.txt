@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli.ts
+<<<
+readOnly: startOpts.has("--read-only") });
+===
+readOnly: false });
+>>>

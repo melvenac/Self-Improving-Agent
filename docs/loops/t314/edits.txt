@@ -1,0 +1,89 @@
+@@@ open-brain/src/cli-spec.ts
+<<<
+  start: {
+    name: "start",
+    booleans: [],
+===
+  start: {
+    name: "start",
+    booleans: ["--read-only"],
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  const projectRoot = parseOrRefuse(COMMAND_SPECS.start, args.slice(1)).directory ?? resolve(".");
+===
+  const startOpts = parseOrRefuse(COMMAND_SPECS.start, args.slice(1));
+  const projectRoot = startOpts.directory ?? resolve(".");
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" } });
+===
+  // T-314: --read-only is a probe: no session log, no role-read record, no greeting-metrics row.
+  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" }, readOnly: startOpts.has("--read-only") });
+>>>
+@@@ open-brain/src/pipelines/session-start/types.ts
+<<<
+  stateBudgetLines?: number;
+}
+
+export type SessionMode
+===
+  stateBudgetLines?: number;
+  /** T-314: a read-only start (a probe) creates no session log, so it takes no session number. */
+  noLog?: boolean;
+}
+
+export type SessionMode
+>>>
+@@@ open-brain/src/pipelines/session-start/index.ts
+<<<
+    if (!existsSync(sessionsDir)) {
+      // Absent is not silent: the caller prints this instead of a blank block.
+===
+    if (options.noLog === true) {
+      session.skippedReason = "not created: read-only start (--read-only)";
+    } else if (!existsSync(sessionsDir)) {
+      // Absent is not silent: the caller prints this instead of a blank block.
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+  /** Names the calling process in the partner-presence header. */
+  callerLabel: string;
+}
+===
+  /** Names the calling process in the partner-presence header. */
+  callerLabel: string;
+  /** T-314: a probe. No session log, no role-read record and no greeting-metrics row are written. */
+  readOnly?: boolean;
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+    stateBudgetLines: input.stateBudgetLines,
+  });
+===
+    stateBudgetLines: input.stateBudgetLines,
+    noLog: input.readOnly === true,
+  });
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+  const unrecorded = recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
+===
+  // T-314: a read-only start records no read, so the seat's real /start still prints what it has not read.
+  const unrecorded = input.readOnly === true ? null : recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+  if (greetingFlag(projectRoot, "greeting_metrics")) {
+===
+  if (greetingFlag(projectRoot, "greeting_metrics") && input.readOnly !== true) {
+>>>
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+    expect(refused(["--x"], COMMAND_SPECS.start)).toContain("Accepted flags: (none)");
+===
+    // T-314 gave `start` its first flag, so the row uses a spec that has none.
+    expect(refused(["--x"], { name: "bare", booleans: [], values: {}, positionals: "directory" })).toContain("Accepted flags: (none)");
+>>>

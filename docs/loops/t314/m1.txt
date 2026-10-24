@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/index.ts
+<<<
+    if (options.noLog === true) {
+===
+    if (options.noLog === true && sessionsDir === "") {
+>>>
