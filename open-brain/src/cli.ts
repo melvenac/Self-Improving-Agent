@@ -176,11 +176,13 @@ if (command === "sync") {
     process.exit(1);
   }
 } else if (command === "start") {
-  const projectRoot = parseOrRefuse(COMMAND_SPECS.start, args.slice(1)).directory ?? resolve(".");
+  const startOpts = parseOrRefuse(COMMAND_SPECS.start, args.slice(1));
+  const projectRoot = startOpts.directory ?? resolve(".");
 
   // T-154: the same report ob_start returns, from a module with no memory imports.
   const { renderStartReport } = await import("./pipelines/session-start/start-report.js");
-  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" } });
+  // T-314: --read-only is a probe: no session log, no role-read record, no greeting-metrics row.
+  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" }, readOnly: startOpts.has("--read-only") });
   console.log(r.text);
   process.exitCode = r.isError ? 1 : 0;
 } else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics") {
@@ -636,7 +638,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("");
   console.log("Commands:");
   console.log("  sync [--check] [--score [--json]] [--history] [--retirements-rehash [--write]]");
-  console.log("  start                                     Start a session");
+  console.log("  start [--read-only]                       Start a session (--read-only: print the report, write nothing)");
   console.log("  end [--dry-run]                            End a session");
   console.log("  relocate [--from <dir> --to <dir> | --worktrees] [--apply]  Fold a renamed project's or a worktree's history forward");
   console.log(

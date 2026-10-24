@@ -51,6 +51,8 @@ trigger reads `MATCH: command:`** (T-170): the first backticked span is the key,
 are wildcards, and the parts must appear in that order in a Bash command. Key the MISTAKE's shape, not
 the tool: a bare `git show` fires on every `git show`. A keyed lesson is injected at most once per
 session. `path:` and `error:` keys are stored but not read yet; a key under 6 characters is lookup-only.
+A mistake made in TEXT, not in this seat's own Bash call (a command handed to the user, a grep written into a brief
+another seat runs), never reaches the trigger: key it `none — lookup only` (T-308).
 
 For each lesson, `ob_recall` its title first (explicit trigger); skip it if it is already stored,
 or add the new detail. Then call `ob_store` with `kind: "event"`:

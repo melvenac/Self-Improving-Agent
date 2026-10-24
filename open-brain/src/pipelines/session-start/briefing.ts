@@ -241,6 +241,7 @@ export const STANDING_RULES_LINE_CHARS = 200;
 const MORE_WATCH = "state.json handoffs[].watch_out";
 const MORE_QUESTIONS = "state.json handoffs[].open_questions";
 const MORE_TASKS = "state.json tasks[]";
+export const STALE_OBJECTIVE = "(objective names a done task: update it with set_objective)";
 
 /** One line: whitespace flattened, cut at `limit` with the full length named. A clip is never silent. */
 function cut(text: string, limit: number): string {
@@ -284,7 +285,9 @@ function renderBudgeted(i: BriefingInput): string[] {
     out.push("NEXT");
     for (const id of ids.slice(0, CAPS.next)) {
       const t = s.tasks.find((x) => x.id === id);
-      out.push(t ? `- [${t.status === "done" ? "done" : t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+      // T-309: a done task in the objective says so on its own row, so a stale objective costs no line.
+      if (t?.status === "done") out.push(`- [done] ${t.id} ${cut(t.title, 36)} ${STALE_OBJECTIVE}`);
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
     }
     if (ids.length > CAPS.next) out.push(`+${ids.length - CAPS.next} more: ${MORE_TASKS}`);
   }
