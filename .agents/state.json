@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 571,
+  "revision": 572,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2557,16 +2557,16 @@
       "id": "T-308",
       "title": "Lessons whose mistake is not a Bash command cannot be keyed to fire",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 174,
       "supersedes": null,
-      "note": "Found s173 (Maker S69 /end). Two of four lessons: 'bang-prefix-runs-bash-mangles-powershell-env' (text handed to the user) and 'event-links-carry-date-query-slug-grep' (a grep written into a brief that another seat runs) are keyed MATCH: command, but the trigger reads only this seat's own Bash, so neither fires when the mistake repeats. path: keys would fit but are stored and not read (end.md step 2). Decide: read path: keys on Write/Edit, or say in end.md that such lessons are lookup-only. — s174 10-24 PLANNER RULING (recommended default, noted for Aaron via clark): a mistake made in TEXT, not in the seat's own Bash call, is keyed `none` (lookup only); end.md step 2 says so in all three copies. Reading path: keys on Write/Edit was not chosen for these: a path key on a brief file would fire on every edit of every brief. Build brief docs/loops/t308-brief.md (#962), job #102 (3 L1 rows + 1 mutant).",
+      "note": "Found s173 (Maker S69 /end). Two of four lessons: 'bang-prefix-runs-bash-mangles-powershell-env' (text handed to the user) and 'event-links-carry-date-query-slug-grep' (a grep written into a brief that another seat runs) are keyed MATCH: command, but the trigger reads only this seat's own Bash, so neither fires when the mistake repeats. path: keys would fit but are stored and not read (end.md step 2). Decide: read path: keys on Write/Edit, or say in end.md that such lessons are lookup-only. — s174 10-24 PLANNER RULING (recommended default, noted for Aaron via clark): a mistake made in TEXT, not in the seat's own Bash call, is keyed `none` (lookup only); end.md step 2 says so in all three copies. Reading path: keys on Write/Edit was not chosen for these: a path key on a brief file would fire on every edit of every brief. Build brief docs/loops/t308-brief.md (#962), job #102 (3 L1 rows + 1 mutant). — s174 10-24 SHIPPED: PR #970 merged f2e031d5 by clark under SG-1 (update-branch to 1a82d83d, patch-id SAME 46f2d5152b9d, CI test SUCCESS, trees equal 7af83310). Build job #102 READY 553465ff: L1 x3 red then green (20/20), the mutant reds only the .cursor copy's row; Atlas byte-compare SAME x4, no EXTRA. No rebuild (text + test). OWED, Aaron's: re-copy the live user-scope ~/.claude/commands/end.md (his config); /sync mirror-parity WARNs until then. Live check: the next /end that stores a text-shaped lesson keys it `none` (lookup only).",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
-      "closed_rev": null
+      "closed_rev": 572
     },
     {
       "id": "T-309",
@@ -6895,7 +6895,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "last_work_rev": 571
+      "last_work_rev": 572
     }
   ]
 }
