@@ -282,6 +282,12 @@ async function main(): Promise<void> {
     leaseReleaseExit: releaseExit,
   });
   writeFileSync(metaPath, JSON.stringify(meta, null, 2) + "\n");
+  // T-301: the run says who owns it, what the lease did and what the census read, not only the meta file.
+  const ownerLine = owner.pid === null ? `none (${owner.reason ?? "unresolved"})` : `pid ${owner.pid} (${owner.source})`;
+  const busy = census.busySia.length > 0 ? census.busySia.join(", ") : "none";
+  process.stdout.write(`suite owner: ${ownerLine}\n`);
+  process.stdout.write(`suite lease: ${lease.status} (take exit ${lease.takeExit ?? "none"}, release exit ${releaseExit ?? "none"})\n`);
+  process.stdout.write(`suite census: ${census.available ? `available, busy SIA: ${busy}` : census.reason ?? "unavailable"}\n`);
   if (refused) {
     process.stderr.write(`${decisionWhy ?? "refused"}\n`);
     process.exitCode = 2;
