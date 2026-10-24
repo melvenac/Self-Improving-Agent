@@ -8,9 +8,10 @@
 
 import { renameSync, unlinkSync, writeFileSync } from "node:fs";
 import type Database from "better-sqlite3";
-import { parseCommandKey, type CommandKey } from "./match-keys.js";
+import { parseCommandKey, parseErrorKey, type CommandKey, type ErrorKey } from "./match-keys.js";
 
 const COMMAND_LINE = /^MATCH:\s*command:/m;
+const ERROR_LINE = /^MATCH:\s*error:/m;
 
 export function writeTriggerKeys(db: Database.Database, path: string): { written: number; unusable: number } {
   const rows = db
@@ -21,8 +22,14 @@ export function writeTriggerKeys(db: Database.Database, path: string): { written
     .all() as Array<{ id: number; content: string }>;
 
   const keys: CommandKey[] = [];
+  // T-170 (ii): error keys ride the same file. The counts returned stay the command keys'.
+  const errorKeys: ErrorKey[] = [];
   let unusable = 0;
   for (const row of rows) {
+    if (ERROR_LINE.test(row.content)) {
+      const text = parseErrorKey(row.content);
+      if (text !== null) errorKeys.push({ id: row.id, text });
+    }
     if (!COMMAND_LINE.test(row.content)) continue;
     const fragments = parseCommandKey(row.content);
     if (fragments) keys.push({ id: row.id, fragments });
@@ -30,7 +37,7 @@ export function writeTriggerKeys(db: Database.Database, path: string): { written
   }
 
   const tmp = `${path}.tmp-${process.pid}`;
-  writeFileSync(tmp, JSON.stringify({ generated_at: new Date().toISOString(), keys }), "utf-8");
+  writeFileSync(tmp, JSON.stringify({ generated_at: new Date().toISOString(), keys, errorKeys }), "utf-8");
   try {
     renameSync(tmp, path);
   } catch (err) {
