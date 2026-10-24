@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+      if (text !== null) errorKeys.push({ id: row.id, text });
+===
+      if (text !== null && text === "") errorKeys.push({ id: row.id, text });
+>>>

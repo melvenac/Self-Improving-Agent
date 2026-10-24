@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+  const error = typeof payload.error === "string" ? payload.error : "";
+===
+  const error = "";
+>>>
