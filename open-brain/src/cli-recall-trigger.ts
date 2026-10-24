@@ -182,6 +182,7 @@ async function main(): Promise<void> {
     const { initTriggerFires } = await import("./db-v2.js");
     const { runTrigger } = await import("./trigger/run.js");
     const { loadPolicy } = await import("./trigger/policy.js");
+    const { resolveTriggerSeat } = await import("./trigger/seat.js");
 
     let policy;
     try {
@@ -218,7 +219,9 @@ async function main(): Promise<void> {
     writeDb.pragma("busy_timeout = 0");
     initTriggerFires(writeDb);
 
-    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds });
+    const cwd = typeof payload.cwd === "string" && payload.cwd !== "" ? payload.cwd : null;
+    const seat = resolveTriggerSeat(readDb, sessionUuid, cwd);
+    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
 
     // The deadline is checked HERE, after the synchronous work, and it
     // governs only whether the result may still be emitted. A reminder that
