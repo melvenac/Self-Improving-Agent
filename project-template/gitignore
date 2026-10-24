@@ -35,6 +35,9 @@ Thumbs.db
 # Runtime artifacts (session-local / regenerated)
 /.recalled-entries.json
 
+# Backups an installer leaves beside a settings file it rewrites (settings.local.json.bak-<stamp>).
+/.claude/*.bak-*
+
 # A2A-Hub seat-waker runtime (.cursor/wake.lock, waker.pid, wake-prompt-*.txt).
 # Hub --say-from-file scratch (hub-reply-*.txt).
 /.cursor/wake.lock

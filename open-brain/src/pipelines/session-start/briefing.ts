@@ -413,10 +413,12 @@ export function describeProblemStatement(projectRoot: string): string {
 }
 
 /** `Working tree: clean`, or `N uncommitted: path, path, ...`. Never silent: a git failure is `not checked`. */
-export function describeWorkingTree(projectRoot: string): string {
+export function describeWorkingTree(projectRoot: string, ownLog?: string): string {
   try {
     const out = execFileSync("git", ["status", "--porcelain"], { cwd: projectRoot, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-    const paths = out.split("\n").filter((l) => l.trim() !== "").map((l) => l.slice(3));
+    // T-297: this session's own new log is expected to be uncommitted, so it is named as such, not hidden.
+    const own = ownLog === undefined ? null : relative(projectRoot, ownLog).split(sep).join("/");
+    const paths = out.split("\n").filter((l) => l.trim() !== "").map((l) => l.slice(3)).map((p) => (p === own ? `${p} (this session's log)` : p));
     if (paths.length === 0) return "Working tree: clean";
     const shown = paths.slice(0, 8).join(", ");
     return `Working tree: ${paths.length} uncommitted: ${shown}${paths.length > 8 ? `, +${paths.length - 8} more` : ""}`;
