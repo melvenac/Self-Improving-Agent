@@ -40,6 +40,8 @@ export interface StartReportInput {
   stateBudgetLines?: number;
   /** Names the calling process in the partner-presence header. */
   callerLabel: string;
+  /** T-314: a probe. No session log, no role-read record and no greeting-metrics row are written. */
+  readOnly?: boolean;
 }
 
 export interface StartReport {
@@ -106,6 +108,7 @@ export async function renderStartReport(input: StartReportInput): Promise<StartR
     // discover, or a shared checkout stamps the other session's transcript.
     sessionId: proven.id,
     stateBudgetLines: input.stateBudgetLines,
+    noLog: input.readOnly === true,
   });
   const sessionIdLine = proven.id === null
     ? `Session ID: none — ${proven.reason}`
@@ -288,7 +291,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
           return fleetFallback(err, process.env);
         }
       })(),
-      workingTree: describeWorkingTree(projectRoot),
+      workingTree: describeWorkingTree(projectRoot, result.session.logPath || undefined),
       skills: describeSkills(projectRoot),
       // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
       budget: greetingFlag(projectRoot, "briefing_budget"),
@@ -366,13 +369,14 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
   // read is recorded only after its full text is in `lines`, and only here.
   const roleDocs = renderRoleDocs(projectRoot, roles.files, roles.seat, greetingFlag(projectRoot, "role_docs_by_sha"));
   lines.push(...roleDocs.lines);
-  const unrecorded = recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
+  // T-314: a read-only start records no read, so the seat's real /start still prints what it has not read.
+  const unrecorded = input.readOnly === true ? null : recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
   if (unrecorded) lines.push(`\n${unrecorded}`);
 
   // Total is of everything above it — the measurement Part 1 of the
   // evaluation asks for. Computed last so it counts the real return.
   // T-299: opt-in (greeting.json `greeting_metrics`). Never changes isError or any line but its own failure line.
-  if (greetingFlag(projectRoot, "greeting_metrics")) {
+  if (greetingFlag(projectRoot, "greeting_metrics") && input.readOnly !== true) {
     const m = recordGreetingMetrics({
       projectRoot,
       callerLabel: input.callerLabel,

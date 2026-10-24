@@ -241,6 +241,7 @@ export const STANDING_RULES_LINE_CHARS = 200;
 const MORE_WATCH = "state.json handoffs[].watch_out";
 const MORE_QUESTIONS = "state.json handoffs[].open_questions";
 const MORE_TASKS = "state.json tasks[]";
+export const STALE_OBJECTIVE = "(objective names a done task: update it with set_objective)";
 
 /** One line: whitespace flattened, cut at `limit` with the full length named. A clip is never silent. */
 function cut(text: string, limit: number): string {
@@ -284,7 +285,9 @@ function renderBudgeted(i: BriefingInput): string[] {
     out.push("NEXT");
     for (const id of ids.slice(0, CAPS.next)) {
       const t = s.tasks.find((x) => x.id === id);
-      out.push(t ? `- [${t.status === "done" ? "done" : t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+      // T-309: a done task in the objective says so on its own row, so a stale objective costs no line.
+      if (t?.status === "done") out.push(`- [done] ${t.id} ${cut(t.title, 36)} ${STALE_OBJECTIVE}`);
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
     }
     if (ids.length > CAPS.next) out.push(`+${ids.length - CAPS.next} more: ${MORE_TASKS}`);
   }
@@ -413,10 +416,12 @@ export function describeProblemStatement(projectRoot: string): string {
 }
 
 /** `Working tree: clean`, or `N uncommitted: path, path, ...`. Never silent: a git failure is `not checked`. */
-export function describeWorkingTree(projectRoot: string): string {
+export function describeWorkingTree(projectRoot: string, ownLog?: string): string {
   try {
     const out = execFileSync("git", ["status", "--porcelain"], { cwd: projectRoot, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-    const paths = out.split("\n").filter((l) => l.trim() !== "").map((l) => l.slice(3));
+    // T-297: this session's own new log is expected to be uncommitted, so it is named as such, not hidden.
+    const own = ownLog === undefined ? null : relative(projectRoot, ownLog).split(sep).join("/");
+    const paths = out.split("\n").filter((l) => l.trim() !== "").map((l) => l.slice(3)).map((p) => (p === own ? `${p} (this session's log)` : p));
     if (paths.length === 0) return "Working tree: clean";
     const shown = paths.slice(0, 8).join(", ");
     return `Working tree: ${paths.length} uncommitted: ${shown}${paths.length > 8 ? `, +${paths.length - 8} more` : ""}`;
