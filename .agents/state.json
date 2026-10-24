@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 576,
+  "revision": 577,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2500,16 +2500,16 @@
       "id": "T-304",
       "title": "A coordinator (or role-none) checkout cannot carry a session handoff: set_handoff accepts only planner|developer|qa",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 174,
       "supersedes": null,
-      "note": "s173, found by T-300 (clark's fleet record, 10-18). set_handoff refuses role none ('seat: expected planner|developer|qa'), and a role-none reader's briefing prints READER'S SEAT UNRESOLVED with no PICK UP. A one-agent bootstrap project (role none by design, bootstrap.md step 3) therefore never gets a pick-up line either. clark works around it with an ignored AGENT.local.md role planner, which also forces a planner loop_state. Options: a 'coordinator' role value, or let role none write and read a handoff without loop_state. Size SMALL to MEDIUM; check the T-163 per-session handoff rules first. — s174 10-24 planner read, not briefed. The gap is on the READ side: state-schema.ts ownHandoff() returns null whenever the reader's seat is null, so a role-none checkout gets no PICK UP even for a handoff its own checkout wrote. role-files.ts NOT_A_SEAT records that `none` is deliberately read-side only and that set_handoff names its own seat (BF-5), so a role-none writer must pick planner (loop_state required), developer or qa. Smallest fix candidate: for a NOT_A_SEAT reader, ownHandoff matches by checkout alone (newest handoff from this checkout, any seat); no schema change. Widening SeatName to include `none` instead touches ~10 modules and the harness RoleName match. Needs a ruling on which before a brief. — s174 10-24 PLANNER RULING (recommended default, noted for Aaron via clark): the READ side only. A reader whose identity declares role none gets the newest handoff written FROM its own checkout, by any seat; with no checkout known it gets none; an unresolved reader (no identity) is unchanged; start-report gives a role-none reader its checkout even with handoff_by_checkout off. No schema, set_handoff or SeatName change; reads-owed and greeting-metrics keep null-seat behaviour. SIM docs/loops/t304-sim.md (#963), job #103: 13 edits in 4 files, rows H1-H3/H4a/H4b/H5, mutants m1-m4.",
+      "note": "s173, found by T-300 (clark's fleet record, 10-18). set_handoff refuses role none ('seat: expected planner|developer|qa'), and a role-none reader's briefing prints READER'S SEAT UNRESOLVED with no PICK UP. A one-agent bootstrap project (role none by design, bootstrap.md step 3) therefore never gets a pick-up line either. clark works around it with an ignored AGENT.local.md role planner, which also forces a planner loop_state. Options: a 'coordinator' role value, or let role none write and read a handoff without loop_state. Size SMALL to MEDIUM; check the T-163 per-session handoff rules first. — s174 10-24 planner read, not briefed. The gap is on the READ side: state-schema.ts ownHandoff() returns null whenever the reader's seat is null, so a role-none checkout gets no PICK UP even for a handoff its own checkout wrote. role-files.ts NOT_A_SEAT records that `none` is deliberately read-side only and that set_handoff names its own seat (BF-5), so a role-none writer must pick planner (loop_state required), developer or qa. Smallest fix candidate: for a NOT_A_SEAT reader, ownHandoff matches by checkout alone (newest handoff from this checkout, any seat); no schema change. Widening SeatName to include `none` instead touches ~10 modules and the harness RoleName match. Needs a ruling on which before a brief. — s174 10-24 PLANNER RULING (recommended default, noted for Aaron via clark): the READ side only. A reader whose identity declares role none gets the newest handoff written FROM its own checkout, by any seat; with no checkout known it gets none; an unresolved reader (no identity) is unchanged; start-report gives a role-none reader its checkout even with handoff_by_checkout off. No schema, set_handoff or SeatName change; reads-owed and greeting-metrics keep null-seat behaviour. SIM docs/loops/t304-sim.md (#963), job #103: 13 edits in 4 files, rows H1-H3/H4a/H4b/H5, mutants m1-m4. — s174 10-24 SHIPPED, TASK CLOSED: PR #985 merged 4e357351 by clark under SG-1 (refresh to 86cdbf44, patch-id SAME 839e6d2fcd52, CI pass, trees equal 2fcd91bf); REBUILT desktop (build-info 4e357351, Atlas-read). Build job #115 READY 1d88304f: H1/H4a/H4b red then green (121/121), wide run 153 files / 1745 tests 0 failed (+1 file over the SIM = T-309's test, merged between), m1 H1+H4a+H4b, m2 H1+H4a+H5, m3 H4a+H4b, m4 H4b; Atlas byte-compare SAME x5; merge-check CLEAN. LIVE GUARD PASS (desktop, `start --read-only` on the main checkout, role none, Clark): 'This checkout is NOT A SEAT', PICK UP 'none: this reader's seat is unresolved', READER'S SEAT UNRESOLVED header; no handoff in the record was written from that checkout (handoffs by checkout: sia-planner 11, sia-forge 1, sia-builder 1, legacy 1), so another checkout's handoff is correctly not named. The positive case (a role-none checkout reading its own handoff) is passive: the first handoff a role-none checkout writes shows as its PICK UP. The write side is unchanged by design (set_handoff still names a seat; noted for Aaron with the ruling).",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
-      "closed_rev": null
+      "closed_rev": 577
     },
     {
       "id": "T-305",
@@ -6895,7 +6895,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "last_work_rev": 576
+      "last_work_rev": 577
     }
   ]
 }
