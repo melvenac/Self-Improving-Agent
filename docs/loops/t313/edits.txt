@@ -1,0 +1,86 @@
+@@@ open-brain/src/trigger/run.ts
+<<<
+import type { TriggerPolicy } from "./policy.js";
+===
+import type { TriggerPolicy } from "./policy.js";
+import { entrySeat } from "./seat.js";
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  keyIds?: number[];
+}
+===
+  keyIds?: number[];
+  /** T-313: the session's seat (resolveTriggerSeat). An entry written for another seat does not fire; null fires all. */
+  seat?: string | null;
+}
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  const readDb = input.readDb ?? input.db;
+  const hits: Array<{ id: number; key: string | null; content: string }> = derived
+    ? queryStore({
+        db: readDb,
+        command: input.command,
+        floor: input.policy.relevance_floor,
+        limit: input.policy.max_injected,
+      })
+    : [];
+===
+  const readDb = input.readDb ?? input.db;
+  // T-313: an entry written for one seat's ops skill does not fire for another seat. A skipped element hit keeps its
+  // slot: the query's limit is unchanged, so a lower-ranked entry does not replace it.
+  const seat = input.seat?.trim().toLowerCase() || null;
+  const skipped: number[] = [];
+  const tagsOf = readDb.prepare(`SELECT tags FROM knowledge_index WHERE id = ?`);
+  const forOtherSeat = (h: { id: number; content: string }): boolean => {
+    if (seat === null) return false;
+    const owner = entrySeat(h.content, (tagsOf.get(h.id) as { tags: string | null } | undefined)?.tags ?? "");
+    if (owner === null || owner === seat) return false;
+    skipped.push(h.id);
+    return true;
+  };
+  const found: Array<{ id: number; key: string | null; content: string }> = derived
+    ? queryStore({
+        db: readDb,
+        command: input.command,
+        floor: input.policy.relevance_floor,
+        limit: input.policy.max_injected,
+      })
+    : [];
+  const hits = found.filter((h) => !forOtherSeat(h));
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+      hits.push(row);
+===
+      if (forOtherSeat(row)) continue;
+      hits.push(row);
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  const query = [derived, keyIds.length ? `match:${keyIds.join(",")}` : ""].filter(Boolean).join(" ");
+===
+  const query = [
+    derived,
+    keyIds.length ? `match:${keyIds.join(",")}` : "",
+    skipped.length ? `seat-skip:${skipped.join(",")}` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+    const { loadPolicy } = await import("./trigger/policy.js");
+===
+    const { loadPolicy } = await import("./trigger/policy.js");
+    const { resolveTriggerSeat } = await import("./trigger/seat.js");
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds });
+===
+    const cwd = typeof payload.cwd === "string" && payload.cwd !== "" ? payload.cwd : null;
+    const seat = resolveTriggerSeat(readDb, sessionUuid, cwd);
+    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
+>>>

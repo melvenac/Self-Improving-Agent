@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/run.ts
+<<<
+    if (seat === null) return false;
+===
+    if (seat === null || seat !== null) return false;
+>>>

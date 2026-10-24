@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
+===
+    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds });
+>>>

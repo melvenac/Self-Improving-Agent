@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/seat.ts
+<<<
+    const there = row?.project_dir ? readAgentIdentity(row.project_dir) : null;
+===
+    const there = row?.project_dir ? null : null;
+>>>
