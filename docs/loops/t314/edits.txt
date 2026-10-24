@@ -87,3 +87,9 @@ export type SessionMode
     // T-314 gave `start` its first flag, so the row uses a spec that has none.
     expect(refused(["--x"], { name: "bare", booleans: [], values: {}, positionals: "directory" })).toContain("Accepted flags: (none)");
 >>>
+@@@ open-brain/src/cli.ts
+<<<
+  console.log("  start                                     Start a session");
+===
+  console.log("  start [--read-only]                       Start a session (--read-only: print the report, write nothing)");
+>>>

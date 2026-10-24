@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/state-render.ts
+<<<
+  if (seat === null && own === null) {
+===
+  if (seat === null) {
+>>>

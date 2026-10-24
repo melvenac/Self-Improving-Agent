@@ -1,0 +1,198 @@
+@@@ open-brain/src/trigger/match-keys.ts
+<<<
+ * parses that line. Only command keys are read: the trigger is a
+ * PostToolUse/Bash hook and sees commands. Path and error keys stay stored and
+ * unread (T-170 part ii).
+===
+ * parses that line. Command keys are read against the command; error keys
+ * against a failed shell call's error text (T-170 part ii, PostToolUseFailure).
+ * Path keys stay stored and unread.
+>>>
+@@@ open-brain/src/trigger/match-keys.ts
+<<<
+export function matchingKeyIds(keys: CommandKey[], command: string): number[] {
+  return keys
+    .filter((k) => commandMatchesKey(k.fragments, command))
+    .sort((a, b) => b.fragments.join("").length - a.fragments.join("").length || a.id - b.id)
+    .map((k) => k.id);
+}
+===
+export function matchingKeyIds(keys: CommandKey[], command: string): number[] {
+  return keys
+    .filter((k) => commandMatchesKey(k.fragments, command))
+    .sort((a, b) => b.fragments.join("").length - a.fragments.join("").length || a.id - b.id)
+    .map((k) => k.id);
+}
+
+/** T-170 (ii): a lesson's `MATCH: error:` key, matched against a failed shell call's error text. */
+export interface ErrorKey {
+  id: number;
+  text: string;
+}
+
+const ERROR_LINE = /^MATCH:\s*error:/;
+
+/**
+ * The text of a lesson's `MATCH: error:` key, or `null` when it has none or the key is too short to match on. /end
+ * writes the key as a double-quoted string; inside it `\"` and `\\` stand for `"` and `\`. Whitespace runs count as one
+ * space.
+ */
+export function parseErrorKey(content: string): string | null {
+  const line = content.split(/\r?\n/).find((l) => ERROR_LINE.test(l));
+  if (line === undefined) return null;
+  let text = line.replace(/^MATCH:\s*error:\s*/, "").trim();
+  const close = text.lastIndexOf('"');
+  if (text.startsWith('"') && close > 0) text = text.slice(1, close).replace(/\\(["\\])/g, "$1");
+  text = text.replace(/\s+/g, " ").trim();
+  return text.replace(/\s/g, "").length < MATCH_KEY_MIN_CHARS ? null : text;
+}
+
+/** True exactly when the key occurs in the error text. Case-sensitive; whitespace runs in the text count as one space. */
+export function errorMatchesKey(key: string, error: string): boolean {
+  return error.replace(/\s+/g, " ").includes(key);
+}
+
+/** The sidecar's error keys. Any failure is `[]` and never throws, as for command keys. */
+export function readTriggerErrorKeys(path: string): ErrorKey[] {
+  try {
+    const keys = (JSON.parse(readFileSync(path, "utf-8")) as { errorKeys?: unknown })?.errorKeys;
+    if (!Array.isArray(keys)) return [];
+    const ok = keys.every(
+      (k) => k !== null && typeof k === "object" && typeof (k as ErrorKey).id === "number" && typeof (k as ErrorKey).text === "string",
+    );
+    return ok ? (keys as ErrorKey[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** The ids whose error key occurs in the error text, longest key first, then id ascending. */
+export function matchingErrorKeyIds(keys: ErrorKey[], error: string): number[] {
+  return keys
+    .filter((k) => errorMatchesKey(k.text, error))
+    .sort((a, b) => b.text.length - a.text.length || a.id - b.id)
+    .map((k) => k.id);
+}
+>>>
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+import { parseCommandKey, type CommandKey } from "./match-keys.js";
+
+const COMMAND_LINE = /^MATCH:\s*command:/m;
+===
+import { parseCommandKey, parseErrorKey, type CommandKey, type ErrorKey } from "./match-keys.js";
+
+const COMMAND_LINE = /^MATCH:\s*command:/m;
+const ERROR_LINE = /^MATCH:\s*error:/m;
+>>>
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+  const keys: CommandKey[] = [];
+  let unusable = 0;
+  for (const row of rows) {
+    if (!COMMAND_LINE.test(row.content)) continue;
+===
+  const keys: CommandKey[] = [];
+  // T-170 (ii): error keys ride the same file. The counts returned stay the command keys'.
+  const errorKeys: ErrorKey[] = [];
+  let unusable = 0;
+  for (const row of rows) {
+    if (ERROR_LINE.test(row.content)) {
+      const text = parseErrorKey(row.content);
+      if (text !== null) errorKeys.push({ id: row.id, text });
+    }
+    if (!COMMAND_LINE.test(row.content)) continue;
+>>>
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+  writeFileSync(tmp, JSON.stringify({ generated_at: new Date().toISOString(), keys }), "utf-8");
+===
+  writeFileSync(tmp, JSON.stringify({ generated_at: new Date().toISOString(), keys, errorKeys }), "utf-8");
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+import { matchingKeyIds, readTriggerKeys, triggerKeysPath } from "./trigger/match-keys.js";
+===
+import { matchingErrorKeyIds, matchingKeyIds, readTriggerErrorKeys, readTriggerKeys, triggerKeysPath } from "./trigger/match-keys.js";
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+  const keyIds = matchingKeyIds(readTriggerKeys(triggerKeysPath(DB_PATH)), command);
+  if (deriveQuery(command) === "" && keyIds.length === 0) {
+===
+  const keyIds = matchingKeyIds(readTriggerKeys(triggerKeysPath(DB_PATH)), command);
+  // T-170 (ii): a failed call's `error` text (PostToolUseFailure) is matched against the `MATCH: error:` keys.
+  const error = typeof payload.error === "string" ? payload.error : "";
+  const errorKeyIds = error !== "" ? matchingErrorKeyIds(readTriggerErrorKeys(triggerKeysPath(DB_PATH)), error) : [];
+  if (deriveQuery(command) === "" && keyIds.length === 0 && errorKeyIds.length === 0) {
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
+===
+    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat, error, errorKeyIds });
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+import { commandMatchesKey, parseCommandKey } from "./match-keys.js";
+===
+import { commandMatchesKey, errorMatchesKey, parseCommandKey, parseErrorKey } from "./match-keys.js";
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  /** T-313: the session's seat (resolveTriggerSeat). An entry written for another seat does not fire; null fires all. */
+  seat?: string | null;
+}
+===
+  /** T-313: the session's seat (resolveTriggerSeat). An entry written for another seat does not fire; null fires all. */
+  seat?: string | null;
+  /** T-170 (ii): a failed call's error text, and the ids the sidecar's error keys matched in it (re-tested here). */
+  error?: string;
+  errorKeyIds?: number[];
+}
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  const keyIds = input.keyIds ?? [];
+
+  if (!derived && keyIds.length === 0) {
+===
+  const keyIds = input.keyIds ?? [];
+  const errorKeyIds = input.errorKeyIds ?? [];
+
+  if (!derived && keyIds.length === 0 && errorKeyIds.length === 0) {
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  if (hits.length < input.policy.max_injected && keyIds.length > 0) {
+    const already = injectedIds(input.db, input.sessionUuid);
+    const byId = readDb.prepare(
+      `SELECT id, key, content FROM knowledge_index WHERE id = ? AND archived_into IS NULL`,
+    );
+    for (const id of keyIds) {
+===
+  if (hits.length < input.policy.max_injected && (keyIds.length > 0 || errorKeyIds.length > 0)) {
+    const already = injectedIds(input.db, input.sessionUuid);
+    const byId = readDb.prepare(
+      `SELECT id, key, content FROM knowledge_index WHERE id = ? AND archived_into IS NULL`,
+    );
+    // T-170 (ii): an error key first. The failure's own text names the mistake more exactly than the command does.
+    for (const id of errorKeyIds) {
+      if (hits.length >= input.policy.max_injected) break;
+      const row = byId.get(id) as { id: number; key: string | null; content: string } | undefined;
+      if (!row) continue;
+      const key = parseErrorKey(row.content);
+      if (key === null || !errorMatchesKey(key, input.error ?? "")) continue;
+      if (already.includes(row.id) || hits.some((h) => h.id === row.id)) continue;
+      if (forOtherSeat(row)) continue;
+      hits.push(row);
+    }
+    for (const id of keyIds) {
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+    keyIds.length ? `match:${keyIds.join(",")}` : "",
+===
+    keyIds.length ? `match:${keyIds.join(",")}` : "",
+    errorKeyIds.length ? `error-match:${errorKeyIds.join(",")}` : "",
+>>>

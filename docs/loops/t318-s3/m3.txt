@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/metrics-review.ts
+<<<
+  const opened = greet.rows.filter((r) => r.caller === "mcp" && typeof r.session === "number" && typeof r.checkout === "string");
+===
+  const opened = greet.rows.filter((r) => typeof r.session === "number" && typeof r.checkout === "string");
+>>>

@@ -1,0 +1,54 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+export function describeWorkingTree(projectRoot: string): string {
+  try {
+    const out = execFileSync("git", ["status", "--porcelain"], { cwd: projectRoot, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    const paths = out.split("\n").filter((l) => l.trim() !== "").map((l) => l.slice(3));
+===
+export function describeWorkingTree(projectRoot: string, ownLog?: string): string {
+  try {
+    const out = execFileSync("git", ["status", "--porcelain"], { cwd: projectRoot, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    // T-297: this session's own new log is expected to be uncommitted, so it is named as such, not hidden.
+    const own = ownLog === undefined ? null : relative(projectRoot, ownLog).split(sep).join("/");
+    const paths = out.split("\n").filter((l) => l.trim() !== "").map((l) => l.slice(3)).map((p) => (p === own ? `${p} (this session's log)` : p));
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      workingTree: describeWorkingTree(projectRoot),
+===
+      workingTree: describeWorkingTree(projectRoot, result.session.logPath || undefined),
+>>>
+@@@ project-template/gitignore
+<<<
+/.recalled-entries.json
+===
+/.recalled-entries.json
+
+# Backups an installer leaves beside a settings file it rewrites (settings.local.json.bak-<stamp>).
+/.claude/*.bak-*
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing.test.ts
+<<<
+        workingTree: describeWorkingTree(root),
+        skills: describeSkills(root),
+      }),
+    );
+===
+        // T-297 step 3: ob_start names its own new log on the Working tree line, so the expectation does too.
+        workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${n}.md`)),
+        skills: describeSkills(root),
+      }),
+    );
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing.test.ts
+<<<
+            workingTree: describeWorkingTree(root),
+            skills: describeSkills(root),
+          }),
+        ),
+===
+            workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${sessionNumber}.md`)),
+            skills: describeSkills(root),
+          }),
+        ),
+>>>
