@@ -18,6 +18,7 @@ import { deriveQuery, queryStore } from "./query.js";
 import { injectedIds, recordFire, type FireState } from "./fires.js";
 import { commandMatchesKey, parseCommandKey } from "./match-keys.js";
 import type { TriggerPolicy } from "./policy.js";
+import { entrySeat } from "./seat.js";
 
 export interface TriggerRunInput {
   /** Writable: the fire record, and nothing else. */
@@ -33,6 +34,8 @@ export interface TriggerRunInput {
   policy: TriggerPolicy;
   /** Ids the sidecar prefilter matched; re-tested here against the store (T-170). */
   keyIds?: number[];
+  /** T-313: the session's seat (resolveTriggerSeat). An entry written for another seat does not fire; null fires all. */
+  seat?: string | null;
 }
 
 export interface TriggerOutcome {
@@ -100,7 +103,19 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
   }
 
   const readDb = input.readDb ?? input.db;
-  const hits: Array<{ id: number; key: string | null; content: string }> = derived
+  // T-313: an entry written for one seat's ops skill does not fire for another seat. A skipped element hit keeps its
+  // slot: the query's limit is unchanged, so a lower-ranked entry does not replace it.
+  const seat = input.seat?.trim().toLowerCase() || null;
+  const skipped: number[] = [];
+  const tagsOf = readDb.prepare(`SELECT tags FROM knowledge_index WHERE id = ?`);
+  const forOtherSeat = (h: { id: number; content: string }): boolean => {
+    if (seat === null) return false;
+    const owner = entrySeat(h.content, (tagsOf.get(h.id) as { tags: string | null } | undefined)?.tags ?? "");
+    if (owner === null || owner === seat) return false;
+    skipped.push(h.id);
+    return true;
+  };
+  const found: Array<{ id: number; key: string | null; content: string }> = derived
     ? queryStore({
         db: readDb,
         command: input.command,
@@ -108,6 +123,7 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
         limit: input.policy.max_injected,
       })
     : [];
+  const hits = found.filter((h) => !forOtherSeat(h));
 
   // T-170: keyed entries fill the slots the element path left. The sidecar
   // only prefiltered them, so each is re-read and re-tested here: a stale
@@ -126,11 +142,18 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
       const fragments = parseCommandKey(row.content);
       if (!fragments || !commandMatchesKey(fragments, input.command)) continue;
       if (already.includes(row.id) || hits.some((h) => h.id === row.id)) continue;
+      if (forOtherSeat(row)) continue;
       hits.push(row);
     }
   }
 
-  const query = [derived, keyIds.length ? `match:${keyIds.join(",")}` : ""].filter(Boolean).join(" ");
+  const query = [
+    derived,
+    keyIds.length ? `match:${keyIds.join(",")}` : "",
+    skipped.length ? `seat-skip:${skipped.join(",")}` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   if (hits.length === 0) {
     recordFire(input.db, {
