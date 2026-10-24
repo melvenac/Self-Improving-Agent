@@ -54,5 +54,8 @@ First line: `READY sim-t301 <HEAD sha8> ALL PASS` only if: c's only red rows are
 d prints `APPLIED 1 edits to 1 files` and all three exit 0; e and the final run of h show 0 failed; f has 0 rows red
 alone; g shows `module-boundary [pass]`; m1 reds L2 only; m2 reds L1 only; m3 reds L4 only; m4 reds L3 only. Otherwise
 `READY sim-t301 <HEAD sha8> MISMATCH` and list each step that differed, with the full assertion message of every red
-row, and for L2 and L5 paste the run's full stdout and exit status (those two rows rest on how the busy census and a
-held-by-owner lease decide, which this brief did not run). Every number is pasted output, with its command.
+row. Every number is pasted output, with its command.
+
+Round 2 (job #87 at 7e6b439b was MISMATCH on L2 and L3 only, on the exit status, not on the printed lines):
+decideSuiteStart refuses on a busy or unavailable census only for a controlled rerun. L2 now sets
+OPEN_BRAIN_CONTROLLED_RERUN=1 and expects exit 2; L3 expects exit 0. Every printed line matched in round 1.
