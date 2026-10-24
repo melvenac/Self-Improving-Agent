@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/run.ts
+<<<
+    for (const id of errorKeyIds) {
+===
+    for (const id of keyIds.length > 0 ? [] : errorKeyIds) {
+>>>

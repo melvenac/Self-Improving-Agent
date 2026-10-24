@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/run.ts
+<<<
+      if (key === null || !errorMatchesKey(key, input.error ?? "")) continue;
+===
+      if (key === null) continue;
+>>>
