@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 567 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 568 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -42,12 +42,11 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-261** Physically split core and memory into separate packages (after T-154; D-151)
 - [ ] **T-284** A commit-msg hook appends the Claude-Session trailer from the session's own id, so attribution never depends on the agent writing it
 - [ ] **T-292** CI test job failed on a vitest-worker 'Timeout calling onTaskUpdate' after every test passed
-- [ ] **T-301** A test:heavy dry run prints only the seat line: owner, lease and census reach only suite-run-meta.json
+- [~] **T-301** A test:heavy dry run prints only the seat line: owner, lease and census reach only suite-run-meta.json
 - [ ] **T-303** Record write model: weigh an append-only ops log (Scion lessons) against today's single state.json, on measured collision data
 - [ ] **T-304** A coordinator (or role-none) checkout cannot carry a session handoff: set_handoff accepts only planner|developer|qa
 - [ ] **T-308** Lessons whose mistake is not a Bash command cannot be keyed to fire
 - [ ] **T-309** Budgeted NEXT does not say when the objective names a done task
-- [ ] **T-311** handoff_caps is opt-in: an uncapped handoff is accepted and clipped silently
 - [ ] **T-312** Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap
 - [~] **T-313** Recall trigger fires a seat-specific stored entry for other seats, naming a script path they don't have
 - [ ] **T-314** CLI `start` creates a session log, so a read-only check takes the next session number
@@ -55,6 +54,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 
 ## Done (last 3 sessions)
 
+- [x] **T-311** handoff_caps is opt-in: an uncapped handoff is accepted and clipped silently (session 174) — Found s173: Maker's pick-up was 2830 chars and 11 watch-outs (greeting shows 400 chars, 3 items); clark's 415 cut on its own instruction. Caps (handoff-caps.ts) apply only with greeting.json handoff_caps. Maker turned it on 10-19. Candidate: scaffold and import write handoff_caps:true by default. Needs a ruling on existing projects. — s174 10-24 CLOSED, no change: the premise is false. An uncapped handoff is clipped VISIBLY, not silently: briefing.ts cut() marks every clip `... (<N> chars)` and each capped section ends `+N more: <pointer>` (since e4d4f46d, 10-03, before T-311 was filed 10-19), and every fleet project runs briefing_budget. handoff_caps (refuse an over-cap set_handoff) stays a per-repo opt-in, each planner's call: on in makerspace, explicitly off in SIA, absent elsewhere. Defaulting it on would refuse writes in four repos that never chose it.
 - [x] **T-298** Briefing gaps seen in Maker's S67 greeting: stale handoff not detectable, Latest brief silent outside docs/loops, divergence banner against the wrong branch, Usage 'not checked' noise (session 174) — s173 (Atlas), from reviewing Maker's S67 /start greeting (Aaron's request, verified in maker transcript a65a9321). Makerspace planner tree, record rev 508. Each observed:
 (1) HANDOFF LAG: the planner handoff was written at rev 506 ('S66 roll handoff'); revs 507-508 landed after (site-analytics skill written; staging PASS + prod-release brief). PICK UP and WAITING ON AARON were stale (an answered question still listed), and only Maker's manual git-log cross-check caught it. handoffs[] carry no revision stamp, so the briefing cannot say 'handoff from rev 506, record at rev 508'. Stamp the rev on set_handoff; print the lag when > 0.
 (2) LATEST BRIEF SILENT: latest-brief.ts looks only in docs/loops/ and docs/loop-*.md and returns null otherwise, so the line is omitted. Makerspace keeps briefs in .agents/plans/ (prod-release-1016b.md, b1af65d). 'None found' and 'did not look there' read the same. Print 'Latest brief: none under <dirs>' and let a project name its brief dir (greeting.json).
