@@ -476,7 +476,8 @@ describe("ob_start carries the same block, and every /start copy prints it verba
         latestBrief: "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
         readsOwed: describeReadsOwed(root, parsed.data, n, "developer", "x"),
         fleet: describeFleet(root, parsed.data.project.name, process.env, startNow),
-        workingTree: describeWorkingTree(root),
+        // T-297 step 3: ob_start names its own new log on the Working tree line, so the expectation does too.
+        workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${n}.md`)),
         skills: describeSkills(root),
       }),
     );
@@ -595,7 +596,7 @@ describe("ob_start carries the same block, and every /start copy prints it verba
             latestBrief: "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
             readsOwed: describeReadsOwed(root, parsed.data, sessionNumber, "developer", "x"),
             fleet: describeFleet(root, parsed.data.project.name, process.env, startNow),
-            workingTree: describeWorkingTree(root),
+            workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${sessionNumber}.md`)),
             skills: describeSkills(root),
           }),
         ),
