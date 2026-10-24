@@ -1,0 +1,24 @@
+@@@ .claude/commands/end.md
+<<<
+session. `path:` and `error:` keys are stored but not read yet; a key under 6 characters is lookup-only.
+===
+session. `path:` and `error:` keys are stored but not read yet; a key under 6 characters is lookup-only.
+A mistake made in TEXT, not in this seat's own Bash call (a command handed to the user, a grep written into a brief
+another seat runs), never reaches the trigger: key it `none — lookup only` (T-308).
+>>>
+@@@ project-template/.claude/commands/end.md
+<<<
+session. `path:` and `error:` keys are stored but not read yet; a key under 6 characters is lookup-only.
+===
+session. `path:` and `error:` keys are stored but not read yet; a key under 6 characters is lookup-only.
+A mistake made in TEXT, not in this seat's own Bash call (a command handed to the user, a grep written into a brief
+another seat runs), never reaches the trigger: key it `none — lookup only` (T-308).
+>>>
+@@@ project-template/.cursor/commands/end.md
+<<<
+session. `path:` and `error:` keys are stored but not read yet; a key under 6 characters is lookup-only.
+===
+session. `path:` and `error:` keys are stored but not read yet; a key under 6 characters is lookup-only.
+A mistake made in TEXT, not in this seat's own Bash call (a command handed to the user, a grep written into a brief
+another seat runs), never reaches the trigger: key it `none — lookup only` (T-308).
+>>>
