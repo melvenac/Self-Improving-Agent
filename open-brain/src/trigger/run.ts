@@ -16,7 +16,7 @@
 import type Database from "better-sqlite3";
 import { deriveQuery, queryStore } from "./query.js";
 import { injectedIds, recordFire, type FireState } from "./fires.js";
-import { commandMatchesKey, parseCommandKey } from "./match-keys.js";
+import { commandMatchesKey, errorMatchesKey, parseCommandKey, parseErrorKey } from "./match-keys.js";
 import type { TriggerPolicy } from "./policy.js";
 import { entrySeat } from "./seat.js";
 
@@ -36,6 +36,9 @@ export interface TriggerRunInput {
   keyIds?: number[];
   /** T-313: the session's seat (resolveTriggerSeat). An entry written for another seat does not fire; null fires all. */
   seat?: string | null;
+  /** T-170 (ii): a failed call's error text, and the ids the sidecar's error keys matched in it (re-tested here). */
+  error?: string;
+  errorKeyIds?: number[];
 }
 
 export interface TriggerOutcome {
@@ -90,8 +93,9 @@ export function actionOf(content: string): string {
 export function runTrigger(input: TriggerRunInput): TriggerOutcome {
   const derived = deriveQuery(input.command);
   const keyIds = input.keyIds ?? [];
+  const errorKeyIds = input.errorKeyIds ?? [];
 
-  if (!derived && keyIds.length === 0) {
+  if (!derived && keyIds.length === 0 && errorKeyIds.length === 0) {
     recordFire(input.db, {
       sessionUuid: input.sessionUuid,
       command: input.command,
@@ -130,11 +134,22 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
   // sidecar can cost a miss, never a wrong injection. A keyed entry is
   // injected at most once per session, and no relevance floor applies — it is
   // not a bm25 match.
-  if (hits.length < input.policy.max_injected && keyIds.length > 0) {
+  if (hits.length < input.policy.max_injected && (keyIds.length > 0 || errorKeyIds.length > 0)) {
     const already = injectedIds(input.db, input.sessionUuid);
     const byId = readDb.prepare(
       `SELECT id, key, content FROM knowledge_index WHERE id = ? AND archived_into IS NULL`,
     );
+    // T-170 (ii): an error key first. The failure's own text names the mistake more exactly than the command does.
+    for (const id of errorKeyIds) {
+      if (hits.length >= input.policy.max_injected) break;
+      const row = byId.get(id) as { id: number; key: string | null; content: string } | undefined;
+      if (!row) continue;
+      const key = parseErrorKey(row.content);
+      if (key === null || !errorMatchesKey(key, input.error ?? "")) continue;
+      if (already.includes(row.id) || hits.some((h) => h.id === row.id)) continue;
+      if (forOtherSeat(row)) continue;
+      hits.push(row);
+    }
     for (const id of keyIds) {
       if (hits.length >= input.policy.max_injected) break;
       const row = byId.get(id) as { id: number; key: string | null; content: string } | undefined;
@@ -150,6 +165,7 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
   const query = [
     derived,
     keyIds.length ? `match:${keyIds.join(",")}` : "",
+    errorKeyIds.length ? `error-match:${errorKeyIds.join(",")}` : "",
     skipped.length ? `seat-skip:${skipped.join(",")}` : "",
   ]
     .filter(Boolean)

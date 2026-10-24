@@ -4,9 +4,9 @@
  *
  * There is no second representation of the key. Since 10-02 `/end` step 2
  * writes `MATCH: command|path|error|none` into each lesson, and this module
- * parses that line. Only command keys are read: the trigger is a
- * PostToolUse/Bash hook and sees commands. Path and error keys stay stored and
- * unread (T-170 part ii).
+ * parses that line. Command keys are read against the command; error keys
+ * against a failed shell call's error text (T-170 part ii, PostToolUseFailure).
+ * Path keys stay stored and unread.
  *
  * The hook reads keys through a small JSON sidecar beside the store, written by
  * the server and the CLIs (keys-writer.ts), so that a command which asks
@@ -112,5 +112,55 @@ export function matchingKeyIds(keys: CommandKey[], command: string): number[] {
   return keys
     .filter((k) => commandMatchesKey(k.fragments, command))
     .sort((a, b) => b.fragments.join("").length - a.fragments.join("").length || a.id - b.id)
+    .map((k) => k.id);
+}
+
+/** T-170 (ii): a lesson's `MATCH: error:` key, matched against a failed shell call's error text. */
+export interface ErrorKey {
+  id: number;
+  text: string;
+}
+
+const ERROR_LINE = /^MATCH:\s*error:/;
+
+/**
+ * The text of a lesson's `MATCH: error:` key, or `null` when it has none or the key is too short to match on. /end
+ * writes the key as a double-quoted string; inside it `\"` and `\\` stand for `"` and `\`. Whitespace runs count as one
+ * space.
+ */
+export function parseErrorKey(content: string): string | null {
+  const line = content.split(/\r?\n/).find((l) => ERROR_LINE.test(l));
+  if (line === undefined) return null;
+  let text = line.replace(/^MATCH:\s*error:\s*/, "").trim();
+  const close = text.lastIndexOf('"');
+  if (text.startsWith('"') && close > 0) text = text.slice(1, close).replace(/\\(["\\])/g, "$1");
+  text = text.replace(/\s+/g, " ").trim();
+  return text.replace(/\s/g, "").length < MATCH_KEY_MIN_CHARS ? null : text;
+}
+
+/** True exactly when the key occurs in the error text. Case-sensitive; whitespace runs in the text count as one space. */
+export function errorMatchesKey(key: string, error: string): boolean {
+  return error.replace(/\s+/g, " ").includes(key);
+}
+
+/** The sidecar's error keys. Any failure is `[]` and never throws, as for command keys. */
+export function readTriggerErrorKeys(path: string): ErrorKey[] {
+  try {
+    const keys = (JSON.parse(readFileSync(path, "utf-8")) as { errorKeys?: unknown })?.errorKeys;
+    if (!Array.isArray(keys)) return [];
+    const ok = keys.every(
+      (k) => k !== null && typeof k === "object" && typeof (k as ErrorKey).id === "number" && typeof (k as ErrorKey).text === "string",
+    );
+    return ok ? (keys as ErrorKey[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** The ids whose error key occurs in the error text, longest key first, then id ascending. */
+export function matchingErrorKeyIds(keys: ErrorKey[], error: string): number[] {
+  return keys
+    .filter((k) => errorMatchesKey(k.text, error))
+    .sort((a, b) => b.text.length - a.text.length || a.id - b.id)
     .map((k) => k.id);
 }
