@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/metrics-review.ts
+<<<
+  const from = since !== null && since > firstEnd ? since : firstEnd;
+===
+  const from = since !== null ? since : "";
+>>>
