@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      workingTree: describeWorkingTree(projectRoot, result.session.logPath || undefined),
+===
+      workingTree: describeWorkingTree(projectRoot),
+>>>

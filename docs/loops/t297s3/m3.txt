@@ -1,0 +1,6 @@
+@@@ project-template/gitignore
+<<<
+/.claude/*.bak-*
+===
+/.claude/*.bak-NOTHING
+>>>

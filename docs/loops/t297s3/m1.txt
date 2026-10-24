@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+    const own = ownLog === undefined ? null : relative(projectRoot, ownLog).split(sep).join("/");
+===
+    const own = ownLog === undefined ? null : null;
+>>>
