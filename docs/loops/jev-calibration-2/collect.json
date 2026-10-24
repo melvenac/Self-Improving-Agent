@@ -29,7 +29,7 @@
           "open-brain/tests/pipelines/sync/ci-runs-on.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-250-t221-t222-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -107,7 +107,7 @@
           "open-brain/tests/harness/t222-attempts.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-250-t221-t222-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -193,7 +193,7 @@
           "open-brain/tests/shared/state-writer.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -273,7 +273,7 @@
           "project-template/.claude/commands/start.md"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-251-t164-t211-r2-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -344,7 +344,7 @@
           "open-brain/tests/pipelines/session-start/state-render.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-253-t209-t210-dispatch.md",
       "head_from": "candidate-field",
       "head_resolved": true,
@@ -420,7 +420,7 @@
           "open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -495,7 +495,7 @@
           "open-brain/tests/shared/handoff-guard.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-254-t208-t212-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -571,7 +571,7 @@
           "open-brain/tests/server.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -649,7 +649,7 @@
           "open-brain/tests/server.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": null,
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -724,7 +724,7 @@
           "project-template/.cursor/commands/start.md"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -803,7 +803,7 @@
           "project-template/.cursor/commands/start.md"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-255-b1-start-dispatch.md",
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -880,7 +880,7 @@
           "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -961,7 +961,7 @@
           "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -1040,7 +1040,7 @@
           "open-brain/tests/pipelines/sync/skills-contract.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -1116,7 +1116,7 @@
           "open-brain/tests/pipelines/sync/staleness.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -1203,7 +1203,7 @@
           "open-brain/tests/pipelines/sync/t048-counts.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -1294,7 +1294,7 @@
           "open-brain/tests/pipelines/sync/t048-counts.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-256-b2-sync-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -1370,7 +1370,7 @@
           "open-brain/tests/shared/closeout-append.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -1463,7 +1463,7 @@
           "open-brain/tsconfig.tests.json"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": null,
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -1538,7 +1538,7 @@
           "open-brain/tests/pipelines/summary-bom.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -1613,7 +1613,7 @@
           "open-brain/tests/shared/paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -1689,7 +1689,7 @@
           "open-brain/tests/pipelines/sync/vault-pollution.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-257-b3-misc-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -1772,7 +1772,7 @@
           "open-brain/tests/pipelines/session-start/tree-currency-fetch.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -1853,7 +1853,7 @@
           "open-brain/tests/shared/handoff-guard.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -1944,7 +1944,7 @@
           "open-brain/tests/trigger/fires.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2023,7 +2023,7 @@
           "open-brain/tests/pipelines/session-end/recalled-ids.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2110,7 +2110,7 @@
           "open-brain/tests/t048-dropped-counts.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-258-b4-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2189,7 +2189,7 @@
           "project-template/.agents/AGENT.md"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2262,7 +2262,7 @@
           "open-brain/tests/pipelines/sync/ci-runs-on.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2340,7 +2340,7 @@
           "project-template/.cursor/rules/hub-room.mdc"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-259-b5-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2418,7 +2418,7 @@
           "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2502,7 +2502,7 @@
           "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2593,7 +2593,7 @@
           "open-brain/tests/pipelines/sync/t048-counts.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2675,7 +2675,7 @@
           "open-brain/tests/pipelines/sync/t048-counts.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-260-b2r2-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2765,7 +2765,7 @@
           "open-brain/tests/t048-zero-case.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-261-302r2-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2846,7 +2846,7 @@
           "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-262-r3-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -2936,7 +2936,7 @@
           "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-262-r3-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -3021,7 +3021,7 @@
           "open-brain/tests/shadow-strategies.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": null,
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -3094,7 +3094,7 @@
           "scripts/setup.mjs"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-264-s159-dispatch.md",
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -3170,7 +3170,7 @@
           "open-brain/tests/pipelines/session-start/serving-build.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": null,
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -3246,7 +3246,7 @@
           "project-template/.cursor/commands/start.md"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": null,
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -3328,7 +3328,7 @@
           "project-template/.cursor/commands/start.md"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -3409,7 +3409,7 @@
           "open-brain/tests/server.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -3484,7 +3484,7 @@
           "open-brain/tests/server.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -3560,7 +3560,7 @@
           "open-brain/tests/pipelines/sync/mcp-command-paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -3638,7 +3638,7 @@
           "open-brain/tests/server.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-265-s159b-dispatch.md",
       "head_from": "led-by-item",
       "head_resolved": true,
@@ -3722,7 +3722,7 @@
           "open-brain/tests/pipelines/sync/greeting-size.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-266-t203-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -3795,7 +3795,7 @@
           "open-brain/tests/server.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -3868,7 +3868,7 @@
           "open-brain/tests/pipelines/session-end/recalled-ids.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -3948,7 +3948,7 @@
           "open-brain/tests/pipelines/session-start/role-docs-by-sha.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -4036,7 +4036,7 @@
           "open-brain/tests/shared/handoff-caps.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-267-s160-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -4123,7 +4123,7 @@
           "open-brain/tests/shared/handoff-caps.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": null,
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -4198,7 +4198,7 @@
           "open-brain/tests/pipelines/session-start/hub-presence.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-268-s160c-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -4278,7 +4278,7 @@
           "open-brain/tests/pipelines/sync/greeting-size.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -4366,7 +4366,7 @@
           "open-brain/tests/shared/state-writer.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": null,
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -4445,7 +4445,7 @@
           "open-brain/tests/pipelines/session-start/missing-handoff.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -4520,7 +4520,7 @@
           "docs/loops/t204-plan.md"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-269-s160d-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -4595,7 +4595,7 @@
           "open-brain/tests/shared/state-keyorder.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -4677,7 +4677,7 @@
           "open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-270-s160e-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -4752,7 +4752,7 @@
           "open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -4834,7 +4834,7 @@
           "open-brain/tests/pipelines/sync/greeting-size.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -4909,7 +4909,7 @@
           "open-brain/tests/harness/fixture.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-272-s160f-dispatch.md",
       "head_from": "verdict-line",
       "head_resolved": true,
@@ -4986,7 +4986,7 @@
           "open-brain/tests/harness/fixture.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5067,7 +5067,7 @@
           "scripts/setup.mjs"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5145,7 +5145,7 @@
           "scripts/setup.mjs"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5224,7 +5224,7 @@
           "open-brain/tests/t235-p2-3-cursor-proof.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-273-s161a-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5301,7 +5301,7 @@
           "open-brain/tests/harness/fixture.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5383,7 +5383,7 @@
           "scripts/setup.mjs"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5465,7 +5465,7 @@
           "open-brain/tests/t235-p2-3-cursor-proof.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-275-s161c-dispatch-amendment-1.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5556,7 +5556,7 @@
           "project-template/.cursor/rules/hub-room.mdc"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5636,7 +5636,7 @@
           "scripts/setup.mjs"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5715,7 +5715,7 @@
           "open-brain/tests/shared/session-hook-claim.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-275-s161c-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5795,7 +5795,7 @@
           "open-brain/tests/t235-p2-3-cursor-proof.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5872,7 +5872,7 @@
           "open-brain/tests/shared/paths.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -5952,7 +5952,7 @@
           "open-brain/tests/pipelines/sync/t048-counts-parity.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6032,7 +6032,7 @@
           "open-brain/tests/suite-run-meta.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6111,7 +6111,7 @@
           "open-brain/tests/t048-r2b.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6194,7 +6194,7 @@
           "open-brain/tests/harness/s4-guards.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6270,7 +6270,7 @@
           "open-brain/tests/pipelines/sync/gitnexus-refresh.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-277-s161e-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6350,7 +6350,7 @@
           "open-brain/tests/t235-p2-3-cursor-proof.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6439,7 +6439,7 @@
           "project-template/.cursor/rules/hub-room.mdc"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6520,7 +6520,7 @@
           "open-brain/tests/shared/session-hook-claim.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6601,7 +6601,7 @@
           "open-brain/tests/suite-run-meta.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6682,7 +6682,7 @@
           "open-brain/tests/t048-r2b.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-279-s161g-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6760,7 +6760,7 @@
           "scripts/setup.mjs"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6842,7 +6842,7 @@
           "open-brain/tests/shared/session-hook-claim.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -6924,7 +6924,7 @@
           "open-brain/tests/t048-r2b.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-280-s162a-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -7008,7 +7008,7 @@
           "open-brain/tests/t048-r2b.test.ts"
         ]
       },
-      "dispatch_commit": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
       "dispatch_path": "docs/loops/qa-281-s162b-dispatch.md",
       "head_from": "verdict-table",
       "head_resolved": true,
@@ -7059,6 +7059,1235 @@
       "round": "r4",
       "task": "T-156",
       "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "ef2b71a57fa614d9a796b1a24f990e2095883b46",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "f32aa900c13e7f5fefbe8e98381ba75c018f496c",
+      "case_id": "qa282-pr464",
+      "case_no": 89,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 40,
+        "files": 2,
+        "insertions": 89,
+        "paths": [
+          "open-brain/tests/pipelines/sync/hub-seats.test.ts",
+          "open-brain/tests/t235-p2-3-cursor-proof.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": null,
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#464"
+      ],
+      "label": "ACCEPT",
+      "label_disputed": false,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "5235985708cab8ef5b9af157031141893415c245",
+      "merged": true,
+      "pair": [],
+      "pair_key": 464,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "48131c28f32fae11c802e2d7cd14e9234cb0e603",
+      "plan_headings": [],
+      "plan_path": "docs/loops/g056-brief.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "task-brief",
+      "plan_why": null,
+      "pr": 464,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s162c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 282,
+      "qa_report_ref": {
+        "commit": "5d0cbbd9b7090fe3f2f118e7c28cf9eb2cac0422",
+        "path": "docs/loops/s162c-qa-report.md",
+        "ref": "origin/qa/s162c-report"
+      },
+      "round": null,
+      "task": "G-056",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "bc9c22b26ef48fe7fd4a8520f3f0329275fb192d",
+      "case_id": "qa282-pr466",
+      "case_no": 90,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 40,
+        "files": 5,
+        "insertions": 314,
+        "paths": [
+          "open-brain/src/pipelines/sync/checks.ts",
+          "open-brain/src/pipelines/sync/index.ts",
+          "open-brain/src/shared/parse-frontmatter.ts",
+          "open-brain/src/vault-writer.ts",
+          "open-brain/tests/pipelines/sync/experience-frontmatter.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-282-s162c-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#466"
+      ],
+      "label": "REJECT",
+      "label_disputed": false,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "b8ab0f042ecec6434112045d50cb1db8ab88da51",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa283-pr466-r2)"
+      ],
+      "pair_key": 466,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "0d176bc30bdd833629d70afa5ca1d1aae6f01f9f",
+      "plan_headings": [
+        "QA 282, session-162 batch c: G-056 (#464) and T-025's /sync frontmatter check (#466)"
+      ],
+      "plan_path": "docs/loops/qa-282-s162c-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 466,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s162c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 282,
+      "qa_report_ref": {
+        "commit": "5d0cbbd9b7090fe3f2f118e7c28cf9eb2cac0422",
+        "path": "docs/loops/s162c-qa-report.md",
+        "ref": "origin/qa/s162c-report"
+      },
+      "round": null,
+      "task": "T-025",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "b4ad38a3573e923b10c4e89d1fc023c710cc0d5a",
+      "case_id": "qa283-pr466-r2",
+      "case_no": 91,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 40,
+        "files": 6,
+        "insertions": 428,
+        "paths": [
+          "open-brain/src/pipelines/sync/checks.ts",
+          "open-brain/src/pipelines/sync/index.ts",
+          "open-brain/src/shared/parse-frontmatter.ts",
+          "open-brain/src/vault-writer.ts",
+          "open-brain/tests/pipelines/sync/experience-frontmatter.test.ts",
+          "open-brain/tests/vault-writer.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-283-s162d-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#466"
+      ],
+      "label": "ACCEPT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "accept",
+        "reject"
+      ],
+      "merge_commit": "b8ab0f042ecec6434112045d50cb1db8ab88da51",
+      "merged": true,
+      "pair": [
+        "fix of qa282-pr466"
+      ],
+      "pair_key": 466,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "961aecb1649e4bf3133554c05eb87d3d3dcdab13",
+      "plan_headings": [
+        "QA 283, session-162 batch d: #466 r2 (T-025 frontmatter check) and #468 (hub-room guard)"
+      ],
+      "plan_path": "docs/loops/qa-283-s162d-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 466,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s162d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 283,
+      "qa_report_ref": {
+        "commit": "29a398b3ef14a71289dacde56ea7ba405dc53877",
+        "path": "docs/loops/s162d-qa-report.md",
+        "ref": "origin/qa/s162d-report"
+      },
+      "round": "r2",
+      "task": "T-025",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "ecbfb16996edad35bfb11f85f4b6eda95d2ce8a9",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "004500e62784e3228b5f8fb2f4aef371c5e8843a",
+      "case_id": "qa283-pr468",
+      "case_no": 92,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 6,
+        "files": 3,
+        "insertions": 138,
+        "paths": [
+          ".agents/SYSTEM/hub-partner-seats.json",
+          "open-brain/src/pipelines/sync/hub-room-guard.ts",
+          "open-brain/tests/pipelines/sync/hub-talk-exit-codes.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-283-s162d-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#468"
+      ],
+      "label": "ACCEPT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "accept",
+        "reject"
+      ],
+      "merge_commit": "5309fc2c29f5623c17d9cc4d7a0208e81ad1995f",
+      "merged": true,
+      "pair": [],
+      "pair_key": 468,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "961aecb1649e4bf3133554c05eb87d3d3dcdab13",
+      "plan_headings": [
+        "QA 283, session-162 batch d: #466 r2 (T-025 frontmatter check) and #468 (hub-room guard)"
+      ],
+      "plan_path": "docs/loops/qa-283-s162d-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 468,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s162d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 283,
+      "qa_report_ref": {
+        "commit": "29a398b3ef14a71289dacde56ea7ba405dc53877",
+        "path": "docs/loops/s162d-qa-report.md",
+        "ref": "origin/qa/s162d-report"
+      },
+      "round": null,
+      "task": null,
+      "verdict_text": "ACCEPT (with finding K1)"
+    },
+    {
+      "base_how": "merge-base with origin/master (not merged)",
+      "base_sha": "91e144511bf70477089aa10f1fb396c5954adc7d",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "ba09e2c6e43de8ee100d3d05b7ddb8d35a7e9ca7",
+      "case_id": "qa284-pr437-r5",
+      "case_no": 93,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 1,
+        "files": 10,
+        "insertions": 1097,
+        "paths": [
+          "docs/loops/t235-p2-7-plan.md",
+          "open-brain/scripts/claim-mutant-report.mts",
+          "open-brain/src/cli-bootstrap.ts",
+          "open-brain/src/cli-session-end.ts",
+          "open-brain/src/shared/session-hook-claim.ts",
+          "open-brain/tests/cli-bootstrap.test.ts",
+          "open-brain/tests/cli-session-end-dedupe.test.ts",
+          "open-brain/tests/shared/claim-barrier-trials.ts",
+          "open-brain/tests/shared/session-hook-claim-interleave.test.ts",
+          "open-brain/tests/shared/session-hook-claim.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-284-s163a-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#437"
+      ],
+      "label": "REJECT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "accept",
+        "reject"
+      ],
+      "merge_commit": "ba09e2c6e43de8ee100d3d05b7ddb8d35a7e9ca7",
+      "merged": false,
+      "pair": [],
+      "pair_key": 437,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "c3b51b11208a81d01727f52d1eb175912bf64fde",
+      "plan_headings": [
+        "QA 284, session-163 batch a: #437 r5 (T-235 P2-7 session-hook claim) and #472 r3 (hub-room guard r3)"
+      ],
+      "plan_path": "docs/loops/qa-284-s163a-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 437,
+      "pr_files_check": {
+        "checked": true,
+        "diff_files": 10,
+        "ok": true,
+        "overlap": 7,
+        "pr_files": 7
+      },
+      "prefix": "s163a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 284,
+      "qa_report_ref": {
+        "commit": "e765175e62d0238380669c5162857aa684bd12e1",
+        "path": "docs/loops/s163a-qa-report.md",
+        "ref": "origin/qa/s163a-report"
+      },
+      "round": "r5",
+      "task": "T-235",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "5309fc2c29f5623c17d9cc4d7a0208e81ad1995f",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "26edb821cac073172ad8788ac99128fa3fad4bde",
+      "case_id": "qa284-pr472-r3",
+      "case_no": 94,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 38,
+        "files": 2,
+        "insertions": 331,
+        "paths": [
+          "open-brain/src/pipelines/sync/hub-room-guard.ts",
+          "open-brain/tests/pipelines/sync/hub-talk-exit-codes.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-284-s163a-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#472"
+      ],
+      "label": "REJECT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "accept",
+        "reject"
+      ],
+      "merge_commit": "4cdd8a12220b0f4a0a1bf6891dcb60222bd52121",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa288-pr472-r5)"
+      ],
+      "pair_key": 472,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "c3b51b11208a81d01727f52d1eb175912bf64fde",
+      "plan_headings": [
+        "QA 284, session-163 batch a: #437 r5 (T-235 P2-7 session-hook claim) and #472 r3 (hub-room guard r3)"
+      ],
+      "plan_path": "docs/loops/qa-284-s163a-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 472,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s163a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 284,
+      "qa_report_ref": {
+        "commit": "e765175e62d0238380669c5162857aa684bd12e1",
+        "path": "docs/loops/s163a-qa-report.md",
+        "ref": "origin/qa/s163a-report"
+      },
+      "round": "r3",
+      "task": null,
+      "verdict_text": "REJECT (narrow)"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "5309fc2c29f5623c17d9cc4d7a0208e81ad1995f",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "1a37410105d706803805ddd05572327676fa0470",
+      "case_id": "qa288-pr472-r5",
+      "case_no": 95,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 38,
+        "files": 2,
+        "insertions": 477,
+        "paths": [
+          "open-brain/src/pipelines/sync/hub-room-guard.ts",
+          "open-brain/tests/pipelines/sync/hub-talk-exit-codes.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-288-s164a-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#472"
+      ],
+      "label": "ACCEPT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "reject"
+      ],
+      "merge_commit": "4cdd8a12220b0f4a0a1bf6891dcb60222bd52121",
+      "merged": true,
+      "pair": [
+        "fix of qa284-pr472-r3"
+      ],
+      "pair_key": 472,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "887d3251ba0a4e6df877fc86caffb9127a2ad444",
+      "plan_headings": [
+        "QA 288, session-164 batch a: #472 r5 (hub-room guard) and #484 r9 (AUDIT-FIX A1/A3/A6 + scrub-trigger-fires)"
+      ],
+      "plan_path": "docs/loops/qa-288-s164a-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 472,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 288,
+      "qa_report_ref": {
+        "commit": "6564f3aa6e3000ab2ba3fab56406db8defac9620",
+        "path": "docs/loops/s164a-qa-report.md",
+        "ref": "origin/qa/s164a-report"
+      },
+      "round": "r5",
+      "task": null,
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "e1734769c05f2cc05198fe11a01cf688e0feeaeb",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "edfc964d98b96c8bc3e73c65f122e0bd5a04ce49",
+      "case_id": "qa288-pr484-r9",
+      "case_no": 96,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 80,
+        "files": 28,
+        "insertions": 1472,
+        "paths": [
+          "CHANGELOG.md",
+          "open-brain/src/cli-spec.ts",
+          "open-brain/src/cli.ts",
+          "open-brain/src/db-v2.ts",
+          "open-brain/src/pipelines/session-end/index-v2.ts",
+          "open-brain/src/pipelines/session-start/hub-presence.ts",
+          "open-brain/src/pipelines/sync/checks.ts",
+          "open-brain/src/pipelines/topics/index.ts",
+          "open-brain/src/scrub-trigger-fires.ts",
+          "open-brain/src/server.ts",
+          "open-brain/src/shared/parse-frontmatter.ts",
+          "open-brain/src/shared/vault-path-segment.ts",
+          "open-brain/src/shared/yaml-frontmatter.ts",
+          "open-brain/src/trigger/command-log.ts",
+          "open-brain/src/trigger/fires.ts",
+          "open-brain/src/vault-writer.ts",
+          "open-brain/tests/audit-fix-a1-r5-migration.test.ts",
+          "open-brain/tests/audit-fix-a1-r5.test.ts",
+          "open-brain/tests/audit-fix-a1-r7-scrub.test.ts",
+          "open-brain/tests/audit-fix-a1-r8-scrub.test.ts",
+          "open-brain/tests/audit-fix-a1-r9-scrub.test.ts",
+          "open-brain/tests/audit-fix-a3-r2.test.ts",
+          "open-brain/tests/audit-fix-a3.test.ts",
+          "open-brain/tests/audit-fix-a6.test.ts",
+          "open-brain/tests/audit-fix-r3-callers.test.ts",
+          "open-brain/tests/audit-fix-r4-topics.test.ts",
+          "open-brain/tests/shared/cli-args.test.ts",
+          "open-brain/tests/vault-writer.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-288-s164a-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#484"
+      ],
+      "label": "ACCEPT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "reject"
+      ],
+      "merge_commit": "ab4c1c5a09f5d1ab2e5ade0363ddc9a025ab417f",
+      "merged": true,
+      "pair": [],
+      "pair_key": 484,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "887d3251ba0a4e6df877fc86caffb9127a2ad444",
+      "plan_headings": [
+        "QA 288, session-164 batch a: #472 r5 (hub-room guard) and #484 r9 (AUDIT-FIX A1/A3/A6 + scrub-trigger-fires)"
+      ],
+      "plan_path": "docs/loops/qa-288-s164a-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 484,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164a",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 288,
+      "qa_report_ref": {
+        "commit": "6564f3aa6e3000ab2ba3fab56406db8defac9620",
+        "path": "docs/loops/s164a-qa-report.md",
+        "ref": "origin/qa/s164a-report"
+      },
+      "round": "r9",
+      "task": null,
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "7f4bf767147e594bbb77a12b90260b671e462386",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "fee2bb50639fc78ba79ba91ced657042f599158e",
+      "case_id": "qa290-pr498",
+      "case_no": 97,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 10,
+        "files": 18,
+        "insertions": 471,
+        "paths": [
+          "CHANGELOG.md",
+          "open-brain/src/cli-spec.ts",
+          "open-brain/src/cli.ts",
+          "open-brain/src/pipelines/bootstrap/index.ts",
+          "open-brain/src/pipelines/session-start/briefing.ts",
+          "open-brain/src/server.ts",
+          "open-brain/tests/pipelines/import-cmds-harness.ts",
+          "open-brain/tests/pipelines/import-cmds-i1.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i2.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i3.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i4.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i5.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i6.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i7.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i8.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i9.test.ts",
+          "open-brain/tests/shared/cli-args.test.ts",
+          "project-template/.claude/commands/bootstrap.md"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-290-s164c-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#498"
+      ],
+      "label": "REJECT",
+      "label_disputed": false,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "1bbf2a5d4828ca88a09b93c1cd418e5ec663e5df",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa291-pr498-r2)"
+      ],
+      "pair_key": 498,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "6dea8328cee42766158f46e64bdcb0df3f89f8f0",
+      "plan_headings": [
+        "QA 290, session-164 batch c: #498 IMPORT-CMDS and #499 T-247 pins"
+      ],
+      "plan_path": "docs/loops/qa-290-s164c-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 498,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 290,
+      "qa_report_ref": {
+        "commit": "30928cc7faa89e4c833beba5d2b615c0ef5d0286",
+        "path": "docs/loops/s164c-qa-report.md",
+        "ref": "origin/qa/s164c-report"
+      },
+      "round": null,
+      "task": null,
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "7f4bf767147e594bbb77a12b90260b671e462386",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "433c503b8317f36d99e40ed093218dad65ecc29e",
+      "case_id": "qa290-pr499",
+      "case_no": 98,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 3,
+        "files": 6,
+        "insertions": 181,
+        "paths": [
+          "CHANGELOG.md",
+          "open-brain/src/scrub-trigger-fires.ts",
+          "open-brain/src/vault-writer.ts",
+          "open-brain/tests/pipelines/sync/hub-talk-exit-codes.test.ts",
+          "open-brain/tests/t247-pins-scrub.test.ts",
+          "open-brain/tests/vault-writer.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-290-s164c-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#499"
+      ],
+      "label": "REJECT",
+      "label_disputed": false,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "c61959daa9ce3da26e38e0abb437dff408967997",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa291-pr499-r2)"
+      ],
+      "pair_key": 499,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "6dea8328cee42766158f46e64bdcb0df3f89f8f0",
+      "plan_headings": [
+        "QA 290, session-164 batch c: #498 IMPORT-CMDS and #499 T-247 pins"
+      ],
+      "plan_path": "docs/loops/qa-290-s164c-dispatch.md",
+      "plan_shared_with_cases": 2,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 499,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164c",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 290,
+      "qa_report_ref": {
+        "commit": "30928cc7faa89e4c833beba5d2b615c0ef5d0286",
+        "path": "docs/loops/s164c-qa-report.md",
+        "ref": "origin/qa/s164c-report"
+      },
+      "round": null,
+      "task": "T-247",
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "53e68b606b08da543d5f37f8744451f99682d7e1",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "f59d03bc7ae3a02b6b3c374eac503c318b40001c",
+      "case_id": "qa291-pr489-r2",
+      "case_no": 99,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 64,
+        "files": 26,
+        "insertions": 1627,
+        "paths": [
+          ".claude/commands/end.md",
+          "CHANGELOG.md",
+          "open-brain/src/cli-bootstrap.ts",
+          "open-brain/src/cli-session-end.ts",
+          "open-brain/src/db-v2.ts",
+          "open-brain/src/server.ts",
+          "open-brain/src/shared/end-record-guard.ts",
+          "open-brain/src/shared/end-record-store.ts",
+          "open-brain/src/shared/handoff-guard.ts",
+          "open-brain/tests/end-fix-q1.test.ts",
+          "open-brain/tests/end-fix-q10.test.ts",
+          "open-brain/tests/end-fix-q11.test.ts",
+          "open-brain/tests/end-fix-q12.test.ts",
+          "open-brain/tests/end-fix-q2.test.ts",
+          "open-brain/tests/end-fix-q3.test.ts",
+          "open-brain/tests/end-fix-q4.test.ts",
+          "open-brain/tests/end-fix-q5.test.ts",
+          "open-brain/tests/end-fix-q6.test.ts",
+          "open-brain/tests/end-fix-q7.test.ts",
+          "open-brain/tests/end-fix-q8.test.ts",
+          "open-brain/tests/end-fix-q9.test.ts",
+          "open-brain/tests/end-fix-r2-pins.test.ts",
+          "open-brain/tests/end-fix.harness.ts",
+          "open-brain/tests/rating-method.test.ts",
+          "open-brain/tests/shared/handoff-guard.test.ts",
+          "project-template/.claude/commands/end.md"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-291-s164d-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#489"
+      ],
+      "label": "REJECT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "accepted"
+      ],
+      "merge_commit": "ecb6473062b2ab6671b51783b3860d827bf65d7b",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa293-pr489-r4)"
+      ],
+      "pair_key": 489,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "257790e37b45c9b5299291ded7c68b5e72ec3238",
+      "plan_headings": [
+        "QA 291, session-164 batch d: round 2 of #489 END-FIX, #498 IMPORT-CMDS and #499 T-247"
+      ],
+      "plan_path": "docs/loops/qa-291-s164d-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 489,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 291,
+      "qa_report_ref": {
+        "commit": "6561ae334b4568260571f189cfee9fb93b62224b",
+        "path": "docs/loops/s164d-qa-report.md",
+        "ref": "origin/qa/s164d-report"
+      },
+      "round": "r2",
+      "task": null,
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "7f4bf767147e594bbb77a12b90260b671e462386",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "f3aba754e7a870c4880639bb564a2d8e7e0e8d71",
+      "case_id": "qa291-pr498-r2",
+      "case_no": 100,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 13,
+        "files": 24,
+        "insertions": 724,
+        "paths": [
+          "CHANGELOG.md",
+          "open-brain/src/cli-spec.ts",
+          "open-brain/src/cli.ts",
+          "open-brain/src/pipelines/bootstrap/index.ts",
+          "open-brain/src/pipelines/session-start/briefing.ts",
+          "open-brain/src/pipelines/state-import/index.ts",
+          "open-brain/src/server.ts",
+          "open-brain/src/shared/import-outputs.ts",
+          "open-brain/tests/pipelines/import-cmds-harness.ts",
+          "open-brain/tests/pipelines/import-cmds-i1.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i2.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i3.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i4.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i5.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i6.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i7.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i8.test.ts",
+          "open-brain/tests/pipelines/import-cmds-i9.test.ts",
+          "open-brain/tests/pipelines/import-cmds-r2-l1.test.ts",
+          "open-brain/tests/pipelines/import-cmds-r2-l2.test.ts",
+          "open-brain/tests/pipelines/import-cmds-r2-l3.test.ts",
+          "open-brain/tests/pipelines/import-cmds-r2-l5.test.ts",
+          "open-brain/tests/shared/cli-args.test.ts",
+          "project-template/.claude/commands/bootstrap.md"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-291-s164d-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#498"
+      ],
+      "label": "ACCEPT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "accepted"
+      ],
+      "merge_commit": "1bbf2a5d4828ca88a09b93c1cd418e5ec663e5df",
+      "merged": true,
+      "pair": [
+        "fix of qa290-pr498"
+      ],
+      "pair_key": 498,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "257790e37b45c9b5299291ded7c68b5e72ec3238",
+      "plan_headings": [
+        "QA 291, session-164 batch d: round 2 of #489 END-FIX, #498 IMPORT-CMDS and #499 T-247"
+      ],
+      "plan_path": "docs/loops/qa-291-s164d-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 498,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 291,
+      "qa_report_ref": {
+        "commit": "6561ae334b4568260571f189cfee9fb93b62224b",
+        "path": "docs/loops/s164d-qa-report.md",
+        "ref": "origin/qa/s164d-report"
+      },
+      "round": "r2",
+      "task": null,
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "7f4bf767147e594bbb77a12b90260b671e462386",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "409c8c08542ebd73f6f15347cb97e52faaf17e04",
+      "case_id": "qa291-pr499-r2",
+      "case_no": 101,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 4,
+        "files": 6,
+        "insertions": 207,
+        "paths": [
+          "CHANGELOG.md",
+          "open-brain/src/scrub-trigger-fires.ts",
+          "open-brain/src/vault-writer.ts",
+          "open-brain/tests/pipelines/sync/hub-talk-exit-codes.test.ts",
+          "open-brain/tests/t247-pins-scrub.test.ts",
+          "open-brain/tests/vault-writer.test.ts"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-291-s164d-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#499"
+      ],
+      "label": "ACCEPT",
+      "label_disputed": false,
+      "leak_group": true,
+      "leak_hits": [
+        "accepted"
+      ],
+      "merge_commit": "c61959daa9ce3da26e38e0abb437dff408967997",
+      "merged": true,
+      "pair": [
+        "fix of qa290-pr499"
+      ],
+      "pair_key": 499,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "257790e37b45c9b5299291ded7c68b5e72ec3238",
+      "plan_headings": [
+        "QA 291, session-164 batch d: round 2 of #489 END-FIX, #498 IMPORT-CMDS and #499 T-247"
+      ],
+      "plan_path": "docs/loops/qa-291-s164d-dispatch.md",
+      "plan_shared_with_cases": 3,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 499,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164d",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 291,
+      "qa_report_ref": {
+        "commit": "6561ae334b4568260571f189cfee9fb93b62224b",
+        "path": "docs/loops/s164d-qa-report.md",
+        "ref": "origin/qa/s164d-report"
+      },
+      "round": "r2",
+      "task": "T-247",
+      "verdict_text": "ACCEPT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "1bbf2a5d4828ca88a09b93c1cd418e5ec663e5df",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "854c6ced526e1e63f998bcafd8c1384068fb0c70",
+      "case_id": "qa292-pr489-r3",
+      "case_no": 102,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 91,
+        "files": 27,
+        "insertions": 1907,
+        "paths": [
+          ".claude/commands/end.md",
+          "CHANGELOG.md",
+          "open-brain/src/cli-bootstrap.ts",
+          "open-brain/src/cli-session-end.ts",
+          "open-brain/src/db-v2.ts",
+          "open-brain/src/server.ts",
+          "open-brain/src/shared/end-record-guard.ts",
+          "open-brain/src/shared/end-record-store.ts",
+          "open-brain/src/shared/handoff-guard.ts",
+          "open-brain/tests/end-fix-q1.test.ts",
+          "open-brain/tests/end-fix-q10.test.ts",
+          "open-brain/tests/end-fix-q11.test.ts",
+          "open-brain/tests/end-fix-q12.test.ts",
+          "open-brain/tests/end-fix-q2.test.ts",
+          "open-brain/tests/end-fix-q3.test.ts",
+          "open-brain/tests/end-fix-q4.test.ts",
+          "open-brain/tests/end-fix-q5.test.ts",
+          "open-brain/tests/end-fix-q6.test.ts",
+          "open-brain/tests/end-fix-q7.test.ts",
+          "open-brain/tests/end-fix-q8.test.ts",
+          "open-brain/tests/end-fix-q9.test.ts",
+          "open-brain/tests/end-fix-r2-pins.test.ts",
+          "open-brain/tests/end-fix-r3-pins.test.ts",
+          "open-brain/tests/end-fix.harness.ts",
+          "open-brain/tests/rating-method.test.ts",
+          "open-brain/tests/shared/handoff-guard.test.ts",
+          "project-template/.claude/commands/end.md"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-292-s164e-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#489"
+      ],
+      "label": "REJECT",
+      "label_disputed": false,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ecb6473062b2ab6671b51783b3860d827bf65d7b",
+      "merged": true,
+      "pair": [
+        "rejected-then-fixed (fixed in qa293-pr489-r4)"
+      ],
+      "pair_key": 489,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "322609158d0aef84708789b855b2ddfc14057a60",
+      "plan_headings": [
+        "QA 292, session-164 batch e: #489 END-FIX r3"
+      ],
+      "plan_path": "docs/loops/qa-292-s164e-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 489,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164e",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 292,
+      "qa_report_ref": {
+        "commit": "de8a29b76a8e2620d9160f203bef52b5360ed48c",
+        "path": "docs/loops/s164e-qa-report.md",
+        "ref": "origin/qa/s164e-report"
+      },
+      "round": "r3",
+      "task": null,
+      "verdict_text": "REJECT"
+    },
+    {
+      "base_how": "merge-commit first parent, merge-base with the head",
+      "base_sha": "a7c26bb2ddd0ff66c466cb9170a843933d5eab67",
+      "cal1_collected_unscored": false,
+      "cal1_seen": false,
+      "candidate_sha": "09a31303416f8e191b08adfed5953a83d77d4fd5",
+      "case_id": "qa293-pr489-r4",
+      "case_no": 103,
+      "checks_hint": {
+        "build_exit": 1,
+        "checks": "none",
+        "reason": "no CI facts recorded for this head (run gh-facts.mjs)",
+        "source": "none",
+        "unit_exit": 1
+      },
+      "conflict": false,
+      "diff": {
+        "deletions": 91,
+        "files": 28,
+        "insertions": 2143,
+        "paths": [
+          ".claude/commands/end.md",
+          "CHANGELOG.md",
+          "open-brain/src/cli-bootstrap.ts",
+          "open-brain/src/cli-session-end.ts",
+          "open-brain/src/db-v2.ts",
+          "open-brain/src/server.ts",
+          "open-brain/src/shared/end-record-guard.ts",
+          "open-brain/src/shared/end-record-store.ts",
+          "open-brain/src/shared/handoff-guard.ts",
+          "open-brain/tests/end-fix-q1.test.ts",
+          "open-brain/tests/end-fix-q10.test.ts",
+          "open-brain/tests/end-fix-q11.test.ts",
+          "open-brain/tests/end-fix-q12.test.ts",
+          "open-brain/tests/end-fix-q2.test.ts",
+          "open-brain/tests/end-fix-q3.test.ts",
+          "open-brain/tests/end-fix-q4.test.ts",
+          "open-brain/tests/end-fix-q5.test.ts",
+          "open-brain/tests/end-fix-q6.test.ts",
+          "open-brain/tests/end-fix-q7.test.ts",
+          "open-brain/tests/end-fix-q8.test.ts",
+          "open-brain/tests/end-fix-q9.test.ts",
+          "open-brain/tests/end-fix-r2-pins.test.ts",
+          "open-brain/tests/end-fix-r3-pins.test.ts",
+          "open-brain/tests/end-fix-r4-pins.test.ts",
+          "open-brain/tests/end-fix.harness.ts",
+          "open-brain/tests/rating-method.test.ts",
+          "open-brain/tests/shared/handoff-guard.test.ts",
+          "project-template/.claude/commands/end.md"
+        ]
+      },
+      "dispatch_commit": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
+      "dispatch_path": "docs/loops/qa-293-s164f-dispatch.md",
+      "head_from": "verdict-table",
+      "head_resolved": true,
+      "items": [
+        "#489"
+      ],
+      "label": "ACCEPT",
+      "label_disputed": false,
+      "leak_group": false,
+      "leak_hits": [],
+      "merge_commit": "ecb6473062b2ab6671b51783b3860d827bf65d7b",
+      "merged": true,
+      "pair": [
+        "fix of qa291-pr489-r2",
+        "fix of qa292-pr489-r3"
+      ],
+      "pair_key": 489,
+      "pair_key_how": "pr",
+      "plan": "plan",
+      "plan_blob": "9727d8c813ed1d5726dacb24ec351d917f056274",
+      "plan_headings": [
+        "QA 293, session-164 batch f: #489 END-FIX r4"
+      ],
+      "plan_path": "docs/loops/qa-293-s164f-dispatch.md",
+      "plan_shared_with_cases": 1,
+      "plan_source": "qa-dispatch-whole",
+      "plan_why": null,
+      "pr": 489,
+      "pr_files_check": {
+        "checked": false,
+        "reason": "no PR file list recorded (run gh-facts.mjs)"
+      },
+      "prefix": "s164f",
+      "provenance": "seat-built",
+      "provenance_from": "report text (a case is runtime-built only when its report says so)",
+      "qa_no": 293,
+      "qa_report_ref": {
+        "commit": "1637a388321545d357898a0cac6b185d3cba648d",
+        "path": "docs/loops/s164f-qa-report.md",
+        "ref": "origin/qa/s164f-report"
+      },
+      "round": "r4",
+      "task": null,
+      "verdict_text": "ACCEPT"
     }
   ],
   "conflicts": [
@@ -7078,9 +8307,9 @@
     }
   ],
   "gh_facts_fetched_at": "2026-10-06T04:40:59.173Z",
-  "max_qa": 282,
+  "max_qa": 298,
   "min_qa": 250,
-  "origin_master": "7d05732a2462f4f9ccdac72d26d02505639f7902",
+  "origin_master": "cf6f9c38a6153cb2b21c5e8adf10781142073e40",
   "pairs": [
     {
       "fixed": "qa255-pr287",
@@ -7228,74 +8457,116 @@
       "pair_key": 445,
       "rejected": "qa280-pr445-r3",
       "rejected_qa": 280
+    },
+    {
+      "fixed": "qa283-pr466-r2",
+      "fixed_qa": 283,
+      "pair_key": 466,
+      "rejected": "qa282-pr466",
+      "rejected_qa": 282
+    },
+    {
+      "fixed": "qa288-pr472-r5",
+      "fixed_qa": 288,
+      "pair_key": 472,
+      "rejected": "qa284-pr472-r3",
+      "rejected_qa": 284
+    },
+    {
+      "fixed": "qa291-pr498-r2",
+      "fixed_qa": 291,
+      "pair_key": 498,
+      "rejected": "qa290-pr498",
+      "rejected_qa": 290
+    },
+    {
+      "fixed": "qa291-pr499-r2",
+      "fixed_qa": 291,
+      "pair_key": 499,
+      "rejected": "qa290-pr499",
+      "rejected_qa": 290
+    },
+    {
+      "fixed": "qa293-pr489-r4",
+      "fixed_qa": 293,
+      "pair_key": 489,
+      "rejected": "qa291-pr489-r2",
+      "rejected_qa": 291
+    },
+    {
+      "fixed": "qa293-pr489-r4",
+      "fixed_qa": 293,
+      "pair_key": 489,
+      "rejected": "qa292-pr489-r3",
+      "rejected_qa": 292
     }
   ],
   "pool": {
-    "ACCEPT": 62,
-    "REJECT": 24,
+    "ACCEPT": 70,
+    "REJECT": 31,
     "base_invariant_failures": 0,
     "cal1_collected_unscored": 0,
     "cal1_seen": 1,
     "checks_by_test_job": {
       "failure": 1,
-      "none": 3,
+      "none": 18,
       "success": 84
     },
-    "checks_none": 3,
+    "checks_none": 18,
     "checks_recorded": 85,
     "conflicts": 1,
     "diff_files": {
-      "max": 21,
+      "max": 28,
       "median": 7,
       "min": 1,
-      "n": 88,
+      "n": 103,
       "p25": 4,
-      "p75": 9,
-      "p90": 15
+      "p75": 10,
+      "p90": 17
     },
     "diff_lines": {
       "max": 3052,
-      "median": 283,
+      "median": 329,
       "min": 4,
-      "n": 88,
-      "p25": 112,
-      "p75": 543,
-      "p90": 712
+      "n": 103,
+      "p25": 135,
+      "p75": 583,
+      "p90": 870
     },
-    "headline_pool": 71,
+    "headline_pool": 77,
     "heads_unresolved": 0,
     "held_out_candidates": {
-      "ACCEPT": 48,
-      "REJECT": 19,
+      "ACCEPT": 50,
+      "REJECT": 23,
       "no_plan": 0,
       "rule": "labelled ACCEPT or REJECT, not in the leak group, not cal1-seen, label not disputed",
-      "total": 67,
-      "with_plan": 67
+      "total": 73,
+      "with_plan": 73
     },
     "label_disputed": 1,
-    "leak_group": 17,
-    "max_qa": 282,
+    "leak_group": 26,
+    "max_qa": 298,
     "min_qa": 250,
     "no_plan": 0,
-    "pair_cases": 36,
-    "pair_prs": 15,
-    "pairs": 21,
-    "plan": 88,
+    "pair_cases": 47,
+    "pair_prs": 20,
+    "pairs": 27,
+    "plan": 103,
     "plan_by_source": {
       "qa-dispatch-section": 14,
-      "qa-dispatch-whole": 67,
-      "task-brief": 7
+      "qa-dispatch-whole": 81,
+      "task-brief": 8
     },
-    "pr_files_checked": 81,
+    "pr_files_checked": 82,
     "pr_files_failed": 0,
-    "runs_considered": 32,
-    "runs_resolved": 31,
-    "runs_with_cases": 29,
+    "runs_considered": 47,
+    "runs_resolved": 44,
+    "runs_with_cases": 37,
     "runtime_built": 0,
-    "seat_built": 88,
-    "total": 88,
+    "seat_built": 103,
+    "total": 103,
     "unlabelled": 2,
-    "unresolved": 9
+    "unresolved": 16
   },
   "runs": [
     {
@@ -7641,12 +8912,181 @@
     },
     {
       "branch": "origin/qa/s162c-report",
-      "cases": 0,
+      "cases": 2,
       "notes": [],
       "prefix": "s162c",
       "prefix_source": "headless-prompt",
       "qa_no": 282,
-      "reason": "branch missing: origin/qa/s162c-report is not on origin",
+      "reason": null,
+      "report_path": "docs/loops/s162c-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s162d-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "s162d",
+      "prefix_source": "headless-prompt",
+      "qa_no": 283,
+      "reason": null,
+      "report_path": "docs/loops/s162d-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s163a-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "s163a",
+      "prefix_source": "headless-prompt",
+      "qa_no": 284,
+      "reason": null,
+      "report_path": "docs/loops/s163a-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/jev-cal-2-report",
+      "cases": 0,
+      "notes": [
+        "the dispatch's Commit line names qa/jev-cal-2-dev-report; the prompt's prefix `jev-cal-2` wins"
+      ],
+      "prefix": "jev-cal-2",
+      "prefix_source": "headless-prompt",
+      "qa_no": 285,
+      "reason": "branch missing: origin/qa/jev-cal-2-report is not on origin",
+      "report_path": null,
+      "resolved": false
+    },
+    {
+      "branch": "origin/qa/jev-cal-2-r2-report",
+      "cases": 0,
+      "notes": [
+        "the dispatch's Commit line names qa/jev-cal-2-r2-dev-report; the prompt's prefix `jev-cal-2-r2` wins"
+      ],
+      "prefix": "jev-cal-2-r2",
+      "prefix_source": "headless-prompt",
+      "qa_no": 287,
+      "reason": "branch missing: origin/qa/jev-cal-2-r2-report is not on origin",
+      "report_path": null,
+      "resolved": false
+    },
+    {
+      "branch": "origin/qa/s164a-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "s164a",
+      "prefix_source": "headless-prompt",
+      "qa_no": 288,
+      "reason": null,
+      "report_path": "docs/loops/s164a-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s164b-report",
+      "cases": 0,
+      "notes": [],
+      "prefix": "s164b",
+      "prefix_source": "headless-prompt",
+      "qa_no": 289,
+      "reason": null,
+      "report_path": "docs/loops/s164b-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s164c-report",
+      "cases": 2,
+      "notes": [],
+      "prefix": "s164c",
+      "prefix_source": "headless-prompt",
+      "qa_no": 290,
+      "reason": null,
+      "report_path": "docs/loops/s164c-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s164d-report",
+      "cases": 3,
+      "notes": [],
+      "prefix": "s164d",
+      "prefix_source": "headless-prompt",
+      "qa_no": 291,
+      "reason": null,
+      "report_path": "docs/loops/s164d-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s164e-report",
+      "cases": 1,
+      "notes": [],
+      "prefix": "s164e",
+      "prefix_source": "headless-prompt",
+      "qa_no": 292,
+      "reason": null,
+      "report_path": "docs/loops/s164e-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s164f-report",
+      "cases": 1,
+      "notes": [],
+      "prefix": "s164f",
+      "prefix_source": "headless-prompt",
+      "qa_no": 293,
+      "reason": null,
+      "report_path": "docs/loops/s164f-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s164g-report",
+      "cases": 0,
+      "notes": [],
+      "prefix": "s164g",
+      "prefix_source": "headless-prompt",
+      "qa_no": 294,
+      "reason": null,
+      "report_path": "docs/loops/s164g-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s164h-report",
+      "cases": 0,
+      "notes": [],
+      "prefix": "s164h",
+      "prefix_source": "headless-prompt",
+      "qa_no": 295,
+      "reason": null,
+      "report_path": "docs/loops/s164h-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s165a-report",
+      "cases": 0,
+      "notes": [],
+      "prefix": "s165a",
+      "prefix_source": "headless-prompt",
+      "qa_no": 296,
+      "reason": null,
+      "report_path": "docs/loops/s165a-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": "origin/qa/s165b-report",
+      "cases": 0,
+      "notes": [],
+      "prefix": "s165b",
+      "prefix_source": "headless-prompt",
+      "qa_no": 297,
+      "reason": null,
+      "report_path": "docs/loops/s165b-qa-report.md",
+      "resolved": true
+    },
+    {
+      "branch": null,
+      "cases": 0,
+      "notes": [],
+      "prefix": null,
+      "prefix_source": null,
+      "qa_no": 298,
+      "reason": "no prefix stated: the prompt has no \"your prefix is\" line and no dispatch has a Commit line naming qa/<prefix>-report",
       "report_path": null,
       "resolved": false
     }
@@ -7677,9 +9117,51 @@
       "scope": "case"
     },
     {
-      "prefix": "s162c",
-      "qa_no": 282,
-      "reason": "branch missing: origin/qa/s162c-report is not on origin",
+      "prefix": "jev-cal-2",
+      "qa_no": 285,
+      "reason": "branch missing: origin/qa/jev-cal-2-report is not on origin",
+      "scope": "run"
+    },
+    {
+      "prefix": "jev-cal-2-r2",
+      "qa_no": 287,
+      "reason": "branch missing: origin/qa/jev-cal-2-r2-report is not on origin",
+      "scope": "run"
+    },
+    {
+      "prefix": "s164b",
+      "qa_no": 289,
+      "reason": "report resolved but it has no PR verdict rows (no verdict table and no ACCEPT/REJECT verdict lines naming a PR or task)",
+      "scope": "run"
+    },
+    {
+      "prefix": "s164g",
+      "qa_no": 294,
+      "reason": "report resolved but it has no PR verdict rows (no verdict table and no ACCEPT/REJECT verdict lines naming a PR or task)",
+      "scope": "run"
+    },
+    {
+      "prefix": "s164h",
+      "qa_no": 295,
+      "reason": "report resolved but it has no PR verdict rows (no verdict table and no ACCEPT/REJECT verdict lines naming a PR or task)",
+      "scope": "run"
+    },
+    {
+      "prefix": "s165a",
+      "qa_no": 296,
+      "reason": "report resolved but it has no PR verdict rows (no verdict table and no ACCEPT/REJECT verdict lines naming a PR or task)",
+      "scope": "run"
+    },
+    {
+      "prefix": "s165b",
+      "qa_no": 297,
+      "reason": "report resolved but it has no PR verdict rows (no verdict table and no ACCEPT/REJECT verdict lines naming a PR or task)",
+      "scope": "run"
+    },
+    {
+      "prefix": null,
+      "qa_no": 298,
+      "reason": "no prefix stated: the prompt has no \"your prefix is\" line and no dispatch has a Commit line naming qa/<prefix>-report",
       "scope": "run"
     },
     {
