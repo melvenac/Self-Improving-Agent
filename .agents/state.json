@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 573,
+  "revision": 574,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2645,16 +2645,16 @@
       "id": "T-314",
       "title": "CLI `start` creates a session log, so a read-only check takes the next session number",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 174,
       "supersedes": null,
-      "note": "S173 (10-19/20), two instances on one evening. (1) Atlas ran `node <main>/open-brain/build/cli.js start <sia-planner>` as T-194's live check: it printed 'Session 174' and left a template .agents/SESSIONS/Session_174.md ('Objective: [TBD]'), removed by hand. (2) Relay (A2A-Hub s42→43) ran its own CLI `start` and found a template Session_43.md, also removed by hand. The CLI route is T-154's memory-free /start, and seats also use it as a read-only probe. start-report.ts carries the same sessionStart() that creates the log; with no proven session it still writes one. Effect: the next real /start sees the number taken (takenNumber path) or reuses a log it did not create. Fix shape when picked up: `start --no-log` (or read-only by default unless a session is proven), plus a row that the probe leaves .agents/SESSIONS unchanged. — s174 10-24 SIM docs/loops/t314-sim.md (#961), job #101: `open-brain start --read-only` prints the report and writes no session log, no role-read record and no greeting-metrics row (10 edits in 6 files; cli-args row 'a command with no flags' moves to a bare spec). Rows R1-R5, mutants m1-m4.",
+      "note": "S173 (10-19/20), two instances on one evening. (1) Atlas ran `node <main>/open-brain/build/cli.js start <sia-planner>` as T-194's live check: it printed 'Session 174' and left a template .agents/SESSIONS/Session_174.md ('Objective: [TBD]'), removed by hand. (2) Relay (A2A-Hub s42→43) ran its own CLI `start` and found a template Session_43.md, also removed by hand. The CLI route is T-154's memory-free /start, and seats also use it as a read-only probe. start-report.ts carries the same sessionStart() that creates the log; with no proven session it still writes one. Effect: the next real /start sees the number taken (takenNumber path) or reuses a log it did not create. Fix shape when picked up: `start --no-log` (or read-only by default unless a session is proven), plus a row that the probe leaves .agents/SESSIONS unchanged. — s174 10-24 SIM docs/loops/t314-sim.md (#961), job #101: `open-brain start --read-only` prints the report and writes no session log, no role-read record and no greeting-metrics row (10 edits in 6 files; cli-args row 'a command with no flags' moves to a bare spec). Rows R1-R5, mutants m1-m4. — s174 10-24 SHIPPED + LIVE PASS: PR #977 merged 11e29d81 by clark under SG-1 (refresh to 7e4a465c, patch-id SAME 0e948d8f3034, CI pass, trees equal 404c31c1); REBUILT desktop (build-info 11e29d81). Build job #109 READY 559fd3e5: R1/R2/R3/R5 red then green (111/111), m1 R1+R5, m2 R2, m3 R3+R5, m4 R5; Atlas byte-compare SAME x7. Ruled deviation: wide run attempt 1 had load timeouts (t154 CS-5 killed at 90s, closeout-erasure T163-1) beside T-292's error, each green alone; attempt 2 was 1046/1046. LIVE (Atlas, desktop, 10-24 ~10:3xZ): `node <main>/open-brain/build/cli.js start --read-only <sia-planner>` exit 0, printed `Session log: not created: read-only start (--read-only)`, and left .agents/SESSIONS and .agents/role-reads.local.json byte-unchanged. Use `start --read-only` for every probe from now on.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
-      "closed_rev": null
+      "closed_rev": 574
     },
     {
       "id": "T-315",
@@ -6895,7 +6895,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "last_work_rev": 573
+      "last_work_rev": 574
     }
   ]
 }
