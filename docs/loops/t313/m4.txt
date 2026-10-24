@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/run.ts
+<<<
+    skipped.length ? `seat-skip:${skipped.join(",")}` : "",
+===
+    "",
+>>>

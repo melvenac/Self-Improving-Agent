@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/seat.ts
+<<<
+    const m = /^([a-z0-9]+)-ops$/i.exec(tag.trim());
+===
+    const m = /^([a-z0-9-]+)-ops$/i.exec(tag.trim());
+>>>
