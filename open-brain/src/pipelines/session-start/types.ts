@@ -17,6 +17,8 @@ export interface SessionStartOptions {
    * so a cut file can never be mistaken for an absent or short one.
    */
   stateBudgetLines?: number;
+  /** T-314: a read-only start (a probe) creates no session log, so it takes no session number. */
+  noLog?: boolean;
 }
 
 export type SessionMode = "project" | "lightweight" | "meta";
