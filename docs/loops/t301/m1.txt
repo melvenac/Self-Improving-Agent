@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-suite-run.ts
+<<<
+  const busy = census.busySia.length > 0 ? census.busySia.join(", ") : "none";
+===
+  const busy = "none";
+>>>
