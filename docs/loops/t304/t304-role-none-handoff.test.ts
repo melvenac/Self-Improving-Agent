@@ -19,6 +19,8 @@ const SIA = JSON.parse(readFileSync(join(import.meta.dirname, "../../fixtures-st
 type Raw = Record<string, unknown>;
 const entry = (checkout: string, first_rev: number, pick_up: string, seat = "developer"): Raw => ({
   ...SIA.handoffs[0], seat, checkout, session_uuid: `u-${checkout}-${first_rev}`, first_rev, pick_up,
+  // A planner handoff must carry loop_state (its fields may be empty).
+  ...(seat === "planner" ? { loop_state: { open_prs: [], frozen_sha: null, questions_for_aaron: [], rulings: [] } } : {}),
 });
 const stateText = (handoffs: Raw[]): string => JSON.stringify({ ...structuredClone(SIA), handoffs }, null, 2);
 const handoffsOf = (handoffs: Raw[]): Handoff[] => {

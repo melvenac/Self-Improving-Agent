@@ -27,3 +27,28 @@ export function describeWorkingTree(projectRoot: string, ownLog?: string): strin
 # Backups an installer leaves beside a settings file it rewrites (settings.local.json.bak-<stamp>).
 /.claude/*.bak-*
 >>>
+@@@ open-brain/tests/pipelines/session-start/briefing.test.ts
+<<<
+        workingTree: describeWorkingTree(root),
+        skills: describeSkills(root),
+      }),
+    );
+===
+        // T-297 step 3: ob_start names its own new log on the Working tree line, so the expectation does too.
+        workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${n}.md`)),
+        skills: describeSkills(root),
+      }),
+    );
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing.test.ts
+<<<
+            workingTree: describeWorkingTree(root),
+            skills: describeSkills(root),
+          }),
+        ),
+===
+            workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${sessionNumber}.md`)),
+            skills: describeSkills(root),
+          }),
+        ),
+>>>
