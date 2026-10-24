@@ -130,7 +130,7 @@ import { matchingErrorKeyIds, matchingKeyIds, readTriggerErrorKeys, readTriggerK
 <<<
     const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
 ===
-    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat, error, errorKeyIds });
+    const outcome = runTrigger({ error, errorKeyIds, db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
 >>>
 @@@ open-brain/src/trigger/run.ts
 <<<

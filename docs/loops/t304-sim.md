@@ -60,3 +60,8 @@ final run of h show 0 failed; f has 0 rows red alone; g shows `module-boundary [
 m2 reds H1 and H5 only; m3 reds H4a and H4b only; m4 reds H4b only. Otherwise `READY sim-t304 <HEAD sha8> MISMATCH`
 and list each step that differed, with the full assertion message of every red row. Every number is pasted output, with
 its command.
+
+Round 2 (job #103 at d9591829: the new test file failed to LOAD, `fixture invalid: handoffs.1.loop_state: a planner
+handoff must carry loop_state`, so no row ran; the edits applied, type-checked, built, and the other 1,734 tests were
+green). The test's `entry()` now gives a planner handoff an empty loop_state. The three fixture states the file builds
+were checked with the main build's parseState on the desktop: all valid. Everything else is unchanged.
