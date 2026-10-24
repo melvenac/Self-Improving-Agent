@@ -440,6 +440,13 @@ export function newestHandoffPerInstance(handoffs: readonly Handoff[]): Handoff[
   return handoffs.filter((h) => keep.has(h));
 }
 
+/** T-304: the newest handoff (by `first_rev`) written from one checkout, whatever seat it is filed under, or null. */
+function newestFromCheckout(handoffs: readonly Handoff[], checkout: string): Handoff | null {
+  let best: Handoff | null = null;
+  for (const h of handoffs) if (h.checkout === checkout && (best === null || compareFirstRev(h.first_rev, best.first_rev) >= 0)) best = h;
+  return best;
+}
+
 /** The newest handoff (by `first_rev`) of one seat role across its instances, or null. */
 export function newestHandoffForSeat(handoffs: readonly Handoff[], seat: Seat): Handoff | null {
   let best: Handoff | null = null;
@@ -464,8 +471,10 @@ export function checkoutOf(projectRoot: string): string {
  * neither is ever returned: briefing a seat from an entry it cannot attribute is the defect (sia-infra session 161 was
  * briefed from sia-builder's session-156 handoff).
  */
-export function ownHandoff(handoffs: readonly Handoff[], seat: Seat | null, ownCheckout?: string): Handoff | null {
-  if (seat === null) return null;
+export function ownHandoff(handoffs: readonly Handoff[], seat: Seat | null, ownCheckout?: string, notASeat = false): Handoff | null {
+  // T-304: a checkout that declares role none has no seat, so its handoff is the newest written FROM it, by any seat.
+  // Never without a checkout: matching on nothing would brief it from another instance's entry.
+  if (seat === null) return notASeat && ownCheckout !== undefined ? newestFromCheckout(handoffs, ownCheckout) : null;
   if (ownCheckout === undefined) return newestHandoffForSeat(handoffs, seat);
   return newestHandoffForSeat(handoffs.filter((h) => h.checkout === ownCheckout), seat);
 }
