@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 572,
+  "revision": 573,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2572,16 +2572,16 @@
       "id": "T-309",
       "title": "Budgeted NEXT does not say when the objective names a done task",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 174,
       "supersedes": null,
-      "note": "Found s173 (Maker S70 greeting). Budgeted NEXT lists only ids the objective names (briefing.ts renderBudgeted). Maker's s65 objective named done T-169 first, so NEXT led with '[done] T-169' while 6 active P1s were hidden; the greeting marks it but never says the objective is stale. Fix: one line 'objective names done T-169: update it (set_objective)'. Maker reset its objective in rev 643, so no live case now. — s174 10-24 SIM docs/loops/t309-sim.md (#961), job #100: the budgeted NEXT keeps a done task's row and ends it with `(objective names a done task: update it with set_objective)` (exported STALE_OBJECTIVE), title cut to 36 so the row is no longer than an open row; no added line. Rows D1-D4, mutants m1-m3.",
+      "note": "Found s173 (Maker S70 greeting). Budgeted NEXT lists only ids the objective names (briefing.ts renderBudgeted). Maker's s65 objective named done T-169 first, so NEXT led with '[done] T-169' while 6 active P1s were hidden; the greeting marks it but never says the objective is stale. Fix: one line 'objective names done T-169: update it (set_objective)'. Maker reset its objective in rev 643, so no live case now. — s174 10-24 SIM docs/loops/t309-sim.md (#961), job #100: the budgeted NEXT keeps a done task's row and ends it with `(objective names a done task: update it with set_objective)` (exported STALE_OBJECTIVE), title cut to 36 so the row is no longer than an open row; no added line. Rows D1-D4, mutants m1-m3. — s174 10-24 SHIPPED: PR #975 merged 54698d3d by clark under SG-1 (refresh to 2961226c, patch-id SAME 0eb1910ce19f, CI pass, trees equal 2094766f); REBUILT desktop main checkout (build-info 54698d3d, Atlas-read). Build job #108 READY 609946af: D1/D3/D4 red then green (86/86), wide run 152 files / 1733 tests 0 failed (T-292 onTaskUpdate error only), m1 D1+D3, m2 D3, m3 D2 + briefing-budget's pinned NEXT row; Atlas byte-compare SAME x2. Live check (passive): the next budgeted greeting whose objective names a done task ends that NEXT row with `(objective names a done task: update it with set_objective)`; no repo has such an objective today (Maker reset its objective in rev 643).",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
-      "closed_rev": null
+      "closed_rev": 573
     },
     {
       "id": "T-310",
@@ -6895,7 +6895,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "last_work_rev": 572
+      "last_work_rev": 573
     }
   ]
 }
