@@ -176,11 +176,13 @@ if (command === "sync") {
     process.exit(1);
   }
 } else if (command === "start") {
-  const projectRoot = parseOrRefuse(COMMAND_SPECS.start, args.slice(1)).directory ?? resolve(".");
+  const startOpts = parseOrRefuse(COMMAND_SPECS.start, args.slice(1));
+  const projectRoot = startOpts.directory ?? resolve(".");
 
   // T-154: the same report ob_start returns, from a module with no memory imports.
   const { renderStartReport } = await import("./pipelines/session-start/start-report.js");
-  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" } });
+  // T-314: --read-only is a probe: no session log, no role-read record, no greeting-metrics row.
+  const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" }, readOnly: startOpts.has("--read-only") });
   console.log(r.text);
   process.exitCode = r.isError ? 1 : 0;
 } else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics") {
@@ -270,12 +272,14 @@ HEAD: ${r.headBefore?.slice(0, 7)}${r.branchBefore ? ` (${r.branchBefore})` : " 
     process.exit(1);
   }
   const { greetingMetricsPath } = await import("./pipelines/session-start/greeting-metrics.js");
-  const { reviewGreetingMetrics, renderReview, reviewEndMetrics, renderEndReview } = await import("./pipelines/session-start/metrics-review.js");
+  const { reviewGreetingMetrics, renderReview, reviewEndMetrics, renderEndReview, reviewNoEnd, renderNoEnd } = await import("./pipelines/session-start/metrics-review.js");
   const { endMetricsPath } = await import("./shared/end-metrics.js");
   const main = greetingMetricsPath();
   console.log(renderReview(reviewGreetingMetrics([`${main}.1`, main], since), since, main).join("\n"));
   const end = endMetricsPath();
   console.log(renderEndReview(reviewEndMetrics([`${end}.1`, end], since), since, end).join("\n"));
+  // T-318 S3: sessions that greeted and never ended, so a skipped /end is listed rather than found by a transcript read.
+  console.log(renderNoEnd(reviewNoEnd([`${main}.1`, main], [`${end}.1`, end], since), end).join("\n"));
 } else if (command === "bootstrap") {
   // /bootstrap's deterministic half (bootstrap-fix BF-3/4/6). The directory is
   // taken literally, never walked up: a fresh project may not be a repository
@@ -636,7 +640,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("");
   console.log("Commands:");
   console.log("  sync [--check] [--score [--json]] [--history] [--retirements-rehash [--write]]");
-  console.log("  start                                     Start a session");
+  console.log("  start [--read-only]                       Start a session (--read-only: print the report, write nothing)");
   console.log("  end [--dry-run]                            End a session");
   console.log("  relocate [--from <dir> --to <dir> | --worktrees] [--apply]  Fold a renamed project's or a worktree's history forward");
   console.log(

@@ -27,6 +27,8 @@ export interface BriefingInput {
   version: string;
   /** The reading seat's role, so its OWN handoff is the pick-up. Null: unresolved, and the briefing says so. */
   seat: Seat | null;
+  /** T-304: the reader's checkout declares role none, so its handoff is matched by checkout alone (needs ownCheckout). */
+  notASeat?: boolean;
   /** `Session #N`'s number, or null when no log was created (the briefing then says why instead of inventing one). */
   sessionNumber: number | null;
   sessionNote: string | null;
@@ -150,7 +152,7 @@ export function renderBriefing(i: BriefingInput): string[] {
   if (i.transcript) out.push(i.transcript);
   out.push(i.usage);
   const session = i.sessionNumber !== null ? `Session ${i.sessionNumber}` : `Session (${i.sessionNote ?? "no log created"})`;
-  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout, i.notASeat === true);
   const lagNote = handoffLagNote(own, s.revision);
   // T-305 (D-160): the date is UTC, and the Z says so; i.date itself stays plain because isExpired compares it.
   out.push(`${session} — ${i.date}Z · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""}`);
@@ -241,6 +243,7 @@ export const STANDING_RULES_LINE_CHARS = 200;
 const MORE_WATCH = "state.json handoffs[].watch_out";
 const MORE_QUESTIONS = "state.json handoffs[].open_questions";
 const MORE_TASKS = "state.json tasks[]";
+export const STALE_OBJECTIVE = "(objective names a done task: update it with set_objective)";
 
 /** One line: whitespace flattened, cut at `limit` with the full length named. A clip is never silent. */
 function cut(text: string, limit: number): string {
@@ -269,7 +272,7 @@ function renderBudgeted(i: BriefingInput): string[] {
     i.drift.length === 0
       ? "Drift: none"
       : cut(`Drift detected (${i.drift.length}): ${i.drift.map((d) => `${d.field}: expected ${d.expected}, got ${d.actual}${d.fixed ? " (fixed)" : " (not fixed)"}`).join("; ")}`, CAPS.drift);
-  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout);
+  const own = ownHandoff(s.handoffs, i.seat, i.ownCheckout, i.notASeat === true);
   const lagNote = handoffLagNote(own, s.revision);
   const sessionLine = `${session} — ${i.date}Z · ${s.project.name} v${i.version} · state rev ${s.revision}${lagNote !== null ? ` (${lagNote})` : ""} · ${drift}`;
   // T-281: T-161's line rides the session line as a fixed note, so an alarm state costs no line and stays inside the char cap.
@@ -284,7 +287,9 @@ function renderBudgeted(i: BriefingInput): string[] {
     out.push("NEXT");
     for (const id of ids.slice(0, CAPS.next)) {
       const t = s.tasks.find((x) => x.id === id);
-      out.push(t ? `- [${t.status === "done" ? "done" : t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+      // T-309: a done task in the objective says so on its own row, so a stale objective costs no line.
+      if (t?.status === "done") out.push(`- [done] ${t.id} ${cut(t.title, 36)} ${STALE_OBJECTIVE}`);
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
     }
     if (ids.length > CAPS.next) out.push(`+${ids.length - CAPS.next} more: ${MORE_TASKS}`);
   }
@@ -413,10 +418,12 @@ export function describeProblemStatement(projectRoot: string): string {
 }
 
 /** `Working tree: clean`, or `N uncommitted: path, path, ...`. Never silent: a git failure is `not checked`. */
-export function describeWorkingTree(projectRoot: string): string {
+export function describeWorkingTree(projectRoot: string, ownLog?: string): string {
   try {
     const out = execFileSync("git", ["status", "--porcelain"], { cwd: projectRoot, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-    const paths = out.split("\n").filter((l) => l.trim() !== "").map((l) => l.slice(3));
+    // T-297: this session's own new log is expected to be uncommitted, so it is named as such, not hidden.
+    const own = ownLog === undefined ? null : relative(projectRoot, ownLog).split(sep).join("/");
+    const paths = out.split("\n").filter((l) => l.trim() !== "").map((l) => l.slice(3)).map((p) => (p === own ? `${p} (this session's log)` : p));
     if (paths.length === 0) return "Working tree: clean";
     const shown = paths.slice(0, 8).join(", ");
     return `Working tree: ${paths.length} uncommitted: ${shown}${paths.length > 8 ? `, +${paths.length - 8} more` : ""}`;

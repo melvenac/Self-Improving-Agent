@@ -16,7 +16,7 @@ export const COMMAND_SPECS = {
   },
   start: {
     name: "start",
-    booleans: [],
+    booleans: ["--read-only"],
     values: {},
     positionals: "directory",
   },

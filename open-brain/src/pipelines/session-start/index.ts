@@ -28,7 +28,9 @@ export function sessionStart(options: SessionStartOptions): SessionStartResult {
 
   if (state.hasAgents) {
     const sessionsDir = join(options.projectRoot, ".agents", "SESSIONS");
-    if (!existsSync(sessionsDir)) {
+    if (options.noLog === true) {
+      session.skippedReason = "not created: read-only start (--read-only)";
+    } else if (!existsSync(sessionsDir)) {
       // Absent is not silent: the caller prints this instead of a blank block.
       session.skippedReason = "no .agents/SESSIONS/ dir — log not created";
     } else {

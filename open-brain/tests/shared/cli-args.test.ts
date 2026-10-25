@@ -44,7 +44,8 @@ describe("parseArgs refuses what it was not told about", () => {
   });
 
   it("a command with no flags says so", () => {
-    expect(refused(["--x"], COMMAND_SPECS.start)).toContain("Accepted flags: (none)");
+    // T-314 gave `start` its first flag, so the row uses a spec that has none.
+    expect(refused(["--x"], { name: "bare", booleans: [], values: {}, positionals: "directory" })).toContain("Accepted flags: (none)");
   });
 
   it("a value flag keeps its declared form", () => {

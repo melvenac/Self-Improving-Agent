@@ -28,6 +28,8 @@ export interface RenderStateOptions {
    * and a legacy entry (null checkout) is listed as `[legacy, unattributed]`. Absent: the role's newest, as before.
    */
   ownCheckout?: string;
+  /** T-304: the reader's checkout declares role none, so its handoff is matched by checkout alone (needs ownCheckout). */
+  notASeat?: boolean;
   /**
    * T-296 (3), OPT-IN per repo (greeting.json `state_compact`), default OFF. Set: Verified prints only reopened claims
    * plus one count line, Gaps prints one count line, and other seats' handoffs are one line in all. The reader's own
@@ -228,9 +230,9 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
   const hidden = state.handoffs.length - visible.length;
   const seat = options.seat ?? null;
   const byCheckout = options.ownCheckout !== undefined;
-  const own = ownHandoff(state.handoffs, seat, options.ownCheckout);
+  const own = ownHandoff(state.handoffs, seat, options.ownCheckout, options.notASeat === true);
 
-  if (seat === null) {
+  if (seat === null && own === null) {
     lines.push(
       `\nHandoffs (${visible.length}) — READER'S SEAT UNRESOLVED, so none is rendered as "yours":`
     );

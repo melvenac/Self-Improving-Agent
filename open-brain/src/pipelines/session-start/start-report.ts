@@ -4,11 +4,11 @@ import { readFileSync } from "node:fs";
 import { sessionStart, type StateFileSize, type StateJsonResult } from "./index.js";
 import { describeTreeCurrency } from "./tree-currency.js";
 import { resolveRecordSource, type RecordSource } from "./record-source.js";
-import { describeRoleFiles, renderRoleDocs, recordRoleReads } from "./role-files.js";
+import { describeRoleFiles, renderRoleDocs, recordRoleReads, NOT_A_SEAT } from "./role-files.js";
 import { greetingFlag, handoffCheckout } from "./greeting-flags.js";
 import { focusLine, seatsLine, seatOrder } from "./focus.js";
 import { resolveCheckoutSeat } from "./seat-map.js";
-import { SeatName, ownHandoff, schemaVersionAdvice, type Seat } from "../../shared/state-schema.js";
+import { SeatName, checkoutOf, ownHandoff, schemaVersionAdvice, type Seat } from "../../shared/state-schema.js";
 import { describeMergedCitations } from "./handoff-merged.js";
 import { resolveUpstreamRef } from "./upstream-ref.js";
 import { readAgentIdentity } from "./agent-identity.js";
@@ -40,6 +40,8 @@ export interface StartReportInput {
   stateBudgetLines?: number;
   /** Names the calling process in the partner-presence header. */
   callerLabel: string;
+  /** T-314: a probe. No session log, no role-read record and no greeting-metrics row are written. */
+  readOnly?: boolean;
 }
 
 export interface StartReport {
@@ -106,6 +108,7 @@ export async function renderStartReport(input: StartReportInput): Promise<StartR
     // discover, or a shared checkout stamps the other session's transcript.
     sessionId: proven.id,
     stateBudgetLines: input.stateBudgetLines,
+    noLog: input.readOnly === true,
   });
   const sessionIdLine = proven.id === null
     ? `Session ID: none — ${proven.reason}`
@@ -251,13 +254,16 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
     // names the others by their close-out commit. A greeting that shows the
     // developer's handoff to the planner is C4 failing on the row C2 exists for.
     // T-239: with handoff_by_checkout on, only THIS checkout's handoff is "yours", in both renders.
-    const ownCheckout = handoffCheckout(projectRoot);
+    // T-304: a role-none checkout's handoff is matched by checkout alone, so it needs its checkout with the flag off too.
+    const notASeat = roles.seat?.role === NOT_A_SEAT;
+    const ownCheckout = handoffCheckout(projectRoot) ?? (notASeat ? checkoutOf(projectRoot) : undefined);
     const startNow = new Date();
     const projectName = sj.data.project.name;
     lines.push(...renderState(sj.data, result.state.version, {
       seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
       projectRoot,
       ownCheckout,
+      notASeat,
       compact: greetingFlag(projectRoot, "state_compact"),
     }));
     // T-233 B: the whole briefing, rendered here, so /start prints it instead of assembling it.
@@ -267,6 +273,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       version: result.state.version,
       seat: roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
       ownCheckout,
+      notASeat,
       sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
       sessionNote: result.session.skippedReason,
       date: new Date().toISOString().slice(0, 10),
@@ -288,7 +295,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
           return fleetFallback(err, process.env);
         }
       })(),
-      workingTree: describeWorkingTree(projectRoot),
+      workingTree: describeWorkingTree(projectRoot, result.session.logPath || undefined),
       skills: describeSkills(projectRoot),
       // T-236 slice 2: OPT-IN per repo (.agents/SYSTEM/greeting.json); absent means the original layout, byte for byte.
       budget: greetingFlag(projectRoot, "briefing_budget"),
@@ -308,7 +315,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       // T-302, opt-in: SHAs this reader's handoff cites that the upstream branch already contains, as of the last fetch.
       // T-298 (3): the DEFAULT branch, where code merges, even when the record lives on `record_branch`.
       mergedCitations: greetingFlag(projectRoot, "merged_citations")
-        ? describeMergedCitations(projectRoot, ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout), resolveUpstreamRef(projectRoot))
+        ? describeMergedCitations(projectRoot, ownHandoff(sj.data.handoffs, roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null, ownCheckout, notASeat), resolveUpstreamRef(projectRoot))
         : null,
       // T-316 S2, opt-in: open tasks a code commit on HEAD or the default branch already names, from the record rendered here.
       maybeShipped: greetingFlag(projectRoot, "maybe_shipped") ? describeMaybeShipped(projectRoot, sj.data.tasks) : null,
@@ -366,13 +373,14 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
   // read is recorded only after its full text is in `lines`, and only here.
   const roleDocs = renderRoleDocs(projectRoot, roles.files, roles.seat, greetingFlag(projectRoot, "role_docs_by_sha"));
   lines.push(...roleDocs.lines);
-  const unrecorded = recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
+  // T-314: a read-only start records no read, so the seat's real /start still prints what it has not read.
+  const unrecorded = input.readOnly === true ? null : recordRoleReads(projectRoot, roles.seat, roleDocs.printedFull, new Date());
   if (unrecorded) lines.push(`\n${unrecorded}`);
 
   // Total is of everything above it — the measurement Part 1 of the
   // evaluation asks for. Computed last so it counts the real return.
   // T-299: opt-in (greeting.json `greeting_metrics`). Never changes isError or any line but its own failure line.
-  if (greetingFlag(projectRoot, "greeting_metrics")) {
+  if (greetingFlag(projectRoot, "greeting_metrics") && input.readOnly !== true) {
     const m = recordGreetingMetrics({
       projectRoot,
       callerLabel: input.callerLabel,
