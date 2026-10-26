@@ -53,7 +53,15 @@ import { homedir } from "node:os";
 import type Database from "better-sqlite3";
 import { deriveQuery } from "./trigger/query.js";
 import { appendPendingNotAsked, pendingFiresPath } from "./trigger/pending-fires.js";
-import { matchingErrorKeyIds, matchingKeyIds, readTriggerErrorKeys, readTriggerKeys, triggerKeysPath } from "./trigger/match-keys.js";
+import {
+  matchingErrorKeyIds,
+  matchingKeyIds,
+  matchingPathKeyIds,
+  readTriggerErrorKeys,
+  readTriggerKeys,
+  readTriggerPathKeys,
+  triggerKeysPath,
+} from "./trigger/match-keys.js";
 
 const DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const LOG_PATH = process.env.RECALL_TRIGGER_LOG || join(dirname(DB_PATH), "recall-trigger.log");
@@ -88,6 +96,21 @@ export function shellCommandFromHookPayload(payload: Record<string, unknown>): s
     return typeof command === "string" && command.trim() !== "" ? command : null;
   }
   return null;
+}
+
+/**
+ * T-170 (iii): file tools whose `tool_input.file_path` the trigger matches against `MATCH: path:` keys. Claude Code's
+ * Edit and Write both take `file_path` (their tool schemas); the hook is registered on PostToolUse `Edit|Write` since
+ * 2026-10-26. No other names without a new measurement row.
+ */
+export const CLAUDE_CODE_FILE_TOOL_NAMES = new Set<string>(["Edit", "Write"]);
+
+/** The file an Edit or Write call touched, or null when this event is not one. */
+export function filePathFromHookPayload(payload: Record<string, unknown>): string | null {
+  const toolName = payload.tool_name;
+  if (typeof toolName !== "string" || !CLAUDE_CODE_FILE_TOOL_NAMES.has(toolName)) return null;
+  const filePath = (payload.tool_input as Record<string, unknown> | undefined)?.file_path;
+  return typeof filePath === "string" && filePath.trim() !== "" ? filePath : null;
 }
 
 /**
@@ -143,8 +166,12 @@ async function main(): Promise<void> {
     return;
   }
 
-  const command = shellCommandFromHookPayload(payload);
-  if (command === null) return;
+  const shell = shellCommandFromHookPayload(payload);
+  // T-170 (iii): an Edit or Write call is asked only when its file matches a path key. Otherwise it never reaches the
+  // store and leaves no not-asked fire: the not-asked census counts shell commands.
+  const filePath = shell === null ? filePathFromHookPayload(payload) : null;
+  if (shell === null && filePath === null) return;
+  const command = shell ?? `${String(payload.tool_name)} ${filePath}`;
 
   const sessionUuid = typeof payload.session_id === "string" ? payload.session_id : "";
   if (!sessionUuid) {
@@ -158,11 +185,13 @@ async function main(): Promise<void> {
   // T-159: AFTER the session check, so an unattributable fire is still
   // dropped rather than written to the pending file. T-170: a command that
   // matches a lesson's `MATCH: command:` key in the sidecar is asked too.
-  const keyIds = matchingKeyIds(readTriggerKeys(triggerKeysPath(DB_PATH)), command);
+  const keyIds = filePath === null ? matchingKeyIds(readTriggerKeys(triggerKeysPath(DB_PATH)), command) : [];
+  const pathKeyIds = filePath !== null ? matchingPathKeyIds(readTriggerPathKeys(triggerKeysPath(DB_PATH)), filePath) : [];
+  if (filePath !== null && pathKeyIds.length === 0) return;
   // T-170 (ii): a failed call's `error` text (PostToolUseFailure) is matched against the `MATCH: error:` keys.
   const error = typeof payload.error === "string" ? payload.error : "";
   const errorKeyIds = error !== "" ? matchingErrorKeyIds(readTriggerErrorKeys(triggerKeysPath(DB_PATH)), error) : [];
-  if (deriveQuery(command) === "" && keyIds.length === 0 && errorKeyIds.length === 0) {
+  if (deriveQuery(command) === "" && keyIds.length === 0 && errorKeyIds.length === 0 && pathKeyIds.length === 0) {
     try {
       appendPendingNotAsked(pendingFiresPath(DB_PATH), { sessionUuid, command }, new Date());
     } catch (err) {
@@ -224,7 +253,7 @@ async function main(): Promise<void> {
 
     const cwd = typeof payload.cwd === "string" && payload.cwd !== "" ? payload.cwd : null;
     const seat = resolveTriggerSeat(readDb, sessionUuid, cwd);
-    const outcome = runTrigger({ error, errorKeyIds, db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
+    const outcome = runTrigger({ filePath: filePath ?? undefined, pathKeyIds, error, errorKeyIds, db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
 
     // The deadline is checked HERE, after the synchronous work, and it
     // governs only whether the result may still be emitted. A reminder that

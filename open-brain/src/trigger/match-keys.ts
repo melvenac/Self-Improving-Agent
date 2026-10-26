@@ -6,7 +6,8 @@
  * writes `MATCH: command|path|error|none` into each lesson, and this module
  * parses that line. Command keys are read against the command; error keys
  * against a failed shell call's error text (T-170 part ii, PostToolUseFailure).
- * Path keys stay stored and unread.
+ * Path keys against the file an Edit or Write call touched (T-170 part iii,
+ * `tool_input.file_path`).
  *
  * The hook reads keys through a small JSON sidecar beside the store, written by
  * the server and the CLIs (keys-writer.ts), so that a command which asks
@@ -19,6 +20,7 @@
  */
 
 import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 
 /** A key with fewer non-whitespace characters than this is lookup-only. */
@@ -162,5 +164,76 @@ export function matchingErrorKeyIds(keys: ErrorKey[], error: string): number[] {
   return keys
     .filter((k) => errorMatchesKey(k.text, error))
     .sort((a, b) => b.text.length - a.text.length || a.id - b.id)
+    .map((k) => k.id);
+}
+
+/** T-170 (iii): a lesson's `MATCH: path:` key, matched against the file an Edit or Write call touched. */
+export interface PathKey {
+  id: number;
+  glob: string;
+}
+
+const PATH_LINE = /^MATCH:\s*path:/;
+
+/**
+ * The glob of a lesson's `MATCH: path:` key, or `null` when it has none, the key is too short, or it is prose (a space
+ * inside it). The first backticked span is the key; without one, a parenthetical is commentary and is cut, as for
+ * command keys. `\` reads as `/`. `*`, `?` and `/` do not count toward the minimum length, so `*.md` is null.
+ */
+export function parsePathKey(content: string): string | null {
+  const line = content.split(/\r?\n/).find((l) => PATH_LINE.test(l));
+  if (line === undefined) return null;
+  let text = line.replace(/^MATCH:\s*path:\s*/, "");
+  const span = /`([^`]+)`/.exec(text);
+  if (span) {
+    text = span[1];
+  } else {
+    const paren = text.indexOf(" (");
+    if (paren !== -1) text = text.slice(0, paren);
+  }
+  text = text.trim().replace(/\\/g, "/");
+  if (/\s/.test(text)) return null;
+  return text.replace(/[*?/]/g, "").length < MATCH_KEY_MIN_CHARS ? null : text;
+}
+
+/**
+ * True exactly when the file matches the key. Both read `\` as `/` and compare case-insensitively (Windows paths).
+ * `*` and `?` stay inside one path segment; `**` crosses segments. A key starting `~/` is under `home`; an absolute key
+ * (`/x` or `C:/x`) must match the whole path; any other key matches the path's tail on a segment boundary, so
+ * `convex/http.ts` matches `C:/repo/convex/http.ts` and not `C:/repo/myconvex/http.ts`.
+ */
+export function pathMatchesKey(glob: string, filePath: string, home: string = homedir()): boolean {
+  const slash = (p: string) => p.replace(/\\/g, "/");
+  let key = slash(glob);
+  if (key.startsWith("~/")) key = `${slash(home).replace(/\/+$/, "")}/${key.slice(2)}`;
+  const body = key
+    .split(/(\*\*|\*|\?)/)
+    .map((part) =>
+      part === "**" ? ".*" : part === "*" ? "[^/]*" : part === "?" ? "[^/]" : part.replace(/[.+^${}()|[\]\\]/g, "\\$&"),
+    )
+    .join("");
+  const absolute = /^([A-Za-z]:)?\//.test(key);
+  return new RegExp(`${absolute ? "^" : "(^|/)"}${body}$`, "i").test(slash(filePath));
+}
+
+/** The sidecar's path keys. Any failure is `[]` and never throws, as for command keys. */
+export function readTriggerPathKeys(path: string): PathKey[] {
+  try {
+    const keys = (JSON.parse(readFileSync(path, "utf-8")) as { pathKeys?: unknown })?.pathKeys;
+    if (!Array.isArray(keys)) return [];
+    const ok = keys.every(
+      (k) => k !== null && typeof k === "object" && typeof (k as PathKey).id === "number" && typeof (k as PathKey).glob === "string",
+    );
+    return ok ? (keys as PathKey[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** The ids whose path key matches the file, longest key first, then id ascending. */
+export function matchingPathKeyIds(keys: PathKey[], filePath: string, home: string = homedir()): number[] {
+  return keys
+    .filter((k) => pathMatchesKey(k.glob, filePath, home))
+    .sort((a, b) => b.glob.length - a.glob.length || a.id - b.id)
     .map((k) => k.id);
 }
