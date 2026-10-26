@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli.ts
+<<<
+command === "topics" || command === "list" || command === "stats") {
+===
+command === "topics" || command === "list") {
+>>>
