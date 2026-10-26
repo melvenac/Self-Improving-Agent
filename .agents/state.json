@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 580,
+  "revision": 581,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2792,6 +2792,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s174 10-26. clark re-copied start.md/end.md from master 3049a96b at 05:01:31Z (backup ~/Worktrees/_archive/commands-20261026-0001); clark's next greeting, 05:56:53Z (session 14, build c9bf887), still carried old_start_command, streak 6 (greeting-metrics.jsonl). Alarm regex: greeting-metrics.ts:33 /^OLD \\/start/m on the report. Find which file served clark's /start (a ~/Worktrees/.claude/commands copy?) or why the report prints OLD /start.",
+      "note_by": [
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-324",
+      "title": "greeting-metrics: pick_up_ids + open_questions on greeting rows (schema 1, additive) and a schema-2 outcome row from SessionEnd (first_action, first_action_match, ended), for the dashboard scorecard (agent-dashboard T-054)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 174,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s174 10-26. Aaron asked for scorecard items 1-6 to be filed for Prism ('file items 1-6 as a dashboard task for Prism', planner's desk 07:21Z); Prism filed agent-dashboard T-054 and asked for these fields. Shape agreed with Prism (sample rows in the A2A exchange; copy into the brief): greeting rows STAY schema 1 (the live dashboard src/greetings.js:31 drops any other schema) and gain optional pick_up_ids (ids from PICK UP/NEXT, print order, dedup, cap 10, [] when none) and open_questions (int). Outcome rows: {schema:2, kind:'outcome', id, ts, greeting_id, session, first_action:{t,tool,ids}|null, first_action_match: true|false|null, ended: bool}, written by SessionEnd from the transcript; append-only, never an edit of the greeting row; no outcome row = ended null. match rule: true if any first-action id is in pick_up_ids; false if it has ids and none match, or none but pick_up_ids non-empty; null when pick_up_ids is []. ended = ob_end ran. q5 noise_lines waits on a noise rule (later slice). Slices: S1 the greeting fields; S2 the outcome row.",
       "note_by": [
         "0bbb03c4-d91d-496e-a6d5-43924f16405b"
       ],
@@ -6948,7 +6962,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 547,
-      "last_work_rev": 580
+      "last_work_rev": 581
     }
   ]
 }
