@@ -185,7 +185,7 @@ if (command === "sync") {
   const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" }, readOnly: startOpts.has("--read-only") });
   console.log(r.text);
   process.exitCode = r.isError ? 1 : 0;
-} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics") {
+} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics" || command === "rematch") {
   // T-261 S2: the memory subcommands live in cli-memory.ts (memory side). This is their one lazy crossing.
   const { runMemoryCommand } = await import("./cli-memory.js");
   await runMemoryCommand(args);
@@ -643,6 +643,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  start [--read-only]                       Start a session (--read-only: print the report, write nothing)");
   console.log("  end [--dry-run]                            End a session");
   console.log("  relocate [--from <dir> --to <dir> | --worktrees] [--apply]  Fold a renamed project's or a worktree's history forward");
+  console.log("  rematch --id <n> --match <none|command: <key>|path: <glob>|error: <text>> [--dry-run]  Rewrite one lesson's MATCH: line in place, counts kept (T-322)");
   console.log(
     "  scrub-trigger-fires [--db <path>] [--dry-run]  One-time rewrite of trigger_fires.command + VACUUM (stop the MCP server and close Claude Code sessions first)",
   );
