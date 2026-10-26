@@ -237,7 +237,8 @@ describe("state-schema (Loop 2, read side)", () => {
   it("T-171 r3b: origin/master's real state.json parses, and a missing note_by is null", () => {
     const root = join(import.meta.dirname, "..", "..", "..");
     const show = (rev: string) =>
-      execFileSync("git", ["show", `${rev}:.agents/state.json`], { cwd: root, encoding: "utf8" });
+      // The record passed 1 MiB at rev 577 (1,049,575 bytes), execFileSync's default maxBuffer: ENOBUFS.
+      execFileSync("git", ["show", `${rev}:.agents/state.json`], { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
     let text: string;
     try {
       text = show("origin/master");
