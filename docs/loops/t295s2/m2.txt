@@ -1,0 +1,7 @@
+@@@ open-brain/src/server.ts
+<<<
+// --- ob_recalled ---
+===
+server.tool("ob_stats", "m2", {}, async () => ({ content: [] }));
+// --- ob_recalled ---
+>>>

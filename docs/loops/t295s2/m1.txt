@@ -1,0 +1,7 @@
+@@@ open-brain/src/pipelines/store/knowledge-report.ts
+<<<
+  sql += " ORDER BY created_at DESC LIMIT ?";
+  params.push(limit);
+===
+  sql += " ORDER BY created_at DESC";
+>>>
