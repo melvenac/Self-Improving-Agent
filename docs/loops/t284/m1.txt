@@ -1,0 +1,6 @@
+@@@ .githooks/commit-msg
+<<<
+if git interpret-trailers --parse "$1" | grep -qi '^Claude-Session:'; then
+===
+if false; then
+>>>
