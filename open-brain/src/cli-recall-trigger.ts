@@ -53,7 +53,7 @@ import { homedir } from "node:os";
 import type Database from "better-sqlite3";
 import { deriveQuery } from "./trigger/query.js";
 import { appendPendingNotAsked, pendingFiresPath } from "./trigger/pending-fires.js";
-import { matchingKeyIds, readTriggerKeys, triggerKeysPath } from "./trigger/match-keys.js";
+import { matchingErrorKeyIds, matchingKeyIds, readTriggerErrorKeys, readTriggerKeys, triggerKeysPath } from "./trigger/match-keys.js";
 
 const DB_PATH = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const LOG_PATH = process.env.RECALL_TRIGGER_LOG || join(dirname(DB_PATH), "recall-trigger.log");
@@ -159,7 +159,10 @@ async function main(): Promise<void> {
   // dropped rather than written to the pending file. T-170: a command that
   // matches a lesson's `MATCH: command:` key in the sidecar is asked too.
   const keyIds = matchingKeyIds(readTriggerKeys(triggerKeysPath(DB_PATH)), command);
-  if (deriveQuery(command) === "" && keyIds.length === 0) {
+  // T-170 (ii): a failed call's `error` text (PostToolUseFailure) is matched against the `MATCH: error:` keys.
+  const error = typeof payload.error === "string" ? payload.error : "";
+  const errorKeyIds = error !== "" ? matchingErrorKeyIds(readTriggerErrorKeys(triggerKeysPath(DB_PATH)), error) : [];
+  if (deriveQuery(command) === "" && keyIds.length === 0 && errorKeyIds.length === 0) {
     try {
       appendPendingNotAsked(pendingFiresPath(DB_PATH), { sessionUuid, command }, new Date());
     } catch (err) {
@@ -221,7 +224,7 @@ async function main(): Promise<void> {
 
     const cwd = typeof payload.cwd === "string" && payload.cwd !== "" ? payload.cwd : null;
     const seat = resolveTriggerSeat(readDb, sessionUuid, cwd);
-    const outcome = runTrigger({ db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
+    const outcome = runTrigger({ error, errorKeyIds, db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
 
     // The deadline is checked HERE, after the synchronous work, and it
     // governs only whether the result may still be emitted. A reminder that
