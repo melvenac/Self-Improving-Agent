@@ -175,7 +175,7 @@ describe("T-298 G8-G11: the greeting metrics row", () => {
   const ORDER = [
     "schema", "id", "ts", "caller", "record_name", "repo", "checkout", "agent", "role", "session", "record_rev", "handoff_rev",
     "handoff_lag_revs", "lag_reason", "greeting_chars", "greeting_bytes", "budget_chars", "report_bytes", "start_ms", "serving_build",
-    "stale_process", "missing_pointers", "unchecked", "alarm_streaks",
+    "stale_process", "missing_pointers", "unchecked", "alarm_streaks", "pick_up_ids", "open_questions",
   ];
 
   it("G8: the row has the pinned keys in order and the measured values", async () => {

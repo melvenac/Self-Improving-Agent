@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readSync, renameSync, statSync, unlinkSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join } from "node:path";
-import { ownHandoff, type Seat, type State } from "../../shared/state-schema.js";
+import { newestHandoffPerInstance, ownHandoff, questionOwner, questionResolvedBy, type Seat, type State } from "../../shared/state-schema.js";
 import { BRIEFING_BUDGET, BRIEFING_END, BRIEFING_START } from "./briefing.js";
 
 /**
@@ -21,6 +21,9 @@ export const GREETING_METRICS_ROTATE_BYTES = 2 * 1024 * 1024;
 export const ALARM_IDS = ["tree_diverged", "tree_stale", "record_behind", "stale_process", "build_behind", "old_start_command", "usage_not_checked", "drift_not_fixed", "handoff_missing", "latest_brief_undetermined"] as const;
 export const MISSING_POINTER_IDS = ["handoff", "pick_up", "objective", "latest_brief"] as const;
 export const UNCHECKED_IDS = ["latest_brief"] as const;
+/** T-324: at most this many ids in a row's `pick_up_ids`. */
+export const PICK_UP_IDS_CAP = 10;
+const PICK_UP_ID = /\b[TV]-\d+\b|#\d+\b/g;
 
 type AlarmId = (typeof ALARM_IDS)[number];
 
@@ -87,6 +90,10 @@ export interface GreetingMetricsRow {
   missing_pointers: string[];
   unchecked: string[];
   alarm_streaks: Record<string, number>;
+  /** T-324: T-, V- and #ids from the reader's own pick-up, then the objective; de-duplicated, at most PICK_UP_IDS_CAP. */
+  pick_up_ids: string[];
+  /** T-324: unresolved questions owned by aaron across the newest handoff per seat instance; null without a record. */
+  open_questions: number | null;
 }
 
 /** The fields of an earlier row that chain the next one. */
@@ -137,6 +144,17 @@ export function buildGreetingMetricsRow(input: GreetingMetricsInput, previous: P
   const streaks: Record<string, number> = {};
   for (const id of ALARM_IDS) if (ALARM_PATTERNS[id].test(report)) streaks[id] = (previous?.alarm_streaks?.[id] ?? 0) + 1;
 
+  // T-324: what the greeting pointed at, and what it showed as waiting on Aaron (dashboard T-054 scores them).
+  const named = [...(own?.pick_up.match(PICK_UP_ID) ?? []), ...(state?.objective?.text.match(PICK_UP_ID) ?? [])];
+  const pickUpIds = [...new Set(named)].slice(0, PICK_UP_IDS_CAP);
+  const openQuestions =
+    state === null
+      ? null
+      : newestHandoffPerInstance(state.handoffs).reduce(
+          (n, h) => n + h.open_questions.filter((q) => questionResolvedBy(q) === null && questionOwner(q)?.toLowerCase() === "aaron").length,
+          0,
+        );
+
   return {
     schema: GREETING_METRICS_SCHEMA,
     id: randomUUID(),
@@ -162,6 +180,8 @@ export function buildGreetingMetricsRow(input: GreetingMetricsInput, previous: P
     missing_pointers: MISSING_POINTER_IDS.filter((id) => missing.has(id)),
     unchecked: /^Latest brief:/m.test(report) ? [] : [...UNCHECKED_IDS],
     alarm_streaks: streaks,
+    pick_up_ids: pickUpIds,
+    open_questions: openQuestions,
   };
 }
 
