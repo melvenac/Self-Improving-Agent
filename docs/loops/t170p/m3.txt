@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/run.ts
+<<<
+      if (glob === null || !pathMatchesKey(glob, input.filePath ?? "")) continue;
+===
+      if (glob === null) continue;
+>>>

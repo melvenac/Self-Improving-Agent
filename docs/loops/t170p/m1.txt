@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+  if (typeof toolName !== "string" || !CLAUDE_CODE_FILE_TOOL_NAMES.has(toolName)) return null;
+===
+  if (typeof toolName !== "string" || !CLAUDE_CODE_FILE_TOOL_NAMES.has(toolName) || toolName !== "") return null;
+>>>

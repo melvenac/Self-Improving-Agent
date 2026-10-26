@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+      if (glob !== null) pathKeys.push({ id: row.id, glob });
+===
+      if (glob === "") pathKeys.push({ id: row.id, glob });
+>>>
