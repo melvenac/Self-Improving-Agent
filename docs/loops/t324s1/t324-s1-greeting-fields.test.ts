@@ -24,7 +24,8 @@ function stateWith(objective: string | null, handoffs: Array<Record<string, unkn
   const r = structuredClone(FIXTURE);
   r.revision = 20;
   r.objective = objective === null ? null : { text: objective, since_session: 1 };
-  r.handoffs = handoffs.map((h) => ({ ...FIXTURE.handoffs[0], watch_out: [], open_questions: [], ...h }));
+  // Each handoff gets its own session_uuid: the record allows one legacy (null) entry per seat.
+  r.handoffs = handoffs.map((h, i) => ({ ...FIXTURE.handoffs[0], watch_out: [], open_questions: [], session_uuid: `u-${i}`, ...h }));
   const parsed = parseState(JSON.stringify(r));
   if (!parsed.ok) throw new Error(`fixture invalid: ${parsed.error}`);
   return parsed.data;

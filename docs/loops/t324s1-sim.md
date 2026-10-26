@@ -27,6 +27,8 @@ Files under `docs/loops/t324s1/`: `t324-s1-greeting-fields.test.ts` (new file, g
 ids dropped), `m2.txt` (resolved questions counted), `m3.txt` (every handoff counted, not the newest per instance),
 `m4.txt` (no cap), `apply.cjs`.
 
+Round 2: round 1 (job #130) held everything except F3, whose fixture gave two planner handoffs a null session_uuid (parseState allows one per seat); the test now gives each handoff `u-<index>`. No source edit changed.
+
 ## Steps
 
 You are in a fresh clone detached at the launcher's START sha. Use PowerShell. Run every apply.cjs from the CLONE ROOT.
