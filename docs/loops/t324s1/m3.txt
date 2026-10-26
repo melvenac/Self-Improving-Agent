@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+      : newestHandoffPerInstance(state.handoffs).reduce(
+===
+      : state.handoffs.reduce(
+>>>
