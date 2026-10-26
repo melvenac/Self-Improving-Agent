@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 580 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 581 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -21,6 +21,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-295** Audit open-brain's 14 MCP tools: keep what the protocol calls, cut or move to the CLI what nothing calls
 - [ ] **T-322** Re-key an existing stored lesson (e.g. MATCH -> none) without losing its counts: ob_store refuses a repeated event key and replaces only state entries
 - [ ] **T-323** clark's /start still raises old_start_command after the 10-26 re-copy of ~/.claude/commands/start.md
+- [ ] **T-324** greeting-metrics: pick_up_ids + open_questions on greeting rows (schema 1, additive) and a schema-2 outcome row from SessionEnd (first_action, first_action_match, ended), for the dashboard scorecard (agent-dashboard T-054)
 
 ## P3
 
