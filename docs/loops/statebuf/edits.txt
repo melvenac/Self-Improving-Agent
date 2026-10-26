@@ -1,0 +1,7 @@
+@@@ open-brain/tests/shared/state-schema.test.ts
+<<<
+      execFileSync("git", ["show", `${rev}:.agents/state.json`], { cwd: root, encoding: "utf8" });
+===
+      // The record passed 1 MiB at rev 577 (1,049,575 bytes), execFileSync's default maxBuffer: ENOBUFS.
+      execFileSync("git", ["show", `${rev}:.agents/state.json`], { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 });
+>>>
