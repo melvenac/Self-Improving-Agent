@@ -17,6 +17,21 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
+/** T-284: the tracked directory setup.mjs points git's core.hooksPath at (commit-msg stamps the session). */
+export const COMMIT_HOOKS_PATH = '.githooks';
+
+/**
+ * T-284: whether setup should set core.hooksPath, given its current value (`git config --get`; '' or null when unset).
+ * Only an unset value is set; one already pointing elsewhere is left alone and reported, never overwritten.
+ * @returns {{ set: boolean, note: string }}
+ */
+export function commitHooksPlan(current) {
+  const c = String(current ?? '').trim();
+  if (c === COMMIT_HOOKS_PATH) return { set: false, note: `git core.hooksPath already ${COMMIT_HOOKS_PATH}` };
+  if (c !== '') return { set: false, note: `git core.hooksPath is ${c}: left alone, so the commit-msg hook (T-284) does not run in this clone` };
+  return { set: true, note: `git core.hooksPath set to ${COMMIT_HOOKS_PATH} (commit-msg stamps Claude-Session, T-284)` };
+}
+
 export const SESSION_HOOKS = [
   ['SessionStart', 'cli-bootstrap.js'],
   ['SessionEnd', 'cli-session-end.js'],
