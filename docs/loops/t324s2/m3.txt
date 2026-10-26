@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+    if (row?.schema !== GREETING_METRICS_SCHEMA || row.checkout !== checkout || typeof row.id !== "string") continue;
+===
+    if (row?.schema !== GREETING_METRICS_SCHEMA || typeof row.id !== "string") continue;
+>>>

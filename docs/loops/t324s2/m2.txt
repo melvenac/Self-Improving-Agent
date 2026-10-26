@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+  if (!Array.isArray(pickUpIds) || pickUpIds.length === 0 || action === null) return null;
+===
+  if (!Array.isArray(pickUpIds) || pickUpIds.length === 0 || action === null || action.ids.length === 0) return null;
+>>>
