@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/match-keys.ts
+<<<
+  return new RegExp(`${absolute ? "^" : "(^|/)"}${body}$`, "i").test(slash(filePath));
+===
+  return new RegExp(`${absolute ? "^" : ""}${body}$`, "i").test(slash(filePath));
+>>>

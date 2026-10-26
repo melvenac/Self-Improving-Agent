@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+  if (filePath !== null && pathKeyIds.length === 0) return;
+===
+  if (filePath !== null && pathKeyIds.length === -1) return;
+>>>

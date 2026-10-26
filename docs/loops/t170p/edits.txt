@@ -1,0 +1,277 @@
+@@@ open-brain/src/trigger/match-keys.ts
+<<<
+ * Path keys stay stored and unread.
+===
+ * Path keys against the file an Edit or Write call touched (T-170 part iii,
+ * `tool_input.file_path`).
+>>>
+@@@ open-brain/src/trigger/match-keys.ts
+<<<
+import { dirname, join } from "node:path";
+===
+import { homedir } from "node:os";
+import { dirname, join } from "node:path";
+>>>
+@@@ open-brain/src/trigger/match-keys.ts
+<<<
+export function matchingErrorKeyIds(keys: ErrorKey[], error: string): number[] {
+  return keys
+    .filter((k) => errorMatchesKey(k.text, error))
+    .sort((a, b) => b.text.length - a.text.length || a.id - b.id)
+    .map((k) => k.id);
+}
+===
+export function matchingErrorKeyIds(keys: ErrorKey[], error: string): number[] {
+  return keys
+    .filter((k) => errorMatchesKey(k.text, error))
+    .sort((a, b) => b.text.length - a.text.length || a.id - b.id)
+    .map((k) => k.id);
+}
+
+/** T-170 (iii): a lesson's `MATCH: path:` key, matched against the file an Edit or Write call touched. */
+export interface PathKey {
+  id: number;
+  glob: string;
+}
+
+const PATH_LINE = /^MATCH:\s*path:/;
+
+/**
+ * The glob of a lesson's `MATCH: path:` key, or `null` when it has none, the key is too short, or it is prose (a space
+ * inside it). The first backticked span is the key; without one, a parenthetical is commentary and is cut, as for
+ * command keys. `\` reads as `/`. `*`, `?` and `/` do not count toward the minimum length, so `*.md` is null.
+ */
+export function parsePathKey(content: string): string | null {
+  const line = content.split(/\r?\n/).find((l) => PATH_LINE.test(l));
+  if (line === undefined) return null;
+  let text = line.replace(/^MATCH:\s*path:\s*/, "");
+  const span = /`([^`]+)`/.exec(text);
+  if (span) {
+    text = span[1];
+  } else {
+    const paren = text.indexOf(" (");
+    if (paren !== -1) text = text.slice(0, paren);
+  }
+  text = text.trim().replace(/\\/g, "/");
+  if (/\s/.test(text)) return null;
+  return text.replace(/[*?/]/g, "").length < MATCH_KEY_MIN_CHARS ? null : text;
+}
+
+/**
+ * True exactly when the file matches the key. Both read `\` as `/` and compare case-insensitively (Windows paths).
+ * `*` and `?` stay inside one path segment; `**` crosses segments. A key starting `~/` is under `home`; an absolute key
+ * (`/x` or `C:/x`) must match the whole path; any other key matches the path's tail on a segment boundary, so
+ * `convex/http.ts` matches `C:/repo/convex/http.ts` and not `C:/repo/myconvex/http.ts`.
+ */
+export function pathMatchesKey(glob: string, filePath: string, home: string = homedir()): boolean {
+  const slash = (p: string) => p.replace(/\\/g, "/");
+  let key = slash(glob);
+  if (key.startsWith("~/")) key = `${slash(home).replace(/\/+$/, "")}/${key.slice(2)}`;
+  const body = key
+    .split(/(\*\*|\*|\?)/)
+    .map((part) =>
+      part === "**" ? ".*" : part === "*" ? "[^/]*" : part === "?" ? "[^/]" : part.replace(/[.+^${}()|[\]\\]/g, "\\$&"),
+    )
+    .join("");
+  const absolute = /^([A-Za-z]:)?\//.test(key);
+  return new RegExp(`${absolute ? "^" : "(^|/)"}${body}$`, "i").test(slash(filePath));
+}
+
+/** The sidecar's path keys. Any failure is `[]` and never throws, as for command keys. */
+export function readTriggerPathKeys(path: string): PathKey[] {
+  try {
+    const keys = (JSON.parse(readFileSync(path, "utf-8")) as { pathKeys?: unknown })?.pathKeys;
+    if (!Array.isArray(keys)) return [];
+    const ok = keys.every(
+      (k) => k !== null && typeof k === "object" && typeof (k as PathKey).id === "number" && typeof (k as PathKey).glob === "string",
+    );
+    return ok ? (keys as PathKey[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** The ids whose path key matches the file, longest key first, then id ascending. */
+export function matchingPathKeyIds(keys: PathKey[], filePath: string, home: string = homedir()): number[] {
+  return keys
+    .filter((k) => pathMatchesKey(k.glob, filePath, home))
+    .sort((a, b) => b.glob.length - a.glob.length || a.id - b.id)
+    .map((k) => k.id);
+}
+>>>
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+import { parseCommandKey, parseErrorKey, type CommandKey, type ErrorKey } from "./match-keys.js";
+===
+import { parseCommandKey, parseErrorKey, parsePathKey, type CommandKey, type ErrorKey, type PathKey } from "./match-keys.js";
+>>>
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+const ERROR_LINE = /^MATCH:\s*error:/m;
+===
+const ERROR_LINE = /^MATCH:\s*error:/m;
+const PATH_LINE = /^MATCH:\s*path:/m;
+>>>
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+  // T-170 (ii): error keys ride the same file. The counts returned stay the command keys'.
+  const errorKeys: ErrorKey[] = [];
+===
+  // T-170 (ii, iii): error and path keys ride the same file. The counts returned stay the command keys'.
+  const errorKeys: ErrorKey[] = [];
+  const pathKeys: PathKey[] = [];
+>>>
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+      if (text !== null) errorKeys.push({ id: row.id, text });
+    }
+===
+      if (text !== null) errorKeys.push({ id: row.id, text });
+    }
+    if (PATH_LINE.test(row.content)) {
+      const glob = parsePathKey(row.content);
+      if (glob !== null) pathKeys.push({ id: row.id, glob });
+    }
+>>>
+@@@ open-brain/src/trigger/keys-writer.ts
+<<<
+  writeFileSync(tmp, JSON.stringify({ generated_at: new Date().toISOString(), keys, errorKeys }), "utf-8");
+===
+  writeFileSync(tmp, JSON.stringify({ generated_at: new Date().toISOString(), keys, errorKeys, pathKeys }), "utf-8");
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+import { commandMatchesKey, errorMatchesKey, parseCommandKey, parseErrorKey } from "./match-keys.js";
+===
+import { commandMatchesKey, errorMatchesKey, parseCommandKey, parseErrorKey, parsePathKey, pathMatchesKey } from "./match-keys.js";
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  errorKeyIds?: number[];
+}
+===
+  errorKeyIds?: number[];
+  /** T-170 (iii): the file an Edit or Write call touched, and the ids the sidecar's path keys matched (re-tested here). */
+  filePath?: string;
+  pathKeyIds?: number[];
+}
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  const derived = deriveQuery(input.command);
+  const keyIds = input.keyIds ?? [];
+  const errorKeyIds = input.errorKeyIds ?? [];
+
+  if (!derived && keyIds.length === 0 && errorKeyIds.length === 0) {
+===
+  // T-170 (iii): a file event has no shell command to derive a query from.
+  const derived = input.filePath !== undefined ? "" : deriveQuery(input.command);
+  const keyIds = input.keyIds ?? [];
+  const errorKeyIds = input.errorKeyIds ?? [];
+  const pathKeyIds = input.pathKeyIds ?? [];
+
+  if (!derived && keyIds.length === 0 && errorKeyIds.length === 0 && pathKeyIds.length === 0) {
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  if (hits.length < input.policy.max_injected && (keyIds.length > 0 || errorKeyIds.length > 0)) {
+===
+  if (hits.length < input.policy.max_injected && (keyIds.length > 0 || errorKeyIds.length > 0 || pathKeyIds.length > 0)) {
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+    for (const id of keyIds) {
+===
+    // T-170 (iii): a path key, re-tested against the file the call touched.
+    for (const id of pathKeyIds) {
+      if (hits.length >= input.policy.max_injected) break;
+      const row = byId.get(id) as { id: number; key: string | null; content: string } | undefined;
+      if (!row) continue;
+      const glob = parsePathKey(row.content);
+      if (glob === null || !pathMatchesKey(glob, input.filePath ?? "")) continue;
+      if (already.includes(row.id) || hits.some((h) => h.id === row.id)) continue;
+      if (forOtherSeat(row)) continue;
+      hits.push(row);
+    }
+    for (const id of keyIds) {
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+    errorKeyIds.length ? `error-match:${errorKeyIds.join(",")}` : "",
+===
+    errorKeyIds.length ? `error-match:${errorKeyIds.join(",")}` : "",
+    pathKeyIds.length ? `path-match:${pathKeyIds.join(",")}` : "",
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+import { matchingErrorKeyIds, matchingKeyIds, readTriggerErrorKeys, readTriggerKeys, triggerKeysPath } from "./trigger/match-keys.js";
+===
+import {
+  matchingErrorKeyIds,
+  matchingKeyIds,
+  matchingPathKeyIds,
+  readTriggerErrorKeys,
+  readTriggerKeys,
+  readTriggerPathKeys,
+  triggerKeysPath,
+} from "./trigger/match-keys.js";
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+    return typeof command === "string" && command.trim() !== "" ? command : null;
+  }
+  return null;
+}
+===
+    return typeof command === "string" && command.trim() !== "" ? command : null;
+  }
+  return null;
+}
+
+/**
+ * T-170 (iii): file tools whose `tool_input.file_path` the trigger matches against `MATCH: path:` keys. Claude Code's
+ * Edit and Write both take `file_path` (their tool schemas); the hook is registered on PostToolUse `Edit|Write` since
+ * 2026-10-26. No other names without a new measurement row.
+ */
+export const CLAUDE_CODE_FILE_TOOL_NAMES = new Set<string>(["Edit", "Write"]);
+
+/** The file an Edit or Write call touched, or null when this event is not one. */
+export function filePathFromHookPayload(payload: Record<string, unknown>): string | null {
+  const toolName = payload.tool_name;
+  if (typeof toolName !== "string" || !CLAUDE_CODE_FILE_TOOL_NAMES.has(toolName)) return null;
+  const filePath = (payload.tool_input as Record<string, unknown> | undefined)?.file_path;
+  return typeof filePath === "string" && filePath.trim() !== "" ? filePath : null;
+}
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+  const command = shellCommandFromHookPayload(payload);
+  if (command === null) return;
+===
+  const shell = shellCommandFromHookPayload(payload);
+  // T-170 (iii): an Edit or Write call is asked only when its file matches a path key. Otherwise it never reaches the
+  // store and leaves no not-asked fire: the not-asked census counts shell commands.
+  const filePath = shell === null ? filePathFromHookPayload(payload) : null;
+  if (shell === null && filePath === null) return;
+  const command = shell ?? `${String(payload.tool_name)} ${filePath}`;
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+  const keyIds = matchingKeyIds(readTriggerKeys(triggerKeysPath(DB_PATH)), command);
+===
+  const keyIds = filePath === null ? matchingKeyIds(readTriggerKeys(triggerKeysPath(DB_PATH)), command) : [];
+  const pathKeyIds = filePath !== null ? matchingPathKeyIds(readTriggerPathKeys(triggerKeysPath(DB_PATH)), filePath) : [];
+  if (filePath !== null && pathKeyIds.length === 0) return;
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+  if (deriveQuery(command) === "" && keyIds.length === 0 && errorKeyIds.length === 0) {
+===
+  if (deriveQuery(command) === "" && keyIds.length === 0 && errorKeyIds.length === 0 && pathKeyIds.length === 0) {
+>>>
+@@@ open-brain/src/cli-recall-trigger.ts
+<<<
+    const outcome = runTrigger({ error, errorKeyIds, db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
+===
+    const outcome = runTrigger({ filePath: filePath ?? undefined, pathKeyIds, error, errorKeyIds, db: writeDb, readDb, sessionUuid, command, policy, keyIds, seat });
+>>>
