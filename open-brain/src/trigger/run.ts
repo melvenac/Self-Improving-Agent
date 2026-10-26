@@ -16,7 +16,7 @@
 import type Database from "better-sqlite3";
 import { deriveQuery, queryStore } from "./query.js";
 import { injectedIds, recordFire, type FireState } from "./fires.js";
-import { commandMatchesKey, errorMatchesKey, parseCommandKey, parseErrorKey } from "./match-keys.js";
+import { commandMatchesKey, errorMatchesKey, parseCommandKey, parseErrorKey, parsePathKey, pathMatchesKey } from "./match-keys.js";
 import type { TriggerPolicy } from "./policy.js";
 import { entrySeat } from "./seat.js";
 
@@ -39,6 +39,9 @@ export interface TriggerRunInput {
   /** T-170 (ii): a failed call's error text, and the ids the sidecar's error keys matched in it (re-tested here). */
   error?: string;
   errorKeyIds?: number[];
+  /** T-170 (iii): the file an Edit or Write call touched, and the ids the sidecar's path keys matched (re-tested here). */
+  filePath?: string;
+  pathKeyIds?: number[];
 }
 
 export interface TriggerOutcome {
@@ -91,11 +94,13 @@ export function actionOf(content: string): string {
  * the model (A6, R3, R15).
  */
 export function runTrigger(input: TriggerRunInput): TriggerOutcome {
-  const derived = deriveQuery(input.command);
+  // T-170 (iii): a file event has no shell command to derive a query from.
+  const derived = input.filePath !== undefined ? "" : deriveQuery(input.command);
   const keyIds = input.keyIds ?? [];
   const errorKeyIds = input.errorKeyIds ?? [];
+  const pathKeyIds = input.pathKeyIds ?? [];
 
-  if (!derived && keyIds.length === 0 && errorKeyIds.length === 0) {
+  if (!derived && keyIds.length === 0 && errorKeyIds.length === 0 && pathKeyIds.length === 0) {
     recordFire(input.db, {
       sessionUuid: input.sessionUuid,
       command: input.command,
@@ -134,7 +139,7 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
   // sidecar can cost a miss, never a wrong injection. A keyed entry is
   // injected at most once per session, and no relevance floor applies — it is
   // not a bm25 match.
-  if (hits.length < input.policy.max_injected && (keyIds.length > 0 || errorKeyIds.length > 0)) {
+  if (hits.length < input.policy.max_injected && (keyIds.length > 0 || errorKeyIds.length > 0 || pathKeyIds.length > 0)) {
     const already = injectedIds(input.db, input.sessionUuid);
     const byId = readDb.prepare(
       `SELECT id, key, content FROM knowledge_index WHERE id = ? AND archived_into IS NULL`,
@@ -146,6 +151,17 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
       if (!row) continue;
       const key = parseErrorKey(row.content);
       if (key === null || !errorMatchesKey(key, input.error ?? "")) continue;
+      if (already.includes(row.id) || hits.some((h) => h.id === row.id)) continue;
+      if (forOtherSeat(row)) continue;
+      hits.push(row);
+    }
+    // T-170 (iii): a path key, re-tested against the file the call touched.
+    for (const id of pathKeyIds) {
+      if (hits.length >= input.policy.max_injected) break;
+      const row = byId.get(id) as { id: number; key: string | null; content: string } | undefined;
+      if (!row) continue;
+      const glob = parsePathKey(row.content);
+      if (glob === null || !pathMatchesKey(glob, input.filePath ?? "")) continue;
       if (already.includes(row.id) || hits.some((h) => h.id === row.id)) continue;
       if (forOtherSeat(row)) continue;
       hits.push(row);
@@ -166,6 +182,7 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
     derived,
     keyIds.length ? `match:${keyIds.join(",")}` : "",
     errorKeyIds.length ? `error-match:${errorKeyIds.join(",")}` : "",
+    pathKeyIds.length ? `path-match:${pathKeyIds.join(",")}` : "",
     skipped.length ? `seat-skip:${skipped.join(",")}` : "",
   ]
     .filter(Boolean)
