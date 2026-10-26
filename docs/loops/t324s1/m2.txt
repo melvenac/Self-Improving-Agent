@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+          (n, h) => n + h.open_questions.filter((q) => questionResolvedBy(q) === null && questionOwner(q)?.toLowerCase() === "aaron").length,
+===
+          (n, h) => n + h.open_questions.filter((q) => questionOwner(q)?.toLowerCase() === "aaron").length,
+>>>
