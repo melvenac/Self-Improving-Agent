@@ -1,0 +1,81 @@
+@@@ open-brain/src/cli.ts
+<<<
+} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics") {
+===
+} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics" || command === "rematch") {
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  console.log("  relocate [--from <dir> --to <dir> | --worktrees] [--apply]  Fold a renamed project's or a worktree's history forward");
+===
+  console.log("  relocate [--from <dir> --to <dir> | --worktrees] [--apply]  Fold a renamed project's or a worktree's history forward");
+  console.log("  rematch --id <n> --match <none|command: <key>|path: <glob>|error: <text>> [--dry-run]  Rewrite one lesson's MATCH: line in place, counts kept (T-322)");
+>>>
+@@@ open-brain/src/cli-spec.ts
+<<<
+  triggerKeys: { name: "trigger-keys", booleans: [], values: {}, positionals: "none" },
+===
+  triggerKeys: { name: "trigger-keys", booleans: [], values: {}, positionals: "none" },
+  rematch: { name: "rematch", booleans: ["--dry-run"], values: { "--id": "both", "--match": "both" }, positionals: "none" },
+>>>
+@@@ open-brain/src/cli-memory.ts
+<<<
+  } else if (command === "topics") {
+===
+  } else if (command === "rematch") {
+    // T-322: rewrite one lesson's MATCH: line in place (id and counts kept), then refresh the trigger key sidecar.
+    const opts = parseOrRefuse(COMMAND_SPECS.rematch, args.slice(1));
+    const idArg = opts.value("--id");
+    const match = opts.value("--match");
+    const id = Number(idArg);
+    if (idArg === undefined || !Number.isInteger(id) || id < 1 || match === undefined) {
+      console.error("rematch refused: --id <positive integer> and --match <none|command: <key>|path: <glob>|error: <text>> are both required");
+      process.exitCode = 1;
+      return;
+    }
+    const { existsSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const { homedir } = await import("node:os");
+    const dbPath = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
+    if (!existsSync(dbPath)) {
+      console.error(`rematch refused: no store at ${dbPath}`);
+      process.exitCode = 1;
+      return;
+    }
+    const { default: Database } = await import("better-sqlite3");
+    const { rematch } = await import("./pipelines/store/rematch.js");
+    const { writeTriggerKeys } = await import("./trigger/keys-writer.js");
+    const { triggerKeysPath } = await import("./trigger/match-keys.js");
+    const db = new Database(dbPath, { fileMustExist: true });
+    try {
+      const r = rematch(db, id, match, { dryRun: opts.has("--dry-run") });
+      if (!r.ok) {
+        console.error(`rematch refused: ${r.error}`);
+        process.exitCode = 1;
+        return;
+      }
+      const what = r.unchanged ? "unchanged" : r.dryRun ? "would change (dry run, nothing written)" : "rewritten";
+      console.log(`rematch: entry ${r.id} (${r.key}) ${what}: "${r.before}" -> "${r.after}"`);
+      if (!r.unchanged && !r.dryRun) {
+        const path = triggerKeysPath(dbPath);
+        const k = writeTriggerKeys(db, path);
+        console.log(`trigger keys: ${k.written} command key(s), ${k.unusable} unusable -> ${path}`);
+      }
+    } finally {
+      db.close();
+    }
+  } else if (command === "topics") {
+>>>
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "main-rebuild", "metrics review", "relocate", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "sync", "topics", "trigger-keys"]
+===
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "main-rebuild", "metrics review", "relocate", "rematch", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "sync", "topics", "trigger-keys"]
+>>>
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+    ["relocate", /^\s+relocate (.*)$/m],
+===
+    ["relocate", /^\s+relocate (.*)$/m],
+    ["rematch", /^\s+rematch (.*)$/m],
+>>>

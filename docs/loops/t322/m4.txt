@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+  if (opts.dryRun) return { ...base, unchanged: false, dryRun: true };
+===
+  // m4: the dry run is ignored
+>>>

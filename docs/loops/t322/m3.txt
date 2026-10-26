@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+  if (lines.length !== 1) return
+===
+  if (lines.length < 1) return
+>>>
