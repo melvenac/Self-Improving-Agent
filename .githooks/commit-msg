@@ -1,0 +1,13 @@
+#!/bin/sh
+# T-284: stamp the Claude Code session on the commit, so /end's attribution never depends on the agent writing the
+# trailer. Only when Claude Code runs the commit (CLAUDE_CODE_SESSION_ID holds the session uuid) and the message has no
+# Claude-Session trailer yet: a commit made by a person, or one that already names its session, is left alone.
+# The guards (end-record-guard.ts, handoff-guard.ts) accept a session's own uuid as its trailer value (T-276).
+id="$CLAUDE_CODE_SESSION_ID"
+case "$id" in
+  "" | *[!0-9a-fA-F-]*) exit 0 ;;
+esac
+if git interpret-trailers --parse "$1" | grep -qi '^Claude-Session:'; then
+  exit 0
+fi
+exec git interpret-trailers --in-place --trailer "Claude-Session: $id" "$1"

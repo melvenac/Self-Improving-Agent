@@ -13,7 +13,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorRecallHook, repoRootFrom, copyCursorSlashCommands } from './setup-hooks.mjs';
+import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorRecallHook, repoRootFrom, copyCursorSlashCommands, commitHooksPlan, COMMIT_HOOKS_PATH } from './setup-hooks.mjs';
 
 const HOME = os.homedir();
 const CLAUDE_DIR = path.join(HOME, '.claude');
@@ -153,6 +153,27 @@ function registerHooks() {
   if (!r.changed) return;
   fs.writeFileSync(settingsPath, JSON.stringify(r.settings, null, 2) + '\n');
   log(OK, `Hooks written to ${settingsPath}`);
+}
+
+function registerCommitHooks() {
+  let current = '';
+  try {
+    current = execSync('git config --get core.hooksPath', { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch {
+    current = ''; // exit 1: unset
+  }
+  const plan = commitHooksPlan(current);
+  if (!plan.set) {
+    log(SKIP, plan.note);
+    return;
+  }
+  try {
+    execSync(`git config core.hooksPath ${COMMIT_HOOKS_PATH}`, { cwd: REPO_ROOT, stdio: 'pipe' });
+    log(OK, plan.note);
+  } catch (err) {
+    log(FAIL, `git core.hooksPath not set: ${String(err.message).split('\n')[0]}`);
+    hadFailure = true;
+  }
 }
 
 function copySlashCommands() {
@@ -306,6 +327,7 @@ function main() {
   buildOpenBrain();
   registerMcpServer();
   registerHooks();
+  registerCommitHooks();
   copySlashCommands();
   registerCursorMcp();
   registerCursorHooks();
