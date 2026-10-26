@@ -1,0 +1,6 @@
+@@@ scripts/setup-hooks.mjs
+<<<
+  if (c !== '') return { set: false, note:
+===
+  if (c === 'never') return { set: false, note:
+>>>

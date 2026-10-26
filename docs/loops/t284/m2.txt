@@ -1,0 +1,6 @@
+@@@ .githooks/commit-msg
+<<<
+  "" | *[!0-9a-fA-F-]*) exit 0 ;;
+===
+  "") exit 0 ;;
+>>>
