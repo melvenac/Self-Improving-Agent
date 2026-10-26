@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+  const named = [...(own?.pick_up.match(PICK_UP_ID) ?? []), ...(state?.objective?.text.match(PICK_UP_ID) ?? [])];
+===
+  const named = [...(own?.pick_up.match(PICK_UP_ID) ?? [])];
+>>>

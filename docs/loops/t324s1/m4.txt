@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+  const pickUpIds = [...new Set(named)].slice(0, PICK_UP_IDS_CAP);
+===
+  const pickUpIds = [...new Set(named)];
+>>>
