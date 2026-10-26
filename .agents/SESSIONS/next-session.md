@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 582 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 583 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,13 +6,14 @@
 
 ### Pick up here
 
-T-315 proxy slice READY as PR #939 (head ce824d8a, byte-compare SAME x4, CI pass): needs Aaron 'merge 939', then pr-refresh.sh + pr-merge.sh, clark sia-rebuild. Then S2 on Aaron's word: point each seat's open-brain MCP command at build/build-proxy.js (config change), every seat reconnects once, live check: next sia-rebuild is served with no reconnect, ob_set_session still proves, a claude -p run keeps open-brain across a rebuild. G-062 (b) still needs a design. Pending live checks: next /start READS OWED own-filter line; next /end first END QUEUE row.
+QA PC queue (atlas-ops `node .../scripts/qapc-job.mjs wait|reply <id>`): SIM #134 sim-t324s1-2 (T-324 S1 round 2: F3 fixture fixed), build #136 t284 (brief docs/loops/t284-brief.md), build #137 t295s1 (docs/loops/t295s1-brief.md). For each READY build: byte-compare.sh <START> <head> docs/loops/<tag> <test>=<dest>, merge-check.sh origin/<branch>, then QA ACCEPT to clark (SG-1). On #134 ALL PASS: write docs/loops/t324s1-brief.md and submit. After merges: T-284 needs `git -C <main> config core.hooksPath .githooks`; T-295 S1 needs ~/.claude and ~/.cursor sync.md re-copied (clark). Next briefs: T-295 S2 (ob_stats/ob_list to CLI), T-324 S2 (outcome row), T-262 part 2, T-241 frogger (QA PC bundle), T-322 (re-key a lesson; then 751 -> MATCH: none).
 
 ### Watch out
 
-- build-watch.ts docstring still claims Claude Code respawns an exited server (false, step 0); it is dead code since the #896 revert — remove or correct it in S2.
-- The proxy itself is not hot-swapped: a change to build-proxy.ts still needs one reconnect per seat.
-- main-rebuild's report still says sessions need /mcp reconnect; reword it in S2 once seats run the proxy.
+- Hold QA PC submits whenever clark says a runner roll is on; queued jobs survive (the queue is on tcm).
+- A brief that deletes an open-brain/src line: check .agents/retirements.json for its hash first (entry 894).
+- SIM wide runs that include tests/harness red s4-guards D1b on the uncommitted new test (entry 895).
+- Lesson 867 (audit-ignore.txt at the ops root) is tagged clark-ops, so T-313 seat-skips it for Atlas though it applies to every seat.
 
 ### Open questions
 
@@ -20,23 +21,14 @@ _None._
 
 ### Loop state
 
-**Open PRs:** 
-- #939 — QA: accepted — T-315 build proxy READY, byte-compare SAME x4, CI pass; needs Aaron 'merge 939'
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** 
-- merge 939 (T-315 build proxy)
-- T-315 S2: switch each seat's open-brain MCP command to build/build-proxy.js
-- T-170-II real-key run host
-- T-295 tool cuts
-- T-261 S3/S4
-- forget entry 751
-- the yaml dependency PR
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- Aaron 10-22: 'merge 929' (merged 79b7451f) and 'merge 933' (merged e8e6f549); REBUILT e8e6f549.
-- Aaron 10-23: 'yes' to the T-315 stdio-proxy shape (step 0, #936).
+- Aaron 10-26 desk: 11 closes, T-295 14->10, T-262 p2 accept all, T-284 uuid hook (key Claude-Session, told), T-241 QA PC bundle, T-181 after T-241, T-261 hold, 751 lookup-only, T-170 path matcher (done #994), scorecard items to Prism (T-054/T-324)
 
 ## developer [sia-builder] _(written session 156)_
 
