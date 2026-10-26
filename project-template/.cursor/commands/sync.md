@@ -8,7 +8,7 @@ Run the **open-brain** `ob_sync` MCP tool to ensure downstream files match autho
 2. Report output to the user
 3. List any files auto-updated
 4. Flag manual attention items
-5. Health score: `ob_sync` with `score: true` or `ob_score` directly
+5. Health score: `ob_sync` with `score: true` (trend: `node open-brain/build/cli.js sync --history`)
 
 ## Authoritative sources
 

@@ -11,7 +11,7 @@
 AI coding sessions start cold: the agent does not know what the project is for, what was decided, or what comes next. This repo gives a project:
 
 - a **session lifecycle** (`/start`, `/end`, `/checkpoint`, `/sync`) that reads and writes one project record;
-- the **open-brain MCP server** (14 tools): the record, recall over a knowledge store, and health checks;
+- the **open-brain MCP server** (12 tools): the record, recall over a knowledge store, and health checks;
 - a **recall trigger** that surfaces a matching lesson at the moment of the act;
 - the **HoH loop runtime**, which enforces the planner, developer and QA boundaries with gates instead of asking each seat to remember them;
 - a **project template** and `/bootstrap` to put a new project on SIA.
@@ -118,7 +118,7 @@ Every failure is silent to the model and loud to the log: the hook exits 0, writ
 
 Project state lives in `.agents/state.json`, created once by `open-brain state import`, read with `open-brain state show`, and **written only through `ob_state`**. `INBOX.md`, `task.md`, `next-session.md` and the marked region of `SUMMARY.md` are rendered views of it; never edit them by hand.
 
-The 14 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_feedback`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync`, `ob_score`. `ob_start` and `ob_sync` resolve the project root from any subdirectory.
+The 12 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync`. `ob_start` and `ob_sync` resolve the project root from any subdirectory.
 
 ## Recall
 

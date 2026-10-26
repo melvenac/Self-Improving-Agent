@@ -681,16 +681,6 @@ server.tool(
   async (args) => handleEnd(args)
 );
 
-server.tool(
-  "ob_score",
-  "Compute health score (0-100) and show trend history.",
-  {
-    project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
-    history_only: z.boolean().optional().default(false).describe("Only show score history, don't compute new score"),
-  },
-  async (args) => handleScore(args)
-);
-
 // ============================================================
 // ob_* tools — knowledge lifecycle
 // ============================================================
@@ -1165,16 +1155,6 @@ export async function handleFeedback(args: { id: number; rating: "helpful" | "ha
 
     return { content: [{ type: "text" as const, text: lines.join("\n") }] };
 }
-
-server.tool(
-  "ob_feedback",
-  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Increments the entry's counter and writes a feedback_log row; nothing is derived from it further (maturity promotion was cut with E3 and apoptosis with E18 in Loop 10). Use ob_forget to retire an entry.",
-  {
-    id: z.coerce.number().describe("Knowledge entry ID"),
-    rating: z.enum(["helpful", "harmful", "neutral"]).describe("Was this knowledge helpful, harmful, or neutral?"),
-  },
-  async ({ id, rating }) => handleFeedback({ id, rating }),
-);
 
 // --- ob_forget ---
 server.tool(

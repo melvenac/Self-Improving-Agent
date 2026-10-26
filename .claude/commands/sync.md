@@ -7,7 +7,7 @@ Run the ob_sync tool to ensure all downstream files match the authoritative sour
 2. Report the output to the user
 3. If any files were updated, show the list
 4. If any items need manual attention, flag them
-5. For health scoring, call `ob_sync` with `score: true` or use `ob_score` directly
+5. For health scoring, call `ob_sync` with `score: true` (trend: `node open-brain/build/cli.js sync --history`)
 
 ## Authoritative sources (read from)
 - `package.json` → version
@@ -39,4 +39,4 @@ Run `/sync` (calls `ob_sync`) to detect drift without fixing.
 
 ## Protocol health
 
-`ob_score` or `ob_sync --score` — deterministic 0-100 health score across 5 categories (config, knowledge quality, staleness, coverage, pipeline health). Score auto-appends to history. `ob_score --history_only` shows trend.
+`ob_sync --score` — deterministic 0-100 health score across 5 categories (config, knowledge quality, staleness, coverage, pipeline health). Score auto-appends to history. `node open-brain/build/cli.js sync --history` shows trend.
