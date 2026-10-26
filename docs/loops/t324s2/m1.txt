@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+const PLUMBING = /^(?:ToolSearch|TodoWrite)$|(?:^|__)ob_(?:set_session|start)$/;
+===
+const PLUMBING = /^(?:ToolSearch|TodoWrite)$|(?:^|__)ob_(?:set_session)$/;
+>>>

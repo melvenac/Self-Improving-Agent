@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-session-end.ts
+<<<
+      ended: Boolean(stamp?.ob_end_at) && id !== "" && stamp?.session === id,
+===
+      ended: Boolean(stamp?.ob_end_at),
+>>>
