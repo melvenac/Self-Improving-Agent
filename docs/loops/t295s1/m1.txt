@@ -1,0 +1,7 @@
+@@@ open-brain/src/server.ts
+<<<
+// --- ob_forget ---
+===
+server.tool("ob_feedback", "m1", {}, async () => ({ content: [] }));
+// --- ob_forget ---
+>>>

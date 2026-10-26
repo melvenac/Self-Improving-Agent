@@ -1,0 +1,82 @@
+@@@ open-brain/src/server.ts
+<<<
+  async (args) => handleEnd(args)
+);
+
+server.tool(
+  "ob_score",
+  "Compute health score (0-100) and show trend history.",
+  {
+    project_root: z.string().optional().describe("Project root directory (defaults to cwd)"),
+    history_only: z.boolean().optional().default(false).describe("Only show score history, don't compute new score"),
+  },
+  async (args) => handleScore(args)
+);
+===
+  async (args) => handleEnd(args)
+);
+>>>
+@@@ open-brain/src/server.ts
+<<<
+server.tool(
+  "ob_feedback",
+  "Record whether a recalled knowledge entry was helpful, harmful, or neutral. Increments the entry's counter and writes a feedback_log row; nothing is derived from it further (maturity promotion was cut with E3 and apoptosis with E18 in Loop 10). Use ob_forget to retire an entry.",
+  {
+    id: z.coerce.number().describe("Knowledge entry ID"),
+    rating: z.enum(["helpful", "harmful", "neutral"]).describe("Was this knowledge helpful, harmful, or neutral?"),
+  },
+  async ({ id, rating }) => handleFeedback({ id, rating }),
+);
+
+// --- ob_forget ---
+===
+// --- ob_forget ---
+>>>
+@@@ .claude/commands/sync.md
+<<<
+5. For health scoring, call `ob_sync` with `score: true` or use `ob_score` directly
+===
+5. For health scoring, call `ob_sync` with `score: true` (trend: `node open-brain/build/cli.js sync --history`)
+>>>
+@@@ .claude/commands/sync.md
+<<<
+`ob_score` or `ob_sync --score` — deterministic 0-100 health score across 5 categories (config, knowledge quality, staleness, coverage, pipeline health). Score auto-appends to history. `ob_score --history_only` shows trend.
+===
+`ob_sync --score` — deterministic 0-100 health score across 5 categories (config, knowledge quality, staleness, coverage, pipeline health). Score auto-appends to history. `node open-brain/build/cli.js sync --history` shows trend.
+>>>
+@@@ project-template/.claude/commands/sync.md
+<<<
+5. For health scoring, call `ob_sync` with `score: true` or use `ob_score` directly
+===
+5. For health scoring, call `ob_sync` with `score: true` (trend: `node open-brain/build/cli.js sync --history`)
+>>>
+@@@ project-template/.claude/commands/sync.md
+<<<
+`ob_score` or `ob_sync --score` — deterministic 0-100 health score across 5 categories (config, knowledge quality, staleness, coverage, pipeline health). Score auto-appends to history. `ob_score --history_only` shows trend.
+===
+`ob_sync --score` — deterministic 0-100 health score across 5 categories (config, knowledge quality, staleness, coverage, pipeline health). Score auto-appends to history. `node open-brain/build/cli.js sync --history` shows trend.
+>>>
+@@@ project-template/.cursor/commands/sync.md
+<<<
+5. Health score: `ob_sync` with `score: true` or `ob_score` directly
+===
+5. Health score: `ob_sync` with `score: true` (trend: `node open-brain/build/cli.js sync --history`)
+>>>
+@@@ CLAUDE.md
+<<<
+**14 tools**: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_feedback`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync`, `ob_score`.
+===
+**12 tools**: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync` (T-295 cut `ob_score`, a duplicate of `ob_sync` `score: true`, and `ob_feedback`, whose ratings `ob_end`'s `entry_ratings` records).
+>>>
+@@@ README.md
+<<<
+- the **open-brain MCP server** (14 tools):
+===
+- the **open-brain MCP server** (12 tools):
+>>>
+@@@ README.md
+<<<
+The 14 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_feedback`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync`, `ob_score`.
+===
+The 12 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync`.
+>>>

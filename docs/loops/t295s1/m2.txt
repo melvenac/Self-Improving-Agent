@@ -1,0 +1,6 @@
+@@@ .claude/commands/sync.md
+<<<
+5. For health scoring, call `ob_sync` with `score: true` (trend: `node open-brain/build/cli.js sync --history`)
+===
+5. For health scoring, call `ob_sync` with `score: true` or use `ob_score` directly
+>>>
