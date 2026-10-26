@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-memory.ts
+<<<
+      if (!r.unchanged && !r.dryRun) {
+===
+      if (false) {
+>>>

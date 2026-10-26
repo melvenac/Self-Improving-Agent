@@ -1,0 +1,8 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+  try {
+    indexKnowledge(db, {
+===
+  try {
+    if (false) indexKnowledge(db, {
+>>>

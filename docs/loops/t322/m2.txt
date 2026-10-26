@@ -1,0 +1,9 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+  try {
+    indexKnowledge(db, {
+===
+  try {
+    db.prepare("DELETE FROM knowledge_index WHERE id = ?").run(row.id);
+    indexKnowledge(db, {
+>>>

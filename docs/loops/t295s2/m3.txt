@@ -1,0 +1,6 @@
+@@@ .claude/commands/start.md
+<<<
+- `node open-brain/build/cli.js list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+===
+- `ob_list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+>>>

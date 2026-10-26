@@ -80,3 +80,10 @@ The 14 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_feed
 ===
 The 12 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync`.
 >>>
+@@@ .agents/retirements.json
+<<<
+            "edb259d4db7480493fcbccfdb280d2cdda5598477056140b92a2966d2960b82d",
+            "7f95baa880539a95ea691a978d6e684940cc818f4ec885f4fa98fc8af688a726",
+===
+            "edb259d4db7480493fcbccfdb280d2cdda5598477056140b92a2966d2960b82d",
+>>>
