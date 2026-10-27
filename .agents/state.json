@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 588,
+  "revision": 589,
   "project": {
     "name": "self-improving-agent"
   },
@@ -482,7 +482,8 @@
       "opened_session": 76,
       "closed_session": null,
       "supersedes": null,
-      "note": "QA's entry 615 (session 75): its two costliest errors in Loop 16 — a mutation script whose regex never compiled, and type-invalid mutants — were both already in the store (entries 292 and 604, stored months earlier), and the trigger could not surface either: its table recognises a trimmer pipeline and a $? read, and `python mutate.py M4` is neither. G-039 one category out: not 'the store was not consulted' but 'the store cannot be consulted for this shape of act'. Amendment 4 ruled the table grows on evidence, not speculation; this is the first evidence. Candidates: a scripted edit whose exit code is read without asserting the edit landed; a test run on a mutant without tsc. Whoever briefs the next trigger increment starts here, with the fires table's not-asked count as the denominator.",
+      "note": "QA's entry 615 (session 75): its two costliest errors in Loop 16 — a mutation script whose regex never compiled, and type-invalid mutants — were both already in the store (entries 292 and 604, stored months earlier), and the trigger could not surface either: its table recognises a trimmer pipeline and a $? read, and `python mutate.py M4` is neither. G-039 one category out: not 'the store was not consulted' but 'the store cannot be consulted for this shape of act'. Amendment 4 ruled the table grows on evidence, not speculation; this is the first evidence. Candidates: a scripted edit whose exit code is read without asserting the edit landed; a test run on a mutant without tsc. Whoever briefs the next trigger increment starts here, with the fires table's not-asked count as the denominator. — s175 10-26 PLANNER READ (desktop store, read-only): the element table is no longer the only route. D-155 lets a lesson carry its own MATCH: command|path|error key; 141 live lessons are command-keyed, and the trigger fired 390 injected / 3,779 silent / 10,294 not-asked in the last 7 days. The two lessons this task cites still have NO MATCH line: 292 mutation-testing-verify-the-mutation-landed and 604 a-mutant-that-does-not-type-check-is-not-a-valid-mutant. So the fix is now per lesson: key them (e.g. 292 and 604 on the mutant-apply act, `apply.cjs ... m*.txt`). Blocker: T-322's `rematch` refuses a note with 0 MATCH lines (refusal K4), so there is no supported way to ADD a first key. Proposed next slice: `rematch` gains an add path for exactly-0 lines (append one MATCH line after the body; still refuse 2+), then key 292 and 604. Planner proposal, not built. Reframe: 'the store cannot be consulted for this act' becomes 'this lesson has no key', which the MATCH line already answers.",
+      "note_by": null,
       "closed_rev": null
     },
     {
@@ -6939,7 +6940,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 588
+      "last_work_rev": 589
     }
   ]
 }
