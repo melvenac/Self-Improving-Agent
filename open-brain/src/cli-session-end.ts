@@ -40,6 +40,7 @@ import {
 } from "./shared/end-record-guard.js";
 
 import { auditSkills, readShellCommands } from "./pipelines/skills-audit/index.js";
+import { recordGreetingOutcome } from "./pipelines/session-start/greeting-outcome.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
@@ -233,6 +234,28 @@ try {
   }
 } catch (err) {
   console.log(`[session-end] skills-audit check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+}
+
+// T-324 S2: the outcome of this session's greeting (first action, did it match the pick-up, did ob_end run), for the
+// dashboard scorecard. Append-only; no greeting row for this session writes nothing.
+try {
+  const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  const tp = hookPayload.transcript_path;
+  if (existsSync(join(dir, ".agents")) && typeof tp === "string" && existsSync(tp)) {
+    const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
+    const stamp = readObEndStamp(dir);
+    const r = recordGreetingOutcome({
+      projectDir: dir,
+      transcriptPath: tp,
+      sessionStart: sessionStartFromTranscript(tp),
+      ended: Boolean(stamp?.ob_end_at) && id !== "" && stamp?.session === id,
+    });
+    if ("written" in r) console.log(`[session-end] greeting outcome: written (match ${r.written.first_action_match}, ended ${r.written.ended})`);
+    else if ("skipped" in r) console.log(`[session-end] greeting outcome: none (${r.skipped})`);
+    else console.log(`[session-end] greeting outcome NOT WRITTEN: ${r.failed}`);
+  }
+} catch (err) {
+  console.log(`[session-end] greeting outcome NOT WRITTEN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
 }
 
 // T-159: the recall trigger's not-asked fires wait in a file beside the store;
