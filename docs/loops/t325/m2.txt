@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli.ts
+<<<
+      if (rep.inbox.unparsed.length) console.log(
+===
+      if (rep.inbox.unparsed.length < 0) console.log(
+>>>
