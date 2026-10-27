@@ -14,7 +14,7 @@
 | **Structural consistency** | Version drift, command mirrors, state schema, merge markers, vault/index parity | `ob_sync` (the `/sync` command) |
 | **Semantic consistency** | Whether protocol documents agree with each other — what `/sync` cannot see | `/harness-audit`; required for every minor and major release |
 | **Hook integration** | The two hooks fire and produce output | Run a short session; `cli-bootstrap.js` prints the project and session line at start, `cli-session-end.js` prints `[session-end]` lines at end |
-| **Retrieval** | `ob_recall` returns relevant results | Call `ob_recall` with a known topic and check the ranking; `ob_stats` for corpus counts |
+| **Retrieval** | `ob_recall` returns relevant results | Call `ob_recall` with a known topic and check the ranking; `open-brain stats` for corpus counts |
 | **Template validation** | The template scaffolds correctly | Copy `project-template/` to a temp dir, run `/start`, verify a session log is created |
 
 ## What We Don't Test
