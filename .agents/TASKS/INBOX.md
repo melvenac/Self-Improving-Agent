@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 593 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 594 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -10,6 +10,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 
 - [ ] **T-181** Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing
 - [~] **T-262** /end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)
+- [ ] **T-326** SessionEnd hook outlives Claude Code's 1.5 s SessionEnd budget: the T-324 outcome block (and everything after the slow git checks) never runs on a real session end
 
 ## P2
 

@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 593 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 594 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
@@ -10,6 +10,6 @@ D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-1
 
 - [ ] **T-181** [P1] Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing
 - [~] **T-262** [P1] /end skills audit: a deterministic `open-brain skills-audit` extractor, /end step 1b (the seat rules on each repeated command shape), and the SessionEnd hook flagging an unaudited session (D-152)
+- [ ] **T-326** [P1] SessionEnd hook outlives Claude Code's 1.5 s SessionEnd budget: the T-324 outcome block (and everything after the slow git checks) never runs on a real session end
 - [ ] **T-046** [P2] Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [ ] **T-191** [P2] Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
-- [ ] **T-241** [P2] Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
