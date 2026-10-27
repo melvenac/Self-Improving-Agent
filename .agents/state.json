@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 596,
+  "revision": 597,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2843,7 +2843,7 @@
       "opened_session": 175,
       "closed_session": null,
       "supersedes": null,
-      "note": "s175 10-27, measured. Claude Code docs (code.claude.com/docs/en/hooks, `timeout` field): 'SessionEnd hooks share a 1.5-second budget; if your settings set a longer per-hook timeout, Claude Code raises the budget to match, up to 60 seconds.' ~/.claude/settings.json's SessionEnd hook (build/cli-session-end.js) sets NO timeout. Timed run of the real hook on COPIES (scratch KNOWLEDGE_V2_DB, missing vault dir) with Relay's ended session e0e0d12f (11 MB transcript): proof 0.33 s, handoff check 25.6 s, work-after-end check 42.9 s, skills-audit 43.1 s, greeting outcome 43.2 s (written: match null, ended false, trigger {asked 430, injected 12, seat_skip 373, path_match 4}), total 43.3 s. Live: Relay (05:32Z) and Prism (05:34Z) sessions ended on the S2/S3 build and wrote 0 outcome rows; Relay has no vault summary (Prism's likely came from its own /end). The pipeline code is right (the emulation writes the row); the budget kills it first. FIX, two halves: (1) code (Atlas, SG-1): move the T-324 outcome block and the T-159 reconcile + trigger-keys refresh to run first, right after the session proof, so they land inside 1.5 s; the slow T-163 git checks go after. (2) config (Aaron, hook config is excluded from D-163): add \"timeout\": 60 to the SessionEnd hook entry, so the rest gets up to 60 s. Even 60 s is close to 43 s on an 11 MB transcript; the handoff and work-after-end checks need to get faster (later slice). Also implies the T-163 handoff check and the T-262 unaudited-session notice have rarely or never completed in production: verify after (2). — s175 10-27: code half SIM docs/loops/t326-sim.md (#1039), job #237 at 95459fc7. One contiguous span moves unchanged to just after the session proof: readTriggerCounts, the T-324 outcome block, the T-159 reconcile and the keys refresh. Rows O1-O3 pin the stdout line order (deterministic; not a timed kill); m1-m3. The settings.json timeout half was sent to clark for Aaron and goes into this session's handoff.",
+      "note": "s175 10-27, measured. Claude Code docs (code.claude.com/docs/en/hooks, `timeout` field): 'SessionEnd hooks share a 1.5-second budget; if your settings set a longer per-hook timeout, Claude Code raises the budget to match, up to 60 seconds.' ~/.claude/settings.json's SessionEnd hook (build/cli-session-end.js) sets NO timeout. Timed run of the real hook on COPIES (scratch KNOWLEDGE_V2_DB, missing vault dir) with Relay's ended session e0e0d12f (11 MB transcript): proof 0.33 s, handoff check 25.6 s, work-after-end check 42.9 s, skills-audit 43.1 s, greeting outcome 43.2 s (written: match null, ended false, trigger {asked 430, injected 12, seat_skip 373, path_match 4}), total 43.3 s. Live: Relay (05:32Z) and Prism (05:34Z) sessions ended on the S2/S3 build and wrote 0 outcome rows; Relay has no vault summary (Prism's likely came from its own /end). The pipeline code is right (the emulation writes the row); the budget kills it first. FIX, two halves: (1) code (Atlas, SG-1): move the T-324 outcome block and the T-159 reconcile + trigger-keys refresh to run first, right after the session proof, so they land inside 1.5 s; the slow T-163 git checks go after. (2) config (Aaron, hook config is excluded from D-163): add \"timeout\": 60 to the SessionEnd hook entry, so the rest gets up to 60 s. Even 60 s is close to 43 s on an 11 MB transcript; the handoff and work-after-end checks need to get faster (later slice). Also implies the T-163 handoff check and the T-262 unaudited-session notice have rarely or never completed in production: verify after (2). — s175 10-27: code half SIM docs/loops/t326-sim.md (#1039), job #237 at 95459fc7. One contiguous span moves unchanged to just after the session proof: readTriggerCounts, the T-324 outcome block, the T-159 reconcile and the keys refresh. Rows O1-O3 pin the stdout line order (deterministic; not a timed kill); m1-m3. The settings.json timeout half was sent to clark for Aaron and goes into this session's handoff. — s175 10-27 CODE HALF DONE: SIM #237 ruled PASS (one t159 N3 flake, green 4/4 after); brief #1043; build #245 READY PR #1045; byte-compare 2/2 SAME vs START 849a6714; merge-check CLEAN; refreshed 0560f294 (patch-id cc38429b = reviewed 4a2cfd98); merged by Atlas (D-163/D-164) as b613feac; sia-rebuild. Live (real hook on copies, Relay's e0e0d12f payload, killed at 1.5 s): proof 0.30 s, outcome written 0.41 s, reconcile 0.41 s, keys 0.43 s; the row survives the kill. REMAINING: (1) Aaron adds \"timeout\": 60 to the SessionEnd hook in ~/.claude/settings.json (hook config, his under D-163); after that, verify that the handoff and work-after-end checks complete on a real end. (2) The first real outcome row closes T-324.",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
@@ -6858,17 +6858,22 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 175 ran on 'Launch + merge + ask' (D-163/D-164): Atlas merges SIA code on its own QA ACCEPT and rebuilds. Merged this session: #1002 T-284, #1003 T-295 S1, #1009 T-324 S1, #1013 S2, #1014 T-322, #1020 T-295 S2, #1025 S3, #1030 T-162A. Main is built at 3de5cc38. NEXT: (1) T-324 close-out: when the first kind:'outcome' row appears in ~/.claude/open-brain/greeting-metrics.jsonl (0 at 3de5cc38: no seat session has ended since S2), check that it has trigger + session_uuid and tell Prism (T-054/t079 waits on it). (2) T-241 ruling for Aaron (ask directly, AskUserQuestion, recommendation first): is FIXED 13/15 (F11 minor) clean enough to start T-181's foundry/worth-it adoptions? Planner recommends yes, with T-325 as the polish. (3) T-325 bootstrap polish (F11, N1-N6, the lifecycle.ts:52 comment): SIM, then build. (4) T-262: live checks only (the sed > file redirect row; the 20-/end kill rule). (5) openlaser: Beam's lane is live; Aaron still owns the ff-merge of sia/adopt into main and the remote.",
+      "pick_up": "Session 175, cont. (10-27): merged under D-163/D-164 since the last handoff: #1034 T-325, #1044 T-327, #1045 T-326 code half. Main is built at b613feac. Closed: T-162, T-295, T-313, T-322, T-323, T-325, T-327. NEXT: (1) the first real kind:'outcome' row in ~/.claude/open-brain/greeting-metrics.jsonl (any desktop session that ends from now on; the T-326 reorder writes it at 0.41 s) -> check trigger + session_uuid, ping Prism, close T-324. (2) Ask Aaron directly: add \"timeout\": 60 to the SessionEnd hook entry in ~/.claude/settings.json (T-326; recommend yes); then verify that a real end prints the handoff and work-after-end check lines. (3) Ask Aaron: T-241 13/15 -> start T-181's foundry/worth-it adoptions (recommend yes). (4) T-262 live checks; T-320 closes once clark stops PID 23584 after Aaron reconnects open-brain in Prism's window.",
       "watch_out": [
-        "relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how). A fix to the script is an atlas-ops edit; the auto-mode classifier refused an atlas-ops self-edit once (clark edited it on Aaron's word).",
-        "Dashboard v1.38.1 redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere in replies and briefs.",
-        "Job client refuses non-ASCII briefs (#1018 -> #1019): keep briefs ASCII.",
-        "Excluded from Atlas's own merges (D-163/D-164): auth, keys, rate limits, .github/workflows, hook CONFIG (.githooks/, settings hooks), deps, destructive migrations, prod. Hook SOURCE code is not excluded."
+        "relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how).",
+        "Dashboard v1.38.1+ redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere.",
+        "Job client refuses non-ASCII briefs: keep briefs ASCII.",
+        "Excluded from Atlas's own merges (D-163/D-164): auth, keys, rate limits, .github/workflows, hook CONFIG (.githooks/, settings hooks), deps, destructive migrations, prod. Hook SOURCE code is not excluded.",
+        "SessionEnd hooks get 1.5 s unless the hook sets a timeout (code.claude.com/docs/en/hooks): anything a SessionEnd step must do goes before the slow git checks."
       ],
       "open_questions": [
         {
           "owner": "aaron",
-          "text": "T-241 graded FIXED 13/15 (F11 still present, minor). Start T-181's foundry and worth-it adoptions now, with T-325 as polish? Planner recommends yes."
+          "text": "Add \"timeout\": 60 to the SessionEnd hook in ~/.claude/settings.json so the T-163 checks can finish (T-326)? Planner recommends yes."
+        },
+        {
+          "owner": "aaron",
+          "text": "T-241 graded FIXED 13/15 (F11 now fixed by T-325). Start T-181's foundry and worth-it adoptions? Planner recommends yes."
         }
       ],
       "session": 175,
@@ -6876,18 +6881,18 @@
         "open_prs": [],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "T-241 13/15: start T-181 foundry/worth-it adoptions? (recommend yes)"
+          "SessionEnd hook timeout 60 (T-326)",
+          "T-181 adoptions after T-241 13/15"
         ],
         "rulings": [
           "Aaron 10-26 (clark popup): Launch + merge + ask -> D-163",
-          "Aaron 10-26 (Atlas window): hooks exclusion = config only -> D-164",
-          "Aaron 10-26: 'Beam is fine' (openlaser seat)"
+          "Aaron 10-26 (Atlas window): hooks exclusion = config only -> D-164"
         ]
       },
       "session_uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "written_rev": 590
+      "written_rev": 597
     }
   ],
   "sessions": [
@@ -7003,7 +7008,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 596
+      "last_work_rev": 597
     }
   ]
 }
