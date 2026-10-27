@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/record-source.ts
+<<<
+    return local(cause, `record source: LOCAL (${cause}). Rendering this tree's own record; there is no ${upstreamRef} to compare it with.`);
+===
+    return unreadable(cause);
+>>>

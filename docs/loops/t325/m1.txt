@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli.ts
+<<<
+ : rep.project.name_from === "package.json" ? " (from package.json)" : ""}`);
+===
+ : ""}`);
+>>>

@@ -1,0 +1,69 @@
+@@@ open-brain/src/cli.ts
+<<<
+ : ""}`);
+      console.log(`Draft:  ${DRAFT_REL}`);
+===
+ : rep.project.name_from === "package.json" ? " (from package.json)" : ""}`);
+      console.log(`Draft:  ${DRAFT_REL}`);
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+      if (stale.length) console.log(`--commit will REFUSE until those inputs are updated and the draft is re-run, or until ${ACCEPT_STALE_FLAG} is passed.`);
+===
+      if (stale.length) console.log(`--commit will REFUSE until those inputs are updated and the draft is re-run, or until ${ACCEPT_STALE_FLAG} is passed.`);
+      if (unknown.length && rep.last_session.file === "(no Session_N.md)") console.log(`  "could not tell" is expected here: there is no SESSIONS/Session_N.md to compare the inputs against.`);
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+      const warning = inboxWarning(rep);
+      if (warning) console.log(warning);
+===
+      if (rep.inbox.unparsed.length) console.log(`  Unparsed lines are INBOX text that is not a task (a legend, a heading note, how-to text); the report lists each one.`);
+      const warning = inboxWarning(rep);
+      if (warning) console.log(warning);
+>>>
+@@@ open-brain/src/pipelines/session-start/record-source.ts
+<<<
+    return unreadable(`${upstreamRef} does not exist in this checkout (no remote, or nothing fetched)`);
+===
+    // T-325 (N5): a ref that does not exist is not "unreadable"; Tree currency already says NOT CHECKED.
+    const cause = `${upstreamRef} does not exist in this checkout (no remote, or nothing fetched)`;
+    return local(cause, `record source: LOCAL (${cause}). Rendering this tree's own record; there is no ${upstreamRef} to compare it with.`);
+>>>
+@@@ open-brain/tests/pipelines/session-start/record-source.test.ts
+<<<
+      expect(out).toMatch(/record source: LOCAL \(origin\/master unreadable: [^)]*origin\/master[^)]*\)/);
+===
+      expect(out).toContain("record source: LOCAL (origin/master does not exist in this checkout (no remote, or nothing fetched))");
+      expect(out).not.toMatch(/record source: LOCAL \(origin\/master unreadable/);
+>>>
+@@@ open-brain/src/lifecycle.ts
+<<<
+held, and `ob_list` and
+===
+held, and `open-brain list` and
+>>>
+@@@ project-template/.claude/commands/bootstrap.md
+<<<
+   it when they have looked. If git already tracked those files, `Next:` says to commit their
+   removal on its own. Do that.
+===
+   it when they have looked. If git already tracked those files, `Next:` says to commit their
+   removal on its own. Do that. Until step 3 merges the template's `.gitignore`, `git status` lists
+   the moved files as untracked (`?? .agents/archive/...`); that is expected, and `check` does not
+   count them as uncommitted changes.
+>>>
+@@@ project-template/.claude/commands/bootstrap.md
+<<<
+  "Append this SIA section to your CLAUDE.md?" Append it only on yes. On no, leave the file as it is.
+===
+  "Append this SIA section to your CLAUDE.md?" Append it only on yes. On no, leave the file as it is.
+  When appending, match the file's line endings (a CRLF file gets CRLF lines), so it does not end up mixed.
+>>>
+@@@ project-template/.claude/commands/bootstrap.md
+<<<
+  replaces it with one rendered from the record.
+===
+  replaces it with one rendered from the record. Replace or delete any `_Not yet defined..._` placeholder
+  that names a document this project does not have, such as a PRD.
+>>>

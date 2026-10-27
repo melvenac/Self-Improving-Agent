@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli.ts
+<<<
+      if (unknown.length && rep.last_session.file === "(no Session_N.md)") console.log(
+===
+      if (unknown.length && rep.last_session.file === "(none)") console.log(
+>>>
