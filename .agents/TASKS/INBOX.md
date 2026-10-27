@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 598 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 599 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -27,6 +27,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-312** Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap
 - [ ] **T-320** T-315 follow-ups: build-watch.ts docstring and dead code after the proxy, the sia-rebuild report wording (no reconnect owed for proxy seats), stale pre-proxy server.js children
 - [ ] **T-321** A separate agent GitHub account so GitHub itself can require Aaron's approval on merges (D-154 option b)
+- [ ] **T-328** SIA's merged .gitignore block re-ignores a project's .env template exceptions (.env.* after !.env.example)
 
 ## Done (last 3 sessions)
 
