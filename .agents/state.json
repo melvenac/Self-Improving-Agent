@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 586,
+  "revision": 587,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1583,10 +1583,11 @@
       "opened_session": 161,
       "closed_session": null,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:2x CDT: 'We need to try the frogger migration again at some point. The plan was to reset frogger repo before the migration and test again.' Then: 'Frogger is a real project but non production, it was a fun test for cc several weeks ago. No plan to publish it.' Relayed by clark (TOLD, one link). SCOPE: frogger is a DISPOSABLE TEST BED, so the reset and the /bootstrap re-run do not need the live-project caution reserved for Makerspace (T-181). The planner schedules it; it is not urgent. STEPS: (1) Before using ~/Projects/frogger-residue as the reset source, establish what it holds and whether it is the saved pre-pilot copy (both directories exist, read at s161). (2) Reset ~/Projects/frogger to its pre-migration state. (3) Re-run /bootstrap from current SIA master, including the bootstrap-fix work (docs/loops/bootstrap-fix-brief.md and its r2-r4 handoffs). (4) Grade the run against F1-F15 in docs/loops/t181-frogger-pilot-report.md and write the result to a tracked file in docs/loops/. RELATION: this is the frogger slice of T-181 run again; T-181 stays open for the other projects. — Session 161, read by the planner on the desktop: frogger has NO git remote. Two local commits: 05ec972 'Initial commit: frogger arcade as it stood before SIA bootstrap' and 07640b8 'Bootstrap frogger onto SIA (T-181 pilot 1)'; tree clean. ~/Projects/frogger-residue is NOT a pre-pilot copy: it holds only .agents/reflection-queue.json, which the pilot moved out (report step 0). Reset point = 05ec972 plus .agents/reflection-queue.json restored. It runs on the desktop, or on the QA PC only after a bundle copy, which needs Aaron's word. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4: 'QA PC via bundle'): tag pilot 1 (frogger-pilot1 on 07640b8) first, copy a git bundle to the QA PC, reset to 05ec972 + restored reflection-queue.json and run /bootstrap there as a job; the desktop repo stays untouched. T-181 (foundry, worth-it-window-washing) follows a clean grade (Aaron, both windows).",
+      "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:2x CDT: 'We need to try the frogger migration again at some point. The plan was to reset frogger repo before the migration and test again.' Then: 'Frogger is a real project but non production, it was a fun test for cc several weeks ago. No plan to publish it.' Relayed by clark (TOLD, one link). SCOPE: frogger is a DISPOSABLE TEST BED, so the reset and the /bootstrap re-run do not need the live-project caution reserved for Makerspace (T-181). The planner schedules it; it is not urgent. STEPS: (1) Before using ~/Projects/frogger-residue as the reset source, establish what it holds and whether it is the saved pre-pilot copy (both directories exist, read at s161). (2) Reset ~/Projects/frogger to its pre-migration state. (3) Re-run /bootstrap from current SIA master, including the bootstrap-fix work (docs/loops/bootstrap-fix-brief.md and its r2-r4 handoffs). (4) Grade the run against F1-F15 in docs/loops/t181-frogger-pilot-report.md and write the result to a tracked file in docs/loops/. RELATION: this is the frogger slice of T-181 run again; T-181 stays open for the other projects. — Session 161, read by the planner on the desktop: frogger has NO git remote. Two local commits: 05ec972 'Initial commit: frogger arcade as it stood before SIA bootstrap' and 07640b8 'Bootstrap frogger onto SIA (T-181 pilot 1)'; tree clean. ~/Projects/frogger-residue is NOT a pre-pilot copy: it holds only .agents/reflection-queue.json, which the pilot moved out (report step 0). Reset point = 05ec972 plus .agents/reflection-queue.json restored. It runs on the desktop, or on the QA PC only after a bundle copy, which needs Aaron's word. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4: 'QA PC via bundle'): tag pilot 1 (frogger-pilot1 on 07640b8) first, copy a git bundle to the QA PC, reset to 05ec972 + restored reflection-queue.json and run /bootstrap there as a job; the desktop repo stays untouched. T-181 (foundry, worth-it-window-washing) follows a clean grade (Aaron, both windows). — s175 10-26 RUN: frogger bundled from the desktop (tag frogger-pilot1 on 07640b8; bundle sha cd2cb1bb), placed by clark as the QA PC mirror C:/Users/Aaron Melven/mirrors/frogger.git; brief docs/loops/t241-frogger-rerun.md (#1018/#1019, ASCII); job #194 at d149450f: READY FIXED 13/15. F11 STILL PRESENT (the draft prints Project: <name> without saying it came from package.json); F14 N/A (model behaviour). New: N1 move-residue leaves an untracked archive file before scaffold merges the gitignore; N2 the SIA section appended LF into a CRLF CLAUDE.md; N3 the draft's 'unparsed lines'/'could not tell' are unexplained in stdout; N4 a fresh /start reads like faults (empty legacy handoff, READS OWED AGENT.md, seat = folder name); N5 'origin/master unreadable' duplicates Tree currency NOT CHECKED; N6 SUMMARY keeps the PRD placeholder. Report docs/loops/t241-frogger-rerun-report.md (#1022). Desktop frogger untouched except the new tag. RULING OWED (Aaron): is 13/15 with F11 minor 'clean' enough to start T-181's foundry/worth-it adoptions? Planner recommends yes, with F11+N1-N6 as one bootstrap-polish task.",
       "note_by": [
         "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1",
-        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b",
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": null
     },
@@ -2383,17 +2384,17 @@
       "id": "T-295",
       "title": "Audit open-brain's 14 MCP tools: keep what the protocol calls, cut or move to the CLI what nothing calls",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 171,
-      "closed_session": null,
+      "closed_session": 175,
       "supersedes": null,
-      "note": "Raised by Aaron in the planner session (s171, 2026-10-14): 'auditing all the tools in open brain. I think we only use 2 or 3 of them.' PLANNER MEASUREMENT (read-only parse of every Claude Code transcript on the desktop, subagents included: 787 files, 2026-09-14..2026-10-15, 0 unparseable lines; Cursor seats and QA PC sessions are NOT in it): ob_state 2043 (last 10-15), ob_set_session 192, ob_start 163, ob_store 158, ob_feedback 109 (none since 09-26), ob_recall 73, ob_sync 56, ob_recalled 43, ob_end 21 (October only), ob_store_chunk 10 (none since 09-26), ob_stats 2 (last 09-23), ob_list 1 (last 09-15), ob_forget 0, ob_score 0. Reading: eight are in regular use, but only ob_state, ob_store and ob_recall are chosen by an agent mid-task. ob_set_session, ob_start, ob_recalled and ob_end are called by /start and /end, and ob_sync by /sync. Docs that still name the rare ones: start.md's monthly maintenance names ob_list; sync.md names ob_score ('or ob_sync --score'); end.md and checkpoint.md name ob_store_chunk; CLAUDE.md lists all 14. Planner proposal, NOT ruled: keep the eight; ob_score is a duplicate of ob_sync score:true, so cut it; ob_stats and ob_list go to the CLI and dashboard; ob_feedback is superseded by ob_end's entry_ratings, so verify that and cut it; ob_store_chunk folds into ob_store or stays as /end's long-write-up path; ob_forget is the only delete path (entry 685 waits on it), so keep it or move it to a CLI command with a confirm. Every cut is a server.ts change plus doc and command edits in three copies, so it needs Aaron's ruling. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4): 'Cut 14 to 10'. Keep the 8 protocol tools plus ob_forget and ob_store_chunk; cut ob_score (duplicate of ob_sync score) and ob_feedback (after verifying ob_end's entry_ratings replace it); move ob_stats and ob_list to the CLI/dashboard; docs and the three command copies in the same PR. Next: brief. — s175 10-26: S1 build job #137 READY PR #1003 head 8f8e1ebd; byte-compare 8/8 SAME vs START 12d176a9; merge-check CLEAN; wide 1740/1740; m1/m2 caught. QA ACCEPT sent to clark (SG-1); waits on Aaron naming #1003. S2 SIM docs/loops/t295s2-sim.md (#1006): ob_list/ob_stats -> pipelines/store/knowledge-report.ts + `open-brain list|stats` via cli-memory.ts, 12 -> 10 tools, 17 edits in 12 files, C1-C4, m1-m5. Anchored on 8f8e1ebd: its SIM needs a START containing #1003, so submit after that merge. Not edited by S2 (records PR owed): lifecycle.ts:52 comment, PRD.md:54 and TESTING.md:17 still list 14 tools. — s175 10-26: S1 MERGED as 20e6f0a8 (#1003). Post-merge: the user-level ~/.claude/commands/sync.md and ~/.cursor/commands/sync.md were re-copied from master; seats told to run /mcp reconnect. S2 SIM job #146 at fd40ea11.",
+      "note": "Raised by Aaron in the planner session (s171, 2026-10-14): 'auditing all the tools in open brain. I think we only use 2 or 3 of them.' PLANNER MEASUREMENT (read-only parse of every Claude Code transcript on the desktop, subagents included: 787 files, 2026-09-14..2026-10-15, 0 unparseable lines; Cursor seats and QA PC sessions are NOT in it): ob_state 2043 (last 10-15), ob_set_session 192, ob_start 163, ob_store 158, ob_feedback 109 (none since 09-26), ob_recall 73, ob_sync 56, ob_recalled 43, ob_end 21 (October only), ob_store_chunk 10 (none since 09-26), ob_stats 2 (last 09-23), ob_list 1 (last 09-15), ob_forget 0, ob_score 0. Reading: eight are in regular use, but only ob_state, ob_store and ob_recall are chosen by an agent mid-task. ob_set_session, ob_start, ob_recalled and ob_end are called by /start and /end, and ob_sync by /sync. Docs that still name the rare ones: start.md's monthly maintenance names ob_list; sync.md names ob_score ('or ob_sync --score'); end.md and checkpoint.md name ob_store_chunk; CLAUDE.md lists all 14. Planner proposal, NOT ruled: keep the eight; ob_score is a duplicate of ob_sync score:true, so cut it; ob_stats and ob_list go to the CLI and dashboard; ob_feedback is superseded by ob_end's entry_ratings, so verify that and cut it; ob_store_chunk folds into ob_store or stays as /end's long-write-up path; ob_forget is the only delete path (entry 685 waits on it), so keep it or move it to a CLI command with a confirm. Every cut is a server.ts change plus doc and command edits in three copies, so it needs Aaron's ruling. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4): 'Cut 14 to 10'. Keep the 8 protocol tools plus ob_forget and ob_store_chunk; cut ob_score (duplicate of ob_sync score) and ob_feedback (after verifying ob_end's entry_ratings replace it); move ob_stats and ob_list to the CLI/dashboard; docs and the three command copies in the same PR. Next: brief. — s175 10-26: S1 build job #137 READY PR #1003 head 8f8e1ebd; byte-compare 8/8 SAME vs START 12d176a9; merge-check CLEAN; wide 1740/1740; m1/m2 caught. QA ACCEPT sent to clark (SG-1); waits on Aaron naming #1003. S2 SIM docs/loops/t295s2-sim.md (#1006): ob_list/ob_stats -> pipelines/store/knowledge-report.ts + `open-brain list|stats` via cli-memory.ts, 12 -> 10 tools, 17 edits in 12 files, C1-C4, m1-m5. Anchored on 8f8e1ebd: its SIM needs a START containing #1003, so submit after that merge. Not edited by S2 (records PR owed): lifecycle.ts:52 comment, PRD.md:54 and TESTING.md:17 still list 14 tools. — s175 10-26: S1 MERGED as 20e6f0a8 (#1003). Post-merge: the user-level ~/.claude/commands/sync.md and ~/.cursor/commands/sync.md were re-copied from master; seats told to run /mcp reconnect. S2 SIM job #146 at fd40ea11. — s175 10-26 DONE (14 -> 10 tools). S2 build job #188 READY PR #1020; byte-compare 14/14 SAME vs START 044528c7 (EDITS=edits-r2.txt, re-anchored on T-322); merge-check CLEAN; refreshed to 53222ea0 (patch-id e2f105e2 = reviewed b039e3d3); merged by Atlas under D-163 as 5b8cfe1e; sia-rebuild at 5b8cfe1e. Live: `cli.js stats` (892 entries, 374 rated) and `cli.js list --limit 2` print on the real store. Desktop ~/.claude and ~/.cursor start.md re-copied from 5b8cfe1e (0 ob_list). FOLLOW-UPS, not done: the QA PC's home start.md copies still name ob_list (clark: re-copy); the lifecycle.ts:52 comment and PRD.md:54 / TESTING.md:17 still list the old tools (records + a one-line code PR).",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b",
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
-      "closed_rev": null
+      "closed_rev": 587
     },
     {
       "id": "T-296",
@@ -2791,15 +2792,16 @@
       "id": "T-323",
       "title": "clark's /start still raises old_start_command after the 10-26 re-copy of ~/.claude/commands/start.md",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 174,
-      "closed_session": null,
+      "closed_session": 175,
       "supersedes": null,
-      "note": "s174 10-26. clark re-copied start.md/end.md from master 3049a96b at 05:01:31Z (backup ~/Worktrees/_archive/commands-20261026-0001); clark's next greeting, 05:56:53Z (session 14, build c9bf887), still carried old_start_command, streak 6 (greeting-metrics.jsonl). Alarm regex: greeting-metrics.ts:33 /^OLD \\/start/m on the report. Find which file served clark's /start (a ~/Worktrees/.claude/commands copy?) or why the report prints OLD /start.",
+      "note": "s174 10-26. clark re-copied start.md/end.md from master 3049a96b at 05:01:31Z (backup ~/Worktrees/_archive/commands-20261026-0001); clark's next greeting, 05:56:53Z (session 14, build c9bf887), still carried old_start_command, streak 6 (greeting-metrics.jsonl). Alarm regex: greeting-metrics.ts:33 /^OLD \\/start/m on the report. Find which file served clark's /start (a ~/Worktrees/.claude/commands copy?) or why the report prints OLD /start. — s175 10-26 CLOSED, no longer reproduces: clark's next session after the 05:01Z re-copy, session 15 at 13:36:56Z (build fd40ea1), has alarm_streaks {} (sessions 13 and 14 had old_start_command 5 and 6). Cause NOT verified: most likely session 14's process predated the re-copy. Reopen if the alarm returns.",
       "note_by": [
-        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b",
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
-      "closed_rev": null
+      "closed_rev": 587
     },
     {
       "id": "T-324",
@@ -2812,6 +2814,20 @@
       "note": "s174 10-26. Aaron asked for scorecard items 1-6 to be filed for Prism ('file items 1-6 as a dashboard task for Prism', planner's desk 07:21Z); Prism filed agent-dashboard T-054 and asked for these fields. Shape agreed with Prism (sample rows in the A2A exchange; copy into the brief): greeting rows STAY schema 1 (the live dashboard src/greetings.js:31 drops any other schema) and gain optional pick_up_ids (ids from PICK UP/NEXT, print order, dedup, cap 10, [] when none) and open_questions (int). Outcome rows: {schema:2, kind:'outcome', id, ts, greeting_id, session, first_action:{t,tool,ids}|null, first_action_match: true|false|null, ended: bool}, written by SessionEnd from the transcript; append-only, never an edit of the greeting row; no outcome row = ended null. match rule: true if any first-action id is in pick_up_ids; false if it has ids and none match, or none but pick_up_ids non-empty; null when pick_up_ids is []. ended = ob_end ran. q5 noise_lines waits on a noise rule (later slice). Slices: S1 the greeting fields; S2 the outcome row. — s174 10-26: S1 SIM docs/loops/t324s1-sim.md (#993), job #130 (6 edits in 2 files incl. G8's pinned key ORDER). — s175 10-26: S1 SIM #134 MISMATCH ruled PASS: only the wide run differed (hub-presence.test.ts and state-import-r4.test.ts timeouts under T-292 load, green alone; neither imports greeting-metrics). Build brief docs/loops/t324s1-brief.md (#1004), build job #141 at 70a8ddfc. S2 SIM docs/loops/t324s2-sim.md (#1005), job #143 at 477d207f: new pipelines/session-start/greeting-outcome.ts + 2 edits in cli-session-end.ts; outcome row in the same greeting-metrics.jsonl; join = earliest schema-1 row for this checkout at or after the transcript's first ts; first action = first main-thread tool call after it, skipping ToolSearch/TodoWrite/ob_set_session/ob_start. Prism confirmed (A2A 10-26): `session` is the greeting row's session NUMBER (they join on record_name, checkout, session); an optional session_uuid is welcome but not needed. — s175 10-26: S1 MERGED as fd40ea11 (#1009, Aaron's popup 'Merge all three'); live check pending the first greeting row on the rebuilt build. S3 agreed with Prism: the outcome row also carries optional trigger:{asked, injected, seat_skip, path_match, error_match} (counts from trigger_fires by session_uuid; asked = state != not-asked; the last three count query tokens match:/seat-skip/path-match/error-match), omitted when the DB is absent (QA PC, Cursor). It goes after S2, not folded into it (S2 is in SIM #143). — s175 10-26: S1 LIVE: the first row with the fields is clark's /start at 13:36:56Z (pick_up_ids [], open_questions 2); Prism told. S2: SIM #143 ALL PASS (one end-fix-q3 hook timeout, green alone 3/3); build brief docs/loops/t324s2-brief.md (#1011); build #148 READY PR #1013; byte-compare 3/3 SAME; refreshed 45570963 (patch-id 0a6e4fbf = reviewed 15ce15ff); merged by Atlas as 17100231 after Aaron's hooks-scope ruling (D-164); sia-rebuild at 17100231. Live check pending: the first kind:'outcome' row from a SessionEnd. Next: S3 (trigger counts) brief. Prism will build T-054 item 1 as one slice once S2 is live; the greeting row's `agent` is the AGENT.md display name, so match it case-insensitively.",
       "note_by": [
         "0bbb03c4-d91d-496e-a6d5-43924f16405b",
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-325",
+      "title": "Bootstrap polish from the T-241 re-run: F11 (name source not printed) and N1-N6 in docs/loops/t241-frogger-rerun-report.md",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 175,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s175 10-26 from job #194. F11: the state import draft prints the project name without its source when it comes from package.json (cli.ts:585 states the source only for the folder-name case). N1-N6 as listed in the report. All are wording or ordering problems; none blocked the bootstrap.",
+      "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": null
@@ -6923,7 +6939,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 586
+      "last_work_rev": 587
     }
   ]
 }
