@@ -47,7 +47,7 @@ a. **SIA clone.** PowerShell: `$env:Path = 'C:\Program Files\nodejs;' + $env:Pat
 
 b. **Starting state.**
    - `git clone "C:/Users/Aaron Melven/mirrors/frogger.git" "$env:TEMP\frogger-rerun"`. In the clone:
-     `git checkout -q master`, `git rev-parse HEAD` must print `05ec972…`. Paste `git branch -a`, `git tag`,
+     `git checkout -q master`, `git rev-parse HEAD` must print `05ec972`. Paste `git branch -a`, `git tag`,
      `git log --oneline -3`.
    - `git remote remove origin`, because pilot 1's frogger had no remote and the mirror clone adds one. Paste
      `git remote -v` (empty).
@@ -102,5 +102,5 @@ finding was, from the pilot report:
   `BLOCKED t241 <reason>`.
 - Then the grading table: `| F# | FIXED / STILL PRESENT / N/A | evidence (step + pasted line) |`, all 15 rows.
 - Then the owner-asks table (`| step | question verbatim | answer given |`), and every NEW problem the run hit that
-  F1-F15 do not cover, as N1, N2… in the same WRONG / MISSING / CONFUSING / MINOR style as the pilot report.
+  F1-F15 do not cover, as N1, N2, ... in the same WRONG / MISSING / CONFUSING / MINOR style as the pilot report.
 - Then the pasted outputs of steps a-e. Mark anything not run `NOT RUN`.
