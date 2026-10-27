@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 593 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 594 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).
 
 ## What's working
@@ -180,10 +180,10 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 ## What's next
 
 - [P1] T-181 Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing
+- [P1] T-326 SessionEnd hook outlives Claude Code's 1.5 s SessionEnd budget: the T-324 outcome block (and everything after the slow git checks) never runs on a real session end
 - [P2] T-046 Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [P2] T-191 Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [P2] T-241 Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
-- [P2] T-324 greeting-metrics: pick_up_ids + open_questions on greeting rows (schema 1, additive) and a schema-2 outcome row from SessionEnd (first_action, first_action_match, ended), for the dashboard scorecard (agent-dashboard T-054)
 
 ## Decisions
 
