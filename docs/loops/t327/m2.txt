@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+  objective_stale: /^- \[done\] \S+ .*\(objective names a done task: update it with set_objective\)$/m,
+===
+  objective_stale: /^- \[done\] \S+ .*\(objective names a done task: update it with set_objective\)$/,
+>>>
