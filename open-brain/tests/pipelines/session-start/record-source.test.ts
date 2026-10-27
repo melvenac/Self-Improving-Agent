@@ -178,7 +178,8 @@ describe("T-200 record source", { timeout: SPAWN_TIMEOUT_MS }, () => {
       const f = makeFixture(root, LOCAL);
       git(f.clone, "remote", "remove", "origin");
       const out = await start(f.clone);
-      expect(out).toMatch(/record source: LOCAL \(origin\/master unreadable: [^)]*origin\/master[^)]*\)/);
+      expect(out).toContain("record source: LOCAL (origin/master does not exist in this checkout (no remote, or nothing fetched))");
+      expect(out).not.toMatch(/record source: LOCAL \(origin\/master unreadable/);
       expect(out).toContain("LOCAL-OBJECTIVE");
     });
 
