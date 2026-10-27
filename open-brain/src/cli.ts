@@ -644,7 +644,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  start [--read-only]                       Start a session (--read-only: print the report, write nothing)");
   console.log("  end [--dry-run]                            End a session");
   console.log("  relocate [--from <dir> --to <dir> | --worktrees] [--apply]  Fold a renamed project's or a worktree's history forward");
-  console.log("  rematch --id <n> --match <none|command: <key>|path: <glob>|error: <text>> [--dry-run]  Rewrite one lesson's MATCH: line in place, counts kept (T-322)");
+  console.log("  rematch --id <n> --match <none|command: <key>|path: <glob>|error: <text>> [--dry-run]  Rewrite one lesson's MATCH: line in place, or add a first one, counts kept (T-322, T-162)");
   console.log(
     "  scrub-trigger-fires [--db <path>] [--dry-run]  One-time rewrite of trigger_fires.command + VACUUM (stop the MCP server and close Claude Code sessions first)",
   );
