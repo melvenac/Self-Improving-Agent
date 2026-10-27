@@ -154,7 +154,7 @@ describe("T-322 rematch (module)", () => {
     expect(row().content).toBe(BODY(OLD));
   });
 
-  it("K4f: no MATCH: line refuses", () => {
+  it("K4f: no MATCH: line with --match none refuses (T-162: no key is already lookup-only)", () => {
     const id = seed({ body: "[EXPERIENCE] x\nACTION: y", note: "---\nkey: k\n---\n\n[EXPERIENCE] x\nACTION: y\n" });
     const r = run(id, "none");
     expect(r.ok).toBe(false);

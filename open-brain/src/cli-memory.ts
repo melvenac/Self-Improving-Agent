@@ -185,8 +185,11 @@ export async function runMemoryCommand(args: readonly string[]): Promise<void> {
         process.exitCode = 1;
         return;
       }
-      const what = r.unchanged ? "unchanged" : r.dryRun ? "would change (dry run, nothing written)" : "rewritten";
-      console.log(`rematch: entry ${r.id} (${r.key}) ${what}: "${r.before}" -> "${r.after}"`);
+      const verb = r.added ? ["would add", "added"] : ["would change", "rewritten"];
+      const what = r.unchanged ? "unchanged" : r.dryRun ? `${verb[0]} (dry run, nothing written)` : verb[1];
+      // T-162: an added line has no before.
+      const change = r.added ? `"${r.after}"` : `"${r.before}" -> "${r.after}"`;
+      console.log(`rematch: entry ${r.id} (${r.key}) ${what}: ${change}`);
       if (!r.unchanged && !r.dryRun) {
         const path = triggerKeysPath(dbPath);
         const k = writeTriggerKeys(db, path);
