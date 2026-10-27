@@ -50,9 +50,9 @@ prerequisite.
 2. **The project record.** `.agents/state.json` is the record, written only through `ob_state`; `INBOX.md`,
    `task.md`, `next-session.md` and the marked region of `SUMMARY.md` are rendered views of it
    (`open-brain/src/pipelines/state-views/`). `open-brain state import` creates it once.
-3. **open-brain, the MCP server (14 tools).** `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`,
-   `ob_feedback`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`,
-   `ob_sync`, `ob_score` (`open-brain/src/server.ts`). One database, `knowledge-v2.db`
+3. **open-brain, the MCP server (10 tools).** `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`,
+   `ob_forget`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync` (`open-brain/src/server.ts`;
+   T-295 cut `ob_score` and `ob_feedback` and moved `ob_list`/`ob_stats` to `open-brain list|stats`). One database, `knowledge-v2.db`
    (SQLite plus FTS5, `open-brain/src/db-v2.ts`). Knowledge content is markdown in a vault directory; the
    database holds the retrieval index, the recall and feedback logs, sessions and chunks.
 4. **Ranked recall.** `ob_recall` is FTS5 keyword search ranked by BM25 with recency decay and a failure boost
@@ -98,7 +98,7 @@ that names the maturity lifecycle):
 - skill distillation and `skill-scan`
 - semantic (Smart Connections) fusion into `ob_recall`, vector search and rank fusion: `ob_recall` is FTS5 only
 
-A stored `maturity` value still displays in `ob_list` and the vault frontmatter as a label last written before
+A stored `maturity` value still displays in `open-brain list` and the vault frontmatter as a label last written before
 Loop 10; nothing computes it (`open-brain/src/lifecycle.ts`).
 
 ## Success metrics
@@ -112,7 +112,7 @@ Loop 10; nothing computes it (`open-brain/src/lifecycle.ts`).
    (Loops 2 to 4). `greeting-size` in `/sync` enforces a 40,000-character ceiling on the `/start` greeting.
 3. **Recall trigger honesty.** `trigger_fires` distinguishes "nothing asked" from "nothing recalled", so the
    trigger's hit rate can be read from the table.
-4. **Protocol health.** `ob_score` gives a deterministic 0 to 100 score across five categories
+4. **Protocol health.** `ob_sync` with `score: true` gives a deterministic 0 to 100 score across five categories
    (`open-brain/src/pipelines/sync/scorer.ts`).
 5. **Structural integrity.** `/sync` passes with no issue before a commit (`open-brain sync --check`).
 6. **Slice four (planned, D-071).** "Calibrated" thresholds need five or more runtime-produced diffs with
