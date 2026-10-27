@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+    if (r.state !== "not-asked") c.asked++;
+===
+    c.asked++;
+>>>

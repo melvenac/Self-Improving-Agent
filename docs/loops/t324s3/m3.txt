@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-session-end.ts
+<<<
+      const rows = db.prepare("SELECT state, query FROM trigger_fires WHERE session_uuid = ?").all(sessionUuid) as Array<{ state: string; query: string }>;
+===
+      const rows = db.prepare("SELECT state, query FROM trigger_fires").all() as Array<{ state: string; query: string }>;
+>>>
