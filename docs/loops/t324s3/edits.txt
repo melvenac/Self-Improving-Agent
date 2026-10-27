@@ -1,0 +1,149 @@
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+const TAIL_BYTES = 256 * 1024;
+===
+const TAIL_BYTES = 256 * 1024;
+
+/**
+ * T-324 S3 (dashboard T-054 item 3): this session's recall-trigger fires, counts only (no query text). asked = rows the
+ * store was asked for (state not 'not-asked'); injected = state 'injected'; the other three count rows whose query
+ * carries that token (trigger/run.ts writes them as space-separated `seat-skip:<ids>`, `path-match:<ids>`,
+ * `error-match:<ids>`). The caller reads trigger_fires (memory side) and passes the rows in; this file stays core.
+ */
+export interface TriggerCounts {
+  asked: number;
+  injected: number;
+  seat_skip: number;
+  path_match: number;
+  error_match: number;
+}
+
+const hasToken = (query: string, token: string): boolean => query.split(/\s+/).some((t) => t.startsWith(token));
+
+export function triggerCounts(rows: ReadonlyArray<{ state: string; query: string }>): TriggerCounts {
+  const c: TriggerCounts = { asked: 0, injected: 0, seat_skip: 0, path_match: 0, error_match: 0 };
+  for (const r of rows) {
+    if (r.state !== "not-asked") c.asked++;
+    if (r.state === "injected") c.injected++;
+    if (hasToken(r.query, "seat-skip:")) c.seat_skip++;
+    if (hasToken(r.query, "path-match:")) c.path_match++;
+    if (hasToken(r.query, "error-match:")) c.error_match++;
+  }
+  return c;
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+  first_action_match: boolean | null;
+  ended: boolean;
+}
+===
+  first_action_match: boolean | null;
+  ended: boolean;
+  /** T-324 S3: the session's uuid, when the hook knows it. */
+  session_uuid?: string;
+  /** T-324 S3: absent = the trigger store was not read (no DB, no uuid); all zeros = read, and nothing fired. */
+  trigger?: TriggerCounts;
+}
+
+/** T-324 S3: optional fields, appended after `ended` only when known. */
+export interface OutcomeExtras {
+  sessionUuid?: string;
+  trigger?: TriggerCounts;
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+export function buildGreetingOutcomeRow(greeting: GreetingRowRef, action: FirstAction | null, ended: boolean, now: Date): GreetingOutcomeRow {
+  return {
+===
+export function buildGreetingOutcomeRow(
+  greeting: GreetingRowRef,
+  action: FirstAction | null,
+  ended: boolean,
+  now: Date,
+  extra: OutcomeExtras = {},
+): GreetingOutcomeRow {
+  const row: GreetingOutcomeRow = {
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+    first_action_match: matchFirstAction(greeting.pick_up_ids, action),
+    ended,
+  };
+}
+===
+    first_action_match: matchFirstAction(greeting.pick_up_ids, action),
+    ended,
+  };
+  if (extra.sessionUuid) row.session_uuid = extra.sessionUuid;
+  if (extra.trigger) row.trigger = extra.trigger;
+  return row;
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+  /** ob_end ran in this session (its stamp names this session). */
+  ended: boolean;
+}
+===
+  /** ob_end ran in this session (its stamp names this session). */
+  ended: boolean;
+  /** T-324 S3: copied to the row when set. */
+  sessionUuid?: string;
+  /** T-324 S3: counts from trigger_fires for this session; omit when the store was not read. */
+  trigger?: TriggerCounts;
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+    const row = buildGreetingOutcomeRow(greeting, action, input.ended, new Date());
+===
+    const row = buildGreetingOutcomeRow(greeting, action, input.ended, new Date(), {
+      sessionUuid: input.sessionUuid,
+      trigger: input.trigger,
+    });
+>>>
+@@@ open-brain/src/cli-session-end.ts
+<<<
+import { recordGreetingOutcome } from "./pipelines/session-start/greeting-outcome.js";
+===
+import { recordGreetingOutcome, triggerCounts, type TriggerCounts } from "./pipelines/session-start/greeting-outcome.js";
+>>>
+@@@ open-brain/src/cli-session-end.ts
+<<<
+// T-324 S2: the outcome of this session's greeting (first action, did it match the pick-up, did ob_end run), for the
+===
+// T-324 S3: this session's trigger_fires as counts, or undefined when the store was not read (no DB file, no
+// trigger_fires table, or an unreadable DB): the row then omits `trigger` rather than writing zeros. Read-only; never
+// creates a store. Not-asked fires still waiting in the pending file carry no query and count toward nothing, so
+// running before the T-159 reconcile below changes no count.
+function readTriggerCounts(dbPath: string, sessionUuid: string): TriggerCounts | undefined {
+  if (!existsSync(dbPath)) return undefined;
+  try {
+    const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+    try {
+      const table = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'trigger_fires'").get();
+      if (!table) return undefined;
+      const rows = db.prepare("SELECT state, query FROM trigger_fires WHERE session_uuid = ?").all(sessionUuid) as Array<{ state: string; query: string }>;
+      return triggerCounts(rows);
+    } finally {
+      db.close();
+    }
+  } catch {
+    return undefined;
+  }
+}
+
+// T-324 S2: the outcome of this session's greeting (first action, did it match the pick-up, did ob_end run), for the
+>>>
+@@@ open-brain/src/cli-session-end.ts
+<<<
+      ended: Boolean(stamp?.ob_end_at) && id !== "" && stamp?.session === id,
+    });
+===
+      ended: Boolean(stamp?.ob_end_at) && id !== "" && stamp?.session === id,
+      sessionUuid: id || undefined,
+      trigger: id !== "" ? readTriggerCounts(V2_DB, id) : undefined,
+    });
+>>>

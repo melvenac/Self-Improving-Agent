@@ -1,0 +1,6 @@
+@@@ open-brain/src/cli-session-end.ts
+<<<
+  if (!existsSync(dbPath)) return undefined;
+===
+  if (!existsSync(dbPath)) return triggerCounts([]);
+>>>
