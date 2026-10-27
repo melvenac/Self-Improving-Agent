@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 589,
+  "revision": 590,
   "project": {
     "name": "self-improving-agent"
   },
@@ -478,13 +478,13 @@
       "id": "T-162",
       "title": "The element table's growth rule: the store cannot be consulted for act shapes the table does not name",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 76,
-      "closed_session": null,
+      "closed_session": 175,
       "supersedes": null,
-      "note": "QA's entry 615 (session 75): its two costliest errors in Loop 16 — a mutation script whose regex never compiled, and type-invalid mutants — were both already in the store (entries 292 and 604, stored months earlier), and the trigger could not surface either: its table recognises a trimmer pipeline and a $? read, and `python mutate.py M4` is neither. G-039 one category out: not 'the store was not consulted' but 'the store cannot be consulted for this shape of act'. Amendment 4 ruled the table grows on evidence, not speculation; this is the first evidence. Candidates: a scripted edit whose exit code is read without asserting the edit landed; a test run on a mutant without tsc. Whoever briefs the next trigger increment starts here, with the fires table's not-asked count as the denominator. — s175 10-26 PLANNER READ (desktop store, read-only): the element table is no longer the only route. D-155 lets a lesson carry its own MATCH: command|path|error key; 141 live lessons are command-keyed, and the trigger fired 390 injected / 3,779 silent / 10,294 not-asked in the last 7 days. The two lessons this task cites still have NO MATCH line: 292 mutation-testing-verify-the-mutation-landed and 604 a-mutant-that-does-not-type-check-is-not-a-valid-mutant. So the fix is now per lesson: key them (e.g. 292 and 604 on the mutant-apply act, `apply.cjs ... m*.txt`). Blocker: T-322's `rematch` refuses a note with 0 MATCH lines (refusal K4), so there is no supported way to ADD a first key. Proposed next slice: `rematch` gains an add path for exactly-0 lines (append one MATCH line after the body; still refuse 2+), then key 292 and 604. Planner proposal, not built. Reframe: 'the store cannot be consulted for this act' becomes 'this lesson has no key', which the MATCH line already answers.",
+      "note": "QA's entry 615 (session 75): its two costliest errors in Loop 16 — a mutation script whose regex never compiled, and type-invalid mutants — were both already in the store (entries 292 and 604, stored months earlier), and the trigger could not surface either: its table recognises a trimmer pipeline and a $? read, and `python mutate.py M4` is neither. G-039 one category out: not 'the store was not consulted' but 'the store cannot be consulted for this shape of act'. Amendment 4 ruled the table grows on evidence, not speculation; this is the first evidence. Candidates: a scripted edit whose exit code is read without asserting the edit landed; a test run on a mutant without tsc. Whoever briefs the next trigger increment starts here, with the fires table's not-asked count as the denominator. — s175 10-26 PLANNER READ (desktop store, read-only): the element table is no longer the only route. D-155 lets a lesson carry its own MATCH: command|path|error key; 141 live lessons are command-keyed, and the trigger fired 390 injected / 3,779 silent / 10,294 not-asked in the last 7 days. The two lessons this task cites still have NO MATCH line: 292 mutation-testing-verify-the-mutation-landed and 604 a-mutant-that-does-not-type-check-is-not-a-valid-mutant. So the fix is now per lesson: key them (e.g. 292 and 604 on the mutant-apply act, `apply.cjs ... m*.txt`). Blocker: T-322's `rematch` refuses a note with 0 MATCH lines (refusal K4), so there is no supported way to ADD a first key. Proposed next slice: `rematch` gains an add path for exactly-0 lines (append one MATCH line after the body; still refuse 2+), then key 292 and 604. Planner proposal, not built. Reframe: 'the store cannot be consulted for this act' becomes 'this lesson has no key', which the MATCH line already answers. — s175 10-26 DONE via D-155 + slice A. SIM docs/loops/t162a-sim.md (#1028), job #202 ALL PASS; brief #1029; build #204 READY PR #1030; byte-compare 5/5 SAME vs START 51ad6ecf; merge-check CLEAN; head unchanged by refresh (patch-id 5ba5f078); merged by Atlas (D-163) as 3de5cc38; sia-rebuild. `rematch` now ADDS a first MATCH line to an unkeyed lesson (before ## Log if any, keeping line endings), and refuses 2+ lines, a note/index disagreement, and --match none on a 0-line note. Live: 292 and 604 keyed `MATCH: path: docs/loops/*/m?.txt` (dry run then real); the sidecar pathKeys lists both. They now fire when a drafter writes a mutant file, the act both lessons are about. The growth rule is answered: a lesson that should fire gets a key; the element table does not grow.",
       "note_by": null,
-      "closed_rev": null
+      "closed_rev": 590
     },
     {
       "id": "T-163",
@@ -6825,6 +6825,39 @@
       "checkout": "sia-planner",
       "first_rev": 547,
       "written_rev": 583
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Session 175 ran on 'Launch + merge + ask' (D-163/D-164): Atlas merges SIA code on its own QA ACCEPT and rebuilds. Merged this session: #1002 T-284, #1003 T-295 S1, #1009 T-324 S1, #1013 S2, #1014 T-322, #1020 T-295 S2, #1025 S3, #1030 T-162A. Main is built at 3de5cc38. NEXT: (1) T-324 close-out: when the first kind:'outcome' row appears in ~/.claude/open-brain/greeting-metrics.jsonl (0 at 3de5cc38: no seat session has ended since S2), check that it has trigger + session_uuid and tell Prism (T-054/t079 waits on it). (2) T-241 ruling for Aaron (ask directly, AskUserQuestion, recommendation first): is FIXED 13/15 (F11 minor) clean enough to start T-181's foundry/worth-it adoptions? Planner recommends yes, with T-325 as the polish. (3) T-325 bootstrap polish (F11, N1-N6, the lifecycle.ts:52 comment): SIM, then build. (4) T-262: live checks only (the sed > file redirect row; the 20-/end kill rule). (5) openlaser: Beam's lane is live; Aaron still owns the ff-merge of sia/adopt into main and the remote.",
+      "watch_out": [
+        "relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how). A fix to the script is an atlas-ops edit; the auto-mode classifier refused an atlas-ops self-edit once (clark edited it on Aaron's word).",
+        "Dashboard v1.38.1 redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere in replies and briefs.",
+        "Job client refuses non-ASCII briefs (#1018 -> #1019): keep briefs ASCII.",
+        "Excluded from Atlas's own merges (D-163/D-164): auth, keys, rate limits, .github/workflows, hook CONFIG (.githooks/, settings hooks), deps, destructive migrations, prod. Hook SOURCE code is not excluded."
+      ],
+      "open_questions": [
+        {
+          "owner": "aaron",
+          "text": "T-241 graded FIXED 13/15 (F11 still present, minor). Start T-181's foundry and worth-it adoptions now, with T-325 as polish? Planner recommends yes."
+        }
+      ],
+      "session": 175,
+      "loop_state": {
+        "open_prs": [],
+        "frozen_sha": null,
+        "questions_for_aaron": [
+          "T-241 13/15: start T-181 foundry/worth-it adoptions? (recommend yes)"
+        ],
+        "rulings": [
+          "Aaron 10-26 (clark popup): Launch + merge + ask -> D-163",
+          "Aaron 10-26 (Atlas window): hooks exclusion = config only -> D-164",
+          "Aaron 10-26: 'Beam is fine' (openlaser seat)"
+        ]
+      },
+      "session_uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
+      "checkout": "sia-planner",
+      "first_rev": 584,
+      "written_rev": 590
     }
   ],
   "sessions": [
@@ -6940,7 +6973,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 589
+      "last_work_rev": 590
     }
   ]
 }
