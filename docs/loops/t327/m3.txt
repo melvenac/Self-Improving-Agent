@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+export const ALARM_IDS = ["tree_diverged", "tree_stale", "record_behind", "stale_process", "build_behind", "old_start_command", "usage_not_checked", "drift_not_fixed", "handoff_missing", "latest_brief_undetermined", "objective_stale"] as const;
+===
+export const ALARM_IDS = ["objective_stale", "tree_diverged", "tree_stale", "record_behind", "stale_process", "build_behind", "old_start_command", "usage_not_checked", "drift_not_fixed", "handoff_missing", "latest_brief_undetermined"] as const;
+>>>
