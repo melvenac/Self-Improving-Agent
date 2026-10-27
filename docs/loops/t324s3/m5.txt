@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+const hasToken = (query: string, token: string): boolean => query.split(/\s+/).some((t) => t.startsWith(token));
+===
+const hasToken = (query: string, token: string): boolean => query.includes(token.slice(0, -1));
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-outcome.ts
+<<<
+  if (extra.trigger) row.trigger = extra.trigger;
+===
+  row.trigger = extra.trigger;
+>>>
