@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+  const nl = text.includes("\r\n") ? "\r\n" : "\n";
+===
+  const nl = "\n";
+>>>

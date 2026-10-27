@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+  if (opts.dryRun) return { ...base, unchanged: false, dryRun: true };
+===
+  if (opts.dryRun && !adding) return { ...base, unchanged: false, dryRun: true };
+>>>

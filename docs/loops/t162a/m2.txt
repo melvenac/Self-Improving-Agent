@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+  let end = lines.indexOf("## Log");
+===
+  let end = -1;
+>>>
