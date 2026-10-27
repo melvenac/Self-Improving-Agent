@@ -67,7 +67,9 @@ export function resolveRecordSource(projectRoot: string, upstreamRef = resolveRe
 
   const sha = gitLine(projectRoot, ["rev-parse", "--verify", "--quiet", `${upstreamRef}^{commit}`]);
   if (!sha) {
-    return unreadable(`${upstreamRef} does not exist in this checkout (no remote, or nothing fetched)`);
+    // T-325 (N5): a ref that does not exist is not "unreadable"; Tree currency already says NOT CHECKED.
+    const cause = `${upstreamRef} does not exist in this checkout (no remote, or nothing fetched)`;
+    return local(cause, `record source: LOCAL (${cause}). Rendering this tree's own record; there is no ${upstreamRef} to compare it with.`);
   }
 
   const shown = gitShow(projectRoot, upstreamRef, STATE_REL);

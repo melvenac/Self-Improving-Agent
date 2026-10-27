@@ -47,7 +47,9 @@ comes next.
 
    They land in `.agents/archive/pre-bootstrap-residue-<date>/`, which stays local. The owner deletes
    it when they have looked. If git already tracked those files, `Next:` says to commit their
-   removal on its own. Do that.
+   removal on its own. Do that. Until step 3 merges the template's `.gitignore`, `git status` lists
+   the moved files as untracked (`?? .agents/archive/...`); that is expected, and `check` does not
+   count them as uncommitted changes.
 2. **Not a repository:** ask the owner, "Initialize git here and commit the project as it stands?"
    On yes, `git init`, then look at `git status --short` **before** committing. If there is no
    `.gitignore`, ask the owner what to leave out (dependencies like `node_modules/`, build output,
@@ -112,6 +114,7 @@ changed `CLAUDE.md` belongs in the SIA commit (step 8), not in the project's own
 
 - **present, without the SIA section:** show the owner the section below and ask,
   "Append this SIA section to your CLAUDE.md?" Append it only on yes. On no, leave the file as it is.
+  When appending, match the file's line endings (a CRLF file gets CRLF lines), so it does not end up mixed.
 - **present, with the SIA section:** nothing to do.
 - **absent:** scan the project (`package.json`, `requirements.txt`, `Cargo.toml`, `go.mod`, the
   README, lint and test configs) and draft a short `CLAUDE.md`: a title, a one-line **About**, the
@@ -141,7 +144,8 @@ Edit the scaffolded files **in place**, and keep their structure:
 - **`.agents/TASKS/task.md`:** replace the objective under `## Current Objective` with the owner's
   first goal.
 - **`.agents/SYSTEM/SUMMARY.md`:** set the title to the project's name. Leave the status line: step 7
-  replaces it with one rendered from the record.
+  replaces it with one rendered from the record. Replace or delete any `_Not yet defined..._` placeholder
+  that names a document this project does not have, such as a PRD.
 
 Show the owner the three files.
 

@@ -49,7 +49,7 @@ export type RankConfig = Record<"recencyDecayPerDay" | "failureBoost", number>;
 
 /**
  * The stored maturity label. Nothing computes it any more — E3's promotion
- * engine is gone — but the column still holds what it held, and `ob_list` and
+ * engine is gone — but the column still holds what it held, and `open-brain list` and
  * the vault frontmatter still display it. Kept as a type so those readers stay
  * honest about what they are reading: a value last written before Loop 10.
  */
