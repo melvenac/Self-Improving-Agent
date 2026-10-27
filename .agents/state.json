@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 585,
+  "revision": 586,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2776,16 +2776,16 @@
       "id": "T-322",
       "title": "Re-key an existing stored lesson (e.g. MATCH -> none) without losing its counts: ob_store refuses a repeated event key and replaces only state entries",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 174,
-      "closed_session": null,
+      "closed_session": 175,
       "supersedes": null,
-      "note": "s174 10-26. Aaron ruled lesson 751 (skills-audit-without-session, MATCH: command `skills-audit`) lookup-only: it injects on every skills-audit call since T-307 fixed /end, 34 recalls. No supported path exists: store/index.ts replaces only when both sides are fact_kind state; ob_forget loses helpful/recall counts (feedback_log/recall_log have no FK). Want: a CLI or ob_store mode that rewrites one entry's MATCH line in note + store (indexKnowledge's ON CONFLICT keeps lifecycle columns), then trigger-keys. First use: 751 -> MATCH: none. — s175 10-26: SIM docs/loops/t322-sim.md (#1007), job #144 at 35e23b4a. `open-brain rematch --id <n> --match <none|command: ..|path: ..|error: ..> [--dry-run]` in pipelines/store/rematch.ts via cli-memory.ts; refuses with no row / archived / missing note / not exactly one MATCH line; re-indexes through indexKnowledge (ON CONFLICT keeps id, counters, recall_count, created_at: row K2) and rewrites the trigger-key sidecar via writeTriggerKeys. 6 edits in 4 files, K1-K6 + C1-C3, m1-m6. Conflicts mechanically with T-295 S2 on cli.ts's memory forward line and cli-args' sorted list; the SIM names the resolution. Live 751 read-only: one MATCH line, helpful 29, recall_count 38.",
+      "note": "s174 10-26. Aaron ruled lesson 751 (skills-audit-without-session, MATCH: command `skills-audit`) lookup-only: it injects on every skills-audit call since T-307 fixed /end, 34 recalls. No supported path exists: store/index.ts replaces only when both sides are fact_kind state; ob_forget loses helpful/recall counts (feedback_log/recall_log have no FK). Want: a CLI or ob_store mode that rewrites one entry's MATCH line in note + store (indexKnowledge's ON CONFLICT keeps lifecycle columns), then trigger-keys. First use: 751 -> MATCH: none. — s175 10-26: SIM docs/loops/t322-sim.md (#1007), job #144 at 35e23b4a. `open-brain rematch --id <n> --match <none|command: ..|path: ..|error: ..> [--dry-run]` in pipelines/store/rematch.ts via cli-memory.ts; refuses with no row / archived / missing note / not exactly one MATCH line; re-indexes through indexKnowledge (ON CONFLICT keeps id, counters, recall_count, created_at: row K2) and rewrites the trigger-key sidecar via writeTriggerKeys. 6 edits in 4 files, K1-K6 + C1-C3, m1-m6. Conflicts mechanically with T-295 S2 on cli.ts's memory forward line and cli-args' sorted list; the SIM names the resolution. Live 751 read-only: one MATCH line, helpful 29, recall_count 38. — s175 10-26 DONE: build job #151 READY PR #1014; byte-compare 6/6 SAME vs START 8328ecb1; merge-check CLEAN; refreshed to 1f349c87 (patch-id 0218d6b6 = the reviewed 53e156ce); merged by Atlas under D-163 as ea3dd365; sia-rebuild at ea3dd365. Live: `rematch --id 751 --match none --dry-run`, then the real run: 'MATCH: command: `skills-audit`' -> 'MATCH: none'; trigger keys rewritten (139 command keys); afterwards 751 keeps id 751, created_at 2026-10-15T17:16:01Z, helpful 31, recall_count 40 (29/38 at the s175 read-only check, recalls since) and is absent from recall-trigger-keys.json.",
       "note_by": [
         "0bbb03c4-d91d-496e-a6d5-43924f16405b",
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
-      "closed_rev": null
+      "closed_rev": 586
     },
     {
       "id": "T-323",
@@ -2809,7 +2809,7 @@
       "opened_session": 174,
       "closed_session": null,
       "supersedes": null,
-      "note": "s174 10-26. Aaron asked for scorecard items 1-6 to be filed for Prism ('file items 1-6 as a dashboard task for Prism', planner's desk 07:21Z); Prism filed agent-dashboard T-054 and asked for these fields. Shape agreed with Prism (sample rows in the A2A exchange; copy into the brief): greeting rows STAY schema 1 (the live dashboard src/greetings.js:31 drops any other schema) and gain optional pick_up_ids (ids from PICK UP/NEXT, print order, dedup, cap 10, [] when none) and open_questions (int). Outcome rows: {schema:2, kind:'outcome', id, ts, greeting_id, session, first_action:{t,tool,ids}|null, first_action_match: true|false|null, ended: bool}, written by SessionEnd from the transcript; append-only, never an edit of the greeting row; no outcome row = ended null. match rule: true if any first-action id is in pick_up_ids; false if it has ids and none match, or none but pick_up_ids non-empty; null when pick_up_ids is []. ended = ob_end ran. q5 noise_lines waits on a noise rule (later slice). Slices: S1 the greeting fields; S2 the outcome row. — s174 10-26: S1 SIM docs/loops/t324s1-sim.md (#993), job #130 (6 edits in 2 files incl. G8's pinned key ORDER). — s175 10-26: S1 SIM #134 MISMATCH ruled PASS: only the wide run differed (hub-presence.test.ts and state-import-r4.test.ts timeouts under T-292 load, green alone; neither imports greeting-metrics). Build brief docs/loops/t324s1-brief.md (#1004), build job #141 at 70a8ddfc. S2 SIM docs/loops/t324s2-sim.md (#1005), job #143 at 477d207f: new pipelines/session-start/greeting-outcome.ts + 2 edits in cli-session-end.ts; outcome row in the same greeting-metrics.jsonl; join = earliest schema-1 row for this checkout at or after the transcript's first ts; first action = first main-thread tool call after it, skipping ToolSearch/TodoWrite/ob_set_session/ob_start. Prism confirmed (A2A 10-26): `session` is the greeting row's session NUMBER (they join on record_name, checkout, session); an optional session_uuid is welcome but not needed. — s175 10-26: S1 MERGED as fd40ea11 (#1009, Aaron's popup 'Merge all three'); live check pending the first greeting row on the rebuilt build. S3 agreed with Prism: the outcome row also carries optional trigger:{asked, injected, seat_skip, path_match, error_match} (counts from trigger_fires by session_uuid; asked = state != not-asked; the last three count query tokens match:/seat-skip/path-match/error-match), omitted when the DB is absent (QA PC, Cursor). It goes after S2, not folded into it (S2 is in SIM #143).",
+      "note": "s174 10-26. Aaron asked for scorecard items 1-6 to be filed for Prism ('file items 1-6 as a dashboard task for Prism', planner's desk 07:21Z); Prism filed agent-dashboard T-054 and asked for these fields. Shape agreed with Prism (sample rows in the A2A exchange; copy into the brief): greeting rows STAY schema 1 (the live dashboard src/greetings.js:31 drops any other schema) and gain optional pick_up_ids (ids from PICK UP/NEXT, print order, dedup, cap 10, [] when none) and open_questions (int). Outcome rows: {schema:2, kind:'outcome', id, ts, greeting_id, session, first_action:{t,tool,ids}|null, first_action_match: true|false|null, ended: bool}, written by SessionEnd from the transcript; append-only, never an edit of the greeting row; no outcome row = ended null. match rule: true if any first-action id is in pick_up_ids; false if it has ids and none match, or none but pick_up_ids non-empty; null when pick_up_ids is []. ended = ob_end ran. q5 noise_lines waits on a noise rule (later slice). Slices: S1 the greeting fields; S2 the outcome row. — s174 10-26: S1 SIM docs/loops/t324s1-sim.md (#993), job #130 (6 edits in 2 files incl. G8's pinned key ORDER). — s175 10-26: S1 SIM #134 MISMATCH ruled PASS: only the wide run differed (hub-presence.test.ts and state-import-r4.test.ts timeouts under T-292 load, green alone; neither imports greeting-metrics). Build brief docs/loops/t324s1-brief.md (#1004), build job #141 at 70a8ddfc. S2 SIM docs/loops/t324s2-sim.md (#1005), job #143 at 477d207f: new pipelines/session-start/greeting-outcome.ts + 2 edits in cli-session-end.ts; outcome row in the same greeting-metrics.jsonl; join = earliest schema-1 row for this checkout at or after the transcript's first ts; first action = first main-thread tool call after it, skipping ToolSearch/TodoWrite/ob_set_session/ob_start. Prism confirmed (A2A 10-26): `session` is the greeting row's session NUMBER (they join on record_name, checkout, session); an optional session_uuid is welcome but not needed. — s175 10-26: S1 MERGED as fd40ea11 (#1009, Aaron's popup 'Merge all three'); live check pending the first greeting row on the rebuilt build. S3 agreed with Prism: the outcome row also carries optional trigger:{asked, injected, seat_skip, path_match, error_match} (counts from trigger_fires by session_uuid; asked = state != not-asked; the last three count query tokens match:/seat-skip/path-match/error-match), omitted when the DB is absent (QA PC, Cursor). It goes after S2, not folded into it (S2 is in SIM #143). — s175 10-26: S1 LIVE: the first row with the fields is clark's /start at 13:36:56Z (pick_up_ids [], open_questions 2); Prism told. S2: SIM #143 ALL PASS (one end-fix-q3 hook timeout, green alone 3/3); build brief docs/loops/t324s2-brief.md (#1011); build #148 READY PR #1013; byte-compare 3/3 SAME; refreshed 45570963 (patch-id 0a6e4fbf = reviewed 15ce15ff); merged by Atlas as 17100231 after Aaron's hooks-scope ruling (D-164); sia-rebuild at 17100231. Live check pending: the first kind:'outcome' row from a SessionEnd. Next: S3 (trigger counts) brief. Prism will build T-054 item 1 as one slice once S2 is live; the greeting row's `agent` is the AGENT.md display name, so match it case-insensitively.",
       "note_by": [
         "0bbb03c4-d91d-496e-a6d5-43924f16405b",
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
@@ -6207,6 +6207,13 @@
       "date": "2026-10-26",
       "note": "VERIFIED (SG-1): an AskUserQuestion popup in clark's window, transcript 82bcf4b1, answered 2026-10-26T12:39:25Z: 'Launch + merge + ask (Recommended)' (option text: planners merge their own docs PRs, and code PRs on a QA ACCEPT under an SG-1-style rule for their repo; planners ask Aaron directly in their windows; clark stops relaying), plus runner concurrency '3 at once'. relay-check.mjs does not see popup answers (tool_result), so verification was by reading the AskUserQuestion record directly. Merge rule: pr-refresh.sh (patch-id SAME), then pr-merge.sh pinned to the refreshed head, CI test green, a judge other than the builder (the QA PC CC builder is the builder; Atlas's byte-compare + merge-check ACCEPT is the judge). EXCLUDED, still Aaron naming the PR: auth, keys, rate limits, .github/workflows, hooks (.githooks/, settings hooks), deps (package.json/lockfile). clark keeps host/machine changes, cross-seat conflicts and the fleet tick. Supersedes the 10-13 'code also needs Aaron naming the PR' for non-excluded SIA code. The atlas-ops SKILL.md note was refused by the auto-mode classifier (self-modification), so this decision is the durable record until Aaron allows that edit.",
       "standing": true
+    },
+    {
+      "id": "D-164",
+      "title": "Aaron 10-26: D-163's 'hooks' exclusion covers hook config and registration only (.githooks/, settings.json hooks). SIA hook SOURCE code (cli-session-end.ts, cli-recall-trigger.ts, the planner hook) is normal code under SG-1, and Atlas merges it on its own QA ACCEPT.",
+      "date": "2026-10-26",
+      "note": "TYPED by Aaron in Atlas's own window (AskUserQuestion, session 175): 'Config only; merge (Recommended)'. Asked over #1013 (T-324 S2 edits cli-session-end.ts). A refinement of D-163.",
+      "standing": true
     }
   ],
   "handoffs": [
@@ -6916,7 +6923,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 585
+      "last_work_rev": 586
     }
   ]
 }
