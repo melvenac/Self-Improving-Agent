@@ -100,6 +100,80 @@ try {
   console.log(`[session-end] session proof NOT removed: ${err instanceof Error ? err.message : String(err)}`);
 }
 
+// T-326: the fast work that needs nothing from the checks below runs here, right after the session proof and
+// before the slow T-163 git checks. Claude Code gives SessionEnd hooks a 1.5 s budget unless the settings raise it
+// (code.claude.com/docs/en/hooks, `timeout`), and the git checks take tens of seconds on a long session: placed after
+// them, the outcome row and the reconcile never landed (0 outcome rows from real session ends, 10-27).
+// T-324 S3: this session's trigger_fires as counts, or undefined when the store was not read (no DB file, no
+// trigger_fires table, or an unreadable DB): the row then omits `trigger` rather than writing zeros. Read-only; never
+// creates a store. Not-asked fires still waiting in the pending file carry no query and count toward nothing, so
+// running before the T-159 reconcile below changes no count.
+function readTriggerCounts(dbPath: string, sessionUuid: string): TriggerCounts | undefined {
+  if (!existsSync(dbPath)) return undefined;
+  try {
+    const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+    try {
+      const table = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'trigger_fires'").get();
+      if (!table) return undefined;
+      const rows = db.prepare("SELECT state, query FROM trigger_fires WHERE session_uuid = ?").all(sessionUuid) as Array<{ state: string; query: string }>;
+      return triggerCounts(rows);
+    } finally {
+      db.close();
+    }
+  } catch {
+    return undefined;
+  }
+}
+
+// T-324 S2: the outcome of this session's greeting (first action, did it match the pick-up, did ob_end run), for the
+// dashboard scorecard. Append-only; no greeting row for this session writes nothing.
+try {
+  const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  const tp = hookPayload.transcript_path;
+  if (existsSync(join(dir, ".agents")) && typeof tp === "string" && existsSync(tp)) {
+    const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
+    const stamp = readObEndStamp(dir);
+    const r = recordGreetingOutcome({
+      projectDir: dir,
+      transcriptPath: tp,
+      sessionStart: sessionStartFromTranscript(tp),
+      ended: Boolean(stamp?.ob_end_at) && id !== "" && stamp?.session === id,
+      sessionUuid: id || undefined,
+      trigger: id !== "" ? readTriggerCounts(V2_DB, id) : undefined,
+    });
+    if ("written" in r) console.log(`[session-end] greeting outcome: written (match ${r.written.first_action_match}, ended ${r.written.ended})`);
+    else if ("skipped" in r) console.log(`[session-end] greeting outcome: none (${r.skipped})`);
+    else console.log(`[session-end] greeting outcome NOT WRITTEN: ${r.failed}`);
+  }
+} catch (err) {
+  console.log(`[session-end] greeting outcome NOT WRITTEN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+}
+
+// T-159: the recall trigger's not-asked fires wait in a file beside the store;
+// move every session's into trigger_fires. Before the vault exit, so a machine
+// with no vault still reconciles. Never openV2Database, which creates a store.
+if (existsSync(V2_DB)) {
+  try {
+    const db = new Database(V2_DB, { fileMustExist: true });
+    try {
+      initTriggerFires(db);
+      const r = reconcilePendingFires(db, pendingFiresPath(V2_DB));
+      console.log(`[session-end] ${formatReconcileLine(r)}`);
+      // T-170: refresh the recall trigger's key sidecar from the store.
+      try {
+        const k = writeTriggerKeys(db, triggerKeysPath(V2_DB));
+        console.log(`[session-end] trigger keys: ${k.written} command key(s), ${k.unusable} unusable`);
+      } catch (err) {
+        console.log(`[session-end] trigger keys NOT REFRESHED: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+      }
+    } finally {
+      db.close();
+    }
+  } catch (err) {
+    console.log(`[session-end] trigger fires NOT RECONCILED: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
+  }
+}
+
 // T179-2: committed loop work with no handoff WARNS, before anything that can
 // exit early (it needs git, not the memory module). It never blocks: /clear
 // fires this hook, and a hook that fails there traps the user.
@@ -234,76 +308,6 @@ try {
   }
 } catch (err) {
   console.log(`[session-end] skills-audit check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
-}
-
-// T-324 S3: this session's trigger_fires as counts, or undefined when the store was not read (no DB file, no
-// trigger_fires table, or an unreadable DB): the row then omits `trigger` rather than writing zeros. Read-only; never
-// creates a store. Not-asked fires still waiting in the pending file carry no query and count toward nothing, so
-// running before the T-159 reconcile below changes no count.
-function readTriggerCounts(dbPath: string, sessionUuid: string): TriggerCounts | undefined {
-  if (!existsSync(dbPath)) return undefined;
-  try {
-    const db = new Database(dbPath, { readonly: true, fileMustExist: true });
-    try {
-      const table = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'trigger_fires'").get();
-      if (!table) return undefined;
-      const rows = db.prepare("SELECT state, query FROM trigger_fires WHERE session_uuid = ?").all(sessionUuid) as Array<{ state: string; query: string }>;
-      return triggerCounts(rows);
-    } finally {
-      db.close();
-    }
-  } catch {
-    return undefined;
-  }
-}
-
-// T-324 S2: the outcome of this session's greeting (first action, did it match the pick-up, did ob_end run), for the
-// dashboard scorecard. Append-only; no greeting row for this session writes nothing.
-try {
-  const dir = resolveHookProjectDir(process.env.CLAUDE_PROJECT_DIR || process.cwd());
-  const tp = hookPayload.transcript_path;
-  if (existsSync(join(dir, ".agents")) && typeof tp === "string" && existsSync(tp)) {
-    const id = resolveSessionId(hookPayload)?.uuid || process.env.CLAUDE_CODE_SESSION_ID || "";
-    const stamp = readObEndStamp(dir);
-    const r = recordGreetingOutcome({
-      projectDir: dir,
-      transcriptPath: tp,
-      sessionStart: sessionStartFromTranscript(tp),
-      ended: Boolean(stamp?.ob_end_at) && id !== "" && stamp?.session === id,
-      sessionUuid: id || undefined,
-      trigger: id !== "" ? readTriggerCounts(V2_DB, id) : undefined,
-    });
-    if ("written" in r) console.log(`[session-end] greeting outcome: written (match ${r.written.first_action_match}, ended ${r.written.ended})`);
-    else if ("skipped" in r) console.log(`[session-end] greeting outcome: none (${r.skipped})`);
-    else console.log(`[session-end] greeting outcome NOT WRITTEN: ${r.failed}`);
-  }
-} catch (err) {
-  console.log(`[session-end] greeting outcome NOT WRITTEN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
-}
-
-// T-159: the recall trigger's not-asked fires wait in a file beside the store;
-// move every session's into trigger_fires. Before the vault exit, so a machine
-// with no vault still reconciles. Never openV2Database, which creates a store.
-if (existsSync(V2_DB)) {
-  try {
-    const db = new Database(V2_DB, { fileMustExist: true });
-    try {
-      initTriggerFires(db);
-      const r = reconcilePendingFires(db, pendingFiresPath(V2_DB));
-      console.log(`[session-end] ${formatReconcileLine(r)}`);
-      // T-170: refresh the recall trigger's key sidecar from the store.
-      try {
-        const k = writeTriggerKeys(db, triggerKeysPath(V2_DB));
-        console.log(`[session-end] trigger keys: ${k.written} command key(s), ${k.unusable} unusable`);
-      } catch (err) {
-        console.log(`[session-end] trigger keys NOT REFRESHED: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
-      }
-    } finally {
-      db.close();
-    }
-  } catch (err) {
-    console.log(`[session-end] trigger fires NOT RECONCILED: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
-  }
 }
 
 try {
