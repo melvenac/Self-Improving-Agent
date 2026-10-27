@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 594,
+  "revision": 595,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2843,7 +2843,21 @@
       "opened_session": 175,
       "closed_session": null,
       "supersedes": null,
-      "note": "s175 10-27, measured. Claude Code docs (code.claude.com/docs/en/hooks, `timeout` field): 'SessionEnd hooks share a 1.5-second budget; if your settings set a longer per-hook timeout, Claude Code raises the budget to match, up to 60 seconds.' ~/.claude/settings.json's SessionEnd hook (build/cli-session-end.js) sets NO timeout. Timed run of the real hook on COPIES (scratch KNOWLEDGE_V2_DB, missing vault dir) with Relay's ended session e0e0d12f (11 MB transcript): proof 0.33 s, handoff check 25.6 s, work-after-end check 42.9 s, skills-audit 43.1 s, greeting outcome 43.2 s (written: match null, ended false, trigger {asked 430, injected 12, seat_skip 373, path_match 4}), total 43.3 s. Live: Relay (05:32Z) and Prism (05:34Z) sessions ended on the S2/S3 build and wrote 0 outcome rows; Relay has no vault summary (Prism's likely came from its own /end). The pipeline code is right (the emulation writes the row); the budget kills it first. FIX, two halves: (1) code (Atlas, SG-1): move the T-324 outcome block and the T-159 reconcile + trigger-keys refresh to run first, right after the session proof, so they land inside 1.5 s; the slow T-163 git checks go after. (2) config (Aaron, hook config is excluded from D-163): add \"timeout\": 60 to the SessionEnd hook entry, so the rest gets up to 60 s. Even 60 s is close to 43 s on an 11 MB transcript; the handoff and work-after-end checks need to get faster (later slice). Also implies the T-163 handoff check and the T-262 unaudited-session notice have rarely or never completed in production: verify after (2).",
+      "note": "s175 10-27, measured. Claude Code docs (code.claude.com/docs/en/hooks, `timeout` field): 'SessionEnd hooks share a 1.5-second budget; if your settings set a longer per-hook timeout, Claude Code raises the budget to match, up to 60 seconds.' ~/.claude/settings.json's SessionEnd hook (build/cli-session-end.js) sets NO timeout. Timed run of the real hook on COPIES (scratch KNOWLEDGE_V2_DB, missing vault dir) with Relay's ended session e0e0d12f (11 MB transcript): proof 0.33 s, handoff check 25.6 s, work-after-end check 42.9 s, skills-audit 43.1 s, greeting outcome 43.2 s (written: match null, ended false, trigger {asked 430, injected 12, seat_skip 373, path_match 4}), total 43.3 s. Live: Relay (05:32Z) and Prism (05:34Z) sessions ended on the S2/S3 build and wrote 0 outcome rows; Relay has no vault summary (Prism's likely came from its own /end). The pipeline code is right (the emulation writes the row); the budget kills it first. FIX, two halves: (1) code (Atlas, SG-1): move the T-324 outcome block and the T-159 reconcile + trigger-keys refresh to run first, right after the session proof, so they land inside 1.5 s; the slow T-163 git checks go after. (2) config (Aaron, hook config is excluded from D-163): add \"timeout\": 60 to the SessionEnd hook entry, so the rest gets up to 60 s. Even 60 s is close to 43 s on an 11 MB transcript; the handoff and work-after-end checks need to get faster (later slice). Also implies the T-163 handoff check and the T-262 unaudited-session notice have rarely or never completed in production: verify after (2). — s175 10-27: code half SIM docs/loops/t326-sim.md (#1039), job #237 at 95459fc7. One contiguous span moves unchanged to just after the session proof: readTriggerCounts, the T-324 outcome block, the T-159 reconcile and the keys refresh. Rows O1-O3 pin the stdout line order (deterministic; not a timed kill); m1-m3. The settings.json timeout half was sent to clark for Aaron and goes into this session's handoff.",
+      "note_by": [
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-327",
+      "title": "greeting-metrics alarm objective_stale: fires when the briefing's NEXT marks the objective as naming a done task",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 175,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s175 10-27, for Prism's scorecard (Prism asked for /start FLAGS on the board; most are already alarm_streaks, and this is the one SIA signal not covered). Pattern anchored on the T-309 NEXT row form: /^- \\[done\\] \\S+ .*\\(objective names a done task: update it with set_objective\\)$/m (literal STALE_OBJECTIVE in briefing.ts). Appended last to ALARM_IDS, so the ten existing ids keep their order. SIM docs/loops/t327-sim.md (#1040), job #240 at d43530a5: rows A1-A5, mutants m1-m3. After it goes live, send Prism the id for SC_ALARM_IDS.",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
@@ -6989,7 +7003,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 594
+      "last_work_rev": 595
     }
   ]
 }

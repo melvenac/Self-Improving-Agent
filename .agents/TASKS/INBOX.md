@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 594 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 595 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -28,6 +28,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-312** Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap
 - [ ] **T-320** T-315 follow-ups: build-watch.ts docstring and dead code after the proxy, the sia-rebuild report wording (no reconnect owed for proxy seats), stale pre-proxy server.js children
 - [ ] **T-321** A separate agent GitHub account so GitHub itself can require Aaron's approval on merges (D-154 option b)
+- [ ] **T-327** greeting-metrics alarm objective_stale: fires when the briefing's NEXT marks the objective as naming a done task
 
 ## Done (last 3 sessions)
 
