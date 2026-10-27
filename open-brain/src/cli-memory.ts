@@ -153,6 +153,48 @@ export async function runMemoryCommand(args: readonly string[]): Promise<void> {
       db.close();
     }
     process.exit(0);
+  } else if (command === "rematch") {
+    // T-322: rewrite one lesson's MATCH: line in place (id and counts kept), then refresh the trigger key sidecar.
+    const opts = parseOrRefuse(COMMAND_SPECS.rematch, args.slice(1));
+    const idArg = opts.value("--id");
+    const match = opts.value("--match");
+    const id = Number(idArg);
+    if (idArg === undefined || !Number.isInteger(id) || id < 1 || match === undefined) {
+      console.error("rematch refused: --id <positive integer> and --match <none|command: <key>|path: <glob>|error: <text>> are both required");
+      process.exitCode = 1;
+      return;
+    }
+    const { existsSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const { homedir } = await import("node:os");
+    const dbPath = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
+    if (!existsSync(dbPath)) {
+      console.error(`rematch refused: no store at ${dbPath}`);
+      process.exitCode = 1;
+      return;
+    }
+    const { default: Database } = await import("better-sqlite3");
+    const { rematch } = await import("./pipelines/store/rematch.js");
+    const { writeTriggerKeys } = await import("./trigger/keys-writer.js");
+    const { triggerKeysPath } = await import("./trigger/match-keys.js");
+    const db = new Database(dbPath, { fileMustExist: true });
+    try {
+      const r = rematch(db, id, match, { dryRun: opts.has("--dry-run") });
+      if (!r.ok) {
+        console.error(`rematch refused: ${r.error}`);
+        process.exitCode = 1;
+        return;
+      }
+      const what = r.unchanged ? "unchanged" : r.dryRun ? "would change (dry run, nothing written)" : "rewritten";
+      console.log(`rematch: entry ${r.id} (${r.key}) ${what}: "${r.before}" -> "${r.after}"`);
+      if (!r.unchanged && !r.dryRun) {
+        const path = triggerKeysPath(dbPath);
+        const k = writeTriggerKeys(db, path);
+        console.log(`trigger keys: ${k.written} command key(s), ${k.unusable} unusable -> ${path}`);
+      }
+    } finally {
+      db.close();
+    }
   } else if (command === "topics") {
     const opts = parseOrRefuse(COMMAND_SPECS.topics, args.slice(1));
     const { openV2Database } = await import("./db-v2.js");

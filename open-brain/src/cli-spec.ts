@@ -39,6 +39,7 @@ export const COMMAND_SPECS = {
     positionals: "directory",
   },
   triggerKeys: { name: "trigger-keys", booleans: [], values: {}, positionals: "none" },
+  rematch: { name: "rematch", booleans: ["--dry-run"], values: { "--id": "both", "--match": "both" }, positionals: "none" },
   scrubTriggerFires: {
     name: "scrub-trigger-fires",
     booleans: ["--dry-run"],
