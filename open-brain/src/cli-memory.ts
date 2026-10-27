@@ -228,5 +228,27 @@ export async function runMemoryCommand(args: readonly string[]): Promise<void> {
       console.log(`Left ${result.skippedForeign.length} hand-written note(s) in Topics/ untouched:`);
       for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
     }
+  } else if (command === "list") {
+    // T-295 S2: the ob_list MCP tool, moved here. Parsed before the database is opened: a refusal must not have touched it.
+    const opts = parseOrRefuse(COMMAND_SPECS.list, args.slice(1));
+    const limitArg = opts.value("--limit");
+    const limit = limitArg !== undefined ? Number(limitArg) : 20;
+    if (!Number.isInteger(limit) || limit < 1) {
+      console.error(`list refused: --limit expects a positive integer, got "${limitArg}".\nNothing was run.`);
+      process.exit(2);
+    }
+    const { openV2Database } = await import("./db-v2.js");
+    const { knowledgeListText } = await import("./pipelines/store/knowledge-report.js");
+    const paths = resolvePaths(resolve("."));
+    console.log(knowledgeListText(openV2Database(paths.knowledgeV2Db), limit, opts.value("--project")));
+    process.exit(0);
+  } else if (command === "stats") {
+    // T-295 S2: the ob_stats MCP tool, moved here.
+    parseOrRefuse(COMMAND_SPECS.stats, args.slice(1));
+    const { openV2Database } = await import("./db-v2.js");
+    const { knowledgeStatsText } = await import("./pipelines/store/knowledge-report.js");
+    const paths = resolvePaths(resolve("."));
+    console.log(knowledgeStatsText(openV2Database(paths.knowledgeV2Db), paths.knowledgeV2Db));
+    process.exit(0);
   }
 }

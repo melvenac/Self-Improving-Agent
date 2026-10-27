@@ -185,8 +185,9 @@ if (command === "sync") {
   const r = await renderStartReport({ projectRoot: resolve(projectRoot), callerLabel: "open-brain CLI (start)", proven: { id: null, reason: "CLI start: no MCP server process, so no session is proven (T-154)" }, readOnly: startOpts.has("--read-only") });
   console.log(r.text);
   process.exitCode = r.isError ? 1 : 0;
-} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics" || command === "rematch") {
+} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics" || command === "rematch" || command === "list" || command === "stats") {
   // T-261 S2: the memory subcommands live in cli-memory.ts (memory side). This is their one lazy crossing.
+  // T-295 S2: list and stats are the ob_list and ob_stats MCP tools, moved here.
   const { runMemoryCommand } = await import("./cli-memory.js");
   await runMemoryCommand(args);
 } else if (command === "skills-audit") {
@@ -652,6 +653,8 @@ Read-only. Change state through ob_state — never by editing the file.`);
   );
   console.log("  trigger-keys                               Rewrite the recall trigger's key sidecar from the store (T-170)");
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
+  console.log("  list [--limit <n>] [--project <dir>]      Stored knowledge entries, newest first (default 20; T-295)");
+  console.log("  stats                                      Knowledge store counts and censuses (T-295)");
   console.log("  skills-audit [--session <uuid>] [--last <n>] [--seat <name>] [--runtime claude|cursor] [--json] [dir]   Read-only: shell commands this session repeated (T-262)");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft [--name <project name>]|--commit [--accept-stale] [--accept-changed]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
