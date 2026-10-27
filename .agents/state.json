@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 592,
+  "revision": 593,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2755,9 +2755,10 @@
       "opened_session": 174,
       "closed_session": null,
       "supersedes": null,
-      "note": "From T-315 (S174). (1) open-brain/src/build-watch.ts and its R1-R6 rows were kept for a respawn attempt that the proxy replaced: rule keep-or-cut and fix its docstring. (2) clark's sia-rebuild report still tells seats to /mcp reconnect; proxy seats need none (a rebuild at a NEW commit swaps on the next call; the same commit never swaps, since the stamp is build-info.json's commit). (3) /mcp reconnect leaves the old direct server.js child running (6 seen 10-23); harmless, gone at session end, cleanup optional. — s174 10-24: ITEM (1) DONE. build-watch.ts cut (no src importer); tests/shared/t315-s1.test.ts keeps R6 and gains R7 (module gone); the server.ts comment names the proxy. SIM docs/loops/t320-sim.md (#945) job #77 matched but one row: retirements-live was red because the SIM deleted with Remove-Item (git ls-files still listed the path); the build brief (docs/loops/t320-brief.md, #947) used git rm and ran the row alone first: 2/2. Build job #80 READY PR #949 head 967ba09f; wide run red twice in state-writer only under T-292's onTaskUpdate timeout, 52/52 alone; m1 R6, m2 R7. Byte-compare SAME on server.ts and the test; build-watch.ts reported EXTRA because the tool does not model deletions (git cat-file confirmed it gone). Clark merged under SG-1 as 581072b5 and rebuilt; no run-time change. Item (2) was done by clark earlier. OPEN: item (3), the six stale direct server.js children from before S2. byte-compare.sh gap: it should model a brief's intended deletions.",
+      "note": "From T-315 (S174). (1) open-brain/src/build-watch.ts and its R1-R6 rows were kept for a respawn attempt that the proxy replaced: rule keep-or-cut and fix its docstring. (2) clark's sia-rebuild report still tells seats to /mcp reconnect; proxy seats need none (a rebuild at a NEW commit swaps on the next call; the same commit never swaps, since the stamp is build-info.json's commit). (3) /mcp reconnect leaves the old direct server.js child running (6 seen 10-23); harmless, gone at session end, cleanup optional. — s174 10-24: ITEM (1) DONE. build-watch.ts cut (no src importer); tests/shared/t315-s1.test.ts keeps R6 and gains R7 (module gone); the server.ts comment names the proxy. SIM docs/loops/t320-sim.md (#945) job #77 matched but one row: retirements-live was red because the SIM deleted with Remove-Item (git ls-files still listed the path); the build brief (docs/loops/t320-brief.md, #947) used git rm and ran the row alone first: 2/2. Build job #80 READY PR #949 head 967ba09f; wide run red twice in state-writer only under T-292's onTaskUpdate timeout, 52/52 alone; m1 R6, m2 R7. Byte-compare SAME on server.ts and the test; build-watch.ts reported EXTRA because the tool does not model deletions (git cat-file confirmed it gone). Clark merged under SG-1 as 581072b5 and rebuilt; no run-time change. Item (2) was done by clark earlier. OPEN: item (3), the six stale direct server.js children from before S2. byte-compare.sh gap: it should model a brief's intended deletions. — s175 10-26 item (3) read (desktop, Win32_Process, read-only): 2 direct pre-proxy build/server.js processes remain (6 at T-320's filing), both started 10-21 19:47, and neither is an orphan. PID 25560's parent is Courier's live claude.exe (--remote-control courier); PID 23584's is a resumed `claude -r` session. Both serve the 10-21 build, so they still list the cut tools. Every other open-brain server today is a build-proxy.js child (build\\server.js). Remedy: a /mcp reconnect in those two sessions, not a kill. Courier was told (A2A 10-26). Close once neither PID exists.",
       "note_by": [
-        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b",
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": null
     },
@@ -6974,7 +6975,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 592
+      "last_work_rev": 593
     }
   ]
 }
