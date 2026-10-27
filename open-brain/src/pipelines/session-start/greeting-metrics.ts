@@ -18,7 +18,7 @@ export const GREETING_METRICS_FILE = "greeting-metrics.jsonl";
 export const GREETING_METRICS_SCHEMA = 1;
 /** Rotate (rename to `.1`, replacing any old `.1`) before an append that finds the file at or above this size. */
 export const GREETING_METRICS_ROTATE_BYTES = 2 * 1024 * 1024;
-export const ALARM_IDS = ["tree_diverged", "tree_stale", "record_behind", "stale_process", "build_behind", "old_start_command", "usage_not_checked", "drift_not_fixed", "handoff_missing", "latest_brief_undetermined"] as const;
+export const ALARM_IDS = ["tree_diverged", "tree_stale", "record_behind", "stale_process", "build_behind", "old_start_command", "usage_not_checked", "drift_not_fixed", "handoff_missing", "latest_brief_undetermined", "objective_stale"] as const;
 export const MISSING_POINTER_IDS = ["handoff", "pick_up", "objective", "latest_brief"] as const;
 export const UNCHECKED_IDS = ["latest_brief"] as const;
 /** T-324: at most this many ids in a row's `pick_up_ids`. */
@@ -38,6 +38,8 @@ const ALARM_PATTERNS: Record<AlarmId, RegExp> = {
   drift_not_fixed: /(?:^|· )Drift detected \(\d+\):[^\n]*\(not fixed\)/m,
   handoff_missing: /(?:^|· )Handoff MISSING: /m,
   latest_brief_undetermined: /^Latest brief: not determined/m,
+  // T-327: briefing.ts STALE_OBJECTIVE on a NEXT row (`- [done] <id> <title> <note>`, T-309), never the note quoted in prose.
+  objective_stale: /^- \[done\] \S+ .*\(objective names a done task: update it with set_objective\)$/m,
 };
 
 export function greetingMetricsPath(env: NodeJS.ProcessEnv = process.env): string {

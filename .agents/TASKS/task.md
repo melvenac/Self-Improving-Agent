@@ -1,10 +1,10 @@
-<!-- generated from .agents/state.json rev 595 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 596 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
 ## Objective
 
-D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps). _(since session 173)_
+D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-27; the greeting-scorecard thread T-298/T-299/T-324/T-327 is shipped): T-326, SessionEnd's fast work inside Claude Code's 1.5 s budget, so outcome rows reach Prism's scorecard (the code half is in build; the settings timeout is Aaron's); then T-181's adoptions on Aaron's T-241 ruling. _(since session 175)_
 
 ## Top tasks
 
