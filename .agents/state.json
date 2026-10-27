@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 595,
+  "revision": 596,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (Aaron's review scorecard, 10-16): make every seat's /start greeting match the project state, fit whole, and point at where the seat left off -- T-298 (handoff lag + brief line), T-299 (greeting metrics for Prism's dashboard panel), T-300 (coordinator greeting), T-297 (import gaps).",
-    "since_session": 173
+    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-27; the greeting-scorecard thread T-298/T-299/T-324/T-327 is shipped): T-326, SessionEnd's fast work inside Claude Code's 1.5 s budget, so outcome rows reach Prism's scorecard (the code half is in build; the settings timeout is Aaron's); then T-181's adoptions on Aaron's T-241 ruling.",
+    "since_session": 175
   },
   "tasks": [
     {
@@ -2853,15 +2853,15 @@
       "id": "T-327",
       "title": "greeting-metrics alarm objective_stale: fires when the briefing's NEXT marks the objective as naming a done task",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 175,
-      "closed_session": null,
+      "closed_session": 175,
       "supersedes": null,
-      "note": "s175 10-27, for Prism's scorecard (Prism asked for /start FLAGS on the board; most are already alarm_streaks, and this is the one SIA signal not covered). Pattern anchored on the T-309 NEXT row form: /^- \\[done\\] \\S+ .*\\(objective names a done task: update it with set_objective\\)$/m (literal STALE_OBJECTIVE in briefing.ts). Appended last to ALARM_IDS, so the ten existing ids keep their order. SIM docs/loops/t327-sim.md (#1040), job #240 at d43530a5: rows A1-A5, mutants m1-m3. After it goes live, send Prism the id for SC_ALARM_IDS.",
+      "note": "s175 10-27, for Prism's scorecard (Prism asked for /start FLAGS on the board; most are already alarm_streaks, and this is the one SIA signal not covered). Pattern anchored on the T-309 NEXT row form: /^- \\[done\\] \\S+ .*\\(objective names a done task: update it with set_objective\\)$/m (literal STALE_OBJECTIVE in briefing.ts). Appended last to ALARM_IDS, so the ten existing ids keep their order. SIM docs/loops/t327-sim.md (#1040), job #240 at d43530a5: rows A1-A5, mutants m1-m3. After it goes live, send Prism the id for SC_ALARM_IDS. — s175 10-27 DONE: SIM #240 ALL PASS; brief #1042; build #244 READY PR #1044; byte-compare 2/2 SAME vs START 71dd239e; merge-check CLEAN; refreshed 04dc79ad (patch-id d29d8140 = reviewed 8c70f61e); merged by Atlas (D-163) as 2c3729c4; sia-rebuild. Live: this seat's ob_start at 09:26:23Z wrote alarm_streaks {tree_stale:2, objective_stale:1} (the SIA objective named done T-298/T-299). Prism given the id for SC_ALARM_IDS. The objective was rewritten in the same write, so the streak stops at 1.",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
-      "closed_rev": null
+      "closed_rev": 596
     }
   ],
   "verified": [
@@ -7003,7 +7003,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 595
+      "last_work_rev": 596
     }
   ]
 }
