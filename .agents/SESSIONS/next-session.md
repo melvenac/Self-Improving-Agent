@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 596 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 597 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,18 +6,20 @@
 
 ### Pick up here
 
-Session 175 ran on 'Launch + merge + ask' (D-163/D-164): Atlas merges SIA code on its own QA ACCEPT and rebuilds. Merged this session: #1002 T-284, #1003 T-295 S1, #1009 T-324 S1, #1013 S2, #1014 T-322, #1020 T-295 S2, #1025 S3, #1030 T-162A. Main is built at 3de5cc38. NEXT: (1) T-324 close-out: when the first kind:'outcome' row appears in ~/.claude/open-brain/greeting-metrics.jsonl (0 at 3de5cc38: no seat session has ended since S2), check that it has trigger + session_uuid and tell Prism (T-054/t079 waits on it). (2) T-241 ruling for Aaron (ask directly, AskUserQuestion, recommendation first): is FIXED 13/15 (F11 minor) clean enough to start T-181's foundry/worth-it adoptions? Planner recommends yes, with T-325 as the polish. (3) T-325 bootstrap polish (F11, N1-N6, the lifecycle.ts:52 comment): SIM, then build. (4) T-262: live checks only (the sed > file redirect row; the 20-/end kill rule). (5) openlaser: Beam's lane is live; Aaron still owns the ff-merge of sia/adopt into main and the remote.
+Session 175, cont. (10-27): merged under D-163/D-164 since the last handoff: #1034 T-325, #1044 T-327, #1045 T-326 code half. Main is built at b613feac. Closed: T-162, T-295, T-313, T-322, T-323, T-325, T-327. NEXT: (1) the first real kind:'outcome' row in ~/.claude/open-brain/greeting-metrics.jsonl (any desktop session that ends from now on; the T-326 reorder writes it at 0.41 s) -> check trigger + session_uuid, ping Prism, close T-324. (2) Ask Aaron directly: add "timeout": 60 to the SessionEnd hook entry in ~/.claude/settings.json (T-326; recommend yes); then verify that a real end prints the handoff and work-after-end check lines. (3) Ask Aaron: T-241 13/15 -> start T-181's foundry/worth-it adoptions (recommend yes). (4) T-262 live checks; T-320 closes once clark stops PID 23584 after Aaron reconnects open-brain in Prism's window.
 
 ### Watch out
 
-- relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how). A fix to the script is an atlas-ops edit; the auto-mode classifier refused an atlas-ops self-edit once (clark edited it on Aaron's word).
-- Dashboard v1.38.1 redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere in replies and briefs.
-- Job client refuses non-ASCII briefs (#1018 -> #1019): keep briefs ASCII.
+- relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how).
+- Dashboard v1.38.1+ redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere.
+- Job client refuses non-ASCII briefs: keep briefs ASCII.
 - Excluded from Atlas's own merges (D-163/D-164): auth, keys, rate limits, .github/workflows, hook CONFIG (.githooks/, settings hooks), deps, destructive migrations, prod. Hook SOURCE code is not excluded.
+- SessionEnd hooks get 1.5 s unless the hook sets a timeout (code.claude.com/docs/en/hooks): anything a SessionEnd step must do goes before the slow git checks.
 
 ### Open questions
 
-- T-241 graded FIXED 13/15 (F11 still present, minor). Start T-181's foundry and worth-it adoptions now, with T-325 as polish? Planner recommends yes.
+- Add "timeout": 60 to the SessionEnd hook in ~/.claude/settings.json so the T-163 checks can finish (T-326)? Planner recommends yes.
+- T-241 graded FIXED 13/15 (F11 now fixed by T-325). Start T-181's foundry and worth-it adoptions? Planner recommends yes.
 
 ### Loop state
 
@@ -26,12 +28,12 @@ Session 175 ran on 'Launch + merge + ask' (D-163/D-164): Atlas merges SIA code o
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- T-241 13/15: start T-181 foundry/worth-it adoptions? (recommend yes)
+- SessionEnd hook timeout 60 (T-326)
+- T-181 adoptions after T-241 13/15
 
 **Rulings made mid-loop:** 
 - Aaron 10-26 (clark popup): Launch + merge + ask -> D-163
 - Aaron 10-26 (Atlas window): hooks exclusion = config only -> D-164
-- Aaron 10-26: 'Beam is fine' (openlaser seat)
 
 ## developer [sia-builder] _(written session 156)_
 
