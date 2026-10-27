@@ -1,0 +1,331 @@
+@@@ open-brain/src/server.ts
+<<<
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, appendFileSync, statSync } from "node:fs";
+===
+import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync, appendFileSync } from "node:fs";
+>>>
+@@@ open-brain/src/server.ts
+<<<
+// --- ob_list ---
+server.tool(
+  "ob_list",
+  "List stored knowledge entries. Pass project to see only global + project-scoped entries.",
+  {
+    limit: z.number().optional().default(20).describe("Max entries to return"),
+    project: z.string().optional().describe("Filter to global + this project's entries"),
+  },
+  async ({ limit, project }) => {
+    const v2db = getV2Db();
+    const normalizedProject = identityKey(project);
+
+    let sql = "SELECT id, key, content, tags, source, project_dir, created_at, maturity FROM knowledge_index WHERE archived_into IS NULL";
+    const params: unknown[] = [];
+    if (normalizedProject) {
+      sql += " AND (project_dir IS NULL OR project_dir LIKE ?)";
+      params.push(`%${normalizedProject}%`);
+    }
+    sql += " ORDER BY created_at DESC LIMIT ?";
+    params.push(limit);
+
+    const entries = v2db.prepare(sql).all(...params) as Array<{
+      id: number; key: string | null; content: string; tags: string | null;
+      source: string; project_dir: string | null; created_at: string;
+      maturity: string;
+    }>;
+
+    if (entries.length === 0) {
+      return { content: [{ type: "text" as const, text: "No stored knowledge entries yet." }] };
+    }
+
+    const lines = ["## Stored Knowledge", ""];
+    for (const e of entries) {
+      const scopeLabel = e.project_dir ? `[project]` : `[global]`;
+      lines.push(`**[${e.id}]** ${scopeLabel} ${e.key ? `\`${e.key}\` — ` : ""}${e.content.length > 120 ? e.content.substring(0, 120) + "..." : e.content}`);
+      if (e.tags) lines.push(`  Tags: ${e.tags}`);
+      lines.push(`  Source: ${e.source} | Created: ${e.created_at}${e.project_dir ? ` | Project: ${e.project_dir}` : ""}`);
+      lines.push("");
+    }
+
+    return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+  }
+);
+
+// --- ob_stats ---
+server.tool(
+  "ob_stats",
+  "Show knowledge database statistics.",
+  {},
+  async () => {
+    const v2db = getV2Db();
+    const knowledge = v2db.prepare("SELECT COUNT(*) as c FROM knowledge_index WHERE archived_into IS NULL").get() as { c: number };
+    const maturityDist = v2db.prepare(
+      "SELECT COALESCE(maturity, 'progenitor') as maturity, COUNT(*) as count FROM knowledge_index WHERE archived_into IS NULL GROUP BY maturity ORDER BY count DESC"
+    ).all() as Array<{ maturity: string; count: number }>;
+
+    const rated = v2db.prepare(
+      "SELECT COUNT(*) as c FROM knowledge_index WHERE (helpful + harmful + neutral) > 0 AND archived_into IS NULL"
+    ).get() as { c: number };
+
+    let dbSize = 0;
+    try { dbSize = statSync(V2_DB_PATH).size; } catch { /* ignore */ }
+
+    // The recall corpus states its own labeling quality before anyone analyzes
+    // it: 'unspecified' counts callers that omitted the trigger (a labeling
+    // gap, not a treatment), '(pre-column)' counts rows older than v0.18.0.
+    const triggerCensus = v2db.prepare(
+      "SELECT COALESCE(recall_trigger, '(pre-column)') as t, COUNT(*) as count FROM recall_log GROUP BY t ORDER BY count DESC"
+    ).all() as Array<{ t: string; count: number }>;
+
+    // The trigger's three states, across every session (Loop 16 R16, A8).
+    //
+    // This is the denominator the memory half never had. 'not-asked' says how
+    // narrow the derivation is, 'silent' says whether the floor is set
+    // sensibly, 'injected' says how often anything actually reached a seat —
+    // and the difference between the first two is the distinction `ob_recalled`
+    // could not make for five loops (G-039). Zero rows is itself an answer
+    // here and is printed as three zeros rather than an omitted section: an
+    // absent census reads as "not measured", which is the failure this table
+    // exists to end.
+    const fireCensus = v2db.prepare(
+      "SELECT state, COUNT(*) as count FROM trigger_fires GROUP BY state ORDER BY count DESC"
+    ).all() as Array<{ state: string; count: number }>;
+    const fireCounts: Record<string, number> = { "not-asked": 0, silent: 0, injected: 0 };
+    for (const row of fireCensus) fireCounts[row.state] = row.count;
+
+    // Same contract for ratings: where each rated id came from, with the
+    // pre-column era its own bucket rather than a healthy-looking zero.
+    const originCensus = v2db.prepare(
+      "SELECT COALESCE(rating_origin, '(pre-column)') as o, COUNT(*) as count FROM feedback_log GROUP BY o ORDER BY count DESC"
+    ).all() as Array<{ o: string; count: number }>;
+
+    // Which ARM produced each rating, crossed with the verdict. This is the
+    // census the lifecycle work is blocked on. The `heuristic` arm that would
+    // have skewed it was CUT in Loop 12 (R-010) having never written a row, so
+    // every row here came from a judgment rather than a topic-mention detector. Crossed rather than
+    // summed because the interesting cell is `supplied` x `harmful` (the
+    // apoptosis threshold it once fed is cut).
+    const methodCensus = v2db.prepare(
+      `SELECT COALESCE(rating_method, '(pre-column)') as m, rating as r, COUNT(*) as count
+       FROM feedback_log GROUP BY m, r ORDER BY m, r`
+    ).all() as Array<{ m: string; r: string; count: number }>;
+
+    const lines = [
+      `## Knowledge Stats`,
+      `Total entries: ${knowledge.c}`,
+      `Rated entries: ${rated.c}`,
+      `Database: ${V2_DB_PATH} (${(dbSize / 1024).toFixed(0)} KB)`,
+      ``,
+      `Maturity distribution:`,
+      ...maturityDist.map(m => `  ${m.maturity}: ${m.count}`),
+      ``,
+      `Recall trigger census:`,
+      ...triggerCensus.map(r => `  ${r.t}: ${r.count}`),
+      ``,
+      `Trigger fires (every invocation, whether or not it surfaced anything):`,
+      `  not asked (no recognised element): ${fireCounts["not-asked"]}`,
+      `  asked, silent (nothing cleared the floor): ${fireCounts.silent}`,
+      `  asked, injected: ${fireCounts.injected}`,
+      ``,
+      `Rating origin census:`,
+      ...originCensus.map(r => `  ${r.o}: ${r.count}`),
+      ``,
+      `Rating method x verdict:`,
+      ...methodCensus.map(r => `  ${r.m} / ${r.r}: ${r.count}`),
+      `  (the heuristic arm was cut in Loop 12 and never wrote a row; NULL means pre-column)`,
+      ``,
+      // Unconditional, including at zero — a line that only appears when
+      // something went wrong reads identically to a healthy silence.
+      // T-003: the self-registration count went with slot adoption. What replaces
+      // it is the proof itself, read now, with the reason when there is none.
+      (() => {
+        const p = writeSessionId();
+        return p.id !== null
+          ? `Session proof (this server instance): ${p.id}, via parent process ${p.pid}`
+          : `Session proof (this server instance): NONE — ${p.reason}`;
+      })(),
+      `Schema: code v${_schemaSkew?.codeVersion ?? "?"}, database v${_schemaSkew?.dbVersion ?? "?"}${_schemaSkew?.writerIsStale ? " — STALE WRITER" : ""}`,
+    ];
+
+    // Loop 10 C2 (E18): the apoptosis review queue is gone with the gate that fed
+    // it. It listed entries that had crossed a threshold on `success_rate` — a
+    // rate that excluded neutral, and so read 1.0 for almost everything. Loop 9
+    // measured the resulting penalty firing on 2 entries out of 554.
+
+    return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+  }
+);
+
+// --- ob_recalled ---
+===
+// --- ob_recalled ---
+>>>
+@@@ open-brain/src/cli-spec.ts
+<<<
+  topics: {
+    name: "topics",
+    booleans: ["--apply"],
+    values: { "--min": "equals" },
+    positionals: "none",
+  },
+===
+  topics: {
+    name: "topics",
+    booleans: ["--apply"],
+    values: { "--min": "equals" },
+    positionals: "none",
+  },
+  list: {
+    name: "list",
+    booleans: [],
+    values: { "--limit": "both", "--project": "both" },
+    positionals: "none",
+  },
+  stats: { name: "stats", booleans: [], values: {}, positionals: "none" },
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics" || command === "rematch") {
+  // T-261 S2: the memory subcommands live in cli-memory.ts (memory side). This is their one lazy crossing.
+===
+} else if (command === "relocate" || command === "scrub-trigger-fires" || command === "trigger-keys" || command === "topics" || command === "rematch" || command === "list" || command === "stats") {
+  // T-261 S2: the memory subcommands live in cli-memory.ts (memory side). This is their one lazy crossing.
+  // T-295 S2: list and stats are the ob_list and ob_stats MCP tools, moved here.
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
+===
+  console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
+  console.log("  list [--limit <n>] [--project <dir>]      Stored knowledge entries, newest first (default 20; T-295)");
+  console.log("  stats                                      Knowledge store counts and censuses (T-295)");
+>>>
+@@@ open-brain/src/cli-memory.ts
+<<<
+      for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
+    }
+  }
+}
+===
+      for (const f of result.skippedForeign.slice(0, 10)) console.log(`  ${f}`);
+    }
+  } else if (command === "list") {
+    // T-295 S2: the ob_list MCP tool, moved here. Parsed before the database is opened: a refusal must not have touched it.
+    const opts = parseOrRefuse(COMMAND_SPECS.list, args.slice(1));
+    const limitArg = opts.value("--limit");
+    const limit = limitArg !== undefined ? Number(limitArg) : 20;
+    if (!Number.isInteger(limit) || limit < 1) {
+      console.error(`list refused: --limit expects a positive integer, got "${limitArg}".\nNothing was run.`);
+      process.exit(2);
+    }
+    const { openV2Database } = await import("./db-v2.js");
+    const { knowledgeListText } = await import("./pipelines/store/knowledge-report.js");
+    const paths = resolvePaths(resolve("."));
+    console.log(knowledgeListText(openV2Database(paths.knowledgeV2Db), limit, opts.value("--project")));
+    process.exit(0);
+  } else if (command === "stats") {
+    // T-295 S2: the ob_stats MCP tool, moved here.
+    parseOrRefuse(COMMAND_SPECS.stats, args.slice(1));
+    const { openV2Database } = await import("./db-v2.js");
+    const { knowledgeStatsText } = await import("./pipelines/store/knowledge-report.js");
+    const paths = resolvePaths(resolve("."));
+    console.log(knowledgeStatsText(openV2Database(paths.knowledgeV2Db), paths.knowledgeV2Db));
+    process.exit(0);
+  }
+}
+>>>
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "main-rebuild", "metrics review", "relocate", "rematch", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "sync", "topics", "trigger-keys"]
+===
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "list", "main-rebuild", "metrics review", "relocate", "rematch", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "stats", "sync", "topics", "trigger-keys"]
+>>>
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+    ["topics", /^\s+topics (.*)$/m],
+===
+    ["topics", /^\s+topics (.*)$/m],
+    ["list", /^\s+list (.*)$/m],
+    ["stats", /^\s+stats(.*)$/m],
+>>>
+@@@ open-brain/tests/t295-s1-tool-cut.test.ts
+<<<
+const AFTER_S1 = [
+  "ob_end", "ob_forget", "ob_list", "ob_recall", "ob_recalled", "ob_set_session", "ob_start", "ob_state", "ob_stats",
+  "ob_store", "ob_store_chunk", "ob_sync",
+];
+===
+// T-295 S2 moved ob_list and ob_stats to the CLI (`open-brain list`, `open-brain stats`).
+const AFTER_S1 = [
+  "ob_end", "ob_forget", "ob_recall", "ob_recalled", "ob_set_session", "ob_start", "ob_state",
+  "ob_store", "ob_store_chunk", "ob_sync",
+];
+>>>
+@@@ open-brain/tests/t295-s1-tool-cut.test.ts
+<<<
+  it("R1 the server's tools/list is exactly the twelve", async () => {
+===
+  it("R1 the server's tools/list is exactly the ten", async () => {
+>>>
+@@@ .agents/retirements.json
+<<<
+            "edb259d4db7480493fcbccfdb280d2cdda5598477056140b92a2966d2960b82d",
+            "b47d0b42ce33c91ce7eb934d97d1c8a3db955607db8379c9eceb21bb75962066",
+            "baad384a5b88920a7104f225035f95b742c3a64b5e21f9c73432ce91cd8b9771",
+            "4ee0e7027bf8d519cadaf4ef159029eb13702cd2970d9a844b730406b3aa23f5",
+            "a24a05991e3204c49fbd18ffb6d001eaa3017bdd2601c0ed5b44191781296f7f",
+            "ce3d86b58af408c2695d263fe9a6d9b7e0be5d5c27f82614274d9fa49374f9c8"
+          ]
+        },
+===
+            "edb259d4db7480493fcbccfdb280d2cdda5598477056140b92a2966d2960b82d",
+            "ce3d86b58af408c2695d263fe9a6d9b7e0be5d5c27f82614274d9fa49374f9c8"
+          ]
+        },
+        {
+          "path": "open-brain/src/pipelines/store/knowledge-report.ts",
+          "class": "prose",
+          "why": "T-295 S2 moved ob_stats's body here from server.ts unchanged: the maturity-distribution select reads the retained label, and the census and review-queue comments record what was cut.",
+          "line_hashes": [
+            "b47d0b42ce33c91ce7eb934d97d1c8a3db955607db8379c9eceb21bb75962066",
+            "baad384a5b88920a7104f225035f95b742c3a64b5e21f9c73432ce91cd8b9771",
+            "4ee0e7027bf8d519cadaf4ef159029eb13702cd2970d9a844b730406b3aa23f5",
+            "a24a05991e3204c49fbd18ffb6d001eaa3017bdd2601c0ed5b44191781296f7f"
+          ]
+        },
+>>>
+@@@ CLAUDE.md
+<<<
+**12 tools**: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync` (T-295 cut `ob_score`, a duplicate of `ob_sync` `score: true`, and `ob_feedback`, whose ratings `ob_end`'s `entry_ratings` records).
+===
+**10 tools**: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync` (T-295 cut `ob_score`, a duplicate of `ob_sync` `score: true`, and `ob_feedback`, whose ratings `ob_end`'s `entry_ratings` records, and moved `ob_list` and `ob_stats` to the CLI as `open-brain list` and `open-brain stats`).
+>>>
+@@@ README.md
+<<<
+- the **open-brain MCP server** (12 tools):
+===
+- the **open-brain MCP server** (10 tools):
+>>>
+@@@ README.md
+<<<
+The 12 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync`.
+===
+The 10 tools: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync`. The store's listing and counts are CLI commands: `node open-brain/build/cli.js list` and `node open-brain/build/cli.js stats`.
+>>>
+@@@ .claude/commands/start.md
+<<<
+- `ob_list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+===
+- `node open-brain/build/cli.js list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+>>>
+@@@ project-template/.claude/commands/start.md
+<<<
+- `ob_list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+===
+- `node open-brain/build/cli.js list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+>>>
+@@@ project-template/.cursor/commands/start.md
+<<<
+- `ob_list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+===
+- `node open-brain/build/cli.js list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+>>>
