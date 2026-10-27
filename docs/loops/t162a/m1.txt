@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+      content: put(row.content),
+===
+      content: adding ? row.content : put(row.content),
+>>>

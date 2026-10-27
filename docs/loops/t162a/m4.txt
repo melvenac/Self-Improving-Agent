@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/rematch.ts
+<<<
+  if (inNote.length !== inIndex.length) {
+===
+  if (false) {
+>>>
