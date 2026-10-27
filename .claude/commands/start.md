@@ -132,7 +132,7 @@ missing `SESSION_UUID`, any drift reported as `not fixed`, and any MCP server th
 Only on the first session of the month or an explicit health-check request.
 
 **Stale experience pruning**
-- `ob_list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
+- `node open-brain/build/cli.js list` for entries with `recall_count = 0`; flag any not recalled in 90+ days.
 - Present the list: "These have never been recalled — prune them?"
 - **Delete only with the user's approval.**
 

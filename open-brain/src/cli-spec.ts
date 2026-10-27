@@ -32,6 +32,13 @@ export const COMMAND_SPECS = {
     values: { "--min": "equals" },
     positionals: "none",
   },
+  list: {
+    name: "list",
+    booleans: [],
+    values: { "--limit": "both", "--project": "both" },
+    positionals: "none",
+  },
+  stats: { name: "stats", booleans: [], values: {}, positionals: "none" },
   skillsAudit: {
     name: "skills-audit",
     booleans: ["--json"],

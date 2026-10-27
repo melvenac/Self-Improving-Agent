@@ -14,8 +14,9 @@ import { checkCommandToolNames } from "../src/pipelines/sync/checks.js";
  */
 const OB = resolve(import.meta.dirname, "..");
 const REPO = resolve(OB, "..");
+// T-295 S2 moved ob_list and ob_stats to the CLI (`open-brain list`, `open-brain stats`).
 const AFTER_S1 = [
-  "ob_end", "ob_forget", "ob_list", "ob_recall", "ob_recalled", "ob_set_session", "ob_start", "ob_state", "ob_stats",
+  "ob_end", "ob_forget", "ob_recall", "ob_recalled", "ob_set_session", "ob_start", "ob_state",
   "ob_store", "ob_store_chunk", "ob_sync",
 ];
 
@@ -25,7 +26,7 @@ afterAll(() => {
 });
 
 describe("T-295 S1: ob_score and ob_feedback are not MCP tools", () => {
-  it("R1 the server's tools/list is exactly the twelve", async () => {
+  it("R1 the server's tools/list is exactly the ten", async () => {
     const transport = new StdioClientTransport({
       command: join(OB, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx"),
       args: [join(OB, "src", "server.ts")],

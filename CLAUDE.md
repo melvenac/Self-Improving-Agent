@@ -50,7 +50,7 @@ boundary reports are preserved in `docs/loops/sia-mailbox-*.md`.
 
 ## Architecture
 
-- `open-brain/src/` — Unified MCP server (TypeScript), **12 tools**: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_list`, `ob_stats`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync` (T-295 cut `ob_score`, a duplicate of `ob_sync` `score: true`, and `ob_feedback`, whose ratings `ob_end`'s `entry_ratings` records). Single DB (knowledge-v2.db). Project state lives in `.agents/state.json` (written only through `ob_state`; created once by `open-brain state import`); INBOX.md, task.md, next-session.md and SUMMARY.md's marked region are rendered views of it.
+- `open-brain/src/` — Unified MCP server (TypeScript), **10 tools**: `ob_recall`, `ob_recalled`, `ob_store`, `ob_store_chunk`, `ob_forget`, `ob_set_session`, `ob_start`, `ob_state`, `ob_end`, `ob_sync` (T-295 cut `ob_score`, a duplicate of `ob_sync` `score: true`, and `ob_feedback`, whose ratings `ob_end`'s `entry_ratings` records, and moved `ob_list` and `ob_stats` to the CLI as `open-brain list` and `open-brain stats`). Single DB (knowledge-v2.db). Project state lives in `.agents/state.json` (written only through `ob_state`; created once by `open-brain state import`); INBOX.md, task.md, next-session.md and SUMMARY.md's marked region are rendered views of it.
 - `scripts/` — Repo-level utilities: session-bootstrap, setup
 - `project-template/` — Distributable skeleton for new projects (.agents/, .claude/, workflows)
 - `.claude/commands/` — Slash commands: /sync, /start, /end

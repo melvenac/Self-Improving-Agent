@@ -757,11 +757,18 @@
             "eab276869e79e08ca1b94f2f8cc8c0f208ae79b20ccdf106e47988eef75539b7",
             "dd5cf43fb445bca18211c8552ad8ef3b4169820b75041d4f7b7b872429a6581f",
             "edb259d4db7480493fcbccfdb280d2cdda5598477056140b92a2966d2960b82d",
+            "ce3d86b58af408c2695d263fe9a6d9b7e0be5d5c27f82614274d9fa49374f9c8"
+          ]
+        },
+        {
+          "path": "open-brain/src/pipelines/store/knowledge-report.ts",
+          "class": "prose",
+          "why": "T-295 S2 moved ob_stats's body here from server.ts unchanged: the maturity-distribution select reads the retained label, and the census and review-queue comments record what was cut.",
+          "line_hashes": [
             "b47d0b42ce33c91ce7eb934d97d1c8a3db955607db8379c9eceb21bb75962066",
             "baad384a5b88920a7104f225035f95b742c3a64b5e21f9c73432ce91cd8b9771",
             "4ee0e7027bf8d519cadaf4ef159029eb13702cd2970d9a844b730406b3aa23f5",
-            "a24a05991e3204c49fbd18ffb6d001eaa3017bdd2601c0ed5b44191781296f7f",
-            "ce3d86b58af408c2695d263fe9a6d9b7e0be5d5c27f82614274d9fa49374f9c8"
+            "a24a05991e3204c49fbd18ffb6d001eaa3017bdd2601c0ed5b44191781296f7f"
           ]
         },
         {
