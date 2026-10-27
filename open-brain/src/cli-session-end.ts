@@ -40,7 +40,7 @@ import {
 } from "./shared/end-record-guard.js";
 
 import { auditSkills, readShellCommands } from "./pipelines/skills-audit/index.js";
-import { recordGreetingOutcome } from "./pipelines/session-start/greeting-outcome.js";
+import { recordGreetingOutcome, triggerCounts, type TriggerCounts } from "./pipelines/session-start/greeting-outcome.js";
 
 const V2_DB = process.env.KNOWLEDGE_V2_DB || join(homedir(), ".claude", "open-brain", "knowledge-v2.db");
 const V2_VAULT = obsidianVaultDir();
@@ -236,6 +236,27 @@ try {
   console.log(`[session-end] skills-audit check NOT RUN: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`);
 }
 
+// T-324 S3: this session's trigger_fires as counts, or undefined when the store was not read (no DB file, no
+// trigger_fires table, or an unreadable DB): the row then omits `trigger` rather than writing zeros. Read-only; never
+// creates a store. Not-asked fires still waiting in the pending file carry no query and count toward nothing, so
+// running before the T-159 reconcile below changes no count.
+function readTriggerCounts(dbPath: string, sessionUuid: string): TriggerCounts | undefined {
+  if (!existsSync(dbPath)) return undefined;
+  try {
+    const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+    try {
+      const table = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'trigger_fires'").get();
+      if (!table) return undefined;
+      const rows = db.prepare("SELECT state, query FROM trigger_fires WHERE session_uuid = ?").all(sessionUuid) as Array<{ state: string; query: string }>;
+      return triggerCounts(rows);
+    } finally {
+      db.close();
+    }
+  } catch {
+    return undefined;
+  }
+}
+
 // T-324 S2: the outcome of this session's greeting (first action, did it match the pick-up, did ob_end run), for the
 // dashboard scorecard. Append-only; no greeting row for this session writes nothing.
 try {
@@ -249,6 +270,8 @@ try {
       transcriptPath: tp,
       sessionStart: sessionStartFromTranscript(tp),
       ended: Boolean(stamp?.ob_end_at) && id !== "" && stamp?.session === id,
+      sessionUuid: id || undefined,
+      trigger: id !== "" ? readTriggerCounts(V2_DB, id) : undefined,
     });
     if ("written" in r) console.log(`[session-end] greeting outcome: written (match ${r.written.first_action_match}, ended ${r.written.ended})`);
     else if ("skipped" in r) console.log(`[session-end] greeting outcome: none (${r.skipped})`);
