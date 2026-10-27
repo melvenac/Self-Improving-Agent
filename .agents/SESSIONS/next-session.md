@@ -1,23 +1,23 @@
-<!-- generated from .agents/state.json rev 589 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 590 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 174)_
+## planner [sia-planner] _(written session 175)_
 
 ### Pick up here
 
-QA PC queue (atlas-ops `node .../scripts/qapc-job.mjs wait|reply <id>`): SIM #134 sim-t324s1-2 (T-324 S1 round 2: F3 fixture fixed), build #136 t284 (brief docs/loops/t284-brief.md), build #137 t295s1 (docs/loops/t295s1-brief.md). For each READY build: byte-compare.sh <START> <head> docs/loops/<tag> <test>=<dest>, merge-check.sh origin/<branch>, then QA ACCEPT to clark (SG-1). On #134 ALL PASS: write docs/loops/t324s1-brief.md and submit. After merges: T-284 needs `git -C <main> config core.hooksPath .githooks`; T-295 S1 needs ~/.claude and ~/.cursor sync.md re-copied (clark). Next briefs: T-295 S2 (ob_stats/ob_list to CLI), T-324 S2 (outcome row), T-262 part 2, T-241 frogger (QA PC bundle), T-322 (re-key a lesson; then 751 -> MATCH: none).
+Session 175 ran on 'Launch + merge + ask' (D-163/D-164): Atlas merges SIA code on its own QA ACCEPT and rebuilds. Merged this session: #1002 T-284, #1003 T-295 S1, #1009 T-324 S1, #1013 S2, #1014 T-322, #1020 T-295 S2, #1025 S3, #1030 T-162A. Main is built at 3de5cc38. NEXT: (1) T-324 close-out: when the first kind:'outcome' row appears in ~/.claude/open-brain/greeting-metrics.jsonl (0 at 3de5cc38: no seat session has ended since S2), check that it has trigger + session_uuid and tell Prism (T-054/t079 waits on it). (2) T-241 ruling for Aaron (ask directly, AskUserQuestion, recommendation first): is FIXED 13/15 (F11 minor) clean enough to start T-181's foundry/worth-it adoptions? Planner recommends yes, with T-325 as the polish. (3) T-325 bootstrap polish (F11, N1-N6, the lifecycle.ts:52 comment): SIM, then build. (4) T-262: live checks only (the sed > file redirect row; the 20-/end kill rule). (5) openlaser: Beam's lane is live; Aaron still owns the ff-merge of sia/adopt into main and the remote.
 
 ### Watch out
 
-- Hold QA PC submits whenever clark says a runner roll is on; queued jobs survive (the queue is on tcm).
-- A brief that deletes an open-brain/src line: check .agents/retirements.json for its hash first (entry 894).
-- SIM wide runs that include tests/harness red s4-guards D1b on the uncommitted new test (entry 895).
-- Lesson 867 (audit-ignore.txt at the ops root) is tagged clark-ops, so T-313 seat-skips it for Atlas though it applies to every seat.
+- relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how). A fix to the script is an atlas-ops edit; the auto-mode classifier refused an atlas-ops self-edit once (clark edited it on Aaron's word).
+- Dashboard v1.38.1 redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere in replies and briefs.
+- Job client refuses non-ASCII briefs (#1018 -> #1019): keep briefs ASCII.
+- Excluded from Atlas's own merges (D-163/D-164): auth, keys, rate limits, .github/workflows, hook CONFIG (.githooks/, settings hooks), deps, destructive migrations, prod. Hook SOURCE code is not excluded.
 
 ### Open questions
 
-_None._
+- T-241 graded FIXED 13/15 (F11 still present, minor). Start T-181's foundry and worth-it adoptions now, with T-325 as polish? Planner recommends yes.
 
 ### Loop state
 
@@ -25,10 +25,13 @@ _None._
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** _None._
+**Questions pending for Aaron:** 
+- T-241 13/15: start T-181 foundry/worth-it adoptions? (recommend yes)
 
 **Rulings made mid-loop:** 
-- Aaron 10-26 desk: 11 closes, T-295 14->10, T-262 p2 accept all, T-284 uuid hook (key Claude-Session, told), T-241 QA PC bundle, T-181 after T-241, T-261 hold, 751 lookup-only, T-170 path matcher (done #994), scorecard items to Prism (T-054/T-324)
+- Aaron 10-26 (clark popup): Launch + merge + ask -> D-163
+- Aaron 10-26 (Atlas window): hooks exclusion = config only -> D-164
+- Aaron 10-26: 'Beam is fine' (openlaser seat)
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -100,7 +103,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
