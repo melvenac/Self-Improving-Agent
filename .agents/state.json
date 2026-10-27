@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 590,
+  "revision": 591,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2823,15 +2823,15 @@
       "id": "T-325",
       "title": "Bootstrap polish from the T-241 re-run: F11 (name source not printed) and N1-N6 in docs/loops/t241-frogger-rerun-report.md",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 175,
-      "closed_session": null,
+      "closed_session": 175,
       "supersedes": null,
-      "note": "s175 10-26 from job #194. F11: the state import draft prints the project name without its source when it comes from package.json (cli.ts:585 states the source only for the folder-name case). N1-N6 as listed in the report. All are wording or ordering problems; none blocked the bootstrap. — Also carry the T-295 leftover: the open-brain/src/lifecycle.ts:52 comment still names ob_list (now `open-brain list`). PRD.md/TESTING.md were fixed in #1024.",
+      "note": "s175 10-26 from job #194. F11: the state import draft prints the project name without its source when it comes from package.json (cli.ts:585 states the source only for the folder-name case). N1-N6 as listed in the report. All are wording or ordering problems; none blocked the bootstrap. — Also carry the T-295 leftover: the open-brain/src/lifecycle.ts:52 comment still names ob_list (now `open-brain list`). PRD.md/TESTING.md were fixed in #1024. — s175 10-26 DONE (scope: F11, N1, N2, N3, N5, N6 and the lifecycle.ts comment; N4 DEFERRED as a design question, since a fresh /start's legacy handoff, READS OWED for AGENT.md and seat-as-folder-name each live in a different renderer; N7 and N8 were run artifacts). SIM docs/loops/t325-sim.md (#1032), job #208 ALL PASS; brief #1033; build #211 READY PR #1034; byte-compare 6/6 SAME vs START 7930d90f; merge-check CLEAN; head unchanged (patch-id 4c8da419); merged by Atlas (D-163) as 56e2c065; sia-rebuild. Live on a real draft (the openlaser rehearsal clone): 'Project: openlaser (from package.json)' and the 'could not tell is expected' hint print. Desktop ~/.claude/commands/bootstrap.md re-copied (sha ad5cce8a); QA PC copy asked of clark.",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
-      "closed_rev": null
+      "closed_rev": 591
     }
   ],
   "verified": [
@@ -6973,7 +6973,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 590
+      "last_work_rev": 591
     }
   ]
 }
