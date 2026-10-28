@@ -104,8 +104,8 @@ describe("server handlers", () => {
         proveOwn("t230-uuid");
         await handleSetSession({ session_id: "t230-uuid", project_dir: tmp });
         const text = getText(await handleStart({ project_root: tmp }));
-        expect(text).toContain("\nSession logs unreadable: 0\n");
-        expect(text).toContain("\nTranscript directories unreadable: 0\n");
+        expect(text).toContain("\nSession logs: all readable\n");
+        expect(text).toContain("\nTranscript directories: all readable\n");
       } finally {
         for (const [k, v] of Object.entries(saved)) {
           if (v === undefined) delete process.env[k];

@@ -54,7 +54,7 @@ describe("T-048 round 2: zero is printed, and 'did not look' is a different line
   });
 
   it("DC-4z/DC-5z: the ob_start lines say a number at zero and 'not searched/not scanned' when the scan did not run", () => {
-    expect(formatScanCounts({ unreadableLogs: 0 }, { transcriptDirsUnreadable: 0 })).toEqual(["Session logs unreadable: 0", "Transcript directories unreadable: 0"]);
+    expect(formatScanCounts({ unreadableLogs: 0 }, { transcriptDirsUnreadable: 0 })).toEqual(["Session logs: all readable", "Transcript directories: all readable"]);
     expect(formatScanCounts({ unreadableLogs: 2 }, { transcriptDirsUnreadable: 3 })).toEqual(["Session logs unreadable: 2", "Transcript directories unreadable: 3"]);
     const none = formatScanCounts({}, { transcriptDirsUnreadable: null });
     expect(none[0]).toContain("not searched");

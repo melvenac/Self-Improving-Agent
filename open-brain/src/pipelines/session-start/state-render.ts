@@ -244,7 +244,9 @@ function renderHandoffs(state: State, options: RenderStateOptions): string[] {
     );
   }
 
-  if (own) {
+  if (own && isEmptyImportedHandoff(own)) {
+    lines.push(`\nYour handoff: none yet (fresh record)`);
+  } else if (own) {
     lines.push(`\nYour handoff — ${own.seat}${instanceLabel(own, byCheckout)}, session ${own.session}:`);
     lines.push(...renderOneHandoff(own));
   }
@@ -318,6 +320,22 @@ export function checkMissingHandoff(state: State, options: MissingHandoffOptions
 export function missingHandoffLine(state: State, options: MissingHandoffOptions): string | null {
   const c = checkMissingHandoff(state, options);
   return c.kind === "missing" ? c.line : c.kind === "not-checked" ? `Handoff check: not checked (${c.reason})` : null;
+}
+
+/**
+ * T-329 (N4): the empty handoff a fresh `state import` carries (importHandoff: no checkout, nothing to pick up, watch or
+ * ask; a planner's loop_state all empty). It is rendered as one "none yet" line, not an empty `pick up:` under a
+ * [legacy] header that reads like a fault. A legacy entry with any content renders as before.
+ */
+function isEmptyImportedHandoff(h: Handoff): boolean {
+  const ls = h.loop_state;
+  return (
+    h.checkout === null &&
+    h.pick_up.trim() === "" &&
+    h.watch_out.length === 0 &&
+    h.open_questions.length === 0 &&
+    (ls === null || (ls.open_prs.length === 0 && ls.frozen_sha === null && ls.questions_for_aaron.length === 0 && ls.rulings.length === 0))
+  );
 }
 
 /**
