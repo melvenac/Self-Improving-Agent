@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 603,
+  "revision": 604,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2876,6 +2876,20 @@
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": 601
+    },
+    {
+      "id": "T-329",
+      "title": "Fresh /start reads like faults (T-241 report N4): neutral scan-count wording, empty legacy handoff as 'none yet', READS FIRST on a checkout's first session",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 175,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s175 10-28, from T-325's deferred N4 (docs/loops/t241-frogger-rerun-report.md:50). Planner rulings: (1) scan-counts.ts: zero counts read 'all readable', not-searched reads 'not searched yet (<reason>)'; no line dropped, nonzero unchanged. (2) state-render.ts: a [legacy] handoff with empty pick_up renders 'Your handoff: none yet (fresh record)'; one with content unchanged. (3) reads-owed.ts: label READS FIRST when the checkout has no earlier session row (fresh import writes checkout null, state-import/index.ts:886); unknown session/checkout stays READS OWED. (4) seat-as-folder-name: no change (correct fallback). No greeting-metrics alarm keys on these strings. Out of scope: the briefing's PICK UP HERE line for the same empty handoff. SIM docs/loops/t329-sim.md (#1057, 11f3c839): 15 edits in 7 files incl. existing tests t048-zero-case, server.test, briefing-fix BF-R4/R5, g062-reads-owed O1/O2/O5; rows F1-F5, mutants m1-m3. SIM job #320.",
+      "note_by": [
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -7016,7 +7030,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 603
+      "last_work_rev": 604
     }
   ]
 }
