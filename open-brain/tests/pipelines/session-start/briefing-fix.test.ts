@@ -247,7 +247,7 @@ describe("BF-R: READS OWED", () => {
     ];
     const state = stateWithSessions([], handoffs);
     const line = describeReadsOwed(root, state, 1, "developer", "sia-forge");
-    expect(line).toMatch(/READS OWED \(8\):/);
+    expect(line).toMatch(/READS FIRST \(8\):/);
     expect(line).toContain(" · +2 more");
     expect(line.split(" · ").length).toBeLessThanOrEqual(7);
   });
@@ -263,7 +263,7 @@ describe("BF-R: READS OWED", () => {
     gitAt(root, "2026-10-01T12:00:00", "commit", "-q", "-m", "seed");
     const state = stateWithSessions([]);
     const line = describeReadsOwed(root, state, 5, "developer", "sia-forge");
-    expect(line).toMatch(/^READS OWED \(\d+\): /);
+    expect(line).toMatch(/^READS FIRST \(\d+\): /);
     expect(line).toContain("docs/loop-7-brief.md");
   });
 });

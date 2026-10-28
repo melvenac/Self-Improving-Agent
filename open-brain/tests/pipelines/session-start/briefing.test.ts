@@ -474,7 +474,8 @@ describe("ob_start carries the same block, and every /start copy prints it verba
         date: new Date().toISOString().slice(0, 10),
         usage: describeUsage(root, process.env, startNow),
         latestBrief: "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
-        readsOwed: describeReadsOwed(root, parsed.data, n, "developer", "x"),
+        // T-329: the checkout handleStart passes for this fixture (no handoff_by_checkout flag, a developer seat) is null.
+        readsOwed: describeReadsOwed(root, parsed.data, n, "developer", null),
         fleet: describeFleet(root, parsed.data.project.name, process.env, startNow),
         // T-297 step 3: ob_start names its own new log on the Working tree line, so the expectation does too.
         workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${n}.md`)),
@@ -594,7 +595,7 @@ describe("ob_start carries the same block, and every /start copy prints it verba
             date: new Date().toISOString().slice(0, 10),
             usage: describeUsage(root, process.env, startNow),
             latestBrief: "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
-            readsOwed: describeReadsOwed(root, parsed.data, sessionNumber, "developer", "x"),
+            readsOwed: describeReadsOwed(root, parsed.data, sessionNumber, "developer", null),
             fleet: describeFleet(root, parsed.data.project.name, process.env, startNow),
             workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${sessionNumber}.md`)),
             skills: describeSkills(root),

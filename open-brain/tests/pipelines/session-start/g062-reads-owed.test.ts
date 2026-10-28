@@ -64,9 +64,9 @@ describe("G-062 (a): describeReadsOwed leaves out a file this seat wrote", () =>
     const root = repo();
     const state = bare([]);
     const line = describeReadsOwed(root, state, 5, "planner", "sia-planner", ["MINE1"]);
-    expect(line).toBe("READS OWED (1): .agents/AGENT.md");
-    expect(describeReadsOwed(root, state, 5, "planner", "sia-planner")).toBe("READS OWED (2): docs/loops/x-brief.md · .agents/AGENT.md");
-    expect(describeReadsOwed(root, state, 5, "planner", "sia-planner", [])).toBe("READS OWED (2): docs/loops/x-brief.md · .agents/AGENT.md");
+    expect(line).toBe("READS FIRST (1): .agents/AGENT.md");
+    expect(describeReadsOwed(root, state, 5, "planner", "sia-planner")).toBe("READS FIRST (2): docs/loops/x-brief.md · .agents/AGENT.md");
+    expect(describeReadsOwed(root, state, 5, "planner", "sia-planner", [])).toBe("READS FIRST (2): docs/loops/x-brief.md · .agents/AGENT.md");
   });
 
   it("O2: every listed file own is `none` with the count; a later commit by another seat makes the brief owed again", () => {
@@ -74,7 +74,7 @@ describe("G-062 (a): describeReadsOwed leaves out a file this seat wrote", () =>
     const state = bare([]);
     expect(describeReadsOwed(root, state, 5, "planner", "sia-planner", ["MINE1", "THEIRS"])).toBe("READS OWED: none (2 written by this seat)");
     commit(root, "docs/loops/x-brief.md", "# brief, amended\n", "https://claude.ai/code/session_THEIRS");
-    expect(describeReadsOwed(root, state, 5, "planner", "sia-planner", ["MINE1"])).toBe("READS OWED (2): docs/loops/x-brief.md · .agents/AGENT.md");
+    expect(describeReadsOwed(root, state, 5, "planner", "sia-planner", ["MINE1"])).toBe("READS FIRST (2): docs/loops/x-brief.md · .agents/AGENT.md");
   });
 });
 
@@ -121,7 +121,7 @@ describe("G-062 (a): renderStartReport", { timeout: 120_000 }, () => {
     commit(dir, "docs/loops/g062-brief.md", "# brief\n", "https://claude.ai/code/session_SELFBRIDGE");
     return dir;
   }
-  const readsOwedLine = (text: string): string | undefined => text.split("\n").find((l) => l.startsWith("READS OWED"));
+  const readsOwedLine = (text: string): string | undefined => text.split("\n").find((l) => /^READS (OWED|FIRST)/.test(l));
 
   it("O5: opted in, the brief this session committed is not owed; not opted in, it is listed as before", async () => {
     const cur = transcript(tmp("g062-cur-"), `${SELF}.jsonl`, "SELFBRIDGE");

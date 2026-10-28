@@ -102,6 +102,9 @@ export function describeReadsOwed(
   ownIds: readonly string[] = [],
 ): string {
   const prevDate = prevSessionDate(state, sessionNumber, checkout);
+  // T-329 (N4): no earlier session of this checkout in the record (a fresh import writes its row with no checkout), so the
+  // list is a first reading, not a debt. An unknown session number or checkout is not a first session.
+  const firstSession = sessionNumber !== null && checkout != null && prevDate === null;
   const paths: string[] = [];
   const seen = new Set<string>();
   const own = ownIds.filter((id) => id !== "");
@@ -141,5 +144,5 @@ export function describeReadsOwed(
   const shown = paths.slice(0, 6);
   const rest = paths.length - shown.length;
   const tail = rest > 0 ? ` · +${rest} more` : "";
-  return `READS OWED (${paths.length}): ${shown.join(" · ")}${tail}`;
+  return `${firstSession ? "READS FIRST" : "READS OWED"} (${paths.length}): ${shown.join(" · ")}${tail}`;
 }
