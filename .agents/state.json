@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 605,
+  "revision": 607,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2346,10 +2346,11 @@
       "opened_session": 171,
       "closed_session": null,
       "supersedes": null,
-      "note": "s171: seen once, CI run 38613905579 on records PR #743 (records-only): 290 files / 3501 tests passed, then 'Error: [vitest-worker]: Timeout calling \"onTaskUpdate\"' failed the job; the run took 8m39s against about 4m usually, so the runner was slow. A rerun of the failed job was green. Watch for a second sighting before briefing anything; a candidate is vitest's RPC/teardown timeout config, but nothing is ruled. — s174 10-24 AUDIT: the second sighting has happened, more than once, all on the QA PC under load: T315-S1 round 1 (0ca53ec5, BLOCKED on 2 unrelated tests, each green alone) and T-320 build job #80 (wide run red twice in state-writer only beside the onTaskUpdate timeout, 52/52 alone). Every brief since carries a re-run-alone exception for it. Not fixed: no vitest RPC/teardown config change has shipped.",
+      "note": "s171: seen once, CI run 38613905579 on records PR #743 (records-only): 290 files / 3501 tests passed, then 'Error: [vitest-worker]: Timeout calling \"onTaskUpdate\"' failed the job; the run took 8m39s against about 4m usually, so the runner was slow. A rerun of the failed job was green. Watch for a second sighting before briefing anything; a candidate is vitest's RPC/teardown timeout config, but nothing is ruled. — s174 10-24 AUDIT: the second sighting has happened, more than once, all on the QA PC under load: T315-S1 round 1 (0ca53ec5, BLOCKED on 2 unrelated tests, each green alone) and T-320 build job #80 (wide run red twice in state-writer only beside the onTaskUpdate timeout, 52/52 alone). Every brief since carries a re-run-alone exception for it. Not fixed: no vitest RPC/teardown config change has shipped. — s175 10-28: more sightings: SIM #296 (latest-brief.test.ts hook timeout beside onTaskUpdate, 3/3 alone) and build #322 (wide run 1785/1785 green, 'Errors 1 error' onTaskUpdate, vitest exit 1). Related but different signature: CI on records PR #1055, server.test.ts handleSync timed out at 5221 ms of the 5000 ms default (rerun green). READ (vitest 3.2.4 in main node_modules): the worker error comes from dist/chunks/rpc.-pEldfrD.js createRuntimeRpc -> createBirpc with no timeout option, so birpc's internal default applies; vitest.config exposes NO knob for it. So the 'RPC/teardown timeout config' candidate in the s171 note does not exist in this version. Remaining levers, none in SIA source: (a) a vitest upgrade (deps: SG-1 exclusion, Aaron); (b) lower QA PC runner concurrency (3 since 10-27) during wide runs (clark's call); (c) keep the per-brief re-run-alone exception (current practice, costs nothing). Planner recommends (c) plus (b) only if sightings rise; stays P3. For the handleSync row: a per-test timeout on that one row is a cheap SIA-side fix if it recurs.",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916",
-        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b",
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": null
     },
@@ -6886,13 +6887,14 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 175 (10-28): T-328 shipped (#1053 -> a3da1fdc, main rebuilt, live check passed). Since the last handoff also merged: #1034 T-325, #1044 T-327, #1045 T-326; SessionEnd timeout 60 is live (Relay s47 outcome row). Adoptions: openlaser (Beam), foundry (Anvil, 7dc7f89 on sia/adopt, not yet on main), worth-it (Pane, on master 94e786e). NEXT: (1) foundry merge once Aaron picks PR vs rebase (planner recommends a PR); (2) T-262 (a): find a session whose /end skills audit shows a `sed ... > f` redirect row, then close; (3) P2 backlog.",
+      "pick_up": "Session 175 (10-28): shipped T-328 (a3da1fdc) and T-329 (4c439e84), both QA-ACCEPTed by Atlas under D-163, main rebuilt, live-checked. Closed T-262 (redirect row seen live in clark's audit). T-292 researched: vitest 3.2.4 has no RPC timeout knob; keep the re-run-alone exception. Clark retired the tcm hub-deploy notice to Atlas (Aaron 10-28). NEXT: (1) foundry merge once Aaron picks PR vs rebase; (2) backlog is thin: P2 T-191 (deferred behind the D-110 shared.md split) and T-046 (upstream Cursor); P3s T-284, T-312, T-320 (waits on PID 23584 /mcp reconnect), T-303, T-321, T-261. Ask clark/Aaron for the next SIA thread rather than inventing one.",
       "watch_out": [
         "relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how).",
         "Dashboard v1.38.1+ redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere.",
         "Job client refuses non-ASCII briefs: keep briefs ASCII.",
         "qapc-job.mjs submit fails 'CHECK sha failed' when this checkout has not fetched the sha: git fetch first.",
-        "install-commands refuses on any dirty or untracked file in the target project: set it aside, run, restore and verify by hash."
+        "byte-compare.sh EDITS env takes a file name inside the loop dir (EDITS=edits-r2.txt), not a repo path.",
+        "A fork that writes docs/loops files in this worktree blocks tree-sync until it lands them: hold record writes until the fork returns."
       ],
       "open_questions": [
         {
@@ -6908,13 +6910,15 @@
           "Foundry sia/adopt: PR or rebase? (planner recommends a PR)"
         ],
         "rulings": [
-          "T-328 QA ACCEPT and merge #1053 -> a3da1fdc under D-163"
+          "T-328 merged a3da1fdc",
+          "T-329 merged 4c439e84",
+          "T-262 closed on live audit row"
         ]
       },
       "session_uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "written_rev": 602
+      "written_rev": 607
     }
   ],
   "sessions": [
@@ -7030,7 +7034,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 605
+      "last_work_rev": 606
     }
   ]
 }
