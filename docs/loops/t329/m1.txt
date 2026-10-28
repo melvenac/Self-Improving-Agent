@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/scan-counts.ts
+<<<
+      : session.unreadableLogs === 0
+===
+      : session.unreadableLogs === -1
+>>>

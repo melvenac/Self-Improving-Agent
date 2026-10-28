@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  const firstSession = sessionNumber !== null && checkout != null && prevDate === null;
+===
+  const firstSession = prevDate === null;
+>>>

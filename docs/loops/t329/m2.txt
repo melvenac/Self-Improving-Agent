@@ -1,0 +1,7 @@
+@@@ open-brain/src/pipelines/session-start/state-render.ts
+<<<
+    h.pick_up.trim() === "" &&
+    h.watch_out.length === 0 &&
+===
+    h.watch_out.length === 0 &&
+>>>
