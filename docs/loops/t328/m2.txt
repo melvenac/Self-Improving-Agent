@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+    if (l.slice(1).replace(/^\//, "").startsWith(".agents")) continue;
+===
+    if (l.slice(1).replace(/^\//, "").startsWith(".agents-never")) continue;
+>>>
