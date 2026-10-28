@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 601 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 602 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,20 +6,19 @@
 
 ### Pick up here
 
-Session 175, cont. (10-27): merged under D-163/D-164 since the last handoff: #1034 T-325, #1044 T-327, #1045 T-326 code half. Main is built at b613feac. Closed: T-162, T-295, T-313, T-322, T-323, T-325, T-327. NEXT: (1) the first real kind:'outcome' row in ~/.claude/open-brain/greeting-metrics.jsonl (any desktop session that ends from now on; the T-326 reorder writes it at 0.41 s) -> check trigger + session_uuid, ping Prism, close T-324. (2) Ask Aaron directly: add "timeout": 60 to the SessionEnd hook entry in ~/.claude/settings.json (T-326; recommend yes); then verify that a real end prints the handoff and work-after-end check lines. (3) Ask Aaron: T-241 13/15 -> start T-181's foundry/worth-it adoptions (recommend yes). (4) T-262 live checks; T-320 closes once clark stops PID 23584 after Aaron reconnects open-brain in Prism's window.
+Session 175 (10-28): T-328 shipped (#1053 -> a3da1fdc, main rebuilt, live check passed). Since the last handoff also merged: #1034 T-325, #1044 T-327, #1045 T-326; SessionEnd timeout 60 is live (Relay s47 outcome row). Adoptions: openlaser (Beam), foundry (Anvil, 7dc7f89 on sia/adopt, not yet on main), worth-it (Pane, on master 94e786e). NEXT: (1) foundry merge once Aaron picks PR vs rebase (planner recommends a PR); (2) T-262 (a): find a session whose /end skills audit shows a `sed ... > f` redirect row, then close; (3) P2 backlog.
 
 ### Watch out
 
 - relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how).
 - Dashboard v1.38.1+ redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere.
 - Job client refuses non-ASCII briefs: keep briefs ASCII.
-- Excluded from Atlas's own merges (D-163/D-164): auth, keys, rate limits, .github/workflows, hook CONFIG (.githooks/, settings hooks), deps, destructive migrations, prod. Hook SOURCE code is not excluded.
-- SessionEnd hooks get 1.5 s unless the hook sets a timeout (code.claude.com/docs/en/hooks): anything a SessionEnd step must do goes before the slow git checks.
+- qapc-job.mjs submit fails 'CHECK sha failed' when this checkout has not fetched the sha: git fetch first.
+- install-commands refuses on any dirty or untracked file in the target project: set it aside, run, restore and verify by hash.
 
 ### Open questions
 
-- Add "timeout": 60 to the SessionEnd hook in ~/.claude/settings.json so the T-163 checks can finish (T-326)? Planner recommends yes.
-- T-241 graded FIXED 13/15 (F11 now fixed by T-325). Start T-181's foundry and worth-it adoptions? Planner recommends yes.
+- Foundry's sia/adopt (7dc7f89) is not a fast-forward of origin/main (7 new commits). Land it as a PR or rebase it? Planner recommends a PR.
 
 ### Loop state
 
@@ -28,12 +27,10 @@ Session 175, cont. (10-27): merged under D-163/D-164 since the last handoff: #10
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- SessionEnd hook timeout 60 (T-326)
-- T-181 adoptions after T-241 13/15
+- Foundry sia/adopt: PR or rebase? (planner recommends a PR)
 
 **Rulings made mid-loop:** 
-- Aaron 10-26 (clark popup): Launch + merge + ask -> D-163
-- Aaron 10-26 (Atlas window): hooks exclusion = config only -> D-164
+- T-328 QA ACCEPT and merge #1053 -> a3da1fdc under D-163
 
 ## developer [sia-builder] _(written session 156)_
 

@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 601 by open-brain v0.45.0 — do not edit; change state via ob_state -->
-> **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-27; the greeting-scorecard thread T-298/T-299/T-324/T-327 is shipped): T-326, SessionEnd's fast work inside Claude Code's 1.5 s budget, so outcome rows reach Prism's scorecard (the code half is in build; the settings timeout is Aaron's); then T-181's adoptions on Aaron's T-241 ruling.
+<!-- generated from .agents/state.json rev 602 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+> **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-28): adoption (T-181). openlaser, foundry and worth-it are on SIA; T-328 (env-template gitignore exceptions) shipped a3da1fdc. Open: foundry's sia/adopt merge (PR vs rebase, Aaron); T-262 live check (a); then P2 by priority (T-241 report's N4 design, T-191, T-046).
 
 ## What's working
 
