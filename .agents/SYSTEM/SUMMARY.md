@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 603 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 604 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-28): adoption (T-181). openlaser, foundry and worth-it are on SIA; T-328 (env-template gitignore exceptions) shipped a3da1fdc. Open: foundry's sia/adopt merge (PR vs rebase, Aaron); T-262 live check (a); then P2 by priority (T-241 report's N4 design, T-191, T-046).
 
 ## What's working
@@ -183,7 +183,7 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - [P2] T-046 Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [P2] T-191 Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [P2] T-241 Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
-- [P3] T-261 Physically split core and memory into separate packages (after T-154; D-151)
+- [P2] T-329 Fresh /start reads like faults (T-241 report N4): neutral scan-count wording, empty legacy handoff as 'none yet', READS FIRST on a checkout's first session
 
 ## Decisions
 
