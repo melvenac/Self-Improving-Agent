@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+    const keep = m.path === ".gitignore" ? ownerNegationsToReapply(existing) : [];
+===
+    const keep: string[] = m.path === ".gitignore" ? [] : [];
+>>>
