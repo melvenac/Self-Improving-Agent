@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "revision": 601,
+  "revision": 602,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-27; the greeting-scorecard thread T-298/T-299/T-324/T-327 is shipped): T-326, SessionEnd's fast work inside Claude Code's 1.5 s budget, so outcome rows reach Prism's scorecard (the code half is in build; the settings timeout is Aaron's); then T-181's adoptions on Aaron's T-241 ruling.",
+    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-28): adoption (T-181). openlaser, foundry and worth-it are on SIA; T-328 (env-template gitignore exceptions) shipped a3da1fdc. Open: foundry's sia/adopt merge (PR vs rebase, Aaron); T-262 live check (a); then P2 by priority (T-241 report's N4 design, T-191, T-046).",
     "since_session": 175
   },
   "tasks": [
@@ -6872,22 +6872,18 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 175, cont. (10-27): merged under D-163/D-164 since the last handoff: #1034 T-325, #1044 T-327, #1045 T-326 code half. Main is built at b613feac. Closed: T-162, T-295, T-313, T-322, T-323, T-325, T-327. NEXT: (1) the first real kind:'outcome' row in ~/.claude/open-brain/greeting-metrics.jsonl (any desktop session that ends from now on; the T-326 reorder writes it at 0.41 s) -> check trigger + session_uuid, ping Prism, close T-324. (2) Ask Aaron directly: add \"timeout\": 60 to the SessionEnd hook entry in ~/.claude/settings.json (T-326; recommend yes); then verify that a real end prints the handoff and work-after-end check lines. (3) Ask Aaron: T-241 13/15 -> start T-181's foundry/worth-it adoptions (recommend yes). (4) T-262 live checks; T-320 closes once clark stops PID 23584 after Aaron reconnects open-brain in Prism's window.",
+      "pick_up": "Session 175 (10-28): T-328 shipped (#1053 -> a3da1fdc, main rebuilt, live check passed). Since the last handoff also merged: #1034 T-325, #1044 T-327, #1045 T-326; SessionEnd timeout 60 is live (Relay s47 outcome row). Adoptions: openlaser (Beam), foundry (Anvil, 7dc7f89 on sia/adopt, not yet on main), worth-it (Pane, on master 94e786e). NEXT: (1) foundry merge once Aaron picks PR vs rebase (planner recommends a PR); (2) T-262 (a): find a session whose /end skills audit shows a `sed ... > f` redirect row, then close; (3) P2 backlog.",
       "watch_out": [
         "relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how).",
         "Dashboard v1.38.1+ redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere.",
         "Job client refuses non-ASCII briefs: keep briefs ASCII.",
-        "Excluded from Atlas's own merges (D-163/D-164): auth, keys, rate limits, .github/workflows, hook CONFIG (.githooks/, settings hooks), deps, destructive migrations, prod. Hook SOURCE code is not excluded.",
-        "SessionEnd hooks get 1.5 s unless the hook sets a timeout (code.claude.com/docs/en/hooks): anything a SessionEnd step must do goes before the slow git checks."
+        "qapc-job.mjs submit fails 'CHECK sha failed' when this checkout has not fetched the sha: git fetch first.",
+        "install-commands refuses on any dirty or untracked file in the target project: set it aside, run, restore and verify by hash."
       ],
       "open_questions": [
         {
           "owner": "aaron",
-          "text": "Add \"timeout\": 60 to the SessionEnd hook in ~/.claude/settings.json so the T-163 checks can finish (T-326)? Planner recommends yes."
-        },
-        {
-          "owner": "aaron",
-          "text": "T-241 graded FIXED 13/15 (F11 now fixed by T-325). Start T-181's foundry and worth-it adoptions? Planner recommends yes."
+          "text": "Foundry's sia/adopt (7dc7f89) is not a fast-forward of origin/main (7 new commits). Land it as a PR or rebase it? Planner recommends a PR."
         }
       ],
       "session": 175,
@@ -6895,18 +6891,16 @@
         "open_prs": [],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "SessionEnd hook timeout 60 (T-326)",
-          "T-181 adoptions after T-241 13/15"
+          "Foundry sia/adopt: PR or rebase? (planner recommends a PR)"
         ],
         "rulings": [
-          "Aaron 10-26 (clark popup): Launch + merge + ask -> D-163",
-          "Aaron 10-26 (Atlas window): hooks exclusion = config only -> D-164"
+          "T-328 QA ACCEPT and merge #1053 -> a3da1fdc under D-163"
         ]
       },
       "session_uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "written_rev": 597
+      "written_rev": 602
     }
   ],
   "sessions": [
@@ -7022,7 +7016,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 601
+      "last_work_rev": 602
     }
   ]
 }
