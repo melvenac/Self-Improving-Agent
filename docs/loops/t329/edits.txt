@@ -1,0 +1,134 @@
+@@@ open-brain/src/pipelines/session-start/scan-counts.ts
+<<<
+ * Each line says a number, or says the scan did not run and why.
+ */
+===
+ * Each line says a number, or says the scan did not run and why.
+ *
+ * T-329 (N4): zero reads `all readable`, and a scan that did not run reads `not searched yet` / `not scanned yet` with its
+ * reason, so a clean fresh install prints no fault-shaped line. Both lines stay printed; a count above zero is unchanged.
+ */
+>>>
+@@@ open-brain/src/pipelines/session-start/scan-counts.ts
+<<<
+    session.unreadableLogs === undefined
+      ? "Session logs unreadable: not searched (no session id, or no .agents/SESSIONS directory)"
+      : `Session logs unreadable: ${session.unreadableLogs}`,
+    health.transcriptDirsUnreadable === null || health.transcriptDirsUnreadable === undefined
+      ? "Transcript directories unreadable: not scanned (no ~/.claude/projects directory)"
+      : `Transcript directories unreadable: ${health.transcriptDirsUnreadable}`,
+===
+    session.unreadableLogs === undefined
+      ? "Session logs: not searched yet (no session id, or no .agents/SESSIONS directory)"
+      : session.unreadableLogs === 0
+        ? "Session logs: all readable"
+        : `Session logs unreadable: ${session.unreadableLogs}`,
+    health.transcriptDirsUnreadable === null || health.transcriptDirsUnreadable === undefined
+      ? "Transcript directories: not scanned yet (no ~/.claude/projects directory)"
+      : health.transcriptDirsUnreadable === 0
+        ? "Transcript directories: all readable"
+        : `Transcript directories unreadable: ${health.transcriptDirsUnreadable}`,
+>>>
+@@@ open-brain/src/pipelines/session-start/state-render.ts
+<<<
+  if (own) {
+===
+  if (own && isEmptyImportedHandoff(own)) {
+    lines.push(`\nYour handoff: none yet (fresh record)`);
+  } else if (own) {
+>>>
+@@@ open-brain/src/pipelines/session-start/state-render.ts
+<<<
+/**
+ * ` [sia-builder]`, or ` [legacy]` for an entry migrated from v2
+===
+/**
+ * T-329 (N4): the empty handoff a fresh `state import` carries (importHandoff: no checkout, nothing to pick up, watch or
+ * ask; a planner's loop_state all empty). It is rendered as one "none yet" line, not an empty `pick up:` under a
+ * [legacy] header that reads like a fault. A legacy entry with any content renders as before.
+ */
+function isEmptyImportedHandoff(h: Handoff): boolean {
+  const ls = h.loop_state;
+  return (
+    h.checkout === null &&
+    h.pick_up.trim() === "" &&
+    h.watch_out.length === 0 &&
+    h.open_questions.length === 0 &&
+    (ls === null || (ls.open_prs.length === 0 && ls.frozen_sha === null && ls.questions_for_aaron.length === 0 && ls.rulings.length === 0))
+  );
+}
+
+/**
+ * ` [sia-builder]`, or ` [legacy]` for an entry migrated from v2
+>>>
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  const prevDate = prevSessionDate(state, sessionNumber, checkout);
+===
+  const prevDate = prevSessionDate(state, sessionNumber, checkout);
+  // T-329 (N4): no earlier session of this checkout in the record (a fresh import writes its row with no checkout), so the
+  // list is a first reading, not a debt. An unknown session number or checkout is not a first session.
+  const firstSession = sessionNumber !== null && checkout != null && prevDate === null;
+>>>
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  return `READS OWED (${paths.length}):
+===
+  return `${firstSession ? "READS FIRST" : "READS OWED"} (${paths.length}):
+>>>
+@@@ open-brain/tests/t048-zero-case.test.ts
+<<<
+    expect(formatScanCounts({ unreadableLogs: 0 }, { transcriptDirsUnreadable: 0 })).toEqual(["Session logs unreadable: 0", "Transcript directories unreadable: 0"]);
+===
+    expect(formatScanCounts({ unreadableLogs: 0 }, { transcriptDirsUnreadable: 0 })).toEqual(["Session logs: all readable", "Transcript directories: all readable"]);
+>>>
+@@@ open-brain/tests/server.test.ts
+<<<
+        expect(text).toContain("\nSession logs unreadable: 0\n");
+        expect(text).toContain("\nTranscript directories unreadable: 0\n");
+===
+        expect(text).toContain("\nSession logs: all readable\n");
+        expect(text).toContain("\nTranscript directories: all readable\n");
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-fix.test.ts
+<<<
+    expect(line).toMatch(/READS OWED \(8\):/);
+===
+    expect(line).toMatch(/READS FIRST \(8\):/);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-fix.test.ts
+<<<
+    expect(line).toMatch(/^READS OWED \(\d+\): /);
+===
+    expect(line).toMatch(/^READS FIRST \(\d+\): /);
+>>>
+@@@ open-brain/tests/pipelines/session-start/g062-reads-owed.test.ts
+<<<
+    expect(line).toBe("READS OWED (1): .agents/AGENT.md");
+===
+    expect(line).toBe("READS FIRST (1): .agents/AGENT.md");
+>>>
+@@@ open-brain/tests/pipelines/session-start/g062-reads-owed.test.ts
+<<<
+"sia-planner")).toBe("READS OWED (2)
+===
+"sia-planner")).toBe("READS FIRST (2)
+>>>
+@@@ open-brain/tests/pipelines/session-start/g062-reads-owed.test.ts
+<<<
+"sia-planner", [])).toBe("READS OWED (2)
+===
+"sia-planner", [])).toBe("READS FIRST (2)
+>>>
+@@@ open-brain/tests/pipelines/session-start/g062-reads-owed.test.ts
+<<<
+"sia-planner", ["MINE1"])).toBe("READS OWED (2)
+===
+"sia-planner", ["MINE1"])).toBe("READS FIRST (2)
+>>>
+@@@ open-brain/tests/pipelines/session-start/g062-reads-owed.test.ts
+<<<
+text.split("\n").find((l) => l.startsWith("READS OWED"));
+===
+text.split("\n").find((l) => /^READS (OWED|FIRST)/.test(l));
+>>>
