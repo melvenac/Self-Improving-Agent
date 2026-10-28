@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 605 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 607 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-Session 175 (10-28): T-328 shipped (#1053 -> a3da1fdc, main rebuilt, live check passed). Since the last handoff also merged: #1034 T-325, #1044 T-327, #1045 T-326; SessionEnd timeout 60 is live (Relay s47 outcome row). Adoptions: openlaser (Beam), foundry (Anvil, 7dc7f89 on sia/adopt, not yet on main), worth-it (Pane, on master 94e786e). NEXT: (1) foundry merge once Aaron picks PR vs rebase (planner recommends a PR); (2) T-262 (a): find a session whose /end skills audit shows a `sed ... > f` redirect row, then close; (3) P2 backlog.
+Session 175 (10-28): shipped T-328 (a3da1fdc) and T-329 (4c439e84), both QA-ACCEPTed by Atlas under D-163, main rebuilt, live-checked. Closed T-262 (redirect row seen live in clark's audit). T-292 researched: vitest 3.2.4 has no RPC timeout knob; keep the re-run-alone exception. Clark retired the tcm hub-deploy notice to Atlas (Aaron 10-28). NEXT: (1) foundry merge once Aaron picks PR vs rebase; (2) backlog is thin: P2 T-191 (deferred behind the D-110 shared.md split) and T-046 (upstream Cursor); P3s T-284, T-312, T-320 (waits on PID 23584 /mcp reconnect), T-303, T-321, T-261. Ask clark/Aaron for the next SIA thread rather than inventing one.
 
 ### Watch out
 
@@ -14,7 +14,8 @@ Session 175 (10-28): T-328 shipped (#1053 -> a3da1fdc, main rebuilt, live check 
 - Dashboard v1.38.1+ redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere.
 - Job client refuses non-ASCII briefs: keep briefs ASCII.
 - qapc-job.mjs submit fails 'CHECK sha failed' when this checkout has not fetched the sha: git fetch first.
-- install-commands refuses on any dirty or untracked file in the target project: set it aside, run, restore and verify by hash.
+- byte-compare.sh EDITS env takes a file name inside the loop dir (EDITS=edits-r2.txt), not a repo path.
+- A fork that writes docs/loops files in this worktree blocks tree-sync until it lands them: hold record writes until the fork returns.
 
 ### Open questions
 
@@ -30,7 +31,9 @@ Session 175 (10-28): T-328 shipped (#1053 -> a3da1fdc, main rebuilt, live check 
 - Foundry sia/adopt: PR or rebase? (planner recommends a PR)
 
 **Rulings made mid-loop:** 
-- T-328 QA ACCEPT and merge #1053 -> a3da1fdc under D-163
+- T-328 merged a3da1fdc
+- T-329 merged 4c439e84
+- T-262 closed on live audit row
 
 ## developer [sia-builder] _(written session 156)_
 
