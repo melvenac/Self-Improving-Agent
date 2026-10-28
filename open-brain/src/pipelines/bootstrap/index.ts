@@ -585,6 +585,22 @@ export function templateText(path: string): string {
 }
 
 /**
+ * T-328: the owner's `!` exceptions, to re-apply after the SIA block. git takes the LAST matching pattern, so a block
+ * rule appended after `!.env.example` (its `.env.*`) silently re-ignored the owner's tracked env templates. Exceptions
+ * under `.agents/` are left out: the SIA block decides what in `.agents/` is tracked.
+ */
+export function ownerNegationsToReapply(existing: string): string[] {
+  const out: string[] = [];
+  for (const raw of existing.split(/\r?\n/)) {
+    const l = raw.trim();
+    if (!l.startsWith("!")) continue;
+    if (l.slice(1).replace(/^\//, "").startsWith(".agents")) continue;
+    if (!out.includes(l)) out.push(l);
+  }
+  return out;
+}
+
+/**
  * BF-4, shared by `scaffold` and (T-297) `state import --commit`: the template's gitignore and gitattributes merged into the
  * project's. The owner's lines stay; the template's missing rules are appended under one SIA header.
  */
@@ -608,7 +624,10 @@ export function mergeTemplateFiles(root: string, templateDir: string): { written
     if (missing.length === 0) { skipped.push({ path: m.path, reason: "already carries every rule in the template's copy" }); continue; }
     const nl = existing.includes("\r\n") ? "\r\n" : "\n";
     const sep = existing.length === 0 || existing.endsWith("\n") ? "" : nl;
-    writeFileSync(dest, `${existing}${sep}${nl}# --- SIA (Self-Improving Agent): from project-template/${m.from} ---${nl}${missing.join(nl)}${nl}`, "utf8");
+    // T-328: the owner's exceptions go back on after the block, so a block rule cannot re-ignore them.
+    const keep = m.path === ".gitignore" ? ownerNegationsToReapply(existing) : [];
+    const tail = keep.length > 0 ? `${nl}# --- the project's own exceptions, re-applied after the SIA block (T-328) ---${nl}${keep.join(nl)}${nl}` : "";
+    writeFileSync(dest, `${existing}${sep}${nl}# --- SIA (Self-Improving Agent): from project-template/${m.from} ---${nl}${missing.join(nl)}${nl}${tail}`, "utf8");
     written.push({ path: m.path, tracked: true, action: "merged", from: `project-template/${m.from}`, why: m.why });
   }
   return { written, skipped };
