@@ -1,7 +1,7 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 599 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 600 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 > **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-27; the greeting-scorecard thread T-298/T-299/T-324/T-327 is shipped): T-326, SessionEnd's fast work inside Claude Code's 1.5 s budget, so outcome rows reach Prism's scorecard (the code half is in build; the settings timeout is Aaron's); then T-181's adoptions on Aaron's T-241 ruling.
 
 ## What's working
@@ -183,7 +183,7 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - [P2] T-046 Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [P2] T-191 Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [P2] T-241 Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
-- [P2] T-324 greeting-metrics: pick_up_ids + open_questions on greeting rows (schema 1, additive) and a schema-2 outcome row from SessionEnd (first_action, first_action_match, ended), for the dashboard scorecard (agent-dashboard T-054)
+- [P3] T-261 Physically split core and memory into separate packages (after T-154; D-151)
 
 ## Decisions
 
