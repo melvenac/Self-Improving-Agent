@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "yaml": "^2.9.1",
     "zod": "^4.3.6"
   },
   "optionalDependencies": {
@@ -31,7 +32,6 @@
     "@types/node": "^22.19.11",
     "tsx": "^4.21.0",
     "typescript": "^5.7.0",
-    "vitest": "^3.2.1",
-    "yaml": "^2.9.1"
+    "vitest": "^3.2.1"
   }
 }
