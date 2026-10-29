@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 610,
+  "revision": 611,
   "project": {
     "name": "self-improving-agent"
   },
@@ -1876,11 +1876,12 @@
       "opened_session": 168,
       "closed_session": null,
       "supersedes": null,
-      "note": "Aaron ruled in s168 (D-151): after T-154 lands, at low priority. Idea B of the Step-Back page; the module-boundary /sync check already enforces the direction (core never imports memory). Shape not yet briefed. — S173 (Aaron 10-19: 'go ahead'). Step 0 measured the boundary (docs/loops/t261-core-split-step0.md, #870). S1 (#873, 55cf1567): the boundary check sees literal import(); DYNAMIC_MEMORY_LOADS allowlist; lifecycle.ts, shared/fts.ts, shared/vault-path-segment.ts, shared/yaml-frontmatter.ts and shared/content-guard.ts are now memory. S2 (#875, 11b1b72a): the 4 memory subcommands moved verbatim to the memory-side cli-memory.ts; cli.ts forwards the same names (no user-visible change); parseOrRefuse moved to shared/cli-args.ts; the allowlist went from 8 to 4. Both are live (V-096). Remaining: S3, the physical package split (npm workspaces; installed hook paths must keep working); S4, install core by default with memory opt-in; the yaml dependencies declaration (planner-hook/prfiles.ts imports it at run time; it is under devDependencies). Rec in step 0: hold S3/S4 until a real memory-free install exists. That is Aaron's call. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4: 'Hold until needed'): S3/S4 parked until a real memory-free install is wanted. The small yaml devDependencies->dependencies fix may still land on its own.",
+      "note": "Aaron ruled in s168 (D-151): after T-154 lands, at low priority. Idea B of the Step-Back page; the module-boundary /sync check already enforces the direction (core never imports memory). Shape not yet briefed. — S173 (Aaron 10-19: 'go ahead'). Step 0 measured the boundary (docs/loops/t261-core-split-step0.md, #870). S1 (#873, 55cf1567): the boundary check sees literal import(); DYNAMIC_MEMORY_LOADS allowlist; lifecycle.ts, shared/fts.ts, shared/vault-path-segment.ts, shared/yaml-frontmatter.ts and shared/content-guard.ts are now memory. S2 (#875, 11b1b72a): the 4 memory subcommands moved verbatim to the memory-side cli-memory.ts; cli.ts forwards the same names (no user-visible change); parseOrRefuse moved to shared/cli-args.ts; the allowlist went from 8 to 4. Both are live (V-096). Remaining: S3, the physical package split (npm workspaces; installed hook paths must keep working); S4, install core by default with memory opt-in; the yaml dependencies declaration (planner-hook/prfiles.ts imports it at run time; it is under devDependencies). Rec in step 0: hold S3/S4 until a real memory-free install exists. That is Aaron's call. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4: 'Hold until needed'): S3/S4 parked until a real memory-free install is wanted. The small yaml devDependencies->dependencies fix may still land on its own. — s175 10-29: the small yaml item SHIPPED. Aaron (AskUserQuestion in Atlas's window, 10-29: 'Move it (Recommended)'; deps are an SG-1 exclusion). Audit at origin/master: yaml is the only devDependency open-brain/src imports (planner-hook/prfiles.ts:4); @types/*, tsx, typescript, vitest have no src import; better-sqlite3 is an optionalDependency (kept by --omit=dev). SIM #382 (896803e0): probe BEFORE on `npm ci --omit=dev` = ERR_MODULE_NOT_FOUND for yaml; stopped on lockfile churn because QA PC npm 10.9.9 drops 'libc' arrays from 13 @rollup/rollup-linux-* entries (the committed lockfile is npm 11 format; desktop npm 11.19.0). Brief #1070 regenerates with `npx -y npm@11.19.0 install --package-lock-only`. Build #383 READY PR #1071 head b77e2a88: lockfile exactly 3 hunks (yaml into dependencies, out of devDependencies, node_modules/yaml loses dev:true), PROBE ok after, planner-hook + pipelines/sync 1645/1645. QA ACCEPT by Atlas (diff read line by line, merge-check CLEAN, patch-id same, CI green); merged 35a7d870, rebuilt; main checkout `npm ls yaml --omit=dev` -> yaml@2.9.1 (already installed, no npm install needed). LESSON for future lockfile briefs: regenerate with npx npm@11.19.0, not the QA PC's npm 10. S3/S4 stay parked (Aaron 10-26 'Hold until needed').",
       "note_by": [
         "f21ca920-a048-4990-935f-42f102efc85f",
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
-        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
+        "0bbb03c4-d91d-496e-a6d5-43924f16405b",
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": null
     },
@@ -7021,12 +7022,12 @@
     },
     {
       "n": 175,
-      "date": "2026-10-28",
+      "date": "2026-10-29",
       "uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 610
+      "last_work_rev": 611
     }
   ]
 }
