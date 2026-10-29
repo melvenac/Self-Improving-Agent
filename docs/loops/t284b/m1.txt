@@ -1,0 +1,7 @@
+@@@ scripts/setup-hooks.mjs
+<<<
+  if (c === COMMIT_HOOKS_PATH) return { set: true, note: `git core.hooksPath upgraded from the relative ${COMMIT_HOOKS_PATH} to ${t} (sparse worktrees have no ${COMMIT_HOOKS_PATH}/, T-284b)` };
+  if (c !== '')
+===
+  if (c !== '')
+>>>

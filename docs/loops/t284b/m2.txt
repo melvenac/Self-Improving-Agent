@@ -1,0 +1,6 @@
+@@@ scripts/setup-hooks.mjs
+<<<
+const normHooksPath = (p) => String(p ?? '').trim().replace(/\\/g, '/').replace(/\/+$/, '');
+===
+const normHooksPath = (p) => String(p ?? '').trim();
+>>>

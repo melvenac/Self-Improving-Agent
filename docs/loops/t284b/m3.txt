@@ -1,0 +1,6 @@
+@@@ scripts/setup-hooks.mjs
+<<<
+  if (c !== '') return { set: false, note: `git core.hooksPath is ${c}: left alone, so the commit-msg hook (T-284) does not run in this clone` };
+===
+  if (c !== '') return { set: true, note: `git core.hooksPath is ${c}: left alone, so the commit-msg hook (T-284) does not run in this clone` };
+>>>
