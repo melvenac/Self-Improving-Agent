@@ -11,7 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { withSessionHooks, withCursorMcp, withCursorSessionHook, withCursorRecallHook, repoRootFrom, copyCursorSlashCommands, commitHooksPlan, COMMIT_HOOKS_PATH } from './setup-hooks.mjs';
 
@@ -162,13 +162,23 @@ function registerCommitHooks() {
   } catch {
     current = ''; // exit 1: unset
   }
-  const plan = commitHooksPlan(current);
+  // T-284b: the MAIN checkout's .githooks as an absolute path, so every worktree (sparse or not) runs the same hook.
+  let target;
+  try {
+    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    target = path.join(path.dirname(common), COMMIT_HOOKS_PATH).replace(/\\/g, '/');
+  } catch (err) {
+    log(FAIL, `git core.hooksPath not set: the main checkout was not found (${String(err.message).split('\n')[0]})`);
+    hadFailure = true;
+    return;
+  }
+  const plan = commitHooksPlan(current, target);
   if (!plan.set) {
     log(SKIP, plan.note);
     return;
   }
   try {
-    execSync(`git config core.hooksPath ${COMMIT_HOOKS_PATH}`, { cwd: REPO_ROOT, stdio: 'pipe' });
+    execFileSync('git', ['config', 'core.hooksPath', target], { cwd: REPO_ROOT, stdio: 'pipe' });
     log(OK, plan.note);
   } catch (err) {
     log(FAIL, `git core.hooksPath not set: ${String(err.message).split('\n')[0]}`);
