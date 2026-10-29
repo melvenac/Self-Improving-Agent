@@ -17,19 +17,26 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
-/** T-284: the tracked directory setup.mjs points git's core.hooksPath at (commit-msg stamps the session). */
+/** T-284: the tracked directory (by name) git's core.hooksPath points at; setup writes its ABSOLUTE path (T-284b). */
 export const COMMIT_HOOKS_PATH = '.githooks';
 
+/** A core.hooksPath value compared as a path: trimmed, forward slashes, no trailing slash. */
+const normHooksPath = (p) => String(p ?? '').trim().replace(/\\/g, '/').replace(/\/+$/, '');
+
 /**
- * T-284: whether setup should set core.hooksPath, given its current value (`git config --get`; '' or null when unset).
- * Only an unset value is set; one already pointing elsewhere is left alone and reported, never overwritten.
+ * T-284: whether setup should set core.hooksPath, given its current value (`git config --get`; '' or null when unset)
+ * and `target`, the main checkout's .githooks as an absolute path. T-284b (Aaron 10-28): the legacy relative
+ * '.githooks' is upgraded, because git resolves a relative value in each worktree and the sparse seat worktrees have no
+ * .githooks/, so the hook never ran there. Any other value is left alone and reported, never overwritten.
  * @returns {{ set: boolean, note: string }}
  */
-export function commitHooksPlan(current) {
-  const c = String(current ?? '').trim();
-  if (c === COMMIT_HOOKS_PATH) return { set: false, note: `git core.hooksPath already ${COMMIT_HOOKS_PATH}` };
+export function commitHooksPlan(current, target) {
+  const c = normHooksPath(current);
+  const t = normHooksPath(target);
+  if (c === t) return { set: false, note: `git core.hooksPath already ${t}` };
+  if (c === COMMIT_HOOKS_PATH) return { set: true, note: `git core.hooksPath upgraded from the relative ${COMMIT_HOOKS_PATH} to ${t} (sparse worktrees have no ${COMMIT_HOOKS_PATH}/, T-284b)` };
   if (c !== '') return { set: false, note: `git core.hooksPath is ${c}: left alone, so the commit-msg hook (T-284) does not run in this clone` };
-  return { set: true, note: `git core.hooksPath set to ${COMMIT_HOOKS_PATH} (commit-msg stamps Claude-Session, T-284)` };
+  return { set: true, note: `git core.hooksPath set to ${t} (commit-msg stamps Claude-Session, T-284)` };
 }
 
 export const SESSION_HOOKS = [
