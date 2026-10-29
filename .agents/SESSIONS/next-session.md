@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 608 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 609 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,20 +6,20 @@
 
 ### Pick up here
 
-Session 175 (10-28): shipped T-328 (a3da1fdc) and T-329 (4c439e84), both QA-ACCEPTed by Atlas under D-163, main rebuilt, live-checked. Closed T-262 (redirect row seen live in clark's audit). T-292 researched: vitest 3.2.4 has no RPC timeout knob; keep the re-run-alone exception. Clark retired the tcm hub-deploy notice to Atlas (Aaron 10-28). NEXT: (1) foundry merge once Aaron picks PR vs rebase; (2) backlog is thin: P2 T-191 (deferred behind the D-110 shared.md split) and T-046 (upstream Cursor); P3s T-284, T-312, T-320 (waits on PID 23584 /mcp reconnect), T-303, T-321, T-261. Ask clark/Aaron for the next SIA thread rather than inventing one.
+Session 175 (10-28): shipped T-328 (a3da1fdc), T-329 (4c439e84); closed T-262, T-320. T-284: hooksPath now absolute in this clone, live check passed; NEXT is the setup.mjs change to write the absolute path (small brief; per clark's routing note, drafts go to Grok first until the weekly reset). Then thin backlog: P2 T-191 (deferred), T-046 (upstream); P3 T-312, T-303, T-321, T-261, T-292 (watch). Herald's import awaits Aaron.
 
 ### Watch out
 
+- Until the Claude Code weekly reset (clark 10-28): Grok first for second-judge reviews, research, mutant triage, long-log reading and first drafts; builds, QA PC test runs and the final QA ACCEPT stay on Claude Code; Grok is never on a merge-blocking path.
 - relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how).
 - Dashboard v1.38.1+ redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere.
-- Job client refuses non-ASCII briefs: keep briefs ASCII.
-- qapc-job.mjs submit fails 'CHECK sha failed' when this checkout has not fetched the sha: git fetch first.
-- byte-compare.sh EDITS env takes a file name inside the loop dir (EDITS=edits-r2.txt), not a repo path.
-- A fork that writes docs/loops files in this worktree blocks tree-sync until it lands them: hold record writes until the fork returns.
+- Job client refuses non-ASCII briefs; qapc-job.mjs submit needs a git fetch first ('CHECK sha failed').
+- byte-compare.sh EDITS env takes a file name inside the loop dir (EDITS=edits-r2.txt).
+- A fork that writes docs/loops files in this worktree blocks tree-sync until it lands them.
 
 ### Open questions
 
-- Foundry's sia/adopt (7dc7f89) is not a fast-forward of origin/main (7 new commits). Land it as a PR or rebase it? Planner recommends a PR.
+_None._
 
 ### Loop state
 
@@ -27,13 +27,11 @@ Session 175 (10-28): shipped T-328 (a3da1fdc) and T-329 (4c439e84), both QA-ACCE
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** 
-- Foundry sia/adopt: PR or rebase? (planner recommends a PR)
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- T-328 merged a3da1fdc
-- T-329 merged 4c439e84
-- T-262 closed on live audit row
+- T-284 absolute hooksPath (Aaron 10-28)
+- Foundry landed as PR #26
 
 ## developer [sia-builder] _(written session 156)_
 
