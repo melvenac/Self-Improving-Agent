@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll } from "vitest";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 // @ts-expect-error - a plain .mjs module outside the TypeScript project
@@ -10,12 +10,15 @@ import * as setupHooks from "../../scripts/setup-hooks.mjs";
  * T-284: a tracked `.githooks/commit-msg` stamps `Claude-Session: <uuid>` from CLAUDE_CODE_SESSION_ID, so a commit's
  * attribution never depends on the agent writing the trailer (deterministic first). Only when the variable holds a
  * session uuid and the message has no Claude-Session trailer yet. The guards read `%(trailers:key=Claude-Session)` and
- * accept a session's own uuid (T-276). setup.mjs points core.hooksPath at `.githooks` only when it is unset.
+ * accept a session's own uuid (T-276). setup.mjs points core.hooksPath at the main checkout's `.githooks`, ABSOLUTE
+ * (T-284b, Aaron 10-28): git resolves a relative value in each worktree, and the sparse seat worktrees have no
+ * `.githooks/`, so the hook never ran there. Unset or the legacy relative value is set; any other value is left alone.
  */
 const REPO = join(import.meta.dirname, "..", "..");
 const HOOKS = join(REPO, ".githooks").replace(/\\/g, "/");
 const UUID = "0bbb03c4-d91d-496e-a6d5-43924f16405b";
-const plan = (setupHooks as { commitHooksPlan?: (current: string | null) => { set: boolean; note: string } }).commitHooksPlan;
+const plan = (setupHooks as { commitHooksPlan?: (current: string | null, target: string) => { set: boolean; note: string } }).commitHooksPlan;
+const TARGET = "C:/x/repo/.githooks";
 
 const made: string[] = [];
 afterAll(() => {
@@ -84,15 +87,37 @@ describe("T-284: the commit-msg hook stamps the Claude Code session", () => {
     expect(sessionLines(r.body)).toEqual([]);
   });
 
-  it("S1 setup sets core.hooksPath only when it is unset", () => {
+  it("S1 setup sets core.hooksPath to the absolute target when unset, keeps it when already there, leaves others alone", () => {
     expect(typeof plan).toBe("function");
-    expect(plan!("").set).toBe(true);
-    expect(plan!(null).set).toBe(true);
-    const same = plan!(".githooks\n");
+    expect(plan!("", TARGET).set).toBe(true);
+    expect(plan!("", TARGET).note).toContain(TARGET);
+    expect(plan!(null, TARGET).set).toBe(true);
+    const same = plan!(`${TARGET}\n`, TARGET);
     expect(same.set).toBe(false);
     expect(same.note).toContain("already");
-    const other = plan!("/somewhere/else");
+    const other = plan!("/somewhere/else", TARGET);
     expect(other.set).toBe(false);
     expect(other.note).toContain("left alone");
+  });
+
+  it("S2 the legacy relative .githooks is upgraded to the absolute target (sparse worktrees have no .githooks/)", () => {
+    const legacy = plan!(".githooks\n", TARGET);
+    expect(legacy.set).toBe(true);
+    expect(legacy.note).toContain("upgraded");
+    expect(legacy.note).toContain(TARGET);
+  });
+
+  it("S3 a current value with backslashes or a trailing slash that names the target counts as already set", () => {
+    const r = plan!("C:\\x\\repo\\.githooks\\\n", TARGET);
+    expect(r.set).toBe(false);
+    expect(r.note).toContain("already");
+    expect(plan!("C:/x/repo/.githooks/", TARGET).set).toBe(false);
+  });
+
+  it("S4 setup.mjs derives the target from the git common dir and writes it without a shell", () => {
+    const src = readFileSync(join(REPO, "scripts", "setup.mjs"), "utf8");
+    expect(src).toContain("'--git-common-dir'");
+    expect(src).toContain("execFileSync('git', ['config', 'core.hooksPath', target]");
+    expect(src).not.toContain("git config core.hooksPath ${COMMIT_HOOKS_PATH}");
   });
 });
