@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 611,
+  "revision": 612,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2892,6 +2892,20 @@
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": 605
+    },
+    {
+      "id": "T-330",
+      "title": "SIA CI runs on the self-hosted tcm runners, always (Aaron 10-30)",
+      "priority": "P1",
+      "status": "done",
+      "opened_session": 175,
+      "closed_session": 175,
+      "supersedes": null,
+      "note": "Aaron 10-30 in clark's window: \"use our own runners, not github\" (relay-check verified). GitHub-hosted jobs stopped starting on a billing hold; T-227 had made ubuntu-latest the default for changed+test. Change: runs-on [self-hosted, linux, tcm] for both, the tcm dispatch input removed, test-windows stays on the laptop. Brief docs/loops/t330-brief.md (+ amendment 1). — Shipped s175. Deadlock: the QA PC builds only master shas (job #396 REFUSED reachable) and every PR's CI sat on the held hosted runner, so Aaron chose (AskUserQuestion) to admin-merge the docs-only brief #1073 and amendment #1074 (edit 13: line 478 toBe of two lists, found by job #398). Build job #403 READY: red-first 3 rows, m1 4 / m2 1 / m3 1 rows as predicted, tests/pipelines/sync 529/529. Byte-compare SAME on both files; PR #1075 CI changed+test green on tcm-1. Aaron named #1075 (AskUserQuestion); merged cc0fffcf pinned to d2cb58ea. Live: master push run 41105135721 test green on tcm-2. No rebuild (no src change).",
+      "note_by": [
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+      ],
+      "closed_rev": 612
     }
   ],
   "verified": [
@@ -7022,12 +7036,12 @@
     },
     {
       "n": 175,
-      "date": "2026-10-29",
+      "date": "2026-10-30",
       "uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 611
+      "last_work_rev": 612
     }
   ]
 }
