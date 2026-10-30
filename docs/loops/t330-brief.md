@@ -5,10 +5,10 @@ SEAT: QA PC job runner, NOT the desktop. No hub key. Code. Ends at READY with a 
 REPLY: the absolute reply path the launcher names. Print it FIRST.
 
 **By:** Atlas (planner), 2026-10-30, session 175. **Task:** T-330. **Tag:** `t330`.
-**Size:** SMALL (`.github/workflows/ci.yml`, 4 edits; `open-brain/tests/pipelines/sync/ci-runs-on.test.ts`, 8 edits).
-**Base:** the START sha the launcher names: `sim/t330`, which is origin/master plus one commit carrying this brief
-and `docs/loops/t330/`. A docs-only PR cannot land it first: its `changed` job is on the hosted runner that is held.
-So the PR carries 2 commits (the docs one and the code one), and that is expected.
+**Size:** SMALL (`.github/workflows/ci.yml`, 4 edits; `open-brain/tests/pipelines/sync/ci-runs-on.test.ts`, 9 edits).
+**Base:** the START sha the launcher names (a master that contains this brief, amendment 1).
+**Amendment 1 (job #398 BLOCKED):** edit 13 changes the T-178 row's `expect(changed["runs-on"]).toBe(...)` (line 478)
+to `toEqual`: two lists are never `toBe`-equal. The build of #398 found it; red-first matched the prediction exactly.
 **Authority:** Aaron, 2026-10-30, typed in clark's window: "use our own runners, not github" (verified with
 relay-check). `.github/workflows` is an SG-1 exclusion: the merge needs Aaron naming the PR, after Atlas's QA ACCEPT.
 
@@ -23,11 +23,11 @@ egress self-check already runs whenever `runner.environment == 'self-hosted'`, s
 
 ## The change, exactly
 
-- **`docs/loops/t330/edits.txt`:** 12 edits. ci.yml: drop the `tcm` input; `changed` and `test` get
+- **`docs/loops/t330/edits.txt`:** 13 edits. ci.yml: drop the `tcm` input; `changed` and `test` get
   `runs-on: [self-hosted, linux, tcm]`; the test job's comment. ci-runs-on.test.ts: the header line; `runsOn()`
   returns the raw value (now a list); the two T-227 hosted rows become two T-330 rows; the changed-equals-test row
-  compares with `toEqual` (two lists); the egress row expects no `tcm` input.
-- Applied to scratch copies of origin/master `8c70141e` by the planner: `APPLIED 12 edits to 2 files`; m1, m2, m3
+  and the T-178 row compare with `toEqual` (two lists); the egress row expects no `tcm` input.
+- Applied to scratch copies of origin/master `8c70141e` by the planner: `APPLIED 13 edits to 2 files`; m1, m2, m3
   each `APPLIED 1 edits to 1 files` on the edited copy.
 
 ## Existing tests (verdicts)
@@ -51,8 +51,8 @@ state-import-r4, end-fix-q3, t159-fast-path N3, record-erasure R179, `tests/pipe
    `~/.claude/`, `scripts/setup.mjs`, `git config` writes, any MCP config, `npm install`, `gh workflow run`, and
    anything under `docs/`.
 3. **Red first (test edits only).** Back up ci.yml: `Copy-Item .github/workflows/ci.yml "$env:TEMP\t330-ci.bak"`.
-   Apply all 12 edits (`node docs/loops/t330/apply.cjs . docs/loops/t330/edits.txt`, prints exactly
-   `APPLIED 12 edits to 2 files`), then restore ONLY the workflow:
+   Apply all 13 edits (`node docs/loops/t330/apply.cjs . docs/loops/t330/edits.txt`, prints exactly
+   `APPLIED 13 edits to 2 files`), then restore ONLY the workflow:
    `Copy-Item "$env:TEMP\t330-ci.bak" .github/workflows/ci.yml`. In `open-brain`:
    `npx vitest run tests/pipelines/sync/ci-runs-on.test.ts`. **Predicted: exactly 3 red rows**:
    - `T-330: the test job runs on the self-hosted tcm runners for every event, ...` (a string is not the list)
@@ -60,13 +60,14 @@ state-import-r4, end-fix-q3, t159-fast-path N3, record-erasure R179, `tests/pipe
    - `keeps the egress self-check on the test job and leaves test-windows opt-in` (`inputs.tcm` is defined)
    Paste the `Tests` line and each red row's first assertion line. Any other count or row: STOP, `BLOCKED t330 red-first`.
 4. **Green.** Re-apply: `git checkout -- .github/workflows/ci.yml open-brain/tests/pipelines/sync/ci-runs-on.test.ts`,
-   then `node docs/loops/t330/apply.cjs . docs/loops/t330/edits.txt` (`APPLIED 12 edits to 2 files`). In `open-brain`:
+   then `node docs/loops/t330/apply.cjs . docs/loops/t330/edits.txt` (`APPLIED 13 edits to 2 files`). In `open-brain`:
    the same vitest command: 0 failed. `npx tsc -p tsconfig.tests.json --noEmit` (exit 0). Paste `git diff --stat`.
 5. **Mutants** (each on the green tree; back up ci.yml to `$env:TEMP\t330-ci.bak` first, restore with Copy-Item after
    each, never git checkout). For each: `node docs/loops/t330/apply.cjs . docs/loops/t330/<m>.txt` (`APPLIED 1 edits
    to 1 files`), then the ci-runs-on vitest command; paste `Tests` and the red row names.
    - **m1** (test job back on the T-227 expression): red = the two T-330 rows and
-     `T-227: the changed job runs on the same runner expression as the test job`.
+     `T-227: the changed job runs on the same runner expression as the test job` and `the change list is git diff of
+     before..sha, and the test job runs unless that output is exactly true (T-178)` (4 rows).
    - **m2** (the `tcm` input back): red = `keeps the egress self-check ...` only.
    - **m3** (`test-windows` on `windows-latest`): red = `T-330: no job runs on a GitHub-hosted runner, ...` only.
    After m3's restore, the file is green again (paste `Tests`). A mutant whose red rows differ from the prediction:

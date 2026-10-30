@@ -108,3 +108,9 @@ function runsOn(): unknown {
 ===
     expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ windows: expect.anything() });
 >>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+    expect(changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
+===
+    expect(changed["runs-on"]).toEqual(doc.jobs.test["runs-on"]);
+>>>
