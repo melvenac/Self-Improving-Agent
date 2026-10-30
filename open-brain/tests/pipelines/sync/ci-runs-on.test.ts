@@ -1,5 +1,5 @@
 /**
- * T-227: tests run on GitHub-hosted ubuntu-latest by default and tcm is a dispatch opt-in (was T-192: a master push runs on tcm). `evalRunsOn` is the small evaluator for the
+ * T-330: every Linux job runs on the self-hosted tcm runners, always (T-227 had made GitHub-hosted the default). `evalRunsOn` is the small evaluator for the
  * one `runs-on` expression. `&&` binds tighter than `||`, and each returns the
  * value rather than a boolean, as GitHub's expression language does. T-221: it also reads github.head_ref, ref_name and run_id, and format() (third commit).
  */
@@ -227,28 +227,27 @@ function testJobRuns(ctx: Ctx, paths: string[] | "unreadable"): boolean {
   }));
 }
 
-function runsOn(): string {
+function runsOn(): unknown {
   const doc = parse(readFileSync(workflowPath, "utf-8")) as { jobs: Record<string, { "runs-on"?: unknown; if?: unknown; steps?: Array<{ name?: string; if?: string }> }> };
   const test = doc.jobs.test;
   expect(test, "job name stays test").toBeTruthy();
-  expect(typeof test["runs-on"]).toBe("string");
-  return test["runs-on"] as string;
+  return test["runs-on"];
 }
 
 describe("ci.yml runs-on (T-192)", () => {
   const expr = runsOn();
 
-  it("T-227: a master push, a pull request and a default dispatch all run on GitHub-hosted ubuntu-latest", () => {
-    expect(evalRunsOn(expr, { event: "push", ref: "refs/heads/master", tcm: null })).toBe("ubuntu-latest");
-    expect(evalRunsOn(expr, { event: "pull_request", ref: "refs/pull/7/merge", headRef: "loop/x", tcm: null })).toBe("ubuntu-latest");
-    expect(evalRunsOn(expr, { event: "workflow_dispatch", ref: "refs/heads/loop/x", tcm: false })).toBe("ubuntu-latest");
+  it("T-330: the test job runs on the self-hosted tcm runners for every event, with no expression to pick a hosted one", () => {
+    expect(expr).toEqual(TCM);
   });
 
-  it("T-227: a dispatch with tcm=true is the only way onto the self-hosted tcm runner", () => {
-    expect(evalRunsOn(expr, { event: "workflow_dispatch", ref: "refs/heads/master", tcm: true })).toEqual(TCM);
-    for (const event of ["push", "pull_request"]) {
-      expect(evalRunsOn(expr, { event, ref: "refs/heads/master", tcm: null }), event).toBe("ubuntu-latest");
+  it("T-330: no job runs on a GitHub-hosted runner, and test-windows stays on the laptop", () => {
+    const doc = workflow() as Workflow & { jobs: Record<string, { "runs-on"?: unknown }> };
+    for (const [id, job] of Object.entries(doc.jobs)) {
+      expect(JSON.stringify(job["runs-on"]), id).not.toMatch(/ubuntu|windows-latest|macos|\$\{\{/);
+      expect(job["runs-on"], id).toContain("self-hosted");
     }
+    expect(doc.jobs["test-windows"]["runs-on"]).toEqual(["self-hosted", "Windows", "laptop"]);
   });
 
   it("T-227 addendum: every checkout in the workflow fetches full history (fetch-depth 0), because the suite reads it", () => {
@@ -271,7 +270,7 @@ describe("ci.yml runs-on (T-192)", () => {
 
   it("T-227: the changed job runs on the same runner expression as the test job", () => {
     const doc = workflow() as Workflow & { jobs: Record<string, { "runs-on"?: string }> };
-    expect(doc.jobs.changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
+    expect(doc.jobs.changed["runs-on"]).toEqual(doc.jobs.test["runs-on"]);
   });
 
   it("keeps the egress self-check on the test job and leaves test-windows opt-in", () => {
@@ -281,12 +280,12 @@ describe("ci.yml runs-on (T-192)", () => {
     };
     const egress = doc.jobs.test.steps?.find((s) => s.name === "Egress isolation self-check (tcm)");
     expect(egress?.if).toBe("runner.environment == 'self-hosted'");
-    // T-227: hosted is the default now, so the old opt-out input is gone and tcm is an opt-in defaulting to false.
+    // T-330: tcm is the only Linux runner, so neither T-192's hosted opt-out nor T-227's tcm opt-in is an input.
     const inputs = doc.on?.workflow_dispatch?.inputs as Record<string, { default?: unknown }>;
     expect(inputs.hosted).toBeUndefined();
-    expect(inputs.tcm.default).toBe(false);
+    expect(inputs.tcm).toBeUndefined();
     expect(doc.jobs["test-windows"].if).toBe("github.event_name == 'workflow_dispatch' && inputs.windows");
-    expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ tcm: expect.anything(), windows: expect.anything() });
+    expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ windows: expect.anything() });
   });
 
   it("a pull request has no paths filter, so a docs-only PR starts the workflow and reports test (D-091, T-219)", () => {
@@ -475,7 +474,7 @@ describe("ci.yml runs-on (T-192)", () => {
     };
     const changed = doc.jobs.changed;
     expect(changed.if).toBe("github.event_name == 'pull_request'");
-    expect(changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
+    expect(changed["runs-on"]).toEqual(doc.jobs.test["runs-on"]);
     expect(changed.outputs?.skip).toBe("${{ steps.diff.outputs.skip }}");
     const checkout = changed.steps?.find((step) => step.uses === "actions/checkout@v4");
     expect(checkout?.with?.["fetch-depth"]).toBe(0);
