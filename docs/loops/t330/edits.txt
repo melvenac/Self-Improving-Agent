@@ -1,0 +1,110 @@
+@@@ .github/workflows/ci.yml
+<<<
+    inputs:
+      tcm:
+        description: "Run on the self-hosted tcm runner instead of GitHub-hosted ubuntu-latest (T-227: hosted is the default, tcm is the opt-in)"
+        type: boolean
+        default: false
+      windows:
+===
+    inputs:
+      windows:
+>>>
+@@@ .github/workflows/ci.yml
+<<<
+    if: github.event_name == 'pull_request'
+    runs-on: ${{ inputs.tcm && fromJSON('["self-hosted", "linux", "tcm"]') || 'ubuntu-latest' }}
+===
+    if: github.event_name == 'pull_request'
+    # T-330 (Aaron 10-30, "use our own runners, not github"): the self-hosted tcm runners, always.
+    runs-on: [self-hosted, linux, tcm]
+>>>
+@@@ .github/workflows/ci.yml
+<<<
+    # T-227: GitHub-hosted ubuntu-latest by default (this repository is public, so its minutes are free).
+    # The self-hosted tcm runner (D-043, T-192) is an opt-in: only a workflow_dispatch with tcm=true selects it.
+===
+    # T-330 (Aaron 10-30, "use our own runners, not github"): the self-hosted tcm runners (D-043, T-192), always.
+    # T-227 had made GitHub-hosted ubuntu-latest the default; hosted jobs stopped starting on a billing hold.
+>>>
+@@@ .github/workflows/ci.yml
+<<<
+    if: "${{ !cancelled() && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
+    runs-on: ${{ inputs.tcm && fromJSON('["self-hosted", "linux", "tcm"]') || 'ubuntu-latest' }}
+===
+    if: "${{ !cancelled() && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
+    runs-on: [self-hosted, linux, tcm]
+>>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+ * T-227: tests run on GitHub-hosted ubuntu-latest by default and tcm is a dispatch opt-in (was T-192: a master push runs on tcm). `evalRunsOn` is the small evaluator for the
+===
+ * T-330: every Linux job runs on the self-hosted tcm runners, always (T-227 had made GitHub-hosted the default). `evalRunsOn` is the small evaluator for the
+>>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+function runsOn(): string {
+===
+function runsOn(): unknown {
+>>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+  expect(typeof test["runs-on"]).toBe("string");
+  return test["runs-on"] as string;
+}
+===
+  return test["runs-on"];
+}
+>>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+  it("T-227: a master push, a pull request and a default dispatch all run on GitHub-hosted ubuntu-latest", () => {
+    expect(evalRunsOn(expr, { event: "push", ref: "refs/heads/master", tcm: null })).toBe("ubuntu-latest");
+    expect(evalRunsOn(expr, { event: "pull_request", ref: "refs/pull/7/merge", headRef: "loop/x", tcm: null })).toBe("ubuntu-latest");
+    expect(evalRunsOn(expr, { event: "workflow_dispatch", ref: "refs/heads/loop/x", tcm: false })).toBe("ubuntu-latest");
+  });
+
+  it("T-227: a dispatch with tcm=true is the only way onto the self-hosted tcm runner", () => {
+    expect(evalRunsOn(expr, { event: "workflow_dispatch", ref: "refs/heads/master", tcm: true })).toEqual(TCM);
+    for (const event of ["push", "pull_request"]) {
+      expect(evalRunsOn(expr, { event, ref: "refs/heads/master", tcm: null }), event).toBe("ubuntu-latest");
+    }
+  });
+===
+  it("T-330: the test job runs on the self-hosted tcm runners for every event, with no expression to pick a hosted one", () => {
+    expect(expr).toEqual(TCM);
+  });
+
+  it("T-330: no job runs on a GitHub-hosted runner, and test-windows stays on the laptop", () => {
+    const doc = workflow() as Workflow & { jobs: Record<string, { "runs-on"?: unknown }> };
+    for (const [id, job] of Object.entries(doc.jobs)) {
+      expect(JSON.stringify(job["runs-on"]), id).not.toMatch(/ubuntu|windows-latest|macos|\$\{\{/);
+      expect(job["runs-on"], id).toContain("self-hosted");
+    }
+    expect(doc.jobs["test-windows"]["runs-on"]).toEqual(["self-hosted", "Windows", "laptop"]);
+  });
+>>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+    expect(doc.jobs.changed["runs-on"]).toBe(doc.jobs.test["runs-on"]);
+===
+    expect(doc.jobs.changed["runs-on"]).toEqual(doc.jobs.test["runs-on"]);
+>>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+    // T-227: hosted is the default now, so the old opt-out input is gone and tcm is an opt-in defaulting to false.
+===
+    // T-330: tcm is the only Linux runner, so neither T-192's hosted opt-out nor T-227's tcm opt-in is an input.
+>>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+    expect(inputs.tcm.default).toBe(false);
+===
+    expect(inputs.tcm).toBeUndefined();
+>>>
+@@@ open-brain/tests/pipelines/sync/ci-runs-on.test.ts
+<<<
+    expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ tcm: expect.anything(), windows: expect.anything() });
+===
+    expect(doc.on?.workflow_dispatch?.inputs).toMatchObject({ windows: expect.anything() });
+>>>

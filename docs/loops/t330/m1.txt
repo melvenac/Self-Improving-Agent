@@ -1,0 +1,8 @@
+@@@ .github/workflows/ci.yml
+<<<
+    if: "${{ !cancelled() && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
+    runs-on: [self-hosted, linux, tcm]
+===
+    if: "${{ !cancelled() && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
+    runs-on: ${{ inputs.tcm && fromJSON('["self-hosted", "linux", "tcm"]') || 'ubuntu-latest' }}
+>>>
