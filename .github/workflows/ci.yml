@@ -18,10 +18,6 @@ on:
     types: [opened, synchronize]
   workflow_dispatch:
     inputs:
-      tcm:
-        description: "Run on the self-hosted tcm runner instead of GitHub-hosted ubuntu-latest (T-227: hosted is the default, tcm is the opt-in)"
-        type: boolean
-        default: false
       windows:
         description: Also run the suite on the Windows laptop runner (laptop-win; opt-in until it proves stable)
         type: boolean
@@ -62,7 +58,8 @@ jobs:
   # test job runs. skip=true only when every path is under docs/ or is README.md.
   changed:
     if: github.event_name == 'pull_request'
-    runs-on: ${{ inputs.tcm && fromJSON('["self-hosted", "linux", "tcm"]') || 'ubuntu-latest' }}
+    # T-330 (Aaron 10-30, "use our own runners, not github"): the self-hosted tcm runners, always.
+    runs-on: [self-hosted, linux, tcm]
     outputs:
       skip: ${{ steps.diff.outputs.skip }}
     steps:
@@ -82,15 +79,15 @@ jobs:
           fi
 
   test:
-    # T-227: GitHub-hosted ubuntu-latest by default (this repository is public, so its minutes are free).
-    # The self-hosted tcm runner (D-043, T-192) is an opt-in: only a workflow_dispatch with tcm=true selects it.
+    # T-330 (Aaron 10-30, "use our own runners, not github"): the self-hosted tcm runners (D-043, T-192), always.
+    # T-227 had made GitHub-hosted ubuntu-latest the default; hosted jobs stopped starting on a billing hold.
     # The job name stays `test`, so the check D-032's merge gate reads keeps its name.
     # GitHub skips a job that needs a skipped job unless its if calls a status
     # function. !cancelled() is that call, so a pull request and a master push
     # still run test. A failed changed job is not success, so the suite runs.
     needs: changed
     if: "${{ !cancelled() && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
-    runs-on: ${{ inputs.tcm && fromJSON('["self-hosted", "linux", "tcm"]') || 'ubuntu-latest' }}
+    runs-on: [self-hosted, linux, tcm]
 
     steps:
       # The tcm runner user is firewalled to the public internet only. If any of these connects,
