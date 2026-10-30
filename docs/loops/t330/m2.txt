@@ -1,0 +1,12 @@
+@@@ .github/workflows/ci.yml
+<<<
+    inputs:
+      windows:
+===
+    inputs:
+      tcm:
+        description: "mutant m2"
+        type: boolean
+        default: false
+      windows:
+>>>

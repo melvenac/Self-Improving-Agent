@@ -1,0 +1,6 @@
+@@@ .github/workflows/ci.yml
+<<<
+    runs-on: [self-hosted, Windows, laptop]
+===
+    runs-on: windows-latest
+>>>
