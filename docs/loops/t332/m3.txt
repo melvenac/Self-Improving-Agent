@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+  const inWindow = (ts: string): boolean => ts >= since && ts <= asOf;
+===
+  const inWindow = (ts: string): boolean => ts > since && ts <= asOf;
+>>>
