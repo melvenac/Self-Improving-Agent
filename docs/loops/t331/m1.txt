@@ -1,0 +1,6 @@
+@@@ open-brain/src/trigger/run.ts
+<<<
+  if (withholdDraw(input.sessionUuid, ids) < (input.policy.withhold_fraction ?? 0)) {
+===
+  if (withholdDraw(input.sessionUuid, ids) <= (input.policy.withhold_fraction ?? 0)) {
+>>>
