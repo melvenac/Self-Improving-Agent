@@ -1,0 +1,75 @@
+@@@ open-brain/src/cli.ts
+<<<
+|| command === "rematch" || command === "list" || command === "stats") {
+===
+|| command === "rematch" || command === "list" || command === "stats" || command === "evidence-report") {
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  console.log("  stats                                      Knowledge store counts and censuses (T-295)");
+===
+  console.log("  stats                                      Knowledge store counts and censuses (T-295)");
+  console.log("  evidence-report [--db <path>] [--days <n>] [--as-of <iso>] [--repo <dir>]  Read-only shadow: lessons with a resolving evidence pointer, and the injections a gate would withhold (T-332)");
+>>>
+@@@ open-brain/src/cli-spec.ts
+<<<
+  stats: { name: "stats", booleans: [], values: {}, positionals: "none" },
+===
+  stats: { name: "stats", booleans: [], values: {}, positionals: "none" },
+  evidenceReport: {
+    name: "evidence-report",
+    booleans: [],
+    values: { "--db": "both", "--days": "both", "--as-of": "both", "--repo": "both" },
+    positionals: "none",
+  },
+>>>
+@@@ open-brain/src/cli-memory.ts
+<<<
+    console.log(knowledgeStatsText(openV2Database(paths.knowledgeV2Db), paths.knowledgeV2Db));
+    process.exit(0);
+  }
+}
+===
+    console.log(knowledgeStatsText(openV2Database(paths.knowledgeV2Db), paths.knowledgeV2Db));
+    process.exit(0);
+  } else if (command === "evidence-report") {
+    // T-332: read-only shadow. Parsed before the store is opened: a refusal must not have touched it.
+    const opts = parseOrRefuse(COMMAND_SPECS.evidenceReport, args.slice(1));
+    const daysArg = opts.value("--days");
+    const days = daysArg !== undefined ? Number(daysArg) : 30;
+    if (!Number.isInteger(days) || days < 1) {
+      console.error(`evidence-report refused: --days expects a positive integer, got "${daysArg}".\nNothing was run.`);
+      process.exit(2);
+    }
+    const asOfArg = opts.value("--as-of");
+    if (asOfArg !== undefined && Number.isNaN(Date.parse(asOfArg))) {
+      console.error(`evidence-report refused: --as-of expects an ISO timestamp, got "${asOfArg}".\nNothing was run.`);
+      process.exit(2);
+    }
+    const asOf = asOfArg !== undefined ? new Date(asOfArg).toISOString() : new Date().toISOString();
+    const { evidenceReport, renderEvidenceReport, gitResolver } = await import("./pipelines/store/evidence-report.js");
+    const dbPath = resolve(opts.value("--db") ?? resolvePaths(resolve(".")).knowledgeV2Db);
+    try {
+      const report = evidenceReport(dbPath, gitResolver(resolve(opts.value("--repo") ?? ".")), { asOf, days });
+      console.log(renderEvidenceReport(report));
+      process.exit(0);
+    } catch (err) {
+      console.error(`evidence-report refused: ${err instanceof Error ? err.message : String(err)}`);
+      process.exit(1);
+    }
+  }
+}
+>>>
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+"bootstrap scaffold", "detach", "list",
+===
+"bootstrap scaffold", "detach", "evidence-report", "list",
+>>>
+@@@ open-brain/tests/shared/cli-args.test.ts
+<<<
+    ["stats", /^\s+stats(.*)$/m],
+===
+    ["stats", /^\s+stats(.*)$/m],
+    ["evidence-report", /^\s+evidence-report (.*)$/m],
+>>>

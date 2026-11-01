@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+  return new Database(dbPath, { readonly: true, fileMustExist: true });
+===
+  return new Database(dbPath, { fileMustExist: true });
+>>>
