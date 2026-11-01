@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 613,
+  "revision": 614,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2915,7 +2915,7 @@
       "opened_session": 175,
       "closed_session": null,
       "supersedes": null,
-      "note": "s175 10-31. From the RSI research Aaron asked for (10-31, 'Look for ideas we can adopt'; docs/loops/rsi-research-2026-10-31.md idea #1). It answers the PRD's open question: does an injected lesson change behaviour? Design: a withhold fraction, default 0 (OFF). A deterministic hash assigns each matched fire to injected or withheld; a 'withheld' trigger_fires row records the would-be ids and injects nothing; outcomes are compared per arm. Built overnight under clark's 10-31 push direction. TURNING IT ON (a fraction > 0) is Aaron's call: it withholds real lessons from real sessions. WAITING ON AARON once merged.",
+      "note": "s175 10-31. From the RSI research Aaron asked for (10-31, 'Look for ideas we can adopt'; docs/loops/rsi-research-2026-10-31.md idea #1). It answers the PRD's open question: does an injected lesson change behaviour? Design: a withhold fraction, default 0 (OFF). A deterministic hash assigns each matched fire to injected or withheld; a 'withheld' trigger_fires row records the would-be ids and injects nothing; outcomes are compared per arm. Built overnight under clark's 10-31 push direction. TURNING IT ON (a fraction > 0) is Aaron's call: it withholds real lessons from real sessions. WAITING ON AARON once merged. — s175 10-31 later: SHIPPED OFF. SIM #492 all pass; build PR #1081 merged 53df28e5 (QA ACCEPT, byte-compare SAME, CI test pass on tcm). Live check on the rebuilt main build against a COPY of the store: withholdDraw exported, shipped withhold_fraction 0, G-039 command injects [299]. WAITING ON AARON: turn the arm on (withhold_fraction > 0 in recall-trigger.json, a one-line policy change). It withholds real lessons from real sessions. Follow-up: per-arm triggerCounts on the dashboard (Prism).",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
@@ -2929,7 +2929,7 @@
       "opened_session": 175,
       "closed_session": null,
       "supersedes": null,
-      "note": "s175 10-31. RSI research idea #3 (Xiong et al. selective addition; Evo-Memory). A filter on the existing ob_store path, not a new stage (R-004's reflection queue is cut). Changes what gets stored, so the design needs Aaron's ruling before a build; brief and measurement (how many current entries would pass) can go first. Ideas #2 (outcome-labelled retirement report, overlaps R-011) waits on T-331's data.",
+      "note": "s175 10-31. RSI research idea #3 (Xiong et al. selective addition; Evo-Memory). A filter on the existing ob_store path, not a new stage (R-004's reflection queue is cut). Changes what gets stored, so the design needs Aaron's ruling before a build; brief and measurement (how many current entries would pass) can go first. Ideas #2 (outcome-labelled retirement report, overlaps R-011) waits on T-331's data. — s175 10-31 later: measure docs/loops/t332-measure.md: 41/302 new entries (13.6%) strict-evidenced; 84/1441 injections (5.8%) of an evidenced entry; entry 299 is 49% of injections with no pointer, so a hard gate would refuse ~86% of new lessons. Recommended option C: a shadow report-only CLI. SIM #497 all pass; build PR #1083 head ced2da92 (open-brain evidence-report, read-only, no recall path reads it): QA'd (byte-compare SAME on 4 edited files, 2 new files SAME, merge-check CLEAN, CI test pass, src read). WAITING ON AARON: rule option C, then merge #1083 (code PR, needs Aaron naming it).",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
@@ -7069,7 +7069,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 613
+      "last_work_rev": 614
     }
   ]
 }
