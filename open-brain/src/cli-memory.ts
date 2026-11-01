@@ -253,5 +253,30 @@ export async function runMemoryCommand(args: readonly string[]): Promise<void> {
     const paths = resolvePaths(resolve("."));
     console.log(knowledgeStatsText(openV2Database(paths.knowledgeV2Db), paths.knowledgeV2Db));
     process.exit(0);
+  } else if (command === "evidence-report") {
+    // T-332: read-only shadow. Parsed before the store is opened: a refusal must not have touched it.
+    const opts = parseOrRefuse(COMMAND_SPECS.evidenceReport, args.slice(1));
+    const daysArg = opts.value("--days");
+    const days = daysArg !== undefined ? Number(daysArg) : 30;
+    if (!Number.isInteger(days) || days < 1) {
+      console.error(`evidence-report refused: --days expects a positive integer, got "${daysArg}".\nNothing was run.`);
+      process.exit(2);
+    }
+    const asOfArg = opts.value("--as-of");
+    if (asOfArg !== undefined && Number.isNaN(Date.parse(asOfArg))) {
+      console.error(`evidence-report refused: --as-of expects an ISO timestamp, got "${asOfArg}".\nNothing was run.`);
+      process.exit(2);
+    }
+    const asOf = asOfArg !== undefined ? new Date(asOfArg).toISOString() : new Date().toISOString();
+    const { evidenceReport, renderEvidenceReport, gitResolver } = await import("./pipelines/store/evidence-report.js");
+    const dbPath = resolve(opts.value("--db") ?? resolvePaths(resolve(".")).knowledgeV2Db);
+    try {
+      const report = evidenceReport(dbPath, gitResolver(resolve(opts.value("--repo") ?? ".")), { asOf, days });
+      console.log(renderEvidenceReport(report));
+      process.exit(0);
+    } catch (err) {
+      console.error(`evidence-report refused: ${err instanceof Error ? err.message : String(err)}`);
+      process.exit(1);
+    }
   }
 }
