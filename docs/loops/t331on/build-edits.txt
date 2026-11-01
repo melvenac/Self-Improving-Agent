@@ -1,0 +1,51 @@
+@@@ open-brain/src/trigger/policies/recall-trigger.json
+<<<
+  "withhold_fraction": 0,
+===
+  "withhold_fraction": 0.5,
+>>>
+@@@ open-brain/tests/trigger/t331-withheld-arm.test.ts
+<<<
+  it('W3: OFF by default: the shipped policy says 0, an absent field injects, and the schema refuses out-of-range values', () => {
+    expect(loadPolicy().withhold_fraction).toBe(0);
+===
+  it('W3: ON since 11-01 (Aaron): the shipped policy says 0.5, an absent field injects, and the schema refuses out-of-range values', () => {
+    expect(loadPolicy().withhold_fraction).toBe(0.5);
+>>>
+@@@ open-brain/tests/setup-env.ts
+<<<
+import { mkdtempSync } from "fs";
+===
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "fs";
+>>>
+@@@ open-brain/tests/setup-env.ts
+<<<
+process.env.KNOWLEDGE_V2_DB = join(stateDir, "knowledge-v2.db");
+===
+process.env.KNOWLEDGE_V2_DB = join(stateDir, "knowledge-v2.db");
+
+// T-331 (Aaron 11-01, the withheld arm ON at 0.5): the shipped recall-trigger.json withholds about half of all
+// would-be injections, drawn by a hash of the session uuid and the ids. A spawned hook reads TRIGGER_POLICY_DIR before
+// the shipped file, so every hook a test spawns gets the shipped policy with the arm OFF, and a test of injection
+// mechanics does not pass or fail on its fixed session's draw (the SIM found 11 such rows, docs/loops/t331on-sim.md).
+// In-process loadPolicy() ignores the variable, so t331-withheld-arm W3 still reads the shipped 0.5, and a test that
+// passes its own TRIGGER_POLICY_DIR still wins. The arm itself is pinned by tests/trigger/t331-withheld-arm.test.ts.
+const armOffPolicyDir = join(stateDir, "trigger-policy-arm-off");
+mkdirSync(armOffPolicyDir);
+const shippedPolicy = JSON.parse(
+  readFileSync(new URL("../src/trigger/policies/recall-trigger.json", import.meta.url), "utf-8"),
+) as Record<string, unknown>;
+writeFileSync(
+  join(armOffPolicyDir, "recall-trigger.json"),
+  JSON.stringify({ ...shippedPolicy, withhold_fraction: 0 }),
+  "utf-8",
+);
+process.env.TRIGGER_POLICY_DIR = armOffPolicyDir;
+>>>
+@@@ open-brain/tests/trigger/no-network.test.ts
+<<<
+      const policy = loadPolicy();
+===
+      // T-331: the arm is ON in the shipped policy and this session draws withheld; this row is about sockets, not the arm.
+      const policy = { ...loadPolicy(), withhold_fraction: 0 };
+>>>

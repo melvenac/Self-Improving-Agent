@@ -1,0 +1,6 @@
+@@@ open-brain/tests/setup-env.ts
+<<<
+process.env.TRIGGER_POLICY_DIR = armOffPolicyDir;
+===
+void armOffPolicyDir;
+>>>
