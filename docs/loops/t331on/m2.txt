@@ -1,0 +1,6 @@
+@@@ open-brain/tests/trigger/no-network.test.ts
+<<<
+      const policy = { ...loadPolicy(), withhold_fraction: 0 };
+===
+      const policy = loadPolicy();
+>>>
