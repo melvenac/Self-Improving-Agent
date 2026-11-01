@@ -1,0 +1,103 @@
+@@@ open-brain/src/trigger/run.ts
+<<<
+import type Database from "better-sqlite3";
+import { deriveQuery, queryStore } from "./query.js";
+===
+import { createHash } from "node:crypto";
+import type Database from "better-sqlite3";
+import { deriveQuery, queryStore } from "./query.js";
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  additionalContext?: string;
+}
+===
+  additionalContext?: string;
+  /** T-331: the ids a withheld fire would have injected. Present only on a withheld fire. */
+  withheldIds?: number[];
+}
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+/**
+ * Run the trigger for one command.
+===
+/**
+ * T-331: the withheld arm's draw for one would-be injection, in [0, 1).
+ *
+ * A hash, not Math.random, so a rerun splits the same way. It is keyed on the
+ * session and the ids, not the command, so one entry is withheld for a whole
+ * session or not at all, whichever command reaches it.
+ */
+export function withholdDraw(sessionUuid: string, ids: readonly number[]): number {
+  const hex = createHash("sha256").update(`${sessionUuid}:${ids.join(",")}`).digest("hex").slice(0, 8);
+  return parseInt(hex, 16) / 0x100000000;
+}
+
+/**
+ * Run the trigger for one command.
+>>>
+@@@ open-brain/src/trigger/run.ts
+<<<
+  const ids = hits.map((h) => h.id);
+  recordFire(input.db, {
+===
+  const ids = hits.map((h) => h.id);
+  // T-331: the withheld arm. A would-be injection drawn under withhold_fraction
+  // (0 or absent: never) is recorded as a SILENT fire whose query carries
+  // `withheld:<ids>`, the seat-skip pattern, so trigger_fires' CHECK needs no
+  // migration. Nothing reaches the model, recall_log or the recall counters:
+  // the arm is the counterfactual an injection is compared against.
+  if (withholdDraw(input.sessionUuid, ids) < (input.policy.withhold_fraction ?? 0)) {
+    recordFire(input.db, {
+      sessionUuid: input.sessionUuid,
+      command: input.command,
+      query: [query, `withheld:${ids.join(",")}`].filter(Boolean).join(" "),
+      state: "silent",
+      injectedIds: [],
+    });
+    return { state: "silent", ids: [], withheldIds: ids };
+  }
+  recordFire(input.db, {
+>>>
+@@@ open-brain/src/trigger/policy.ts
+<<<
+  deadline_ms: z.number().int().min(1),
+===
+  deadline_ms: z.number().int().min(1),
+  /**
+   * T-331: the share of would-be injections the trigger WITHHOLDS, in [0, 1],
+   * so an injection can be compared with the same match left uninjected.
+   * Absent or 0 is off, which is how it ships: turning it on is a ruling, not a
+   * default. The split is a hash of the session and the ids (`withholdDraw`).
+   */
+  withhold_fraction: z.number().min(0).max(1).optional(),
+>>>
+@@@ open-brain/src/trigger/policies/recall-trigger.json
+<<<
+  "deadline_ms": 2000,
+===
+  "deadline_ms": 2000,
+  "withhold_fraction": 0,
+>>>
+@@@ open-brain/src/trigger/policies/recall-trigger.schema.json
+<<<
+    "deadline_ms": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "provenance": {
+===
+    "deadline_ms": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "withhold_fraction": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "provenance": {
+>>>
