@@ -13,6 +13,7 @@
  * records the same row the reconcile does.
  */
 
+import { createHash } from "node:crypto";
 import type Database from "better-sqlite3";
 import { deriveQuery, queryStore } from "./query.js";
 import { injectedIds, recordFire, type FireState } from "./fires.js";
@@ -58,6 +59,8 @@ export interface TriggerOutcome {
    * one does the same thing while looking harmless.
    */
   additionalContext?: string;
+  /** T-331: the ids a withheld fire would have injected. Present only on a withheld fire. */
+  withheldIds?: number[];
 }
 
 /**
@@ -83,6 +86,18 @@ export function actionOf(content: string): string {
     out.push(line.trim());
   }
   return out.join(" ").trim();
+}
+
+/**
+ * T-331: the withheld arm's draw for one would-be injection, in [0, 1).
+ *
+ * A hash, not Math.random, so a rerun splits the same way. It is keyed on the
+ * session and the ids, not the command, so one entry is withheld for a whole
+ * session or not at all, whichever command reaches it.
+ */
+export function withholdDraw(sessionUuid: string, ids: readonly number[]): number {
+  const hex = createHash("sha256").update(`${sessionUuid}:${ids.join(",")}`).digest("hex").slice(0, 8);
+  return parseInt(hex, 16) / 0x100000000;
 }
 
 /**
@@ -200,6 +215,21 @@ export function runTrigger(input: TriggerRunInput): TriggerOutcome {
   }
 
   const ids = hits.map((h) => h.id);
+  // T-331: the withheld arm. A would-be injection drawn under withhold_fraction
+  // (0 or absent: never) is recorded as a SILENT fire whose query carries
+  // `withheld:<ids>`, the seat-skip pattern, so trigger_fires' CHECK needs no
+  // migration. Nothing reaches the model, recall_log or the recall counters:
+  // the arm is the counterfactual an injection is compared against.
+  if (withholdDraw(input.sessionUuid, ids) < (input.policy.withhold_fraction ?? 0)) {
+    recordFire(input.db, {
+      sessionUuid: input.sessionUuid,
+      command: input.command,
+      query: [query, `withheld:${ids.join(",")}`].filter(Boolean).join(" "),
+      state: "silent",
+      injectedIds: [],
+    });
+    return { state: "silent", ids: [], withheldIds: ids };
+  }
   recordFire(input.db, {
     sessionUuid: input.sessionUuid,
     command: input.command,
