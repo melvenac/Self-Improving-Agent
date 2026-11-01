@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 612,
+  "revision": 613,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2906,6 +2906,34 @@
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": 612
+    },
+    {
+      "id": "T-331",
+      "title": "Recall trigger: a hash-assigned 'withheld' arm, so injected vs withheld fires show whether an injection changes behaviour (ships OFF)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 175,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s175 10-31. From the RSI research Aaron asked for (10-31, 'Look for ideas we can adopt'; docs/loops/rsi-research-2026-10-31.md idea #1). It answers the PRD's open question: does an injected lesson change behaviour? Design: a withhold fraction, default 0 (OFF). A deterministic hash assigns each matched fire to injected or withheld; a 'withheld' trigger_fires row records the would-be ids and injects nothing; outcomes are compared per arm. Built overnight under clark's 10-31 push direction. TURNING IT ON (a fraction > 0) is Aaron's call: it withholds real lessons from real sessions. WAITING ON AARON once merged.",
+      "note_by": [
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-332",
+      "title": "Evidence-gated lesson writes: a new lesson becomes recall-eligible only with a resolvable pointer (test, commit, QA verdict, CI run)",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 175,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s175 10-31. RSI research idea #3 (Xiong et al. selective addition; Evo-Memory). A filter on the existing ob_store path, not a new stage (R-004's reflection queue is cut). Changes what gets stored, so the design needs Aaron's ruling before a build; brief and measurement (how many current entries would pass) can go first. Ideas #2 (outcome-labelled retirement report, overlaps R-011) waits on T-331's data.",
+      "note_by": [
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -7036,12 +7064,12 @@
     },
     {
       "n": 175,
-      "date": "2026-10-30",
+      "date": "2026-10-31",
       "uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 612
+      "last_work_rev": 613
     }
   ]
 }

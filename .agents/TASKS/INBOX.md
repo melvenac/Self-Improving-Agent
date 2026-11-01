@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 612 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 613 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -15,6 +15,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-046** Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-241** Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15
+- [ ] **T-331** Recall trigger: a hash-assigned 'withheld' arm, so injected vs withheld fires show whether an injection changes behaviour (ships OFF)
 
 ## P3
 
@@ -23,6 +24,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-303** Record write model: weigh an append-only ops log (Scion lessons) against today's single state.json, on measured collision data
 - [ ] **T-312** Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap
 - [ ] **T-321** A separate agent GitHub account so GitHub itself can require Aaron's approval on merges (D-154 option b)
+- [ ] **T-332** Evidence-gated lesson writes: a new lesson becomes recall-eligible only with a resolvable pointer (test, commit, QA verdict, CI run)
 
 ## Done (last 3 sessions)
 
