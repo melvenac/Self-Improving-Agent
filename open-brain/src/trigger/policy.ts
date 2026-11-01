@@ -69,6 +69,13 @@ export const TriggerPolicySchema = z.strictObject({
    */
   deadline_ms: z.number().int().min(1),
   /**
+   * T-331: the share of would-be injections the trigger WITHHOLDS, in [0, 1],
+   * so an injection can be compared with the same match left uninjected.
+   * Absent or 0 is off, which is how it ships: turning it on is a ruling, not a
+   * default. The split is a hash of the session and the ids (`withholdDraw`).
+   */
+  withhold_fraction: z.number().min(0).max(1).optional(),
+  /**
    * WHERE `relevance_floor` WAS MEASURED, AND AGAINST WHAT — required, not
    * decorative (R19).
    *
