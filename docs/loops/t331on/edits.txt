@@ -1,0 +1,14 @@
+@@@ open-brain/src/trigger/policies/recall-trigger.json
+<<<
+  "withhold_fraction": 0,
+===
+  "withhold_fraction": 0.5,
+>>>
+@@@ open-brain/tests/trigger/t331-withheld-arm.test.ts
+<<<
+  it('W3: OFF by default: the shipped policy says 0, an absent field injects, and the schema refuses out-of-range values', () => {
+    expect(loadPolicy().withhold_fraction).toBe(0);
+===
+  it('W3: ON since 11-01 (Aaron): the shipped policy says 0.5, an absent field injects, and the schema refuses out-of-range values', () => {
+    expect(loadPolicy().withhold_fraction).toBe(0.5);
+>>>
