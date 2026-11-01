@@ -158,7 +158,7 @@ describe("every declared flag of every command is accepted", () => {
 
   it("walks at least the fifteen commands (proves it looked)", () => {
     expect(specs.map((s) => s.name).sort()).toEqual(
-      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "list", "main-rebuild", "metrics review", "relocate", "rematch", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "stats", "sync", "topics", "trigger-keys"]
+      ["bootstrap check", "bootstrap install-commands", "bootstrap move-residue", "bootstrap scaffold", "detach", "evidence-report", "list", "main-rebuild", "metrics review", "relocate", "rematch", "scrub-trigger-fires", "skills-audit", "start", "state erasures", "state migrate", "state show", "stats", "sync", "topics", "trigger-keys"]
     );
   });
 
@@ -208,6 +208,7 @@ describe("the declarations agree with the usage text the CLI prints", () => {
     ["topics", /^\s+topics (.*)$/m],
     ["list", /^\s+list (.*)$/m],
     ["stats", /^\s+stats(.*)$/m],
+    ["evidence-report", /^\s+evidence-report (.*)$/m],
     ["skills-audit", /^\s+skills-audit (.*)$/m],
     ["detach", /^\s+detach (.*)$/m],
     ["main-rebuild", /^\s+main-rebuild (.*)$/m],

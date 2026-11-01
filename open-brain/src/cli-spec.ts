@@ -39,6 +39,12 @@ export const COMMAND_SPECS = {
     positionals: "none",
   },
   stats: { name: "stats", booleans: [], values: {}, positionals: "none" },
+  evidenceReport: {
+    name: "evidence-report",
+    booleans: [],
+    values: { "--db": "both", "--days": "both", "--as-of": "both", "--repo": "both" },
+    positionals: "none",
+  },
   skillsAudit: {
     name: "skills-audit",
     booleans: ["--json"],
