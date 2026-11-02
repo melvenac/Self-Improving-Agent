@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 615,
+  "revision": 616,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2911,15 +2911,15 @@
       "id": "T-331",
       "title": "Recall trigger: a hash-assigned 'withheld' arm, so injected vs withheld fires show whether an injection changes behaviour (ships OFF)",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 175,
-      "closed_session": null,
+      "closed_session": 175,
       "supersedes": null,
-      "note": "s175 10-31. From the RSI research Aaron asked for (10-31, 'Look for ideas we can adopt'; docs/loops/rsi-research-2026-10-31.md idea #1). It answers the PRD's open question: does an injected lesson change behaviour? Design: a withhold fraction, default 0 (OFF). A deterministic hash assigns each matched fire to injected or withheld; a 'withheld' trigger_fires row records the would-be ids and injects nothing; outcomes are compared per arm. Built overnight under clark's 10-31 push direction. TURNING IT ON (a fraction > 0) is Aaron's call: it withholds real lessons from real sessions. WAITING ON AARON once merged. — s175 10-31 later: SHIPPED OFF. SIM #492 all pass; build PR #1081 merged 53df28e5 (QA ACCEPT, byte-compare SAME, CI test pass on tcm). Live check on the rebuilt main build against a COPY of the store: withholdDraw exported, shipped withhold_fraction 0, G-039 command injects [299]. WAITING ON AARON: turn the arm on (withhold_fraction > 0 in recall-trigger.json, a one-line policy change). It withholds real lessons from real sessions. Follow-up: per-arm triggerCounts on the dashboard (Prism). — s175 11-01: Aaron said TURN IT ON (AskUserQuestion in clark's window, 11-01, 'Yes, turn it on (Recommended)'). Plan: withhold_fraction 0 -> 0.5 in recall-trigger.json (0.5: the research's figure, most statistical power; Aaron named no value), W3 re-pinned to 0.5, and every test that relies on the shipped policy injecting (hook.test, floor.test, no-network.test spread loadPolicy()) pinned to fraction 0 or checked against the hash draw. A QA PC SIM measures which rows flip before the build brief. Code PR: merge on Aaron's word, which this is.",
+      "note": "s175 10-31. From the RSI research Aaron asked for (10-31, 'Look for ideas we can adopt'; docs/loops/rsi-research-2026-10-31.md idea #1). It answers the PRD's open question: does an injected lesson change behaviour? Design: a withhold fraction, default 0 (OFF). A deterministic hash assigns each matched fire to injected or withheld; a 'withheld' trigger_fires row records the would-be ids and injects nothing; outcomes are compared per arm. Built overnight under clark's 10-31 push direction. TURNING IT ON (a fraction > 0) is Aaron's call: it withholds real lessons from real sessions. WAITING ON AARON once merged. — s175 10-31 later: SHIPPED OFF. SIM #492 all pass; build PR #1081 merged 53df28e5 (QA ACCEPT, byte-compare SAME, CI test pass on tcm). Live check on the rebuilt main build against a COPY of the store: withholdDraw exported, shipped withhold_fraction 0, G-039 command injects [299]. WAITING ON AARON: turn the arm on (withhold_fraction > 0 in recall-trigger.json, a one-line policy change). It withholds real lessons from real sessions. Follow-up: per-arm triggerCounts on the dashboard (Prism). — s175 11-01: Aaron said TURN IT ON (AskUserQuestion in clark's window, 11-01, 'Yes, turn it on (Recommended)'). Plan: withhold_fraction 0 -> 0.5 in recall-trigger.json (0.5: the research's figure, most statistical power; Aaron named no value), W3 re-pinned to 0.5, and every test that relies on the shipped policy injecting (hook.test, floor.test, no-network.test spread loadPolicy()) pinned to fraction 0 or checked against the hash draw. A QA PC SIM measures which rows flip before the build brief. Code PR: merge on Aaron's word, which this is. — s175 11-02: ON at 0.5 (Aaron 11-01 AUQ in clark's window: 'Yes, turn it on' and '50% (Atlas's pick)'). SIM #613 found 11 rows in 6 files red at 0.5 (fixed test sessions drawing withheld); fix: tests/setup-env.ts gives every spawned hook an arm-off policy copy via TRIGGER_POLICY_DIR, no-network A11 pins 0, W3 re-pinned 0.5. Build PR #1088 (QA ACCEPT: byte-compare SAME x4, mutants as predicted, full suite red only T-292 flake) merged pinned 93a7c067 -> 6c98303b; clark REBUILT. Live check on a store COPY: shipped 0.5; G-039 command matches [299]; session draw 0.3098 -> silent, withheldIds [299], fire row 'withheld:299'; draw 0.5563 -> injected [299]. The comparison itself is T-334.",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
-      "closed_rev": null
+      "closed_rev": 616
     },
     {
       "id": "T-332",
@@ -2944,6 +2944,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s175 11-01. From T-332's live check: the CLI resolves shas only in --repo (one checkout) and has no run resolver, so fleet lessons citing makerspace/courier/etc. shas or CI run ids count as not evidenced (4.3% vs the measure's 13.6% of new entries). Candidate: repeatable --repo, or default to every git repo under ~/Projects; a run resolver via gh is network, so opt-in only. Read-only shadow still.",
+      "note_by": [
+        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-334",
+      "title": "Recall trigger per-arm outcomes: do withheld and injected fires differ in what the session does next (T-331's comparison; dashboard counts with Prism)",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 175,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s175 11-02. T-331's arm has been ON at 0.5 since 6c98303b (11-02). Arms in trigger_fires: injected = state 'injected'; withheld = state 'silent' AND query has a 'withheld:<ids>' token. Needs: (1) Prism: per-arm counts on the dashboard (clark relays; Aaron asked for it 11-01); (2) an outcome measure, e.g. whether the lesson's failure recurs later in the same session (the same pattern in a later command), per arm. Let data accumulate a week or two before any reading; 299 dominates (about half of injections).",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
@@ -7078,12 +7092,12 @@
     },
     {
       "n": 175,
-      "date": "2026-11-01",
+      "date": "2026-11-02",
       "uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "last_work_rev": 615
+      "last_work_rev": 616
     }
   ]
 }
