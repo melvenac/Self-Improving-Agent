@@ -9,7 +9,7 @@
 // the leak by forgetting to opt out.
 
 import { afterEach, beforeEach } from "vitest";
-import { mkdtempSync } from "fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 import { bindSymlinkTest } from "./harness/symlink-or-skip.js";
@@ -39,6 +39,24 @@ process.env.OPEN_BRAIN_ACTIVE_SESSION = join(stateDir, "active-session.json");
 // not exist" and four tests in server.test.ts failed. server.ts reads this at
 // import time, so it must be set here rather than inside a test.
 process.env.KNOWLEDGE_V2_DB = join(stateDir, "knowledge-v2.db");
+
+// T-331 (Aaron 11-01, the withheld arm ON at 0.5): the shipped recall-trigger.json withholds about half of all
+// would-be injections, drawn by a hash of the session uuid and the ids. A spawned hook reads TRIGGER_POLICY_DIR before
+// the shipped file, so every hook a test spawns gets the shipped policy with the arm OFF, and a test of injection
+// mechanics does not pass or fail on its fixed session's draw (the SIM found 11 such rows, docs/loops/t331on-sim.md).
+// In-process loadPolicy() ignores the variable, so t331-withheld-arm W3 still reads the shipped 0.5, and a test that
+// passes its own TRIGGER_POLICY_DIR still wins. The arm itself is pinned by tests/trigger/t331-withheld-arm.test.ts.
+const armOffPolicyDir = join(stateDir, "trigger-policy-arm-off");
+mkdirSync(armOffPolicyDir);
+const shippedPolicy = JSON.parse(
+  readFileSync(new URL("../src/trigger/policies/recall-trigger.json", import.meta.url), "utf-8"),
+) as Record<string, unknown>;
+writeFileSync(
+  join(armOffPolicyDir, "recall-trigger.json"),
+  JSON.stringify({ ...shippedPolicy, withhold_fraction: 0 }),
+  "utf-8",
+);
+process.env.TRIGGER_POLICY_DIR = armOffPolicyDir;
 
 // The vault was the last unredirected write target. Every session-end run writes
 // a summary named after its project, so the server tests — which use temp
