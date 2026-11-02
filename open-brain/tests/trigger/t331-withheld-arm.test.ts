@@ -72,8 +72,8 @@ describe('T-331 withheld arm', () => {
     expect(recallCount()).toBe(1);
   });
 
-  it('W3: OFF by default: the shipped policy says 0, an absent field injects, and the schema refuses out-of-range values', () => {
-    expect(loadPolicy().withhold_fraction).toBe(0);
+  it('W3: ON since 11-01 (Aaron): the shipped policy says 0.5, an absent field injects, and the schema refuses out-of-range values', () => {
+    expect(loadPolicy().withhold_fraction).toBe(0.5);
     const outcome = runTrigger({ db, sessionUuid: SESSION, command: G039, policy: BASE });
     expect(outcome.state).toBe('injected');
     expect(outcome.withheldIds).toBeUndefined();

@@ -139,7 +139,8 @@ describe('A11 — the trigger attempts no network call, and the tripwire can see
       // Every exported surface of the trigger's module, in the order the hook
       // uses them. `loadPolicy` reads from disk, `queryStore` reads SQLite,
       // `runTrigger` writes the fire — none of it may touch a socket.
-      const policy = loadPolicy();
+      // T-331: the arm is ON in the shipped policy and this session draws withheld; this row is about sockets, not the arm.
+      const policy = { ...loadPolicy(), withhold_fraction: 0 };
       expect(deriveQuery(G039_COMMAND)).toBe('"tail" "exit" "code"');
       expect(queryStore({ db, command: G039_COMMAND, floor: -Infinity }).length).toBeGreaterThan(0);
 
