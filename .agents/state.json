@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 616,
+  "revision": 617,
   "project": {
     "name": "self-improving-agent"
   },
@@ -6958,14 +6958,13 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 175 (10-28): shipped T-328 (a3da1fdc), T-329 (4c439e84); closed T-262, T-320. T-284: hooksPath now absolute in this clone, live check passed; NEXT is the setup.mjs change to write the absolute path (small brief; per clark's routing note, drafts go to Grok first until the weekly reset). Then thin backlog: P2 T-191 (deferred), T-046 (upstream); P3 T-312, T-303, T-321, T-261, T-292 (watch). Herald's import awaits Aaron.",
+      "pick_up": "Session 175 (10-30..11-02) shipped the RSI-research slate: T-330 CI on tcm runners (cc0fffcf), T-331 withheld arm ON at 0.5 (6c98303b, live PASS), T-332 shadow evidence-report CLI (b9971b99, live PASS). Nothing in flight: no open PRs, no QA PC jobs. Next by priority: T-334 (P2) per-arm outcomes once a week or two of withheld/injected fires accumulate (arm live since 11-02); Prism's per-arm dashboard counts were requested via clark 11-02 (injected = state 'injected'; withheld = state 'silent' + 'withheld:<ids>' token). T-333 (P3) evidence-report multi-repo sha resolver. Otherwise work the backlog by priority (parked: T-191, T-046, T-312, T-303, T-321, T-261 S3/S4, T-292 watch, T-181 Herald import is Aaron's).",
       "watch_out": [
-        "Until the Claude Code weekly reset (clark 10-28): Grok first for second-judge reviews, research, mutant triage, long-log reading and first drafts; builds, QA PC test runs and the final QA ACCEPT stay on Claude Code; Grok is never on a merge-blocking path.",
-        "relay-check.mjs cannot see AskUserQuestion popup answers (they are tool_results): verify a relayed popup by reading the transcript's AskUserQuestion record (D-163 note shows how).",
-        "Dashboard v1.38.1+ redacts any full 40-hex sha not in a first line starting READY|BLOCKED|SIM <tag> <sha40>; use 8-char shas elsewhere.",
-        "Job client refuses non-ASCII briefs; qapc-job.mjs submit needs a git fetch first ('CHECK sha failed').",
-        "byte-compare.sh EDITS env takes a file name inside the loop dir (EDITS=edits-r2.txt).",
-        "A fork that writes docs/loops files in this worktree blocks tree-sync until it lands them."
+        "Tests that spawn the recall hook now get an arm-OFF policy copy via TRIGGER_POLICY_DIR set in open-brain/tests/setup-env.ts (T-331 on). A new hook test that expects injection works; one that wants the SHIPPED 0.5 must pass its own TRIGGER_POLICY_DIR or call runTrigger in-process with loadPolicy().",
+        "T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green (#1089 run 41433845760, 11-02): read the log before treating a red records PR as real; rerun --failed.",
+        "relay-check.mjs matches only TYPED text: an Aaron answer given via AskUserQuestion in clark's window shows NOT verified. Grep clark's transcript jsonl for '\"answers\":' instead (done for #1083 and T-331 on 11-01).",
+        "qapc-job.mjs submit prints JSON; parse the job id with grep -o '\"id\":[0-9]*', not 'job N' (a chain lost its wait step on 11-01; job 613 had been submitted once).",
+        "evidence-report counts lower than the T-332 measure (4.3% vs 13.6% of new entries): it resolves shas in one --repo and no CI run ids. That is T-333, not a bug."
       ],
       "open_questions": [],
       "session": 175,
@@ -6974,14 +6973,14 @@
         "frozen_sha": null,
         "questions_for_aaron": [],
         "rulings": [
-          "T-284 absolute hooksPath (Aaron 10-28)",
-          "Foundry landed as PR #26"
+          "11-01 Aaron (AUQ via clark): T-332 option C, shadow report only; merge #1083.",
+          "11-01 Aaron (AUQ via clark): T-331 turn the withheld arm on, fraction 0.5 ('50% (Atlas's pick)')."
         ]
       },
       "session_uuid": "0147d7e6-acbf-49eb-bd66-534461b3098f",
       "checkout": "sia-planner",
       "first_rev": 584,
-      "written_rev": 609
+      "written_rev": 617
     }
   ],
   "sessions": [
