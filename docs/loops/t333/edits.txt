@@ -1,0 +1,165 @@
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+import { spawnSync } from "node:child_process";
+import Database from "better-sqlite3";
+===
+import { spawnSync } from "node:child_process";
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import Database from "better-sqlite3";
+>>>
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+    path: (p) => files.has(p) || files.has(`open-brain/${p}`),
+  };
+}
+===
+    path: (p) => files.has(p) || files.has(`open-brain/${p}`),
+  };
+}
+
+/** T-333: the direct children of `dir` that are git checkouts. A worktree's `.git` is a file, and counts. */
+export function reposUnder(dir: string): string[] {
+  return readdirSync(dir)
+    .map((name) => join(dir, name))
+    .filter((p) => existsSync(join(p, ".git")))
+    .sort();
+}
+
+/**
+ * Every commit object in a repo, sorted, from one spawn. `cat-file -e` per sha per repo is thousands of spawns over
+ * the live store; this is one per repo, and like `cat-file` it sees unreachable commits and refuses blobs and trees.
+ */
+function commitsIn(repoRoot: string): string[] {
+  const r = spawnSync("git", ["-C", repoRoot, "cat-file", "--batch-all-objects", "--batch-check=%(objecttype) %(objectname)"], {
+    encoding: "utf8",
+    maxBuffer: 1 << 28,
+  });
+  if (r.status !== 0) throw new Error(`git cat-file exited ${r.status ?? r.error?.message}`);
+  return r.stdout
+    .split("\n")
+    .filter((l) => l.startsWith("commit "))
+    .map((l) => l.slice("commit ".length))
+    .sort();
+}
+
+/** Does any sha in the sorted list start with `prefix`? */
+function hasPrefix(sorted: readonly string[], prefix: string): boolean {
+  let lo = 0;
+  let hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if ((sorted[mid] ?? "") < prefix) lo = mid + 1;
+    else hi = mid;
+  }
+  return (sorted[lo] ?? "").startsWith(prefix);
+}
+
+export interface RepoSet {
+  resolver: EvidenceResolver;
+  repos: string[];
+  /** Repos that could not be read. Named in the report, so a smaller set never passes for a full one. */
+  skipped: Array<{ repo: string; reason: string }>;
+}
+
+/**
+ * T-333: a pointer resolves when ANY of `roots` holds it, as the T-332 measure resolved shas (lenient, "any of 25
+ * repos"). A root that cannot be read is skipped and named; no readable root at all throws, rather than reporting
+ * every pointer unresolved.
+ */
+export function repoSetResolver(roots: readonly string[]): RepoSet {
+  const readable: Array<{ repo: string; commits: string[]; path: (p: string) => boolean }> = [];
+  const skipped: RepoSet["skipped"] = [];
+  for (const repo of new Set(roots)) {
+    try {
+      readable.push({ repo, commits: commitsIn(repo), path: gitResolver(repo).path });
+    } catch (err) {
+      skipped.push({ repo, reason: err instanceof Error ? err.message : String(err) });
+    }
+  }
+  if (readable.length === 0) throw new Error(`no readable git checkout among ${roots.length} root(s)`);
+  return {
+    resolver: {
+      sha: (sha) => readable.some((r) => hasPrefix(r.commits, sha)),
+      path: (p) => readable.some((r) => r.path(p)),
+    },
+    repos: readable.map((r) => r.repo),
+    skipped,
+  };
+}
+
+export function renderResolverScope(set: RepoSet): string {
+  return [
+    `pointers resolved against ${set.repos.length} repo(s), any one is enough; skipped ${set.skipped.length}`,
+    ...set.skipped.map((s) => `  skipped ${s.repo}: ${s.reason}`),
+  ].join("\n");
+}
+
+export type GhRunner = (args: string[]) => { status: number | null; stderr: string };
+
+const ghSpawn: GhRunner = (args) => {
+  const r = spawnSync("gh", args, { encoding: "utf8" });
+  return { status: r.status, stderr: r.stderr ?? r.error?.message ?? "" };
+};
+
+/**
+ * T-333: the opt-in run resolver, and the only network this module does. A 404 means the run does not exist. Any other
+ * failure (no gh, no auth, offline) throws: reported as "unresolved", it would read as a store with no evidence.
+ */
+export function ghRunResolver(slug: string, gh: GhRunner = ghSpawn): (id: string) => boolean {
+  return (id) => {
+    const r = gh(["api", `repos/${slug}/actions/runs/${id}`, "--silent"]);
+    if (r.status === 0) return true;
+    if (r.stderr.includes("HTTP 404")) return false;
+    throw new Error(`gh could not answer for run ${id} (exit ${r.status}): ${r.stderr.trim().slice(0, 200)}`);
+  };
+}
+>>>
+@@@ open-brain/src/cli-spec.ts
+<<<
+    values: { "--db": "both", "--days": "both", "--as-of": "both", "--repo": "both" },
+===
+    values: { "--db": "both", "--days": "both", "--as-of": "both", "--repo": "both", "--repos-under": "both", "--runs-repo": "both" },
+>>>
+@@@ open-brain/src/cli-memory.ts
+<<<
+    const { evidenceReport, renderEvidenceReport, gitResolver } = await import("./pipelines/store/evidence-report.js");
+    const dbPath = resolve(opts.value("--db") ?? resolvePaths(resolve(".")).knowledgeV2Db);
+    try {
+      const report = evidenceReport(dbPath, gitResolver(resolve(opts.value("--repo") ?? ".")), { asOf, days });
+      console.log(renderEvidenceReport(report));
+      process.exit(0);
+===
+    const runsRepo = opts.value("--runs-repo");
+    if (runsRepo !== undefined && !/^[\w.-]+\/[\w.-]+$/.test(runsRepo)) {
+      console.error(`evidence-report refused: --runs-repo expects owner/name, got "${runsRepo}".\nNothing was run.`);
+      process.exit(2);
+    }
+    const { evidenceReport, renderEvidenceReport, renderResolverScope, gitResolver, reposUnder, repoSetResolver, ghRunResolver } = await import("./pipelines/store/evidence-report.js");
+    const dbPath = resolve(opts.value("--db") ?? resolvePaths(resolve(".")).knowledgeV2Db);
+    try {
+      // T-333: --repos-under widens the search to every checkout there, plus --repo when it is given as well.
+      const repoArg = opts.value("--repo");
+      const under = opts.value("--repos-under");
+      const set = under !== undefined ? repoSetResolver([...(repoArg !== undefined ? [resolve(repoArg)] : []), ...reposUnder(resolve(under))]) : undefined;
+      const base = set?.resolver ?? gitResolver(resolve(repoArg ?? "."));
+      const resolver = runsRepo !== undefined ? { ...base, run: ghRunResolver(runsRepo) } : base;
+      const report = evidenceReport(dbPath, resolver, { asOf, days });
+      console.log(renderEvidenceReport(report));
+      if (set) console.log(renderResolverScope(set));
+      process.exit(0);
+>>>
+@@@ open-brain/src/cli.ts
+<<<
+  console.log("  evidence-report [--db <path>] [--days <n>] [--as-of <iso>] [--repo <dir>]  Read-only shadow: lessons with a resolving evidence pointer, and the injections a gate would withhold (T-332)");
+===
+  console.log("  evidence-report [--db <path>] [--days <n>] [--as-of <iso>] [--repo <dir>] [--repos-under <dir>] [--runs-repo <owner/name>]  Read-only shadow: lessons with a resolving evidence pointer, and the injections a gate would withhold (T-332)");
+>>>
+@@@ open-brain/tests/pipelines/session-start/state-render.test.ts
+<<<
+    const active = real.tasks.filter((t) => t.status !== "done" && (t.priority === "P0" || t.priority === "P1"));
+    expect(active.length).toBeGreaterThan(0);
+===
+    // No floor on the count: an empty P0/P1 list is a healthy record. T-333: closing T-181 failed CI on records PR #1091.
+    const active = real.tasks.filter((t) => t.status !== "done" && (t.priority === "P0" || t.priority === "P1"));
+>>>

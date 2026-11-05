@@ -1,0 +1,8 @@
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+    .filter((l) => l.startsWith("commit "))
+    .map((l) => l.slice("commit ".length))
+===
+    .filter((l) => l !== "")
+    .map((l) => l.slice(l.indexOf(" ") + 1))
+>>>

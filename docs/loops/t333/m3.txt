@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+      sha: (sha) => readable.some((r) => hasPrefix(r.commits, sha)),
+===
+      sha: (sha) => hasPrefix(readable[0]?.commits ?? [], sha),
+>>>
