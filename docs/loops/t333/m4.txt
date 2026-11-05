@@ -1,0 +1,7 @@
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+    if (r.stderr.includes("HTTP 404")) return false;
+    throw new Error(`gh could not answer for run ${id} (exit ${r.status}): ${r.stderr.trim().slice(0, 200)}`);
+===
+    return false;
+>>>

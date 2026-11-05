@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+      skipped.push({ repo, reason: err instanceof Error ? err.message : String(err) });
+===
+      void err;
+>>>
