@@ -1,12 +1,12 @@
 {
   "schema_version": 3,
-  "revision": 617,
+  "revision": 619,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. Current SIA thread (planner, s175 10-28): adoption (T-181). openlaser, foundry and worth-it are on SIA; T-328 (env-template gitignore exceptions) shipped a3da1fdc. Open: foundry's sia/adopt merge (PR vs rebase, Aaron); T-262 live check (a); then P2 by priority (T-241 report's N4 design, T-191, T-046).",
-    "since_session": 175
+    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. T-181 adoption closed s177 (all projects on their default branches). Current thread (planner, s177 11-05): T-333 evidence-report resolver, PR #1093 accepted and waiting on Aaron's merge; T-334 waits for a week or two of per-arm fires (arm live since 11-02).",
+    "since_session": 177
   },
   "tasks": [
     {
@@ -706,13 +706,13 @@
       "id": "T-181",
       "title": "Adopt Aaron's active projects onto SIA per docs/loops/adoption-plan-2026-09-25.md: frogger (fresh install) and co-op-mailer (import) as pilots, then Tarrant County Makerspace record-only BEFORE its cutover (D-048), then foundry and worth-it-window-washing",
       "priority": "P1",
-      "status": "open",
+      "status": "done",
       "opened_session": 100,
-      "closed_session": null,
+      "closed_session": 177,
       "supersedes": null,
-      "note": "Session 100. Sequenced AFTER T-175 + T-180 land (brief: docs/loops/importer-fixes-brief.md, developer record session 101, started 2026-09-25 in parallel with QA 99). Amended the same session: candidate A closing is NOT a gate; the planner had sequenced it so, and Aaron asked whether the loop blocked downstream work. It did not, technically. The plan file carries the order, the per-project state read on 2026-09-25, Makerspace's six guardrails, the seat-name collisions (foundry and co-op-mailer name 'Forge', Makerspace names 'Relay'), the Actions-minutes and machine-load hazards, and the A2A-Hub migration as the only precedent. Makerspace is the one Aaron said must not be messed up: record only, one seat, no loops, rehearsal in a throwaway clone first, its 17 uncommitted files settled by Aaron or its own seat first, --commit run by Aaron (G-007). — s174 10-24 AUDIT, partly delivered (read on disk 10-24): frogger pilot 1 DONE (bootstrap commit 2026-09-26 'Bootstrap frogger onto SIA (T-181 pilot 1)'; re-run is T-241); co-op-mailer DONE (~/Projects/tarrantmailer, project co-op-mailer, state.json rev 108, Courier seat); Tarrant County Makerspace DONE (state.json rev 76, 108 tasks, Maker seat; import brief 06717789). NOT done: foundry (no .agents/state.json; last commit 09-05) and worth-it-window-washing (no state.json). Remaining scope = those two. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4, 'After the frogger re-run'; and typed in clark's window 02:1x CDT: 'add Foundry and Worth-It Window Washing to SIA yes after frogger re run'): adopt both with the fixed /bootstrap once T-241 grades clean; fresh install, record only, one seat, no loops. — s175 10-26: openlaser (~/Projects/openlaser, SvelteKit + Tauri) ADOPTED on Aaron's typed request via clark ('let's migrate this to sia and add it as a lane on the dashboard', verified with relay-check in clark's transcript 82bcf4b1). Import path: rehearsal --draft in a throwaway clone, then live on branch sia/adopt. Seat renamed Beam/planner ('Beam is fine', verified) as ef2dc0e. Aaron ran `state import <dir> --commit`. I moved the residue to the archive, ran install-commands, appended the CLAUDE.md SIA section, set the objective (rev 1), and committed 7591dd8 'Bootstrap SIA'. Planner worktree ~/Worktrees/openlaser-planner (detached at sia/adopt, AGENT.local.md Beam/planner); lane path sent to clark/Prism. Aaron still owns: ff-merge sia/adopt into main, and a GitHub remote (deferred by him, INBOX line 33). Lesson: an import's objective write is stamped as the project's session 1 under the importing seat's uuid. — s175 10-27 foundry + worth-it ADOPTED. Aaron typed (Atlas window): 'rename them as you see fit ... go ahead and migrate those other two projects to SIA', which also answers the T-241 question (yes). Seats: foundry -> Anvil/planner (was Forge/implementation, a collision); worth-it -> Pane/planner (no AGENT.md before). Both were rehearsed in throwaway clones first (full --commit there), then replayed on sia/adopt. foundry: INBOX regrouped Now/Next/Later/Deferred -> P1/P2/P3 (12 open, 16 done, 94 ADRs); objective set from INBOX P1 (rev 1; next-session.md was stale); commits 2c59ab9 (seat + INBOX) and 7dc7f89 'Bootstrap SIA'. worth-it: .agents/ was ENTIRELY gitignored (.gitignore `.agents/` -> `/.agents/*` so the allowlist can re-include); no INBOX before, so 26 open items moved from task.md into P1/P2/P3; objective found; commits 4110551 and 94e786e. Its CLAUDE.md and .claude/ are gitignored by the repo's own design, so the SIA section and commands stay local. Aaron was REMOTE, so `!` could not run: he sent the --commit command twice and said 'I'm remote'; Atlas ran both --commit lines on that explicit instruction (owner intent, typed). Pre-existing dirt was left untouched and out of every commit: foundry's CLAUDE.md context-mode block (set aside during install-commands, restored byte-identical; only the SIA section was staged), and worth-it's untracked .inflate.mjs (moved aside during install-commands, restored, sha 023793be). Snapshots: foundry 28 files; worth-it 353 files / 160 MB (it copies all of .agents/ including 146 MB of docs; untracked). OWED to Aaron: ff-merge sia/adopt into main/master in each repo and push (foundry and worth-it both have remotes). T-181 stays open only if more projects are named. — 10-28 merge outcomes: worth-it-window-washing sia/adopt fast-forwarded into master and pushed (94e786e). Foundry sia/adopt (7dc7f89) is not a fast-forward (origin/main gained 7 commits); clark asked Aaron PR vs rebase, Atlas recommends a PR. T-328 (env-template exceptions) now fixed in bootstrap, a3da1fdc. — 10-28: clark-ops merge-release.md no longer sends the tcm hub-deploy notice to Atlas (Aaron, typed in Atlas's window: 'send clark the change'; clark applied and verified 07:59Z). Clark checks its own hub rooms/listeners and notifies only a seat with a hub job in flight. — 10-28: foundry sia/adopt landed as foundry PR #26 (merge 2a85d4a on origin/main); Aaron answered 'Open a PR', already done. All three adoptions (openlaser, foundry, worth-it) are on their default branches. Herald (tcm-marketing) bootstrapped 10-28, awaiting Aaron's state import --commit; Atlas previewed its Briefing on a scratch copy: clean. Aaron's earlier 'Can you do it in manual mode?' is closed: nothing owed.",
+      "note": "Session 100. Sequenced AFTER T-175 + T-180 land (brief: docs/loops/importer-fixes-brief.md, developer record session 101, started 2026-09-25 in parallel with QA 99). Amended the same session: candidate A closing is NOT a gate; the planner had sequenced it so, and Aaron asked whether the loop blocked downstream work. It did not, technically. The plan file carries the order, the per-project state read on 2026-09-25, Makerspace's six guardrails, the seat-name collisions (foundry and co-op-mailer name 'Forge', Makerspace names 'Relay'), the Actions-minutes and machine-load hazards, and the A2A-Hub migration as the only precedent. Makerspace is the one Aaron said must not be messed up: record only, one seat, no loops, rehearsal in a throwaway clone first, its 17 uncommitted files settled by Aaron or its own seat first, --commit run by Aaron (G-007). — s174 10-24 AUDIT, partly delivered (read on disk 10-24): frogger pilot 1 DONE (bootstrap commit 2026-09-26 'Bootstrap frogger onto SIA (T-181 pilot 1)'; re-run is T-241); co-op-mailer DONE (~/Projects/tarrantmailer, project co-op-mailer, state.json rev 108, Courier seat); Tarrant County Makerspace DONE (state.json rev 76, 108 tasks, Maker seat; import brief 06717789). NOT done: foundry (no .agents/state.json; last commit 09-05) and worth-it-window-washing (no state.json). Remaining scope = those two. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4, 'After the frogger re-run'; and typed in clark's window 02:1x CDT: 'add Foundry and Worth-It Window Washing to SIA yes after frogger re run'): adopt both with the fixed /bootstrap once T-241 grades clean; fresh install, record only, one seat, no loops. — s175 10-26: openlaser (~/Projects/openlaser, SvelteKit + Tauri) ADOPTED on Aaron's typed request via clark ('let's migrate this to sia and add it as a lane on the dashboard', verified with relay-check in clark's transcript 82bcf4b1). Import path: rehearsal --draft in a throwaway clone, then live on branch sia/adopt. Seat renamed Beam/planner ('Beam is fine', verified) as ef2dc0e. Aaron ran `state import <dir> --commit`. I moved the residue to the archive, ran install-commands, appended the CLAUDE.md SIA section, set the objective (rev 1), and committed 7591dd8 'Bootstrap SIA'. Planner worktree ~/Worktrees/openlaser-planner (detached at sia/adopt, AGENT.local.md Beam/planner); lane path sent to clark/Prism. Aaron still owns: ff-merge sia/adopt into main, and a GitHub remote (deferred by him, INBOX line 33). Lesson: an import's objective write is stamped as the project's session 1 under the importing seat's uuid. — s175 10-27 foundry + worth-it ADOPTED. Aaron typed (Atlas window): 'rename them as you see fit ... go ahead and migrate those other two projects to SIA', which also answers the T-241 question (yes). Seats: foundry -> Anvil/planner (was Forge/implementation, a collision); worth-it -> Pane/planner (no AGENT.md before). Both were rehearsed in throwaway clones first (full --commit there), then replayed on sia/adopt. foundry: INBOX regrouped Now/Next/Later/Deferred -> P1/P2/P3 (12 open, 16 done, 94 ADRs); objective set from INBOX P1 (rev 1; next-session.md was stale); commits 2c59ab9 (seat + INBOX) and 7dc7f89 'Bootstrap SIA'. worth-it: .agents/ was ENTIRELY gitignored (.gitignore `.agents/` -> `/.agents/*` so the allowlist can re-include); no INBOX before, so 26 open items moved from task.md into P1/P2/P3; objective found; commits 4110551 and 94e786e. Its CLAUDE.md and .claude/ are gitignored by the repo's own design, so the SIA section and commands stay local. Aaron was REMOTE, so `!` could not run: he sent the --commit command twice and said 'I'm remote'; Atlas ran both --commit lines on that explicit instruction (owner intent, typed). Pre-existing dirt was left untouched and out of every commit: foundry's CLAUDE.md context-mode block (set aside during install-commands, restored byte-identical; only the SIA section was staged), and worth-it's untracked .inflate.mjs (moved aside during install-commands, restored, sha 023793be). Snapshots: foundry 28 files; worth-it 353 files / 160 MB (it copies all of .agents/ including 146 MB of docs; untracked). OWED to Aaron: ff-merge sia/adopt into main/master in each repo and push (foundry and worth-it both have remotes). T-181 stays open only if more projects are named. — 10-28 merge outcomes: worth-it-window-washing sia/adopt fast-forwarded into master and pushed (94e786e). Foundry sia/adopt (7dc7f89) is not a fast-forward (origin/main gained 7 commits); clark asked Aaron PR vs rebase, Atlas recommends a PR. T-328 (env-template exceptions) now fixed in bootstrap, a3da1fdc. — 10-28: clark-ops merge-release.md no longer sends the tcm hub-deploy notice to Atlas (Aaron, typed in Atlas's window: 'send clark the change'; clark applied and verified 07:59Z). Clark checks its own hub rooms/listeners and notifies only a seat with a hub job in flight. — 10-28: foundry sia/adopt landed as foundry PR #26 (merge 2a85d4a on origin/main); Aaron answered 'Open a PR', already done. All three adoptions (openlaser, foundry, worth-it) are on their default branches. Herald (tcm-marketing) bootstrapped 10-28, awaiting Aaron's state import --commit; Atlas previewed its Briefing on a scratch copy: clean. Aaron's earlier 'Can you do it in manual mode?' is closed: nothing owed. — s177 11-04 DONE, read on disk: every project in scope is adopted and on its default branch. Herald (tcm-marketing) state.json landed as 05571b6 'Bootstrap SIA' 10-28, contained in origin/main, rev 28 in ~/Worktrees/marketing-planner, so the 'Herald import is Aaron's' item in the s175 handoff was already done. openlaser sia/adopt is an ancestor of main (its origin is the mirror on 100.73.250.101; a GitHub remote stays Aaron's, deferred by him, not adoption scope). foundry sia/adopt is in origin/main; worth-it sia/adopt is in master. Note: ~/Projects/tcm-marketing is 42 behind origin/main, which is why its own tree shows no state.json; the seat works in the worktree.",
       "note_by": null,
-      "closed_rev": null
+      "closed_rev": 618
     },
     {
       "id": "T-182",
@@ -1580,17 +1580,18 @@
       "id": "T-241",
       "title": "Frogger pilot re-run: reset ~/Projects/frogger to its pre-migration state, re-run /bootstrap on current SIA master with the bootstrap fixes, grade against T-181 pilot 1's F1-F15",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 161,
-      "closed_session": null,
+      "closed_session": 177,
       "supersedes": null,
-      "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:2x CDT: 'We need to try the frogger migration again at some point. The plan was to reset frogger repo before the migration and test again.' Then: 'Frogger is a real project but non production, it was a fun test for cc several weeks ago. No plan to publish it.' Relayed by clark (TOLD, one link). SCOPE: frogger is a DISPOSABLE TEST BED, so the reset and the /bootstrap re-run do not need the live-project caution reserved for Makerspace (T-181). The planner schedules it; it is not urgent. STEPS: (1) Before using ~/Projects/frogger-residue as the reset source, establish what it holds and whether it is the saved pre-pilot copy (both directories exist, read at s161). (2) Reset ~/Projects/frogger to its pre-migration state. (3) Re-run /bootstrap from current SIA master, including the bootstrap-fix work (docs/loops/bootstrap-fix-brief.md and its r2-r4 handoffs). (4) Grade the run against F1-F15 in docs/loops/t181-frogger-pilot-report.md and write the result to a tracked file in docs/loops/. RELATION: this is the frogger slice of T-181 run again; T-181 stays open for the other projects. — Session 161, read by the planner on the desktop: frogger has NO git remote. Two local commits: 05ec972 'Initial commit: frogger arcade as it stood before SIA bootstrap' and 07640b8 'Bootstrap frogger onto SIA (T-181 pilot 1)'; tree clean. ~/Projects/frogger-residue is NOT a pre-pilot copy: it holds only .agents/reflection-queue.json, which the pilot moved out (report step 0). Reset point = 05ec972 plus .agents/reflection-queue.json restored. It runs on the desktop, or on the QA PC only after a bundle copy, which needs Aaron's word. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4: 'QA PC via bundle'): tag pilot 1 (frogger-pilot1 on 07640b8) first, copy a git bundle to the QA PC, reset to 05ec972 + restored reflection-queue.json and run /bootstrap there as a job; the desktop repo stays untouched. T-181 (foundry, worth-it-window-washing) follows a clean grade (Aaron, both windows). — s175 10-26 RUN: frogger bundled from the desktop (tag frogger-pilot1 on 07640b8; bundle sha cd2cb1bb), placed by clark as the QA PC mirror C:/Users/Aaron Melven/mirrors/frogger.git; brief docs/loops/t241-frogger-rerun.md (#1018/#1019, ASCII); job #194 at d149450f: READY FIXED 13/15. F11 STILL PRESENT (the draft prints Project: <name> without saying it came from package.json); F14 N/A (model behaviour). New: N1 move-residue leaves an untracked archive file before scaffold merges the gitignore; N2 the SIA section appended LF into a CRLF CLAUDE.md; N3 the draft's 'unparsed lines'/'could not tell' are unexplained in stdout; N4 a fresh /start reads like faults (empty legacy handoff, READS OWED AGENT.md, seat = folder name); N5 'origin/master unreadable' duplicates Tree currency NOT CHECKED; N6 SUMMARY keeps the PRD placeholder. Report docs/loops/t241-frogger-rerun-report.md (#1022). Desktop frogger untouched except the new tag. RULING OWED (Aaron): is 13/15 with F11 minor 'clean' enough to start T-181's foundry/worth-it adoptions? Planner recommends yes, with F11+N1-N6 as one bootstrap-polish task. — s175 10-27: answered: Aaron approved starting T-181's next adoptions (foundry and worth-it done the same day).",
+      "note": "AUTHORITY: Aaron in clark's window, session 161, 2026-10-04 ~02:2x CDT: 'We need to try the frogger migration again at some point. The plan was to reset frogger repo before the migration and test again.' Then: 'Frogger is a real project but non production, it was a fun test for cc several weeks ago. No plan to publish it.' Relayed by clark (TOLD, one link). SCOPE: frogger is a DISPOSABLE TEST BED, so the reset and the /bootstrap re-run do not need the live-project caution reserved for Makerspace (T-181). The planner schedules it; it is not urgent. STEPS: (1) Before using ~/Projects/frogger-residue as the reset source, establish what it holds and whether it is the saved pre-pilot copy (both directories exist, read at s161). (2) Reset ~/Projects/frogger to its pre-migration state. (3) Re-run /bootstrap from current SIA master, including the bootstrap-fix work (docs/loops/bootstrap-fix-brief.md and its r2-r4 handoffs). (4) Grade the run against F1-F15 in docs/loops/t181-frogger-pilot-report.md and write the result to a tracked file in docs/loops/. RELATION: this is the frogger slice of T-181 run again; T-181 stays open for the other projects. — Session 161, read by the planner on the desktop: frogger has NO git remote. Two local commits: 05ec972 'Initial commit: frogger arcade as it stood before SIA bootstrap' and 07640b8 'Bootstrap frogger onto SIA (T-181 pilot 1)'; tree clean. ~/Projects/frogger-residue is NOT a pre-pilot copy: it holds only .agents/reflection-queue.json, which the pilot moved out (report step 0). Reset point = 05ec972 plus .agents/reflection-queue.json restored. It runs on the desktop, or on the QA PC only after a bundle copy, which needs Aaron's word. — s174 10-26 RULED (Aaron at the planner's desk, transcript 0bbb03c4: 'QA PC via bundle'): tag pilot 1 (frogger-pilot1 on 07640b8) first, copy a git bundle to the QA PC, reset to 05ec972 + restored reflection-queue.json and run /bootstrap there as a job; the desktop repo stays untouched. T-181 (foundry, worth-it-window-washing) follows a clean grade (Aaron, both windows). — s175 10-26 RUN: frogger bundled from the desktop (tag frogger-pilot1 on 07640b8; bundle sha cd2cb1bb), placed by clark as the QA PC mirror C:/Users/Aaron Melven/mirrors/frogger.git; brief docs/loops/t241-frogger-rerun.md (#1018/#1019, ASCII); job #194 at d149450f: READY FIXED 13/15. F11 STILL PRESENT (the draft prints Project: <name> without saying it came from package.json); F14 N/A (model behaviour). New: N1 move-residue leaves an untracked archive file before scaffold merges the gitignore; N2 the SIA section appended LF into a CRLF CLAUDE.md; N3 the draft's 'unparsed lines'/'could not tell' are unexplained in stdout; N4 a fresh /start reads like faults (empty legacy handoff, READS OWED AGENT.md, seat = folder name); N5 'origin/master unreadable' duplicates Tree currency NOT CHECKED; N6 SUMMARY keeps the PRD placeholder. Report docs/loops/t241-frogger-rerun-report.md (#1022). Desktop frogger untouched except the new tag. RULING OWED (Aaron): is 13/15 with F11 minor 'clean' enough to start T-181's foundry/worth-it adoptions? Planner recommends yes, with F11+N1-N6 as one bootstrap-polish task. — s175 10-27: answered: Aaron approved starting T-181's next adoptions (foundry and worth-it done the same day). — s177 11-04 DONE: the re-run graded (13/15), Aaron answered its ruling 10-27, and T-325 shipped F11, N1-N3, N5, N6 (56e2c065). The only leftover is N4, a design question, moved to T-335 so this task stops reading as open work.",
       "note_by": [
         "9a3bc5a9-fd23-444f-a45e-3bc75c455cd1",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b",
-        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+        "0147d7e6-acbf-49eb-bd66-534461b3098f",
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
-      "closed_rev": null
+      "closed_rev": 618
     },
     {
       "id": "T-242",
@@ -2943,9 +2944,10 @@
       "opened_session": 175,
       "closed_session": null,
       "supersedes": null,
-      "note": "s175 11-01. From T-332's live check: the CLI resolves shas only in --repo (one checkout) and has no run resolver, so fleet lessons citing makerspace/courier/etc. shas or CI run ids count as not evidenced (4.3% vs the measure's 13.6% of new entries). Candidate: repeatable --repo, or default to every git repo under ~/Projects; a run resolver via gh is network, so opt-in only. Read-only shadow still.",
+      "note": "s175 11-01. From T-332's live check: the CLI resolves shas only in --repo (one checkout) and has no run resolver, so fleet lessons citing makerspace/courier/etc. shas or CI run ids count as not evidenced (4.3% vs the measure's 13.6% of new entries). Candidate: repeatable --repo, or default to every git repo under ~/Projects; a run resolver via gh is network, so opt-in only. Read-only shadow still. — s177 11-05: SIM job 699 (689 refused: sha on sim/, runner takes only the default branch or loop/*); all 5 mutants as predicted; it found the usage line missing and the T183-3 row. Brief #1092. Build job 705 READY PR #1093 head bcda7658: byte-compare 6/6 SAME vs 25d08074, merge-check CLEAN, CI test green, wide suite 4922 passed, 75 skipped (the same 75 as job 615). QA ACCEPT by Atlas, with the limit that Atlas wrote the edits and the builder only applied them. MERGE NOT DONE: pr-merge.sh was denied by the session's auto-mode classifier ('Merge Without Review'); the ask is in clark's queue for Aaron. After merge: sia-rebuild.sh, the brief's live check, close this task.",
       "note_by": [
-        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+        "0147d7e6-acbf-49eb-bd66-534461b3098f",
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
       "closed_rev": null
     },
@@ -2962,6 +2964,20 @@
         "0147d7e6-acbf-49eb-bd66-534461b3098f"
       ],
       "closed_rev": null
+    },
+    {
+      "id": "T-335",
+      "title": "A fresh /start reads like faults: empty legacy handoff, READS OWED AGENT.md, seat = folder name (T-241 report N4)",
+      "priority": "P2",
+      "status": "done",
+      "opened_session": 177,
+      "closed_session": 177,
+      "supersedes": null,
+      "note": "s177 11-04, split from T-241. docs/loops/t241-frogger-rerun-report.md N4. Three renderers, deferred from T-325 as a design question. Needs a one-page design before any build. — s177 11-05 DUPLICATE, opened in error: T-241's N4 already shipped as T-329 (4c439e84, 10-28). The planner read T-241's note and T-325's 'N4 DEFERRED' without searching for a later task. Nothing owed.",
+      "note_by": [
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
+      ],
+      "closed_rev": 619
     }
   ],
   "verified": [
@@ -6439,47 +6455,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "(1) VERIFY #545 LIVE on build a7443d3: plain '## Briefing', READS OWED after Latest brief, a FLEET line with SIA seats and no 'vv'. (2) FORWARD grok-audit's reply to clark: room k575fscdqd291tgnpg51yttgbh8frzq8, after job turn 48 (MAKERSPACE AUDIT P4, 17:16Z). (3) D-143: small fixes only; support Maker. (4) Laptop QA 298 leftovers go in clark's batched ask.",
-      "watch_out": [
-        "D-143: NO new SIA loops. Work T-248..T-253 only if one becomes a real issue for Maker (T-250 the likeliest). Every Cursor task: text to clark first (checklist plus IMPACT-TARGETS first in the brief), and post on GO.",
-        "QA on Windows: a laptop QA launched by ssh is ELEVATED, and DENY ACLs don't bind it. Use clark's RunLevel Limited scheduled task, a privilege preflight via System32 whoami.exe that fails closed, and fresh scratch names per rerun.",
-        "HUB-TALK: C:/Users/melve/Worktrees/a2a-planner/scripts/hub-talk.mjs with HUB_URL=http://100.124.212.87:4000. Grok job turns start with their prefix (grok-audit also takes 'MAKERSPACE JOB:'). A planner set_handoff needs loop_state (C3)."
-      ],
-      "open_questions": [
-        "Aaron (via clark): post-freeze recall-trigger loop? (now under D-143: small fixes only)",
-        "Aaron (via clark): #437 r10 or T-245 Option A? (parked)"
-      ],
-      "session": 165,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#437",
-            "qa_status": "in_progress",
-            "note": "PARKED (D-130)"
-          },
-          {
-            "ref": "#425",
-            "qa_status": "accepted",
-            "note": "PARKED (D-130)"
-          },
-          {
-            "ref": "#470",
-            "qa_status": "in_progress",
-            "note": "PARKED (D-130) with #463 #465"
-          }
-        ],
-        "frozen_sha": null,
-        "questions_for_aaron": [],
-        "rulings": [
-          "s165: E4 (21 standing); STANDING-BUDGET (D-139); D-138; V-079; D-140 QA routing; Makerspace PROVEN (D-141, sia/adopt merged 56877428); BRIEFING-FIX merged (D-142, a7443d33, rebuilt); D-143 small-fixes-only; tasks T-248..T-253; Makerspace audit P4 posted to grok-audit (turn 48) for clark."
-        ]
-      },
-      "session_uuid": "367df9c3-ef6b-47f0-be31-1f60993dddcd",
-      "checkout": "sia-planner",
-      "first_rev": 360
-    },
-    {
-      "seat": "planner",
       "pick_up": "(1) CLOSE T-255 on A3: Maker, after an explicit /mcp reconnect open-brain, runs /start. It should print 'Build c23fff6 · current', the note 'Session_57.md was already taken and was not overwritten; this session's log is Session_58.md', and Session_58 must carry a Session ID line; a 2nd ob_start prints the reuse marker. Then Maker deletes Session_57.md (A4). As of s166's end there was no Session_58 in makerspace-planner. (2) D-143 small fixes only; support Maker. (3) D-144: no Claude except planners. Aaron stopped all work 10-09 ~23:3x CDT; resume late 10-10.",
       "watch_out": [
         "D-144 (Aaron 10-09): no Claude Code except planners. Dev goes to Cursor (cursor-builder, room k575sfwr9wcx3r8fw83g3bc00x8fmar3); QA goes to Grok bots (grok-sia-review room k57c639j4wkyp3y3vhfxxytn1s8fsdx6; grok-audit room k575fscdqd291tgnpg51yttgbh8frzq8, which also takes 'MAKERSPACE JOB:'). A gate that needs Claude goes to clark, then Aaron.",
@@ -6981,6 +6956,45 @@
       "checkout": "sia-planner",
       "first_rev": 584,
       "written_rev": 617
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Session 177 (overnight go via clark, 11-04): closed T-181 and T-241; built T-333. PR #1093 is QA ACCEPTED at head bcda7658 and NOT merged: pr-merge.sh was denied by the auto-mode classifier ('Merge Without Review'), and the ask is in clark's queue for Aaron. Records PR #1091 (this record, rev 618+) stays red until #1093 lands, because closing T-181 left no P0/P1 task and state-render.test.ts T183-3 pinned at least one on the live record; #1093 removes that floor. After #1093 merges: pr-keep-current.sh 1091, sia-rebuild.sh <mergesha>, the live check in docs/loops/t333-brief.md, close T-333. Then T-334 when per-arm fires have accumulated.",
+      "watch_out": [
+        "Do NOT reopen T-181 or add a placeholder P1 to turn #1091 green: the record is right and the test was wrong.",
+        "No ob_state write from origin/master until #1091 merges: master is behind this record. Work from #1091's head.",
+        "The QA PC runner accepts a sha only if reachable from the default branch or a loop/* branch; a job on sim/ is refused 'reachable'. sim-push.sh now pushes loop/sim-<tag> (syntax-checked, not yet run live). Lenovo takes reviews and sims only and cannot push; it runs Linux, so a brief's PowerShell is translated there.",
+        "tests/harness/checks.test.ts D4 went red on Lenovo (npm in a scratch repo) and green on the QA PC: a Lenovo SIM red there is not evidence against a change.",
+        "Before opening a task for a report's leftover, search tasks by the report's item id: T-335 duplicated T-329 for want of that.",
+        "T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green: read the log before treating a red records PR as real; but read it, #1091's red was real.",
+        "relay-check.mjs matches only TYPED text: an Aaron answer via AskUserQuestion in clark's window shows NOT verified. Grep clark's transcript jsonl for '\"answers\":' instead.",
+        "Tests that spawn the recall hook get an arm-OFF policy copy via TRIGGER_POLICY_DIR in open-brain/tests/setup-env.ts; a test wanting the shipped 0.5 passes its own or calls runTrigger in-process."
+      ],
+      "open_questions": [],
+      "session": 177,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#1093",
+            "qa_status": "accepted",
+            "note": "T-333 code; ACCEPT by Atlas at bcda7658; merge denied by classifier, waiting on Aaron"
+          },
+          {
+            "ref": "#1091",
+            "qa_status": "not_required",
+            "note": "records rev 618+; CI red until #1093 lands"
+          }
+        ],
+        "frozen_sha": "bcda7658990229580bdc5ad72af1336217bb8db5",
+        "questions_for_aaron": [
+          "Merge #1093 at bcda7658, or allow Atlas's merge permission? Atlas recommends merging."
+        ],
+        "rulings": []
+      },
+      "session_uuid": "6f5b8a9d-429d-4c93-99a4-996634877932",
+      "checkout": "sia-planner",
+      "first_rev": 618,
+      "written_rev": 619
     }
   ],
   "sessions": [
@@ -7007,14 +7021,6 @@
       "seat": "developer",
       "checkout": "sia-builder",
       "first_rev": 263
-    },
-    {
-      "n": 165,
-      "date": "2026-10-09",
-      "uuid": "367df9c3-ef6b-47f0-be31-1f60993dddcd",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 360
     },
     {
       "n": 166,
@@ -7097,6 +7103,15 @@
       "checkout": "sia-planner",
       "first_rev": 584,
       "last_work_rev": 616
+    },
+    {
+      "n": 177,
+      "date": "2026-11-05",
+      "uuid": "6f5b8a9d-429d-4c93-99a4-996634877932",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 618,
+      "last_work_rev": 619
     }
   ]
 }
