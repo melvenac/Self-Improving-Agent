@@ -13,6 +13,8 @@
  * `pipelines/store/` is in MEMORY_SIDE.
  */
 import { spawnSync } from "node:child_process";
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import Database from "better-sqlite3";
 
 export type PointerKind = "sha" | "test" | "loop" | "run" | "pr";
@@ -266,5 +268,102 @@ export function gitResolver(repoRoot: string): EvidenceResolver {
   return {
     sha: (sha) => spawnSync("git", ["-C", repoRoot, "cat-file", "-e", `${sha}^{commit}`], { stdio: "ignore" }).status === 0,
     path: (p) => files.has(p) || files.has(`open-brain/${p}`),
+  };
+}
+
+/** T-333: the direct children of `dir` that are git checkouts. A worktree's `.git` is a file, and counts. */
+export function reposUnder(dir: string): string[] {
+  return readdirSync(dir)
+    .map((name) => join(dir, name))
+    .filter((p) => existsSync(join(p, ".git")))
+    .sort();
+}
+
+/**
+ * Every commit object in a repo, sorted, from one spawn. `cat-file -e` per sha per repo is thousands of spawns over
+ * the live store; this is one per repo, and like `cat-file` it sees unreachable commits and refuses blobs and trees.
+ */
+function commitsIn(repoRoot: string): string[] {
+  const r = spawnSync("git", ["-C", repoRoot, "cat-file", "--batch-all-objects", "--batch-check=%(objecttype) %(objectname)"], {
+    encoding: "utf8",
+    maxBuffer: 1 << 28,
+  });
+  if (r.status !== 0) throw new Error(`git cat-file exited ${r.status ?? r.error?.message}`);
+  return r.stdout
+    .split("\n")
+    .filter((l) => l.startsWith("commit "))
+    .map((l) => l.slice("commit ".length))
+    .sort();
+}
+
+/** Does any sha in the sorted list start with `prefix`? */
+function hasPrefix(sorted: readonly string[], prefix: string): boolean {
+  let lo = 0;
+  let hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if ((sorted[mid] ?? "") < prefix) lo = mid + 1;
+    else hi = mid;
+  }
+  return (sorted[lo] ?? "").startsWith(prefix);
+}
+
+export interface RepoSet {
+  resolver: EvidenceResolver;
+  repos: string[];
+  /** Repos that could not be read. Named in the report, so a smaller set never passes for a full one. */
+  skipped: Array<{ repo: string; reason: string }>;
+}
+
+/**
+ * T-333: a pointer resolves when ANY of `roots` holds it, as the T-332 measure resolved shas (lenient, "any of 25
+ * repos"). A root that cannot be read is skipped and named; no readable root at all throws, rather than reporting
+ * every pointer unresolved.
+ */
+export function repoSetResolver(roots: readonly string[]): RepoSet {
+  const readable: Array<{ repo: string; commits: string[]; path: (p: string) => boolean }> = [];
+  const skipped: RepoSet["skipped"] = [];
+  for (const repo of new Set(roots)) {
+    try {
+      readable.push({ repo, commits: commitsIn(repo), path: gitResolver(repo).path });
+    } catch (err) {
+      skipped.push({ repo, reason: err instanceof Error ? err.message : String(err) });
+    }
+  }
+  if (readable.length === 0) throw new Error(`no readable git checkout among ${roots.length} root(s)`);
+  return {
+    resolver: {
+      sha: (sha) => readable.some((r) => hasPrefix(r.commits, sha)),
+      path: (p) => readable.some((r) => r.path(p)),
+    },
+    repos: readable.map((r) => r.repo),
+    skipped,
+  };
+}
+
+export function renderResolverScope(set: RepoSet): string {
+  return [
+    `pointers resolved against ${set.repos.length} repo(s), any one is enough; skipped ${set.skipped.length}`,
+    ...set.skipped.map((s) => `  skipped ${s.repo}: ${s.reason}`),
+  ].join("\n");
+}
+
+export type GhRunner = (args: string[]) => { status: number | null; stderr: string };
+
+const ghSpawn: GhRunner = (args) => {
+  const r = spawnSync("gh", args, { encoding: "utf8" });
+  return { status: r.status, stderr: r.stderr ?? r.error?.message ?? "" };
+};
+
+/**
+ * T-333: the opt-in run resolver, and the only network this module does. A 404 means the run does not exist. Any other
+ * failure (no gh, no auth, offline) throws: reported as "unresolved", it would read as a store with no evidence.
+ */
+export function ghRunResolver(slug: string, gh: GhRunner = ghSpawn): (id: string) => boolean {
+  return (id) => {
+    const r = gh(["api", `repos/${slug}/actions/runs/${id}`, "--silent"]);
+    if (r.status === 0) return true;
+    if (r.stderr.includes("HTTP 404")) return false;
+    throw new Error(`gh could not answer for run ${id} (exit ${r.status}): ${r.stderr.trim().slice(0, 200)}`);
   };
 }

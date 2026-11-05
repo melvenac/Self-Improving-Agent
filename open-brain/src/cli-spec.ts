@@ -42,7 +42,7 @@ export const COMMAND_SPECS = {
   evidenceReport: {
     name: "evidence-report",
     booleans: [],
-    values: { "--db": "both", "--days": "both", "--as-of": "both", "--repo": "both" },
+    values: { "--db": "both", "--days": "both", "--as-of": "both", "--repo": "both", "--repos-under": "both", "--runs-repo": "both" },
     positionals: "none",
   },
   skillsAudit: {
