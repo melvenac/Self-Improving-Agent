@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/store/evidence-report.ts
+<<<
+  return (sorted[lo] ?? "").startsWith(prefix);
+===
+  return sorted[lo] === prefix;
+>>>

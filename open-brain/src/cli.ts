@@ -657,7 +657,7 @@ Read-only. Change state through ob_state — never by editing the file.`);
   console.log("  topics [--min=<n>] [--apply]               Generate Topic notes from subject tags");
   console.log("  list [--limit <n>] [--project <dir>]      Stored knowledge entries, newest first (default 20; T-295)");
   console.log("  stats                                      Knowledge store counts and censuses (T-295)");
-  console.log("  evidence-report [--db <path>] [--days <n>] [--as-of <iso>] [--repo <dir>]  Read-only shadow: lessons with a resolving evidence pointer, and the injections a gate would withhold (T-332)");
+  console.log("  evidence-report [--db <path>] [--days <n>] [--as-of <iso>] [--repo <dir>] [--repos-under <dir>] [--runs-repo <owner/name>]  Read-only shadow: lessons with a resolving evidence pointer, and the injections a gate would withhold (T-332)");
   console.log("  skills-audit [--session <uuid>] [--last <n>] [--seat <name>] [--runtime claude|cursor] [--json] [dir]   Read-only: shell commands this session repeated (T-262)");
   console.log("  state show [--json]                                 Read .agents/state.json (read-only; write via ob_state)");
   console.log("  state import [--draft [--name <project name>]|--commit [--accept-stale] [--accept-changed]] [--force-snapshot]  Migrate .agents/ prose into state.json (once)");
