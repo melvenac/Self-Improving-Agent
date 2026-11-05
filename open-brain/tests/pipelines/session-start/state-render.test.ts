@@ -408,8 +408,8 @@ describe("renderState — T183-3 the real record's handoffs are verbatim", () =>
     const text = renderState(real, "x").join("\n");
     if (real.objective) expect(text).toContain(`Objective: ${real.objective.text} (since session ${real.objective.since_session})`);
     // P2 and P3 render as count lines (D-100 follow-up), so only P0 and P1 titles are asserted.
+    // No floor on the count: an empty P0/P1 list is a healthy record. T-333: closing T-181 failed CI on records PR #1091.
     const active = real.tasks.filter((t) => t.status !== "done" && (t.priority === "P0" || t.priority === "P1"));
-    expect(active.length).toBeGreaterThan(0);
     for (const t of active) expect(text).toContain(`${t.id} ${t.title.length > 100 ? `${t.title.slice(0, 100).trimEnd()}…` : t.title}`);
   });
 });

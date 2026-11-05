@@ -268,11 +268,23 @@ export async function runMemoryCommand(args: readonly string[]): Promise<void> {
       process.exit(2);
     }
     const asOf = asOfArg !== undefined ? new Date(asOfArg).toISOString() : new Date().toISOString();
-    const { evidenceReport, renderEvidenceReport, gitResolver } = await import("./pipelines/store/evidence-report.js");
+    const runsRepo = opts.value("--runs-repo");
+    if (runsRepo !== undefined && !/^[\w.-]+\/[\w.-]+$/.test(runsRepo)) {
+      console.error(`evidence-report refused: --runs-repo expects owner/name, got "${runsRepo}".\nNothing was run.`);
+      process.exit(2);
+    }
+    const { evidenceReport, renderEvidenceReport, renderResolverScope, gitResolver, reposUnder, repoSetResolver, ghRunResolver } = await import("./pipelines/store/evidence-report.js");
     const dbPath = resolve(opts.value("--db") ?? resolvePaths(resolve(".")).knowledgeV2Db);
     try {
-      const report = evidenceReport(dbPath, gitResolver(resolve(opts.value("--repo") ?? ".")), { asOf, days });
+      // T-333: --repos-under widens the search to every checkout there, plus --repo when it is given as well.
+      const repoArg = opts.value("--repo");
+      const under = opts.value("--repos-under");
+      const set = under !== undefined ? repoSetResolver([...(repoArg !== undefined ? [resolve(repoArg)] : []), ...reposUnder(resolve(under))]) : undefined;
+      const base = set?.resolver ?? gitResolver(resolve(repoArg ?? "."));
+      const resolver = runsRepo !== undefined ? { ...base, run: ghRunResolver(runsRepo) } : base;
+      const report = evidenceReport(dbPath, resolver, { asOf, days });
       console.log(renderEvidenceReport(report));
+      if (set) console.log(renderResolverScope(set));
       process.exit(0);
     } catch (err) {
       console.error(`evidence-report refused: ${err instanceof Error ? err.message : String(err)}`);
