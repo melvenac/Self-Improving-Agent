@@ -1,20 +1,23 @@
-<!-- generated from .agents/state.json rev 618 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 619 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 175)_
+## planner [sia-planner] _(written session 177)_
 
 ### Pick up here
 
-Session 175 (10-30..11-02) shipped the RSI-research slate: T-330 CI on tcm runners (cc0fffcf), T-331 withheld arm ON at 0.5 (6c98303b, live PASS), T-332 shadow evidence-report CLI (b9971b99, live PASS). Nothing in flight: no open PRs, no QA PC jobs. Next by priority: T-334 (P2) per-arm outcomes once a week or two of withheld/injected fires accumulate (arm live since 11-02); Prism's per-arm dashboard counts were requested via clark 11-02 (injected = state 'injected'; withheld = state 'silent' + 'withheld:<ids>' token). T-333 (P3) evidence-report multi-repo sha resolver. Otherwise work the backlog by priority (parked: T-191, T-046, T-312, T-303, T-321, T-261 S3/S4, T-292 watch, T-181 Herald import is Aaron's).
+Session 177 (overnight go via clark, 11-04): closed T-181 and T-241; built T-333. PR #1093 is QA ACCEPTED at head bcda7658 and NOT merged: pr-merge.sh was denied by the auto-mode classifier ('Merge Without Review'), and the ask is in clark's queue for Aaron. Records PR #1091 (this record, rev 618+) stays red until #1093 lands, because closing T-181 left no P0/P1 task and state-render.test.ts T183-3 pinned at least one on the live record; #1093 removes that floor. After #1093 merges: pr-keep-current.sh 1091, sia-rebuild.sh <mergesha>, the live check in docs/loops/t333-brief.md, close T-333. Then T-334 when per-arm fires have accumulated.
 
 ### Watch out
 
-- Tests that spawn the recall hook now get an arm-OFF policy copy via TRIGGER_POLICY_DIR set in open-brain/tests/setup-env.ts (T-331 on). A new hook test that expects injection works; one that wants the SHIPPED 0.5 must pass its own TRIGGER_POLICY_DIR or call runTrigger in-process with loadPolicy().
-- T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green (#1089 run 41433845760, 11-02): read the log before treating a red records PR as real; rerun --failed.
-- relay-check.mjs matches only TYPED text: an Aaron answer given via AskUserQuestion in clark's window shows NOT verified. Grep clark's transcript jsonl for '"answers":' instead (done for #1083 and T-331 on 11-01).
-- qapc-job.mjs submit prints JSON; parse the job id with grep -o '"id":[0-9]*', not 'job N' (a chain lost its wait step on 11-01; job 613 had been submitted once).
-- evidence-report counts lower than the T-332 measure (4.3% vs 13.6% of new entries): it resolves shas in one --repo and no CI run ids. That is T-333, not a bug.
+- Do NOT reopen T-181 or add a placeholder P1 to turn #1091 green: the record is right and the test was wrong.
+- No ob_state write from origin/master until #1091 merges: master is behind this record. Work from #1091's head.
+- The QA PC runner accepts a sha only if reachable from the default branch or a loop/* branch; a job on sim/ is refused 'reachable'. sim-push.sh now pushes loop/sim-<tag> (syntax-checked, not yet run live). Lenovo takes reviews and sims only and cannot push; it runs Linux, so a brief's PowerShell is translated there.
+- tests/harness/checks.test.ts D4 went red on Lenovo (npm in a scratch repo) and green on the QA PC: a Lenovo SIM red there is not evidence against a change.
+- Before opening a task for a report's leftover, search tasks by the report's item id: T-335 duplicated T-329 for want of that.
+- T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green: read the log before treating a red records PR as real; but read it, #1091's red was real.
+- relay-check.mjs matches only TYPED text: an Aaron answer via AskUserQuestion in clark's window shows NOT verified. Grep clark's transcript jsonl for '"answers":' instead.
+- Tests that spawn the recall hook get an arm-OFF policy copy via TRIGGER_POLICY_DIR in open-brain/tests/setup-env.ts; a test wanting the shipped 0.5 passes its own or calls runTrigger in-process.
 
 ### Open questions
 
@@ -22,15 +25,16 @@ _None._
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #1093 — QA: accepted — T-333 code; ACCEPT by Atlas at bcda7658; merge denied by classifier, waiting on Aaron
+- #1091 — QA: not_required — records rev 618+; CI red until #1093 lands
 
-**SHA frozen for QA:** _None._
+**SHA frozen for QA:** `bcda7658990229580bdc5ad72af1336217bb8db5`
 
-**Questions pending for Aaron:** _None._
+**Questions pending for Aaron:** 
+- Merge #1093 at bcda7658, or allow Atlas's merge permission? Atlas recommends merging.
 
-**Rulings made mid-loop:** 
-- 11-01 Aaron (AUQ via clark): T-332 option C, shadow report only; merge #1083.
-- 11-01 Aaron (AUQ via clark): T-331 turn the withheld arm on, fraction 0.5 ('50% (Atlas's pick)').
+**Rulings made mid-loop:** _None._
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -102,8 +106,8 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
-Session 177 — 2026-11-04 — planner [sia-planner] — `6f5b8a9d-429d-4c93-99a4-996634877932` (14 writing session(s) in the record)
+Session 177 — 2026-11-05 — planner [sia-planner] — `6f5b8a9d-429d-4c93-99a4-996634877932` (14 writing session(s) in the record)

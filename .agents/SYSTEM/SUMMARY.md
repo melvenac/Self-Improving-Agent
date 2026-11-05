@@ -1,8 +1,8 @@
 # Project Summary
 
 <!-- state:begin -->
-<!-- generated from .agents/state.json rev 618 by open-brain v0.45.0 — do not edit; change state via ob_state -->
-> **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. T-181 adoption closed s177 (all projects on their default branches). Current thread (planner, s177 11-04, overnight go via clark): T-333 evidence-report multi-repo resolver, then T-335 design; T-334 waits for a week or two of per-arm fires (arm live since 11-02).
+<!-- generated from .agents/state.json rev 619 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+> **Status:** v0.45.0 — D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. T-181 adoption closed s177 (all projects on their default branches). Current thread (planner, s177 11-05): T-333 evidence-report resolver, PR #1093 accepted and waiting on Aaron's merge; T-334 waits for a week or two of per-arm fires (arm live since 11-02).
 
 ## What's working
 
@@ -182,8 +182,8 @@ THE IRONY IS THE POINT AND IT BELONGS IN THIS GAP: an amendment to the gap about
 - [P2] T-046 Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [P2] T-191 Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [P2] T-334 Recall trigger per-arm outcomes: do withheld and injected fires differ in what the session does next (T-331's comparison; dashboard counts with Prism)
-- [P2] T-335 A fresh /start reads like faults: empty legacy handoff, READS OWED AGENT.md, seat = folder name (T-241 report N4)
 - [P3] T-261 Physically split core and memory into separate packages (after T-154; D-151)
+- [P3] T-292 CI test job failed on a vitest-worker 'Timeout calling onTaskUpdate' after every test passed
 
 ## Decisions
 

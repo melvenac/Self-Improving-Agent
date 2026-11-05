@@ -1,11 +1,11 @@
 {
   "schema_version": 3,
-  "revision": 618,
+  "revision": 619,
   "project": {
     "name": "self-improving-agent"
   },
   "objective": {
-    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. T-181 adoption closed s177 (all projects on their default branches). Current thread (planner, s177 11-04, overnight go via clark): T-333 evidence-report multi-repo resolver, then T-335 design; T-334 waits for a week or two of per-arm fires (arm live since 11-02).",
+    "text": "D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-16 (Aaron, typed): dev resumes on all 4 projects; his focus is Makerspace and the A2A hub. T-181 adoption closed s177 (all projects on their default branches). Current thread (planner, s177 11-05): T-333 evidence-report resolver, PR #1093 accepted and waiting on Aaron's merge; T-334 waits for a week or two of per-arm fires (arm live since 11-02).",
     "since_session": 177
   },
   "tasks": [
@@ -2944,9 +2944,10 @@
       "opened_session": 175,
       "closed_session": null,
       "supersedes": null,
-      "note": "s175 11-01. From T-332's live check: the CLI resolves shas only in --repo (one checkout) and has no run resolver, so fleet lessons citing makerspace/courier/etc. shas or CI run ids count as not evidenced (4.3% vs the measure's 13.6% of new entries). Candidate: repeatable --repo, or default to every git repo under ~/Projects; a run resolver via gh is network, so opt-in only. Read-only shadow still.",
+      "note": "s175 11-01. From T-332's live check: the CLI resolves shas only in --repo (one checkout) and has no run resolver, so fleet lessons citing makerspace/courier/etc. shas or CI run ids count as not evidenced (4.3% vs the measure's 13.6% of new entries). Candidate: repeatable --repo, or default to every git repo under ~/Projects; a run resolver via gh is network, so opt-in only. Read-only shadow still. — s177 11-05: SIM job 699 (689 refused: sha on sim/, runner takes only the default branch or loop/*); all 5 mutants as predicted; it found the usage line missing and the T183-3 row. Brief #1092. Build job 705 READY PR #1093 head bcda7658: byte-compare 6/6 SAME vs 25d08074, merge-check CLEAN, CI test green, wide suite 4922 passed, 75 skipped (the same 75 as job 615). QA ACCEPT by Atlas, with the limit that Atlas wrote the edits and the builder only applied them. MERGE NOT DONE: pr-merge.sh was denied by the session's auto-mode classifier ('Merge Without Review'); the ask is in clark's queue for Aaron. After merge: sia-rebuild.sh, the brief's live check, close this task.",
       "note_by": [
-        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+        "0147d7e6-acbf-49eb-bd66-534461b3098f",
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
       "closed_rev": null
     },
@@ -2968,15 +2969,15 @@
       "id": "T-335",
       "title": "A fresh /start reads like faults: empty legacy handoff, READS OWED AGENT.md, seat = folder name (T-241 report N4)",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 177,
-      "closed_session": null,
+      "closed_session": 177,
       "supersedes": null,
-      "note": "s177 11-04, split from T-241. docs/loops/t241-frogger-rerun-report.md N4. Three renderers, deferred from T-325 as a design question. Needs a one-page design before any build.",
+      "note": "s177 11-04, split from T-241. docs/loops/t241-frogger-rerun-report.md N4. Three renderers, deferred from T-325 as a design question. Needs a one-page design before any build. — s177 11-05 DUPLICATE, opened in error: T-241's N4 already shipped as T-329 (4c439e84, 10-28). The planner read T-241's note and T-325's 'N4 DEFERRED' without searching for a later task. Nothing owed.",
       "note_by": [
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
-      "closed_rev": null
+      "closed_rev": 619
     }
   ],
   "verified": [
@@ -6955,6 +6956,45 @@
       "checkout": "sia-planner",
       "first_rev": 584,
       "written_rev": 617
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Session 177 (overnight go via clark, 11-04): closed T-181 and T-241; built T-333. PR #1093 is QA ACCEPTED at head bcda7658 and NOT merged: pr-merge.sh was denied by the auto-mode classifier ('Merge Without Review'), and the ask is in clark's queue for Aaron. Records PR #1091 (this record, rev 618+) stays red until #1093 lands, because closing T-181 left no P0/P1 task and state-render.test.ts T183-3 pinned at least one on the live record; #1093 removes that floor. After #1093 merges: pr-keep-current.sh 1091, sia-rebuild.sh <mergesha>, the live check in docs/loops/t333-brief.md, close T-333. Then T-334 when per-arm fires have accumulated.",
+      "watch_out": [
+        "Do NOT reopen T-181 or add a placeholder P1 to turn #1091 green: the record is right and the test was wrong.",
+        "No ob_state write from origin/master until #1091 merges: master is behind this record. Work from #1091's head.",
+        "The QA PC runner accepts a sha only if reachable from the default branch or a loop/* branch; a job on sim/ is refused 'reachable'. sim-push.sh now pushes loop/sim-<tag> (syntax-checked, not yet run live). Lenovo takes reviews and sims only and cannot push; it runs Linux, so a brief's PowerShell is translated there.",
+        "tests/harness/checks.test.ts D4 went red on Lenovo (npm in a scratch repo) and green on the QA PC: a Lenovo SIM red there is not evidence against a change.",
+        "Before opening a task for a report's leftover, search tasks by the report's item id: T-335 duplicated T-329 for want of that.",
+        "T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green: read the log before treating a red records PR as real; but read it, #1091's red was real.",
+        "relay-check.mjs matches only TYPED text: an Aaron answer via AskUserQuestion in clark's window shows NOT verified. Grep clark's transcript jsonl for '\"answers\":' instead.",
+        "Tests that spawn the recall hook get an arm-OFF policy copy via TRIGGER_POLICY_DIR in open-brain/tests/setup-env.ts; a test wanting the shipped 0.5 passes its own or calls runTrigger in-process."
+      ],
+      "open_questions": [],
+      "session": 177,
+      "loop_state": {
+        "open_prs": [
+          {
+            "ref": "#1093",
+            "qa_status": "accepted",
+            "note": "T-333 code; ACCEPT by Atlas at bcda7658; merge denied by classifier, waiting on Aaron"
+          },
+          {
+            "ref": "#1091",
+            "qa_status": "not_required",
+            "note": "records rev 618+; CI red until #1093 lands"
+          }
+        ],
+        "frozen_sha": "bcda7658990229580bdc5ad72af1336217bb8db5",
+        "questions_for_aaron": [
+          "Merge #1093 at bcda7658, or allow Atlas's merge permission? Atlas recommends merging."
+        ],
+        "rulings": []
+      },
+      "session_uuid": "6f5b8a9d-429d-4c93-99a4-996634877932",
+      "checkout": "sia-planner",
+      "first_rev": 618,
+      "written_rev": 619
     }
   ],
   "sessions": [
@@ -7066,12 +7106,12 @@
     },
     {
       "n": 177,
-      "date": "2026-11-04",
+      "date": "2026-11-05",
       "uuid": "6f5b8a9d-429d-4c93-99a4-996634877932",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 618
+      "last_work_rev": 619
     }
   ]
 }
