@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 619 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 620 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,16 +6,16 @@
 
 ### Pick up here
 
-Session 177 (overnight go via clark, 11-04): closed T-181 and T-241; built T-333. PR #1093 is QA ACCEPTED at head bcda7658 and NOT merged: pr-merge.sh was denied by the auto-mode classifier ('Merge Without Review'), and the ask is in clark's queue for Aaron. Records PR #1091 (this record, rev 618+) stays red until #1093 lands, because closing T-181 left no P0/P1 task and state-render.test.ts T183-3 pinned at least one on the live record; #1093 removes that floor. After #1093 merges: pr-keep-current.sh 1091, sia-rebuild.sh <mergesha>, the live check in docs/loops/t333-brief.md, close T-333. Then T-334 when per-arm fires have accumulated.
+Session 177 (overnight go via clark, 11-04) closed T-181, T-241 and T-333. #1093 merged 4b1fcfbb on Aaron's word, clark REBUILT main there, the live check passed (new entries evidenced 4.3% to 16.3%), and master CI is green at f5d99176. No P0/P1 tasks exist. Next: T-334 when per-arm fires have accumulated (a week or two); the rest of the backlog is parked (T-191, T-046, T-312, T-303, T-321, T-261 S3/S4, T-292 watch).
 
 ### Watch out
 
-- Do NOT reopen T-181 or add a placeholder P1 to turn #1091 green: the record is right and the test was wrong.
-- No ob_state write from origin/master until #1091 merges: master is behind this record. Work from #1091's head.
 - The QA PC runner accepts a sha only if reachable from the default branch or a loop/* branch; a job on sim/ is refused 'reachable'. sim-push.sh now pushes loop/sim-<tag> (syntax-checked, not yet run live). Lenovo takes reviews and sims only and cannot push; it runs Linux, so a brief's PowerShell is translated there.
 - tests/harness/checks.test.ts D4 went red on Lenovo (npm in a scratch repo) and green on the QA PC: a Lenovo SIM red there is not evidence against a change.
-- Before opening a task for a report's leftover, search tasks by the report's item id: T-335 duplicated T-329 for want of that.
-- T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green: read the log before treating a red records PR as real; but read it, #1091's red was real.
+- Before opening a task for a report's leftover, search tasks by the report's item id: T-335 duplicated T-329 for want of that. T-241's note still says N4 moved to T-335 and the record refuses edits to done tasks; T-335's note carries the correction.
+- pr-merge.sh on a PR whose edits Atlas wrote was denied by the permission classifier ('Merge Without Review') in s177: do not retry or route around it; ask Aaron.
+- T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green, and fired on two overlapping runs on 11-05: read the log before treating a red as real, rerun the failed job, and avoid starting a records PR while a master run is going.
+- evidence-report's scope line naming a skipped repo has not been seen live: the first skipped repo is worth a look. 16.3% vs T-332's 13.6% is not fully explained; no entries were sampled.
 - relay-check.mjs matches only TYPED text: an Aaron answer via AskUserQuestion in clark's window shows NOT verified. Grep clark's transcript jsonl for '"answers":' instead.
 - Tests that spawn the recall hook get an arm-OFF policy copy via TRIGGER_POLICY_DIR in open-brain/tests/setup-env.ts; a test wanting the shipped 0.5 passes its own or calls runTrigger in-process.
 
@@ -25,14 +25,11 @@ _None._
 
 ### Loop state
 
-**Open PRs:** 
-- #1093 — QA: accepted — T-333 code; ACCEPT by Atlas at bcda7658; merge denied by classifier, waiting on Aaron
-- #1091 — QA: not_required — records rev 618+; CI red until #1093 lands
+**Open PRs:** _None._
 
-**SHA frozen for QA:** `bcda7658990229580bdc5ad72af1336217bb8db5`
+**SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** 
-- Merge #1093 at bcda7658, or allow Atlas's merge permission? Atlas recommends merging.
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** _None._
 
