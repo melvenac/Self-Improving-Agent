@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 619,
+  "revision": 620,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2348,11 +2348,12 @@
       "opened_session": 171,
       "closed_session": null,
       "supersedes": null,
-      "note": "s171: seen once, CI run 38613905579 on records PR #743 (records-only): 290 files / 3501 tests passed, then 'Error: [vitest-worker]: Timeout calling \"onTaskUpdate\"' failed the job; the run took 8m39s against about 4m usually, so the runner was slow. A rerun of the failed job was green. Watch for a second sighting before briefing anything; a candidate is vitest's RPC/teardown timeout config, but nothing is ruled. — s174 10-24 AUDIT: the second sighting has happened, more than once, all on the QA PC under load: T315-S1 round 1 (0ca53ec5, BLOCKED on 2 unrelated tests, each green alone) and T-320 build job #80 (wide run red twice in state-writer only beside the onTaskUpdate timeout, 52/52 alone). Every brief since carries a re-run-alone exception for it. Not fixed: no vitest RPC/teardown config change has shipped. — s175 10-28: more sightings: SIM #296 (latest-brief.test.ts hook timeout beside onTaskUpdate, 3/3 alone) and build #322 (wide run 1785/1785 green, 'Errors 1 error' onTaskUpdate, vitest exit 1). Related but different signature: CI on records PR #1055, server.test.ts handleSync timed out at 5221 ms of the 5000 ms default (rerun green). READ (vitest 3.2.4 in main node_modules): the worker error comes from dist/chunks/rpc.-pEldfrD.js createRuntimeRpc -> createBirpc with no timeout option, so birpc's internal default applies; vitest.config exposes NO knob for it. So the 'RPC/teardown timeout config' candidate in the s171 note does not exist in this version. Remaining levers, none in SIA source: (a) a vitest upgrade (deps: SG-1 exclusion, Aaron); (b) lower QA PC runner concurrency (3 since 10-27) during wide runs (clark's call); (c) keep the per-brief re-run-alone exception (current practice, costs nothing). Planner recommends (c) plus (b) only if sightings rise; stays P3. For the handleSync row: a per-test timeout on that one row is a cheap SIA-side fix if it recurs.",
+      "note": "s171: seen once, CI run 38613905579 on records PR #743 (records-only): 290 files / 3501 tests passed, then 'Error: [vitest-worker]: Timeout calling \"onTaskUpdate\"' failed the job; the run took 8m39s against about 4m usually, so the runner was slow. A rerun of the failed job was green. Watch for a second sighting before briefing anything; a candidate is vitest's RPC/teardown timeout config, but nothing is ruled. — s174 10-24 AUDIT: the second sighting has happened, more than once, all on the QA PC under load: T315-S1 round 1 (0ca53ec5, BLOCKED on 2 unrelated tests, each green alone) and T-320 build job #80 (wide run red twice in state-writer only beside the onTaskUpdate timeout, 52/52 alone). Every brief since carries a re-run-alone exception for it. Not fixed: no vitest RPC/teardown config change has shipped. — s175 10-28: more sightings: SIM #296 (latest-brief.test.ts hook timeout beside onTaskUpdate, 3/3 alone) and build #322 (wide run 1785/1785 green, 'Errors 1 error' onTaskUpdate, vitest exit 1). Related but different signature: CI on records PR #1055, server.test.ts handleSync timed out at 5221 ms of the 5000 ms default (rerun green). READ (vitest 3.2.4 in main node_modules): the worker error comes from dist/chunks/rpc.-pEldfrD.js createRuntimeRpc -> createBirpc with no timeout option, so birpc's internal default applies; vitest.config exposes NO knob for it. So the 'RPC/teardown timeout config' candidate in the s171 note does not exist in this version. Remaining levers, none in SIA source: (a) a vitest upgrade (deps: SG-1 exclusion, Aaron); (b) lower QA PC runner concurrency (3 since 10-27) during wide runs (clark's call); (c) keep the per-brief re-run-alone exception (current practice, costs nothing). Planner recommends (c) plus (b) only if sightings rise; stays P3. For the handleSync row: a per-test timeout on that one row is a cheap SIA-side fix if it recurs. — s177 11-05: two more sightings, both CI on GitHub, overlapping in time: master run 42050673215 at 4b1fcfbb (15:01-15:18) and #1091 run 42050796528 (15:03-15:20), each 362 files / 4990 passed / 7 skipped then 'Timeout calling onTaskUpdate', exit 1. #1091's failed-job rerun (attempt 2) was green and master's next run 42058069982 at f5d99176 was green. Overlap as the cause is suspected, not proven. Remedy held: rerun the failed job. When two runs would overlap on purpose, hold the later one.",
       "note_by": [
         "13042431-247e-4dad-9477-507e43fc7916",
         "0bbb03c4-d91d-496e-a6d5-43924f16405b",
-        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+        "0147d7e6-acbf-49eb-bd66-534461b3098f",
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
       "closed_rev": null
     },
@@ -2940,16 +2941,16 @@
       "id": "T-333",
       "title": "evidence-report: resolve shas across every local repo and CI run ids, so the shadow matches the T-332 measure",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 175,
-      "closed_session": null,
+      "closed_session": 177,
       "supersedes": null,
-      "note": "s175 11-01. From T-332's live check: the CLI resolves shas only in --repo (one checkout) and has no run resolver, so fleet lessons citing makerspace/courier/etc. shas or CI run ids count as not evidenced (4.3% vs the measure's 13.6% of new entries). Candidate: repeatable --repo, or default to every git repo under ~/Projects; a run resolver via gh is network, so opt-in only. Read-only shadow still. — s177 11-05: SIM job 699 (689 refused: sha on sim/, runner takes only the default branch or loop/*); all 5 mutants as predicted; it found the usage line missing and the T183-3 row. Brief #1092. Build job 705 READY PR #1093 head bcda7658: byte-compare 6/6 SAME vs 25d08074, merge-check CLEAN, CI test green, wide suite 4922 passed, 75 skipped (the same 75 as job 615). QA ACCEPT by Atlas, with the limit that Atlas wrote the edits and the builder only applied them. MERGE NOT DONE: pr-merge.sh was denied by the session's auto-mode classifier ('Merge Without Review'); the ask is in clark's queue for Aaron. After merge: sia-rebuild.sh, the brief's live check, close this task.",
+      "note": "s175 11-01. From T-332's live check: the CLI resolves shas only in --repo (one checkout) and has no run resolver, so fleet lessons citing makerspace/courier/etc. shas or CI run ids count as not evidenced (4.3% vs the measure's 13.6% of new entries). Candidate: repeatable --repo, or default to every git repo under ~/Projects; a run resolver via gh is network, so opt-in only. Read-only shadow still. — s177 11-05: SIM job 699 (689 refused: sha on sim/, runner takes only the default branch or loop/*); all 5 mutants as predicted; it found the usage line missing and the T183-3 row. Brief #1092. Build job 705 READY PR #1093 head bcda7658: byte-compare 6/6 SAME vs 25d08074, merge-check CLEAN, CI test green, wide suite 4922 passed, 75 skipped (the same 75 as job 615). QA ACCEPT by Atlas, with the limit that Atlas wrote the edits and the builder only applied them. MERGE NOT DONE: pr-merge.sh was denied by the session's auto-mode classifier ('Merge Without Review'); the ask is in clark's queue for Aaron. After merge: sia-rebuild.sh, the brief's live check, close this task. — s177 11-05 CLOSED. #1093 merged 4b1fcfbb from head bcda7658 on Aaron's word in clark's window (plain merge word, manual mode, no independent review added; Atlas's own pinned merge had been denied by the session permission classifier, and Atlas wrote the edits, so the QA ACCEPT was not a fully independent judge). Clark REBUILT main at 4b1fcfbb. Live check on the main build, read-only, exit 0, one 30-day window: no flags 14/325 new (4.3%), 36/953 all; --repos-under ~/Projects 53/325 (16.3%), 93/953; --runs-repo only 14/325, 37/953; both 53/325, 94/953. 25 repos resolved, skipped 0. PR-number-only fell 100 to 86. 16.3% exceeds the T-332 measure's 13.6%: chance prefix hits are negligible (14,914 commits, about 0.06 per 1,000 tokens); T-332's window began 10-02 and this one 10-06, which may explain the gap, but no entries were sampled to prove it. NOT exercised live: the scope line naming a skipped repo, since nothing was skipped; tests only. --runs-repo adds 1 entry overall, 0 in the window. #1091 went green on a job rerun after T-292's flake and merged f5d99176; master CI green there (run 42058069982).",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f",
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
-      "closed_rev": null
+      "closed_rev": 620
     },
     {
       "id": "T-334",
@@ -6959,42 +6960,29 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Session 177 (overnight go via clark, 11-04): closed T-181 and T-241; built T-333. PR #1093 is QA ACCEPTED at head bcda7658 and NOT merged: pr-merge.sh was denied by the auto-mode classifier ('Merge Without Review'), and the ask is in clark's queue for Aaron. Records PR #1091 (this record, rev 618+) stays red until #1093 lands, because closing T-181 left no P0/P1 task and state-render.test.ts T183-3 pinned at least one on the live record; #1093 removes that floor. After #1093 merges: pr-keep-current.sh 1091, sia-rebuild.sh <mergesha>, the live check in docs/loops/t333-brief.md, close T-333. Then T-334 when per-arm fires have accumulated.",
+      "pick_up": "Session 177 (overnight go via clark, 11-04) closed T-181, T-241 and T-333. #1093 merged 4b1fcfbb on Aaron's word, clark REBUILT main there, the live check passed (new entries evidenced 4.3% to 16.3%), and master CI is green at f5d99176. No P0/P1 tasks exist. Next: T-334 when per-arm fires have accumulated (a week or two); the rest of the backlog is parked (T-191, T-046, T-312, T-303, T-321, T-261 S3/S4, T-292 watch).",
       "watch_out": [
-        "Do NOT reopen T-181 or add a placeholder P1 to turn #1091 green: the record is right and the test was wrong.",
-        "No ob_state write from origin/master until #1091 merges: master is behind this record. Work from #1091's head.",
         "The QA PC runner accepts a sha only if reachable from the default branch or a loop/* branch; a job on sim/ is refused 'reachable'. sim-push.sh now pushes loop/sim-<tag> (syntax-checked, not yet run live). Lenovo takes reviews and sims only and cannot push; it runs Linux, so a brief's PowerShell is translated there.",
         "tests/harness/checks.test.ts D4 went red on Lenovo (npm in a scratch repo) and green on the QA PC: a Lenovo SIM red there is not evidence against a change.",
-        "Before opening a task for a report's leftover, search tasks by the report's item id: T-335 duplicated T-329 for want of that.",
-        "T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green: read the log before treating a red records PR as real; but read it, #1091's red was real.",
+        "Before opening a task for a report's leftover, search tasks by the report's item id: T-335 duplicated T-329 for want of that. T-241's note still says N4 moved to T-335 and the record refuses edits to done tasks; T-335's note carries the correction.",
+        "pr-merge.sh on a PR whose edits Atlas wrote was denied by the permission classifier ('Merge Without Review') in s177: do not retry or route around it; ask Aaron.",
+        "T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green, and fired on two overlapping runs on 11-05: read the log before treating a red as real, rerun the failed job, and avoid starting a records PR while a master run is going.",
+        "evidence-report's scope line naming a skipped repo has not been seen live: the first skipped repo is worth a look. 16.3% vs T-332's 13.6% is not fully explained; no entries were sampled.",
         "relay-check.mjs matches only TYPED text: an Aaron answer via AskUserQuestion in clark's window shows NOT verified. Grep clark's transcript jsonl for '\"answers\":' instead.",
         "Tests that spawn the recall hook get an arm-OFF policy copy via TRIGGER_POLICY_DIR in open-brain/tests/setup-env.ts; a test wanting the shipped 0.5 passes its own or calls runTrigger in-process."
       ],
       "open_questions": [],
       "session": 177,
       "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#1093",
-            "qa_status": "accepted",
-            "note": "T-333 code; ACCEPT by Atlas at bcda7658; merge denied by classifier, waiting on Aaron"
-          },
-          {
-            "ref": "#1091",
-            "qa_status": "not_required",
-            "note": "records rev 618+; CI red until #1093 lands"
-          }
-        ],
-        "frozen_sha": "bcda7658990229580bdc5ad72af1336217bb8db5",
-        "questions_for_aaron": [
-          "Merge #1093 at bcda7658, or allow Atlas's merge permission? Atlas recommends merging."
-        ],
+        "open_prs": [],
+        "frozen_sha": null,
+        "questions_for_aaron": [],
         "rulings": []
       },
       "session_uuid": "6f5b8a9d-429d-4c93-99a4-996634877932",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "written_rev": 619
+      "written_rev": 620
     }
   ],
   "sessions": [
@@ -7111,7 +7099,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 619
+      "last_work_rev": 620
     }
   ]
 }
