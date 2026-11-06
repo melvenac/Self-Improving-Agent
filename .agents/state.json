@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 620,
+  "revision": 621,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2960,9 +2960,10 @@
       "opened_session": 175,
       "closed_session": null,
       "supersedes": null,
-      "note": "s175 11-02. T-331's arm has been ON at 0.5 since 6c98303b (11-02). Arms in trigger_fires: injected = state 'injected'; withheld = state 'silent' AND query has a 'withheld:<ids>' token. Needs: (1) Prism: per-arm counts on the dashboard (clark relays; Aaron asked for it 11-01); (2) an outcome measure, e.g. whether the lesson's failure recurs later in the same session (the same pattern in a later command), per arm. Let data accumulate a week or two before any reading; 299 dominates (about half of injections).",
+      "note": "s175 11-02. T-331's arm has been ON at 0.5 since 6c98303b (11-02). Arms in trigger_fires: injected = state 'injected'; withheld = state 'silent' AND query has a 'withheld:<ids>' token. Needs: (1) Prism: per-arm counts on the dashboard (clark relays; Aaron asked for it 11-01); (2) an outcome measure, e.g. whether the lesson's failure recurs later in the same session (the same pattern in a later command), per arm. Let data accumulate a week or two before any reading; 299 dominates (about half of injections). — s177 11-05: measure fixed BEFORE reading, in docs/loops/t334-measure-plan.md. Unit is the draw (session, entry) at first exposure, NOT the fire: an injected entry is deduped for the session and a withheld one refires, so 42 vs 184 fires came from 42 vs 58 draws. Outcome: a later match:/error-match: token for that entry in the same session, read identically in both arms; keyed draws only (about 80%). Arm instrument healthy: 100/100 draws reproduce, 0 pairs in both arms. No code change needed. First reading on or after 2026-11-16 with at least 200 keyed draws, else 11-23. Item 1 for Prism: dashboard counts must be per draw, not per fire. The arm comparison has not been computed; what was seen is listed in the plan.",
       "note_by": [
-        "0147d7e6-acbf-49eb-bd66-534461b3098f"
+        "0147d7e6-acbf-49eb-bd66-534461b3098f",
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
       "closed_rev": null
     },
@@ -7099,7 +7100,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 620
+      "last_work_rev": 621
     }
   ]
 }
