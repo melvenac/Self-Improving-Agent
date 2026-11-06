@@ -20,7 +20,7 @@ dedup. **Any dashboard count must be per draw, not per fire** (T-334's item 1, P
 | A session-entry pair in both arms | 0 of 100 |
 | Draws with more than one id (`max_injected` is 1) | 0 |
 | Arm sessions with a transcript on the desktop | 24 of 25 |
-| Injected draws by path | keyed 34, element 9 |
+| Draws by path, both arms (11-06, corrected) | injected 45: match 37, path 6, element 2; withheld 62: match 51, path 10, element 1 |
 | A later match visible after injection | yes: the `match:` token is built before the dedup, so a silent fire carries it |
 
 `trigger_fires.command` holds only the first word (longest 10 chars, 454 of them `?`), so a "same pattern in a later
@@ -41,7 +41,7 @@ command" measure cannot be read from it. The tokens below replace it. No code ch
 
 ## When to read, and what a result allows
 
-- **First reading on or after 2026-11-16, and only with at least 200 keyed draws.** Otherwise wait to 11-23 and read what
+- **First reading on or after 2026-11-16, and only with at least 200 draws in the primary classes (`match:` or `error-match:`; 88 on 11-06).** Otherwise wait to 11-23 and read what
   exists, saying the count is short.
 - One reading of the primary. A second look at later data is reported as a second look.
 - CI excludes 0: report an association in this direction. CI includes 0: "no detectable difference at this n", not "no
@@ -62,3 +62,10 @@ command" measure cannot be read from it. The tokens below replace it. No code ch
 The fire totals and draw split above; withheld fires per pair (median 2, max 28, 35 of 58 pairs above 1); top ids per arm;
 one example of a later `match:` after an injection. The same-rule recurrence share for the injected arm was NOT computed, so
 the comparison itself has not been seen. The withheld figures are a partial look at one arm and are declared for that reason.
+
+## Correction, 11-06
+
+The first version said keyed 34, element 9, and the T-334 note said keyed draws were about 80%. Both were wrong: the classifier's
+regex lost its backslashes in a shell heredoc, and the figure covered one arm only. Recounted with plain token parsing and a
+self-test: 104 of 107 draws are keyed. The read gate now names the primary classes instead of "keyed". No outcome was computed
+for either version.
