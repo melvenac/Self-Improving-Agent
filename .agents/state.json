@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 623,
+  "revision": 624,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2980,6 +2980,20 @@
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
       "closed_rev": 619
+    },
+    {
+      "id": "T-336",
+      "title": "Greeting metrics: a repo with no brief folder is not missing latest_brief",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 177,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Prism via clark 11-08: Fleet has no docs/loops/ and no docs/loop-*-brief.md, so every Clark start records missing_pointers latest_brief (greeting-metrics.ts:144 matches /^Latest brief: none/) and the dashboard scorecard shows it forever. Code read 11-08 at 5fccc6ab: describeNoBrief (latest-brief.ts:120) prints the same 'none (looked in ...)' line whether the folder is absent or present and empty, so the metric cannot tell them apart. Fix: describeNoBrief says when no brief location exists (e.g. 'Latest brief: none (no brief folder)') and buildGreetingMetricsRow does not add latest_brief for that line; a folder that exists with no brief still counts. Keep the greeting line visible either way (T-298: none vs didn't look). Tests: both lines in greeting-metrics and latest-brief tests. Check that the dashboard's T-085 brief exemption, if it shipped, does not double-handle it.",
+      "note_by": [
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -7095,12 +7109,12 @@
     },
     {
       "n": 177,
-      "date": "2026-11-05",
+      "date": "2026-11-08",
       "uuid": "6f5b8a9d-429d-4c93-99a4-996634877932",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 623
+      "last_work_rev": 624
     }
   ]
 }
