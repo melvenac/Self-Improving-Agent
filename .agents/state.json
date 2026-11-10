@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 626,
+  "revision": 627,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3013,15 +3013,15 @@
       "id": "T-338",
       "title": "CI draft gate: no head code runs on a draft PR, so SIA can join the Lenovo's buildRepos",
       "priority": "P2",
-      "status": "open",
+      "status": "done",
       "opened_session": 177,
-      "closed_session": null,
+      "closed_session": 177,
       "supersedes": null,
-      "note": "clark 11-09 (Aaron wants the Lenovo used more; dashboard t106 amendment-3 rule: a repo joins the Lenovo's buildRepos only once its CI runs no head code on a draft PR). After T-336. Touches .github/workflows: Aaron's word merges it, via clark. Design read 11-09 at 45cf0fe5 (ci.yml): (1) types [opened, synchronize, ready_for_review]; T-227's comment (lines 15-17) rules out ready_for_review because it starts a second run of the same head SHA that cancels the first. With drafts skipped that no longer holds: the draft run has no running job to cancel, and a PR opened non-draft never gets ready_for_review. The PR and the comment must say so. (2) Gate BOTH jobs: `changed` checks out the head and runs ci-seat-skip.mjs from it, so it is head code too. And `test`'s if is !cancelled() && changed not success, so skipping only `changed` would RUN test on a draft. Add `!(github.event_name == 'pull_request' && github.event.pull_request.draft)` to both ifs. (3) A skipped required `test` reads as passing, harmless because a draft cannot merge; on ready_for_review the new run's pending test blocks the merge. Live check on the path (not config only): open the PR itself as a draft, so its own workflow runs. Expect changed and test Skipped and no checkout step. Then mark it ready: expect a ready_for_review run whose test runs and passes. A push and a dispatch are unchanged.",
+      "note": "clark 11-09 (Aaron wants the Lenovo used more; dashboard t106 amendment-3 rule: a repo joins the Lenovo's buildRepos only once its CI runs no head code on a draft PR). After T-336. Touches .github/workflows: Aaron's word merges it, via clark. Design read 11-09 at 45cf0fe5 (ci.yml): (1) types [opened, synchronize, ready_for_review]; T-227's comment (lines 15-17) rules out ready_for_review because it starts a second run of the same head SHA that cancels the first. With drafts skipped that no longer holds: the draft run has no running job to cancel, and a PR opened non-draft never gets ready_for_review. The PR and the comment must say so. (2) Gate BOTH jobs: `changed` checks out the head and runs ci-seat-skip.mjs from it, so it is head code too. And `test`'s if is !cancelled() && changed not success, so skipping only `changed` would RUN test on a draft. Add `!(github.event_name == 'pull_request' && github.event.pull_request.draft)` to both ifs. (3) A skipped required `test` reads as passing, harmless because a draft cannot merge; on ready_for_review the new run's pending test blocks the merge. Live check on the path (not config only): open the PR itself as a draft, so its own workflow runs. Expect changed and test Skipped and no checkout step. Then mark it ready: expect a ready_for_review run whose test runs and passes. A push and a dispatch are unchanged. — Done 11-10: PR #1103 (Atlas-authored; builder = planner, no QA seat) merged by clark on Aaron's 'Merge it', pinned 8e375f96, merge a1cd8306. Live check on the path, both PASS: draft run 42744118366 started no job (test Skipped, no runner, no steps; changed not listed); ready_for_review run 42744154627 ran changed + test green on tcm-1 (362/362 files, 4991 passed, 7 skipped). The Lenovo's buildRepos now includes Self-Improving-Agent (clark). Its builds come back as hand-backs landed with `job.mjs land` (creates loop/<tag> only). Atlas's local client copy (atlas-ops/scripts/dash-job-client.mjs) has no `land` yet: refresh it from agent-dashboard scripts/job.mjs before the first Lenovo hand-back.",
       "note_by": [
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
-      "closed_rev": null
+      "closed_rev": 627
     }
   ],
   "verified": [
@@ -7142,7 +7142,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 626
+      "last_work_rev": 627
     }
   ]
 }
