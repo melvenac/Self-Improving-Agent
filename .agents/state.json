@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 625,
+  "revision": 626,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3004,6 +3004,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Maker S75 11-09: 'seats maker (verified 11-08 12:55 CST) · STALE (verified 11-08 12:55 CST)' read as maker's own verification, with STALE as a separate seat. Code (fleet.ts:177-190 at 563edac5): verifiedSuffix is fleet.json's single top-level verifiedAt, appended after the seat list; verifiedStale repeats the stamp. Data was right (verifiedAt 11-08 18:55Z, >24 h). Fix: label it as the file's, once, e.g. 'FLEET: ... · seats maker · fleet.json verified 11-08 12:55 CST, STALE'; same for the legacy header. Update the fleet tests that pin the string. Same build lane as T-336.",
+      "note_by": [
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-338",
+      "title": "CI draft gate: no head code runs on a draft PR, so SIA can join the Lenovo's buildRepos",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 177,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "clark 11-09 (Aaron wants the Lenovo used more; dashboard t106 amendment-3 rule: a repo joins the Lenovo's buildRepos only once its CI runs no head code on a draft PR). After T-336. Touches .github/workflows: Aaron's word merges it, via clark. Design read 11-09 at 45cf0fe5 (ci.yml): (1) types [opened, synchronize, ready_for_review]; T-227's comment (lines 15-17) rules out ready_for_review because it starts a second run of the same head SHA that cancels the first. With drafts skipped that no longer holds: the draft run has no running job to cancel, and a PR opened non-draft never gets ready_for_review. The PR and the comment must say so. (2) Gate BOTH jobs: `changed` checks out the head and runs ci-seat-skip.mjs from it, so it is head code too. And `test`'s if is !cancelled() && changed not success, so skipping only `changed` would RUN test on a draft. Add `!(github.event_name == 'pull_request' && github.event.pull_request.draft)` to both ifs. (3) A skipped required `test` reads as passing, harmless because a draft cannot merge; on ready_for_review the new run's pending test blocks the merge. Live check on the path (not config only): open the PR itself as a draft, so its own workflow runs. Expect changed and test Skipped and no checkout step. Then mark it ready: expect a ready_for_review run whose test runs and passes. A push and a dispatch are unchanged.",
       "note_by": [
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
@@ -7128,7 +7142,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 625
+      "last_work_rev": 626
     }
   ]
 }

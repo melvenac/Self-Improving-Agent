@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 625 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 626 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -12,6 +12,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-334** Recall trigger per-arm outcomes: do withheld and injected fires differ in what the session does next (T-331's comparison; dashboard counts with Prism)
 - [ ] **T-336** Greeting metrics: a repo with no brief folder is not missing latest_brief
+- [ ] **T-338** CI draft gate: no head code runs on a draft PR, so SIA can join the Lenovo's buildRepos
 
 ## P3
 
