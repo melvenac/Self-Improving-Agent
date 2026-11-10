@@ -160,3 +160,19 @@ function verifiedStale(verifiedAt: string | number | undefined, now: Date): bool
     expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia · fleet.json verified ?");
     expect(r.budget).not.toContain("FLEET: unavailable");
 >>>
+@@@ open-brain/tests/pipelines/session-start/briefing.test.ts
+<<<
+        latestBrief: "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
+        // T-329: the checkout handleStart passes for this fixture (no handoff_by_checkout flag, a developer seat) is null.
+===
+        latestBrief: "Latest brief: none (no brief folder: docs/loops/ does not exist and docs/ has no loop-*-brief.md)",
+        // T-329: the checkout handleStart passes for this fixture (no handoff_by_checkout flag, a developer seat) is null.
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing.test.ts
+<<<
+            latestBrief: "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
+            readsOwed: describeReadsOwed(root, parsed.data, sessionNumber, "developer", null),
+===
+            latestBrief: "Latest brief: none (no brief folder: docs/loops/ does not exist and docs/ has no loop-*-brief.md)",
+            readsOwed: describeReadsOwed(root, parsed.data, sessionNumber, "developer", null),
+>>>
