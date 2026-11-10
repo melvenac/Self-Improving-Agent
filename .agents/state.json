@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 629,
+  "revision": 630,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3032,6 +3032,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "clark 11-09, from Beam's /end audit (session 5c5a0261): auditSkills (src/pipelines/skills-audit/index.ts:208-209 at a1cd8306) resolves only join(home, '.claude', 'skills', `${seat}-ops`). Beam's ops skill has lived at <project>/.claude/skills/beam-ops since 10-26, so the audit prints 'ops none', counts 8 of Beam's 27 rows (record-commit.sh, merge-land.sh, job-wait.sh, job-submit.sh, brief-submit.sh, roadmap.mjs, laptop.sh, source lib.sh) as by-hand, and cannot read Beam's audit-ignore.txt (line 161 reads it from opsDir). Fix: when the home path does not exist, try join(opts.projectDir, '.claude', 'skills', `${seat}-ops`); the recall trigger's seat.js:13 already matches that path. Which wins when both exist: home (unchanged behaviour), and the audit line should name the path it used. Test: a temp project with the skill only in the project resolves it and reads its audit-ignore.txt; home-only unchanged; neither prints ops none. Small; batch with the next SIA build.",
+      "note_by": [
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-340",
+      "title": "CI on the Lenovo: a shared runner label so SIA's Linux jobs can run on tcm-1, tcm-2 or the Lenovo",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 177,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "clark 11-09: the Lenovo is now a D-043 CI host (Aaron's 'All three', 11-09): gh-runner user, owner-matched egress firewall, drop-in masking /home/dashjobs, /home/melvenac and the docker socket, MemoryMax 5G, runner 2.338.2. ci.yml pins runs-on [self-hosted, linux, tcm] on `changed` (:67) and `test` (:98) at 4a2d0bac. Atlas's call on design (11-09): a runs-on label array is an AND (a runner needs every label), so 'tcm with a fallback' cannot be written in one runs-on, and runner groups are org-only (melvenac is a user account). So: ONE shared label on all three runners, then pin [self-hosted, linux, fleet]. ORDER MATTERS: (1) host work, clark's: register a Lenovo runner for melvenac/Self-Improving-Agent (repo-level) and add the `fleet` label to tcm-1, tcm-2 and the Lenovo; confirm with `gh api repos/melvenac/Self-Improving-Agent/actions/runners`. (2) Only then the PR, or every job queues with no runner. The PR: both runs-on lines; ci-runs-on.test.ts (TCM const :14, the T-330 row :243 and its title, the comment :286 'tcm is the only Linux runner'); the egress self-check step is named 'Egress isolation self-check (tcm)' (:284 pins the name): read what it checks and confirm it passes on the Lenovo's firewall before the switch, renaming it if the name is tcm-specific. Watch: MemoryMax 5G vs the full suite (test job runs the whole vitest suite; tcm has more), so the live check must include a run that lands on the Lenovo (dispatch with tcm-1/2 busy or temporarily offline, clark's call) and passes. Touches .github/workflows: Aaron's word merges it, via clark. Not urgent; tcm-1 and tcm-2 keep working.",
       "note_by": [
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
@@ -7154,7 +7168,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 629
+      "last_work_rev": 630
     }
   ]
 }
