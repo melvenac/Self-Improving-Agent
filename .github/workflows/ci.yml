@@ -12,10 +12,14 @@ on:
     # D-091 (T-219): no paths filter. A workflow that never starts never reports `test`, which master's ruleset
     # (D-090) requires, so every docs-only PR was blocked forever. A docs-only PR starts the workflow and the
     # changed job decides: skip=true skips `test` at the job level, and a skipped job reports Skipped.
-    # T-227: only opened and synchronize. A reopened or ready_for_review event would start a SECOND run of the
-    # same head SHA, and that run would cancel the first inside the PR's concurrency group, leaving a cancelled
-    # `test` on the head commit (the #277 lesson). One run per commit means only a superseded commit is cancelled.
-    types: [opened, synchronize]
+    # T-227: opened and synchronize, so one run per commit and only a superseded commit is cancelled. A reopened
+    # event would start a SECOND run of the same head SHA, and that run would cancel the first inside the PR's
+    # concurrency group, leaving a cancelled `test` on the head commit (the #277 lesson).
+    # T-338: ready_for_review is added, because a draft PR now runs NO job (both jobs' ifs below): no head code
+    # runs on a draft, which is the rule a repo must meet before the Lenovo build host takes its builds (dashboard
+    # t106 amendment 3). So the first run that does anything on a draft's head is the one ready_for_review starts,
+    # and the draft run it can cancel had no job running. A PR opened as ready never receives ready_for_review.
+    types: [opened, synchronize, ready_for_review]
   workflow_dispatch:
     inputs:
       windows:
@@ -46,7 +50,7 @@ on:
 
 # T-227: concurrency is per pull request. A newer commit on a PR cancels the run of the commit it superseded and
 # nothing else: the head commit's run is never cancelled, because it is the newest in its group and the PR trigger
-# fires once per commit (see `types` above). A master push gets a group of its own per SHA and is never cancelled:
+# fires once per commit (see `types` above; T-338's ready_for_review fires once more, after a draft run with no job). A master push gets a group of its own per SHA and is never cancelled:
 # two merges close together must both get a result. A dispatch has its own group per run.
 concurrency:
   group: "${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || (github.event_name == 'workflow_dispatch' && format('ci-dispatch-{0}', github.run_id) || format('ci-push-{0}', github.sha)) }}"
@@ -56,8 +60,9 @@ jobs:
   # T-178/T-227: the list of changed files comes from git diff, not from a payload. It runs on a pull request
   # only (a push is master, which always runs the suite). Any error or an empty list prints skip=false, and the
   # test job runs. skip=true only when every path is under docs/ or is README.md.
+  # T-338: never on a draft PR. This job checks out the head and runs ci-seat-skip.mjs from it, so it is head code.
   changed:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
     # T-330 (Aaron 10-30, "use our own runners, not github"): the self-hosted tcm runners, always.
     runs-on: [self-hosted, linux, tcm]
     outputs:
@@ -85,8 +90,11 @@ jobs:
     # GitHub skips a job that needs a skipped job unless its if calls a status
     # function. !cancelled() is that call, so a pull request and a master push
     # still run test. A failed changed job is not success, so the suite runs.
+    # T-338: a draft PR skips changed, and "not success" would then RUN test, so test names the draft gate itself.
+    # A skipped required `test` on a draft reads as passing; a draft cannot merge, and ready_for_review starts the
+    # run whose `test` gates the merge.
     needs: changed
-    if: "${{ !cancelled() && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
+    if: "${{ !cancelled() && !(github.event_name == 'pull_request' && github.event.pull_request.draft) && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
     runs-on: [self-hosted, linux, tcm]
 
     steps:
