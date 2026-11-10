@@ -121,13 +121,12 @@ function seatToken(s: FleetSeat): string {
   return `${s.name} ${s.kind} ${s.runtime}/${s.model} ${s.host} ${s.status}`;
 }
 
-function verifiedStale(verifiedAt: string | number | undefined, now: Date): string | null {
-  if (!verifiedAt) return null;
+/** T-337: true when fleet.json's one file-level verifiedAt is over FLEET_STALE_HOURS old. The caller prints the stamp once. */
+function verifiedStale(verifiedAt: string | number | undefined, now: Date): boolean {
+  if (!verifiedAt) return false;
   const t = new Date(verifiedAt);
-  if (Number.isNaN(t.getTime())) return null;
-  const ageMs = now.getTime() - t.getTime();
-  if (ageMs <= FLEET_STALE_HOURS * 60 * 60 * 1000) return null;
-  return ` · STALE (verified ${chicagoStamp(t)})`;
+  if (Number.isNaN(t.getTime())) return false;
+  return now.getTime() - t.getTime() > FLEET_STALE_HOURS * 60 * 60 * 1000;
 }
 
 function hubFields(data: FleetJson): { hubV: string; hubUrl: string; dashV: string; dashUrl: string } {
@@ -165,7 +164,7 @@ function buildFleet(
   const verifiedLabel = verified && !Number.isNaN(verified.getTime()) ? chicagoStamp(verified) : "?";
   const stale = verifiedStale(verifiedAt, now);
 
-  const header = `## Fleet (fleet.json, verified ${verifiedLabel})${stale ?? ""}`;
+  const header = `## Fleet (fleet.json, verified ${verifiedLabel})${stale ? " · STALE" : ""}`;
   const legacy: string[] = [
     header,
     `Coordinator: ${coord} · questions and Aaron's decisions go to ${coord}`,
@@ -175,7 +174,9 @@ function buildFleet(
       : `Seats (${fleetKey}): ${seats.map(seatToken).join(" · ")}`,
   ];
 
-  const verifiedSuffix = `(verified ${verifiedLabel})${stale ?? ""}`;
+  // T-337: the stamp is the whole file's, not the last seat's (Maker S75 read "maker (verified ...) · STALE (verified ...)"
+  // as maker's own status, and STALE as a seat): name it once, as the file's, after a separator.
+  const verifiedSuffix = `· fleet.json verified ${verifiedLabel}${stale ? ", STALE" : ""}`;
   const allNames = seats.map((s) => s.name);
   const budgetCore = `FLEET: coordinator ${coord} · hub ${hubV} · dashboard ${dashV} · seats `;
   const suffix = ` ${verifiedSuffix}`;

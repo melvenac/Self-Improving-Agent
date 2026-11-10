@@ -42,9 +42,9 @@ describe("T-252: BRIEFING-FIX r2 follow-ups", () => {
     writeFileSync(fb, JSON.stringify({ coordinator: { name: C190 }, seats: [] }));
     const a = describeFleet(root, "SIA", { FLEET_JSON: fa }, now);
     const b = describeFleet(root, "SIA", { FLEET_JSON: fb }, now);
-    expect(a.budget).toBe(`FLEET: coordinator ${C190} · hub ? · dashboard ? · seats +2 more (verified ?)`);
+    expect(a.budget).toBe(`FLEET: coordinator ${C190} · hub ? · dashboard ? · seats +2 more · fleet.json verified ?`);
     expect(a.budget).not.toContain("none");
-    expect(b.budget).toBe(`FLEET: coordinator ${C190} · hub ? · dashboard ? · seats none (verified ?)`);
+    expect(b.budget).toBe(`FLEET: coordinator ${C190} · hub ? · dashboard ? · seats none · fleet.json verified ?`);
   });
 
   it("T252-2 (F2, loop 1): fleetProjectKey skips a null projects[] entry before the repo match", () => {
@@ -68,7 +68,7 @@ describe("T-252: BRIEFING-FIX r2 follow-ups", () => {
     const path = join(root, "f.json");
     writeFileSync(path, JSON.stringify({ projects: [null], seats: [seat("atlas-sia")] }));
     const r = describeFleet(root, "SIA", { FLEET_JSON: path }, now);
-    expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia (verified ?)");
+    expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia · fleet.json verified ?");
     expect(r.legacy[3]).toBe("Seats (SIA): atlas-sia ? ?/? ? ?");
   });
 
@@ -105,7 +105,7 @@ describe("T-252: BRIEFING-FIX r2 follow-ups", () => {
     const path = join(root, "f.json");
     writeFileSync(path, '{"verifiedAt":{"valueOf":0,"toString":0},"seats":[{"name":"atlas-sia","project":"SIA"}]}');
     const r = describeFleet(root, "SIA", { FLEET_JSON: path }, now);
-    expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia (verified ?)");
+    expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia · fleet.json verified ?");
     expect(r.budget).not.toContain("FLEET: unavailable");
     expect(r.legacy).toEqual([
       "## Fleet (fleet.json, verified ?)",
