@@ -1,0 +1,302 @@
+@@@ open-brain/src/pipelines/skills-audit/index.ts
+<<<
+  const candidate = seat ? join(opts.home, ".claude", "skills", `${seat}-ops`) : null;
+  const opsDir = candidate && existsSync(candidate) ? candidate : null;
+===
+  // T-339: a seat's ops skill lives in ~/.claude/skills or, as Beam's does, in the project's .claude/skills.
+  // Home wins when both exist; the report line names the path used.
+  const candidates = seat
+    ? [join(opts.home, ".claude", "skills", `${seat}-ops`), join(opts.projectDir, ".claude", "skills", `${seat}-ops`)]
+    : [];
+  const opsDir = candidates.find((c) => existsSync(c)) ?? null;
+>>>
+@@@ open-brain/tests/t262-skills-audit.test.ts
+<<<
+  it("SA-8 a seat with no ops directory has only by-hand keys", () => {
+    writeSession(U(1), mtime(1), times(3, "bash foo.sh"));
+    const r = auditSkills({ projectDir: proj, home });
+    expect(r.opsDir).toBeNull();
+    expect(r.rows[0].status).toBe("by-hand");
+    expect(r.scriptsCalled).toEqual([]);
+  });
+===
+  it("SA-8 a seat with no ops directory has only by-hand keys", () => {
+    writeSession(U(1), mtime(1), times(3, "bash foo.sh"));
+    const r = auditSkills({ projectDir: proj, home });
+    expect(r.opsDir).toBeNull();
+    expect(r.rows[0].status).toBe("by-hand");
+    expect(r.scriptsCalled).toEqual([]);
+  });
+
+  it("T339-1 an ops skill only in the project is found, its scripts counted and its audit-ignore.txt read", () => {
+    const projOps = join(proj, ".claude", "skills", "testseat-ops");
+    mkdirSync(join(projOps, "scripts"), { recursive: true });
+    writeFileSync(join(projOps, "scripts", "foo.sh"), "echo");
+    writeFileSync(join(projOps, "audit-ignore.txt"), "gh pr view\n");
+    writeSession(U(1), mtime(1), [...times(3, "bash C:/s/foo.sh a"), ...times(3, "gh pr view 1")]);
+    const r = auditSkills({ projectDir: proj, home });
+    expect(r.opsDir).toBe(projOps);
+    expect(r.scriptsCalled).toEqual([{ script: "foo.sh", count: 3 }]);
+    expect(r.ignoredHits).toBe(1);
+  });
+
+  it("T339-2 with the ops skill in both places, home wins", () => {
+    makeOps();
+    mkdirSync(join(proj, ".claude", "skills", "testseat-ops", "scripts"), { recursive: true });
+    writeSession(U(1), mtime(1), times(3, "git fetch"));
+    const r = auditSkills({ projectDir: proj, home });
+    expect(r.opsDir).toBe(opsDir());
+  });
+>>>
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+/**
+ * Guards against the same hook script being registered more than once for the
+ * same event.
+===
+/** T-341: a matcher's tool names, or null when it matches every tool (absent, empty, '*', or a regex this does not parse). */
+function matcherTools(m: unknown): Set<string> | null {
+  if (typeof m !== "string") return null;
+  const t = m.trim();
+  if (t === "" || t === "*" || !/^[A-Za-z0-9_]+(\|[A-Za-z0-9_]+)*$/.test(t)) return null;
+  return new Set(t.split("|"));
+}
+
+function toolsOverlap(a: Set<string> | null, b: Set<string> | null): boolean {
+  return a === null || b === null || [...a].some((x) => b.has(x));
+}
+
+/**
+ * Guards against the same hook script being registered more than once for the
+ * same event.
+>>>
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+  let parsed: { hooks?: Record<string, Array<{ hooks?: Array<{ command?: string }> }>> };
+===
+  let parsed: { hooks?: Record<string, Array<{ matcher?: unknown; hooks?: Array<{ command?: string }> }>> };
+>>>
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+    const counts = new Map<string, number>();
+    events++;
+
+    for (const matcher of matchers ?? []) {
+===
+    // T-341: per script, the tool set of each registration's matcher (null = every tool).
+    const regs = new Map<string, Array<Set<string> | null>>();
+    events++;
+
+    for (const matcher of matchers ?? []) {
+      const tools = matcherTools(matcher.matcher);
+>>>
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+        registrations++;
+        counts.set(script, (counts.get(script) ?? 0) + 1);
+      }
+    }
+
+    for (const [script, n] of counts) {
+      if (n > 1) duplicates.push(`${event}: ${script} registered ${n}x`);
+    }
+===
+        registrations++;
+        regs.set(script, [...(regs.get(script) ?? []), tools]);
+      }
+    }
+
+    // A duplicate is the same script under two matchers that can fire on the same tool call. Disjoint matchers
+    // ('Bash|PowerShell' and 'Edit|Write', the recall trigger's live shape) are one fire per call, not a duplicate.
+    for (const [script, sets] of regs) {
+      const n = sets.filter((a, i) => sets.some((b, j) => j !== i && toolsOverlap(a, b))).length;
+      if (n > 1) duplicates.push(`${event}: ${script} registered ${n}x`);
+    }
+>>>
+@@@ open-brain/tests/pipelines/sync/hook-registration.test.ts
+<<<
+        SessionEnd: [{ hooks: [{ command: "node /x/shared.js" }] }],
+      },
+    });
+    expect(checkHookRegistration(p).severity).toBe("pass");
+  });
+===
+        SessionEnd: [{ hooks: [{ command: "node /x/shared.js" }] }],
+      },
+    });
+    expect(checkHookRegistration(p).severity).toBe("pass");
+  });
+
+  it("T341-1: one script on disjoint matchers (the recall trigger's live shape) is not a duplicate", () => {
+    const p = settings({
+      hooks: {
+        PostToolUse: [
+          { matcher: "Bash|PowerShell", hooks: [{ command: "node /x/cli-recall-trigger.js" }] },
+          { matcher: "Edit|Write", hooks: [{ command: "node /x/cli-recall-trigger.js" }] },
+        ],
+      },
+    });
+    const r = checkHookRegistration(p);
+    expect(r.severity, r.message).toBe("pass");
+  });
+
+  it("T341-2: overlapping matchers are a duplicate", () => {
+    const p = settings({
+      hooks: {
+        PostToolUse: [
+          { matcher: "Bash", hooks: [{ command: "node /x/cli-recall-trigger.js" }] },
+          { matcher: "Bash|PowerShell", hooks: [{ command: "node /x/cli-recall-trigger.js" }] },
+        ],
+      },
+    });
+    const r = checkHookRegistration(p);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("PostToolUse: cli-recall-trigger.js registered 2x");
+  });
+
+  it("T341-3: a '*' matcher overlaps every tool", () => {
+    const p = settings({
+      hooks: {
+        PostToolUse: [
+          { matcher: "*", hooks: [{ command: "node /x/a.js" }] },
+          { matcher: "Edit", hooks: [{ command: "node /x/a.js" }] },
+        ],
+      },
+    });
+    expect(checkHookRegistration(p).severity).toBe("issue");
+  });
+
+  it("T341-4: of three registrations, only the two that overlap are counted", () => {
+    const p = settings({
+      hooks: {
+        PostToolUse: [
+          { matcher: "Bash", hooks: [{ command: "node /x/a.js" }] },
+          { matcher: "Bash|PowerShell", hooks: [{ command: "node /x/a.js" }] },
+          { matcher: "Edit|Write", hooks: [{ command: "node /x/a.js" }] },
+        ],
+      },
+    });
+    const r = checkHookRegistration(p);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("a.js registered 2x");
+  });
+>>>
+@@@ open-brain/src/pipelines/sync/developer-building-checks.ts
+<<<
+  const name = "cursor-rules-current";
+  const path = join(projectRoot, DEVELOPER_BUILDING_CHECKS_MDC_REL);
+  try {
+===
+  const name = "cursor-rules-current";
+  const path = join(projectRoot, DEVELOPER_BUILDING_CHECKS_MDC_REL);
+  // T-341: a repo with no .cursor/ has no Cursor seat to feed (mail-server, 11-10). Skip, and say it is not a pass.
+  if (!existsSync(join(projectRoot, ".cursor")) && !existsSync(path)) {
+    return { name, severity: "skip", message: "not checked: no .cursor/ here, so no Cursor seat reads the rule. This is not a pass." };
+  }
+  try {
+>>>
+@@@ open-brain/tests/pipelines/fleet-ae-f2.test.ts
+<<<
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
+===
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+>>>
+@@@ open-brain/tests/pipelines/fleet-ae-f2.test.ts
+<<<
+    writeFileSync(join(dir, ".agents/roles/developer.md"), savedRole, "utf8");
+    writeDeveloperBuildingChecksMdc(dir);
+    expect(checkCursorRulesCurrent(dir).severity).toBe("pass");
+  });
+===
+    writeFileSync(join(dir, ".agents/roles/developer.md"), savedRole, "utf8");
+    writeDeveloperBuildingChecksMdc(dir);
+    expect(checkCursorRulesCurrent(dir).severity).toBe("pass");
+  });
+
+  it("T341-5: a repo with no .cursor/ skips, even when developer.md has no Building checks section", () => {
+    dir = mkFleetAeTemp("fleet-ae-t341-");
+    mkdirSync(join(dir, ".agents", "roles"), { recursive: true });
+    writeFileSync(join(dir, ".agents/roles/developer.md"), "# Developer\n\nNo building checks here.\n", "utf8");
+    const r = checkCursorRulesCurrent(dir);
+    expect(r.severity, r.message).toBe("skip");
+    expect(r.message).toContain("This is not a pass.");
+  });
+
+  it("T341-6: with .cursor/ present, a missing section is still an issue", () => {
+    dir = mkFleetAeTemp("fleet-ae-t341-");
+    mkdirSync(join(dir, ".agents", "roles"), { recursive: true });
+    mkdirSync(join(dir, ".cursor"), { recursive: true });
+    writeFileSync(join(dir, ".agents/roles/developer.md"), "# Developer\n\nNo building checks here.\n", "utf8");
+    expect(checkCursorRulesCurrent(dir).severity).toBe("issue");
+  });
+>>>
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+  const st = classifySessionCommand(projectRoot, "start", templateDir);
+  return st === "OLD" ? OLD_START_COMMAND_WARNING : null;
+}
+===
+  const st = classifySessionCommand(projectRoot, "start", templateDir);
+  if (st !== "OLD") return null;
+  // T-342: the byte compare marks every SIA copy OLD after any template edit, and three seats stopped to ask (11-09/10).
+  // Say which kind of OLD it is and how far it is from the template; the constant stays the line's prefix.
+  return `${OLD_START_COMMAND_WARNING} (${describeStartDifference(projectRoot, templateDir)})`;
+}
+
+/** T-342: "an earlier SIA copy" when the first line matches the template's, else "not SIA's /start"; plus a line count. */
+export function describeStartDifference(projectRoot: string, templateDir: string): string {
+  const read = (p: string): string[] => (existsSync(p) ? readFileSync(p, "utf8").replace(/\r\n/g, "\n").split("\n") : []);
+  const mine = read(join(resolve(projectRoot), sessionCommandRel("start")));
+  const tmpl = read(join(templateDir, sessionCommandRel("start")));
+  const inTmpl = new Set(tmpl);
+  const inMine = new Set(mine);
+  const differ = mine.filter((l) => !inTmpl.has(l)).length + tmpl.filter((l) => !inMine.has(l)).length;
+  const kind = tmpl.length > 0 && mine[0] === tmpl[0] ? "an earlier SIA copy" : "not SIA's /start";
+  return `${kind}: ${differ} line(s) differ from the template`;
+}
+>>>
+@@@ open-brain/tests/pipelines/import-cmds-i9.test.ts
+<<<
+import { readFileSync } from "node:fs";
+===
+import { readFileSync, writeFileSync } from "node:fs";
+>>>
+@@@ open-brain/tests/pipelines/import-cmds-i9.test.ts
+<<<
+  classifySessionCommand,
+  OLD_START_COMMAND_WARNING,
+} from "../../src/pipelines/bootstrap/index.js";
+===
+  classifySessionCommand,
+  OLD_START_COMMAND_WARNING,
+  oldStartCommandWarning,
+} from "../../src/pipelines/bootstrap/index.js";
+>>>
+@@@ open-brain/tests/pipelines/import-cmds-i9.test.ts
+<<<
+    const text = (await handleStart({ project_root: dir })).content.map((c) => c.text).join("\n");
+    expect(text).toContain(OLD_START_COMMAND_WARNING);
+  });
+===
+    const text = (await handleStart({ project_root: dir })).content.map((c) => c.text).join("\n");
+    expect(text).toContain(OLD_START_COMMAND_WARNING);
+  });
+
+  it("T342-1: an earlier SIA copy (the template plus one line) is named as one, with the count", () => {
+    const dir = preStateProject();
+    importCommit(dir);
+    const tmpl = readFileSync(join(templateDir, ".claude/commands/start.md"), "utf8").replace(/\r\n/g, "\n");
+    writeFileSync(join(dir, ".claude/commands/start.md"), `${tmpl}T342 EXTRA LINE\n`);
+    expect(oldStartCommandWarning(dir, templateDir)).toBe(
+      `${OLD_START_COMMAND_WARNING} (an earlier SIA copy: 1 line(s) differ from the template)`,
+    );
+  });
+
+  it("T342-2: a hand-written /start is named as not SIA's", () => {
+    const dir = preStateProject();
+    importCommit(dir);
+    const w = oldStartCommandWarning(dir, templateDir);
+    expect(w).toContain(`${OLD_START_COMMAND_WARNING} (not SIA's /start: `);
+    expect(w).toContain(" line(s) differ from the template)");
+  });
+>>>

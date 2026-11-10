@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/developer-building-checks.ts
+<<<
+  if (!existsSync(join(projectRoot, ".cursor")) && !existsSync(path)) {
+===
+  if (false) {
+>>>

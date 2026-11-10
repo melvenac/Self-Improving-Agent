@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+  const differ = mine.filter((l) => !inTmpl.has(l)).length + tmpl.filter((l) => !inMine.has(l)).length;
+===
+  const differ = mine.filter((l) => !inTmpl.has(l)).length + tmpl.filter((l) => !inMine.has(l)).length + 1;
+>>>

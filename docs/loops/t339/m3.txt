@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+  return a === null || b === null || [...a].some((x) => b.has(x));
+===
+  return a !== null && b !== null && [...a].some((x) => b.has(x));
+>>>

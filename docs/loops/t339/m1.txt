@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/skills-audit/index.ts
+<<<
+    ? [join(opts.home, ".claude", "skills", `${seat}-ops`), join(opts.projectDir, ".claude", "skills", `${seat}-ops`)]
+===
+    ? [join(opts.home, ".claude", "skills", `${seat}-ops`)]
+>>>
