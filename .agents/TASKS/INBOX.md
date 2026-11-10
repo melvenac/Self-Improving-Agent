@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 630 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 631 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -21,6 +21,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-321** A separate agent GitHub account so GitHub itself can require Aaron's approval on merges (D-154 option b)
 - [ ] **T-339** skills-audit: find a seat's ops skill in the project (.claude/skills/<seat>-ops), not only in ~/.claude/skills
 - [ ] **T-340** CI on the Lenovo: a shared runner label so SIA's Linux jobs can run on tcm-1, tcm-2 or the Lenovo
+- [ ] **T-341** /sync false issues in consumer repos: hook-registration counts disjoint matchers as duplicates; cursor-rules-current fires in a repo with no Cursor
 
 ## Done (last 3 sessions)
 

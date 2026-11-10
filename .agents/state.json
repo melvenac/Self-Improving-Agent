@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 630,
+  "revision": 631,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3046,6 +3046,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "clark 11-09: the Lenovo is now a D-043 CI host (Aaron's 'All three', 11-09): gh-runner user, owner-matched egress firewall, drop-in masking /home/dashjobs, /home/melvenac and the docker socket, MemoryMax 5G, runner 2.338.2. ci.yml pins runs-on [self-hosted, linux, tcm] on `changed` (:67) and `test` (:98) at 4a2d0bac. Atlas's call on design (11-09): a runs-on label array is an AND (a runner needs every label), so 'tcm with a fallback' cannot be written in one runs-on, and runner groups are org-only (melvenac is a user account). So: ONE shared label on all three runners, then pin [self-hosted, linux, fleet]. ORDER MATTERS: (1) host work, clark's: register a Lenovo runner for melvenac/Self-Improving-Agent (repo-level) and add the `fleet` label to tcm-1, tcm-2 and the Lenovo; confirm with `gh api repos/melvenac/Self-Improving-Agent/actions/runners`. (2) Only then the PR, or every job queues with no runner. The PR: both runs-on lines; ci-runs-on.test.ts (TCM const :14, the T-330 row :243 and its title, the comment :286 'tcm is the only Linux runner'); the egress self-check step is named 'Egress isolation self-check (tcm)' (:284 pins the name): read what it checks and confirm it passes on the Lenovo's firewall before the switch, renaming it if the name is tcm-specific. Watch: MemoryMax 5G vs the full suite (test job runs the whole vitest suite; tcm has more), so the live check must include a run that lands on the Lenovo (dispatch with tcm-1/2 busy or temporarily offline, clark's call) and passes. Touches .github/workflows: Aaron's word merges it, via clark. Not urgent; tcm-1 and tcm-2 keep working.",
+      "note_by": [
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-341",
+      "title": "/sync false issues in consumer repos: hook-registration counts disjoint matchers as duplicates; cursor-rules-current fires in a repo with no Cursor",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 177,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "From the mail-server developer seat's /start flags (session ccfc759a, 11-10, via Aaron). Read by Atlas at 77f67a4e. (1) hook-registration (checks.ts:937-962) counts a script per EVENT, ignoring the matcher. ~/.claude/settings.json registers cli-recall-trigger.js under PostToolUse twice, on matcher 'Bash|PowerShell' and on 'Edit|Write': disjoint tool sets, one fire per tool call, intended. The check reports 'PostToolUse: cli-recall-trigger.js registered 2x' at severity issue on every /sync in every repo. Fix: a duplicate is the same script under two matchers whose tool sets intersect (split on '|'; an empty or '*' matcher matches everything); disjoint matchers are not counted. Rows: the live shape (Bash|PowerShell + Edit|Write) passes; Bash + Bash|PowerShell is a duplicate; '*' + Edit is a duplicate; the same script in two events stays per-event. (2) cursor-rules-current (developer-building-checks.ts:108-133) returns issue when expectedDeveloperBuildingChecksMdc throws, and in mail-server (.agents/roles/developer.md without '## Building checks', no .cursor/ directory) it reports the missing section as an issue. A repo with no .cursor/ has no Cursor seat to feed. Fix: no .cursor/ directory AND no generated rule file -> skip with the reason ('no .cursor/: no Cursor seat here. This is not a pass.'); with .cursor/ present, behaviour unchanged. Rows: no .cursor/ skips; .cursor/ present + missing section stays issue; SIA's own tree unchanged (pass). Why it matters: an issue that is always there is read past, the failure CLAUDE.md names for PRD.md. Small; batch with T-339 in the next SIA build. Not SIA's: the mail seat's other flags (OLD /start: run bootstrap install-commands, as Beam; record.sh 'next is 6' vs ob_start #7 is mail-server-ops's own count, ob_start numbers by log on disk (T-314's area); usage_file is fleet seat data, clark's).",
       "note_by": [
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
@@ -7163,12 +7177,12 @@
     },
     {
       "n": 177,
-      "date": "2026-11-09",
+      "date": "2026-11-10",
       "uuid": "6f5b8a9d-429d-4c93-99a4-996634877932",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 630
+      "last_work_rev": 631
     }
   ]
 }
