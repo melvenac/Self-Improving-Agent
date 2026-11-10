@@ -141,7 +141,8 @@ export function buildGreetingMetricsRow(input: GreetingMetricsInput, previous: P
   if (state !== null && role !== null && own === null) missing.add("handoff");
   if (own !== null && own.pick_up.trim() === "") missing.add("pick_up");
   if (state !== null && state.objective === null) missing.add("objective");
-  if (/^Latest brief: none/m.test(report)) missing.add("latest_brief");
+  // T-336: only a brief folder that exists with no brief in it is a missing pointer; "no brief folder" is not.
+  if (/^Latest brief: none \(looked in /m.test(report)) missing.add("latest_brief");
 
   const streaks: Record<string, number> = {};
   for (const id of ALARM_IDS) if (ALARM_PATTERNS[id].test(report)) streaks[id] = (previous?.alarm_streaks?.[id] ?? 0) + 1;

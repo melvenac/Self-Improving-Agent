@@ -323,7 +323,7 @@ describe("BF-F: Fleet block", () => {
       "Seats (SIA): atlas-sia planner claude-code/opus DESKTOP-UGEKR74 active · cursor-infra dev cursor/composer-2.5 DESKTOP-O4EGB1E active",
     ]);
     expect(budget).toBe(
-      "FLEET: coordinator clark · hub v1.21.0 · dashboard v1.15.0 · seats atlas-sia, cursor-infra (verified 10-08 16:40 CDT)",
+      "FLEET: coordinator clark · hub v1.21.0 · dashboard v1.15.0 · seats atlas-sia, cursor-infra · fleet.json verified 10-08 16:40 CDT",
     );
   });
 
@@ -373,8 +373,11 @@ describe("BF-F: Fleet block", () => {
     const staleNow = new Date("2026-10-08T22:00:00.000Z");
     gitRepo(root);
     const { legacy, budget } = describeFleet(root, "SIA", { FLEET_JSON: path }, staleNow);
-    expect(legacy[0]).toContain(" · STALE (verified ");
-    expect(budget).toContain(" · STALE (verified ");
+    // T-337: STALE follows the file's stamp, once, and never sits where a seat name would.
+    expect(legacy[0]).toMatch(/^## Fleet \(fleet\.json, verified [^)]+\) · STALE$/);
+    expect(budget).toMatch(/ · seats atlas-sia, cursor-infra · fleet\.json verified [^,]+, STALE$/);
+    expect(budget.split("verified").length - 1).toBe(1);
+    expect(budget).not.toContain("(verified");
   });
 
   it("BF-F4: missing and invalid JSON still render briefing end", () => {

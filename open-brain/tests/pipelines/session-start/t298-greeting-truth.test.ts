@@ -126,12 +126,23 @@ describe("T-298 G5-G7: brief_dir and the no-brief line", () => {
   it("G6: the none line names where it looked", () => {
     const bare = repo();
     commitAt(bare, "README.md", "2026-10-01T12:00:00+00:00");
-    expect(describeNoBrief(bare)).toBe("Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)");
+    expect(describeNoBrief(bare)).toBe("Latest brief: none (no brief folder: docs/loops/ does not exist and docs/ has no loop-*-brief.md)");
     const root = repo();
     commitAt(root, ".agents/plans/notes.txt", "2026-10-01T12:00:00+00:00");
     writeGreeting(root, { brief_dir: ".agents/plans" });
     expect(describeLatestBrief(root)).toBeNull();
     expect(describeNoBrief(root)).toBe("Latest brief: none (looked in .agents/plans/, from greeting.json brief_dir)");
+  });
+
+  it("T336-2: an existing folder with no brief says where it looked; a brief_dir that does not exist says so", () => {
+    const empty = repo();
+    commitAt(empty, "docs/loops/loop-3-qa-report.md", "2026-10-01T12:00:00+00:00");
+    expect(describeLatestBrief(empty)).toBeNull();
+    expect(describeNoBrief(empty)).toBe("Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)");
+    const set = repo();
+    commitAt(set, "README.md", "2026-10-01T12:00:00+00:00");
+    writeGreeting(set, { brief_dir: ".agents/plans" });
+    expect(describeNoBrief(set)).toBe("Latest brief: none (no brief folder: .agents/plans/ does not exist, from greeting.json brief_dir)");
   });
 
   it("G7: an invalid brief_dir is reported, not guessed", () => {
@@ -192,6 +203,22 @@ describe("T-298 G8-G11: the greeting metrics row", () => {
     expect(row.unchecked).toEqual([]);
     expect(row.alarm_streaks).toEqual({ tree_diverged: 1, stale_process: 1, usage_not_checked: 1 });
     expect(Buffer.byteLength(JSON.stringify(row))).toBeLessThan(2048);
+  });
+
+  it("T336-1: a no-brief-folder line is not a missing latest_brief; a looked-in line still is", async () => {
+    const { buildGreetingMetricsRow } = await metrics();
+    const root = repo();
+    const at = new Date("2026-10-16T12:00:00Z");
+    const noFolder = REPORT.replace(
+      "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
+      "Latest brief: none (no brief folder: docs/loops/ does not exist and docs/ has no loop-*-brief.md)",
+    );
+    expect(noFolder).not.toBe(REPORT);
+    const a = buildGreetingMetricsRow(metricsInput(root, { report: noFolder }), null, at);
+    expect(a.missing_pointers).not.toContain("latest_brief");
+    expect(a.unchecked).toEqual([]);
+    const b = buildGreetingMetricsRow(metricsInput(root, { report: REPORT }), null, at);
+    expect(b.missing_pointers).toContain("latest_brief");
   });
 
   function withDb<T>(fn: (dir: string) => T): T {
@@ -278,7 +305,7 @@ describe("T-298 G12: ob_start, metrics opt-in and the no-brief line default on",
     const file = join(dir, GREETING_METRICS_FILE);
     try {
       const off = (await handleStart({ project_root: project() })).content[0]!.text;
-      expect(off).toContain("Latest brief: none (looked in docs/loops/");
+      expect(off).toContain("Latest brief: none (no brief folder: docs/loops/");
       expect(existsSync(file)).toBe(false);
 
       const root = project();
