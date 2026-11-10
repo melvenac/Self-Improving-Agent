@@ -22,10 +22,10 @@ IMPACT-TARGETS: describeNoBrief (latest-brief.ts), buildGreetingMetricsRow (gree
 - **T-336, `greeting-metrics.ts`:** `missing_pointers` counts `latest_brief` only on `Latest brief: none (looked in `.
   Fleet has no brief folder, so every Clark start was scored missing forever.
 - **T-337, `fleet.ts`:** `verifiedStale` returns a boolean. The FLEET budget line ends
-  `· seats maker · fleet.json verified <stamp>` plus `, STALE` when over 24 h, instead of
-  `seats maker (verified <stamp>) · STALE (verified <stamp>)`, which read as maker's status with STALE as a seat
-  (Maker S75). The legacy header keeps `## Fleet (fleet.json, verified <stamp>)` and appends ` · STALE` without the
-  repeated stamp.
+  `<dot> seats maker <dot> fleet.json verified <stamp>` plus `, STALE` when over 24 h, instead of
+  `seats maker (verified <stamp>) <dot> STALE (verified <stamp>)`, which read as maker's status with STALE as a seat
+  (Maker S75). The legacy header keeps `## Fleet (fleet.json, verified <stamp>)` and appends ` <dot> STALE` without the
+  repeated stamp. (`<dot>` stands for the middle-dot separator U+00B7 the code prints; edits.txt has the real character.)
 
 ## Existing tests that pin this behaviour (planner read; not simulated)
 
@@ -100,5 +100,5 @@ New rows: T336-1 (metrics, in G8-G11's describe) and T336-2 (latest-brief, after
 
 `sia-rebuild.sh <mergesha>`. Live check, read-only: in `~/Worktrees` (Fleet, no brief folder), the CLI start line must
 print `Latest brief: none (no brief folder: ...)`, and Clark's next greeting-metrics row must not list `latest_brief`.
-In this planner tree the line is unchanged. Any greeting's FLEET line ends `· fleet.json verified <stamp>` (`, STALE`
+In this planner tree the line is unchanged. Any greeting's FLEET line ends `<dot> fleet.json verified <stamp>` (`, STALE`
 when over 24 h).
