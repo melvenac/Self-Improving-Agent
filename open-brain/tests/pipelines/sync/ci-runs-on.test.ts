@@ -1,5 +1,6 @@
 /**
- * T-330: every Linux job runs on the self-hosted tcm runners, always (T-227 had made GitHub-hosted the default). `evalRunsOn` is the small evaluator for the
+ * T-330: every Linux job runs on self-hosted runners, always (T-227 had made GitHub-hosted the default). T-340: the fleet
+ * label (tcm-1, tcm-2, lenovo-sia-1). `evalRunsOn` is the small evaluator for the
  * one `runs-on` expression. `&&` binds tighter than `||`, and each returns the
  * value rather than a boolean, as GitHub's expression language does. T-221: it also reads github.head_ref, ref_name and run_id, and format() (third commit).
  */
@@ -11,7 +12,7 @@ import { dirname, join } from "node:path";
 import { parse } from "yaml";
 
 const workflowPath = join(import.meta.dirname, "../../../../.github/workflows/ci.yml");
-const TCM = ["self-hosted", "linux", "tcm"];
+const FLEET = ["self-hosted", "linux", "fleet"];
 
 type Ctx = {
   event: string;
@@ -240,8 +241,8 @@ function runsOn(): unknown {
 describe("ci.yml runs-on (T-192)", () => {
   const expr = runsOn();
 
-  it("T-330: the test job runs on the self-hosted tcm runners for every event, with no expression to pick a hosted one", () => {
-    expect(expr).toEqual(TCM);
+  it("T-330/T-340: the test job runs on the self-hosted fleet runners for every event, with no expression to pick a hosted one", () => {
+    expect(expr).toEqual(FLEET);
   });
 
   it("T-330: no job runs on a GitHub-hosted runner, and test-windows stays on the laptop", () => {
@@ -281,9 +282,9 @@ describe("ci.yml runs-on (T-192)", () => {
       jobs: Record<string, { if?: string; steps?: Array<{ name?: string; if?: string }> }>;
       on?: { workflow_dispatch?: { inputs?: Record<string, unknown> } };
     };
-    const egress = doc.jobs.test.steps?.find((s) => s.name === "Egress isolation self-check (tcm)");
+    const egress = doc.jobs.test.steps?.find((s) => s.name === "Egress isolation self-check (linux)");
     expect(egress?.if).toBe("runner.environment == 'self-hosted'");
-    // T-330: tcm is the only Linux runner, so neither T-192's hosted opt-out nor T-227's tcm opt-in is an input.
+    // T-330: self-hosted Linux is the only Linux target, so neither T-192's hosted opt-out nor T-227's tcm opt-in is an input.
     const inputs = doc.on?.workflow_dispatch?.inputs as Record<string, { default?: unknown }>;
     expect(inputs.hosted).toBeUndefined();
     expect(inputs.tcm).toBeUndefined();
