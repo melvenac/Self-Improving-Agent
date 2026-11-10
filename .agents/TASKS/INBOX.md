@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 627 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 628 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -21,6 +21,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-312** Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap
 - [ ] **T-321** A separate agent GitHub account so GitHub itself can require Aaron's approval on merges (D-154 option b)
 - [ ] **T-337** FLEET line: the file-wide verified stamp and STALE read as a seat's status
+- [ ] **T-339** skills-audit: find a seat's ops skill in the project (.claude/skills/<seat>-ops), not only in ~/.claude/skills
 
 ## Done (last 3 sessions)
 

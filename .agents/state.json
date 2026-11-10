@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 627,
+  "revision": 628,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3022,6 +3022,20 @@
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
       "closed_rev": 627
+    },
+    {
+      "id": "T-339",
+      "title": "skills-audit: find a seat's ops skill in the project (.claude/skills/<seat>-ops), not only in ~/.claude/skills",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 177,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "clark 11-09, from Beam's /end audit (session 5c5a0261): auditSkills (src/pipelines/skills-audit/index.ts:208-209 at a1cd8306) resolves only join(home, '.claude', 'skills', `${seat}-ops`). Beam's ops skill has lived at <project>/.claude/skills/beam-ops since 10-26, so the audit prints 'ops none', counts 8 of Beam's 27 rows (record-commit.sh, merge-land.sh, job-wait.sh, job-submit.sh, brief-submit.sh, roadmap.mjs, laptop.sh, source lib.sh) as by-hand, and cannot read Beam's audit-ignore.txt (line 161 reads it from opsDir). Fix: when the home path does not exist, try join(opts.projectDir, '.claude', 'skills', `${seat}-ops`); the recall trigger's seat.js:13 already matches that path. Which wins when both exist: home (unchanged behaviour), and the audit line should name the path it used. Test: a temp project with the skill only in the project resolves it and reads its audit-ignore.txt; home-only unchanged; neither prints ops none. Small; batch with the next SIA build.",
+      "note_by": [
+        "6f5b8a9d-429d-4c93-99a4-996634877932"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -7142,7 +7156,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 627
+      "last_work_rev": 628
     }
   ]
 }
