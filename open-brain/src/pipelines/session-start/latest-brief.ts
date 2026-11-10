@@ -119,9 +119,15 @@ export function describeLatestBrief(projectRoot: string): string | null {
 /** T-298: the line ob_start prints when describeLatestBrief found no brief: where it looked, so "none" and "didn't look" differ. */
 export function describeNoBrief(projectRoot: string): string {
   const s = briefDirSetting(projectRoot);
-  return s !== null && "dir" in s
-    ? `Latest brief: none (looked in ${s.dir}/, from greeting.json brief_dir)`
-    : `Latest brief: none (looked in ${BRIEF_DIR}/ and ${ROOT_BRIEF_DIR}/loop-*-brief.md)`;
+  // T-336: a repo with no brief folder has nothing to point at, and says so, so the metrics row does not count it missing.
+  if (s !== null && "dir" in s) {
+    return existsSync(join(projectRoot, s.dir))
+      ? `Latest brief: none (looked in ${s.dir}/, from greeting.json brief_dir)`
+      : `Latest brief: none (no brief folder: ${s.dir}/ does not exist, from greeting.json brief_dir)`;
+  }
+  return existsSync(join(projectRoot, BRIEF_DIR)) || rootBriefOnDisk(projectRoot)
+    ? `Latest brief: none (looked in ${BRIEF_DIR}/ and ${ROOT_BRIEF_DIR}/loop-*-brief.md)`
+    : `Latest brief: none (no brief folder: ${BRIEF_DIR}/ does not exist and ${ROOT_BRIEF_DIR}/ has no loop-*-brief.md)`;
 }
 
 /**

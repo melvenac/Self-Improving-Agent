@@ -473,7 +473,7 @@ describe("ob_start carries the same block, and every /start copy prints it verba
         serving: block[1]!,
         date: new Date().toISOString().slice(0, 10),
         usage: describeUsage(root, process.env, startNow),
-        latestBrief: "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
+        latestBrief: "Latest brief: none (no brief folder: docs/loops/ does not exist and docs/ has no loop-*-brief.md)",
         // T-329: the checkout handleStart passes for this fixture (no handoff_by_checkout flag, a developer seat) is null.
         readsOwed: describeReadsOwed(root, parsed.data, n, "developer", null),
         fleet: describeFleet(root, parsed.data.project.name, process.env, startNow),
@@ -594,7 +594,7 @@ describe("ob_start carries the same block, and every /start copy prints it verba
             serving: first,
             date: new Date().toISOString().slice(0, 10),
             usage: describeUsage(root, process.env, startNow),
-            latestBrief: "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
+            latestBrief: "Latest brief: none (no brief folder: docs/loops/ does not exist and docs/ has no loop-*-brief.md)",
             readsOwed: describeReadsOwed(root, parsed.data, sessionNumber, "developer", null),
             fleet: describeFleet(root, parsed.data.project.name, process.env, startNow),
             workingTree: describeWorkingTree(root, join(root, ".agents", "SESSIONS", `Session_${sessionNumber}.md`)),
