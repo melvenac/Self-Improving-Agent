@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 632,
+  "revision": 633,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3027,15 +3027,15 @@
       "id": "T-339",
       "title": "skills-audit: find a seat's ops skill in the project (.claude/skills/<seat>-ops), not only in ~/.claude/skills",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 177,
-      "closed_session": null,
+      "closed_session": 177,
       "supersedes": null,
-      "note": "clark 11-09, from Beam's /end audit (session 5c5a0261): auditSkills (src/pipelines/skills-audit/index.ts:208-209 at a1cd8306) resolves only join(home, '.claude', 'skills', `${seat}-ops`). Beam's ops skill has lived at <project>/.claude/skills/beam-ops since 10-26, so the audit prints 'ops none', counts 8 of Beam's 27 rows (record-commit.sh, merge-land.sh, job-wait.sh, job-submit.sh, brief-submit.sh, roadmap.mjs, laptop.sh, source lib.sh) as by-hand, and cannot read Beam's audit-ignore.txt (line 161 reads it from opsDir). Fix: when the home path does not exist, try join(opts.projectDir, '.claude', 'skills', `${seat}-ops`); the recall trigger's seat.js:13 already matches that path. Which wins when both exist: home (unchanged behaviour), and the audit line should name the path it used. Test: a temp project with the skill only in the project resolves it and reads its audit-ignore.txt; home-only unchanged; neither prints ops none. Small; batch with the next SIA build.",
+      "note": "clark 11-09, from Beam's /end audit (session 5c5a0261): auditSkills (src/pipelines/skills-audit/index.ts:208-209 at a1cd8306) resolves only join(home, '.claude', 'skills', `${seat}-ops`). Beam's ops skill has lived at <project>/.claude/skills/beam-ops since 10-26, so the audit prints 'ops none', counts 8 of Beam's 27 rows (record-commit.sh, merge-land.sh, job-wait.sh, job-submit.sh, brief-submit.sh, roadmap.mjs, laptop.sh, source lib.sh) as by-hand, and cannot read Beam's audit-ignore.txt (line 161 reads it from opsDir). Fix: when the home path does not exist, try join(opts.projectDir, '.claude', 'skills', `${seat}-ops`); the recall trigger's seat.js:13 already matches that path. Which wins when both exist: home (unchanged behaviour), and the audit line should name the path it used. Test: a temp project with the skill only in the project resolves it and reads its audit-ignore.txt; home-only unchanged; neither prints ops none. Small; batch with the next SIA build. — Done 11-10 with T-341/T-342 as one build (brief docs/loops/t339-brief.md, #1113): job 1072 (Lenovo, Sonnet) HANDBACK 2636d1c0, landed as #1114, byte-compare 8/8 SAME, mutants 6/6 red, PR run 42783713611 green on tcm-1 (362/362, 5003 passed). QA ACCEPT Atlas (builder = job), merged by clark under SG-1 at cadb576d, rebuilt. Master push run 42784633089 green on tcm-2. Live check of the beam-ops path left to the next Beam skills-audit.",
       "note_by": [
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
-      "closed_rev": null
+      "closed_rev": 633
     },
     {
       "id": "T-340",
@@ -3055,29 +3055,29 @@
       "id": "T-341",
       "title": "/sync false issues in consumer repos: hook-registration counts disjoint matchers as duplicates; cursor-rules-current fires in a repo with no Cursor",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 177,
-      "closed_session": null,
+      "closed_session": 177,
       "supersedes": null,
-      "note": "From the mail-server developer seat's /start flags (session ccfc759a, 11-10, via Aaron). Read by Atlas at 77f67a4e. (1) hook-registration (checks.ts:937-962) counts a script per EVENT, ignoring the matcher. ~/.claude/settings.json registers cli-recall-trigger.js under PostToolUse twice, on matcher 'Bash|PowerShell' and on 'Edit|Write': disjoint tool sets, one fire per tool call, intended. The check reports 'PostToolUse: cli-recall-trigger.js registered 2x' at severity issue on every /sync in every repo. Fix: a duplicate is the same script under two matchers whose tool sets intersect (split on '|'; an empty or '*' matcher matches everything); disjoint matchers are not counted. Rows: the live shape (Bash|PowerShell + Edit|Write) passes; Bash + Bash|PowerShell is a duplicate; '*' + Edit is a duplicate; the same script in two events stays per-event. (2) cursor-rules-current (developer-building-checks.ts:108-133) returns issue when expectedDeveloperBuildingChecksMdc throws, and in mail-server (.agents/roles/developer.md without '## Building checks', no .cursor/ directory) it reports the missing section as an issue. A repo with no .cursor/ has no Cursor seat to feed. Fix: no .cursor/ directory AND no generated rule file -> skip with the reason ('no .cursor/: no Cursor seat here. This is not a pass.'); with .cursor/ present, behaviour unchanged. Rows: no .cursor/ skips; .cursor/ present + missing section stays issue; SIA's own tree unchanged (pass). Why it matters: an issue that is always there is read past, the failure CLAUDE.md names for PRD.md. Small; batch with T-339 in the next SIA build. Not SIA's: the mail seat's other flags (OLD /start: run bootstrap install-commands, as Beam; record.sh 'next is 6' vs ob_start #7 is mail-server-ops's own count, ob_start numbers by log on disk (T-314's area); usage_file is fleet seat data, clark's).",
+      "note": "From the mail-server developer seat's /start flags (session ccfc759a, 11-10, via Aaron). Read by Atlas at 77f67a4e. (1) hook-registration (checks.ts:937-962) counts a script per EVENT, ignoring the matcher. ~/.claude/settings.json registers cli-recall-trigger.js under PostToolUse twice, on matcher 'Bash|PowerShell' and on 'Edit|Write': disjoint tool sets, one fire per tool call, intended. The check reports 'PostToolUse: cli-recall-trigger.js registered 2x' at severity issue on every /sync in every repo. Fix: a duplicate is the same script under two matchers whose tool sets intersect (split on '|'; an empty or '*' matcher matches everything); disjoint matchers are not counted. Rows: the live shape (Bash|PowerShell + Edit|Write) passes; Bash + Bash|PowerShell is a duplicate; '*' + Edit is a duplicate; the same script in two events stays per-event. (2) cursor-rules-current (developer-building-checks.ts:108-133) returns issue when expectedDeveloperBuildingChecksMdc throws, and in mail-server (.agents/roles/developer.md without '## Building checks', no .cursor/ directory) it reports the missing section as an issue. A repo with no .cursor/ has no Cursor seat to feed. Fix: no .cursor/ directory AND no generated rule file -> skip with the reason ('no .cursor/: no Cursor seat here. This is not a pass.'); with .cursor/ present, behaviour unchanged. Rows: no .cursor/ skips; .cursor/ present + missing section stays issue; SIA's own tree unchanged (pass). Why it matters: an issue that is always there is read past, the failure CLAUDE.md names for PRD.md. Small; batch with T-339 in the next SIA build. Not SIA's: the mail seat's other flags (OLD /start: run bootstrap install-commands, as Beam; record.sh 'next is 6' vs ob_start #7 is mail-server-ops's own count, ob_start numbers by log on disk (T-314's area); usage_file is fleet seat data, clark's). — Done 11-10 in #1114 (merge cadb576d; see T-339). Live, rebuilt build at cadb576d: checkHookRegistration on the live ~/.claude/settings.json reads 'pass | No duplicate hook registrations: 8 script registration(s) counted across 6 event(s)'. cursor-rules-current in mail-server and in this sparse planner tree reads 'not checked: no .cursor/ here ... This is not a pass.' Seen while checking: the CLI sync output prints passes only partly (13 of 28 [pass] lines), so a pass has to be read by calling the check directly.",
       "note_by": [
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
-      "closed_rev": null
+      "closed_rev": 633
     },
     {
       "id": "T-342",
       "title": "OLD /start warning cannot tell a stale SIA copy from a non-SIA command, and names no difference",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 177,
-      "closed_session": null,
+      "closed_session": 177,
       "supersedes": null,
-      "note": "Three seats flagged 'OLD /start in this project: run bootstrap install-commands' on 11-09/10: Beam, mail-server, and clark (fleet, session 19). classifySessionCommand (bootstrap/index.ts:82-88 at ba982502) is a byte compare against project-template, so ANY template edit turns every bootstrapped repo OLD. Fleet's start.md is SIA's own copy from d808cc5 and differs by one line (template :135 now names `cli.js list`; fleet's says `ob_list`, the tool T-295 moved to the CLI). The warning reads as 'not SIA's /start', and each seat stops to ask. Fix: (a) say which: compare against the template's git history (git log -p project-template/.claude/commands/start.md, or a hash list shipped with the build); a past SIA version prints 'stale SIA /start (N lines behind the template): bootstrap install-commands updates it', and anything else keeps OLD; (b) print the differing line count either way. Rows: identical -> no line; a past template version -> stale line; a hand-edited file -> OLD; no record -> no line. Batch with T-339/T-341.",
+      "note": "Three seats flagged 'OLD /start in this project: run bootstrap install-commands' on 11-09/10: Beam, mail-server, and clark (fleet, session 19). classifySessionCommand (bootstrap/index.ts:82-88 at ba982502) is a byte compare against project-template, so ANY template edit turns every bootstrapped repo OLD. Fleet's start.md is SIA's own copy from d808cc5 and differs by one line (template :135 now names `cli.js list`; fleet's says `ob_list`, the tool T-295 moved to the CLI). The warning reads as 'not SIA's /start', and each seat stops to ask. Fix: (a) say which: compare against the template's git history (git log -p project-template/.claude/commands/start.md, or a hash list shipped with the build); a past SIA version prints 'stale SIA /start (N lines behind the template): bootstrap install-commands updates it', and anything else keeps OLD; (b) print the differing line count either way. Rows: identical -> no line; a past template version -> stale line; a hand-edited file -> OLD; no record -> no line. Batch with T-339/T-341. — Done 11-10 in #1114 (merge cadb576d; see T-339). Shape as built: OLD_START_COMMAND_WARNING stays the prefix (no test churn), and the line appends '(an earlier SIA copy: N line(s) differ from the template)' or '(not SIA's /start: N ...)'. First line matched against the template's is the SIA marker. Fleet ran install-commands at cd36fee, so the live line waits for the next repo whose copy falls behind.",
       "note_by": [
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
-      "closed_rev": null
+      "closed_rev": 633
     }
   ],
   "verified": [
@@ -7196,7 +7196,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 618,
-      "last_work_rev": 632
+      "last_work_rev": 633
     }
   ]
 }
