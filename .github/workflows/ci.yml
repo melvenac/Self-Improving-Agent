@@ -63,8 +63,10 @@ jobs:
   # T-338: never on a draft PR. This job checks out the head and runs ci-seat-skip.mjs from it, so it is head code.
   changed:
     if: github.event_name == 'pull_request' && !github.event.pull_request.draft
-    # T-330 (Aaron 10-30, "use our own runners, not github"): the self-hosted tcm runners, always.
-    runs-on: [self-hosted, linux, tcm]
+    # T-330 (Aaron 10-30, "use our own runners, not github"): self-hosted runners, always.
+    # T-340: the fleet label is on tcm-1, tcm-2 and lenovo-sia-1 (a D-043 host since 11-09). A runs-on array is an
+    # AND of labels, so one shared label is how a job may land on any of the three.
+    runs-on: [self-hosted, linux, fleet]
     outputs:
       skip: ${{ steps.diff.outputs.skip }}
     steps:
@@ -95,12 +97,12 @@ jobs:
     # run whose `test` gates the merge.
     needs: changed
     if: "${{ !cancelled() && !(github.event_name == 'pull_request' && github.event.pull_request.draft) && (needs.changed.result != 'success' || needs.changed.outputs.skip != 'true') }}"
-    runs-on: [self-hosted, linux, tcm]
+    runs-on: [self-hosted, linux, fleet]
 
     steps:
-      # The tcm runner user is firewalled to the public internet only. If any of these connects,
-      # the isolation is gone and the job must not run the repository's code.
-      - name: Egress isolation self-check (tcm)
+      # Every Linux runner user (tcm-1, tcm-2, lenovo-sia-1) is firewalled to the public internet only, by the same
+      # D-043 script. If any of these connects, the isolation is gone and the job must not run the repository's code.
+      - name: Egress isolation self-check (linux)
         if: runner.environment == 'self-hosted'
         run: |
           fail=0
