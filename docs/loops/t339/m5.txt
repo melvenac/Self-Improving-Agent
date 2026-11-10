@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+  const kind = tmpl.length > 0 && mine[0] === tmpl[0] ? "an earlier SIA copy" : "not SIA's /start";
+===
+  const kind = "an earlier SIA copy";
+>>>
