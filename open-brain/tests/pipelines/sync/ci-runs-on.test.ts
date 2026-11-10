@@ -30,6 +30,8 @@ type Ctx = {
   /** T-227: github.event.pull_request.number and github.sha, for the concurrency group. */
   prNumber?: string;
   sha?: string;
+  /** T-338: github.event.pull_request.draft (null when the event is not a pull request, as in GitHub). */
+  draft?: boolean | null;
 };
 
 function truthy(v: unknown): boolean {
@@ -140,6 +142,7 @@ export function evalRunsOn(runsOn: string, ctx: Ctx): unknown {
     if (m[0] === "inputs.hosted") return ctx.hosted ?? null;
     if (m[0] === "inputs.tcm") return ctx.tcm ?? null;
     if (m[0] === "github.event.pull_request.number") return ctx.prNumber ?? "";
+    if (m[0] === "github.event.pull_request.draft") return ctx.draft ?? null;
     if (m[0] === "github.sha") return ctx.sha ?? "0000000";
     throw new Error(`evalRunsOn: unknown name ${m[0]}`);
   }
@@ -357,9 +360,30 @@ describe("ci.yml runs-on (T-192)", () => {
     }
   });
 
-  it("T-227: the pull_request trigger fires once per commit (opened, synchronize), so a head commit never gets a duplicate run", () => {
+  it("T-227/T-338: the pull_request trigger is opened, synchronize and ready_for_review; never reopened", () => {
     const doc = workflow();
-    expect(doc.on.pull_request?.types).toEqual(["opened", "synchronize"]);
+    expect(doc.on.pull_request?.types).toEqual(["opened", "synchronize", "ready_for_review"]);
+  });
+
+  it("T-338: a draft PR runs no job (no head code), a ready PR runs both, and a push or dispatch is unchanged", () => {
+    const doc = workflow();
+    const changedIf = doc.jobs.changed.if ?? "";
+    const testIf = doc.jobs.test.if ?? "";
+    const pr = { event: "pull_request", ref: "refs/pull/9/merge", headRef: "loop/x", tcm: null } as const;
+    // A draft: changed is skipped, and test must not read "changed not success" as "run the suite".
+    expect(truthy(evalRunsOn(changedIf, { ...pr, draft: true }))).toBe(false);
+    for (const changedResult of ["skipped", "success", "failure"]) {
+      expect(truthy(evalRunsOn(testIf, { ...pr, draft: true, changedResult, changedSkip: "" })), changedResult).toBe(false);
+    }
+    // Ready (or never a draft): changed runs, and test runs for code and skips for docs-only, as before.
+    expect(truthy(evalRunsOn(changedIf, { ...pr, draft: false }))).toBe(true);
+    expect(truthy(evalRunsOn(testIf, { ...pr, draft: false, changedResult: "success", changedSkip: "false" }))).toBe(true);
+    expect(truthy(evalRunsOn(testIf, { ...pr, draft: false, changedResult: "success", changedSkip: "true" }))).toBe(false);
+    // A master push and a dispatch carry no pull_request: changed does not run and test does.
+    for (const ctx of [{ event: "push", ref: "refs/heads/master" }, { event: "workflow_dispatch", ref: "refs/heads/master" }]) {
+      expect(truthy(evalRunsOn(changedIf, { ...ctx, tcm: null }))).toBe(false);
+      expect(truthy(evalRunsOn(testIf, { ...ctx, tcm: null, changedResult: "skipped", changedSkip: "" }))).toBe(true);
+    }
   });
 
   it("a push has no paths filter, so master is not filtered, and a dispatch has none either (T-178)", () => {
@@ -473,7 +497,7 @@ describe("ci.yml runs-on (T-192)", () => {
       }>;
     };
     const changed = doc.jobs.changed;
-    expect(changed.if).toBe("github.event_name == 'pull_request'");
+    expect(changed.if).toBe("github.event_name == 'pull_request' && !github.event.pull_request.draft");
     expect(changed["runs-on"]).toEqual(doc.jobs.test["runs-on"]);
     expect(changed.outputs?.skip).toBe("${{ steps.diff.outputs.skip }}");
     const checkout = changed.steps?.find((step) => step.uses === "actions/checkout@v4");
