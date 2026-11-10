@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 628 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 629 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,18 +6,13 @@
 
 ### Pick up here
 
-Session 177 (overnight go via clark, 11-04) closed T-181, T-241 and T-333. #1093 merged 4b1fcfbb on Aaron's word, clark REBUILT main there, the live check passed (new entries evidenced 4.3% to 16.3%), and master CI is green at f5d99176. No P0/P1 tasks exist. Next: T-334 when per-arm fires have accumulated (a week or two); the rest of the backlog is parked (T-191, T-046, T-312, T-303, T-321, T-261 S3/S4, T-292 watch).
+No open PRs. T-339 (skills-audit finds a project-local ops skill, P3) is the next SIA build: brief it like t336 (edits.txt + mutants), submit with qapc-job.mjs; a Lenovo hand-back lands with `qapc-job.mjs land <id>`, then `gh pr ready <n>` BEFORE reading checks (land opens a draft, and since T-338 a draft's checks all read Skipped/CLEAN). Read Clark's next greeting-metrics row (~/.claude/open-brain/greeting-metrics.jsonl): missing_pointers must not hold latest_brief (T-336's last unseen check). T-334 first reading on or after 11-16 with >=200 primary draws (101 on 11-08, ~5/day), else 11-23.
 
 ### Watch out
 
-- The QA PC runner accepts a sha only if reachable from the default branch or a loop/* branch; a job on sim/ is refused 'reachable'. sim-push.sh now pushes loop/sim-<tag> (syntax-checked, not yet run live). Lenovo takes reviews and sims only and cannot push; it runs Linux, so a brief's PowerShell is translated there.
-- tests/harness/checks.test.ts D4 went red on Lenovo (npm in a scratch repo) and green on the QA PC: a Lenovo SIM red there is not evidence against a change.
-- Before opening a task for a report's leftover, search tasks by the report's item id: T-335 duplicated T-329 for want of that. T-241's note still says N4 moved to T-335 and the record refuses edits to done tasks; T-335's note carries the correction.
-- pr-merge.sh on a PR whose edits Atlas wrote was denied by the permission classifier ('Merge Without Review') in s177: do not retry or route around it; ask Aaron.
-- T-292 'Timeout calling onTaskUpdate' still fails whole CI runs with every test green, and fired on two overlapping runs on 11-05: read the log before treating a red as real, rerun the failed job, and avoid starting a records PR while a master run is going.
-- evidence-report's scope line naming a skipped repo has not been seen live: the first skipped repo is worth a look. 16.3% vs T-332's 13.6% is not fully explained; no entries were sampled.
-- relay-check.mjs matches only TYPED text: an Aaron answer via AskUserQuestion in clark's window shows NOT verified. Grep clark's transcript jsonl for '"answers":' instead.
-- Tests that spawn the recall hook get an arm-OFF policy copy via TRIGGER_POLICY_DIR in open-brain/tests/setup-env.ts; a test wanting the shipped 0.5 passes its own or calls runTrigger in-process.
+- Lenovo builds: Linux host, cannot push; the brief must say what a no-push host does (t336 v2 step 9: HANDBACK line). Its full suite shows checks.test.ts D4 red (npm ERR!): CI judges it.
+- Job briefs must be ASCII (the queue refuses a non-ASCII brief: CHECK ascii).
+- Code-PR merges go to clark as a pinned QA ACCEPT; workflow changes need Aaron's word via clark.
 
 ### Open questions
 
@@ -31,7 +26,9 @@ _None._
 
 **Questions pending for Aaron:** _None._
 
-**Rulings made mid-loop:** _None._
+**Rulings made mid-loop:** 
+- T-336/T-337 ACCEPT #1106 a74ca5ed (merged a97e1209)
+- T-338 #1103 merged a1cd8306 on Aaron's word
 
 ## developer [sia-builder] _(written session 156)_
 
