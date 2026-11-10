@@ -172,6 +172,26 @@ describe("auditSkills", { timeout: TIMEOUT }, () => {
     expect(r.scriptsCalled).toEqual([]);
   });
 
+  it("T339-1 an ops skill only in the project is found, its scripts counted and its audit-ignore.txt read", () => {
+    const projOps = join(proj, ".claude", "skills", "testseat-ops");
+    mkdirSync(join(projOps, "scripts"), { recursive: true });
+    writeFileSync(join(projOps, "scripts", "foo.sh"), "echo");
+    writeFileSync(join(projOps, "audit-ignore.txt"), "gh pr view\n");
+    writeSession(U(1), mtime(1), [...times(3, "bash C:/s/foo.sh a"), ...times(3, "gh pr view 1")]);
+    const r = auditSkills({ projectDir: proj, home });
+    expect(r.opsDir).toBe(projOps);
+    expect(r.scriptsCalled).toEqual([{ script: "foo.sh", count: 3 }]);
+    expect(r.ignoredHits).toBe(1);
+  });
+
+  it("T339-2 with the ops skill in both places, home wins", () => {
+    makeOps();
+    mkdirSync(join(proj, ".claude", "skills", "testseat-ops", "scripts"), { recursive: true });
+    writeSession(U(1), mtime(1), times(3, "git fetch"));
+    const r = auditSkills({ projectDir: proj, home });
+    expect(r.opsDir).toBe(opsDir());
+  });
+
   it("SA-9 subagent transcripts in subdirectories are never read", () => {
     mkdirSync(join(tdir(), U(1), "subagents"), { recursive: true });
     writeFileSync(join(tdir(), U(1), "subagents", `${U(9)}.jsonl`), times(3, "git push").map((l) => JSON.stringify(l)).join("\n") + "\n");
