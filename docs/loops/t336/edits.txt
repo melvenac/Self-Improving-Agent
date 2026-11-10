@@ -1,0 +1,162 @@
+@@@ open-brain/src/pipelines/session-start/latest-brief.ts
+<<<
+export function describeNoBrief(projectRoot: string): string {
+  const s = briefDirSetting(projectRoot);
+  return s !== null && "dir" in s
+    ? `Latest brief: none (looked in ${s.dir}/, from greeting.json brief_dir)`
+    : `Latest brief: none (looked in ${BRIEF_DIR}/ and ${ROOT_BRIEF_DIR}/loop-*-brief.md)`;
+}
+===
+export function describeNoBrief(projectRoot: string): string {
+  const s = briefDirSetting(projectRoot);
+  // T-336: a repo with no brief folder has nothing to point at, and says so, so the metrics row does not count it missing.
+  if (s !== null && "dir" in s) {
+    return existsSync(join(projectRoot, s.dir))
+      ? `Latest brief: none (looked in ${s.dir}/, from greeting.json brief_dir)`
+      : `Latest brief: none (no brief folder: ${s.dir}/ does not exist, from greeting.json brief_dir)`;
+  }
+  return existsSync(join(projectRoot, BRIEF_DIR)) || rootBriefOnDisk(projectRoot)
+    ? `Latest brief: none (looked in ${BRIEF_DIR}/ and ${ROOT_BRIEF_DIR}/loop-*-brief.md)`
+    : `Latest brief: none (no brief folder: ${BRIEF_DIR}/ does not exist and ${ROOT_BRIEF_DIR}/ has no loop-*-brief.md)`;
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+  if (/^Latest brief: none/m.test(report)) missing.add("latest_brief");
+===
+  // T-336: only a brief folder that exists with no brief in it is a missing pointer; "no brief folder" is not.
+  if (/^Latest brief: none \(looked in /m.test(report)) missing.add("latest_brief");
+>>>
+@@@ open-brain/src/pipelines/session-start/fleet.ts
+<<<
+function verifiedStale(verifiedAt: string | number | undefined, now: Date): string | null {
+  if (!verifiedAt) return null;
+  const t = new Date(verifiedAt);
+  if (Number.isNaN(t.getTime())) return null;
+  const ageMs = now.getTime() - t.getTime();
+  if (ageMs <= FLEET_STALE_HOURS * 60 * 60 * 1000) return null;
+  return ` · STALE (verified ${chicagoStamp(t)})`;
+}
+===
+/** T-337: true when fleet.json's one file-level verifiedAt is over FLEET_STALE_HOURS old. The caller prints the stamp once. */
+function verifiedStale(verifiedAt: string | number | undefined, now: Date): boolean {
+  if (!verifiedAt) return false;
+  const t = new Date(verifiedAt);
+  if (Number.isNaN(t.getTime())) return false;
+  return now.getTime() - t.getTime() > FLEET_STALE_HOURS * 60 * 60 * 1000;
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/fleet.ts
+<<<
+  const header = `## Fleet (fleet.json, verified ${verifiedLabel})${stale ?? ""}`;
+===
+  const header = `## Fleet (fleet.json, verified ${verifiedLabel})${stale ? " · STALE" : ""}`;
+>>>
+@@@ open-brain/src/pipelines/session-start/fleet.ts
+<<<
+  const verifiedSuffix = `(verified ${verifiedLabel})${stale ?? ""}`;
+===
+  // T-337: the stamp is the whole file's, not the last seat's (Maker S75 read "maker (verified ...) · STALE (verified ...)"
+  // as maker's own status, and STALE as a seat): name it once, as the file's, after a separator.
+  const verifiedSuffix = `· fleet.json verified ${verifiedLabel}${stale ? ", STALE" : ""}`;
+>>>
+@@@ open-brain/tests/pipelines/session-start/t298-greeting-truth.test.ts
+<<<
+    expect(describeNoBrief(bare)).toBe("Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)");
+===
+    expect(describeNoBrief(bare)).toBe("Latest brief: none (no brief folder: docs/loops/ does not exist and docs/ has no loop-*-brief.md)");
+>>>
+@@@ open-brain/tests/pipelines/session-start/t298-greeting-truth.test.ts
+<<<
+    expect(describeNoBrief(root)).toBe("Latest brief: none (looked in .agents/plans/, from greeting.json brief_dir)");
+  });
+===
+    expect(describeNoBrief(root)).toBe("Latest brief: none (looked in .agents/plans/, from greeting.json brief_dir)");
+  });
+
+  it("T336-2: an existing folder with no brief says where it looked; a brief_dir that does not exist says so", () => {
+    const empty = repo();
+    commitAt(empty, "docs/loops/loop-3-qa-report.md", "2026-10-01T12:00:00+00:00");
+    expect(describeLatestBrief(empty)).toBeNull();
+    expect(describeNoBrief(empty)).toBe("Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)");
+    const set = repo();
+    commitAt(set, "README.md", "2026-10-01T12:00:00+00:00");
+    writeGreeting(set, { brief_dir: ".agents/plans" });
+    expect(describeNoBrief(set)).toBe("Latest brief: none (no brief folder: .agents/plans/ does not exist, from greeting.json brief_dir)");
+  });
+>>>
+@@@ open-brain/tests/pipelines/session-start/t298-greeting-truth.test.ts
+<<<
+    expect(Buffer.byteLength(JSON.stringify(row))).toBeLessThan(2048);
+  });
+===
+    expect(Buffer.byteLength(JSON.stringify(row))).toBeLessThan(2048);
+  });
+
+  it("T336-1: a no-brief-folder line is not a missing latest_brief; a looked-in line still is", async () => {
+    const { buildGreetingMetricsRow } = await metrics();
+    const root = repo();
+    const at = new Date("2026-10-16T12:00:00Z");
+    const noFolder = REPORT.replace(
+      "Latest brief: none (looked in docs/loops/ and docs/loop-*-brief.md)",
+      "Latest brief: none (no brief folder: docs/loops/ does not exist and docs/ has no loop-*-brief.md)",
+    );
+    expect(noFolder).not.toBe(REPORT);
+    const a = buildGreetingMetricsRow(metricsInput(root, { report: noFolder }), null, at);
+    expect(a.missing_pointers).not.toContain("latest_brief");
+    expect(a.unchecked).toEqual([]);
+    const b = buildGreetingMetricsRow(metricsInput(root, { report: REPORT }), null, at);
+    expect(b.missing_pointers).toContain("latest_brief");
+  });
+>>>
+@@@ open-brain/tests/pipelines/session-start/t298-greeting-truth.test.ts
+<<<
+      expect(off).toContain("Latest brief: none (looked in docs/loops/");
+===
+      expect(off).toContain("Latest brief: none (no brief folder: docs/loops/");
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-fix.test.ts
+<<<
+      "FLEET: coordinator clark · hub v1.21.0 · dashboard v1.15.0 · seats atlas-sia, cursor-infra (verified 10-08 16:40 CDT)",
+===
+      "FLEET: coordinator clark · hub v1.21.0 · dashboard v1.15.0 · seats atlas-sia, cursor-infra · fleet.json verified 10-08 16:40 CDT",
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-fix.test.ts
+<<<
+    expect(legacy[0]).toContain(" · STALE (verified ");
+    expect(budget).toContain(" · STALE (verified ");
+===
+    // T-337: STALE follows the file's stamp, once, and never sits where a seat name would.
+    expect(legacy[0]).toMatch(/^## Fleet \(fleet\.json, verified [^)]+\) · STALE$/);
+    expect(budget).toMatch(/ · seats atlas-sia, cursor-infra · fleet\.json verified [^,]+, STALE$/);
+    expect(budget.split("verified").length - 1).toBe(1);
+    expect(budget).not.toContain("(verified");
+>>>
+@@@ open-brain/tests/pipelines/session-start/t252-briefing-followups.test.ts
+<<<
+    expect(a.budget).toBe(`FLEET: coordinator ${C190} · hub ? · dashboard ? · seats +2 more (verified ?)`);
+===
+    expect(a.budget).toBe(`FLEET: coordinator ${C190} · hub ? · dashboard ? · seats +2 more · fleet.json verified ?`);
+>>>
+@@@ open-brain/tests/pipelines/session-start/t252-briefing-followups.test.ts
+<<<
+    expect(b.budget).toBe(`FLEET: coordinator ${C190} · hub ? · dashboard ? · seats none (verified ?)`);
+===
+    expect(b.budget).toBe(`FLEET: coordinator ${C190} · hub ? · dashboard ? · seats none · fleet.json verified ?`);
+>>>
+@@@ open-brain/tests/pipelines/session-start/t252-briefing-followups.test.ts
+<<<
+    expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia (verified ?)");
+    expect(r.legacy[3]).toBe("Seats (SIA): atlas-sia ? ?/? ? ?");
+===
+    expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia · fleet.json verified ?");
+    expect(r.legacy[3]).toBe("Seats (SIA): atlas-sia ? ?/? ? ?");
+>>>
+@@@ open-brain/tests/pipelines/session-start/t252-briefing-followups.test.ts
+<<<
+    expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia (verified ?)");
+    expect(r.budget).not.toContain("FLEET: unavailable");
+===
+    expect(r.budget).toBe("FLEET: coordinator ? · hub ? · dashboard ? · seats atlas-sia · fleet.json verified ?");
+    expect(r.budget).not.toContain("FLEET: unavailable");
+>>>

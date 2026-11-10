@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+  if (/^Latest brief: none \(looked in /m.test(report)) missing.add("latest_brief");
+===
+  if (/^Latest brief: none/m.test(report)) missing.add("latest_brief");
+>>>
