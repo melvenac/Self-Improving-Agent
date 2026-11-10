@@ -63,6 +63,60 @@ describe("checkHookRegistration", () => {
     expect(checkHookRegistration(p).severity).toBe("pass");
   });
 
+  it("T341-1: one script on disjoint matchers (the recall trigger's live shape) is not a duplicate", () => {
+    const p = settings({
+      hooks: {
+        PostToolUse: [
+          { matcher: "Bash|PowerShell", hooks: [{ command: "node /x/cli-recall-trigger.js" }] },
+          { matcher: "Edit|Write", hooks: [{ command: "node /x/cli-recall-trigger.js" }] },
+        ],
+      },
+    });
+    const r = checkHookRegistration(p);
+    expect(r.severity, r.message).toBe("pass");
+  });
+
+  it("T341-2: overlapping matchers are a duplicate", () => {
+    const p = settings({
+      hooks: {
+        PostToolUse: [
+          { matcher: "Bash", hooks: [{ command: "node /x/cli-recall-trigger.js" }] },
+          { matcher: "Bash|PowerShell", hooks: [{ command: "node /x/cli-recall-trigger.js" }] },
+        ],
+      },
+    });
+    const r = checkHookRegistration(p);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("PostToolUse: cli-recall-trigger.js registered 2x");
+  });
+
+  it("T341-3: a '*' matcher overlaps every tool", () => {
+    const p = settings({
+      hooks: {
+        PostToolUse: [
+          { matcher: "*", hooks: [{ command: "node /x/a.js" }] },
+          { matcher: "Edit", hooks: [{ command: "node /x/a.js" }] },
+        ],
+      },
+    });
+    expect(checkHookRegistration(p).severity).toBe("issue");
+  });
+
+  it("T341-4: of three registrations, only the two that overlap are counted", () => {
+    const p = settings({
+      hooks: {
+        PostToolUse: [
+          { matcher: "Bash", hooks: [{ command: "node /x/a.js" }] },
+          { matcher: "Bash|PowerShell", hooks: [{ command: "node /x/a.js" }] },
+          { matcher: "Edit|Write", hooks: [{ command: "node /x/a.js" }] },
+        ],
+      },
+    });
+    const r = checkHookRegistration(p);
+    expect(r.severity).toBe("issue");
+    expect(r.message).toContain("a.js registered 2x");
+  });
+
   it("reports invalid JSON rather than throwing", () => {
     const p = join(dir, "settings.json");
     writeFileSync(p, "{not json", "utf-8");

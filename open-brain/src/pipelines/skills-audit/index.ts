@@ -205,8 +205,12 @@ function listTranscripts(dir: string, runtime: AuditRuntime): TranscriptFile[] {
 export function auditSkills(opts: AuditOptions): AuditReport {
   const runtime: AuditRuntime = opts.runtime ?? "claude";
   const seat = opts.seat?.trim().toLowerCase() || (readAgentIdentity(opts.projectDir)?.name.toLowerCase() ?? null);
-  const candidate = seat ? join(opts.home, ".claude", "skills", `${seat}-ops`) : null;
-  const opsDir = candidate && existsSync(candidate) ? candidate : null;
+  // T-339: a seat's ops skill lives in ~/.claude/skills or, as Beam's does, in the project's .claude/skills.
+  // Home wins when both exist; the report line names the path used.
+  const candidates = seat
+    ? [join(opts.home, ".claude", "skills", `${seat}-ops`), join(opts.projectDir, ".claude", "skills", `${seat}-ops`)]
+    : [];
+  const opsDir = candidates.find((c) => existsSync(c)) ?? null;
 
   const projects = join(opts.home, runtime === "cursor" ? ".cursor" : ".claude", "projects");
   let transcriptDir: string | null;

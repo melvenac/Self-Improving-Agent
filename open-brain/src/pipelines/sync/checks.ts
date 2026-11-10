@@ -910,6 +910,18 @@ export function checkSpecProvenance(projectRoot: string): CheckResult {
   return { name: "spec-provenance", severity: "pass", message: `specs/ has ${files.length} spec file(s)` };
 }
 
+/** T-341: a matcher's tool names, or null when it matches every tool (absent, empty, '*', or a regex this does not parse). */
+function matcherTools(m: unknown): Set<string> | null {
+  if (typeof m !== "string") return null;
+  const t = m.trim();
+  if (t === "" || t === "*" || !/^[A-Za-z0-9_]+(\|[A-Za-z0-9_]+)*$/.test(t)) return null;
+  return new Set(t.split("|"));
+}
+
+function toolsOverlap(a: Set<string> | null, b: Set<string> | null): boolean {
+  return a === null || b === null || [...a].some((x) => b.has(x));
+}
+
 /**
  * Guards against the same hook script being registered more than once for the
  * same event. A duplicate SessionStart registration made the bootstrap hook emit
@@ -921,7 +933,7 @@ export function checkHookRegistration(settingsPath: string): CheckResult {
     return { name: "hook-registration", severity: "warn", message: "settings.json not found" };
   }
 
-  let parsed: { hooks?: Record<string, Array<{ hooks?: Array<{ command?: string }> }>> };
+  let parsed: { hooks?: Record<string, Array<{ matcher?: unknown; hooks?: Array<{ command?: string }> }>> };
   try {
     parsed = JSON.parse(readFileSync(settingsPath, "utf-8"));
   } catch {
@@ -935,10 +947,12 @@ export function checkHookRegistration(settingsPath: string): CheckResult {
   const skipped = { noCommand: 0, noScriptName: 0 };
 
   for (const [event, matchers] of Object.entries(parsed.hooks ?? {})) {
-    const counts = new Map<string, number>();
+    // T-341: per script, the tool set of each registration's matcher (null = every tool).
+    const regs = new Map<string, Array<Set<string> | null>>();
     events++;
 
     for (const matcher of matchers ?? []) {
+      const tools = matcherTools(matcher.matcher);
       for (const hook of matcher.hooks ?? []) {
         const command = hook.command;
         if (!command) {
@@ -953,11 +967,14 @@ export function checkHookRegistration(settingsPath: string): CheckResult {
           continue;
         }
         registrations++;
-        counts.set(script, (counts.get(script) ?? 0) + 1);
+        regs.set(script, [...(regs.get(script) ?? []), tools]);
       }
     }
 
-    for (const [script, n] of counts) {
+    // A duplicate is the same script under two matchers that can fire on the same tool call. Disjoint matchers
+    // ('Bash|PowerShell' and 'Edit|Write', the recall trigger's live shape) are one fire per call, not a duplicate.
+    for (const [script, sets] of regs) {
+      const n = sets.filter((a, i) => sets.some((b, j) => j !== i && toolsOverlap(a, b))).length;
       if (n > 1) duplicates.push(`${event}: ${script} registered ${n}x`);
     }
   }

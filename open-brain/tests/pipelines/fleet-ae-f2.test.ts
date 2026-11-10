@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { checkCursorRulesCurrent, writeDeveloperBuildingChecksMdc } from "../../src/pipelines/sync/developer-building-checks.js";
 import { expectRepoClean, mkFleetAeTemp, REPO_ROOT, seedFleetAeCursorProject } from "./fleet-ae-harness.js";
@@ -33,5 +33,22 @@ describe("F2: cursor-rules-current fails on drift", () => {
     writeFileSync(join(dir, ".agents/roles/developer.md"), savedRole, "utf8");
     writeDeveloperBuildingChecksMdc(dir);
     expect(checkCursorRulesCurrent(dir).severity).toBe("pass");
+  });
+
+  it("T341-5: a repo with no .cursor/ skips, even when developer.md has no Building checks section", () => {
+    dir = mkFleetAeTemp("fleet-ae-t341-");
+    mkdirSync(join(dir, ".agents", "roles"), { recursive: true });
+    writeFileSync(join(dir, ".agents/roles/developer.md"), "# Developer\n\nNo building checks here.\n", "utf8");
+    const r = checkCursorRulesCurrent(dir);
+    expect(r.severity, r.message).toBe("skip");
+    expect(r.message).toContain("This is not a pass.");
+  });
+
+  it("T341-6: with .cursor/ present, a missing section is still an issue", () => {
+    dir = mkFleetAeTemp("fleet-ae-t341-");
+    mkdirSync(join(dir, ".agents", "roles"), { recursive: true });
+    mkdirSync(join(dir, ".cursor"), { recursive: true });
+    writeFileSync(join(dir, ".agents/roles/developer.md"), "# Developer\n\nNo building checks here.\n", "utf8");
+    expect(checkCursorRulesCurrent(dir).severity).toBe("issue");
   });
 });

@@ -108,6 +108,10 @@ export function writeDeveloperBuildingChecksMdc(projectRoot: string): { changed:
 export function checkCursorRulesCurrent(projectRoot: string): CheckResult {
   const name = "cursor-rules-current";
   const path = join(projectRoot, DEVELOPER_BUILDING_CHECKS_MDC_REL);
+  // T-341: a repo with no .cursor/ has no Cursor seat to feed (mail-server, 11-10). Skip, and say it is not a pass.
+  if (!existsSync(join(projectRoot, ".cursor")) && !existsSync(path)) {
+    return { name, severity: "skip", message: "not checked: no .cursor/ here, so no Cursor seat reads the rule. This is not a pass." };
+  }
   try {
     const expected = expectedDeveloperBuildingChecksMdc(projectRoot);
     if (!existsSync(path)) {

@@ -102,7 +102,22 @@ export function oldStartCommandWarning(projectRoot: string, templateDir = defaul
   const statePath = join(resolve(projectRoot), ".agents", "state.json");
   if (!isStateRecord(statePath)) return null;
   const st = classifySessionCommand(projectRoot, "start", templateDir);
-  return st === "OLD" ? OLD_START_COMMAND_WARNING : null;
+  if (st !== "OLD") return null;
+  // T-342: the byte compare marks every SIA copy OLD after any template edit, and three seats stopped to ask (11-09/10).
+  // Say which kind of OLD it is and how far it is from the template; the constant stays the line's prefix.
+  return `${OLD_START_COMMAND_WARNING} (${describeStartDifference(projectRoot, templateDir)})`;
+}
+
+/** T-342: "an earlier SIA copy" when the first line matches the template's, else "not SIA's /start"; plus a line count. */
+export function describeStartDifference(projectRoot: string, templateDir: string): string {
+  const read = (p: string): string[] => (existsSync(p) ? readFileSync(p, "utf8").replace(/\r\n/g, "\n").split("\n") : []);
+  const mine = read(join(resolve(projectRoot), sessionCommandRel("start")));
+  const tmpl = read(join(templateDir, sessionCommandRel("start")));
+  const inTmpl = new Set(tmpl);
+  const inMine = new Set(mine);
+  const differ = mine.filter((l) => !inTmpl.has(l)).length + tmpl.filter((l) => !inMine.has(l)).length;
+  const kind = tmpl.length > 0 && mine[0] === tmpl[0] ? "an earlier SIA copy" : "not SIA's /start";
+  return `${kind}: ${differ} line(s) differ from the template`;
 }
 
 /** The heading bootstrap appends to an owner's CLAUDE.md, and the one `check` looks for. */
