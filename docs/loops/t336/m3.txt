@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/latest-brief.ts
+<<<
+    return existsSync(join(projectRoot, s.dir))
+===
+    return true
+>>>

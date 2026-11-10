@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/fleet.ts
+<<<
+  return now.getTime() - t.getTime() > FLEET_STALE_HOURS * 60 * 60 * 1000;
+===
+  return false;
+>>>

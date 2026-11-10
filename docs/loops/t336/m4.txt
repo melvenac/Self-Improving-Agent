@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/fleet.ts
+<<<
+  const verifiedSuffix = `· fleet.json verified ${verifiedLabel}${stale ? ", STALE" : ""}`;
+===
+  const verifiedSuffix = `(verified ${verifiedLabel})${stale ? ` · STALE (verified ${verifiedLabel})` : ""}`;
+>>>
