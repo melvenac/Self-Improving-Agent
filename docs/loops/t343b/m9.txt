@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+["diff", "--name-only", "--no-renames", "-z", "HEAD"
+===
+["diff", "--name-only", "-z", "HEAD"
+>>>

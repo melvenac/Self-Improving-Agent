@@ -1,0 +1,7 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  if (!treeHere || !treeUpstream) return null;
+  if (treeHere === treeUpstream) return 0;
+===
+  if (treeHere === treeUpstream) return 0;
+>>>
