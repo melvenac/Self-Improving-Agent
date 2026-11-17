@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 637 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 638 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -24,6 +24,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-345** Two 'next' answers disagree: fleet On Deck says T-046, ob_start NEXT says T-334, with three P2 tasks open and no stated rule
 - [ ] **T-346** Due dates in the record are never compared with today: T-334's reading was a day overdue and the briefing did not say so
 - [ ] **T-347** Seat identity conflict not surfaced: tracked AGENT.md and CLAUDE.md say Forge (developer), the hook and ob_start say Atlas (planner)
+- [ ] **T-348** READS OWED is printed but nothing checks the reads happened: two of six planners greeted with owed briefs unread and did not say so
+- [ ] **T-349** Latest brief looks only at the checked-out branch: Courier's handoff named three briefs on loop/b1117 and the briefing pointed at an 8-day-old one
 
 ## Done (last 3 sessions)
 
