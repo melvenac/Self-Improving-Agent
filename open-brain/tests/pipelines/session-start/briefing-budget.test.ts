@@ -46,11 +46,13 @@ const input = (state: State, over: Partial<BriefingInput> = {}): BriefingInput =
 
 const render = (state: State, over: Partial<BriefingInput> = {}): string[] => renderBriefing(input(state, over));
 const section = (lines: string[], header: string): string[] => {
-  const at = lines.indexOf(header);
+  // T-312: a capped list's header carries its total (`WATCH OUT (5):`), and an empty WAITING prints `WAITING ON AARON: none`.
+  const total = `${header.replace(/:$/, "")} (`;
+  const at = lines.findIndex((l) => l === header || l.startsWith(total));
   if (at < 0) return [];
   const heads = new Set(["OBJECTIVE", "NEXT", "PICK UP HERE", "WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]);
   let end = at + 1;
-  while (end < lines.length && !heads.has(lines[end]!) && !/^(Gaps: |Working tree|Latest brief|Skills: |## End)/.test(lines[end]!)) end++;
+  while (end < lines.length && !heads.has(lines[end]!) && !/^(Gaps: |Working tree|Latest brief|Skills: |## End|WATCH OUT \(|WAITING ON AARON|OPEN QUESTIONS \()/.test(lines[end]!)) end++;
   return lines.slice(at + 1, end);
 };
 const long = (tag: string, n: number): string => `${tag} ${"x".repeat(n)}`;
@@ -130,9 +132,9 @@ describe("(e) WAITING ON AARON, from open questions that carry owner aaron", () 
     expect(section(render(state), "WAITING ON AARON:")).toEqual(["- dev asks aaron (developer)", "- qa asks aaron (qa)"]);
   });
 
-  it("omits the section when nothing is waiting, a resolved question is not waiting, and an ownerless question never is", () => {
+  it("prints `WAITING ON AARON: none` when nothing is waiting (T-312): a resolved question is not waiting, and an ownerless question never is", () => {
     const state = stateWith([{ open_questions: [q("answered", { owner: "aaron", resolved_by: "D-9" }), q("no owner"), "plain"] }]);
-    expect(render(state)).not.toContain("WAITING ON AARON:");
+    expect(render(state).filter((l) => l.startsWith("WAITING ON AARON"))).toEqual(["WAITING ON AARON: none"]);
   });
 
   it("reads each seat's CURRENT handoff only: a superseded one's question is not waiting", () => {
@@ -140,7 +142,7 @@ describe("(e) WAITING ON AARON, from open questions that carry owner aaron", () 
       { first_rev: 10, session_uuid: "old", open_questions: [q("stale", { owner: "aaron" })] },
       { first_rev: 20, session_uuid: "new", open_questions: [] },
     ]);
-    expect(render(state)).not.toContain("WAITING ON AARON:");
+    expect(render(state).filter((l) => l.startsWith("WAITING ON AARON"))).toEqual(["WAITING ON AARON: none"]);
   });
 
   it("an aaron-owned question is shown once: under WAITING, not again under OPEN QUESTIONS", () => {
@@ -160,6 +162,118 @@ describe("(e) WAITING ON AARON, from open questions that carry owner aaron", () 
     const lines = render(state, { budget: false });
     expect(lines).not.toContain("WAITING ON AARON:");
     expect(lines).toContain("- for aaron");
+  });
+});
+
+describe("T-312 and T-344: a cap reads as a cap, and a cut does not split a fact", () => {
+  const q = (text: string, extra: Record<string, unknown> = {}) => ({ text, ...extra });
+  const pickUp = (lines: string[]): string => lines[lines.indexOf("PICK UP HERE") + 1]!;
+  const words = (n: number): string => "word ".repeat(n);
+
+  it("T312-1 a capped list's header carries the total; a list that fits keeps the bare header", () => {
+    const five = ["a", "b", "c", "d", "e"];
+    const capped = render(stateWith([{ watch_out: ["w1", "w2", "w3", "w4"], open_questions: [...five.map((t) => q(t, { owner: "aaron" })), ...five.map((t) => `open ${t}`), "open f"] }]));
+    expect(capped).toContain("WATCH OUT (4):");
+    expect(capped).toContain("WAITING ON AARON (5):");
+    expect(capped.filter((l) => l.startsWith("WAITING ON AARON")), "no `none` line beside a section that has items").toEqual(["WAITING ON AARON (5):"]);
+    expect(capped).toContain("OPEN QUESTIONS (6):");
+    for (const bare of ["WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]) expect(capped, bare).not.toContain(bare);
+    expect(section(capped, "WATCH OUT")).toEqual(["- w1", "- w2", "- w3", "+1 more: state.json handoffs[].watch_out"]);
+    expect(section(capped, "WAITING ON AARON:")).toEqual(["- a (developer)", "- b (developer)", "+3 more: state.json handoffs[].open_questions"]);
+    expect(section(capped, "OPEN QUESTIONS")).toEqual(["- open a", "- open b", "+4 more: state.json handoffs[].open_questions"]);
+
+    const fits = render(stateWith([{ watch_out: ["w1", "w2", "w3"], open_questions: [q("a", { owner: "aaron" }), q("b", { owner: "aaron" }), "o1", "o2"] }]));
+    for (const bare of ["WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]) expect(fits, bare).toContain(bare);
+    expect(fits.filter((l) => /^(WATCH OUT|WAITING ON AARON|OPEN QUESTIONS) \(/.test(l))).toEqual([]);
+  });
+
+  it("T312-2 past the cap an item that expires is shown before one that does not, in the record's order", () => {
+    const watch_out = ["plain 1", "plain 2", "plain 3", { text: "dated", expires: "2026-11-24" }, { text: "numbered", expires: 999 }];
+    expect(section(render(stateWith([{ watch_out }])), "WATCH OUT")).toEqual(["- plain 1", "- dated", "- numbered", "+2 more: state.json handoffs[].watch_out"]);
+    const fits = ["plain 1", { text: "dated", expires: "2026-11-24" }, "plain 2"];
+    expect(section(render(stateWith([{ watch_out: fits }])), "WATCH OUT"), "at the cap nothing is reordered").toEqual(["- plain 1", "- dated", "- plain 2"]);
+  });
+
+  it("T312-3 no question owned by aaron prints one line, `WAITING ON AARON: none`, above OPEN QUESTIONS; the default layout prints no such line", () => {
+    const state = stateWith([{ watch_out: ["w1"], open_questions: ["for anyone"] }]);
+    const lines = render(state);
+    expect(lines.filter((l) => l.startsWith("WAITING ON AARON"))).toEqual(["WAITING ON AARON: none"]);
+    expect(lines.indexOf("WAITING ON AARON: none")).toBe(lines.indexOf("OPEN QUESTIONS") - 1);
+    expect(section(lines, "WATCH OUT")).toEqual(["- w1"]);
+    expect(render(state, { seat: "qa" }).filter((l) => l.startsWith("WAITING ON AARON")), "a reader with no handoff of its own").toEqual(["WAITING ON AARON: none"]);
+    expect(render(state, { budget: false }).join("\n")).not.toContain("WAITING ON AARON");
+  });
+
+  it("T344-1 the pick-up prints whole past the old 400 cap, a note riding the line takes nothing from it, and past 4000 it ends at a whole sentence", () => {
+    const head = `${words(60)}reading due on 2026-11-16.`;
+    const pick_up = `${head} Else on 2026-11-23 ${Array.from({ length: 40 }, () => "tail").join(" ")}`;
+    expect(head.length).toBe(326);
+    expect(pick_up.length).toBeGreaterThan(HANDOFF_CAPS.pickUpChars);
+    expect(pickUp(render(stateWith([{ pick_up }])))).toBe(pick_up);
+    const note = "Already in origin/master (last fetch): aaaaaaaa, bbbbbbbb, cccccccc, dddddddd";
+    const shipped = "MAYBE SHIPPED (3): T-117 T-149 T-159, see /sync";
+    expect(pickUp(render(stateWith([{ pick_up }]), { mergedCitations: note, maybeShipped: shipped }))).toBe([pick_up, note, shipped].join(" · "));
+    // Past the safety cap: thirteen 326-character sentences are 4250 characters; twelve end at 3923, inside 4000.
+    const runaway = Array.from({ length: 13 }, () => head).join(" ");
+    expect(runaway.length).toBe(4250);
+    expect(pickUp(render(stateWith([{ pick_up: runaway }])))).toBe(`${Array.from({ length: 12 }, () => head).join(" ")}… (4250 chars)`);
+  });
+
+  it("T344-2 a cut watch-out, question or NEXT title backs off to a space, so a date is not split; the length is still named", () => {
+    const watch = `${words(39)}due 2026-11-24 and then more words here`;
+    const question = `${words(31)}on 2026-11-24 then more words to pass the cap`;
+    const lines = render(stateWith([{ watch_out: [watch], open_questions: [question, q(question, { owner: "aaron" })] }]));
+    expect(section(lines, "WATCH OUT")).toEqual([`- ${words(39)}due… (${watch.length} chars)`]);
+    expect(section(lines, "OPEN QUESTIONS")).toEqual([`- ${words(31)}on… (${question.length} chars)`]);
+    expect(section(lines, "WAITING ON AARON:")).toEqual([`- ${words(31)}on… (${question.length} chars) (developer)`]);
+
+    const open = (SIA.tasks as Array<{ id: string; status: string; priority: string }>).find((t) => t.status !== "done")!;
+    const title = `${words(19)}by 2026-11-24 and more`;
+    const tasks = (SIA.tasks as Array<{ id: string }>).map((t) => (t.id === open.id ? { ...t, title } : t));
+    const next = section(render(stateWith([{}], { tasks, objective: { text: `Do ${open.id}.`, since_session: 5 } })), "NEXT");
+    expect(next).toEqual([`- [${open.priority}] ${open.id} ${words(19)}by… (${title.length} chars)`]);
+  });
+
+  it("T344-3 a pick-up of exactly 4000 characters prints whole, though a sentence ends in its second half", () => {
+    // 2500 + 10 + 1 + 1485 + 4 = 4000. The full stop is at index 2509, past half the cap.
+    const pick_up = `${words(500)}Then stop. ${"tail ".repeat(297)}done`;
+    expect(pick_up.length).toBe(4000);
+    expect(pick_up.indexOf(". ")).toBe(2509);
+    const line = pickUp(render(stateWith([{ pick_up }])));
+    expect(line.length).toBe(4000);
+    expect(line).toBe(pick_up);
+  });
+
+  it("T344-4 a 5000-character pick-up whose only sentence end is in the first half is cut at the cap, not at that sentence", () => {
+    // 6 + 4990 + 4 = 5000. The only full stop is at index 4. Index 4000 is a space, so the cut is at 4000.
+    const pick_up = `Done. ${words(998)}word`;
+    expect(pick_up.length).toBe(5000);
+    expect(pick_up[4000]).toBe(" ");
+    const line = pickUp(render(stateWith([{ pick_up }])));
+    expect(line.length).toBe(4014);
+    expect(line).toBe(`Done. ${words(798)}word… (5000 chars)`);
+  });
+
+  it("T344-5 a numbered pick-up past 4000 characters ends after a step's sentence, never on a bare `12.`", () => {
+    // Steps 1-9 are 328 characters, 10 and 11 are 329; joined by spaces they are 3620. Then ` 12. ` and 1000 more without a full stop.
+    const steps = Array.from({ length: 11 }, (_, n) => `${n + 1}. ${words(64)}done.`).join(" ");
+    const pick_up = `${steps} 12. ${words(199)}word`;
+    expect(steps.length).toBe(3620);
+    expect(pick_up.length).toBe(4624);
+    expect(pick_up.slice(3621, 3625)).toBe("12. ");
+    const line = pickUp(render(stateWith([{ pick_up }])));
+    expect(line.length).toBe(3634);
+    expect(line).toBe(`${steps}… (4624 chars)`);
+  });
+
+  it("T344-6 a watch-out whose last space before the cap is exactly 24 characters back is cut at that space", () => {
+    // 176 + 12 + 150 = 338. The only space is at index 176, which is 200 - 24.
+    const watch = `${"a".repeat(176)} 2026-11-24T${"b".repeat(150)}`;
+    expect(watch.length).toBe(338);
+    expect(watch.indexOf(" ")).toBe(HANDOFF_CAPS.watchOutChars - 24);
+    const sec = section(render(stateWith([{ watch_out: [watch] }])), "WATCH OUT");
+    expect(sec).toEqual([`- ${"a".repeat(176)}… (338 chars)`]);
+    expect(sec[0]!.length).toBe(191);
   });
 });
 
@@ -206,7 +320,10 @@ describe("(d) NEXT only when the objective names task ids, and then exactly thos
 });
 
 describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a pointer on every cut", () => {
-  const size = (lines: string[]): { lines: number; chars: number } => ({ lines: lines.length, chars: lines.join("\n").length });
+  // T-344: the pick-up prints whole, so the budget is measured on the briefing EXCLUDING the pick-up text a row passes in.
+  const size = (lines: string[], pickUp = ""): { lines: number; chars: number } => ({ lines: lines.length, chars: lines.join("\n").length - pickUp.length });
+  /** worst()'s pick-up as the briefing prints it: one line, whole. */
+  const WORST_PICK_UP = "Pick up ".repeat(300).trim();
 
   /** Every section at or past its cap, with long text everywhere a writer can put some. */
   const worst = (): State => {
@@ -239,7 +356,8 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
       usage: "Usage: STOP (weekly 98%) · park, push WIP · 5h 14%",
       workingTree: `Working tree: 9 uncommitted: ${"a/b/c.ts, ".repeat(8)}+1 more`,
     });
-    const { lines: n, chars } = size(lines);
+    expect(lines[lines.indexOf("PICK UP HERE") + 1], "T-344: the 2399-character pick-up prints whole").toBe(WORST_PICK_UP);
+    const { lines: n, chars } = size(lines, WORST_PICK_UP);
     expect(n, `${n} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
     expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
     expect(lines[0]).toBe(BRIEFING_START);
@@ -255,7 +373,7 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
       workingTree: `Working tree: 9 uncommitted: ${"a/b/c.ts, ".repeat(8)}+1 more`,
       missingHandoff: notice,
     });
-    const { lines: n, chars } = size(lines);
+    const { lines: n, chars } = size(lines, WORST_PICK_UP);
     expect(lines.join("\n")).toContain(notice);
     expect(n, `${n} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
     expect(chars, `${chars} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
@@ -325,7 +443,8 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
       // T-281: T-161's line at a long real-shaped path. The budgeted layout carries only a fixed note for it, on the session line.
       transcript: `NO TRANSCRIPT: session 00000000-0000-4000-8000-000000000000 has no transcript at C:/Users/someone/.claude/projects/C--Users-someone-Worktrees-sia-builder/00000000-0000-4000-8000-000000000000.jsonl, so /end's transcript checks, the handoff guard and the recall census cannot see it (T-161). Relaunching is the first thing to try; the cause is unknown.`,
     });
-    const { lines: count, chars } = size(lines);
+    const { lines: count, chars } = size(lines, `OWN ${WORST_PICK_UP}`);
+    expect(lines.join("\n"), "T-344: the pick-up prints whole").toContain(`\nOWN ${WORST_PICK_UP} `);
     const at = lines.findIndex((l) => l.startsWith("PICK UP HERE"));
     expect(lines[at]).toMatch(/^PICK UP HERE · FOCUS: T-\d+ Title x+… \(P\d, \w+\)/);
     expect(lines[at + 1]!.startsWith("OWN Pick up"), "this checkout's handoff, not the newer sibling's").toBe(true);
@@ -343,7 +462,7 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
 
   it("WORST CASE keeps the facts that decide a session: every section header is present, each cut ends with its pointer", () => {
     const lines = render(worst(), { drift });
-    for (const h of ["OBJECTIVE", "NEXT", "PICK UP HERE", "WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]) expect(lines, h).toContain(h);
+    for (const h of ["OBJECTIVE", "NEXT", "PICK UP HERE", "WATCH OUT (17):", "WAITING ON AARON (8):", "OPEN QUESTIONS (8):"]) expect(lines, h).toContain(h);
     const text = lines.join("\n");
     expect(text).toContain("+14 more: state.json handoffs[].watch_out");
     expect(text).toContain("+6 more: state.json handoffs[].open_questions");
@@ -356,7 +475,8 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
 
   it("an SIA-shaped record (twelve long watch-outs, as measured on 2026-10-03) renders far inside the budget", () => {
     const state = stateWith([{ pick_up: "p".repeat(1000), watch_out: Array.from({ length: 12 }, (_, i) => long(`rule ${i}:`, 550)), open_questions: ["q1", "q2"] }]);
-    const { lines, chars } = size(render(state));
+    const { lines, chars } = size(render(state), "p".repeat(1000));
+    expect(render(state), "T-344: the 1000-character pick-up prints whole").toContain("p".repeat(1000));
     expect(lines).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
     expect(chars).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
     expect(chars, "the default layout on the same record is several times larger").toBeLessThan(size(render(state, { budget: false })).chars);
@@ -365,7 +485,11 @@ describe("(f) the budget: ~4 KB and ~30 lines, with per-section caps and a point
   it.each(["planner", "developer", "qa", null] as const)("A2A's REAL record (rev 179, seventeen long watch-outs) fits the budget when a repo opts in, for seat %s", (seat) => {
     const parsed = parseState(A2A);
     if (!parsed.ok) throw new Error(parsed.error);
-    const { lines, chars } = size(render(parsed.data, { seat, serving: "Build abc1234 · current" }));
+    const rendered = render(parsed.data, { seat, serving: "Build abc1234 · current" });
+    // T-344: the seat's own pick-up (738 characters for qa, 1.2 to 1.9 KB for planner in this record) prints whole and is not counted; a "none" line is.
+    const pick = rendered[rendered.indexOf("PICK UP HERE") + 1]!;
+    expect(pick).not.toMatch(/\(\d+ chars\)$/);
+    const { lines, chars } = size(rendered, pick.startsWith("none") ? "" : pick);
     expect(lines).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
     expect(chars).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
   });

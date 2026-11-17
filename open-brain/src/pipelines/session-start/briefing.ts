@@ -64,7 +64,7 @@ export interface BriefingInput {
   /**
    * T-316 S2, OPT-IN per repo (greeting.json `maybe_shipped`), default OFF. describeMaybeShipped()'s note: the open tasks a
    * code commit already names. Null or absent prints nothing. Legacy: its own line after the pick-up notes. Budgeted:
-   * appended to the pick-up line after mergedCitations and paid for out of the pick-up's cap, as T-302's note is.
+   * appended to the pick-up line after mergedCitations. T-344: neither note takes room from the pick-up any more.
    */
   maybeShipped?: string | null;
   /** IMPORT-CMDS C4: valid record but project `.claude/commands/start.md` is not SIA's copy. */
@@ -226,7 +226,8 @@ export function renderBriefing(i: BriefingInput): string[] {
 
 /**
  * What the budgeted briefing must fit in: ~4 KB and ~30 lines (T-236 (f)), plus the one PROBLEM line T-167 adds (a line and at
- * most ~330 characters). A test renders the worst case against both.
+ * most ~330 characters). A test renders the worst case against both. T-344: the pick-up text prints whole and is NOT counted:
+ * the tests measure the briefing without it. greeting-metrics still records the full text's size beside `chars`.
  */
 export const BRIEFING_BUDGET = { lines: 31, chars: 4400 } as const;
 
@@ -249,6 +250,54 @@ export const STALE_OBJECTIVE = "(objective names a done task: update it with set
 function cut(text: string, limit: number): string {
   const flat = text.replace(/\s+/g, " ").trim();
   return flat.length <= limit ? flat : `${flat.slice(0, limit).trimEnd()}… (${flat.length} chars)`;
+}
+
+/** T-344: how far a cut backs off to reach whitespace. A token longer than this is cut at the cap, as `cut` does. */
+const CUT_BACKOFF = 24;
+
+/**
+ * T-344: `cut`, but the cut backs off to the last whitespace within CUT_BACKOFF of the cap, so a word or a date is not split
+ * ("else 11-2" read as a date). The suffix is `cut`'s, and so is the result when no whitespace is that near.
+ */
+function cutWord(text: string, limit: number): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  if (flat.length <= limit) return flat;
+  const space = flat[limit] === " " ? limit : flat.lastIndexOf(" ", limit - 1);
+  const end = space >= limit - CUT_BACKOFF && space > 0 ? space : limit;
+  return `${flat.slice(0, end).trimEnd()}… (${flat.length} chars)`;
+}
+
+/**
+ * T-344: the budgeted pick-up prints whole up to this many characters. It is a guard against a runaway record, not a budget:
+ * the pick-up is the one line a rolled session needs, and the long layout prints 3-4 KB pick-ups whole.
+ */
+const PICK_UP_SAFETY_CHARS = 4000;
+
+/**
+ * T-344: the pick-up's cut, used only past PICK_UP_SAFETY_CHARS. The text ends after its last whole sentence inside the cap,
+ * so a clause is printed whole or not at all. `1. ` and `12. ` are list markers, not sentence ends. With no sentence end in
+ * the second half of the cap, the cut is `cutWord`'s.
+ */
+function cutSentence(text: string, limit: number): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  if (flat.length <= limit) return flat;
+  let end = -1;
+  for (const m of flat.slice(0, limit + 1).matchAll(/(?<!(?:^|\s)\d{1,3})[.;!?](?= )/g)) end = (m.index ?? 0) + 1;
+  return end >= limit / 2 ? `${flat.slice(0, end)}… (${flat.length} chars)` : cutWord(flat, limit);
+}
+
+/**
+ * T-312: which watch-outs print when there are more than `cap`. An item that carries `expires` is kept before one that does
+ * not, so the time-limited item is never the hidden one; the kept items print in the record's order. At or under the cap the
+ * list is returned as it is.
+ */
+function shownWatch(live: readonly WatchOut[], cap: number): WatchOut[] {
+  if (live.length <= cap) return [...live];
+  const index = live.map((_, n) => n);
+  const expiring = index.filter((n) => watchExpires(live[n]!) !== null);
+  const plain = index.filter((n) => watchExpires(live[n]!) === null);
+  const keep = new Set([...expiring, ...plain].slice(0, cap));
+  return live.filter((_, n) => keep.has(n));
 }
 
 /**
@@ -289,7 +338,7 @@ function renderBudgeted(i: BriefingInput): string[] {
       const t = s.tasks.find((x) => x.id === id);
       // T-309: a done task in the objective says so on its own row, so a stale objective costs no line.
       if (t?.status === "done") out.push(`- [done] ${t.id} ${cut(t.title, 36)} ${STALE_OBJECTIVE}`);
-      else out.push(t ? `- [${t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cutWord(t.title, 100)}` : `- ${id} (not in the record)`);
     }
     if (ids.length > CAPS.next) out.push(`+${ids.length - CAPS.next} more: ${MORE_TASKS}`);
   }
@@ -300,11 +349,11 @@ function renderBudgeted(i: BriefingInput): string[] {
   if (seats !== null) out.push(seats);
   if (i.fleet) out.push(i.fleet.budget);
   out.push(i.focus?.focus ? `PICK UP HERE · ${i.focus.focus}` : "PICK UP HERE");
-  // T-302: the merged note rides the pick-up line and is paid for out of the pick-up's cap, so the budget does not grow.
-  // T-316 S2: MAYBE SHIPPED rides it after the merged note, paid for the same way.
-  const noteRoom = [i.mergedCitations, i.maybeShipped].reduce((n, x) => n + (x ? x.length + 3 : 0), 0);
+  // T-302, T-316 S2: the merged note and MAYBE SHIPPED ride the pick-up line, so they add no line.
+  // T-344: the pick-up prints whole (four seats lost the later steps of a numbered procedure to the old 400 cap on 2026-11-17),
+  // and the notes no longer take room from it. BRIEFING_BUDGET is measured without the pick-up text.
   const pickUp = own
-    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars - noteRoom)
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cutSentence(own.pick_up, PICK_UP_SAFETY_CHARS)
     : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : noneRecorded(i.seat, i.ownCheckout);
   out.push([pickUp, i.missingHandoff, i.mergedCitations, i.maybeShipped].filter((x): x is string => typeof x === "string" && x !== "").join(" · "));
 
@@ -312,8 +361,9 @@ function renderBudgeted(i: BriefingInput): string[] {
     const live = own.watch_out.filter((w) => !isExpired(w, i.sessionNumber, i.date));
     const expired = own.watch_out.length - live.length;
     if (live.length > 0 || expired > 0) {
-      out.push("WATCH OUT");
-      for (const w of live.slice(0, CAPS.watch)) out.push(`- ${cut(watchText(w), CAPS.watchChars)}`);
+      // T-312: a capped list says its total on the header, so a cap reads as a cap. A list that fits keeps the bare header.
+      out.push(live.length > CAPS.watch ? `WATCH OUT (${live.length}):` : "WATCH OUT");
+      for (const w of shownWatch(live, CAPS.watch)) out.push(`- ${cutWord(watchText(w), CAPS.watchChars)}`);
       const notes = [live.length > CAPS.watch ? `+${live.length - CAPS.watch} more: ${MORE_WATCH}` : null, expired > 0 ? `${expired} expired, not shown` : null].filter((n): n is string => n !== null);
       if (notes.length > 0) out.push(notes.join(" · "));
     }
@@ -324,10 +374,12 @@ function renderBudgeted(i: BriefingInput): string[] {
 
   // (e) WAITING ON AARON: every seat's CURRENT handoff (the newest per seat and checkout), unresolved questions owned by aaron.
   const waiting = newestHandoffPerInstance(s.handoffs).flatMap((h) =>
-    h.open_questions.filter((q) => questionResolvedBy(q) === null && questionOwner(q)?.toLowerCase() === "aaron").map((q) => `${cut(questionText(q), CAPS.question)} (${h.seat})`),
+    h.open_questions.filter((q) => questionResolvedBy(q) === null && questionOwner(q)?.toLowerCase() === "aaron").map((q) => `${cutWord(questionText(q), CAPS.question)} (${h.seat})`),
   );
+  // T-312: an empty list prints "none", so "nothing is waiting" and "not checked" do not look the same.
+  if (waiting.length === 0) out.push("WAITING ON AARON: none");
   if (waiting.length > 0) {
-    out.push("WAITING ON AARON:");
+    out.push(waiting.length > CAPS.waiting ? `WAITING ON AARON (${waiting.length}):` : "WAITING ON AARON:");
     for (const w of waiting.slice(0, CAPS.waiting)) out.push(`- ${w}`);
     if (waiting.length > CAPS.waiting) out.push(`+${waiting.length - CAPS.waiting} more: ${MORE_QUESTIONS}`);
   }
@@ -337,10 +389,10 @@ function renderBudgeted(i: BriefingInput): string[] {
     const open: string[] = [];
     for (const q of own.open_questions) {
       if (questionResolvedBy(q) !== null) resolved++;
-      else if (questionOwner(q)?.toLowerCase() !== "aaron") open.push(cut(questionText(q), CAPS.question)); // aaron's are WAITING ON AARON, once
+      else if (questionOwner(q)?.toLowerCase() !== "aaron") open.push(cutWord(questionText(q), CAPS.question)); // aaron's are WAITING ON AARON, once
     }
     if (open.length > 0 || resolved > 0) {
-      out.push("OPEN QUESTIONS");
+      out.push(open.length > CAPS.open ? `OPEN QUESTIONS (${open.length}):` : "OPEN QUESTIONS");
       for (const q of open.slice(0, CAPS.open)) out.push(`- ${q}`);
       const notes = [open.length > CAPS.open ? `+${open.length - CAPS.open} more: ${MORE_QUESTIONS}` : null, resolved > 0 ? `(${resolved} resolved, not shown)` : null].filter((n): n is string => n !== null);
       if (notes.length > 0) out.push(notes.join(" · "));

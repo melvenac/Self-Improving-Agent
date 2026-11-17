@@ -215,7 +215,10 @@ describe("T-236 (c) B1 the worst case still fits the budget with FOCUS and SEATS
     const lines = renderBriefing(input);
     const text = lines.join("\n");
     expect(lines.length, `${lines.length} lines`).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
-    expect(text.length, `${text.length} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    // T-344: the pick-up prints whole and is not counted against the budget.
+    const pickUpText = "Pick up ".repeat(300).trim();
+    expect(text).toContain(`\n${pickUpText}\n`);
+    expect(text.length - pickUpText.length, `${text.length} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
     expect(text).toMatch(/\nPICK UP HERE · FOCUS: T-\d+ Title x+… \(P\d, \w+\) · \+\d+ more: state\.json tasks\[\] \(assignee\)\n/);
     expect(text).toMatch(/\nSEATS: planner T-\d+ \(\+\d+\)/);
     expect(text).toContain("Latest brief: docs/loops/t236-brief.md (2026-10-03) · Skills: self-improving-agent-gotchas");

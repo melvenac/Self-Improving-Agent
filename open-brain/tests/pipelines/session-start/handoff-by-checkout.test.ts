@@ -64,7 +64,7 @@ function section(lines: string[], header: string): string[] | null {
   const at = lines.indexOf(header);
   if (at < 0) return null;
   let end = at + 1;
-  while (end < lines.length && !HEADS.has(lines[end]!) && !/^(BROKEN|Gaps: |Working tree|Latest brief|Skills: |## End)/.test(lines[end]!)) end++;
+  while (end < lines.length && !HEADS.has(lines[end]!) && !/^(BROKEN|Gaps: |Working tree|Latest brief|Skills: |## End|WAITING ON AARON: none)/.test(lines[end]!)) end++;
   // The original layout separates sections with a blank line; it is layout, not section content.
   while (end > at + 1 && lines[end - 1] === "") end--;
   return lines.slice(at + 1, end);
