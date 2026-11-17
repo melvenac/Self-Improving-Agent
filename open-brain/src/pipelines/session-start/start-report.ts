@@ -249,6 +249,8 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
   // says so and falls back. Absent leaves v0.28.0 output untouched. Each
   // prose file sits under its own header; "absent" is spelled out so a
   // missing file and an empty one never look alike.
+  // T-352: the budgeted briefing reports the pick-up text it printed; the greeting-metrics row adds it to budget_chars.
+  const printed = { pickUpPrintedChars: 0 };
   if (sj.present && sj.valid && sj.data) {
     // The reader's OWN seat, so the greeting renders this seat's handoff and
     // names the others by their close-out commit. A greeting that shows the
@@ -326,7 +328,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       transcript,
       // T-167, opt-in: the PRD's own problem statement, one line above OBJECTIVE.
       problem: greetingFlag(projectRoot, "briefing_problem") ? describeProblemStatement(projectRoot) : null,
-    }));
+    }, printed));
     // T-348: only a real start of a proven session records; a read-only probe (T-314) leaves no trace.
     if (input.readOnly !== true && proven.id !== null) recordReadsOwed(projectRoot, proven.id, owedPaths);
   } else {
@@ -398,6 +400,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       sessionNumber: result.session.logPath ? result.session.sessionNumber : null,
       startedAt,
       budget: greetingFlag(projectRoot, "briefing_budget"),
+      pickUpPrintedChars: printed.pickUpPrintedChars,
     });
     if (!m.ok) lines.push(`\nGreeting metrics: not written (${m.why})`);
   }

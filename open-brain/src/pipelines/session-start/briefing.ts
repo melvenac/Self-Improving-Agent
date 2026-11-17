@@ -142,8 +142,18 @@ export function handoffLagNote(own: { written_rev?: number } | null, revision: n
   return lag > 0 ? `handoff +${lag}` : null;
 }
 
-export function renderBriefing(i: BriefingInput): string[] {
-  if (i.budget === true) return renderBudgeted(i);
+/**
+ * T-352: what the budgeted layout printed that BRIEFING_BUDGET does not count. The caller passes `{ pickUpPrintedChars: 0 }`;
+ * the budgeted layout sets it to the length of the reader's own pick-up text as printed (whitespace flattened, and past
+ * PICK_UP_SAFETY_CHARS cut, the cut's suffix included). It stays 0 for an empty pick-up, for a reader with no handoff and in
+ * the legacy layout: those lines are counted, or there is no budget. Notes riding the pick-up line are counted, so not here.
+ */
+export interface BriefingPrinted {
+  pickUpPrintedChars: number;
+}
+
+export function renderBriefing(i: BriefingInput, printed?: BriefingPrinted): string[] {
+  if (i.budget === true) return renderBudgeted(i, printed);
   const s = i.state;
   const out: string[] = [BRIEFING_START];
 
@@ -227,7 +237,8 @@ export function renderBriefing(i: BriefingInput): string[] {
 /**
  * What the budgeted briefing must fit in: ~4 KB and ~30 lines (T-236 (f)), plus the one PROBLEM line T-167 adds (a line and at
  * most ~330 characters). A test renders the worst case against both. T-344: the pick-up text prints whole and is NOT counted:
- * the tests measure the briefing without it. greeting-metrics still records the full text's size beside `chars`.
+ * the tests measure the briefing without it. T-352: greeting-metrics records the full text's size (greeting_chars) beside
+ * budget_chars = `chars` + the printed pick-up's length (BriefingPrinted), so the two compare like with like.
  */
 export const BRIEFING_BUDGET = { lines: 31, chars: 4400 } as const;
 
@@ -311,7 +322,7 @@ function isExpired(w: WatchOut, sessionNumber: number | null, date: string): boo
   return date > e;
 }
 
-function renderBudgeted(i: BriefingInput): string[] {
+function renderBudgeted(i: BriefingInput, printed?: BriefingPrinted): string[] {
   const s = i.state;
   const out: string[] = [BRIEFING_START, i.serving];
   if (i.oldStartCommand) out.push(i.oldStartCommand);
@@ -355,6 +366,8 @@ function renderBudgeted(i: BriefingInput): string[] {
   const pickUp = own
     ? own.pick_up.trim() === "" ? "(nothing recorded)" : cutSentence(own.pick_up, PICK_UP_SAFETY_CHARS)
     : i.seat === null ? "none: this reader's seat is unresolved, so no handoff is named as yours" : noneRecorded(i.seat, i.ownCheckout);
+  // T-352: the text BRIEFING_BUDGET excludes, measured where it is printed, so greeting-metrics cannot disagree with it.
+  if (printed && own && own.pick_up.trim() !== "") printed.pickUpPrintedChars = pickUp.length;
   out.push([pickUp, i.missingHandoff, i.mergedCitations, i.maybeShipped].filter((x): x is string => typeof x === "string" && x !== "").join(" · "));
 
   if (own) {
