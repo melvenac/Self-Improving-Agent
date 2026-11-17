@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  if (dirty !== "") return null;
+===
+  if (dirty) return null;
+>>>

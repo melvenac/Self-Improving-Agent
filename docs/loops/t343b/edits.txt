@@ -1,0 +1,37 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+ * "The record is the same" is two checks, because the revision is read from the working copy
+ * and the diff from the commits: the revisions are equal, and no path under .agents/ differs
+ * between HEAD and the upstream ref.
+===
+ * "The record is the same" is three checks, because no single read sees it all. The revision is
+ * read from the working copy. `git status` sees an uncommitted change to a tracked file under
+ * .agents/ that leaves the revision alone (T-343 review F1). The diff sees the commits: no path
+ * under .agents/ differs between HEAD and the upstream ref. An untracked file, or a change git
+ * is told not to look at (an ignored file, a skip-worktree entry), is seen only if it moves the
+ * revision.
+>>>
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  if (revHere !== revUpstream) return null;
+  const treeHere = git(
+===
+  if (revHere !== revUpstream) return null;
+  // T-343 review F1: the checks below read COMMITS. An uncommitted edit under .agents/ that keeps
+  // the revision would pass them, so a TRACKED file changed there keeps the STALE line.
+  // --untracked-files=no: ob_start itself creates this session's log, .agents/SESSIONS/Session_N.md,
+  // untracked and not ignored in most repos, at every start; an untracked file cannot make the
+  // record here older than master's. --porcelain omits ignored files as well (AGENT.local.md).
+  // git() returns "" for a clean tree and null for a failed call, so `!== ""` covers both a
+  // change and a failure.
+  const dirty = git(projectRoot, ["status", "--porcelain", "-z", "--untracked-files=no", "--", ".agents"]);
+  if (dirty !== "") return null;
+  const treeHere = git(
+>>>
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  if (files.length === 0 || files.some((f) => f.startsWith(".agents/"))) return null;
+===
+  // `files.length === 0` is defensive: two different trees always list at least one name.
+  if (files.length === 0 || files.some((f) => f.startsWith(".agents/"))) return null;
+>>>
