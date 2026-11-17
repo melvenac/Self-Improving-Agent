@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 641,
+  "revision": 642,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3200,7 +3200,7 @@
       "opened_session": 178,
       "closed_session": null,
       "supersedes": null,
-      "note": "s178 11-17 (Atlas, from Prism's question via clark, Prism T-128). Since #1133 the pick-up prints whole (to 4000) and the 4400 budget is measured without it, but greeting-metrics.ts:176-178 still writes greeting_chars = the whole block and budget_chars = BRIEFING_BUDGET.chars. The dashboard's Fits cell is red when greeting_chars > budget_chars, so a correct briefing with a long pick-up reads red. Planner's proposed fix: budget_chars = BRIEFING_BUDGET.chars + the printed pick-up's length (greeting_chars stays the true size; no dashboard change). Until then a red Fits with a long pick-up is a false alarm.",
+      "note": "s178 11-17 (Atlas, from Prism's question via clark, Prism T-128). Since #1133 the pick-up prints whole (to 4000) and the 4400 budget is measured without it, but greeting-metrics.ts:176-178 still writes greeting_chars = the whole block and budget_chars = BRIEFING_BUDGET.chars. The dashboard's Fits cell is red when greeting_chars > budget_chars, so a correct briefing with a long pick-up reads red. Planner's proposed fix: budget_chars = BRIEFING_BUDGET.chars + the printed pick-up's length (greeting_chars stays the true size; no dashboard change). Until then a red Fits with a long pick-up is a false alarm. — s178 11-17: built as PR #1146 (loop/t352, CAND 4b8abecf on START d1cbfdd6, job 1351 on the Lenovo; byte-compare 4 files SAME). Review job 1358 (QA PC, Opus): ACCEPT-WITH-NOTES. The count equals the excluded pick-up text in every case, offset 0; full suite on the committed tree 5046 passed, 1 failed (checks D4, red at START too, now seen on the QA PC as well as the Lenovo); 8 mutants killed, 1 equivalent (= to += on a per-call object). Notes: no row reuses a printed object across two calls; the budget flag is read twice per start. NOT MERGED: waits for Aaron's word typed in Atlas's window. After merge: clark rebuilds, check one live row has budget_chars = 4400 + pick-up length, tell Prism (its T-128 waits on this).",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -7177,7 +7177,7 @@
     },
     {
       "seat": "planner",
-      "pick_up": "The three greeting fixes are merged and live in build 224b79d: #1138 (T-343), #1133 (T-344 + T-312), #1141 (T-348). T-343, T-344 and T-312 are closed with live checks. T-348 stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. New task: the greeting-metrics row still counts the pick-up against the 4400 budget, so the dashboard Fits cell can read red falsely (fix: budget_chars = 4400 + printed pick-up length). Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30 with docs/loops/t334/t334-read.cjs); greeting reviews filed T-343..T-351.",
+      "pick_up": "PR #1146 (T-352, greeting row budget_chars counts the printed pick-up; reviewed 4b8abecf, job 1358 ACCEPT-WITH-NOTES) is NOT merged and waits for Aaron's word typed in Atlas's window. To merge: bash atlas-ops pr-refresh.sh 1146 4b8abecf3506154e185785a9bd934fdb7989251c (same patch-id, CI SUCCESS), then pr-merge.sh 1146 <new head>; ask clark to rebuild the main checkout; read one live greeting-metrics row (budget_chars = 4400 + the pick-up's printed length); close T-352; tell Prism (its T-128 waits on it). The three greeting fixes are merged and live in build 224b79d: T-343, T-344 and T-312 are closed with live checks. T-348 stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30 with docs/loops/t334/t334-read.cjs); greeting reviews filed T-343..T-351.",
       "watch_out": [
         "Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.",
         "Fleet scheduling (slots, host, order) and main-tree rebuilds are clark's; Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.",
@@ -7185,24 +7185,38 @@
         "T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.",
         "T-336 last check: clark's next greeting-metrics row must not list latest_brief.",
         "tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.",
-        "tests/harness/checks.test.ts D4 is red at master on the Lenovo host (npm error); it is not a change's fault."
+        "tests/harness/checks.test.ts D4 is red at master on the Lenovo host AND the QA PC (npm error); it is not a change's fault."
       ],
-      "open_questions": [],
+      "open_questions": [
+        {
+          "owner": "aaron",
+          "text": "Merge #1146 (T-352; QA ACCEPT-WITH-NOTES, job 1358)?"
+        }
+      ],
       "session": 178,
       "loop_state": {
-        "open_prs": [],
+        "open_prs": [
+          {
+            "ref": "#1146",
+            "qa_status": "accepted",
+            "note": "T-352 t352, reviewed 4b8abecf, job 1358 ACCEPT-WITH-NOTES"
+          }
+        ],
         "frozen_sha": null,
-        "questions_for_aaron": [],
+        "questions_for_aaron": [
+          "Merge #1146?"
+        ],
         "rulings": [
           "s178: T-334 arm kept at 0.5 (Aaron, D-165).",
           "s178: t344: pick-up whole to 4000; budget measured without it.",
-          "s178: round-2/3 reviews delta-only; a further tests-only gap is a NOTE, not a REJECT."
+          "s178: t352: budget_chars = 4400 + printed pick-up length; greeting_chars stays the true size.",
+          "s178: reviews: a tests-only gap on an input the source handles is a NOTE, not a REJECT."
         ]
       },
       "session_uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "written_rev": 641
+      "written_rev": 642
     }
   ],
   "sessions": [
@@ -7320,7 +7334,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 641
+      "last_work_rev": 642
     }
   ]
 }
