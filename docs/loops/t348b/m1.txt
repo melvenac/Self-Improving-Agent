@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+JSON.stringify({ session: rec.session, paths: rec.paths, reminded: true })
+===
+JSON.stringify({ session: rec.session, paths: rec.paths, reminded: false })
+>>>

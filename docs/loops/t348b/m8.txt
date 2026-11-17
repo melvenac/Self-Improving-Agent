@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+    if (typeof r.session !== "string" || !Array.isArray(r.paths) || !r.paths.every((p) => typeof p === "string")) return null;
+===
+    if (typeof r.session !== "string" || !Array.isArray(r.paths)) return null;
+>>>

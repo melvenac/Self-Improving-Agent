@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  if (rec === null || rec.session !== sessionId || rec.reminded || rec.paths.length === 0) return null;
+===
+  if (rec === null || rec.session !== sessionId || rec.reminded) return null;
+>>>
