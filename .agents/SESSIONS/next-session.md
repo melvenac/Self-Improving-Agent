@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 633 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 634 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,13 +6,14 @@
 
 ### Pick up here
 
-No open PRs. T-339 (skills-audit finds a project-local ops skill, P3) is the next SIA build: brief it like t336 (edits.txt + mutants), submit with qapc-job.mjs; a Lenovo hand-back lands with `qapc-job.mjs land <id>`, then `gh pr ready <n>` BEFORE reading checks (land opens a draft, and since T-338 a draft's checks all read Skipped/CLEAN). Read Clark's next greeting-metrics row (~/.claude/open-brain/greeting-metrics.jsonl): missing_pointers must not hold latest_brief (T-336's last unseen check). T-334 first reading on or after 11-16 with >=200 primary draws (101 on 11-08, ~5/day), else 11-23.
+Backlog by priority (D-145). T-339/T-341/T-342 merged at cadb576d and closed (rev 633); T-340 Lenovo runner live (lenovo-sia-1 in the fleet label set). Nothing queued after clark's 11-10 23:05 hold lift: T-046 is env work, T-191 large design, T-334 reading due on/after 11-16 (200+ primary draws) else 11-23.
 
 ### Watch out
 
-- Lenovo builds: Linux host, cannot push; the brief must say what a no-push host does (t336 v2 step 9: HANDBACK line). Its full suite shows checks.test.ts D4 red (npm ERR!): CI judges it.
-- Job briefs must be ASCII (the queue refuses a non-ASCII brief: CHECK ascii).
-- Code-PR merges go to clark as a pinned QA ACCEPT; workflow changes need Aaron's word via clark.
+- Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.
+- T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.
+- T-336 last check: clark's next greeting-metrics row must not list latest_brief.
+- Lenovo jobs between 20:27 and 22:47 CT 11-10 ran during a Wi-Fi stall: re-check before ruling (none were SIA's).
 
 ### Open questions
 
@@ -27,8 +28,7 @@ _None._
 **Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- T-336/T-337 ACCEPT #1106 a74ca5ed (merged a97e1209)
-- T-338 #1103 merged a1cd8306 on Aaron's word
+- s177: #1110 (T-340) and #1114 (t339) merged on QA ACCEPT; nothing queued after the 11-10 hold lift.
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -104,4 +104,4 @@ _10 older handoff(s), superseded within their seat and checkout, are in state.js
 
 ## Last session
 
-Session 177 — 2026-11-10 — planner [sia-planner] — `6f5b8a9d-429d-4c93-99a4-996634877932` (14 writing session(s) in the record)
+Session 177 — 2026-11-17 — planner [sia-planner] — `6f5b8a9d-429d-4c93-99a4-996634877932` (14 writing session(s) in the record)
