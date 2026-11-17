@@ -23,6 +23,7 @@ import {
 import { appendScore, readHistory, calculateTrend } from "./pipelines/sync/history.js";
 import { renderStartReport, isSeat } from "./pipelines/session-start/start-report.js";
 import { greetingFlag } from "./pipelines/session-start/greeting-flags.js";
+import { readsOwedReminder } from "./pipelines/session-start/reads-owed.js";
 import { readAgentIdentity } from "./pipelines/session-start/agent-identity.js";
 import { describeServingBuild } from "./pipelines/session-start/serving-build.js";
 import { resolveRepoRoot, describeNoRoot } from "./shared/repo-root.js";
@@ -366,6 +367,9 @@ export async function handleState(args: StateArgs): Promise<ToolResponse> {
     // Anything the writer did differently from what was asked.
     for (const n of r.notes) lines.push(`NOTE: ${n}`);
     lines.push(`${r.dry_run ? "Would render" : "Rendered"} (${r.rendered.length}): ${r.rendered.length ? r.rendered.join(", ") : "none (render: false)"}`);
+    // T-348: once per session, on its first applied write, the owed reads ob_start listed. Never refuses the write.
+    const owed = readsOwedReminder(projectRoot, stateSession.id, r.dry_run);
+    if (owed !== null) lines.push(owed);
     return { content: [{ type: "text", text: lines.join("\n") }] };
   } catch (err) {
     return {

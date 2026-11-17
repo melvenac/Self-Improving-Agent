@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { endRecordProjectDir } from "../../shared/end-record-store.js";
 import { sessionTrailerIds } from "../../shared/handoff-guard.js";
 import type { Seat, State } from "../../shared/state-schema.js";
 import { ownHandoff, questionText, watchText } from "../../shared/state-schema.js";
@@ -56,6 +57,71 @@ export function ownTrailerIds(state: State, sessionUuid: string | null, transcri
   return [...ids];
 }
 
+/**
+ * T-348: the READS OWED line was advice with nothing behind it. On 2026-11-17 two of six planner sessions greeted with
+ * owed briefs unread and did not say so. ob_start now keeps the list it printed, for the session that started, and that
+ * session's first ob_state write repeats it once.
+ *
+ * It is a reminder, not a check: nothing in SIA records that a file was opened (the role-reads store records what
+ * ob_start itself printed, and the PostToolUse hook is not registered for Read), so the line asks the seat to confirm
+ * and is printed whether or not the files were read.
+ *
+ * The record is one file in the per-project end-record directory (outside the repo, beside the other once-shown
+ * markers), holding the LAST started session only: a second session started in the same checkout replaces the first
+ * one's list. Every failure is silent and means no reminder; the state write is never refused or delayed by it.
+ */
+const READS_OWED_FILE = ".reads-owed.json";
+
+interface ReadsOwedRecord {
+  session: string;
+  paths: string[];
+  reminded: boolean;
+}
+
+function readReadsOwedRecord(projectRoot: string): ReadsOwedRecord | null {
+  try {
+    const raw: unknown = JSON.parse(readFileSync(join(endRecordProjectDir(projectRoot), READS_OWED_FILE), "utf8"));
+    if (typeof raw !== "object" || raw === null) return null;
+    const r = raw as { session?: unknown; paths?: unknown; reminded?: unknown };
+    if (typeof r.session !== "string" || !Array.isArray(r.paths) || !r.paths.every((p) => typeof p === "string")) return null;
+    return { session: r.session, paths: r.paths as string[], reminded: r.reminded === true };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * T-348: ob_start's owed list for `sessionId`, an empty one included. A session that has already been reminded keeps its
+ * record, so a second /start in the same session does not arm the reminder again.
+ */
+export function recordReadsOwed(projectRoot: string, sessionId: string, paths: readonly string[]): void {
+  try {
+    const prev = readReadsOwedRecord(projectRoot);
+    if (prev !== null && prev.session === sessionId && prev.reminded) return;
+    writeFileSync(join(endRecordProjectDir(projectRoot), READS_OWED_FILE), `${JSON.stringify({ session: sessionId, paths: [...paths], reminded: false })}\n`);
+  } catch {
+    /* best effort: no record means no reminder */
+  }
+}
+
+/**
+ * T-348: the one line ob_state appends to the first write of a session that started with owed reads, else null. A dry
+ * run gets no line and leaves the reminder armed. No proven session, another session's record, or none: null.
+ */
+export function readsOwedReminder(projectRoot: string, sessionId: string | null, dryRun: boolean): string | null {
+  if (sessionId === null || dryRun) return null;
+  const rec = readReadsOwedRecord(projectRoot);
+  if (rec === null || rec.session !== sessionId || rec.reminded || rec.paths.length === 0) return null;
+  try {
+    writeFileSync(join(endRecordProjectDir(projectRoot), READS_OWED_FILE), `${JSON.stringify({ session: rec.session, paths: rec.paths, reminded: true })}\n`);
+  } catch {
+    /* the line still prints; it may print again on the next write */
+  }
+  const shown = rec.paths.slice(0, 6);
+  const rest = rec.paths.length - shown.length;
+  return `READS OWED at start (${rec.paths.length}), confirm each was read: ${shown.join(", ")}${rest > 0 ? `, +${rest} more` : ""}`;
+}
+
 function prevSessionDate(state: State, sessionNumber: number | null, checkout: string | null | undefined): string | null {
   if (sessionNumber === null || checkout == null) return null;
   let best: string | null = null;
@@ -100,6 +166,8 @@ export function describeReadsOwed(
   checkout: string | null | undefined,
   /** G-062 (a): ownTrailerIds(); a path whose newest commit carries one of them is not owed. Empty: nothing is left out. */
   ownIds: readonly string[] = [],
+  /** T-348: when given, every owed path is pushed onto it (all of them, not only the six the line shows). */
+  collect?: string[],
 ): string {
   const prevDate = prevSessionDate(state, sessionNumber, checkout);
   // T-329 (N4): no earlier session of this checkout in the record (a fresh import writes its row with no checkout), so the
@@ -140,6 +208,7 @@ export function describeReadsOwed(
     add(rel);
   }
 
+  if (collect) collect.push(...paths);
   if (paths.length === 0) return ownCount > 0 ? `READS OWED: none (${ownCount} written by this seat)` : "READS OWED: none";
   const shown = paths.slice(0, 6);
   const rest = paths.length - shown.length;
