@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      pickUpPrintedChars: printed.pickUpPrintedChars,
+===
+      pickUpPrintedChars: 0,
+>>>

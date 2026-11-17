@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+printed.pickUpPrintedChars = pickUp.length;
+===
+printed.pickUpPrintedChars = own.pick_up.length;
+>>>

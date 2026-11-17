@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  if (printed && own && own.pick_up.trim() !== "") printed.pickUpPrintedChars
+===
+  if (printed && own) printed.pickUpPrintedChars
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  if (i.budget === true) return renderBudgeted(i, printed);
+===
+  if (i.budget === true) return renderBudgeted(i);
+>>>
