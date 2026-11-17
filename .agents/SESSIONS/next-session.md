@@ -1,12 +1,12 @@
-<!-- generated from .agents/state.json rev 636 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 637 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
-## planner [sia-planner] _(written session 177)_
+## planner [sia-planner] _(written session 178)_
 
 ### Pick up here
 
-Backlog by priority (D-145). T-339/T-341/T-342 merged at cadb576d and closed (rev 633); T-340 Lenovo runner live (lenovo-sia-1 in the fleet label set). Nothing queued after clark's 11-10 23:05 hold lift: T-046 is env work, T-191 large design, T-334 reading due on/after 11-16 (200+ primary draws) else 11-23.
+Backlog by priority (D-145). s178: T-334 reading 1 is done (docs/loops/t334-reading-1.md). No detectable difference; Aaron kept the arm at 0.5, with a second look around 11-30. The greeting self-review filed T-343..T-347 and added notes to T-312 (park condition now met) and T-191. The next pickable items are the P2s T-046 (env) and T-191 (design), or the cheap P3 greeting fixes T-343/T-344.
 
 ### Watch out
 
@@ -14,6 +14,7 @@ Backlog by priority (D-145). T-339/T-341/T-342 merged at cadb576d and closed (re
 - T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.
 - T-336 last check: clark's next greeting-metrics row must not list latest_brief.
 - Lenovo jobs between 20:27 and 22:47 CT 11-10 ran during a Wi-Fi stall: re-check before ruling (none were SIA's).
+- tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.
 
 ### Open questions
 
@@ -28,7 +29,7 @@ _None._
 **Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
-- s177: #1110 (T-340) and #1114 (t339) merged on QA ACCEPT; nothing queued after the 11-10 hold lift.
+- s178: T-334 arm kept at 0.5 (Aaron); records PRs #1117 and #1118 merged.
 
 ## developer [sia-builder] _(written session 156)_
 
@@ -100,7 +101,7 @@ THIS IS THE QA SEAT'S HANDOFF for Loop 16, the G-039 recall trigger, ACCEPTED at
 - IS THE RANKING GAP (R26) WORSE THAN THE LIVE STORE SUGGESTS? Entry 299 ranks first on the real 599-entry store only because five entries there carry all three derived terms — a thin field. Against ten same-topic competitors it ranks 4th (developer, comparable length) or 3rd (mine). The key-weight table is in the close-out as evidence; the loop that owns ranking chooses.
 - IS G-042 ANYTHING BUT THIS MACHINE? Eight sightings, one machine, and now three clean full runs in a row in the QA tree at rising counts (1021, 1027, 1031). CI has never shown the worker-heartbeat signature — but CI has now shown two OTHER load-dependent faults in the same file, which is the first evidence that the QA tree is a fast machine rather than a representative one. UNWRITTEN AS A GAP because the id would have collided.
 
-_9 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
+_10 older handoff(s), superseded within their seat and checkout, are in state.json and not rendered here._
 
 ## Last session
 
