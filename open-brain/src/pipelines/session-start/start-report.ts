@@ -21,7 +21,7 @@ import { renderBriefing, describeUsage, describeWorkingTree, describeSkills, des
 import { oldStartCommandWarning } from "../bootstrap/index.js";
 import { describeLatestBrief, describeNoBrief } from "./latest-brief.js";
 import { recordGreetingMetrics } from "./greeting-metrics.js";
-import { describeReadsOwed, ownTrailerIds } from "./reads-owed.js";
+import { describeReadsOwed, ownTrailerIds, recordReadsOwed } from "./reads-owed.js";
 import { describeMaybeShipped } from "../sync/open-task-commits.js";
 import { describeFleet, fleetFallback } from "./fleet.js";
 import { formatScanCounts } from "./scan-counts.js";
@@ -266,6 +266,8 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       notASeat,
       compact: greetingFlag(projectRoot, "state_compact"),
     }));
+    // T-348: every path the READS OWED line counts, kept for this session's first ob_state write.
+    const owedPaths: string[] = [];
     // T-233 B: the whole briefing, rendered here, so /start prints it instead of assembling it.
     lines.push("", ...renderBriefing({
       serving,
@@ -287,6 +289,7 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
         roles.seat && isSeat(roles.seat.role) ? roles.seat.role : null,
         ownCheckout ?? null,
         greetingFlag(projectRoot, "reads_owed_own") ? ownTrailerIds(sj.data, proven.id, proven.id !== null ? proven.transcriptPath : undefined, ownCheckout ?? null) : [],
+        owedPaths,
       ),
       fleet: (() => {
         try {
@@ -324,6 +327,8 @@ ROLE KNOWLEDGE PROBLEMS (${roles.problems.length}):`);
       // T-167, opt-in: the PRD's own problem statement, one line above OBJECTIVE.
       problem: greetingFlag(projectRoot, "briefing_problem") ? describeProblemStatement(projectRoot) : null,
     }));
+    // T-348: only a real start of a proven session records; a read-only probe (T-314) leaves no trace.
+    if (input.readOnly !== true && proven.id !== null) recordReadsOwed(projectRoot, proven.id, owedPaths);
   } else {
     // F3: an unknown schema_version REFUSES, with no prose fallback.
     //
