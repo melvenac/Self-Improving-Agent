@@ -255,7 +255,9 @@ describe("T-199 HO-4: the line is in the BRIEFING, once, and the budgeted layout
     const s = stateWith([], [{ ...handoff("u-own", "sia-builder", 1, 5), pick_up: "Pick up ".repeat(300) } as Handoff]);
     const lines = renderBriefing(base(s, { budget: true, missingHandoff: NOTICE }));
     expect(lines.length).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
-    expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    // T-344: the pick-up prints whole and is not counted against the budget.
+    expect(lines[lines.indexOf("PICK UP HERE") + 1]!.startsWith(`${"Pick up ".repeat(300).trim()} `)).toBe(true);
+    expect(lines.join("\n").length - "Pick up ".repeat(300).trim().length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
   });
 
   it("the budget still holds with 20 standing rules in the record (fixture base, not live tags)", () => {
@@ -266,7 +268,7 @@ describe("T-199 HO-4: the line is in the BRIEFING, once, and the budgeted layout
     );
     const lines = renderBriefing(base(s, { budget: true, missingHandoff: NOTICE }));
     expect(lines.length).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
-    expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    expect(lines.join("\n").length - "Pick up ".repeat(300).trim().length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
     expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
   });
 
@@ -290,7 +292,7 @@ describe("T-199 HO-4: the line is in the BRIEFING, once, and the budgeted layout
       );
       const lines = renderBriefing(base(s, { budget: true, missingHandoff: NOTICE }));
       expect(lines.length).toBeLessThanOrEqual(BRIEFING_BUDGET.lines);
-      expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+      expect(lines.join("\n").length - "Pick up ".repeat(300).trim().length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
       expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
     } finally {
       spy.mockRestore();
