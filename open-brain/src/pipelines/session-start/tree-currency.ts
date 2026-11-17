@@ -49,6 +49,8 @@ import { resolveRecordRef } from "./upstream-ref.js";
 export type TreeCurrencySeverity =
   | "current"
   | "behind"
+  // T-343: commits behind, the record the same on both sides, only non-record files differ.
+  | "behind-code"
   | "ahead"
   | "diverged"
   | "record-behind"
@@ -220,6 +222,7 @@ export function describeTreeCurrency(projectRoot: string, options: TreeCurrencyO
           l
             .replace("although the commits are level with", "although the commits show no difference from")
             .replace("Not stale; local work is not yet on ", "Not confirmed against a fresh fetch; local work is not yet on ")
+            .replace(", record current with ", ", record showing no difference from ")
         );
   return { ...result, lines: [failed, ...body] };
 }
@@ -264,7 +267,12 @@ function compare(projectRoot: string, options: TreeCurrencyOptions): TreeCurrenc
   const recordRevisionUpstream = readRevisionAtRef(projectRoot, upstreamRef);
   const lastFetchAt = readLastFetchAt(projectRoot);
 
-  const severity = classify(headBehind, headAhead, recordRevisionHere, recordRevisionUpstream);
+  const classified = classify(headBehind, headAhead, recordRevisionHere, recordRevisionUpstream);
+  // T-343: a commit COUNT says nothing about content. Only "behind" is re-read; diverged, ahead and
+  // record-behind keep their lines. null keeps the STALE line.
+  const differing =
+    classified === "behind" ? behindContent(projectRoot, upstreamRef, recordRevisionHere, recordRevisionUpstream) : null;
+  const severity: TreeCurrencySeverity = differing === null ? classified : differing === 0 ? "current" : "behind-code";
   const lines = describe(severity, {
     headBehind,
     headAhead,
@@ -272,6 +280,7 @@ function compare(projectRoot: string, options: TreeCurrencyOptions): TreeCurrenc
     recordRevisionUpstream,
     upstreamRef,
     lastFetchAt,
+    nonRecordFiles: differing ?? 0,
   });
 
   return {
@@ -303,7 +312,58 @@ function classify(
   return "current";
 }
 
+/**
+ * T-343: what a "behind" count hides. On 2026-11-17 two greetings printed THIS TREE IS STALE in
+ * capitals: one was 1 commit behind, and that commit was the merge of the tree's own records PR,
+ * with a tree identical to HEAD's; the other was 3 commits behind with the record at the same
+ * revision on both sides and one workflow file different.
+ *
+ * Returns 0 when HEAD's tree IS the upstream tree; n > 0 when the record is the same on both
+ * sides and n other files differ; null to keep the STALE line. null is also the answer whenever
+ * a git call fails or the record cannot be shown to be the same: the fallback is the warning,
+ * never silence.
+ *
+ * "The record is the same" is three checks, because no single read sees it all. The revision is
+ * read from the working copy. `git status` sees an uncommitted change to a tracked file under
+ * .agents/ that leaves the revision alone (T-343 review F1). The diff sees the commits: no path
+ * under .agents/ differs between HEAD and the upstream ref. An untracked file, or a change git
+ * is told not to look at (an ignored file, a skip-worktree entry), is seen only if it moves the
+ * revision.
+ */
+function behindContent(
+  projectRoot: string,
+  upstreamRef: string,
+  revHere: number | null,
+  revUpstream: number | null
+): number | null {
+  if (revHere !== revUpstream) return null;
+  // T-343 review F1: the checks below read COMMITS. An uncommitted edit under .agents/ that keeps
+  // the revision would pass them, so a TRACKED file changed there keeps the STALE line.
+  // --untracked-files=no: ob_start itself creates this session's log, .agents/SESSIONS/Session_N.md,
+  // untracked and not ignored in most repos, at every start; an untracked file cannot make the
+  // record here older than master's. --porcelain omits ignored files as well (AGENT.local.md).
+  // git() returns "" for a clean tree and null for a failed call, so `!== ""` covers both a
+  // change and a failure.
+  const dirty = git(projectRoot, ["status", "--porcelain", "-z", "--untracked-files=no", "--", ".agents"]);
+  if (dirty !== "") return null;
+  const treeHere = git(projectRoot, ["rev-parse", "--verify", "--quiet", "HEAD^{tree}"]);
+  const treeUpstream = git(projectRoot, ["rev-parse", "--verify", "--quiet", `${upstreamRef}^{tree}`]);
+  if (!treeHere || !treeUpstream) return null;
+  if (treeHere === treeUpstream) return 0;
+  if (revHere === null) return null;
+  // -z: names arrive unquoted, so a path under .agents/ cannot hide behind core.quotepath.
+  // --no-renames: a file moved out of .agents/ still lists its old path.
+  const names = git(projectRoot, ["diff", "--name-only", "--no-renames", "-z", "HEAD", upstreamRef, "--"]);
+  if (names === null) return null;
+  const files = names.split("\0").filter(Boolean);
+  // `files.length === 0` is defensive: two different trees always list at least one name.
+  if (files.length === 0 || files.some((f) => f.startsWith(".agents/"))) return null;
+  return files.length;
+}
+
 interface DescribeInput {
+  /** T-343: files outside .agents/ that differ from the upstream ref; read only for "behind-code". */
+  nonRecordFiles: number;
   headBehind: number;
   headAhead: number;
   recordRevisionHere: number | null;
@@ -314,11 +374,24 @@ interface DescribeInput {
 
 function describe(severity: TreeCurrencySeverity, d: DescribeInput): string[] {
   const rev = (n: number | null) => (n === null ? "no record" : `rev ${n}`);
-  const records = `record here ${rev(d.recordRevisionHere)}, at ${d.upstreamRef} ${rev(d.recordRevisionUpstream)}`;
+  // T-343: "current" with commits behind is the identical-tree case. The count stays visible, inside the brackets.
+  const sameTree =
+    severity === "current" && d.headBehind > 0 ? `; ${plural(d.headBehind, "commit")} behind with the same content` : "";
+  const records = `record here ${rev(d.recordRevisionHere)}, at ${d.upstreamRef} ${rev(d.recordRevisionUpstream)}${sameTree}`;
   const head = `${plural(d.headBehind, "commit")} behind`;
   const lines: string[] = [];
 
   switch (severity) {
+    case "behind-code":
+      // T-343: one calm line. It does not start with THIS TREE IS STALE, so greeting-metrics
+      // raises no tree_stale alarm for it.
+      lines.push(
+        `Tree currency: ${head} ${d.upstreamRef}, record current with ${d.upstreamRef} (${records}); ` +
+          `${plural(d.nonRecordFiles, "non-record file")} ${d.nonRecordFiles === 1 ? "differs" : "differ"}. ` +
+          `Compared against the last fetch (${d.lastFetchAt ?? "fetch time unknown"}), not the network. ` +
+          `Not the drift line: drift compares the rendered views to ${STATE_REL} within this tree.`
+      );
+      return lines;
     case "behind":
       lines.push(
         `THIS TREE IS STALE: ${head} ${d.upstreamRef} — ${records}. ` +
