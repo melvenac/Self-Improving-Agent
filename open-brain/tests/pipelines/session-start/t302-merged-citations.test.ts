@@ -96,12 +96,13 @@ describe("T-302", () => {
       expect(renderBriefing(base(s, { budget: true, mergedCitations: null }))).toEqual(renderBriefing(base(s, { budget: true })));
     });
 
-    it("M6 budgeted: a pick-up past its cap gives up the note's room, so the line is no longer than without the note", () => {
+    it("M6 budgeted (T-344): a pick-up past the old cap prints whole, and the note is appended without taking room from it", () => {
       const s = stateWithPickUp("x".repeat(1500));
       const without = pickUpLine(renderBriefing(base(s, { budget: true })));
       const withIt = pickUpLine(renderBriefing(base(s, { budget: true, mergedCitations: NOTE })));
       expect(withIt.endsWith(` · ${NOTE}`)).toBe(true);
-      expect(withIt.length).toBeLessThanOrEqual(without.length);
+      expect(without).toBe("x".repeat(1500));
+      expect(withIt.length).toBe(without.length + 3 + NOTE.length);
     });
   });
 });

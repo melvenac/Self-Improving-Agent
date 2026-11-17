@@ -123,15 +123,15 @@ describe("T-316 S2: the note in the briefing", () => {
     expect(lines.length).toBe(before.length + 1);
   });
 
-  it("R7 budgeted: it rides the pick-up line after the merged note and is paid for out of the pick-up's cap, so the line does not grow", () => {
+  it("R7 budgeted (T-344): it rides the pick-up line after the merged note, adds no line, and takes nothing from the pick-up", () => {
     const state = stateWithPickUp("P".repeat(1000));
     const before = renderBriefing(input(state, { budget: true, mergedCitations: MERGED }));
     expect(renderBriefing(input(state, { budget: true, mergedCitations: MERGED, maybeShipped: null }))).toEqual(before);
     const lines = renderBriefing(input(state, { budget: true, mergedCitations: MERGED, maybeShipped: NOTE }));
     expect(lines.length).toBe(before.length);
-    const room = MERGED.length + 3 + NOTE.length + 3;
+    expect(1000, "the pick-up is past the old cap").toBeGreaterThan(HANDOFF_CAPS.pickUpChars);
     const pick = lines[lines.indexOf("PICK UP HERE") + 1]!;
-    expect(pick).toBe(`${"P".repeat(HANDOFF_CAPS.pickUpChars - room)}… (1000 chars) · ${MERGED} · ${NOTE}`);
-    expect(lines.join("\n").length).toBe(before.join("\n").length);
+    expect(pick).toBe(`${"P".repeat(1000)} · ${MERGED} · ${NOTE}`);
+    expect(lines.join("\n").length).toBe(before.join("\n").length + 3 + NOTE.length);
   });
 });
