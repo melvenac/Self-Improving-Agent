@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 643,
+  "revision": 644,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3205,6 +3205,20 @@
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
       "closed_rev": 643
+    },
+    {
+      "id": "T-353",
+      "title": "/bootstrap does not write .agents/SYSTEM/greeting.json, so a new project gets the legacy briefing and no scorecard rows",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s178 11-17 (Atlas, from clark relaying Prism's T-122, #835). Read at master f1a2811f: every greeting feature is opt-in through `.agents/SYSTEM/greeting.json` (12 flags; SIA's own file has 11 true and handoff_caps false), but neither `open-brain bootstrap` (src/pipelines/bootstrap) nor project-template/ writes that file. Result seen in the fleet: Herald (tcm-marketing) and Beam (openlaser) had no greeting-metrics rows at all, and by the same cause no budgeted briefing, until someone noticed on the dashboard. Planner's proposed fix: bootstrap's scaffold writes greeting.json with SIA's current set when the file is absent (never overwrite an existing one), and /sync warns when a project with state.json has no greeting.json. NOT checked: how each flag reads in a repo without .agents/roles or PRD.md; Herald and Beam were asked on 11-17 to report any wrong or noisy line after turning the full set on, and that report is the evidence to wait for before the brief. Turning features on by default for new projects is a product choice: ask Aaron before the brief is pinned.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -7321,7 +7335,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 643
+      "last_work_rev": 644
     }
   ]
 }
