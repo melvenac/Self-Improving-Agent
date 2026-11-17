@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  return end >= limit / 2 ? `${flat.slice(0, end)}
+===
+  return end > 0 ? `${flat.slice(0, end)}
+>>>

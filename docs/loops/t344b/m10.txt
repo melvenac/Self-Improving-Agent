@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  for (const m of flat.slice(0, limit + 1).matchAll(/(?<!(?:^|\s)\d{1,3})[.;!?](?= )/g)) end = (m.index ?? 0) + 1;
+===
+  for (const m of flat.slice(0, limit + 1).matchAll(/[.;!?](?= )/g)) end = (m.index ?? 0) + 1;
+>>>

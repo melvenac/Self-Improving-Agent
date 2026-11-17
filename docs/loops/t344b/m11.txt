@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  const end = space >= limit - CUT_BACKOFF && space > 0 ? space : limit;
+===
+  const end = space > limit - CUT_BACKOFF && space > 0 ? space : limit;
+>>>

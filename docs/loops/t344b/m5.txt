@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+      for (const w of shownWatch(live, CAPS.watch)) out.push(`- ${cutWord(watchText(w), CAPS.watchChars)}`);
+===
+      for (const w of shownWatch(live, CAPS.watch)) out.push(`- ${cut(watchText(w), CAPS.watchChars)}`);
+>>>
