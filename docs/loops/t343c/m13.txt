@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+"--porcelain", "-z", "--untracked-files=no", "--", ".agents"]
+===
+"--porcelain", "-z", "--", ".agents"]
+>>>

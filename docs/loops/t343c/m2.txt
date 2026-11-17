@@ -1,0 +1,7 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  if (revHere !== revUpstream) return null;
+  // T-343 review F1: the checks below read COMMITS.
+===
+  // T-343 review F1: the checks below read COMMITS.
+>>>
