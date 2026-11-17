@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 641 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 642 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-The three greeting fixes are merged and live in build 224b79d: #1138 (T-343), #1133 (T-344 + T-312), #1141 (T-348). T-343, T-344 and T-312 are closed with live checks. T-348 stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. New task: the greeting-metrics row still counts the pick-up against the 4400 budget, so the dashboard Fits cell can read red falsely (fix: budget_chars = 4400 + printed pick-up length). Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30 with docs/loops/t334/t334-read.cjs); greeting reviews filed T-343..T-351.
+PR #1146 (T-352, greeting row budget_chars counts the printed pick-up; reviewed 4b8abecf, job 1358 ACCEPT-WITH-NOTES) is NOT merged and waits for Aaron's word typed in Atlas's window. To merge: bash atlas-ops pr-refresh.sh 1146 4b8abecf3506154e185785a9bd934fdb7989251c (same patch-id, CI SUCCESS), then pr-merge.sh 1146 <new head>; ask clark to rebuild the main checkout; read one live greeting-metrics row (budget_chars = 4400 + the pick-up's printed length); close T-352; tell Prism (its T-128 waits on it). The three greeting fixes are merged and live in build 224b79d: T-343, T-344 and T-312 are closed with live checks. T-348 stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30 with docs/loops/t334/t334-read.cjs); greeting reviews filed T-343..T-351.
 
 ### Watch out
 
@@ -16,24 +16,27 @@ The three greeting fixes are merged and live in build 224b79d: #1138 (T-343), #1
 - T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.
 - T-336 last check: clark's next greeting-metrics row must not list latest_brief.
 - tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.
-- tests/harness/checks.test.ts D4 is red at master on the Lenovo host (npm error); it is not a change's fault.
+- tests/harness/checks.test.ts D4 is red at master on the Lenovo host AND the QA PC (npm error); it is not a change's fault.
 
 ### Open questions
 
-_None._
+- Merge #1146 (T-352; QA ACCEPT-WITH-NOTES, job 1358)?
 
 ### Loop state
 
-**Open PRs:** _None._
+**Open PRs:** 
+- #1146 — QA: accepted — T-352 t352, reviewed 4b8abecf, job 1358 ACCEPT-WITH-NOTES
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** _None._
+**Questions pending for Aaron:** 
+- Merge #1146?
 
 **Rulings made mid-loop:** 
 - s178: T-334 arm kept at 0.5 (Aaron, D-165).
 - s178: t344: pick-up whole to 4000; budget measured without it.
-- s178: round-2/3 reviews delta-only; a further tests-only gap is a NOTE, not a REJECT.
+- s178: t352: budget_chars = 4400 + printed pick-up length; greeting_chars stays the true size.
+- s178: reviews: a tests-only gap on an input the source handles is a NOTE, not a REJECT.
 
 ## developer [sia-builder] _(written session 156)_
 
