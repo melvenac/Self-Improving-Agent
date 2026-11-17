@@ -1,0 +1,94 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+export function renderBriefing(i: BriefingInput): string[] {
+  if (i.budget === true) return renderBudgeted(i);
+===
+/**
+ * T-352: what the budgeted layout printed that BRIEFING_BUDGET does not count. The caller passes `{ pickUpPrintedChars: 0 }`;
+ * the budgeted layout sets it to the length of the reader's own pick-up text as printed (whitespace flattened, and past
+ * PICK_UP_SAFETY_CHARS cut, the cut's suffix included). It stays 0 for an empty pick-up, for a reader with no handoff and in
+ * the legacy layout: those lines are counted, or there is no budget. Notes riding the pick-up line are counted, so not here.
+ */
+export interface BriefingPrinted {
+  pickUpPrintedChars: number;
+}
+
+export function renderBriefing(i: BriefingInput, printed?: BriefingPrinted): string[] {
+  if (i.budget === true) return renderBudgeted(i, printed);
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+ * the tests measure the briefing without it. greeting-metrics still records the full text's size beside `chars`.
+===
+ * the tests measure the briefing without it. T-352: greeting-metrics records the full text's size (greeting_chars) beside
+ * budget_chars = `chars` + the printed pick-up's length (BriefingPrinted), so the two compare like with like.
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+function renderBudgeted(i: BriefingInput): string[] {
+===
+function renderBudgeted(i: BriefingInput, printed?: BriefingPrinted): string[] {
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  out.push([pickUp, i.missingHandoff, i.mergedCitations, i.maybeShipped].filter(
+===
+  // T-352: the text BRIEFING_BUDGET excludes, measured where it is printed, so greeting-metrics cannot disagree with it.
+  if (printed && own && own.pick_up.trim() !== "") printed.pickUpPrintedChars = pickUp.length;
+  out.push([pickUp, i.missingHandoff, i.mergedCitations, i.maybeShipped].filter(
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+  /** greeting.json `briefing_budget` is on. */
+  budget: boolean;
+}
+===
+  /** greeting.json `briefing_budget` is on. */
+  budget: boolean;
+  /** T-352: renderBriefing's BriefingPrinted.pickUpPrintedChars, the printed pick-up text the budget does not count. Absent is 0. */
+  pickUpPrintedChars?: number;
+}
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+  budget_chars: number | null;
+===
+  /**
+   * T-352: with the budgeted layout on, BRIEFING_BUDGET.chars plus the printed pick-up's length, so `greeting_chars <=
+   * budget_chars` exactly when the briefing without its pick-up is within the budget. Null when the layout is off.
+   */
+  budget_chars: number | null;
+>>>
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+    budget_chars: input.budget ? BRIEFING_BUDGET.chars : null,
+===
+    budget_chars: input.budget ? BRIEFING_BUDGET.chars + (input.pickUpPrintedChars ?? 0) : null,
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+  // missing file and an empty one never look alike.
+  if (sj.present && sj.valid && sj.data) {
+===
+  // missing file and an empty one never look alike.
+  // T-352: the budgeted briefing reports the pick-up text it printed; the greeting-metrics row adds it to budget_chars.
+  const printed = { pickUpPrintedChars: 0 };
+  if (sj.present && sj.valid && sj.data) {
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      problem: greetingFlag(projectRoot, "briefing_problem") ? describeProblemStatement(projectRoot) : null,
+    }));
+===
+      problem: greetingFlag(projectRoot, "briefing_problem") ? describeProblemStatement(projectRoot) : null,
+    }, printed));
+>>>
+@@@ open-brain/src/pipelines/session-start/start-report.ts
+<<<
+      startedAt,
+      budget: greetingFlag(projectRoot, "briefing_budget"),
+===
+      startedAt,
+      budget: greetingFlag(projectRoot, "briefing_budget"),
+      pickUpPrintedChars: printed.pickUpPrintedChars,
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/greeting-metrics.ts
+<<<
+BRIEFING_BUDGET.chars + (input.pickUpPrintedChars ?? 0) : null,
+===
+BRIEFING_BUDGET.chars + (input.pickUpPrintedChars ?? 0) + 1 : null,
+>>>
