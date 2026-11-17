@@ -1,0 +1,381 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+ * What the budgeted briefing must fit in: ~4 KB and ~30 lines (T-236 (f)), plus the one PROBLEM line T-167 adds (a line and at
+ * most ~330 characters). A test renders the worst case against both.
+ */
+export const BRIEFING_BUDGET = { lines: 31, chars: 4400 } as const;
+===
+ * What the budgeted briefing must fit in: ~4 KB and ~30 lines (T-236 (f)), plus the one PROBLEM line T-167 adds (a line and at
+ * most ~330 characters). A test renders the worst case against both. T-344: the pick-up text prints whole and is NOT counted:
+ * the tests measure the briefing without it. greeting-metrics still records the full text's size beside `chars`.
+ */
+export const BRIEFING_BUDGET = { lines: 31, chars: 4400 } as const;
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+   * appended to the pick-up line after mergedCitations and paid for out of the pick-up's cap, as T-302's note is.
+===
+   * appended to the pick-up line after mergedCitations. T-344: neither note takes room from the pick-up any more.
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+/**
+ * Has this watch-out expired? A number is the LAST SESSION it prints in; an ISO date is the last DAY. With no session number
+===
+/** T-344: how far a cut backs off to reach whitespace. A token longer than this is cut at the cap, as `cut` does. */
+const CUT_BACKOFF = 24;
+
+/**
+ * T-344: `cut`, but the cut backs off to the last whitespace within CUT_BACKOFF of the cap, so a word or a date is not split
+ * ("else 11-2" read as a date). The suffix is `cut`'s, and so is the result when no whitespace is that near.
+ */
+function cutWord(text: string, limit: number): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  if (flat.length <= limit) return flat;
+  const space = flat[limit] === " " ? limit : flat.lastIndexOf(" ", limit - 1);
+  const end = space >= limit - CUT_BACKOFF && space > 0 ? space : limit;
+  return `${flat.slice(0, end).trimEnd()}… (${flat.length} chars)`;
+}
+
+/**
+ * T-344: the budgeted pick-up prints whole up to this many characters. It is a guard against a runaway record, not a budget:
+ * the pick-up is the one line a rolled session needs, and the long layout prints 3-4 KB pick-ups whole.
+ */
+const PICK_UP_SAFETY_CHARS = 4000;
+
+/**
+ * T-344: the pick-up's cut, used only past PICK_UP_SAFETY_CHARS. The text ends after its last whole sentence inside the cap,
+ * so a clause is printed whole or not at all. `1. ` and `12. ` are list markers, not sentence ends. With no sentence end in
+ * the second half of the cap, the cut is `cutWord`'s.
+ */
+function cutSentence(text: string, limit: number): string {
+  const flat = text.replace(/\s+/g, " ").trim();
+  if (flat.length <= limit) return flat;
+  let end = -1;
+  for (const m of flat.slice(0, limit + 1).matchAll(/(?<!(?:^|\s)\d{1,3})[.;!?](?= )/g)) end = (m.index ?? 0) + 1;
+  return end >= limit / 2 ? `${flat.slice(0, end)}… (${flat.length} chars)` : cutWord(flat, limit);
+}
+
+/**
+ * T-312: which watch-outs print when there are more than `cap`. An item that carries `expires` is kept before one that does
+ * not, so the time-limited item is never the hidden one; the kept items print in the record's order. At or under the cap the
+ * list is returned as it is.
+ */
+function shownWatch(live: readonly WatchOut[], cap: number): WatchOut[] {
+  if (live.length <= cap) return [...live];
+  const index = live.map((_, n) => n);
+  const expiring = index.filter((n) => watchExpires(live[n]!) !== null);
+  const plain = index.filter((n) => watchExpires(live[n]!) === null);
+  const keep = new Set([...expiring, ...plain].slice(0, cap));
+  return live.filter((_, n) => keep.has(n));
+}
+
+/**
+ * Has this watch-out expired? A number is the LAST SESSION it prints in; an ISO date is the last DAY. With no session number
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cut(t.title, 100)}` : `- ${id} (not in the record)`);
+===
+      else out.push(t ? `- [${t.priority}] ${t.id} ${cutWord(t.title, 100)}` : `- ${id} (not in the record)`);
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  // T-302: the merged note rides the pick-up line and is paid for out of the pick-up's cap, so the budget does not grow.
+  // T-316 S2: MAYBE SHIPPED rides it after the merged note, paid for the same way.
+  const noteRoom = [i.mergedCitations, i.maybeShipped].reduce((n, x) => n + (x ? x.length + 3 : 0), 0);
+  const pickUp = own
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, HANDOFF_CAPS.pickUpChars - noteRoom)
+===
+  // T-302, T-316 S2: the merged note and MAYBE SHIPPED ride the pick-up line, so they add no line.
+  // T-344: the pick-up prints whole (four seats lost the later steps of a numbered procedure to the old 400 cap on 2026-11-17),
+  // and the notes no longer take room from it. BRIEFING_BUDGET is measured without the pick-up text.
+  const pickUp = own
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cutSentence(own.pick_up, PICK_UP_SAFETY_CHARS)
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+      out.push("WATCH OUT");
+      for (const w of live.slice(0, CAPS.watch)) out.push(`- ${cut(watchText(w), CAPS.watchChars)}`);
+===
+      // T-312: a capped list says its total on the header, so a cap reads as a cap. A list that fits keeps the bare header.
+      out.push(live.length > CAPS.watch ? `WATCH OUT (${live.length}):` : "WATCH OUT");
+      for (const w of shownWatch(live, CAPS.watch)) out.push(`- ${cutWord(watchText(w), CAPS.watchChars)}`);
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+    h.open_questions.filter((q) => questionResolvedBy(q) === null && questionOwner(q)?.toLowerCase() === "aaron").map((q) => `${cut(questionText(q), CAPS.question)} (${h.seat})`),
+  );
+  if (waiting.length > 0) {
+    out.push("WAITING ON AARON:");
+===
+    h.open_questions.filter((q) => questionResolvedBy(q) === null && questionOwner(q)?.toLowerCase() === "aaron").map((q) => `${cutWord(questionText(q), CAPS.question)} (${h.seat})`),
+  );
+  // T-312: an empty list prints "none", so "nothing is waiting" and "not checked" do not look the same.
+  if (waiting.length === 0) out.push("WAITING ON AARON: none");
+  if (waiting.length > 0) {
+    out.push(waiting.length > CAPS.waiting ? `WAITING ON AARON (${waiting.length}):` : "WAITING ON AARON:");
+>>>
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+      else if (questionOwner(q)?.toLowerCase() !== "aaron") open.push(cut(questionText(q), CAPS.question)); // aaron's are WAITING ON AARON, once
+    }
+    if (open.length > 0 || resolved > 0) {
+      out.push("OPEN QUESTIONS");
+===
+      else if (questionOwner(q)?.toLowerCase() !== "aaron") open.push(cutWord(questionText(q), CAPS.question)); // aaron's are WAITING ON AARON, once
+    }
+    if (open.length > 0 || resolved > 0) {
+      out.push(open.length > CAPS.open ? `OPEN QUESTIONS (${open.length}):` : "OPEN QUESTIONS");
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+  const at = lines.indexOf(header);
+  if (at < 0) return [];
+  const heads = new Set(["OBJECTIVE", "NEXT", "PICK UP HERE", "WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]);
+  let end = at + 1;
+  while (end < lines.length && !heads.has(lines[end]!) && !/^(Gaps: |Working tree|Latest brief|Skills: |## End)/.test(lines[end]!)) end++;
+===
+  // T-312: a capped list's header carries its total (`WATCH OUT (5):`), and an empty WAITING prints `WAITING ON AARON: none`.
+  const total = `${header.replace(/:$/, "")} (`;
+  const at = lines.findIndex((l) => l === header || l.startsWith(total));
+  if (at < 0) return [];
+  const heads = new Set(["OBJECTIVE", "NEXT", "PICK UP HERE", "WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]);
+  let end = at + 1;
+  while (end < lines.length && !heads.has(lines[end]!) && !/^(Gaps: |Working tree|Latest brief|Skills: |## End|WATCH OUT \(|WAITING ON AARON|OPEN QUESTIONS \()/.test(lines[end]!)) end++;
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+  it("omits the section when nothing is waiting, a resolved question is not waiting, and an ownerless question never is", () => {
+    const state = stateWith([{ open_questions: [q("answered", { owner: "aaron", resolved_by: "D-9" }), q("no owner"), "plain"] }]);
+    expect(render(state)).not.toContain("WAITING ON AARON:");
+  });
+===
+  it("prints `WAITING ON AARON: none` when nothing is waiting (T-312): a resolved question is not waiting, and an ownerless question never is", () => {
+    const state = stateWith([{ open_questions: [q("answered", { owner: "aaron", resolved_by: "D-9" }), q("no owner"), "plain"] }]);
+    expect(render(state).filter((l) => l.startsWith("WAITING ON AARON"))).toEqual(["WAITING ON AARON: none"]);
+  });
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+      { first_rev: 20, session_uuid: "new", open_questions: [] },
+    ]);
+    expect(render(state)).not.toContain("WAITING ON AARON:");
+===
+      { first_rev: 20, session_uuid: "new", open_questions: [] },
+    ]);
+    expect(render(state).filter((l) => l.startsWith("WAITING ON AARON"))).toEqual(["WAITING ON AARON: none"]);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+describe("(d) NEXT only when the objective names task ids, and then exactly those", () => {
+===
+describe("T-312 and T-344: a cap reads as a cap, and a cut does not split a fact", () => {
+  const q = (text: string, extra: Record<string, unknown> = {}) => ({ text, ...extra });
+  const pickUp = (lines: string[]): string => lines[lines.indexOf("PICK UP HERE") + 1]!;
+  const words = (n: number): string => "word ".repeat(n);
+
+  it("T312-1 a capped list's header carries the total; a list that fits keeps the bare header", () => {
+    const five = ["a", "b", "c", "d", "e"];
+    const capped = render(stateWith([{ watch_out: ["w1", "w2", "w3", "w4"], open_questions: [...five.map((t) => q(t, { owner: "aaron" })), ...five.map((t) => `open ${t}`), "open f"] }]));
+    expect(capped).toContain("WATCH OUT (4):");
+    expect(capped).toContain("WAITING ON AARON (5):");
+    expect(capped).toContain("OPEN QUESTIONS (6):");
+    for (const bare of ["WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]) expect(capped, bare).not.toContain(bare);
+    expect(section(capped, "WATCH OUT")).toEqual(["- w1", "- w2", "- w3", "+1 more: state.json handoffs[].watch_out"]);
+    expect(section(capped, "WAITING ON AARON:")).toEqual(["- a (developer)", "- b (developer)", "+3 more: state.json handoffs[].open_questions"]);
+    expect(section(capped, "OPEN QUESTIONS")).toEqual(["- open a", "- open b", "+4 more: state.json handoffs[].open_questions"]);
+
+    const fits = render(stateWith([{ watch_out: ["w1", "w2", "w3"], open_questions: [q("a", { owner: "aaron" }), q("b", { owner: "aaron" }), "o1", "o2"] }]));
+    for (const bare of ["WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]) expect(fits, bare).toContain(bare);
+    expect(fits.filter((l) => /^(WATCH OUT|WAITING ON AARON|OPEN QUESTIONS) \(/.test(l))).toEqual([]);
+  });
+
+  it("T312-2 past the cap an item that expires is shown before one that does not, in the record's order", () => {
+    const watch_out = ["plain 1", "plain 2", "plain 3", { text: "dated", expires: "2026-11-24" }, { text: "numbered", expires: 999 }];
+    expect(section(render(stateWith([{ watch_out }])), "WATCH OUT")).toEqual(["- plain 1", "- dated", "- numbered", "+2 more: state.json handoffs[].watch_out"]);
+    const fits = ["plain 1", { text: "dated", expires: "2026-11-24" }, "plain 2"];
+    expect(section(render(stateWith([{ watch_out: fits }])), "WATCH OUT"), "at the cap nothing is reordered").toEqual(["- plain 1", "- dated", "- plain 2"]);
+  });
+
+  it("T312-3 no question owned by aaron prints one line, `WAITING ON AARON: none`, above OPEN QUESTIONS; the default layout prints no such line", () => {
+    const state = stateWith([{ watch_out: ["w1"], open_questions: ["for anyone"] }]);
+    const lines = render(state);
+    expect(lines.filter((l) => l.startsWith("WAITING ON AARON"))).toEqual(["WAITING ON AARON: none"]);
+    expect(lines.indexOf("WAITING ON AARON: none")).toBe(lines.indexOf("OPEN QUESTIONS") - 1);
+    expect(section(lines, "WATCH OUT")).toEqual(["- w1"]);
+    expect(render(state, { seat: "qa" }).filter((l) => l.startsWith("WAITING ON AARON")), "a reader with no handoff of its own").toEqual(["WAITING ON AARON: none"]);
+    expect(render(state, { budget: false }).join("\n")).not.toContain("WAITING ON AARON");
+  });
+
+  it("T344-1 the pick-up prints whole past the old 400 cap, a note riding the line takes nothing from it, and past 4000 it ends at a whole sentence", () => {
+    const head = `${words(60)}reading due on 2026-11-16.`;
+    const pick_up = `${head} Else on 2026-11-23 ${Array.from({ length: 40 }, () => "tail").join(" ")}`;
+    expect(head.length).toBe(326);
+    expect(pick_up.length).toBeGreaterThan(HANDOFF_CAPS.pickUpChars);
+    expect(pickUp(render(stateWith([{ pick_up }])))).toBe(pick_up);
+    const note = "Already in origin/master (last fetch): aaaaaaaa, bbbbbbbb, cccccccc, dddddddd";
+    const shipped = "MAYBE SHIPPED (3): T-117 T-149 T-159, see /sync";
+    expect(pickUp(render(stateWith([{ pick_up }]), { mergedCitations: note, maybeShipped: shipped }))).toBe([pick_up, note, shipped].join(" · "));
+    // Past the safety cap: thirteen 326-character sentences are 4250 characters; twelve end at 3923, inside 4000.
+    const runaway = Array.from({ length: 13 }, () => head).join(" ");
+    expect(runaway.length).toBe(4250);
+    expect(pickUp(render(stateWith([{ pick_up: runaway }])))).toBe(`${Array.from({ length: 12 }, () => head).join(" ")}… (4250 chars)`);
+  });
+
+  it("T344-2 a cut watch-out, question or NEXT title backs off to a space, so a date is not split; the length is still named", () => {
+    const watch = `${words(39)}due 2026-11-24 and then more words here`;
+    const question = `${words(31)}on 2026-11-24 then more words to pass the cap`;
+    const lines = render(stateWith([{ watch_out: [watch], open_questions: [question, q(question, { owner: "aaron" })] }]));
+    expect(section(lines, "WATCH OUT")).toEqual([`- ${words(39)}due… (${watch.length} chars)`]);
+    expect(section(lines, "OPEN QUESTIONS")).toEqual([`- ${words(31)}on… (${question.length} chars)`]);
+    expect(section(lines, "WAITING ON AARON:")).toEqual([`- ${words(31)}on… (${question.length} chars) (developer)`]);
+
+    const open = (SIA.tasks as Array<{ id: string; status: string; priority: string }>).find((t) => t.status !== "done")!;
+    const title = `${words(19)}by 2026-11-24 and more`;
+    const tasks = (SIA.tasks as Array<{ id: string }>).map((t) => (t.id === open.id ? { ...t, title } : t));
+    const next = section(render(stateWith([{}], { tasks, objective: { text: `Do ${open.id}.`, since_session: 5 } })), "NEXT");
+    expect(next).toEqual([`- [${open.priority}] ${open.id} ${words(19)}by… (${title.length} chars)`]);
+  });
+});
+
+describe("(d) NEXT only when the objective names task ids, and then exactly those", () => {
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+  const size = (lines: string[]): { lines: number; chars: number } => ({ lines: lines.length, chars: lines.join("\n").length });
+===
+  // T-344: the pick-up prints whole, so the budget is measured on the briefing EXCLUDING the pick-up text a row passes in.
+  const size = (lines: string[], pickUp = ""): { lines: number; chars: number } => ({ lines: lines.length, chars: lines.join("\n").length - pickUp.length });
+  /** worst()'s pick-up as the briefing prints it: one line, whole. */
+  const WORST_PICK_UP = "Pick up ".repeat(300).trim();
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+      workingTree: `Working tree: 9 uncommitted: ${"a/b/c.ts, ".repeat(8)}+1 more`,
+    });
+    const { lines: n, chars } = size(lines);
+===
+      workingTree: `Working tree: 9 uncommitted: ${"a/b/c.ts, ".repeat(8)}+1 more`,
+    });
+    expect(lines[lines.indexOf("PICK UP HERE") + 1], "T-344: the 2399-character pick-up prints whole").toBe(WORST_PICK_UP);
+    const { lines: n, chars } = size(lines, WORST_PICK_UP);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+      missingHandoff: notice,
+    });
+    const { lines: n, chars } = size(lines);
+===
+      missingHandoff: notice,
+    });
+    const { lines: n, chars } = size(lines, WORST_PICK_UP);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    const { lines: count, chars } = size(lines);
+===
+    const { lines: count, chars } = size(lines, `OWN ${WORST_PICK_UP}`);
+    expect(lines.join("\n"), "T-344: the pick-up prints whole").toContain(`\nOWN ${WORST_PICK_UP} `);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    for (const h of ["OBJECTIVE", "NEXT", "PICK UP HERE", "WATCH OUT", "WAITING ON AARON:", "OPEN QUESTIONS"]) expect(lines, h).toContain(h);
+===
+    for (const h of ["OBJECTIVE", "NEXT", "PICK UP HERE", "WATCH OUT (17):", "WAITING ON AARON (8):", "OPEN QUESTIONS (8):"]) expect(lines, h).toContain(h);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    const { lines, chars } = size(render(state));
+===
+    const { lines, chars } = size(render(state), "p".repeat(1000));
+    expect(render(state), "T-344: the 1000-character pick-up prints whole").toContain("p".repeat(1000));
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    const { lines, chars } = size(render(parsed.data, { seat, serving: "Build abc1234 · current" }));
+===
+    const rendered = render(parsed.data, { seat, serving: "Build abc1234 · current" });
+    // T-344: the seat's own pick-up (738 characters for qa, 1.2 to 1.9 KB for planner in this record) prints whole and is not counted; a "none" line is.
+    const pick = rendered[rendered.indexOf("PICK UP HERE") + 1]!;
+    expect(pick).not.toMatch(/\(\d+ chars\)$/);
+    const { lines, chars } = size(rendered, pick.startsWith("none") ? "" : pick);
+>>>
+@@@ open-brain/tests/pipelines/session-start/handoff-by-checkout.test.ts
+<<<
+  while (end < lines.length && !HEADS.has(lines[end]!) && !/^(BROKEN|Gaps: |Working tree|Latest brief|Skills: |## End)/.test(lines[end]!)) end++;
+===
+  while (end < lines.length && !HEADS.has(lines[end]!) && !/^(BROKEN|Gaps: |Working tree|Latest brief|Skills: |## End|WAITING ON AARON: none)/.test(lines[end]!)) end++;
+>>>
+@@@ open-brain/tests/pipelines/session-start/missing-handoff.test.ts
+<<<
+    expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+  });
+
+  it("the budget still holds with 20 standing rules in the record (fixture base, not live tags)", () => {
+===
+    // T-344: the pick-up prints whole and is not counted against the budget.
+    expect(lines[lines.indexOf("PICK UP HERE") + 1]!.startsWith(`${"Pick up ".repeat(300).trim()} `)).toBe(true);
+    expect(lines.join("\n").length - "Pick up ".repeat(300).trim().length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+  });
+
+  it("the budget still holds with 20 standing rules in the record (fixture base, not live tags)", () => {
+>>>
+@@@ open-brain/tests/pipelines/session-start/missing-handoff.test.ts
+<<<
+    expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
+  });
+===
+    expect(lines.join("\n").length - "Pick up ".repeat(300).trim().length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+    expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
+  });
+>>>
+@@@ open-brain/tests/pipelines/session-start/missing-handoff.test.ts
+<<<
+      expect(lines.join("\n").length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+      expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
+===
+      expect(lines.join("\n").length - "Pick up ".repeat(300).trim().length).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+      expect(lines.some((l) => l.startsWith("STANDING RULES (20):"))).toBe(true);
+>>>
+@@@ open-brain/tests/pipelines/session-start/t302-merged-citations.test.ts
+<<<
+    it("M6 budgeted: a pick-up past its cap gives up the note's room, so the line is no longer than without the note", () => {
+===
+    it("M6 budgeted (T-344): a pick-up past the old cap prints whole, and the note is appended without taking room from it", () => {
+>>>
+@@@ open-brain/tests/pipelines/session-start/t302-merged-citations.test.ts
+<<<
+      expect(withIt.length).toBeLessThanOrEqual(without.length);
+===
+      expect(without).toBe("x".repeat(1500));
+      expect(withIt.length).toBe(without.length + 3 + NOTE.length);
+>>>
+@@@ open-brain/tests/pipelines/sync/t316-s2.test.ts
+<<<
+  it("R7 budgeted: it rides the pick-up line after the merged note and is paid for out of the pick-up's cap, so the line does not grow", () => {
+===
+  it("R7 budgeted (T-344): it rides the pick-up line after the merged note, adds no line, and takes nothing from the pick-up", () => {
+>>>
+@@@ open-brain/tests/pipelines/sync/t316-s2.test.ts
+<<<
+    const room = MERGED.length + 3 + NOTE.length + 3;
+    const pick = lines[lines.indexOf("PICK UP HERE") + 1]!;
+    expect(pick).toBe(`${"P".repeat(HANDOFF_CAPS.pickUpChars - room)}… (1000 chars) · ${MERGED} · ${NOTE}`);
+    expect(lines.join("\n").length).toBe(before.join("\n").length);
+===
+    expect(1000, "the pick-up is past the old cap").toBeGreaterThan(HANDOFF_CAPS.pickUpChars);
+    const pick = lines[lines.indexOf("PICK UP HERE") + 1]!;
+    expect(pick).toBe(`${"P".repeat(1000)} · ${MERGED} · ${NOTE}`);
+    expect(lines.join("\n").length).toBe(before.join("\n").length + 3 + NOTE.length);
+>>>
+@@@ open-brain/tests/pipelines/session-start/focus.test.ts
+<<<
+    expect(text.length, `${text.length} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+===
+    // T-344: the pick-up prints whole and is not counted against the budget.
+    const pickUpText = "Pick up ".repeat(300).trim();
+    expect(text).toContain(`\n${pickUpText}\n`);
+    expect(text.length - pickUpText.length, `${text.length} chars`).toBeLessThanOrEqual(BRIEFING_BUDGET.chars);
+>>>
