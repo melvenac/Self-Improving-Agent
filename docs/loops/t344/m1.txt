@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+      out.push(live.length > CAPS.watch ? `WATCH OUT (${live.length}):` : "WATCH OUT");
+===
+      out.push("WATCH OUT");
+>>>

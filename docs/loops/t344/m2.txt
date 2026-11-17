@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  return live.filter((_, n) => keep.has(n));
+===
+  return live.slice(0, cap);
+>>>

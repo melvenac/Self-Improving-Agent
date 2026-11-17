@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  if (waiting.length === 0) out.push("WAITING ON AARON: none");
+===
+  if (waiting.length < 0) out.push("WAITING ON AARON: none");
+>>>

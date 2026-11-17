@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cutSentence(own.pick_up, PICK_UP_SAFETY_CHARS)
+===
+    ? own.pick_up.trim() === "" ? "(nothing recorded)" : cut(own.pick_up, PICK_UP_SAFETY_CHARS)
+>>>
