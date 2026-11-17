@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 634,
+  "revision": 635,
   "project": {
     "name": "self-improving-agent"
   },
@@ -829,7 +829,7 @@
       "opened_session": 109,
       "closed_session": null,
       "supersedes": null,
-      "note": "Session 109, on Aaron's word ('Could the greeting be dynamic per seat depending on what context that agent needs' and then 'yes' to recording it, 2026-09-25, planner session). SEQUENCED AFTER T-183, which clips lines for everyone and is scored an honest no against 40,000 characters (T-183 brief amendment 1): per-seat profiles are the change that gets a non-planner greeting under. SHAPE (planner's, the developer designs): a zod-validated profile file, like the gate policies, mapping the seat (already known from AGENT.local.md at start) to its sections. Planner: everything. Developer: objective, own handoff, watch-outs, verified (count plus newest), gap ids and titles, role files. QA: verified and gaps in full, watch-outs, role files. RULE: every omitted section is PRINTED as omitted, with its count and the read-only command that shows it (G-032: a section a seat never sees is the failure). Per-seat WATCH-OUTS need a seats tag on each watch-out, a schema change, so that part waits for a migration window. NOT this task: task-aware selection (reading the brief to pick lines) or model-scored relevance. Aaron asked the same session whether each line could be scored; the planner's answer is recorded in docs/loops/planner-session-109-notes.md (exact-match rules first, a scorer only in shadow with a measured miss rate). Candidate seat: sia-builder, which touches only the render and sync code. — NOT RAISED, planner ruling session 149 (2026-09-28), on the relay that opened T-196. T-196's planner-side acceptance (HB-1: a fresh planner arms its listeners from what /start prints) does not need T-191: ob_start already prints planner.md in full, so a section there reaches the planner at /start today. T-196's data file is written so T-191 can later render each seat's rooms from it. T-191 stays P1, sequenced after T-183. It does not fix stale-record starts either: that is D-062's. — DEFERRED to P2, session 160, on Aaron's answer in the planner's window ('Defer T-191 to P2 (Recommended)'). Basis: sia-builder's Phase 1 plan docs/loops/t191-plan.md (branch docs/t191-plan @ 1e7870e8, from f8345f1b) measured the State block at 13,340 chars (developer), 16,457 (planner) and 16,841 (QA). A profile removes at most about 3.8 KB (QA tasks) and a few hundred bytes for a developer. The bulk is the role files, 23,427 chars (shared.md 17,643, which the planner checked at f8345f1b), and the D-110 shared.md split targets them. Planner rulings on the plan, kept for a later build: (1) resolve the seat by checkout map first, identity only when no map exists; (2) key by role with no per-seat override; (3) a single `omit` word; (5) ship seat_profiles OFF and turn it on in a separate record PR after QA. (4) QA's `tasks: count` is unruled. The builder slot moves to the D-110 shared.md split proposal.",
+      "note": "Session 109, on Aaron's word ('Could the greeting be dynamic per seat depending on what context that agent needs' and then 'yes' to recording it, 2026-09-25, planner session). SEQUENCED AFTER T-183, which clips lines for everyone and is scored an honest no against 40,000 characters (T-183 brief amendment 1): per-seat profiles are the change that gets a non-planner greeting under. SHAPE (planner's, the developer designs): a zod-validated profile file, like the gate policies, mapping the seat (already known from AGENT.local.md at start) to its sections. Planner: everything. Developer: objective, own handoff, watch-outs, verified (count plus newest), gap ids and titles, role files. QA: verified and gaps in full, watch-outs, role files. RULE: every omitted section is PRINTED as omitted, with its count and the read-only command that shows it (G-032: a section a seat never sees is the failure). Per-seat WATCH-OUTS need a seats tag on each watch-out, a schema change, so that part waits for a migration window. NOT this task: task-aware selection (reading the brief to pick lines) or model-scored relevance. Aaron asked the same session whether each line could be scored; the planner's answer is recorded in docs/loops/planner-session-109-notes.md (exact-match rules first, a scorer only in shadow with a measured miss rate). Candidate seat: sia-builder, which touches only the render and sync code. — NOT RAISED, planner ruling session 149 (2026-09-28), on the relay that opened T-196. T-196's planner-side acceptance (HB-1: a fresh planner arms its listeners from what /start prints) does not need T-191: ob_start already prints planner.md in full, so a section there reaches the planner at /start today. T-196's data file is written so T-191 can later render each seat's rooms from it. T-191 stays P1, sequenced after T-183. It does not fix stale-record starts either: that is D-062's. — DEFERRED to P2, session 160, on Aaron's answer in the planner's window ('Defer T-191 to P2 (Recommended)'). Basis: sia-builder's Phase 1 plan docs/loops/t191-plan.md (branch docs/t191-plan @ 1e7870e8, from f8345f1b) measured the State block at 13,340 chars (developer), 16,457 (planner) and 16,841 (QA). A profile removes at most about 3.8 KB (QA tasks) and a few hundred bytes for a developer. The bulk is the role files, 23,427 chars (shared.md 17,643, which the planner checked at f8345f1b), and the D-110 shared.md split targets them. Planner rulings on the plan, kept for a later build: (1) resolve the seat by checkout map first, identity only when no map exists; (2) key by role with no per-seat override; (3) a single `omit` word; (5) ship seat_profiles OFF and turn it on in a separate record PR after QA. (4) QA's `tasks: count` is unruled. The builder slot moves to the D-110 shared.md split proposal. — S178 input for per-seat profiles. These lines fired in the planner greeting and nobody acted on them: 'Usage: OFF → no usage gate', 23 bare STANDING RULES ids with no titles, 'Gaps: 44 open', the fleet.json STALE marker, the role-file lines (printed by the hook and again by ob_start, with different hashes 1305396 vs 5e0d80660e5c, commit sha vs content hash, unlabelled), and the hook's 'THIS TREE IS STALE' block printed twice. The SEATS line also said 'planner — claude-code sonnet' while the session ran Opus 5.5 (fleet.json data, clark's file). A profile should drop or collapse these.",
       "note_by": null,
       "closed_rev": null
     },
@@ -2618,21 +2618,6 @@
       "closed_rev": 528
     },
     {
-      "id": "T-311",
-      "title": "handoff_caps is opt-in: an uncapped handoff is accepted and clipped silently",
-      "priority": "P3",
-      "status": "done",
-      "opened_session": 173,
-      "closed_session": 174,
-      "supersedes": null,
-      "note": "Found s173: Maker's pick-up was 2830 chars and 11 watch-outs (greeting shows 400 chars, 3 items); clark's 415 cut on its own instruction. Caps (handoff-caps.ts) apply only with greeting.json handoff_caps. Maker turned it on 10-19. Candidate: scaffold and import write handoff_caps:true by default. Needs a ruling on existing projects. — s174 10-24 CLOSED, no change: the premise is false. An uncapped handoff is clipped VISIBLY, not silently: briefing.ts cut() marks every clip `... (<N> chars)` and each capped section ends `+N more: <pointer>` (since e4d4f46d, 10-03, before T-311 was filed 10-19), and every fleet project runs briefing_budget. handoff_caps (refuse an over-cap set_handoff) stays a per-repo opt-in, each planner's call: on in makerspace, explicitly off in SIA, absent elsewhere. Defaulting it on would refuse writes in four repos that never chose it.",
-      "note_by": [
-        "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
-        "0bbb03c4-d91d-496e-a6d5-43924f16405b"
-      ],
-      "closed_rev": 568
-    },
-    {
       "id": "T-312",
       "title": "Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap",
       "priority": "P3",
@@ -2640,9 +2625,10 @@
       "opened_session": 173,
       "closed_session": null,
       "supersedes": null,
-      "note": "S173 greeting review of clark session 5 (7b387bc1, fleet rev 15, greeting.json briefing_budget on). The budgeted layout (briefing.ts CAPS waiting/open 2, watch HANDOFF_CAPS.watchOuts) printed 2 Aaron items and '+3 more: state.json handoffs[].open_questions'. The seat greeted 'One question / WAITING ON AARON: L84 merge' with 5 Aaron-owned items open, one of them (incognito toggle) blocking a run and printed 2 lines above. Scorecard Q7 failed. ob_start's State block had all 5, so the data was in context; the header just gave no total, so '1' read as plausible. Fix: the headers print the total, e.g. 'WAITING ON AARON (5):' and 'WATCH OUT (6):', inside the budget (a few chars). Test: a 5-question handoff renders '(5)' in the budgeted layout; the legacy layout is byte-identical. — S173 measured before briefing: PARKED until a second instance. (1) The overflow line was already printed ('+3 more: state.json handoffs[].open_questions'), so the miss was the seat reading past a visible count, not a hidden one. A '(5)' header adds prominence, not information. (2) The bare header strings are pinned across about 15 test sites (briefing-budget.test.ts section()/heads sets, handoff-by-checkout.test.ts HEADS, fleet-ae-e3/f8 indexOf, the a2a golden, the fleet-ae-f5 snapshot), so a header change costs a wide test edit for little gain. (3) The seat-side fix landed: clark now lists every Aaron-owned item in its greeting (clark s5, 10-19). Reopen the code change if another seat's greeting under-reports WAITING ON AARON with the overflow line present; then prefer changing the overflow line ('+3 more (5 in all): ...') over the headers.",
+      "note": "S173 greeting review of clark session 5 (7b387bc1, fleet rev 15, greeting.json briefing_budget on). The budgeted layout (briefing.ts CAPS waiting/open 2, watch HANDOFF_CAPS.watchOuts) printed 2 Aaron items and '+3 more: state.json handoffs[].open_questions'. The seat greeted 'One question / WAITING ON AARON: L84 merge' with 5 Aaron-owned items open, one of them (incognito toggle) blocking a run and printed 2 lines above. Scorecard Q7 failed. ob_start's State block had all 5, so the data was in context; the header just gave no total, so '1' read as plausible. Fix: the headers print the total, e.g. 'WAITING ON AARON (5):' and 'WATCH OUT (6):', inside the budget (a few chars). Test: a 5-question handoff renders '(5)' in the budgeted layout; the legacy layout is byte-identical. — S173 measured before briefing: PARKED until a second instance. (1) The overflow line was already printed ('+3 more: state.json handoffs[].open_questions'), so the miss was the seat reading past a visible count, not a hidden one. A '(5)' header adds prominence, not information. (2) The bare header strings are pinned across about 15 test sites (briefing-budget.test.ts section()/heads sets, handoff-by-checkout.test.ts HEADS, fleet-ae-e3/f8 indexOf, the a2a golden, the fleet-ae-f5 snapshot), so a header change costs a wide test edit for little gain. (3) The seat-side fix landed: clark now lists every Aaron-owned item in its greeting (clark s5, 10-19). Reopen the code change if another seat's greeting under-reports WAITING ON AARON with the overflow line present; then prefer changing the overflow line ('+3 more (5 in all): ...') over the headers. — S178 second instance (Atlas self-review of its own greeting): WATCH OUT printed 3 of 4 items plus '+1 more: state.json handoffs[].watch_out'. The hidden one was the only time-limited item (Lenovo Wi-Fi stall, expires 2026-11-24), and start.md says WATCH OUT is every item. The agent did not notice the cap either. In the same greeting there was no WAITING ON AARON line at all when the record had none, so 'none' and 'not checked' looked the same (scorecard Q6). The park condition (a second instance) is now met. Add: an expiring or newest item is never the one hidden, and an empty WAITING ON AARON prints 'WAITING ON AARON: none (handoff open_questions)'.",
       "note_by": [
-        "4a1f437b-3711-4f60-8d0d-4e85764e8bde"
+        "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
       "closed_rev": null
     },
@@ -3078,6 +3064,76 @@
         "6f5b8a9d-429d-4c93-99a4-996634877932"
       ],
       "closed_rev": 633
+    },
+    {
+      "id": "T-343",
+      "title": "Stale-tree warning counts commits, not content: fires when the only missing commit is the merge of this tree's own records",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S178 self-review of the Atlas greeting. The hook and ob_start both printed 'THIS TREE IS STALE: 1 commit behind origin/master' in capitals; the one commit was d863d7ff, the merge of PR #1116 (this tree's own rev-634 records), with identical content and the same rev on both sides. Fix: compare trees (git diff --quiet HEAD origin/master, or rev plus tree hash), and stay quiet when the content matches. Test: a checkout one pure-merge commit behind with an identical tree prints no STALE line; one with a real content diff still does.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-344",
+      "title": "Briefing truncation cuts a line mid-fact: pick-up lost its own fallback date ('else 11-2… (308 chars)')",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S178 self-review. The PICK UP line was cut at 'T-334 reading due on/after 11-16 (200+ primary draws) else 11-2… (308 chars)', which drops the one date the line exists to carry. The NEXT title for T-334 was cut too ('(150 chars)'). The char budget truncates blind. Fix: truncate at a clause or sentence boundary, or never cut a line that is the pick-up; give the total instead. Test: a pick-up whose last clause holds a date renders that date whole.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-345",
+      "title": "Two 'next' answers disagree: fleet On Deck says T-046, ob_start NEXT says T-334, with three P2 tasks open and no stated rule",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S178 self-review. The SessionStart FLEET ON DECK line for SIA read 'next: T-046'; the briefing's NEXT listed only T-334. T-046, T-191 and T-334 are all P2. Neither says how it chose, and T-046 is also flagged MAYBE SHIPPED while the handoff calls it env work. Fix: one ordering function shared by the dashboard /api/ondeck and briefing NEXT, and NEXT shows every task at the top priority (or its count). Test: three open P2 tasks render the same first id in both, and NEXT shows '(3 at P2)'.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-346",
+      "title": "Due dates in the record are never compared with today: T-334's reading was a day overdue and the briefing did not say so",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S178 self-review (2026-11-17). The objective and pick-up both say T-334's first reading is 'on or after 2026-11-16'. Nothing in the briefing marked it DUE; only the agent's own FLAGS did. Fix: a task or handoff carries a structured due date (or the renderer parses ISO dates in the pick-up), and the briefing prints 'DUE: T-334 (since 11-16)'. Test: a pick-up with a past due date renders a DUE line; a future one does not.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-347",
+      "title": "Seat identity conflict not surfaced: tracked AGENT.md and CLAUDE.md say Forge (developer), the hook and ob_start say Atlas (planner)",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S178 self-review. In sia-planner the tracked .agents/AGENT.md frontmatter is name: Forge, role: developer, partner: Atlas, and the project CLAUDE.md says 'You are Forge'. The hook and ob_start said Atlas (planner), presumably from AGENT.local.md. Neither output named the conflict, and /start step 4 (read AGENT.md) would hand the agent the wrong identity. Fix: ob_start prints 'Identity: Atlas (AGENT.local.md overrides tracked AGENT.md: Forge)' whenever the two differ, and the CLAUDE.md identity section stops naming a seat in a tree that serves several. Test: a tree with differing local and tracked names prints the override line.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
     }
   ],
   "verified": [
@@ -6555,48 +6611,6 @@
     },
     {
       "seat": "planner",
-      "pick_up": "(1) CLOSE T-255 on A3: Maker, after an explicit /mcp reconnect open-brain, runs /start. It should print 'Build c23fff6 · current', the note 'Session_57.md was already taken and was not overwritten; this session's log is Session_58.md', and Session_58 must carry a Session ID line; a 2nd ob_start prints the reuse marker. Then Maker deletes Session_57.md (A4). As of s166's end there was no Session_58 in makerspace-planner. (2) D-143 small fixes only; support Maker. (3) D-144: no Claude except planners. Aaron stopped all work 10-09 ~23:3x CDT; resume late 10-10.",
-      "watch_out": [
-        "D-144 (Aaron 10-09): no Claude Code except planners. Dev goes to Cursor (cursor-builder, room k575sfwr9wcx3r8fw83g3bc00x8fmar3); QA goes to Grok bots (grok-sia-review room k57c639j4wkyp3y3vhfxxytn1s8fsdx6; grok-audit room k575fscdqd291tgnpg51yttgbh8frzq8, which also takes 'MAKERSPACE JOB:'). A gate that needs Claude goes to clark, then Aaron.",
-        "A rebuild reaches no running seat until that seat runs an explicit /mcp reconnect open-brain AFTER the rebuild time. /clear keeps the old process. T-254 (merged 5d633411) makes processes started after that rebuild report STALE PROCESS on the build line.",
-        "Records PRs move master. Land them only AFTER clark merges the code PR in flight, or that PR goes BEHIND (D-117) and needs another update-branch plus CI run.",
-        "Every Cursor brief passes ~/Worktrees/cursor-brief-checklist.md. Restate items 6 (single-process tests plus a cap) and 17 (PID-only kills) in the dispatch. Run every mutant first-hand: builders have skipped mutants and posted empty diffs."
-      ],
-      "open_questions": [
-        "Aaron (via clark): a post-freeze recall-trigger loop? (under D-143, small fixes only)",
-        "Aaron (via clark): #437 r10 or T-245 Option A? (parked)"
-      ],
-      "session": 166,
-      "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#437",
-            "qa_status": "in_progress",
-            "note": "PARKED (D-130)"
-          },
-          {
-            "ref": "#425",
-            "qa_status": "accepted",
-            "note": "PARKED (D-130)"
-          },
-          {
-            "ref": "#470",
-            "qa_status": "in_progress",
-            "note": "PARKED (D-130) with #463 #465"
-          }
-        ],
-        "frozen_sha": null,
-        "questions_for_aaron": [],
-        "rulings": [
-          "s166: T-250 merged f64ff7c6 CLOSED (A3 passed on Maker); T-254 STALE PROCESS build line merged 5d633411 CLOSED (F1-F5 follow-ups); T-255 session log id + next-free-number merged c23fff60, open until A3; D-144 no CC except planners; #545 live PASS; grok-audit P4 forwarded to clark; P3 forwarded to Maker (tie-breaks done, Maker T-090..093)."
-        ]
-      },
-      "session_uuid": "73efb2c2-ab62-465b-a3fd-bf635649141f",
-      "checkout": "sia-planner",
-      "first_rev": 369
-    },
-    {
-      "seat": "planner",
       "pick_up": "Roll at Aaron's word (2026-10-11 23:00Z, clark's window, verified: 'yes, merge. Let's roll all agents on the desktop when ready.'). Open SIA code PRs, all planner-ACCEPTed and reviewed, all BEHIND master: #576 T-245 r4 (2ce8eeb5; CC Opus review CHANGES -> r4 fixed), #579 T-253 (72f384a3; grok-audit APPROVE of 4349c14c, identical patch-id), #580 T-252 (4f607a6f; grok-audit APPROVE of 6e3374d5, identical patch-id), #588 T-256 r2 (49899106; CC Opus review CHANGES -> r2 fixed). Aaron's 'yes, merge' was relayed to clark; clark merges. Before EACH merge: gh pr update-branch, prove the PR's own diff unchanged (git patch-id --stable of merge-base..old vs origin/master..new; src/tests diff old..new empty), wait CI test, send clark the new head. #595 T-257 (da164982, tests-only): SG-1 merge by clark when grok-audit's review of da164982 (job posted, atlas<->grok-audit room) APPROVEs and CI passes. After #576 merges + SIA rebuild: T-245 A4 live (doubled Cursor start/end: one claim, one feedback row, one shadow line; a resume within 120 s is NOT skipped; BOTH doubled payloads carry cursor_version), then the D-148 recall-effect analysis per docs/loops/recall-effect-design-2026-10-11.md (uncommitted local run; anchor = transcript attachment toolUseID).",
       "watch_out": [
         "Every merge sends the other open PRs BEHIND: update-branch each just before its own merge, never in bulk.",
@@ -7111,14 +7125,6 @@
       "first_rev": 263
     },
     {
-      "n": 166,
-      "date": "2026-10-09",
-      "uuid": "73efb2c2-ab62-465b-a3fd-bf635649141f",
-      "seat": "planner",
-      "checkout": "sia-planner",
-      "first_rev": 369
-    },
-    {
       "n": 167,
       "date": "2026-10-11",
       "uuid": "6646f34e-175c-4a4e-a39b-a2878070946b",
@@ -7200,6 +7206,15 @@
       "checkout": "sia-planner",
       "first_rev": 618,
       "last_work_rev": 633
+    },
+    {
+      "n": 178,
+      "date": "2026-11-17",
+      "uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
+      "seat": "planner",
+      "checkout": "sia-planner",
+      "first_rev": 635,
+      "last_work_rev": 635
     }
   ]
 }
