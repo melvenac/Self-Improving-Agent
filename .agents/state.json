@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 638,
+  "revision": 639,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3159,6 +3159,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "S178 review. Courier s9: 'Latest brief: docs/loops/build1-brief.md (2026-11-09)' and 'READS OWED: none', while the pick-up says three builds are queued from briefs on branch loop/b1117. The agent caught it by reading the pick-up. Fix: when the handoff names a branch or a docs/loops path absent from the tree, say so on the Latest brief line ('handoff names loop/b1117: not in this checkout'), or search remote branches' docs/loops by commit date. Test: a handoff naming an absent brief path renders the notice.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-350",
+      "title": "Dashboard greeting scorecard vs the six real greetings (11-17 roll): two seats missing, a false red alarm, and columns that cannot see the real misses",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "S178, Atlas read http://100.124.212.87:4100/ (v1.60.0, a5f225e) at about 14:30Z and compared its Greeting scorecard with the six planner transcripts from the 11-17 roll. SIA side (greeting-metrics rows and alarm ids) unless marked Prism. (1) Herald and Beam have no row, though both started 20 to 25 min earlier; both are on the long briefing layout. Nothing on the page says rows are missing. (2) tree_stale is red for Atlas (x1) and Courier (x3) with the text 'its record is older than master's'. Atlas's tree was content-identical; Courier's record was the same rev with one CI file different. Same cause as T-343; the alarm text is wrong in both cases. (3) Fits, Looked and Pointers read pass/all/all for every seat, while four pick-ups were cut mid-procedure (T-344), watch-outs and questions were capped without totals (T-312), and two seats left owed reads unread (T-348). The columns measure size and presence, not these. (4) First action shows 'miss, 297h ago' for five seats: it is the previous session's outcome because one is written only at /end, so the column says nothing about the current start. By transcript, Beam and Herald matched their pick-up; Relay, Maker and Prism messaged clark first; Courier had not acted. (5) Asks: Courier 3/0 and Maker 0/0, while the Lanes panel on the same page lists 5 and 3 'Questions for Aaron (upcoming)' and 'Needs you now' says nothing needs him. Courier's greeting had two WAITING ON AARON items. (6) objective_stale for Relay is correct and Relay acted on it. Prism 'lag 1' matches the briefing's '(handoff +1)'. Prism's hook-reported HANDOFF MISSING has no alarm. (7) Recall trigger arms panel agrees with T-334 reading 1: draws per arm, 299 only in element/path classes, error-match 0. (8) Prism: the page rendered without the Greeting scorecard, alarms, recall arms and CI sections in about half of 8 fetches (about 60 KB against 107 KB). (9) Prism: desktop, QA PC and laptop show holder 'IDLE (Aaron stopped work 10-09 ...) 922h' while marked busy.",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -7277,7 +7291,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 638
+      "last_work_rev": 639
     }
   ]
 }
