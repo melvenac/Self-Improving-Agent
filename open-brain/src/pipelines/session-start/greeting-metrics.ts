@@ -65,6 +65,8 @@ export interface GreetingMetricsInput {
   startedAt: number;
   /** greeting.json `briefing_budget` is on. */
   budget: boolean;
+  /** T-352: renderBriefing's BriefingPrinted.pickUpPrintedChars, the printed pick-up text the budget does not count. Absent is 0. */
+  pickUpPrintedChars?: number;
 }
 
 export interface GreetingMetricsRow {
@@ -84,6 +86,10 @@ export interface GreetingMetricsRow {
   lag_reason: "no_record" | "seat_unresolved" | "no_own_handoff" | "no_stamp" | null;
   greeting_chars: number;
   greeting_bytes: number;
+  /**
+   * T-352: with the budgeted layout on, BRIEFING_BUDGET.chars plus the printed pick-up's length, so `greeting_chars <=
+   * budget_chars` exactly when the briefing without its pick-up is within the budget. Null when the layout is off.
+   */
   budget_chars: number | null;
   report_bytes: number;
   start_ms: number;
@@ -175,7 +181,7 @@ export function buildGreetingMetricsRow(input: GreetingMetricsInput, previous: P
     lag_reason: lagReason,
     greeting_chars: block.length,
     greeting_bytes: Buffer.byteLength(block, "utf8"),
-    budget_chars: input.budget ? BRIEFING_BUDGET.chars : null,
+    budget_chars: input.budget ? BRIEFING_BUDGET.chars + (input.pickUpPrintedChars ?? 0) : null,
     report_bytes: Buffer.byteLength(report, "utf8"),
     start_ms: Math.max(0, Math.round(now.getTime() - input.startedAt)),
     serving_build: input.serving.match(/^Build ([0-9a-f]{7,})/)?.[1] ?? null,
