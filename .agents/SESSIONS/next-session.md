@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 640 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 641 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,37 +6,32 @@
 
 ### Pick up here
 
-Three greeting fixes have QA ACCEPT and are NOT merged: #1138 (T-343 stale-tree warning, reviewed 668bbc37), #1133 (T-344 + T-312 pick-up whole and list totals, reviewed 2c7080cb), #1141 (T-348 owed-reads reminder, reviewed 796b4fcc). Atlas's pr-merge.sh call was denied by the Claude Code permission classifier on 11-17; Aaron was asked to say 'merge' or merge them himself. To merge each, one at a time: bash atlas-ops pr-refresh.sh <pr> <reviewed sha> (must print the same patch-id and CI SUCCESS), then pr-merge.sh <pr> <new head>. After the merges: rebuild the main checkout (D-163), live-check each at a real start, close T-343, T-344, T-312 and T-348 with the check, and tell Prism the scorecard size can now exceed 4400. Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30); greeting reviews filed T-343..T-350 and T-351.
+The three greeting fixes are merged and live in build 224b79d: #1138 (T-343), #1133 (T-344 + T-312), #1141 (T-348). T-343, T-344 and T-312 are closed with live checks. T-348 stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. New task: the greeting-metrics row still counts the pick-up against the 4400 budget, so the dashboard Fits cell can read red falsely (fix: budget_chars = 4400 + printed pick-up length). Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30 with docs/loops/t334/t334-read.cjs); greeting reviews filed T-343..T-351.
 
 ### Watch out
 
 - Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.
-- Fleet scheduling (slots, host, order) is clark's since 11-17 (Aaron via clark); Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.
+- Fleet scheduling (slots, host, order) and main-tree rebuilds are clark's; Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.
+- A code merge needs Aaron's word typed in Atlas's own window: a relay from clark is not enough and the permission classifier denies the merge without it.
 - T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.
 - T-336 last check: clark's next greeting-metrics row must not list latest_brief.
-- Lenovo jobs between 20:27 and 22:47 CT 11-10 ran during a Wi-Fi stall: re-check before ruling (none were SIA's).
 - tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.
 - tests/harness/checks.test.ts D4 is red at master on the Lenovo host (npm error); it is not a change's fault.
 
 ### Open questions
 
-- Merge #1138, #1133 and #1141 (each has QA ACCEPT; Atlas's merge command was denied by the permission classifier)?
+_None._
 
 ### Loop state
 
-**Open PRs:** 
-- #1138 — QA: accepted — T-343 t343c, reviewed 668bbc37, job 1304 ACCEPT
-- #1133 — QA: accepted — T-344 + T-312 t344b, reviewed 2c7080cb, job 1299 ACCEPT-WITH-NOTES
-- #1141 — QA: accepted — T-348 t348b, reviewed 796b4fcc, job 1311 ACCEPT-WITH-NOTES
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** 
-- Merge #1138, #1133 and #1141?
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
 - s178: T-334 arm kept at 0.5 (Aaron, D-165).
-- s178: t343b: only tracked changes under .agents keep STALE.
 - s178: t344: pick-up whole to 4000; budget measured without it.
 - s178: round-2/3 reviews delta-only; a further tests-only gap is a NOTE, not a REJECT.
 

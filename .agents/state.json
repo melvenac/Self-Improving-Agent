@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 640,
+  "revision": 641,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2621,16 +2621,16 @@
       "id": "T-312",
       "title": "Budgeted briefing: WAITING ON AARON (and WATCH OUT) headers carry the total, so a cap reads as a cap",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 173,
-      "closed_session": null,
+      "closed_session": 178,
       "supersedes": null,
-      "note": "S173 greeting review of clark session 5 (7b387bc1, fleet rev 15, greeting.json briefing_budget on). The budgeted layout (briefing.ts CAPS waiting/open 2, watch HANDOFF_CAPS.watchOuts) printed 2 Aaron items and '+3 more: state.json handoffs[].open_questions'. The seat greeted 'One question / WAITING ON AARON: L84 merge' with 5 Aaron-owned items open, one of them (incognito toggle) blocking a run and printed 2 lines above. Scorecard Q7 failed. ob_start's State block had all 5, so the data was in context; the header just gave no total, so '1' read as plausible. Fix: the headers print the total, e.g. 'WAITING ON AARON (5):' and 'WATCH OUT (6):', inside the budget (a few chars). Test: a 5-question handoff renders '(5)' in the budgeted layout; the legacy layout is byte-identical. — S173 measured before briefing: PARKED until a second instance. (1) The overflow line was already printed ('+3 more: state.json handoffs[].open_questions'), so the miss was the seat reading past a visible count, not a hidden one. A '(5)' header adds prominence, not information. (2) The bare header strings are pinned across about 15 test sites (briefing-budget.test.ts section()/heads sets, handoff-by-checkout.test.ts HEADS, fleet-ae-e3/f8 indexOf, the a2a golden, the fleet-ae-f5 snapshot), so a header change costs a wide test edit for little gain. (3) The seat-side fix landed: clark now lists every Aaron-owned item in its greeting (clark s5, 10-19). Reopen the code change if another seat's greeting under-reports WAITING ON AARON with the overflow line present; then prefer changing the overflow line ('+3 more (5 in all): ...') over the headers. — S178 second instance (Atlas self-review of its own greeting): WATCH OUT printed 3 of 4 items plus '+1 more: state.json handoffs[].watch_out'. The hidden one was the only time-limited item (Lenovo Wi-Fi stall, expires 2026-11-24), and start.md says WATCH OUT is every item. The agent did not notice the cap either. In the same greeting there was no WAITING ON AARON line at all when the record had none, so 'none' and 'not checked' looked the same (scorecard Q6). The park condition (a second instance) is now met. Add: an expiring or newest item is never the one hidden, and an empty WAITING ON AARON prints 'WAITING ON AARON: none (handoff open_questions)'. — S178 fleet review, more instances: Prism '+2 more' watch-outs (Prism went to the record and listed both in FLAGS, which is the cost the header total would avoid), Courier '+1 more' watch-out, '+1 more' WAITING ON AARON and '+3 more' open questions with no totals, Maker '+1 more' open questions. Courier and Maker did not mention the hidden items. — s178: implemented in PR #1133 with T-344 (header totals when items are hidden, expiring watch-outs kept first, 'WAITING ON AARON: none'). QA ACCEPT-WITH-NOTES; not merged, see T-344.",
+      "note": "S173 greeting review of clark session 5 (7b387bc1, fleet rev 15, greeting.json briefing_budget on). The budgeted layout (briefing.ts CAPS waiting/open 2, watch HANDOFF_CAPS.watchOuts) printed 2 Aaron items and '+3 more: state.json handoffs[].open_questions'. The seat greeted 'One question / WAITING ON AARON: L84 merge' with 5 Aaron-owned items open, one of them (incognito toggle) blocking a run and printed 2 lines above. Scorecard Q7 failed. ob_start's State block had all 5, so the data was in context; the header just gave no total, so '1' read as plausible. Fix: the headers print the total, e.g. 'WAITING ON AARON (5):' and 'WATCH OUT (6):', inside the budget (a few chars). Test: a 5-question handoff renders '(5)' in the budgeted layout; the legacy layout is byte-identical. — S173 measured before briefing: PARKED until a second instance. (1) The overflow line was already printed ('+3 more: state.json handoffs[].open_questions'), so the miss was the seat reading past a visible count, not a hidden one. A '(5)' header adds prominence, not information. (2) The bare header strings are pinned across about 15 test sites (briefing-budget.test.ts section()/heads sets, handoff-by-checkout.test.ts HEADS, fleet-ae-e3/f8 indexOf, the a2a golden, the fleet-ae-f5 snapshot), so a header change costs a wide test edit for little gain. (3) The seat-side fix landed: clark now lists every Aaron-owned item in its greeting (clark s5, 10-19). Reopen the code change if another seat's greeting under-reports WAITING ON AARON with the overflow line present; then prefer changing the overflow line ('+3 more (5 in all): ...') over the headers. — S178 second instance (Atlas self-review of its own greeting): WATCH OUT printed 3 of 4 items plus '+1 more: state.json handoffs[].watch_out'. The hidden one was the only time-limited item (Lenovo Wi-Fi stall, expires 2026-11-24), and start.md says WATCH OUT is every item. The agent did not notice the cap either. In the same greeting there was no WAITING ON AARON line at all when the record had none, so 'none' and 'not checked' looked the same (scorecard Q6). The park condition (a second instance) is now met. Add: an expiring or newest item is never the one hidden, and an empty WAITING ON AARON prints 'WAITING ON AARON: none (handoff open_questions)'. — S178 fleet review, more instances: Prism '+2 more' watch-outs (Prism went to the record and listed both in FLAGS, which is the cost the header total would avoid), Courier '+1 more' watch-out, '+1 more' WAITING ON AARON and '+3 more' open questions with no totals, Maker '+1 more' open questions. Courier and Maker did not mention the hidden items. — s178: implemented in PR #1133 with T-344 (header totals when items are hidden, expiring watch-outs kept first, 'WAITING ON AARON: none'). QA ACCEPT-WITH-NOTES; not merged, see T-344. — s178 11-17: merged with T-344 as #1133 (d9bd8ac3). Live check PASS (build 224b79d): 'WATCH OUT (7):' with three shown and '+4 more: state.json handoffs[].watch_out'. A list that fits prints no count ('WAITING ON AARON:' with one item), by design.",
       "note_by": [
         "4a1f437b-3711-4f60-8d0d-4e85764e8bde",
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
-      "closed_rev": null
+      "closed_rev": 641
     },
     {
       "id": "T-313",
@@ -3070,29 +3070,29 @@
       "id": "T-343",
       "title": "Stale-tree warning counts commits, not content: fires when the only missing commit is the merge of this tree's own records",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 178,
-      "closed_session": null,
+      "closed_session": 178,
       "supersedes": null,
-      "note": "S178 self-review of the Atlas greeting. The hook and ob_start both printed 'THIS TREE IS STALE: 1 commit behind origin/master' in capitals; the one commit was d863d7ff, the merge of PR #1116 (this tree's own rev-634 records), with identical content and the same rev on both sides. Fix: compare trees (git diff --quiet HEAD origin/master, or rev plus tree hash), and stay quiet when the content matches. Test: a checkout one pure-merge commit behind with an identical tree prints no STALE line; one with a real content diff still does. — S178 fleet review, second instance with a twist: Courier s9 printed 'THIS TREE IS STALE: 3 commits behind origin/main' with the record at rev 193 on both sides. The real difference was one CI workflow file (#279, 8 lines); the record was identical, yet the warning says 'anything read from the record here describes an older state'. Courier's FLAGS told Aaron to fetch and pull before acting on the record. So the fix needs two cases: identical tree prints nothing; same record but different code says 'record current, N non-record file(s) differ'. — s178: built and reviewed in three rounds. PR #1138 (t343c, CAND 668bbc37) has QA ACCEPT (job 1304); refreshed head 6ab17b53 had CI green and patch-id equal to the reviewed commit. NOT MERGED: Atlas's merge command was denied by the Claude Code permission classifier, waiting on Aaron. Round 1 (job 1285) REJECT: uncommitted tracked .agents edits got the calm line; --no-renames and -z unpinned. Round 2 (job 1295) REJECT: the .agents pathspec unpinned. Planner ruling in t343b: only TRACKED changes under .agents keep STALE, because ob_start's own untracked session log would otherwise defeat the calm line in A2A and Makerspace. Superseded PRs #1125 and #1131 closed. After merge: rebuild the main checkout, then live-check the next start in a tree that is behind by a records merge only.",
+      "note": "S178 self-review of the Atlas greeting. The hook and ob_start both printed 'THIS TREE IS STALE: 1 commit behind origin/master' in capitals; the one commit was d863d7ff, the merge of PR #1116 (this tree's own rev-634 records), with identical content and the same rev on both sides. Fix: compare trees (git diff --quiet HEAD origin/master, or rev plus tree hash), and stay quiet when the content matches. Test: a checkout one pure-merge commit behind with an identical tree prints no STALE line; one with a real content diff still does. — S178 fleet review, second instance with a twist: Courier s9 printed 'THIS TREE IS STALE: 3 commits behind origin/main' with the record at rev 193 on both sides. The real difference was one CI workflow file (#279, 8 lines); the record was identical, yet the warning says 'anything read from the record here describes an older state'. Courier's FLAGS told Aaron to fetch and pull before acting on the record. So the fix needs two cases: identical tree prints nothing; same record but different code says 'record current, N non-record file(s) differ'. — s178: built and reviewed in three rounds. PR #1138 (t343c, CAND 668bbc37) has QA ACCEPT (job 1304); refreshed head 6ab17b53 had CI green and patch-id equal to the reviewed commit. NOT MERGED: Atlas's merge command was denied by the Claude Code permission classifier, waiting on Aaron. Round 1 (job 1285) REJECT: uncommitted tracked .agents edits got the calm line; --no-renames and -z unpinned. Round 2 (job 1295) REJECT: the .agents pathspec unpinned. Planner ruling in t343b: only TRACKED changes under .agents keep STALE, because ob_start's own untracked session log would otherwise defeat the calm line in A2A and Makerspace. Superseded PRs #1125 and #1131 closed. After merge: rebuild the main checkout, then live-check the next start in a tree that is behind by a records merge only. — s178 11-17: merged as #1138 (5d993d01) on Aaron's typed word, QA ACCEPT job 1304 on 668bbc37, same patch-id after refresh, CI green. Live check PASS (build 224b79d, sia-planner 13 commits behind by code and docs only, record rev 640 on both sides): ob_start printed 'Tree currency: 13 commits behind origin/master, record current with origin/master ...; 13 non-record files differ', not THIS TREE IS STALE.",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
-      "closed_rev": null
+      "closed_rev": 641
     },
     {
       "id": "T-344",
       "title": "Briefing truncation cuts a line mid-fact: pick-up lost its own fallback date ('else 11-2… (308 chars)')",
       "priority": "P3",
-      "status": "open",
+      "status": "done",
       "opened_session": 178,
-      "closed_session": null,
+      "closed_session": 178,
       "supersedes": null,
-      "note": "S178 self-review. The PICK UP line was cut at 'T-334 reading due on/after 11-16 (200+ primary draws) else 11-2… (308 chars)', which drops the one date the line exists to carry. The NEXT title for T-334 was cut too ('(150 chars)'). The char budget truncates blind. Fix: truncate at a clause or sentence boundary, or never cut a line that is the pick-up; give the total instead. Test: a pick-up whose last clause holds a date renders that date whole. — S178 fleet review, four more instances in one roll: PICK UP cut at Courier 793 chars (mid-procedure, in the middle of a command), Prism 1002, Relay 724, Maker 354. Each pick-up was a numbered procedure written for the roll, and the cut removed the later steps. Herald and Beam are on the unbudgeted layout and got theirs whole (6.8 KB and 8.0 KB briefings). After a roll the pick-up is the one line that must not be cut. — s178: built with T-312 as tag t344/t344b. PR #1133 (CAND 2c7080cb) has QA ACCEPT-WITH-NOTES (job 1299); refresh proved the patch-id and CI was green at 98ca7ce5, since gone BEHIND. NOT MERGED: merge command denied by the permission classifier, waiting on Aaron. Planner ruling: the pick-up prints whole up to a 4000-char safety cap and BRIEFING_BUDGET (4400) is measured without the pick-up; past 4000 it ends at the last sentence in the second half of the cap. Round 1 (job 1287) REJECT was four surviving mutants, tests only. Known side effect: greeting-metrics still writes the full size, so the dashboard scorecard can read over 4400 for a long pick-up (tell Prism after merge). Follow-up: the three start.md copies say 'WATCH OUT is every item'.",
+      "note": "S178 self-review. The PICK UP line was cut at 'T-334 reading due on/after 11-16 (200+ primary draws) else 11-2… (308 chars)', which drops the one date the line exists to carry. The NEXT title for T-334 was cut too ('(150 chars)'). The char budget truncates blind. Fix: truncate at a clause or sentence boundary, or never cut a line that is the pick-up; give the total instead. Test: a pick-up whose last clause holds a date renders that date whole. — S178 fleet review, four more instances in one roll: PICK UP cut at Courier 793 chars (mid-procedure, in the middle of a command), Prism 1002, Relay 724, Maker 354. Each pick-up was a numbered procedure written for the roll, and the cut removed the later steps. Herald and Beam are on the unbudgeted layout and got theirs whole (6.8 KB and 8.0 KB briefings). After a roll the pick-up is the one line that must not be cut. — s178: built with T-312 as tag t344/t344b. PR #1133 (CAND 2c7080cb) has QA ACCEPT-WITH-NOTES (job 1299); refresh proved the patch-id and CI was green at 98ca7ce5, since gone BEHIND. NOT MERGED: merge command denied by the permission classifier, waiting on Aaron. Planner ruling: the pick-up prints whole up to a 4000-char safety cap and BRIEFING_BUDGET (4400) is measured without the pick-up; past 4000 it ends at the last sentence in the second half of the cap. Round 1 (job 1287) REJECT was four surviving mutants, tests only. Known side effect: greeting-metrics still writes the full size, so the dashboard scorecard can read over 4400 for a long pick-up (tell Prism after merge). Follow-up: the three start.md copies say 'WATCH OUT is every item'. — s178 11-17: merged as #1133 (d9bd8ac3) on Aaron's typed word, QA ACCEPT-WITH-NOTES job 1299 on 2c7080cb, same patch-id after refresh, CI green. Live check PASS (build 224b79d): the planner pick-up (about 1,000 characters) printed whole in the budgeted briefing; before it was cut at 400.",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
-      "closed_rev": null
+      "closed_rev": 641
     },
     {
       "id": "T-345",
@@ -3144,7 +3144,7 @@
       "opened_session": 178,
       "closed_session": null,
       "supersedes": null,
-      "note": "S178 review of the six planner greetings after the 11-17 Claude Code roll. Beam: READS OWED (5), read AGENT.md only before FLAGS; tb3-brief, jg1-brief and ps2c-reply unread and unmentioned. Prism: READS OWED (3), read none before FLAGS, unmentioned. Relay, Maker and Herald read theirs and said so. The line is advice with no instrument behind it. Fix options, deterministic first: ob_start records owed reads for the session and the recall-trigger PostToolUse hook (or ob_state's first write) reports the ones not yet opened; or the briefing asks for the FLAGS line to name each owed read as read or deferred. Test: a session that writes state with an owed read unopened gets the reminder once. — s178: built as t348/t348b. PR #1141 (CAND 796b4fcc) has QA ACCEPT-WITH-NOTES (job 1311); refreshed head e5e9aff2 had CI green and the reviewed patch-id. NOT MERGED: merge command denied by the permission classifier, waiting on Aaron. Design as built: an unconditional once-per-session reminder on the first applied ob_state write ('READS OWED at start (N), confirm each was read: ...'), not a check, because nothing in SIA records a Read (the recall-trigger hook never sees Read; role-reads.local.json records what ob_start printed). Store: .reads-owed.json in the per-project end-record directory. Accepted limit: a second session started in the same checkout erases the first one's unprinted reminder. Round 1 (job 1301) REJECT was two surviving mutants, tests only. Review notes for a follow-up row: the 7th and 8th recorded paths are pinned by count only. Superseded PR #1135 closed.",
+      "note": "S178 review of the six planner greetings after the 11-17 Claude Code roll. Beam: READS OWED (5), read AGENT.md only before FLAGS; tb3-brief, jg1-brief and ps2c-reply unread and unmentioned. Prism: READS OWED (3), read none before FLAGS, unmentioned. Relay, Maker and Herald read theirs and said so. The line is advice with no instrument behind it. Fix options, deterministic first: ob_start records owed reads for the session and the recall-trigger PostToolUse hook (or ob_state's first write) reports the ones not yet opened; or the briefing asks for the FLAGS line to name each owed read as read or deferred. Test: a session that writes state with an owed read unopened gets the reminder once. — s178: built as t348/t348b. PR #1141 (CAND 796b4fcc) has QA ACCEPT-WITH-NOTES (job 1311); refreshed head e5e9aff2 had CI green and the reviewed patch-id. NOT MERGED: merge command denied by the permission classifier, waiting on Aaron. Design as built: an unconditional once-per-session reminder on the first applied ob_state write ('READS OWED at start (N), confirm each was read: ...'), not a check, because nothing in SIA records a Read (the recall-trigger hook never sees Read; role-reads.local.json records what ob_start printed). Store: .reads-owed.json in the per-project end-record directory. Accepted limit: a second session started in the same checkout erases the first one's unprinted reminder. Round 1 (job 1301) REJECT was two surviving mutants, tests only. Review notes for a follow-up row: the 7th and 8th recorded paths are pinned by count only. Superseded PR #1135 closed. — s178 11-17: merged as #1141 (224b79de) on Aaron's typed word, QA ACCEPT-WITH-NOTES job 1311 on 796b4fcc, same patch-id after refresh, CI green. Live check NOT DONE: the only start since the rebuild had 'READS OWED: none', so no reminder was due. Close at the first start that lists a read owed, when the first applied ob_state prints 'READS OWED at start (N), confirm each was read: ...' once.",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -3187,6 +3187,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "S178. T-343, T-344 and T-348 each got REJECT from the Opus review for surviving mutants with the source judged correct (five REJECTs, all test gaps; one also had a real source finding, T-343 round 1). Each cost a new brief, a docs PR, a full build with the 500 s suite, a new PR and a second review: about 40 minutes and three Opus runs per round, seven extra jobs in all. Two causes. (1) The build's mutants are the drafter's own, so they are red by construction; the reviewer's independent hunt is where the gaps show. (2) The loop has no cheap path for 'add these rows to the reviewed branch': a job starts from master and re-applies everything. Options: a 'rows' job kind that checks out CAND, adds test files only (a guard refuses any src diff), runs the named mutants and pushes to the same PR; or have the build brief ask the builder for an independent surviving-mutant hunt before READY. Also from this session: byte-compare.sh cannot take edit files from two loop directories (done by hand three times); the build reply's test count used a narrower file list than the review's (168 vs 1228), so a close-out should name the command behind a count; a brief that adds a test file must git add it before the full suite (s4-guards D1b); tests/harness/checks.test.ts D4 is red at master on the Lenovo host (npm 'could not determine executable to run'), which every run had to explain.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-352",
+      "title": "Greeting metrics row: a long pick-up reads as over budget on the dashboard scorecard",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s178 11-17 (Atlas, from Prism's question via clark, Prism T-128). Since #1133 the pick-up prints whole (to 4000) and the 4400 budget is measured without it, but greeting-metrics.ts:176-178 still writes greeting_chars = the whole block and budget_chars = BRIEFING_BUDGET.chars. The dashboard's Fits cell is red when greeting_chars > budget_chars, so a correct briefing with a long pick-up reads red. Planner's proposed fix: budget_chars = BRIEFING_BUDGET.chars + the printed pick-up's length (greeting_chars stays the true size; no dashboard change). Until then a red Fits with a long pick-up is a false alarm.",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -7163,51 +7177,24 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Three greeting fixes have QA ACCEPT and are NOT merged: #1138 (T-343 stale-tree warning, reviewed 668bbc37), #1133 (T-344 + T-312 pick-up whole and list totals, reviewed 2c7080cb), #1141 (T-348 owed-reads reminder, reviewed 796b4fcc). Atlas's pr-merge.sh call was denied by the Claude Code permission classifier on 11-17; Aaron was asked to say 'merge' or merge them himself. To merge each, one at a time: bash atlas-ops pr-refresh.sh <pr> <reviewed sha> (must print the same patch-id and CI SUCCESS), then pr-merge.sh <pr> <new head>. After the merges: rebuild the main checkout (D-163), live-check each at a real start, close T-343, T-344, T-312 and T-348 with the check, and tell Prism the scorecard size can now exceed 4400. Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30); greeting reviews filed T-343..T-350 and T-351.",
+      "pick_up": "The three greeting fixes are merged and live in build 224b79d: #1138 (T-343), #1133 (T-344 + T-312), #1141 (T-348). T-343, T-344 and T-312 are closed with live checks. T-348 stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. New task: the greeting-metrics row still counts the pick-up against the 4400 budget, so the dashboard Fits cell can read red falsely (fix: budget_chars = 4400 + printed pick-up length). Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30 with docs/loops/t334/t334-read.cjs); greeting reviews filed T-343..T-351.",
       "watch_out": [
         "Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.",
-        "Fleet scheduling (slots, host, order) is clark's since 11-17 (Aaron via clark); Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.",
+        "Fleet scheduling (slots, host, order) and main-tree rebuilds are clark's; Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.",
+        "A code merge needs Aaron's word typed in Atlas's own window: a relay from clark is not enough and the permission classifier denies the merge without it.",
         "T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.",
         "T-336 last check: clark's next greeting-metrics row must not list latest_brief.",
-        {
-          "expires": "2026-11-24",
-          "text": "Lenovo jobs between 20:27 and 22:47 CT 11-10 ran during a Wi-Fi stall: re-check before ruling (none were SIA's)."
-        },
         "tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.",
         "tests/harness/checks.test.ts D4 is red at master on the Lenovo host (npm error); it is not a change's fault."
       ],
-      "open_questions": [
-        {
-          "owner": "aaron",
-          "text": "Merge #1138, #1133 and #1141 (each has QA ACCEPT; Atlas's merge command was denied by the permission classifier)?"
-        }
-      ],
+      "open_questions": [],
       "session": 178,
       "loop_state": {
-        "open_prs": [
-          {
-            "ref": "#1138",
-            "qa_status": "accepted",
-            "note": "T-343 t343c, reviewed 668bbc37, job 1304 ACCEPT"
-          },
-          {
-            "ref": "#1133",
-            "qa_status": "accepted",
-            "note": "T-344 + T-312 t344b, reviewed 2c7080cb, job 1299 ACCEPT-WITH-NOTES"
-          },
-          {
-            "ref": "#1141",
-            "qa_status": "accepted",
-            "note": "T-348 t348b, reviewed 796b4fcc, job 1311 ACCEPT-WITH-NOTES"
-          }
-        ],
+        "open_prs": [],
         "frozen_sha": null,
-        "questions_for_aaron": [
-          "Merge #1138, #1133 and #1141?"
-        ],
+        "questions_for_aaron": [],
         "rulings": [
           "s178: T-334 arm kept at 0.5 (Aaron, D-165).",
-          "s178: t343b: only tracked changes under .agents keep STALE.",
           "s178: t344: pick-up whole to 4000; budget measured without it.",
           "s178: round-2/3 reviews delta-only; a further tests-only gap is a NOTE, not a REJECT."
         ]
@@ -7215,7 +7202,7 @@
       "session_uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "written_rev": 640
+      "written_rev": 641
     }
   ],
   "sessions": [
@@ -7333,7 +7320,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 640
+      "last_work_rev": 641
     }
   ]
 }
