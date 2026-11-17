@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 636,
+  "revision": 637,
   "project": {
     "name": "self-improving-agent"
   },
@@ -2946,7 +2946,7 @@
       "opened_session": 175,
       "closed_session": null,
       "supersedes": null,
-      "note": "s175 11-02. T-331's arm has been ON at 0.5 since 6c98303b (11-02). Arms in trigger_fires: injected = state 'injected'; withheld = state 'silent' AND query has a 'withheld:<ids>' token. Needs: (1) Prism: per-arm counts on the dashboard (clark relays; Aaron asked for it 11-01); (2) an outcome measure, e.g. whether the lesson's failure recurs later in the same session (the same pattern in a later command), per arm. Let data accumulate a week or two before any reading; 299 dominates (about half of injections). — s177 11-05: measure fixed BEFORE reading, in docs/loops/t334-measure-plan.md. Unit is the draw (session, entry) at first exposure, NOT the fire: an injected entry is deduped for the session and a withheld one refires, so 42 vs 184 fires came from 42 vs 58 draws. Outcome: a later match:/error-match: token for that entry in the same session, read identically in both arms; keyed draws only (about 80%). Arm instrument healthy: 100/100 draws reproduce, 0 pairs in both arms. No code change needed. First reading on or after 2026-11-16 with at least 200 keyed draws, else 11-23. Item 1 for Prism: dashboard counts must be per draw, not per fire. The arm comparison has not been computed; what was seen is listed in the plan. — s177 11-06 CORRECTION: 'keyed draws only (about 80%)' above is wrong. Recounted with a self-tested parser: 104 of 107 draws keyed; injected 45 (match 37, path 6, element 2), withheld 62 (match 51, path 10, element 1). The first count's regex lost its backslashes in a Bash heredoc and covered one arm. The read gate is now at least 200 draws in the primary classes (match or error-match; 88 on 11-06). Dashboard: Prism's T-083 takes per-draw counts with the path split and will not show recurrence. — s178 11-17 READING 1 (docs/loops/t334-reading-1.md; script docs/loops/t334/t334-read.cjs, run in gate mode first). 215 primary draws (gate 200), 0 pairs in both arms. Primary, a later match:/error-match: naming the entry: injected 57/106 (53.8%) vs withheld 67/109 (61.5%), diff -7.7 pts, session-cluster 95% CI [-20.8, +9.1] over 52 sessions. No detectable difference at this n. Without 299 the result is identical, because 299 has no primary draws (its injections come through element paths). error-match: had 0 later hits in both arms, too sparse to read. path-match: 11/14 vs 13/15. Per the plan, nothing changes on this result alone. Open: (a) a ruling on the arm (keep running at 0.5 for a second look, or end it); (b) Prism's T-083 per-draw dashboard counts. The seat-skip: tokens (1,353) are not covered by the plan; see the reading's notes.",
+      "note": "s175 11-02. T-331's arm has been ON at 0.5 since 6c98303b (11-02). Arms in trigger_fires: injected = state 'injected'; withheld = state 'silent' AND query has a 'withheld:<ids>' token. Needs: (1) Prism: per-arm counts on the dashboard (clark relays; Aaron asked for it 11-01); (2) an outcome measure, e.g. whether the lesson's failure recurs later in the same session (the same pattern in a later command), per arm. Let data accumulate a week or two before any reading; 299 dominates (about half of injections). — s177 11-05: measure fixed BEFORE reading, in docs/loops/t334-measure-plan.md. Unit is the draw (session, entry) at first exposure, NOT the fire: an injected entry is deduped for the session and a withheld one refires, so 42 vs 184 fires came from 42 vs 58 draws. Outcome: a later match:/error-match: token for that entry in the same session, read identically in both arms; keyed draws only (about 80%). Arm instrument healthy: 100/100 draws reproduce, 0 pairs in both arms. No code change needed. First reading on or after 2026-11-16 with at least 200 keyed draws, else 11-23. Item 1 for Prism: dashboard counts must be per draw, not per fire. The arm comparison has not been computed; what was seen is listed in the plan. — s177 11-06 CORRECTION: 'keyed draws only (about 80%)' above is wrong. Recounted with a self-tested parser: 104 of 107 draws keyed; injected 45 (match 37, path 6, element 2), withheld 62 (match 51, path 10, element 1). The first count's regex lost its backslashes in a Bash heredoc and covered one arm. The read gate is now at least 200 draws in the primary classes (match or error-match; 88 on 11-06). Dashboard: Prism's T-083 takes per-draw counts with the path split and will not show recurrence. — s178 11-17 READING 1 (docs/loops/t334-reading-1.md; script docs/loops/t334/t334-read.cjs, run in gate mode first). 215 primary draws (gate 200), 0 pairs in both arms. Primary, a later match:/error-match: naming the entry: injected 57/106 (53.8%) vs withheld 67/109 (61.5%), diff -7.7 pts, session-cluster 95% CI [-20.8, +9.1] over 52 sessions. No detectable difference at this n. Without 299 the result is identical, because 299 has no primary draws (its injections come through element paths). error-match: had 0 later hits in both arms, too sparse to read. path-match: 11/14 vs 13/15. Per the plan, nothing changes on this result alone. Open: (a) a ruling on the arm (keep running at 0.5 for a second look, or end it); (b) Prism's T-083 per-draw dashboard counts. The seat-skip: tokens (1,353) are not covered by the plan; see the reading's notes. — s178: Aaron kept the arm at 0.5 (decision of 11-17). The second look is due around 2026-11-30, using the same script and labelled a second look.",
       "note_by": [
         "0147d7e6-acbf-49eb-bd66-534461b3098f",
         "6f5b8a9d-429d-4c93-99a4-996634877932",
@@ -6534,6 +6534,12 @@
       "date": "2026-10-26",
       "note": "TYPED by Aaron in Atlas's own window (AskUserQuestion, session 175): 'Config only; merge (Recommended)'. Asked over #1013 (T-324 S2 edits cli-session-end.ts). A refinement of D-163.",
       "standing": true
+    },
+    {
+      "id": "D-165",
+      "title": "Aaron 11-17 (AskUserQuestion, Atlas s178): keep the T-331 recall-trigger arm at 0.5 after T-334 reading 1 (no detectable difference, CI [-20.8, +9.1])",
+      "date": "2026-11-17",
+      "note": "Chosen over two alternatives: ending the arm and always injecting, or ending it and stopping injection. There will be a second look around 2026-11-30, reported as a second look under docs/loops/t334-measure-plan.md, with the same script (docs/loops/t334/t334-read.cjs)."
     }
   ],
   "handoffs": [
@@ -7098,6 +7104,34 @@
       "checkout": "sia-planner",
       "first_rev": 618,
       "written_rev": 634
+    },
+    {
+      "seat": "planner",
+      "pick_up": "Backlog by priority (D-145). s178: T-334 reading 1 is done (docs/loops/t334-reading-1.md). No detectable difference; Aaron kept the arm at 0.5, with a second look around 11-30. The greeting self-review filed T-343..T-347 and added notes to T-312 (park condition now met) and T-191. The next pickable items are the P2s T-046 (env) and T-191 (design), or the cheap P3 greeting fixes T-343/T-344.",
+      "watch_out": [
+        "Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.",
+        "T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.",
+        "T-336 last check: clark's next greeting-metrics row must not list latest_brief.",
+        {
+          "expires": "2026-11-24",
+          "text": "Lenovo jobs between 20:27 and 22:47 CT 11-10 ran during a Wi-Fi stall: re-check before ruling (none were SIA's)."
+        },
+        "tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state."
+      ],
+      "open_questions": [],
+      "session": 178,
+      "loop_state": {
+        "open_prs": [],
+        "frozen_sha": null,
+        "questions_for_aaron": [],
+        "rulings": [
+          "s178: T-334 arm kept at 0.5 (Aaron); records PRs #1117 and #1118 merged."
+        ]
+      },
+      "session_uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
+      "checkout": "sia-planner",
+      "first_rev": 635,
+      "written_rev": 637
     }
   ],
   "sessions": [
@@ -7215,7 +7249,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 636
+      "last_work_rev": 637
     }
   ]
 }
