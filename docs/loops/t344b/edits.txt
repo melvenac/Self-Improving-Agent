@@ -1,0 +1,61 @@
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+    expect(capped).toContain("WAITING ON AARON (5):");
+===
+    expect(capped).toContain("WAITING ON AARON (5):");
+    expect(capped.filter((l) => l.startsWith("WAITING ON AARON")), "no `none` line beside a section that has items").toEqual(["WAITING ON AARON (5):"]);
+>>>
+@@@ open-brain/tests/pipelines/session-start/briefing-budget.test.ts
+<<<
+  });
+});
+
+describe("(d) NEXT only when the objective names task ids, and then exactly those", () => {
+===
+  });
+
+  it("T344-3 a pick-up of exactly 4000 characters prints whole, though a sentence ends in its second half", () => {
+    // 2500 + 10 + 1 + 1485 + 4 = 4000. The full stop is at index 2509, past half the cap.
+    const pick_up = `${words(500)}Then stop. ${"tail ".repeat(297)}done`;
+    expect(pick_up.length).toBe(4000);
+    expect(pick_up.indexOf(". ")).toBe(2509);
+    const line = pickUp(render(stateWith([{ pick_up }])));
+    expect(line.length).toBe(4000);
+    expect(line).toBe(pick_up);
+  });
+
+  it("T344-4 a 5000-character pick-up whose only sentence end is in the first half is cut at the cap, not at that sentence", () => {
+    // 6 + 4990 + 4 = 5000. The only full stop is at index 4. Index 4000 is a space, so the cut is at 4000.
+    const pick_up = `Done. ${words(998)}word`;
+    expect(pick_up.length).toBe(5000);
+    expect(pick_up[4000]).toBe(" ");
+    const line = pickUp(render(stateWith([{ pick_up }])));
+    expect(line.length).toBe(4014);
+    expect(line).toBe(`Done. ${words(798)}word… (5000 chars)`);
+  });
+
+  it("T344-5 a numbered pick-up past 4000 characters ends after a step's sentence, never on a bare `12.`", () => {
+    // Steps 1-9 are 328 characters, 10 and 11 are 329; joined by spaces they are 3620. Then ` 12. ` and 1000 more without a full stop.
+    const steps = Array.from({ length: 11 }, (_, n) => `${n + 1}. ${words(64)}done.`).join(" ");
+    const pick_up = `${steps} 12. ${words(199)}word`;
+    expect(steps.length).toBe(3620);
+    expect(pick_up.length).toBe(4624);
+    expect(pick_up.slice(3621, 3625)).toBe("12. ");
+    const line = pickUp(render(stateWith([{ pick_up }])));
+    expect(line.length).toBe(3634);
+    expect(line).toBe(`${steps}… (4624 chars)`);
+  });
+
+  it("T344-6 a watch-out whose last space before the cap is exactly 24 characters back is cut at that space", () => {
+    // 176 + 12 + 150 = 338. The only space is at index 176, which is 200 - 24.
+    const watch = `${"a".repeat(176)} 2026-11-24T${"b".repeat(150)}`;
+    expect(watch.length).toBe(338);
+    expect(watch.indexOf(" ")).toBe(HANDOFF_CAPS.watchOutChars - 24);
+    const sec = section(render(stateWith([{ watch_out: [watch] }])), "WATCH OUT");
+    expect(sec).toEqual([`- ${"a".repeat(176)}… (338 chars)`]);
+    expect(sec[0]!.length).toBe(191);
+  });
+});
+
+describe("(d) NEXT only when the objective names task ids, and then exactly those", () => {
+>>>

@@ -1,0 +1,8 @@
+@@@ open-brain/src/pipelines/session-start/briefing.ts
+<<<
+  if (flat.length <= limit) return flat;
+  let end = -1;
+===
+  if (flat.length < limit) return flat;
+  let end = -1;
+>>>
