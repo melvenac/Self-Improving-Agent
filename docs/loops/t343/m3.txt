@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  if (files.length === 0 || files.some((f) => f.startsWith(".agents/"))) return null;
+===
+  if (files.length === 0) return null;
+>>>

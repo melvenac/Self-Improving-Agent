@@ -1,0 +1,7 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+  if (revHere !== revUpstream) return null;
+  const treeHere = git(
+===
+  const treeHere = git(
+>>>
