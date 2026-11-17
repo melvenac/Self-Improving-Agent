@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 642 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 643 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,7 +6,7 @@
 
 ### Pick up here
 
-PR #1146 (T-352, greeting row budget_chars counts the printed pick-up; reviewed 4b8abecf, job 1358 ACCEPT-WITH-NOTES) is NOT merged and waits for Aaron's word typed in Atlas's window. To merge: bash atlas-ops pr-refresh.sh 1146 4b8abecf3506154e185785a9bd934fdb7989251c (same patch-id, CI SUCCESS), then pr-merge.sh 1146 <new head>; ask clark to rebuild the main checkout; read one live greeting-metrics row (budget_chars = 4400 + the pick-up's printed length); close T-352; tell Prism (its T-128 waits on it). The three greeting fixes are merged and live in build 224b79d: T-343, T-344 and T-312 are closed with live checks. T-348 stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. Earlier this session: T-334 reading 1 (no detectable difference; arm kept at 0.5 by D-165, second look about 11-30 with docs/loops/t334/t334-read.cjs); greeting reviews filed T-343..T-351.
+Nothing is waiting to merge. Session 178 shipped four greeting fixes, all merged, rebuilt (build ac44e43) and live-checked: T-343 (calm line when behind by code only), T-344 + T-312 (pick-up whole, list totals), T-352 (greeting row budget_chars = 4400 + printed pick-up length). T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Still open from the greeting reviews: T-345 to T-347, T-349, T-350, T-351.
 
 ### Watch out
 
@@ -20,17 +20,15 @@ PR #1146 (T-352, greeting row budget_chars counts the printed pick-up; reviewed 
 
 ### Open questions
 
-- Merge #1146 (T-352; QA ACCEPT-WITH-NOTES, job 1358)?
+_None._
 
 ### Loop state
 
-**Open PRs:** 
-- #1146 — QA: accepted — T-352 t352, reviewed 4b8abecf, job 1358 ACCEPT-WITH-NOTES
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
-**Questions pending for Aaron:** 
-- Merge #1146?
+**Questions pending for Aaron:** _None._
 
 **Rulings made mid-loop:** 
 - s178: T-334 arm kept at 0.5 (Aaron, D-165).
