@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/tree-currency.ts
+<<<
+"--untracked-files=no", "--", ".agents"]
+===
+"--untracked-files=no"]
+>>>
