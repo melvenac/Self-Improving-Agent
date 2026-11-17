@@ -1,0 +1,6 @@
+@@@ open-brain/src/server.ts
+<<<
+    const owed = readsOwedReminder(projectRoot, stateSession.id, r.dry_run);
+===
+    const owed = readsOwedReminder(projectRoot, stateSession.id, false);
+>>>

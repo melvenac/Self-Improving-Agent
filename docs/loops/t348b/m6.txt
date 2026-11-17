@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/session-start/reads-owed.ts
+<<<
+  if (collect) collect.push(...paths);
+===
+  if (collect) collect.push(...paths.slice(0, 6));
+>>>

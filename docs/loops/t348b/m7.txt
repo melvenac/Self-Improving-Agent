@@ -1,0 +1,7 @@
+@@@ open-brain/src/server.ts
+<<<
+      lines.push(`ob_state refused: ${r.error}`);
+===
+      lines.push(`ob_state refused: ${r.error}`);
+      readsOwedReminder(projectRoot, stateSession.id, false);
+>>>
