@@ -1,0 +1,9 @@
+@@@ open-brain/src/pipelines/sync/index.ts
+<<<
+  checks.push(checkTaskAssignees(options.projectRoot));
+  // T-353: a bootstrapped project with no greeting.json, or one git ignores, runs with every greeting feature off.
+  checks.push(checkGreetingFlags(options.projectRoot));
+===
+  checks.push(checkTaskAssignees(options.projectRoot));
+  // T-353: a bootstrapped project with no greeting.json, or one git ignores, runs with every greeting feature off.
+>>>

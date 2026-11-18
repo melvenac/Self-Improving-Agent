@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+    execFileSync("git", ["check-ignore", "-q", "--", rel], {
+===
+    execFileSync("git", ["check-ignore", "-q", "--no-index", "--", rel], {
+>>>

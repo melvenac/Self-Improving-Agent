@@ -1,0 +1,8 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+  if (!parseState(readFileSync(statePath, "utf-8")).ok) {
+    return { name, severity: "skip", message: "skipped: .agents/state.json is not a valid record (see state-schema)", report: true };
+===
+  if (false) {
+    return { name, severity: "skip", message: "skipped: .agents/state.json is not a valid record (see state-schema)", report: true };
+>>>

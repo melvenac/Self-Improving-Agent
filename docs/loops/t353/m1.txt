@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+    if (existsSync(dest)) { skipped.push({ path: f.path, reason:
+===
+    if (false) { skipped.push({ path: f.path, reason:
+>>>

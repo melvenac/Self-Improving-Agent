@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+  if (answer.kind === "ignored") return { name, severity: "warn", message: GREETING_FLAGS_IGNORED, report: true };
+===
+  if (answer.kind === "ignored") return { name, severity: "issue", message: GREETING_FLAGS_IGNORED, report: true };
+>>>
