@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 646 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 647 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -26,6 +26,8 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-350** Dashboard greeting scorecard vs the six real greetings (11-17 roll): two seats missing, a false red alarm, and columns that cannot see the real misses
 - [ ] **T-351** A review REJECT for a surviving mutant costs a full build and review round even when the source is right: let a tests-only delta land on the reviewed branch
 - [ ] **T-353** /bootstrap does not write .agents/SYSTEM/greeting.json, so a new project gets the legacy briefing and no scorecard rows
+- [ ] **T-354** briefing_focus prints 'no seat map ... seat is unknown' on every start in a project with no hub-partner-seats.json
+- [ ] **T-355** handoff_by_checkout: a fresh record's first greeting loses 'Your handoff: none yet (fresh record)' and shows a legacy, unattributed handoff
 
 ## Done (last 3 sessions)
 
