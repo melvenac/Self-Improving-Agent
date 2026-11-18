@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 647 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 648 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -28,6 +28,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-353** /bootstrap does not write .agents/SYSTEM/greeting.json, so a new project gets the legacy briefing and no scorecard rows
 - [ ] **T-354** briefing_focus prints 'no seat map ... seat is unknown' on every start in a project with no hub-partner-seats.json
 - [ ] **T-355** handoff_by_checkout: a fresh record's first greeting loses 'Your handoff: none yet (fresh record)' and shows a legacy, unattributed handoff
+- [ ] **T-356** The budgeted briefing prints 'WAITING ON AARON' in every project, including installs that are not Aaron's
 
 ## Done (last 3 sessions)
 
