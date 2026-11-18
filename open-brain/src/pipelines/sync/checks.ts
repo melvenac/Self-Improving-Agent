@@ -17,7 +17,7 @@ import { diffReferrerLineHashes, matchingLineHashes } from "./retirements-line-h
 import { parseFrontmatter } from "../../shared/parse-frontmatter.js";
 import { obsidianVaultDir } from "../../shared/paths.js";
 import { resolveDocPath } from "../../shared/doc-path.js";
-import { greetingFlag } from "../session-start/greeting-flags.js";
+import { greetingFlag, readGreetingFlags, GREETING_FLAGS_REL } from "../session-start/greeting-flags.js";
 import { isMainCheckout } from "../../shared/main-checkout.js";
 
 /**
@@ -2705,4 +2705,62 @@ export function checkGreetingSize(version: string, projectRoot: string, limit = 
   return n > limit
     ? { name, severity: "issue", message: `greeting is ${n} characters, over the ${limit} limit ${detail}`, report: true }
     : { name, severity: "pass", message: `greeting is ${n} characters, within the ${limit} limit ${detail}`, report: true };
+}
+
+/** T-353: what git said about one path. `unknown` carries git's first line (outside a repository, or git is not installed). */
+export type IgnoreAnswer = { kind: "ignored" } | { kind: "not-ignored" } | { kind: "unknown"; why: string };
+
+/**
+ * T-353: `git check-ignore -q`, by exit status: 0 is ignored, 1 is not ignored, anything else (128 outside a repository) is
+ * unknown. WITHOUT `--no-index`, on purpose: git then answers for the path as it stands, and a file that is already tracked
+ * is never ignored, whatever the patterns say.
+ */
+export function gitCheckIgnore(projectRoot: string, rel: string): IgnoreAnswer {
+  try {
+    execFileSync("git", ["check-ignore", "-q", "--", rel], { cwd: projectRoot, encoding: "utf8", stdio: ["ignore", "ignore", "pipe"] });
+    return { kind: "ignored" };
+  } catch (err) {
+    const e = err as NodeJS.ErrnoException & { status?: number | null; stderr?: string };
+    if (e.status === 1) return { kind: "not-ignored" };
+    if (e.code === "ENOENT") return { kind: "unknown", why: "git not found (ENOENT)" };
+    const first = (text: string | undefined): string => (text ?? "").trim().split(/\r?\n/)[0] ?? "";
+    return { kind: "unknown", why: first(e.stderr) || first(e.message) || "unknown error" };
+  }
+}
+
+/** T-353: the two warnings of `greeting-flags`, whole. */
+export const GREETING_FLAGS_MISSING =
+  `${GREETING_FLAGS_REL} is absent, so every greeting option is off: /start prints the legacy briefing and writes no greeting-metrics row. ` +
+  `To turn the default set on, create ${GREETING_FLAGS_REL} as a copy of the eight-key default in project-template/${GREETING_FLAGS_REL} of the SIA install, and commit it`;
+export const GREETING_FLAGS_IGNORED =
+  `${GREETING_FLAGS_REL} exists but git ignores it, so it reaches this checkout only: ` +
+  `add the line !/${GREETING_FLAGS_REL} to .gitignore, after /.agents/SYSTEM/*, and commit both`;
+
+/**
+ * T-353 (D-166). Every greeting feature is opt-in through GREETING_FLAGS_REL. A project bootstrapped before the scaffold
+ * wrote that file has none, and one whose .gitignore predates the template's exception keeps the file on one checkout:
+ * two fleet repos ran for weeks on the legacy briefing with no greeting-metrics row, and nothing said so. This check says
+ * so, as a WARNING in both cases and never an issue: a project may run without the features on purpose.
+ *
+ * Only a project with a valid record is judged; without one there is no greeting to configure, which is a skip with the
+ * reason. A file that exists and is tracked, or untracked and not ignored, passes. Where git cannot answer (not a
+ * repository), the ignore question is a skip with git's reason, never a pass.
+ */
+export function checkGreetingFlags(projectRoot: string, probe: (projectRoot: string, rel: string) => IgnoreAnswer = gitCheckIgnore): CheckResult {
+  const name = "greeting-flags";
+  const statePath = join(projectRoot, ".agents", "state.json");
+  if (!existsSync(statePath)) {
+    return { name, severity: "skip", message: "skipped: no .agents/state.json, so this project has no greeting to configure", report: true };
+  }
+  if (!parseState(readFileSync(statePath, "utf-8")).ok) {
+    return { name, severity: "skip", message: "skipped: .agents/state.json is not a valid record (see state-schema)", report: true };
+  }
+  if (!existsSync(join(projectRoot, GREETING_FLAGS_REL))) return { name, severity: "warn", message: GREETING_FLAGS_MISSING, report: true };
+  const answer = probe(projectRoot, GREETING_FLAGS_REL);
+  if (answer.kind === "ignored") return { name, severity: "warn", message: GREETING_FLAGS_IGNORED, report: true };
+  const on = Object.values(readGreetingFlags(projectRoot)).filter((v) => v === true).length;
+  if (answer.kind === "unknown") {
+    return { name, severity: "skip", message: `skipped: ${GREETING_FLAGS_REL} present (${on} flag(s) on); whether git ignores it: unknown (git check-ignore failed: ${answer.why})`, report: true };
+  }
+  return { name, severity: "pass", message: `${GREETING_FLAGS_REL} present and not ignored by git (${on} flag(s) on)`, report: true };
 }
