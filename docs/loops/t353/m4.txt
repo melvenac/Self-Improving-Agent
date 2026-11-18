@@ -1,0 +1,7 @@
+@@@ project-template/gitignore
+<<<
+!/.agents/SYSTEM/SUMMARY.md
+!/.agents/SYSTEM/greeting.json
+===
+!/.agents/SYSTEM/SUMMARY.md
+>>>

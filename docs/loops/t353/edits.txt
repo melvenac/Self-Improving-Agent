@@ -1,0 +1,139 @@
+@@@ open-brain/src/pipelines/bootstrap/index.ts
+<<<
+  { path: ".agents/SYSTEM/SUMMARY.md", from: ".agents/SYSTEM/SUMMARY.md", tracked: true, why: "the project summary; its marked region is rendered from the record" },
+===
+  { path: ".agents/SYSTEM/SUMMARY.md", from: ".agents/SYSTEM/SUMMARY.md", tracked: true, why: "the project summary; its marked region is rendered from the record" },
+  { path: ".agents/SYSTEM/greeting.json", from: ".agents/SYSTEM/greeting.json", tracked: true, why: "the /start greeting options a new project starts with (D-166, T-353); set a flag to false to turn one off" },
+>>>
+@@@ project-template/gitignore
+<<<
+# .agents/ is ignored EXCEPT the five state files, AGENT.md and the role files:
+# state.json is the record; INBOX.md, task.md, next-session.md and SUMMARY.md
+# are its rendered views; AGENT.md says whether this checkout is a seat, and the
+# role files under roles/ say how each seat works, so a clone needs both.
+# Session logs, archive/, PRD, docs etc. stay local (git is not their history).
+===
+# .agents/ is ignored EXCEPT the five state files, AGENT.md, the role files and
+# SYSTEM/greeting.json: state.json is the record; INBOX.md, task.md,
+# next-session.md and SUMMARY.md are its rendered views; AGENT.md says whether
+# this checkout is a seat, and the role files under roles/ say how each seat
+# works, so a clone needs both. greeting.json turns the /start greeting features
+# on for the project (T-353): ignored, it would reach one checkout only.
+# Session logs, archive/, PRD, docs etc. stay local (git is not their history).
+>>>
+@@@ project-template/gitignore
+<<<
+!/.agents/SYSTEM/SUMMARY.md
+===
+!/.agents/SYSTEM/SUMMARY.md
+!/.agents/SYSTEM/greeting.json
+>>>
+@@@ project-template/.claude/commands/bootstrap.md
+<<<
+  `.agents/SYSTEM/SUMMARY.md`, `.agents/AGENT.md`, the four role-file stubs in `.agents/roles/`
+===
+  `.agents/SYSTEM/SUMMARY.md`, `.agents/SYSTEM/greeting.json` (the `/start` greeting features, on by
+  default; set a flag to `false` to turn one off), `.agents/AGENT.md`, the four role-file stubs in `.agents/roles/`
+>>>
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+import { greetingFlag } from "../session-start/greeting-flags.js";
+===
+import { greetingFlag, readGreetingFlags, GREETING_FLAGS_REL } from "../session-start/greeting-flags.js";
+>>>
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+    : { name, severity: "pass", message: `greeting is ${n} characters, within the ${limit} limit ${detail}`, report: true };
+}
+===
+    : { name, severity: "pass", message: `greeting is ${n} characters, within the ${limit} limit ${detail}`, report: true };
+}
+
+/** T-353: what git said about one path. `unknown` carries git's first line (outside a repository, or git is not installed). */
+export type IgnoreAnswer = { kind: "ignored" } | { kind: "not-ignored" } | { kind: "unknown"; why: string };
+
+/**
+ * T-353: `git check-ignore -q`, by exit status: 0 is ignored, 1 is not ignored, anything else (128 outside a repository) is
+ * unknown. WITHOUT `--no-index`, on purpose: git then answers for the path as it stands, and a file that is already tracked
+ * is never ignored, whatever the patterns say.
+ */
+export function gitCheckIgnore(projectRoot: string, rel: string): IgnoreAnswer {
+  try {
+    execFileSync("git", ["check-ignore", "-q", "--", rel], { cwd: projectRoot, encoding: "utf8", stdio: ["ignore", "ignore", "pipe"] });
+    return { kind: "ignored" };
+  } catch (err) {
+    const e = err as NodeJS.ErrnoException & { status?: number | null; stderr?: string };
+    if (e.status === 1) return { kind: "not-ignored" };
+    if (e.code === "ENOENT") return { kind: "unknown", why: "git not found (ENOENT)" };
+    const first = (text: string | undefined): string => (text ?? "").trim().split(/\r?\n/)[0] ?? "";
+    return { kind: "unknown", why: first(e.stderr) || first(e.message) || "unknown error" };
+  }
+}
+
+/** T-353: the two warnings of `greeting-flags`, whole. */
+export const GREETING_FLAGS_MISSING =
+  `${GREETING_FLAGS_REL} is absent, so every greeting option is off: /start prints the legacy briefing and writes no greeting-metrics row. ` +
+  `To turn the default set on, create ${GREETING_FLAGS_REL} as a copy of the eight-key default in project-template/${GREETING_FLAGS_REL} of the SIA install, and commit it`;
+export const GREETING_FLAGS_IGNORED =
+  `${GREETING_FLAGS_REL} exists but git ignores it, so it reaches this checkout only: ` +
+  `add the line !/${GREETING_FLAGS_REL} to .gitignore, after /.agents/SYSTEM/*, and commit both`;
+
+/**
+ * T-353 (D-166). Every greeting feature is opt-in through GREETING_FLAGS_REL. A project bootstrapped before the scaffold
+ * wrote that file has none, and one whose .gitignore predates the template's exception keeps the file on one checkout:
+ * two fleet repos ran for weeks on the legacy briefing with no greeting-metrics row, and nothing said so. This check says
+ * so, as a WARNING in both cases and never an issue: a project may run without the features on purpose.
+ *
+ * Only a project with a valid record is judged; without one there is no greeting to configure, which is a skip with the
+ * reason. A file that exists and is tracked, or untracked and not ignored, passes. Where git cannot answer (not a
+ * repository), the ignore question is a skip with git's reason, never a pass.
+ */
+export function checkGreetingFlags(projectRoot: string, probe: (projectRoot: string, rel: string) => IgnoreAnswer = gitCheckIgnore): CheckResult {
+  const name = "greeting-flags";
+  const statePath = join(projectRoot, ".agents", "state.json");
+  if (!existsSync(statePath)) {
+    return { name, severity: "skip", message: "skipped: no .agents/state.json, so this project has no greeting to configure", report: true };
+  }
+  if (!parseState(readFileSync(statePath, "utf-8")).ok) {
+    return { name, severity: "skip", message: "skipped: .agents/state.json is not a valid record (see state-schema)", report: true };
+  }
+  if (!existsSync(join(projectRoot, GREETING_FLAGS_REL))) return { name, severity: "warn", message: GREETING_FLAGS_MISSING, report: true };
+  const answer = probe(projectRoot, GREETING_FLAGS_REL);
+  if (answer.kind === "ignored") return { name, severity: "warn", message: GREETING_FLAGS_IGNORED, report: true };
+  const on = Object.values(readGreetingFlags(projectRoot)).filter((v) => v === true).length;
+  if (answer.kind === "unknown") {
+    return { name, severity: "skip", message: `skipped: ${GREETING_FLAGS_REL} present (${on} flag(s) on); whether git ignores it: unknown (git check-ignore failed: ${answer.why})`, report: true };
+  }
+  return { name, severity: "pass", message: `${GREETING_FLAGS_REL} present and not ignored by git (${on} flag(s) on)`, report: true };
+}
+>>>
+@@@ open-brain/src/pipelines/sync/index.ts
+<<<
+  checkGreetingSize,
+  checkCommandParity,
+===
+  checkGreetingSize,
+  checkGreetingFlags,
+  checkCommandParity,
+>>>
+@@@ open-brain/src/pipelines/sync/index.ts
+<<<
+  checks.push(checkTaskAssignees(options.projectRoot));
+===
+  checks.push(checkTaskAssignees(options.projectRoot));
+  // T-353: a bootstrapped project with no greeting.json, or one git ignores, runs with every greeting feature off.
+  checks.push(checkGreetingFlags(options.projectRoot));
+>>>
+@@@ open-brain/tests/pipelines/template-seed.test.ts
+<<<
+  it("the template's gitignore (shipped without the dot) tracks exactly the five state files, AGENT.md and the role files (T-251)", () => {
+===
+  it("the template's gitignore (shipped without the dot) tracks exactly the five state files, AGENT.md, the role files (T-251) and greeting.json (T-353)", () => {
+>>>
+@@@ open-brain/tests/pipelines/template-seed.test.ts
+<<<
+      "!/.agents/SYSTEM/SUMMARY.md",
+===
+      "!/.agents/SYSTEM/SUMMARY.md",
+      "!/.agents/SYSTEM/greeting.json",
+>>>

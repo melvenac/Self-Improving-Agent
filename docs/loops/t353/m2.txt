@@ -1,0 +1,7 @@
+@@@ project-template/.agents/SYSTEM/greeting.json
+<<<
+  "greeting_metrics": true,
+===
+  "greeting_metrics": true,
+  "handoff_caps": true,
+>>>

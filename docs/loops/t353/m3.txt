@@ -1,0 +1,7 @@
+@@@ project-template/.agents/SYSTEM/greeting.json
+<<<
+  "greeting_metrics": true,
+  "maybe_shipped": true,
+===
+  "maybe_shipped": true,
+>>>

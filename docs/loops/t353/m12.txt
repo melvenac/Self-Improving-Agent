@@ -1,0 +1,7 @@
+@@@ project-template/.agents/SYSTEM/greeting.json
+<<<
+  "briefing_budget": true,
+===
+  "briefing_budget": true,
+  "briefing_problem": true,
+>>>

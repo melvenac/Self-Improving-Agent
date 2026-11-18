@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+  if (!existsSync(join(projectRoot, GREETING_FLAGS_REL))) return { name, severity: "warn", message: GREETING_FLAGS_MISSING, report: true };
+===
+  if (!existsSync(join(projectRoot, GREETING_FLAGS_REL))) return { name, severity: "issue", message: GREETING_FLAGS_MISSING, report: true };
+>>>

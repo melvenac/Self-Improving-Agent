@@ -1,0 +1,6 @@
+@@@ open-brain/src/pipelines/sync/checks.ts
+<<<
+    if (e.status === 1) return { kind: "not-ignored" };
+===
+    if (e.status !== 0) return { kind: "not-ignored" };
+>>>
