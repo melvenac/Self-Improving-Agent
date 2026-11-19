@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (j.type === "attachment") return j.attachment?.type === "queued_command" && j.attachment.origin?.kind === "human";
+===
+  if (j.type === "attachment") return false;
+>>>

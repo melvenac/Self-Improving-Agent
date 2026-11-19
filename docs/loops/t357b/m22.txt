@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  const bad = !plainObject(cfg.seats) || Object.values(cfg.seats).some((v) => typeof v !== "string" || v.trim() === "");
+===
+  const bad = !plainObject(cfg.seats);
+>>>

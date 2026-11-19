@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+      const added = addNote(changes, date, o.note, o.dryRun);
+===
+      const added = addNote(changes, date, o.note);
+>>>

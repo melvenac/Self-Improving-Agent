@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  return missing > 0 ? 1 : 0;
+===
+  return 0;
+>>>

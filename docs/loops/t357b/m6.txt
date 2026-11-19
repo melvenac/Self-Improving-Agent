@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (f.prev !== null && ctx >= f.prev) a.growth.push(ctx - f.prev);
+===
+  if (f.prev !== null) a.growth.push(ctx - f.prev);
+>>>

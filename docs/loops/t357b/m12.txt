@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (f.first) { a.firstCtx.push(ctx); f.first = false; }
+===
+  if (f.first) { a.firstCtx.push(ctx); }
+>>>

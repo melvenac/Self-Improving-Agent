@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (dryRun) return true;
+===
+  if (false) return true;
+>>>

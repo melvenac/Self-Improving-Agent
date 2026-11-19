@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+    if (cfg[k] !== undefined && typeof cfg[k] !== "string") throw new Error(`"${k}" must be a string`);
+===
+    if (false) throw new Error(`"${k}" must be a string`);
+>>>
