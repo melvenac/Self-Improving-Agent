@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 648,
+  "revision": 649,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3257,6 +3257,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "s178 11-18 (Atlas, from the T-353 review, job 1455 note 1; line read by the judge at briefing.ts:393 and seen in a live scratch bootstrap). With briefing_budget on, which T-353 makes the default for new projects, the briefing prints `WAITING ON AARON: none` (or the list) in every project. SIA is distributed as a template, and /sync's template-personal-names check exists so a third-party install does not carry this name; the label is in code, where that check does not look. Also the owner match is the literal 'aaron' (questionOwner(q)?.toLowerCase() === 'aaron' in briefing.ts and greeting-metrics.ts). Not a fault in Aaron's fleet. Options: a neutral label ('WAITING ON THE OWNER'), or an owner name read from the record or config with 'aaron' as today's value. This is a product question (is a third-party install in scope now?): ask Aaron before a brief.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-357",
+      "title": "Context efficiency per seat: a weekly recorded metric with a change log",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Aaron approved 2026-11-19 in clark's window (AskUserQuestion answer \"Yes, fleet-only first (Recommended)\", read by Atlas in clark's transcript at 20:22:47Z). Origin: clark measured seat transcripts (C:/Users/melve/Worktrees/codemode-trial/ctx-trend.mjs, ctx-trend-findings.md) after Aaron noticed planner context windows lasting longer. Atlas's review: the script measures workload (calls per week), not window life; the last week was partial; `seen` is per file so resumed sessions may double count; tool-result size is a mean. Scope: fleet-only script under the SIA repo's scripts/, not an open-brain CLI feature. It appends one row per seat per CLOSED ISO week to a jsonl: windows (spans between compact_boundary or session start/end), median calls / user turns / hours per window, context at compaction, first-call context per session, median and p90 growth per call and tool-result chars per call, sidechain share, model id, Claude Code version; message ids deduplicated across all files of a seat. A dated change log sits beside it, seeded with: code mode A/B on dashboard t139 (11-19, not adopted), CC 2.1.329 on the QA PC and Lenovo (11-19). Check H1 first (model or window size change: model per week and context at each compaction). Runs weekly on the desktop, off-peak (clark's ruling 11-19: it only streams local files). DONE when four weekly rows exist and one named change has a before/after read from them. Open with Aaron (clark's): raising cleanupPeriodDays so transcripts are kept longer; without it the history is about 30 days.",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -7393,12 +7407,12 @@
     },
     {
       "n": 178,
-      "date": "2026-11-18",
+      "date": "2026-11-19",
       "uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 648
+      "last_work_rev": 649
     }
   ]
 }
