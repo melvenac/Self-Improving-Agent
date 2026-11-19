@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (sidechainFile || j.isSidechain === true) {
+===
+  if (j.isSidechain === true) {
+>>>

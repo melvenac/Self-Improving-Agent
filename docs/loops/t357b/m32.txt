@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  const sinceMonday = (d.getUTCDay() + 6) % 7;
+===
+  const sinceMonday = (d.getDay() + 6) % 7;
+>>>

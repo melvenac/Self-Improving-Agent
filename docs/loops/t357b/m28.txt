@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+        if (!statSync(dir).isDirectory()) throw new Error("not a folder");
+===
+        if (false) throw new Error("not a folder");
+>>>

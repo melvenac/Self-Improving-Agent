@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+    f.win = null; f.prev = null; f.pending = 0;
+===
+    f.win = null; f.pending = 0;
+>>>

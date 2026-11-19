@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (Array.isArray(c) && c.some((x) => x?.type === "tool_result")) return false;
+===
+  if (false) return false;
+>>>

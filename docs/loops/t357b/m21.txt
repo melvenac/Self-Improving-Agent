@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (!plainObject(cfg)) throw new Error("it must be a JSON object");
+===
+  if (cfg === undefined) throw new Error("it must be a JSON object");
+>>>

@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (f.win && f.win.calls > 0) weekOf(seat, weekStart(f.win.end)).openEnd++;
+===
+  if (f.win) weekOf(seat, weekStart(f.win.end)).openEnd++;
+>>>

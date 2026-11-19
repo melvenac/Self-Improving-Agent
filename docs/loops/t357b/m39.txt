@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+      const eq = v === undefined ? -1 : v.lastIndexOf("=");
+===
+      const eq = v === undefined ? -1 : v.indexOf("=");
+>>>

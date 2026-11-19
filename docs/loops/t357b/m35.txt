@@ -1,0 +1,10 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+    weekOf(seat, week).turns++;
+    f.win ??= { start: ts, end: ts, calls: 0, turns: 0 };
+    f.win.turns++; f.win.end = ts;
+===
+    weekOf(seat, week).turns++;
+    f.win ??= { start: ts, end: ts, calls: 0, turns: 0 };
+    f.win.turns++;
+>>>
