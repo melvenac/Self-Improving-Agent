@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 649 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 650 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,14 +6,17 @@
 
 ### Pick up here
 
-PR #1155 (T-353, bootstrap writes an eight-flag greeting.json, the template tracks it, /sync warns; reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES) is NOT merged and waits for Aaron's word typed in Atlas's window. To merge: bash atlas-ops pr-refresh.sh 1155 6d82d38eca779d953e0bf5097d1271da595fff98 (same patch-id, CI SUCCESS), then pr-merge.sh 1155 <new head>; ask clark to rebuild the main checkout; live check: `sync` from the new build in a fleet repo prints greeting-flags [pass]; close T-353. Session 178 also shipped and live-checked T-343, T-344 + T-312 and T-352. T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Herald and Beam turned the full flag set on 11-17 and owe a report on their first greeting. Open from this session's reviews: T-345 to T-347, T-349 to T-351, T-354, T-355 and the WAITING ON AARON label task.
+Two code PRs are accepted and NOT merged; each waits for Aaron's word typed in Atlas's window. (1) #1155 (T-353, bootstrap writes an eight-flag greeting.json, the template tracks it, /sync warns; reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES): bash atlas-ops pr-refresh.sh 1155 6d82d38eca779d953e0bf5097d1271da595fff98 (same patch-id, CI SUCCESS), then pr-merge.sh 1155 <new head>; ask clark to rebuild the main checkout; live check: `sync` from the new build in a fleet repo prints greeting-flags [pass]; close T-353. (2) #1163 (T-357, scripts/ctx-metrics.mjs, a weekly context-efficiency row per seat with a change log; reviewed d19c4f6c, job 1532 ACCEPT-WITH-NOTES): pr-refresh.sh 1163 d19c4f6c759acee7dcc14291a762f0cb2209baad, then pr-merge.sh; no rebuild; then the After-merge steps in docs/loops/t357b-brief.md (write ~/.claude/open-brain/context-metrics.config.json with the eight seats' transcript folders, add the two seed notes, first run) and ask clark to schedule the weekly run; T-357 stays open until four scheduled weekly rows per seat and one named before/after exist. Session 178 also shipped and live-checked T-343, T-344 + T-312 and T-352. T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Herald and Beam turned the full flag set on 11-17 and owe a report on their first greeting. Open from this session's reviews: T-345 to T-347, T-349 to T-351, T-354, T-355, T-356.
 
 ### Watch out
 
 - Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.
 - Fleet scheduling (slots, host, order) and main-tree rebuilds are clark's; Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.
 - A code merge needs Aaron's word typed in Atlas's own window: a relay from clark is not enough and the permission classifier denies the merge without it.
-- Build briefs run the full suite before the commit, so s4-guards D1b goes red on any new test file (seen on t348, t352, t353): put the commit before the full suite in the next brief.
+- Put the commit before the full suite in a build brief (done in t357/t357b: no s4-guards D1b red).
+- A brief with no edits.txt (new files only) cannot use byte-compare.sh: compare by git diff --name-status and blob ids (git rev-parse <head>:<dest> <base>:docs/loops/<tag>/<file>).
+- qapc-job.mjs submit prints 'CHECK sha failed' until the sha is fetched locally: git fetch origin first.
+- An AskUserQuestion answer in another seat's window is a tool result, which relay-check.mjs skips: grep that transcript for the "answers" record instead.
 - T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.
 - T-336 last check: clark's next greeting-metrics row must not list latest_brief.
 - tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.
@@ -22,16 +25,19 @@ PR #1155 (T-353, bootstrap writes an eight-flag greeting.json, the template trac
 ### Open questions
 
 - Merge #1155 (T-353; QA ACCEPT-WITH-NOTES, job 1455)?
+- Merge #1163 (T-357; QA ACCEPT-WITH-NOTES, job 1532)?
 
 ### Loop state
 
 **Open PRs:** 
 - #1155 — QA: accepted — T-353 t353, reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES
+- #1163 — QA: accepted — T-357 t357b, reviewed d19c4f6c, job 1532 ACCEPT-WITH-NOTES
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
 - Merge #1155?
+- Merge #1163?
 
 **Rulings made mid-loop:** 
 - s178: T-334 arm kept at 0.5 (Aaron, D-165).
@@ -39,6 +45,7 @@ PR #1155 (T-353, bootstrap writes an eight-flag greeting.json, the template trac
 - s178: t352: budget_chars = 4400 + printed pick-up length; greeting_chars stays the true size.
 - s178: t353: the bootstrap default is eight flags; briefing_problem, briefing_focus and handoff_by_checkout are left out (D-166 allows it).
 - s178: reviews: a tests-only gap on an input the source handles is a NOTE, not a REJECT.
+- s178: t357: output outside the repo under ~/.claude/open-brain/; done = four scheduled weekly rows per seat after the merge plus one before/after.
 
 ## developer [sia-builder] _(written session 156)_
 
