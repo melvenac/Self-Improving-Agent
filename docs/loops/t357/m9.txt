@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+    const pre = Number.isFinite(m.preTokens) ? m.preTokens : f.prev;
+===
+    const pre = f.prev;
+>>>

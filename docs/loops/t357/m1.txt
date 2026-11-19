@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+    if (a.calls === 0 || !weekClosed(week, now)) continue;
+===
+    if (a.calls === 0) continue;
+>>>

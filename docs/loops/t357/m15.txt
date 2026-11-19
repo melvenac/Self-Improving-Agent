@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (old !== null && old.split(/\r?\n/).includes(line)) return false;
+===
+  if (false) return false;
+>>>
