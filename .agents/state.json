@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 649,
+  "revision": 650,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3270,7 +3270,7 @@
       "opened_session": 178,
       "closed_session": null,
       "supersedes": null,
-      "note": "Aaron approved 2026-11-19 in clark's window (AskUserQuestion answer \"Yes, fleet-only first (Recommended)\", read by Atlas in clark's transcript at 20:22:47Z). Origin: clark measured seat transcripts (C:/Users/melve/Worktrees/codemode-trial/ctx-trend.mjs, ctx-trend-findings.md) after Aaron noticed planner context windows lasting longer. Atlas's review: the script measures workload (calls per week), not window life; the last week was partial; `seen` is per file so resumed sessions may double count; tool-result size is a mean. Scope: fleet-only script under the SIA repo's scripts/, not an open-brain CLI feature. It appends one row per seat per CLOSED ISO week to a jsonl: windows (spans between compact_boundary or session start/end), median calls / user turns / hours per window, context at compaction, first-call context per session, median and p90 growth per call and tool-result chars per call, sidechain share, model id, Claude Code version; message ids deduplicated across all files of a seat. A dated change log sits beside it, seeded with: code mode A/B on dashboard t139 (11-19, not adopted), CC 2.1.329 on the QA PC and Lenovo (11-19). Check H1 first (model or window size change: model per week and context at each compaction). Runs weekly on the desktop, off-peak (clark's ruling 11-19: it only streams local files). DONE when four weekly rows exist and one named change has a before/after read from them. Open with Aaron (clark's): raising cleanupPeriodDays so transcripts are kept longer; without it the history is about 30 days.",
+      "note": "Aaron approved 2026-11-19 in clark's window (AskUserQuestion answer \"Yes, fleet-only first (Recommended)\", read by Atlas in clark's transcript at 20:22:47Z). Origin: clark measured seat transcripts (C:/Users/melve/Worktrees/codemode-trial/ctx-trend.mjs, ctx-trend-findings.md) after Aaron noticed planner context windows lasting longer. Atlas's review: the script measures workload (calls per week), not window life; the last week was partial; `seen` is per file so resumed sessions may double count; tool-result size is a mean. Scope: fleet-only script under the SIA repo's scripts/, not an open-brain CLI feature. It appends one row per seat per CLOSED ISO week to a jsonl: windows (spans between compact_boundary or session start/end), median calls / user turns / hours per window, context at compaction, first-call context per session, median and p90 growth per call and tool-result chars per call, sidechain share, model id, Claude Code version; message ids deduplicated across all files of a seat. A dated change log sits beside it, seeded with: code mode A/B on dashboard t139 (11-19, not adopted), CC 2.1.329 on the QA PC and Lenovo (11-19). Check H1 first (model or window size change: model per week and context at each compaction). Runs weekly on the desktop, off-peak (clark's ruling 11-19: it only streams local files). DONE when four weekly rows exist and one named change has a before/after read from them. Open with Aaron (clark's): raising cleanupPeriodDays so transcripts are kept longer; without it the history is about 30 days. — s178 11-19: built and reviewed in two rounds. Round one (brief docs/loops/t357-brief.md, build job 1529, PR #1160) was REJECTED by review job 1530: appendRows glued a new row to a last line with no newline, after which a rerun rewrote a closed week from whatever transcripts remained; and a null config exited 1 with a stack. #1160 closed. Round two (docs/loops/t357b-brief.md, build job 1531, PR #1163, CAND d19c4f6c759acee7dcc14291a762f0cb2209baad on START 7420a541) fixes both, merges folders that share a seat name, reports an unreadable seat without stopping the others (that seat writes no row that run), makes --note respect --dry-run, and refuses a --now without a zone; 20 rows, 41 mutants all red. Review job 1532: ACCEPT-WITH-NOTES, no findings; full suite 5066 passed, only the known D4 red. NOT merged: waits for Aaron's word. Notes left for a follow-up if they bite: a failure on the out file itself is uncaught (stack, exit 1); seat names are matched exactly (a trailing space makes a second seat); --now's zone test only checks the end of the string; CM-20's TZ child processes were not observed on Windows. Measured premises worth keeping: context at compaction is not constant (atlas 201K-562K, clark 201K-761K; atlas weekly median 320K, 261K, 212K, 245K on one model id); 0 of 44,197 message ids repeat across files of a seat; a turn typed mid-work is a queued_command attachment, not a user record. Ruled: output lives under ~/.claude/open-brain/ (context-metrics.jsonl, context-changes.md, context-metrics.config.json), not in the repo; DONE means four rows per seat written by four scheduled weekly runs AFTER the merge plus one named before/after; the oldest week of the first run may be cut short by cleanup and is not a 'before'. After merge: Atlas writes the config, adds the two seed notes (code mode A/B on dashboard t139 not adopted; Claude Code 2.1.329 on the QA PC and Lenovo; both 2026-11-19), does the first run; clark schedules the weekly run. No rebuild needed (nothing under open-brain/src).",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -7253,12 +7253,15 @@
     },
     {
       "seat": "planner",
-      "pick_up": "PR #1155 (T-353, bootstrap writes an eight-flag greeting.json, the template tracks it, /sync warns; reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES) is NOT merged and waits for Aaron's word typed in Atlas's window. To merge: bash atlas-ops pr-refresh.sh 1155 6d82d38eca779d953e0bf5097d1271da595fff98 (same patch-id, CI SUCCESS), then pr-merge.sh 1155 <new head>; ask clark to rebuild the main checkout; live check: `sync` from the new build in a fleet repo prints greeting-flags [pass]; close T-353. Session 178 also shipped and live-checked T-343, T-344 + T-312 and T-352. T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Herald and Beam turned the full flag set on 11-17 and owe a report on their first greeting. Open from this session's reviews: T-345 to T-347, T-349 to T-351, T-354, T-355 and the WAITING ON AARON label task.",
+      "pick_up": "Two code PRs are accepted and NOT merged; each waits for Aaron's word typed in Atlas's window. (1) #1155 (T-353, bootstrap writes an eight-flag greeting.json, the template tracks it, /sync warns; reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES): bash atlas-ops pr-refresh.sh 1155 6d82d38eca779d953e0bf5097d1271da595fff98 (same patch-id, CI SUCCESS), then pr-merge.sh 1155 <new head>; ask clark to rebuild the main checkout; live check: `sync` from the new build in a fleet repo prints greeting-flags [pass]; close T-353. (2) #1163 (T-357, scripts/ctx-metrics.mjs, a weekly context-efficiency row per seat with a change log; reviewed d19c4f6c, job 1532 ACCEPT-WITH-NOTES): pr-refresh.sh 1163 d19c4f6c759acee7dcc14291a762f0cb2209baad, then pr-merge.sh; no rebuild; then the After-merge steps in docs/loops/t357b-brief.md (write ~/.claude/open-brain/context-metrics.config.json with the eight seats' transcript folders, add the two seed notes, first run) and ask clark to schedule the weekly run; T-357 stays open until four scheduled weekly rows per seat and one named before/after exist. Session 178 also shipped and live-checked T-343, T-344 + T-312 and T-352. T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Herald and Beam turned the full flag set on 11-17 and owe a report on their first greeting. Open from this session's reviews: T-345 to T-347, T-349 to T-351, T-354, T-355, T-356.",
       "watch_out": [
         "Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.",
         "Fleet scheduling (slots, host, order) and main-tree rebuilds are clark's; Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.",
         "A code merge needs Aaron's word typed in Atlas's own window: a relay from clark is not enough and the permission classifier denies the merge without it.",
-        "Build briefs run the full suite before the commit, so s4-guards D1b goes red on any new test file (seen on t348, t352, t353): put the commit before the full suite in the next brief.",
+        "Put the commit before the full suite in a build brief (done in t357/t357b: no s4-guards D1b red).",
+        "A brief with no edits.txt (new files only) cannot use byte-compare.sh: compare by git diff --name-status and blob ids (git rev-parse <head>:<dest> <base>:docs/loops/<tag>/<file>).",
+        "qapc-job.mjs submit prints 'CHECK sha failed' until the sha is fetched locally: git fetch origin first.",
+        "An AskUserQuestion answer in another seat's window is a tool result, which relay-check.mjs skips: grep that transcript for the \"answers\" record instead.",
         "T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.",
         "T-336 last check: clark's next greeting-metrics row must not list latest_brief.",
         "tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.",
@@ -7268,6 +7271,10 @@
         {
           "owner": "aaron",
           "text": "Merge #1155 (T-353; QA ACCEPT-WITH-NOTES, job 1455)?"
+        },
+        {
+          "owner": "aaron",
+          "text": "Merge #1163 (T-357; QA ACCEPT-WITH-NOTES, job 1532)?"
         }
       ],
       "session": 178,
@@ -7277,24 +7284,31 @@
             "ref": "#1155",
             "qa_status": "accepted",
             "note": "T-353 t353, reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES"
+          },
+          {
+            "ref": "#1163",
+            "qa_status": "accepted",
+            "note": "T-357 t357b, reviewed d19c4f6c, job 1532 ACCEPT-WITH-NOTES"
           }
         ],
         "frozen_sha": null,
         "questions_for_aaron": [
-          "Merge #1155?"
+          "Merge #1155?",
+          "Merge #1163?"
         ],
         "rulings": [
           "s178: T-334 arm kept at 0.5 (Aaron, D-165).",
           "s178: t344: pick-up whole to 4000; budget measured without it.",
           "s178: t352: budget_chars = 4400 + printed pick-up length; greeting_chars stays the true size.",
           "s178: t353: the bootstrap default is eight flags; briefing_problem, briefing_focus and handoff_by_checkout are left out (D-166 allows it).",
-          "s178: reviews: a tests-only gap on an input the source handles is a NOTE, not a REJECT."
+          "s178: reviews: a tests-only gap on an input the source handles is a NOTE, not a REJECT.",
+          "s178: t357: output outside the repo under ~/.claude/open-brain/; done = four scheduled weekly rows per seat after the merge plus one before/after."
         ]
       },
       "session_uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "written_rev": 648
+      "written_rev": 650
     }
   ],
   "sessions": [
@@ -7412,7 +7426,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 649
+      "last_work_rev": 650
     }
   ]
 }
