@@ -1,0 +1,7 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  a.tr.push(f.pending);
+  f.pending = 0;
+===
+  a.tr.push(f.pending);
+>>>

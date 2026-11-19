@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+const realCall = (j) => j.type === "assistant" && j.message?.usage && j.message.id && j.message.model !== "<synthetic>";
+===
+const realCall = (j) => j.type === "assistant" && j.message?.usage && j.message.id;
+>>>
