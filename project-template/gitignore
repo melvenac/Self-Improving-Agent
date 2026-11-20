@@ -10,10 +10,12 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# .agents/ is ignored EXCEPT the five state files, AGENT.md and the role files:
-# state.json is the record; INBOX.md, task.md, next-session.md and SUMMARY.md
-# are its rendered views; AGENT.md says whether this checkout is a seat, and the
-# role files under roles/ say how each seat works, so a clone needs both.
+# .agents/ is ignored EXCEPT the five state files, AGENT.md, the role files and
+# SYSTEM/greeting.json: state.json is the record; INBOX.md, task.md,
+# next-session.md and SUMMARY.md are its rendered views; AGENT.md says whether
+# this checkout is a seat, and the role files under roles/ say how each seat
+# works, so a clone needs both. greeting.json turns the /start greeting features
+# on for the project (T-353): ignored, it would reach one checkout only.
 # Session logs, archive/, PRD, docs etc. stay local (git is not their history).
 /.agents/*
 !/.agents/state.json
@@ -28,6 +30,7 @@ Thumbs.db
 !/.agents/SYSTEM/
 /.agents/SYSTEM/*
 !/.agents/SYSTEM/SUMMARY.md
+!/.agents/SYSTEM/greeting.json
 !/.agents/roles/
 /.agents/roles/*
 !/.agents/roles/*.md

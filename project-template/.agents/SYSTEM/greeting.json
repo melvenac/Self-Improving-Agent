@@ -1,0 +1,10 @@
+{
+  "briefing_budget": true,
+  "greeting_metrics": true,
+  "maybe_shipped": true,
+  "merged_citations": true,
+  "missing_handoff": true,
+  "reads_owed_own": true,
+  "role_docs_by_sha": true,
+  "state_compact": true
+}

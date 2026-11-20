@@ -24,6 +24,7 @@ import {
   checkMirrorParity,
   checkStateSchema,
   checkGreetingSize,
+  checkGreetingFlags,
   checkCommandParity,
   checkCommandToolNames,
   checkCommandNames,
@@ -120,6 +121,8 @@ export function runSync(input: SyncOptions): SyncResult {
   checks.push(checkSeatIdentity(options.projectRoot));
   // T-236 (c): tasks[].assignee names a seat in the map.
   checks.push(checkTaskAssignees(options.projectRoot));
+  // T-353: a bootstrapped project with no greeting.json, or one git ignores, runs with every greeting feature off.
+  checks.push(checkGreetingFlags(options.projectRoot));
   checks.push(checkCursorStartParity(options.projectRoot));
   // Record 198: a file under open-brain/tests that says "not for merge" is an issue.
   checks.push(checkProbeMarkers(options.projectRoot));
