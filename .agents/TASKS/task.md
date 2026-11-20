@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 652 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 653 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Current Focus
 
@@ -12,4 +12,4 @@ D-145 (Aaron 10-11): SIA loop at normal pace; work the backlog by priority. 10-1
 - [ ] **T-191** [P2] Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-334** [P2] Recall trigger per-arm outcomes: do withheld and injected fires differ in what the session does next (T-331's comparison; dashboard counts with Prism)
 - [ ] **T-357** [P2] Context efficiency per seat: a weekly recorded metric with a change log
-- [ ] **T-358** [P2] A task records its predicted effect before the change and its observed effect at close
+- [~] **T-358** [P2] A task records its predicted effect before the change and its observed effect at close

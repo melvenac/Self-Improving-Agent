@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 652,
+  "revision": 653,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3280,11 +3280,11 @@
       "id": "T-358",
       "title": "A task records its predicted effect before the change and its observed effect at close",
       "priority": "P2",
-      "status": "open",
+      "status": "in_progress",
       "opened_session": 178,
       "closed_session": null,
       "supersedes": null,
-      "note": "Aaron 2026-11-20 (typed in Atlas's window): asked what SIA can take from arXiv 2611.18856 (Self-Improvement Memory), then 'Write the brief loop'. The paper's core mechanism: each harness edit stores which tasks it was predicted to fix BEFORE evaluation and what it fixed after; accepted edits often missed their prediction (0 of 4, 2 of 8), and keeping only the diagnosis without attempts and outcomes was no better than no memory. SIA today records why a change was made but not what it should fix or whether it did; a task closes on merge plus a live check, which is 'accepted', not 'worked'. SCOPE (this task only): optional `predicted` on open_task/update_task, `observed` on update_task/close_task; close_task on a task that has `predicted` and no `observed` is refused by code. No schema version bump (optional keys, as `assignee` T-236). NOT in scope, candidates for later tasks: provenance (model, evidence) on rules and hooks; a 'does it still fire' pass at a model change; grouping attempts under a recurring problem. Brief: docs/loops/t358-brief.md. PREDICTED (by hand until the field exists): after this ships, every task Atlas opens for a behaviour change carries a prediction, and at least one close in the first two weeks records 'did not hold'.",
+      "note": "Aaron 2026-11-20 (typed in Atlas's window): asked what SIA can take from arXiv 2611.18856 (Self-Improvement Memory), then 'Write the brief loop'. The paper's core mechanism: each harness edit stores which tasks it was predicted to fix BEFORE evaluation and what it fixed after; accepted edits often missed their prediction (0 of 4, 2 of 8), and keeping only the diagnosis without attempts and outcomes was no better than no memory. SIA today records why a change was made but not what it should fix or whether it did; a task closes on merge plus a live check, which is 'accepted', not 'worked'. SCOPE (this task only): optional `predicted` on open_task/update_task, `observed` on update_task/close_task; close_task on a task that has `predicted` and no `observed` is refused by code. No schema version bump (optional keys, as `assignee` T-236). NOT in scope, candidates for later tasks: provenance (model, evidence) on rules and hooks; a 'does it still fire' pass at a model change; grouping attempts under a recurring problem. Brief: docs/loops/t358-brief.md. PREDICTED (by hand until the field exists): after this ships, every task Atlas opens for a behaviour change carries a prediction, and at least one close in the first two weeks records 'did not hold'. — s178 2026-11-20: brief docs/loops/t358-brief.md (#1168), drafted by a fork, predictions checked by SIM job 1534 (190 rows green, 15 mutants killed; m1's row list corrected). Build job 1535 (Lenovo) HANDBACK 76e453736e911d8d8c4504e0436741886d8ec0b5, landed as PR #1169; byte-compare five SAME, no EXTRA. Review job 1536 (QA PC, Opus): ACCEPT-WITH-NOTES, no REJECT-class finding; full suite on the committed tree 5099 passed, 1 failed (checks.test.ts D4, known red at START); CI test SUCCESS. Notes, none fixed: N1 a whitespace-only predicted or observed is accepted; N2 no size cap (as notes); N3 test gaps (three surviving mutants, source correct); N5 observed can be overwritten by update_task; NIT the SET lines print no prior length. Ruled before review: no schema bump (a build without the change refuses a record carrying `predicted`, so after merge: rebuild, reconnect, then first use); reopen_task keeps both fields; the line prints under NOTE CHANGE. Lesson for briefs: a brief that adds a test file must stage it before the full-suite step (s4-guards D1b fails on an untracked test file). WAITING: Aaron's merge word for #1169, typed in Atlas's window. After merge: clark rebuild, Aaron reconnects, live check = open a scratch-free real use (set predicted on a task, close refused without observed).",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -7426,7 +7426,7 @@
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 652
+      "last_work_rev": 653
     }
   ]
 }
