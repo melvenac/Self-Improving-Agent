@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 651,
+  "revision": 652,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3271,6 +3271,20 @@
       "closed_session": null,
       "supersedes": null,
       "note": "Aaron approved 2026-11-19 in clark's window (AskUserQuestion answer \"Yes, fleet-only first (Recommended)\", read by Atlas in clark's transcript at 20:22:47Z). Origin: clark measured seat transcripts (C:/Users/melve/Worktrees/codemode-trial/ctx-trend.mjs, ctx-trend-findings.md) after Aaron noticed planner context windows lasting longer. Atlas's review: the script measures workload (calls per week), not window life; the last week was partial; `seen` is per file so resumed sessions may double count; tool-result size is a mean. Scope: fleet-only script under the SIA repo's scripts/, not an open-brain CLI feature. It appends one row per seat per CLOSED ISO week to a jsonl: windows (spans between compact_boundary or session start/end), median calls / user turns / hours per window, context at compaction, first-call context per session, median and p90 growth per call and tool-result chars per call, sidechain share, model id, Claude Code version; message ids deduplicated across all files of a seat. A dated change log sits beside it, seeded with: code mode A/B on dashboard t139 (11-19, not adopted), CC 2.1.329 on the QA PC and Lenovo (11-19). Check H1 first (model or window size change: model per week and context at each compaction). Runs weekly on the desktop, off-peak (clark's ruling 11-19: it only streams local files). DONE when four weekly rows exist and one named change has a before/after read from them. Open with Aaron (clark's): raising cleanupPeriodDays so transcripts are kept longer; without it the history is about 30 days. — s178 11-19: built and reviewed in two rounds. Round one (brief docs/loops/t357-brief.md, build job 1529, PR #1160) was REJECTED by review job 1530: appendRows glued a new row to a last line with no newline, after which a rerun rewrote a closed week from whatever transcripts remained; and a null config exited 1 with a stack. #1160 closed. Round two (docs/loops/t357b-brief.md, build job 1531, PR #1163, CAND d19c4f6c759acee7dcc14291a762f0cb2209baad on START 7420a541) fixes both, merges folders that share a seat name, reports an unreadable seat without stopping the others (that seat writes no row that run), makes --note respect --dry-run, and refuses a --now without a zone; 20 rows, 41 mutants all red. Review job 1532: ACCEPT-WITH-NOTES, no findings; full suite 5066 passed, only the known D4 red. NOT merged: waits for Aaron's word. Notes left for a follow-up if they bite: a failure on the out file itself is uncaught (stack, exit 1); seat names are matched exactly (a trailing space makes a second seat); --now's zone test only checks the end of the string; CM-20's TZ child processes were not observed on Windows. Measured premises worth keeping: context at compaction is not constant (atlas 201K-562K, clark 201K-761K; atlas weekly median 320K, 261K, 212K, 245K on one model id); 0 of 44,197 message ids repeat across files of a seat; a turn typed mid-work is a queued_command attachment, not a user record. Ruled: output lives under ~/.claude/open-brain/ (context-metrics.jsonl, context-changes.md, context-metrics.config.json), not in the repo; DONE means four rows per seat written by four scheduled weekly runs AFTER the merge plus one named before/after; the oldest week of the first run may be cut short by cleanup and is not a 'before'. After merge: Atlas writes the config, adds the two seed notes (code mode A/B on dashboard t139 not adopted; Claude Code 2.1.329 on the QA PC and Lenovo; both 2026-11-19), does the first run; clark schedules the weekly run. No rebuild needed (nothing under open-brain/src). — s178 11-19: MERGED on Aaron's word (\"Merge both.\"): PR #1163 refreshed to 9f3f50a4 (same patch-id as the reviewed d19c4f6c, CI SUCCESS), merge commit e44c28e8e39ff346bf2b2e5f46664fe6abf011b3. After-merge steps done by Atlas on the desktop: ~/.claude/open-brain/context-metrics.config.json written (eight seats), three change-log notes added to context-changes.md (the two seeds and a note that the first run's rows come from history and each seat's oldest week is not a 'before'), first run wrote 31 rows to context-metrics.jsonl (clark, relay, maker, atlas, courier 4 weeks each; prism 5; beam, herald 3), an immediate rerun wrote 0. The run used the merged blob b000f477 extracted from e44c28e8 because the sparse planner tree has no scripts/ and the main checkout was at 697cf5d7. First reading, from history and with few compactions per week, so weak: it does NOT show windows lasting longer. clark: median calls per compacted window 607, 421.5, 149, 349 for weeks 10-19, 10-26, 11-02, 11-09; context at compaction 761K, 517K, 291K, 428K; growth per call 774, 765, 843, 920. atlas: calls per window 186, 191, 60, 152; context at compaction 320K, 261K, 212K, 245K. First-call context is flat (clark 66K-71K, atlas 73K-76K). STILL OPEN: clark schedules the weekly run from a checkout at or after e44c28e8; done = four rows per seat written by scheduled weekly runs (first expected for week 2026-11-16, after Monday 11-23 00:00 UTC) plus one named before/after.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-358",
+      "title": "A task records its predicted effect before the change and its observed effect at close",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Aaron 2026-11-20 (typed in Atlas's window): asked what SIA can take from arXiv 2611.18856 (Self-Improvement Memory), then 'Write the brief loop'. The paper's core mechanism: each harness edit stores which tasks it was predicted to fix BEFORE evaluation and what it fixed after; accepted edits often missed their prediction (0 of 4, 2 of 8), and keeping only the diagnosis without attempts and outcomes was no better than no memory. SIA today records why a change was made but not what it should fix or whether it did; a task closes on merge plus a live check, which is 'accepted', not 'worked'. SCOPE (this task only): optional `predicted` on open_task/update_task, `observed` on update_task/close_task; close_task on a task that has `predicted` and no `observed` is refused by code. No schema version bump (optional keys, as `assignee` T-236). NOT in scope, candidates for later tasks: provenance (model, evidence) on rules and hooks; a 'does it still fire' pass at a model change; grouping attempts under a recurring problem. Brief: docs/loops/t358-brief.md. PREDICTED (by hand until the field exists): after this ships, every task Atlas opens for a behaviour change carries a prediction, and at least one close in the first two weeks records 'did not hold'.",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -7407,12 +7421,12 @@
     },
     {
       "n": 178,
-      "date": "2026-11-19",
+      "date": "2026-11-20",
       "uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 651
+      "last_work_rev": 652
     }
   ]
 }

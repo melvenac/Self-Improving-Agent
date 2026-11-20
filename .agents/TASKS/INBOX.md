@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 651 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 652 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -12,6 +12,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-334** Recall trigger per-arm outcomes: do withheld and injected fires differ in what the session does next (T-331's comparison; dashboard counts with Prism)
 - [ ] **T-357** Context efficiency per seat: a weekly recorded metric with a change log
+- [ ] **T-358** A task records its predicted effect before the change and its observed effect at close
 
 ## P3
 
