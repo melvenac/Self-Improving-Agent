@@ -109,6 +109,15 @@ export const TaskSchema = z.strictObject({
    * The writer does not read the seat map; /sync `task-assignees` checks the value.
    */
   assignee: z.string().min(1).optional(),
+  /**
+   * T-358: `predicted` is what this task's change is expected to fix or move, written BEFORE the change. `observed` is
+   * what was seen afterwards, and it may say the prediction did not hold or was not measured. Both OPTIONAL WITH NO
+   * DEFAULT, as `assignee`: absent stays absent on disk, and a task with neither behaves as before. The writer keeps
+   * the rules (state-writer `editEffect`): no `observed` without `predicted`, no change to `predicted` once `observed`
+   * is set, and no close of a task that has `predicted` and no `observed`.
+   */
+  predicted: z.string().min(1).optional(),
+  observed: z.string().min(1).optional(),
 }).refine((t) => (t.status === "done") === (t.closed_session !== null), {
   message: 'closed_session must be set when status is "done" and null otherwise',
   path: ["closed_session"],
@@ -527,7 +536,7 @@ export const KEY_ORDER: Readonly<Record<string, readonly string[]>> = {
   $: ["schema_version", "revision", "project", "objective", "tasks", "verified", "gaps", "decisions", "handoffs", "sessions"],
   project: ["name"],
   objective: ["text", "since_session"],
-  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "note_by", "closed_rev", "assignee"],
+  tasks: ["id", "title", "priority", "status", "opened_session", "closed_session", "supersedes", "note", "note_by", "closed_rev", "assignee", "predicted", "observed"],
   verified: ["id", "claim", "evidence", "since_session", "status"],
   evidence: ["type", "path", "observation"],
   gaps: ["id", "what", "evidence", "recommended_update", "opened_session", "status", "closed_session", "closed_rev"],

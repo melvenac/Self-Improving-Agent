@@ -69,11 +69,11 @@ const NoteEdit = {
 const NOTE_JOIN = " — ";
 
 export const OpSchema = z.discriminatedUnion("op", [
-  z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional(), assignee: z.string().min(1).optional() }),
+  z.strictObject({ op: z.literal("open_task"), id: z.string().optional(), title: z.string().min(1), priority: TaskPriority, note: z.string().optional(), supersedes: z.string().nullable().optional(), assignee: z.string().min(1).optional(), predicted: z.string().min(1).optional() }),
   // T-171: adding to a note and replacing it are different fields, named at the
   // call. `note` is gone from both ops (refused by name below, not ignored).
-  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), assignee: z.string().min(1).nullable().optional(), ...NoteEdit }),
-  z.strictObject({ op: z.literal("close_task"), id: z.string(), ...NoteEdit }),
+  z.strictObject({ op: z.literal("update_task"), id: z.string(), title: z.string().min(1).optional(), priority: TaskPriority.optional(), status: ActiveStatus.optional(), assignee: z.string().min(1).nullable().optional(), predicted: z.string().min(1).optional(), observed: z.string().min(1).optional(), ...NoteEdit }),
+  z.strictObject({ op: z.literal("close_task"), id: z.string(), observed: z.string().min(1).optional(), ...NoteEdit }),
   z.strictObject({ op: z.literal("reopen_task"), id: z.string(), note: z.string().min(1) }),
   z.strictObject({ op: z.literal("add_verified"), id: z.string().optional(), claim: z.string().min(1), evidence: z.array(EvidenceSchema).min(1) }),
   z.strictObject({ op: z.literal("reopen_verified"), id: z.string(), evidence: EvidenceSchema }),
@@ -632,6 +632,32 @@ function editNote(t: Task, op: { append_note?: string; replace_note?: string; re
   return null;
 }
 
+/**
+ * T-358: a task's predicted and observed effect, on update_task (`closing` false) and close_task (`closing` true).
+ * Returns the refusal, or null after applying. Every rule is checked before anything is set, and each set is printed
+ * with its size on the same lines as a note change, dry run included.
+ */
+function editEffect(t: Task, op: { predicted?: string; observed?: string }, ctx: OpContext, closing: boolean): string | null {
+  if (op.predicted !== undefined && t.observed !== undefined) {
+    return `${t.id} already has an observed effect; a prediction cannot change after the result is recorded`;
+  }
+  if (op.observed !== undefined && t.predicted === undefined && op.predicted === undefined) {
+    return `${t.id} has no predicted effect to compare with; set predicted first`;
+  }
+  if (closing && t.predicted !== undefined && t.observed === undefined && op.observed === undefined) {
+    return `${t.id} has a predicted effect and no observed effect: close it with observed: "<what happened>" (it may say the prediction did not hold, or was not measured and why)`;
+  }
+  if (op.predicted !== undefined) {
+    t.predicted = op.predicted;
+    ctx.noteChanges.push(`${t.id} predicted SET: ${op.predicted.length} chars`);
+  }
+  if (op.observed !== undefined) {
+    t.observed = op.observed;
+    ctx.noteChanges.push(`${t.id} observed SET: ${op.observed.length} chars`);
+  }
+  return null;
+}
+
 function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
   const { session } = ctx;
   switch (op.op) {
@@ -639,8 +665,9 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       const id = op.id ?? nextId("T", s.tasks.map((t) => t.id));
       if (s.tasks.some((t) => t.id === id)) return { ok: false, error: `task ${id} already exists` };
       if (op.supersedes && !s.tasks.some((t) => t.id === op.supersedes)) return { ok: false, error: `supersedes unknown task ${op.supersedes}` };
-      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: !op.note ? [] : ctx.uuid === null ? null : [ctx.uuid], closed_rev: null, ...(op.assignee !== undefined ? { assignee: op.assignee } : {}) });
+      s.tasks.push({ id, title: op.title, priority: op.priority, status: "open", opened_session: session, closed_session: null, supersedes: op.supersedes ?? null, note: op.note ?? "", note_by: !op.note ? [] : ctx.uuid === null ? null : [ctx.uuid], closed_rev: null, ...(op.assignee !== undefined ? { assignee: op.assignee } : {}), ...(op.predicted !== undefined ? { predicted: op.predicted } : {}) });
       if (op.note) ctx.noteChanges.push(`${id} note SET: 0 -> ${op.note.length} chars`);
+      if (op.predicted !== undefined) ctx.noteChanges.push(`${id} predicted SET: ${op.predicted.length} chars`);
       return { ok: true, id };
     }
     case "update_task": {
@@ -653,6 +680,8 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       // T-236 (c): null CLEARS, and clearing removes the key, so the record reads as if it was never assigned.
       if (op.assignee === null) delete t.assignee;
       else if (op.assignee !== undefined) t.assignee = op.assignee;
+      const effect = editEffect(t, op, ctx, false);
+      if (effect) return { ok: false, error: effect };
       const refused = editNote(t, op, ctx);
       if (refused) return { ok: false, error: refused };
       return { ok: true, id: t.id };
@@ -661,6 +690,9 @@ function applyOne(s: State, op: StateOp, ctx: OpContext): OpResult {
       const t = findTask(s, op.id);
       if (!t) return { ok: false, error: `unknown task ${op.id}` };
       if (t.status === "done") return { ok: false, error: `task ${op.id} is already done (closed session ${t.closed_session})` };
+      // T-358: checked before the task is marked done, so the refusal is the first thing a close of such a task meets.
+      const effect = editEffect(t, op, ctx, true);
+      if (effect) return { ok: false, error: effect };
       t.status = "done";
       t.closed_session = session;
       t.closed_rev = ctx.rev;

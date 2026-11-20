@@ -16,7 +16,7 @@ const UUID = "u-t271";
 
 const ADD_VERIFIED_SHAPE = `{op: "add_verified", id?: string, claim: string (non-empty), evidence: [{type: string, path: string, observation: string}] (non-empty)}`;
 const SET_HANDOFF_SHAPE = String.raw`{op: "set_handoff", seat: "planner"|"developer"|"qa", pick_up: string, watch_out: [string | {text: string (non-empty), expires?: integer (> 0) | string (matching /^\d{4}-\d{2}-\d{2}$/)}], open_questions: [string | {text: string (non-empty), resolved_by?: string (non-empty), owner?: string (non-empty)}], loop_state?: {open_prs: [{ref: string (non-empty), qa_status: "not_started"|"in_progress"|"accepted"|"rejected"|"not_required", note: string}], frozen_sha: string | null, questions_for_aaron: [string], rulings: [string]} | null}`;
-const UPDATE_TASK_SHAPE = `{op: "update_task", id: string, title?: string (non-empty), priority?: "P0"|"P1"|"P2"|"P3", status?: "open"|"in_progress"|"blocked", assignee?: string (non-empty) | null, append_note?: string (non-empty), replace_note?: string, replace_other_sessions?: true}`;
+const UPDATE_TASK_SHAPE = `{op: "update_task", id: string, title?: string (non-empty), priority?: "P0"|"P1"|"P2"|"P3", status?: "open"|"in_progress"|"blocked", assignee?: string (non-empty) | null, predicted?: string (non-empty), observed?: string (non-empty), append_note?: string (non-empty), replace_note?: string, replace_other_sessions?: true}`;
 const OP_NAMES = "open_task, update_task, close_task, reopen_task, add_verified, reopen_verified, add_gap, update_gap, close_gap, reopen_gap, add_decision, set_standing, set_objective, set_handoff";
 
 // Prism's first attempt, reconstructed from the planner's evaluation (the transcript stays out of this public repo): the
