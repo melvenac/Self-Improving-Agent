@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 650 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 651 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Next Session Handoff
 
@@ -6,17 +6,19 @@
 
 ### Pick up here
 
-Two code PRs are accepted and NOT merged; each waits for Aaron's word typed in Atlas's window. (1) #1155 (T-353, bootstrap writes an eight-flag greeting.json, the template tracks it, /sync warns; reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES): bash atlas-ops pr-refresh.sh 1155 6d82d38eca779d953e0bf5097d1271da595fff98 (same patch-id, CI SUCCESS), then pr-merge.sh 1155 <new head>; ask clark to rebuild the main checkout; live check: `sync` from the new build in a fleet repo prints greeting-flags [pass]; close T-353. (2) #1163 (T-357, scripts/ctx-metrics.mjs, a weekly context-efficiency row per seat with a change log; reviewed d19c4f6c, job 1532 ACCEPT-WITH-NOTES): pr-refresh.sh 1163 d19c4f6c759acee7dcc14291a762f0cb2209baad, then pr-merge.sh; no rebuild; then the After-merge steps in docs/loops/t357b-brief.md (write ~/.claude/open-brain/context-metrics.config.json with the eight seats' transcript folders, add the two seed notes, first run) and ask clark to schedule the weekly run; T-357 stays open until four scheduled weekly rows per seat and one named before/after exist. Session 178 also shipped and live-checked T-343, T-344 + T-312 and T-352. T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Herald and Beam turned the full flag set on 11-17 and owe a report on their first greeting. Open from this session's reviews: T-345 to T-347, T-349 to T-351, T-354, T-355, T-356.
+Both of the session's waiting code PRs are merged on Aaron's typed word: #1155 (T-353, closed, live-checked) and #1163 (T-357). T-357 stays open: the script scripts/ctx-metrics.mjs is on master at e44c28e8, the config, change log and first 31 rows are in ~/.claude/open-brain/ (context-metrics.config.json, context-changes.md, context-metrics.jsonl), and clark has been asked to schedule the weekly run (`node scripts/ctx-metrics.mjs --config <home>/.claude/open-brain/context-metrics.config.json` from a checkout at or after e44c28e8, after Monday 00:00 UTC). Next for T-357: after the run of Monday 2026-11-23, check that each active seat got one row for week 2026-11-16 and a rerun writes 0; T-357 closes after four such weekly rows per seat and one named before/after read from them. The first reading from history does not show windows lasting longer (see the T-357 note); tell Aaron again when scheduled rows exist. Session 178 also shipped and live-checked T-343, T-344 + T-312 and T-352. T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Herald and Beam turned the full flag set on 11-17 and owe a report on their first greeting. Open from this session's reviews: T-345 to T-347, T-349 to T-351, T-354, T-355, T-356 (needs Aaron's answer on third-party installs before any brief). Atlas also reviewed clark's ops.mjs adversarially in three rounds at Aaron's request (findings under ~/Worktrees/codemode-trial/ops-review/); v3 (named checks, JSON request) held, and clark plans to offer it to the planners after a day of its own use.
 
 ### Watch out
 
-- Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.
+- Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build and no scripts/.
 - Fleet scheduling (slots, host, order) and main-tree rebuilds are clark's; Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.
 - A code merge needs Aaron's word typed in Atlas's own window: a relay from clark is not enough and the permission classifier denies the merge without it.
 - Put the commit before the full suite in a build brief (done in t357/t357b: no s4-guards D1b red).
 - A brief with no edits.txt (new files only) cannot use byte-compare.sh: compare by git diff --name-status and blob ids (git rev-parse <head>:<dest> <base>:docs/loops/<tag>/<file>).
 - qapc-job.mjs submit prints 'CHECK sha failed' until the sha is fetched locally: git fetch origin first.
 - An AskUserQuestion answer in another seat's window is a tool result, which relay-check.mjs skips: grep that transcript for the "answers" record instead.
+- When grepping `sync --check` output, anchor the pattern (for example '^\s*greeting-flags'): a loose word like 'build' matches two lines of several thousand characters each.
+- ctx-metrics rows are written once and never updated: do not run it with a --now in the future, and do not delete context-metrics.jsonl (the transcripts it was read from are cleaned up after about 30 days).
 - T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.
 - T-336 last check: clark's next greeting-metrics row must not list latest_brief.
 - tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.
@@ -24,20 +26,16 @@ Two code PRs are accepted and NOT merged; each waits for Aaron's word typed in A
 
 ### Open questions
 
-- Merge #1155 (T-353; QA ACCEPT-WITH-NOTES, job 1455)?
-- Merge #1163 (T-357; QA ACCEPT-WITH-NOTES, job 1532)?
+- T-356: are third-party (non-Aaron) installs in scope, so the 'WAITING ON AARON' label should become configurable?
 
 ### Loop state
 
-**Open PRs:** 
-- #1155 — QA: accepted — T-353 t353, reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES
-- #1163 — QA: accepted — T-357 t357b, reviewed d19c4f6c, job 1532 ACCEPT-WITH-NOTES
+**Open PRs:** _None._
 
 **SHA frozen for QA:** _None._
 
 **Questions pending for Aaron:** 
-- Merge #1155?
-- Merge #1163?
+- T-356: are third-party installs in scope?
 
 **Rulings made mid-loop:** 
 - s178: T-334 arm kept at 0.5 (Aaron, D-165).
