@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+    const lead = old !== "" && !old.endsWith("\n") ? "\n" : "";
+===
+    const lead = !old.endsWith("\n") ? "\n" : "";
+>>>

@@ -1,0 +1,9 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+    if (o.dryRun) {
+      for (const r of rows) log(JSON.stringify(r));
+===
+    if (o.dryRun) {
+      mkdirSync(dirname(out), { recursive: true });
+      for (const r of rows) log(JSON.stringify(r));
+>>>

@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "revision": 646,
+  "revision": 650,
   "project": {
     "name": "self-improving-agent"
   },
@@ -3214,7 +3214,63 @@
       "opened_session": 178,
       "closed_session": null,
       "supersedes": null,
-      "note": "s178 11-17 (Atlas, from clark relaying Prism's T-122, #835). Read at master f1a2811f: every greeting feature is opt-in through `.agents/SYSTEM/greeting.json` (12 flags; SIA's own file has 11 true and handoff_caps false), but neither `open-brain bootstrap` (src/pipelines/bootstrap) nor project-template/ writes that file. Result seen in the fleet: Herald (tcm-marketing) and Beam (openlaser) had no greeting-metrics rows at all, and by the same cause no budgeted briefing, until someone noticed on the dashboard. Planner's proposed fix: bootstrap's scaffold writes greeting.json with SIA's current set when the file is absent (never overwrite an existing one), and /sync warns when a project with state.json has no greeting.json. NOT checked: how each flag reads in a repo without .agents/roles or PRD.md; Herald and Beam were asked on 11-17 to report any wrong or noisy line after turning the full set on, and that report is the evidence to wait for before the brief. Turning features on by default for new projects is a product choice: ask Aaron before the brief is pinned. — s178 11-17, second cause, reported by Herald and Beam and read by Atlas at master 5ee27905: project-template/gitignore lines 28-30 ignore /.agents/SYSTEM/* except SUMMARY.md, so a greeting.json written in a bootstrapped project is ignored by git and reaches one checkout only. Herald's land.sh committed nothing and said nothing; both repos added `!/.agents/SYSTEM/greeting.json` by hand (tcm-marketing 7513a3c + 9ee659f, openlaser d3e8589 + 430f03f). The fix must add that exception to the template gitignore, and /sync should warn when greeting.json exists but is ignored (git check-ignore). Existing bootstrapped repos need the one-line exception by hand: check the other fleet repos. Both seats took the full 11-flag set; openlaser has roles but no tracked PRD.md, so its first greeting is the test of briefing_problem without a PRD. — s178 11-18: Aaron answered yes (see the decision recorded at this revision). As of 11-18 no greeting-metrics row exists yet for tcm-marketing or openlaser since they turned the flags on; drafting starts now, pinning waits for those two rows and greetings.",
+      "note": "s178 11-17 (Atlas, from clark relaying Prism's T-122, #835). Read at master f1a2811f: every greeting feature is opt-in through `.agents/SYSTEM/greeting.json` (12 flags; SIA's own file has 11 true and handoff_caps false), but neither `open-brain bootstrap` (src/pipelines/bootstrap) nor project-template/ writes that file. Result seen in the fleet: Herald (tcm-marketing) and Beam (openlaser) had no greeting-metrics rows at all, and by the same cause no budgeted briefing, until someone noticed on the dashboard. Planner's proposed fix: bootstrap's scaffold writes greeting.json with SIA's current set when the file is absent (never overwrite an existing one), and /sync warns when a project with state.json has no greeting.json. NOT checked: how each flag reads in a repo without .agents/roles or PRD.md; Herald and Beam were asked on 11-17 to report any wrong or noisy line after turning the full set on, and that report is the evidence to wait for before the brief. Turning features on by default for new projects is a product choice: ask Aaron before the brief is pinned. — s178 11-17, second cause, reported by Herald and Beam and read by Atlas at master 5ee27905: project-template/gitignore lines 28-30 ignore /.agents/SYSTEM/* except SUMMARY.md, so a greeting.json written in a bootstrapped project is ignored by git and reaches one checkout only. Herald's land.sh committed nothing and said nothing; both repos added `!/.agents/SYSTEM/greeting.json` by hand (tcm-marketing 7513a3c + 9ee659f, openlaser d3e8589 + 430f03f). The fix must add that exception to the template gitignore, and /sync should warn when greeting.json exists but is ignored (git check-ignore). Existing bootstrapped repos need the one-line exception by hand: check the other fleet repos. Both seats took the full 11-flag set; openlaser has roles but no tracked PRD.md, so its first greeting is the test of briefing_problem without a PRD. — s178 11-18: Aaron answered yes (see the decision recorded at this revision). As of 11-18 no greeting-metrics row exists yet for tcm-marketing or openlaser since they turned the flags on; drafting starts now, pinning waits for those two rows and greetings. — s178 11-18: brief pinned (docs PR #1153, master 83f87efa) and build job 1451 submitted. Default is EIGHT flags, not eleven: briefing_problem (no PRD after scaffold, so /sync prd-version would be an ISSUE and sync --check would exit 1 on a fresh install), briefing_focus and handoff_by_checkout (each filed as its own task at this revision) are left out, as D-166 allows. Pinned on the code reading of each flag, before Herald's and Beam's first greetings: neither had greeted by 11-18, and both have role files so neither is the bare case. Accepted and out of scope: a bootstrap re-run writes nothing (the /sync warning is the path for existing projects); `state import --commit` gives the ignore exception but no greeting.json. — s178 11-18: built as PR #1155 (loop/t353, CAND 6d82d38e on START 83f87efa, job 1451 on the QA PC; byte-compare 8 files SAME). Review job 1455 (QA PC, Opus): ACCEPT-WITH-NOTES. It bootstrapped a scratch project for real: greeting.json is the eight-key file, tracked and not ignored; none of the eight flags prints a fault or alarm in the first briefing; the check never returns issue and sync --check's exit status is the same at START and CAND on 11 fixture shapes; the ignore probe is right in all four cases; full suite on the committed tree 5061 passed, 1 failed (checks D4, known). One mutant survives (the ENOENT message, a test gap). Notes: (1) the budgeted layout prints 'WAITING ON AARON: none' in every new project, filed as its own task at this revision; (2) checkGreetingFlags' own state.json read is unguarded, unreachable today because checkSummary throws first; (3) maybe_shipped can misfire in an adopted project whose history already uses T-n ids; (4) an invalid-JSON greeting.json passes with '0 flag(s) on' rather than warning. NOT RUN by the review: the MCP ob_start path with a proven session, and Windows. NOT MERGED: waits for Aaron's word typed in Atlas's window. After merge: clark rebuilds; live check = `sync` in a fleet repo prints greeting-flags [pass].",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-354",
+      "title": "briefing_focus prints 'no seat map ... seat is unknown' on every start in a project with no hub-partner-seats.json",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s178 11-18 (Atlas; found by the T-353 drafting agent reading the code, line confirmed by Atlas at master 139d3ec0: session-start/focus.ts:75). With greeting.json briefing_focus on and no .agents/SYSTEM/hub-partner-seats.json, the PICK UP HERE header carries `FOCUS: no seat map (.agents/SYSTEM/hub-partner-seats.json), so this checkout's seat is unknown` on every start, beside a Seat line that did resolve the seat from AGENT.md. A single-seat project has no seat map by design, so the line is noise and reads as a fault. Because of it briefing_focus was left out of the bootstrap default (T-353, D-166). Proposed fix: with no seat map, resolve the seat from AGENT.md as the Seat line does, or print nothing; then add the flag to the default. NOT run: read from code only.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-355",
+      "title": "handoff_by_checkout: a fresh record's first greeting loses 'Your handoff: none yet (fresh record)' and shows a legacy, unattributed handoff",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s178 11-18 (Atlas; found by the T-353 drafting agent reading the code at master 139d3ec0, NOT confirmed by Atlas or by a run). A record fresh from `state import` carries one empty handoff with checkout null (state-import/index.ts:544). With greeting.json handoff_by_checkout on, that handoff is never 'yours': the State block prints 'no handoff recorded for this checkout' and lists it as `developer [legacy, unattributed]` (state-render.ts:242, 257, 346), where with the flag off it prints T-329's `Your handoff: none yet (fresh record)` (:248). Because of it handoff_by_checkout was left out of the bootstrap default (T-353, D-166). Proposed fix: treat the import's empty checkout-less handoff as the fresh-record case under the flag too; then add the flag to the default. First step: reproduce in a scratch project.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-356",
+      "title": "The budgeted briefing prints 'WAITING ON AARON' in every project, including installs that are not Aaron's",
+      "priority": "P3",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "s178 11-18 (Atlas, from the T-353 review, job 1455 note 1; line read by the judge at briefing.ts:393 and seen in a live scratch bootstrap). With briefing_budget on, which T-353 makes the default for new projects, the briefing prints `WAITING ON AARON: none` (or the list) in every project. SIA is distributed as a template, and /sync's template-personal-names check exists so a third-party install does not carry this name; the label is in code, where that check does not look. Also the owner match is the literal 'aaron' (questionOwner(q)?.toLowerCase() === 'aaron' in briefing.ts and greeting-metrics.ts). Not a fault in Aaron's fleet. Options: a neutral label ('WAITING ON THE OWNER'), or an owner name read from the record or config with 'aaron' as today's value. This is a product question (is a third-party install in scope now?): ask Aaron before a brief.",
+      "note_by": [
+        "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
+      ],
+      "closed_rev": null
+    },
+    {
+      "id": "T-357",
+      "title": "Context efficiency per seat: a weekly recorded metric with a change log",
+      "priority": "P2",
+      "status": "open",
+      "opened_session": 178,
+      "closed_session": null,
+      "supersedes": null,
+      "note": "Aaron approved 2026-11-19 in clark's window (AskUserQuestion answer \"Yes, fleet-only first (Recommended)\", read by Atlas in clark's transcript at 20:22:47Z). Origin: clark measured seat transcripts (C:/Users/melve/Worktrees/codemode-trial/ctx-trend.mjs, ctx-trend-findings.md) after Aaron noticed planner context windows lasting longer. Atlas's review: the script measures workload (calls per week), not window life; the last week was partial; `seen` is per file so resumed sessions may double count; tool-result size is a mean. Scope: fleet-only script under the SIA repo's scripts/, not an open-brain CLI feature. It appends one row per seat per CLOSED ISO week to a jsonl: windows (spans between compact_boundary or session start/end), median calls / user turns / hours per window, context at compaction, first-call context per session, median and p90 growth per call and tool-result chars per call, sidechain share, model id, Claude Code version; message ids deduplicated across all files of a seat. A dated change log sits beside it, seeded with: code mode A/B on dashboard t139 (11-19, not adopted), CC 2.1.329 on the QA PC and Lenovo (11-19). Check H1 first (model or window size change: model per week and context at each compaction). Runs weekly on the desktop, off-peak (clark's ruling 11-19: it only streams local files). DONE when four weekly rows exist and one named change has a before/after read from them. Open with Aaron (clark's): raising cleanupPeriodDays so transcripts are kept longer; without it the history is about 30 days. — s178 11-19: built and reviewed in two rounds. Round one (brief docs/loops/t357-brief.md, build job 1529, PR #1160) was REJECTED by review job 1530: appendRows glued a new row to a last line with no newline, after which a rerun rewrote a closed week from whatever transcripts remained; and a null config exited 1 with a stack. #1160 closed. Round two (docs/loops/t357b-brief.md, build job 1531, PR #1163, CAND d19c4f6c759acee7dcc14291a762f0cb2209baad on START 7420a541) fixes both, merges folders that share a seat name, reports an unreadable seat without stopping the others (that seat writes no row that run), makes --note respect --dry-run, and refuses a --now without a zone; 20 rows, 41 mutants all red. Review job 1532: ACCEPT-WITH-NOTES, no findings; full suite 5066 passed, only the known D4 red. NOT merged: waits for Aaron's word. Notes left for a follow-up if they bite: a failure on the out file itself is uncaught (stack, exit 1); seat names are matched exactly (a trailing space makes a second seat); --now's zone test only checks the end of the string; CM-20's TZ child processes were not observed on Windows. Measured premises worth keeping: context at compaction is not constant (atlas 201K-562K, clark 201K-761K; atlas weekly median 320K, 261K, 212K, 245K on one model id); 0 of 44,197 message ids repeat across files of a seat; a turn typed mid-work is a queued_command attachment, not a user record. Ruled: output lives under ~/.claude/open-brain/ (context-metrics.jsonl, context-changes.md, context-metrics.config.json), not in the repo; DONE means four rows per seat written by four scheduled weekly runs AFTER the merge plus one named before/after; the oldest week of the first run may be cut short by cleanup and is not a 'before'. After merge: Atlas writes the config, adds the two seed notes (code mode A/B on dashboard t139 not adopted; Claude Code 2.1.329 on the QA PC and Lenovo; both 2026-11-19), does the first run; clark schedules the weekly run. No rebuild needed (nothing under open-brain/src).",
       "note_by": [
         "a7111bb2-0767-43ec-bd4e-a5192a3f957f"
       ],
@@ -7197,33 +7253,62 @@
     },
     {
       "seat": "planner",
-      "pick_up": "Nothing is waiting to merge. Session 178 shipped four greeting fixes, all merged, rebuilt (build ac44e43) and live-checked: T-343 (calm line when behind by code only), T-344 + T-312 (pick-up whole, list totals), T-352 (greeting row budget_chars = 4400 + printed pick-up length). T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once; then close it. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Still open from the greeting reviews: T-345 to T-347, T-349, T-350, T-351.",
+      "pick_up": "Two code PRs are accepted and NOT merged; each waits for Aaron's word typed in Atlas's window. (1) #1155 (T-353, bootstrap writes an eight-flag greeting.json, the template tracks it, /sync warns; reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES): bash atlas-ops pr-refresh.sh 1155 6d82d38eca779d953e0bf5097d1271da595fff98 (same patch-id, CI SUCCESS), then pr-merge.sh 1155 <new head>; ask clark to rebuild the main checkout; live check: `sync` from the new build in a fleet repo prints greeting-flags [pass]; close T-353. (2) #1163 (T-357, scripts/ctx-metrics.mjs, a weekly context-efficiency row per seat with a change log; reviewed d19c4f6c, job 1532 ACCEPT-WITH-NOTES): pr-refresh.sh 1163 d19c4f6c759acee7dcc14291a762f0cb2209baad, then pr-merge.sh; no rebuild; then the After-merge steps in docs/loops/t357b-brief.md (write ~/.claude/open-brain/context-metrics.config.json with the eight seats' transcript folders, add the two seed notes, first run) and ask clark to schedule the weekly run; T-357 stays open until four scheduled weekly rows per seat and one named before/after exist. Session 178 also shipped and live-checked T-343, T-344 + T-312 and T-352. T-348 (owed-reads reminder) is merged and stays open only for its live check: at the first start that lists a read owed, the first applied ob_state must print 'READS OWED at start (N), confirm each was read: ...' once. T-334 reading 1 found no detectable difference; the arm stays at 0.5 (D-165); second look about 11-30 with docs/loops/t334/t334-read.cjs. Herald and Beam turned the full flag set on 11-17 and owe a report on their first greeting. Open from this session's reviews: T-345 to T-347, T-349 to T-351, T-354, T-355, T-356.",
       "watch_out": [
         "Run the SIA CLI from the main tree build (C:/Users/melve/Projects/Self-Improving-Agent/open-brain/build/cli.js); the sparse planner tree has no open-brain/build.",
         "Fleet scheduling (slots, host, order) and main-tree rebuilds are clark's; Atlas still submits SIA's own jobs and tells clark only if one queues over 15 minutes.",
         "A code merge needs Aaron's word typed in Atlas's own window: a relay from clark is not enough and the permission classifier denies the merge without it.",
+        "Put the commit before the full suite in a build brief (done in t357/t357b: no s4-guards D1b red).",
+        "A brief with no edits.txt (new files only) cannot use byte-compare.sh: compare by git diff --name-status and blob ids (git rev-parse <head>:<dest> <base>:docs/loops/<tag>/<file>).",
+        "qapc-job.mjs submit prints 'CHECK sha failed' until the sha is fetched locally: git fetch origin first.",
+        "An AskUserQuestion answer in another seat's window is a tool result, which relay-check.mjs skips: grep that transcript for the \"answers\" record instead.",
         "T-339 live check still open: Beam's next skills-audit should name .claude/skills/beam-ops as ops.",
         "T-336 last check: clark's next greeting-metrics row must not list latest_brief.",
         "tree-sync.sh refuses untracked docs/: move new docs aside, sync, then move them back before ob_state.",
-        "tests/harness/checks.test.ts D4 is red at master on the Lenovo host AND the QA PC (npm error); it is not a change's fault."
+        "tests/harness/checks.test.ts D4 is red at master on the Lenovo host AND the QA PC (npm error); it is not a change's fault. A lone 'Timeout calling onTaskUpdate' with every file green is the T-292 flake: rerun the CI job."
       ],
-      "open_questions": [],
+      "open_questions": [
+        {
+          "owner": "aaron",
+          "text": "Merge #1155 (T-353; QA ACCEPT-WITH-NOTES, job 1455)?"
+        },
+        {
+          "owner": "aaron",
+          "text": "Merge #1163 (T-357; QA ACCEPT-WITH-NOTES, job 1532)?"
+        }
+      ],
       "session": 178,
       "loop_state": {
-        "open_prs": [],
+        "open_prs": [
+          {
+            "ref": "#1155",
+            "qa_status": "accepted",
+            "note": "T-353 t353, reviewed 6d82d38e, job 1455 ACCEPT-WITH-NOTES"
+          },
+          {
+            "ref": "#1163",
+            "qa_status": "accepted",
+            "note": "T-357 t357b, reviewed d19c4f6c, job 1532 ACCEPT-WITH-NOTES"
+          }
+        ],
         "frozen_sha": null,
-        "questions_for_aaron": [],
+        "questions_for_aaron": [
+          "Merge #1155?",
+          "Merge #1163?"
+        ],
         "rulings": [
           "s178: T-334 arm kept at 0.5 (Aaron, D-165).",
           "s178: t344: pick-up whole to 4000; budget measured without it.",
           "s178: t352: budget_chars = 4400 + printed pick-up length; greeting_chars stays the true size.",
-          "s178: reviews: a tests-only gap on an input the source handles is a NOTE, not a REJECT."
+          "s178: t353: the bootstrap default is eight flags; briefing_problem, briefing_focus and handoff_by_checkout are left out (D-166 allows it).",
+          "s178: reviews: a tests-only gap on an input the source handles is a NOTE, not a REJECT.",
+          "s178: t357: output outside the repo under ~/.claude/open-brain/; done = four scheduled weekly rows per seat after the merge plus one before/after."
         ]
       },
       "session_uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "written_rev": 643
+      "written_rev": 650
     }
   ],
   "sessions": [
@@ -7336,12 +7421,12 @@
     },
     {
       "n": 178,
-      "date": "2026-11-18",
+      "date": "2026-11-19",
       "uuid": "a7111bb2-0767-43ec-bd4e-a5192a3f957f",
       "seat": "planner",
       "checkout": "sia-planner",
       "first_rev": 635,
-      "last_work_rev": 646
+      "last_work_rev": 650
     }
   ]
 }

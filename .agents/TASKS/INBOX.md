@@ -1,4 +1,4 @@
-<!-- generated from .agents/state.json rev 646 by open-brain v0.45.0 — do not edit; change state via ob_state -->
+<!-- generated from .agents/state.json rev 650 by open-brain v0.45.0 — do not edit; change state via ob_state -->
 
 # Inbox
 
@@ -11,6 +11,7 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-046** Cursor + Git Bash: PowerShell hook wrapper fail-closes every tool
 - [ ] **T-191** Per-seat greeting profiles: ob_start renders what each seat needs, from a data file, and names every section it omits
 - [ ] **T-334** Recall trigger per-arm outcomes: do withheld and injected fires differ in what the session does next (T-331's comparison; dashboard counts with Prism)
+- [ ] **T-357** Context efficiency per seat: a weekly recorded metric with a change log
 
 ## P3
 
@@ -26,6 +27,9 @@ Titles only. Full rationale for a task is its `note` in `.agents/state.json` und
 - [ ] **T-350** Dashboard greeting scorecard vs the six real greetings (11-17 roll): two seats missing, a false red alarm, and columns that cannot see the real misses
 - [ ] **T-351** A review REJECT for a surviving mutant costs a full build and review round even when the source is right: let a tests-only delta land on the reviewed branch
 - [ ] **T-353** /bootstrap does not write .agents/SYSTEM/greeting.json, so a new project gets the legacy briefing and no scorecard rows
+- [ ] **T-354** briefing_focus prints 'no seat map ... seat is unknown' on every start in a project with no hub-partner-seats.json
+- [ ] **T-355** handoff_by_checkout: a fresh record's first greeting loses 'Your handoff: none yet (fresh record)' and shows a legacy, unattributed handoff
+- [ ] **T-356** The budgeted briefing prints 'WAITING ON AARON' in every project, including installs that are not Aaron's
 
 ## Done (last 3 sessions)
 

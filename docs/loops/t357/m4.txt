@@ -1,0 +1,6 @@
+@@@ scripts/ctx-metrics.mjs
+<<<
+  if (j.origin) return j.origin.kind === "human";
+===
+  if (j.origin) return true;
+>>>
