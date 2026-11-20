@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+  if (op.observed !== undefined && t.predicted === undefined && op.predicted === undefined) {
+===
+  if (op.observed !== undefined && t.predicted === undefined && op.predicted === undefined && false) {
+>>>

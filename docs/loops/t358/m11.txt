@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+      const effect = editEffect(t, op, ctx, true);
+===
+      const effect = editEffect(t, op, ctx, false);
+>>>

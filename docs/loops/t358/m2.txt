@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+...(op.predicted !== undefined ? { predicted: op.predicted } : {}) });
+===
+...(op.predicted !== undefined ? {} : {}) });
+>>>

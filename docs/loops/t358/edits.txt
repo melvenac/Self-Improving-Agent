@@ -1,0 +1,119 @@
+@@@ open-brain/src/shared/state-schema.ts
+<<<
+  assignee: z.string().min(1).optional(),
+}).refine((t) => (t.status === "done") === (t.closed_session !== null), {
+===
+  assignee: z.string().min(1).optional(),
+  /**
+   * T-358: `predicted` is what this task's change is expected to fix or move, written BEFORE the change. `observed` is
+   * what was seen afterwards, and it may say the prediction did not hold or was not measured. Both OPTIONAL WITH NO
+   * DEFAULT, as `assignee`: absent stays absent on disk, and a task with neither behaves as before. The writer keeps
+   * the rules (state-writer `editEffect`): no `observed` without `predicted`, no change to `predicted` once `observed`
+   * is set, and no close of a task that has `predicted` and no `observed`.
+   */
+  predicted: z.string().min(1).optional(),
+  observed: z.string().min(1).optional(),
+}).refine((t) => (t.status === "done") === (t.closed_session !== null), {
+>>>
+@@@ open-brain/src/shared/state-schema.ts
+<<<
+"note", "note_by", "closed_rev", "assignee"],
+===
+"note", "note_by", "closed_rev", "assignee", "predicted", "observed"],
+>>>
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+supersedes: z.string().nullable().optional(), assignee: z.string().min(1).optional() }),
+===
+supersedes: z.string().nullable().optional(), assignee: z.string().min(1).optional(), predicted: z.string().min(1).optional() }),
+>>>
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+assignee: z.string().min(1).nullable().optional(), ...NoteEdit }),
+===
+assignee: z.string().min(1).nullable().optional(), predicted: z.string().min(1).optional(), observed: z.string().min(1).optional(), ...NoteEdit }),
+>>>
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+  z.strictObject({ op: z.literal("close_task"), id: z.string(), ...NoteEdit }),
+===
+  z.strictObject({ op: z.literal("close_task"), id: z.string(), observed: z.string().min(1).optional(), ...NoteEdit }),
+>>>
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+  if (op.replace_note !== undefined) return replaceNote(t, op.replace_note, op.replace_other_sessions === true, ctx);
+  return null;
+}
+===
+  if (op.replace_note !== undefined) return replaceNote(t, op.replace_note, op.replace_other_sessions === true, ctx);
+  return null;
+}
+
+/**
+ * T-358: a task's predicted and observed effect, on update_task (`closing` false) and close_task (`closing` true).
+ * Returns the refusal, or null after applying. Every rule is checked before anything is set, and each set is printed
+ * with its size on the same lines as a note change, dry run included.
+ */
+function editEffect(t: Task, op: { predicted?: string; observed?: string }, ctx: OpContext, closing: boolean): string | null {
+  if (op.predicted !== undefined && t.observed !== undefined) {
+    return `${t.id} already has an observed effect; a prediction cannot change after the result is recorded`;
+  }
+  if (op.observed !== undefined && t.predicted === undefined && op.predicted === undefined) {
+    return `${t.id} has no predicted effect to compare with; set predicted first`;
+  }
+  if (closing && t.predicted !== undefined && t.observed === undefined && op.observed === undefined) {
+    return `${t.id} has a predicted effect and no observed effect: close it with observed: "<what happened>" (it may say the prediction did not hold, or was not measured and why)`;
+  }
+  if (op.predicted !== undefined) {
+    t.predicted = op.predicted;
+    ctx.noteChanges.push(`${t.id} predicted SET: ${op.predicted.length} chars`);
+  }
+  if (op.observed !== undefined) {
+    t.observed = op.observed;
+    ctx.noteChanges.push(`${t.id} observed SET: ${op.observed.length} chars`);
+  }
+  return null;
+}
+>>>
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+closed_rev: null, ...(op.assignee !== undefined ? { assignee: op.assignee } : {}) });
+      if (op.note) ctx.noteChanges.push(`${id} note SET: 0 -> ${op.note.length} chars`);
+===
+closed_rev: null, ...(op.assignee !== undefined ? { assignee: op.assignee } : {}), ...(op.predicted !== undefined ? { predicted: op.predicted } : {}) });
+      if (op.note) ctx.noteChanges.push(`${id} note SET: 0 -> ${op.note.length} chars`);
+      if (op.predicted !== undefined) ctx.noteChanges.push(`${id} predicted SET: ${op.predicted.length} chars`);
+>>>
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+      else if (op.assignee !== undefined) t.assignee = op.assignee;
+      const refused = editNote(t, op, ctx);
+===
+      else if (op.assignee !== undefined) t.assignee = op.assignee;
+      const effect = editEffect(t, op, ctx, false);
+      if (effect) return { ok: false, error: effect };
+      const refused = editNote(t, op, ctx);
+>>>
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+      if (t.status === "done") return { ok: false, error: `task ${op.id} is already done (closed session ${t.closed_session})` };
+      t.status = "done";
+===
+      if (t.status === "done") return { ok: false, error: `task ${op.id} is already done (closed session ${t.closed_session})` };
+      // T-358: checked before the task is marked done, so the refusal is the first thing a close of such a task meets.
+      const effect = editEffect(t, op, ctx, true);
+      if (effect) return { ok: false, error: effect };
+      t.status = "done";
+>>>
+@@@ open-brain/src/server.ts
+<<<
+every note change is printed with its sizes, dry run included. Atomic: all ops apply or none.
+===
+every note change is printed with its sizes, dry run included. Task effects (T-358): open_task and update_task take predicted (what the change should fix or move, written before the change); update_task and close_task take observed (what was seen afterwards, including that the prediction did not hold); close_task refuses a task that has predicted and no observed, observed is refused without predicted, and predicted cannot change once observed is set; each is printed with its size. Atomic: all ops apply or none.
+>>>
+@@@ open-brain/tests/shared/t271-op-refusals.test.ts
+<<<
+assignee?: string (non-empty) | null, append_note?: string (non-empty), replace_note?: string, replace_other_sessions?: true}`;
+===
+assignee?: string (non-empty) | null, predicted?: string (non-empty), observed?: string (non-empty), append_note?: string (non-empty), replace_note?: string, replace_other_sessions?: true}`;
+>>>
