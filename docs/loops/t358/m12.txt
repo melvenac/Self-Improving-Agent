@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+predicted: z.string().min(1).optional(), observed: z.string().min(1).optional(), ...NoteEdit }),
+===
+predicted: z.string().min(1).optional(), ...NoteEdit }),
+>>>

@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+    ctx.noteChanges.push(`${t.id} observed SET: ${op.observed.length} chars`);
+===
+    ctx.noteChanges.push(`${t.id} observed SET: ${t.id.length} chars`);
+>>>

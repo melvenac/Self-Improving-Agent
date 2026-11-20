@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-writer.ts
+<<<
+    t.predicted = op.predicted;
+===
+    if (t.predicted === undefined) t.predicted = op.predicted;
+>>>

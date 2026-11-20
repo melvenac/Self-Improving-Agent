@@ -1,0 +1,6 @@
+@@@ open-brain/src/shared/state-schema.ts
+<<<
+"note", "note_by", "closed_rev", "assignee", "predicted", "observed"],
+===
+"note", "note_by", "closed_rev", "assignee", "observed"],
+>>>
