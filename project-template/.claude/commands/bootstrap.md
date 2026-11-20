@@ -85,7 +85,8 @@ project's, and then **checks with git** that every file is tracked or local exac
 It prints each file as `tracked` or `local` with the reason. **Read that list to the owner**:
 
 - **Tracked** (committed with the project): `.agents/TASKS/INBOX.md`, `.agents/TASKS/task.md`,
-  `.agents/SYSTEM/SUMMARY.md`, `.agents/AGENT.md`, the four role-file stubs in `.agents/roles/`
+  `.agents/SYSTEM/SUMMARY.md`, `.agents/SYSTEM/greeting.json` (the `/start` greeting features, on by
+  default; set a flag to `false` to turn one off), `.agents/AGENT.md`, the four role-file stubs in `.agents/roles/`
   (`shared.md`, `planner.md`, `developer.md`, `qa.md`: starting points to replace with this project's
   own rules), the four session commands in `.claude/commands/` (`/start`, `/end`, `/task`, `/sync`),
   `.gitignore` and `.gitattributes`.

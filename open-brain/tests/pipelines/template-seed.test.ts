@@ -17,7 +17,7 @@ describe("project-template/.agents", () => {
     expect(existsSync(join(templateDir, ".agents", "state.json"))).toBe(false);
   });
 
-  it("the template's gitignore (shipped without the dot) tracks exactly the five state files, AGENT.md and the role files (T-251)", () => {
+  it("the template's gitignore (shipped without the dot) tracks exactly the five state files, AGENT.md, the role files (T-251) and greeting.json (T-353)", () => {
     const text = readFileSync(join(templateDir, "gitignore"), "utf-8");
     const rules = text.split(/\r?\n/).filter((l) => l.startsWith("/.agents") || l.startsWith("!/.agents"));
     expect(rules).toEqual([
@@ -34,6 +34,7 @@ describe("project-template/.agents", () => {
       "!/.agents/SYSTEM/",
       "/.agents/SYSTEM/*",
       "!/.agents/SYSTEM/SUMMARY.md",
+      "!/.agents/SYSTEM/greeting.json",
       "!/.agents/roles/",
       "/.agents/roles/*",
       "!/.agents/roles/*.md",

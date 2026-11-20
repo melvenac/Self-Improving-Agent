@@ -561,6 +561,7 @@ export const SCAFFOLD_FILES: readonly ScaffoldFile[] = [
   { path: ".agents/TASKS/INBOX.md", from: ".agents/TASKS/INBOX.md", tracked: true, why: "the task list `state import` reads into the record; afterwards a rendered view of it" },
   { path: ".agents/TASKS/task.md", from: ".agents/TASKS/task.md", tracked: true, why: "the current objective `state import` reads; afterwards a rendered view" },
   { path: ".agents/SYSTEM/SUMMARY.md", from: ".agents/SYSTEM/SUMMARY.md", tracked: true, why: "the project summary; its marked region is rendered from the record" },
+  { path: ".agents/SYSTEM/greeting.json", from: ".agents/SYSTEM/greeting.json", tracked: true, why: "the /start greeting options a new project starts with (D-166, T-353); set a flag to false to turn one off" },
   { path: ".agents/SESSIONS/SESSION_TEMPLATE.md", from: ".agents/SESSIONS/SESSION_TEMPLATE.md", tracked: false, why: "the shape of each per-session log, and session logs are local" },
   { path: ".agents/AGENT.md", from: null, tracked: true, why: "declares this checkout the developer seat (G-064), so the next /start shows its handoff as this checkout's own" },
   { path: ".agents/roles/shared.md", from: ".agents/roles/shared.md", tracked: true, why: "a starting stub of the rules every seat follows; tracked so every clone has it (T-251)" },
