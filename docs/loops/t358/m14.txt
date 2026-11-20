@@ -1,0 +1,6 @@
+@@@ open-brain/src/server.ts
+<<<
+close_task refuses a task that has predicted and no observed, observed is refused
+===
+close_task accepts a task that has predicted and no observed, observed is refused
+>>>
